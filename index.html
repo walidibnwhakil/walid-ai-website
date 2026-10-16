@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090d16">
+  <meta name="description" content="Walid AI — নিজের AI তৈরির কাজ চলছে।">
+  <title>Walid AI — নিজের AI তৈরির পথে</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090d16;--panel:#101722;--panel2:#141d2a;--line:#242f3e;--text:#edf3f7;--muted:#8998a9;--mint:#88e7c5;--purple:#b3a2ff;--amber:#ffcf80}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:252px 1fr}.side{border-right:1px solid var(--line);padding:25px 16px;background:#0d121c;display:flex;flex-direction:column}.brand{padding:4px 12px 28px;font-weight:800;letter-spacing:.04em;font-size:1.1rem}.brand span{color:var(--mint)}.small-label{padding:0 12px;margin:5px 0 10px;font-size:.7rem;color:#637286;letter-spacing:.13em;font-weight:750}.nav{display:grid;gap:6px}.nav button{border:0;text-align:left;background:transparent;color:#a8b4c2;padding:11px 12px;border-radius:10px;cursor:default}.nav button.active{background:#18242b;color:var(--mint)}.nav .navicon{display:inline-block;width:27px;color:inherit}.side-note{margin-top:auto;border:1px solid #283644;background:#111a25;padding:15px;border-radius:14px}.side-note b{font-size:.82rem}.side-note p{margin:7px 0 0;color:var(--muted);font-size:.78rem}.owner{display:flex;align-items:center;gap:10px;padding:19px 8px 0;color:#bac6d0;font-size:.84rem}.avatar{width:31px;height:31px;display:grid;place-items:center;border-radius:50%;background:#1c3b37;color:var(--mint);font-weight:800}
+    .main{min-width:0;display:flex;flex-direction:column;min-height:100vh}.top{height:70px;padding:0 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;color:#c5ced8}.top .context{font-size:.9rem}.status{font-size:.76rem;color:var(--amber);border:1px solid #51432d;border-radius:99px;padding:6px 10px;background:#241f17}.content{width:min(900px,calc(100% - 44px));margin:0 auto;flex:1;display:flex;flex-direction:column;padding:55px 0 20px}.heading{text-align:center;margin:5px 0 42px}.mark{width:62px;height:62px;margin:0 auto 20px;display:grid;place-items:center;border:1px solid #315347;border-radius:20px;background:linear-gradient(145deg,#17362f,#142238);color:var(--mint);font-size:1.35rem;font-weight:850;box-shadow:0 0 65px #71ddba16}.heading h1{font-size:clamp(1.8rem,4vw,2.55rem);line-height:1.2;letter-spacing:-.04em;margin:0 0 12px}.heading p{color:var(--muted);max-width:590px;margin:0 auto}.notice{display:flex;gap:13px;align-items:flex-start;border:1px solid #4d412e;background:linear-gradient(100deg,#211d17,#171a1f);border-radius:13px;padding:15px 17px;margin:0 auto 28px;width:min(720px,100%)}.notice .dot{color:var(--amber);font-size:1.1rem}.notice strong{font-size:.87rem;color:#f4dfba}.notice p{margin:3px 0 0;font-size:.82rem;color:#a9a297}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;width:min(720px,100%);margin:0 auto}.feature{border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:16px}.feature .ico{font-size:1.15rem}.feature h2{font-size:.86rem;margin:9px 0 5px}.feature p{font-size:.77rem;color:var(--muted);margin:0}.composer-wrap{width:min(720px,100%);margin:37px auto 0}.composer{border:1px solid #303b4a;background:#121923;padding:12px;border-radius:17px;opacity:.7}.composer textarea{resize:none;display:block;width:100%;height:53px;border:0;outline:0;background:transparent;color:var(--text);padding:7px 8px}.composer textarea::placeholder{color:#788595}.composer-bottom{display:flex;align-items:center;justify-content:space-between;padding:4px 3px 0}.attach,.send{border:0;border-radius:9px;padding:8px 11px;background:#1d2632;color:#758394;font-size:.78rem;cursor:not-allowed}.send{background:#244138;color:#8aa99e;font-weight:700}.composer-hint{text-align:center;font-size:.72rem;color:#6f7c8a;margin:9px 0}.footer{text-align:center;color:#596777;font-size:.72rem;padding:0 18px 18px}.mobile-brand{display:none}
+    @media(max-width:760px){.app{grid-template-columns:1fr}.side{display:none}.top{height:60px;padding:0 18px}.mobile-brand{display:block;font-weight:800}.content{width:calc(100% - 30px);padding:37px 0 15px}.heading{margin-bottom:30px}.features{grid-template-columns:1fr}.feature{display:grid;grid-template-columns:34px 1fr;column-gap:10px;padding:13px}.feature .ico{grid-row:span 2}.feature h2{margin:0}.feature p{margin-top:3px}.composer-wrap{margin-top:26px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="side" aria-label="Walid AI menu">
+      <div class="brand">WALID<span> AI</span></div>
+      <div class="small-label">WORKSPACE</div>
+      <nav class="nav"><button class="active"><span class="navicon">◉</span>চ্যাট</button><button><span class="navicon">▤</span>জ্ঞানভাণ্ডার</button><button><span class="navicon">✳</span>শেখানো ও প্রশিক্ষণ</button></nav>
+      <div class="side-note"><b>নিজস্ব AI তৈরির কাজ চলছে</b><p>ধাপে ধাপে শেখা, তথ্য যোগ করা এবং নিজের মডেল তৈরি—এই হলো লক্ষ্য।</p></div>
+      <div class="owner"><span class="avatar">W</span><span>Walid AI Project</span></div>
+    </aside>
+    <main class="main">
+      <header class="top"><span class="mobile-brand">WALID AI</span><span class="context">চ্যাট</span><span class="status">● মডেল এখনো প্রস্তুত নয়</span></header>
+      <div class="content">
+        <section class="heading">
+          <div class="mark" aria-hidden="true">W</div>
+          <h1>Walid AI তৈরি হচ্ছে</h1>
+          <p>এই চ্যাটটি আপনার নিজস্ব AI-এর জন্য তৈরি করা হচ্ছে। এখনো কোনো AI মডেল যুক্ত নেই, তাই এটি প্রশ্নের উত্তর দিতে পারবে না।</p>
+        </section>
+        <section class="notice" aria-label="বর্তমান অবস্থা"><span class="dot">◷</span><div><strong>এখন এটি পরিচিতি ও নকশা</strong><p>অন্য কোনো AI ব্যবহার করা হচ্ছে না। নিজের মডেল প্রস্তুত হলে এই চ্যাটে যুক্ত করা যাবে।</p></div></section>
+        <section class="features" aria-label="পরিকল্পিত সুবিধা">
+          <article class="feature"><span class="ico">💬</span><h2>নিজের AI-এর সঙ্গে চ্যাট</h2><p>মডেল তৈরি হলে প্রশ্ন করুন, উত্তর দেখুন ও উন্নতির জন্য মতামত দিন।</p></article>
+          <article class="feature"><span class="ico">📚</span><h2>নথি ও বাংলা শেখানো</h2><p>নিরাপদে তথ্য যোগ করে, পরে সেগুলো AI-কে শেখানোর কাজে ব্যবহার করুন।</p></article>
+          <article class="feature"><span class="ico">🧠</span><h2>ধীরে ধীরে উন্নতি</h2><p>প্রশ্ন-উত্তর সাজান, ফল যাচাই করুন, তারপর মডেল উন্নত করুন।</p></article>
+        </section>
+        <section class="composer-wrap" aria-label="চ্যাট ইনপুটের নকশা">
+          <div class="composer"><textarea disabled placeholder="নিজস্ব AI প্রস্তুত হলে এখানে লিখতে পারবেন…"></textarea><div class="composer-bottom"><button class="attach" disabled>＋ নথি যোগ</button><button class="send" disabled>পাঠান&nbsp; ↑</button></div></div>
+          <p class="composer-hint">চ্যাট, নথি আপলোড ও প্রশিক্ষণ এখনো চালু হয়নি।</p>
+        </section>
+      </div>
+      <footer class="footer">Walid AI · নিজের AI তৈরির পথে · walid-ai.com</footer>
+    </main>
+  </div>
+</body>
+</html>

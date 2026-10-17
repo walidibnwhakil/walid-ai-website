@@ -8,7 +8,7 @@
   <title>Walid AI</title>
   <style>
     :root{color-scheme:light;--bg:#f4f7f4;--paper:#fff;--ink:#18231e;--muted:#748078;--line:#e1e8e2;--green:#167454;--green-dark:#105d43;--mint:#e8f4ec;--red:#a73535;--shadow:0 20px 60px #123d260d}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -34%,#deeee2 0,transparent 56%),var(--bg);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}.page{width:min(1020px,100%);min-height:100vh;margin:auto;padding:0 26px 22px;display:flex;flex-direction:column}.topbar{height:78px;display:flex;align-items:center;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:11px;font-size:1.08rem;font-weight:850;letter-spacing:.035em}.brand-name span{color:var(--green)}.logo{width:56px;height:44px;display:block;overflow:hidden}.logo img{display:block;width:100%;height:100%;object-fit:contain}.main{width:min(820px,100%);flex:1;margin:34px auto 0;display:flex;flex-direction:column}.access-panel{width:min(480px,100%);margin:auto;padding:25px;border:1px solid var(--line);border-radius:17px;background:var(--paper);box-shadow:var(--shadow)}.access-panel label{display:block;margin:0 0 8px;font-size:.95rem;font-weight:650}.access-row{display:flex;gap:9px}.access-row input{min-width:0;flex:1;height:46px;padding:0 13px;border:1px solid #d5dfd8;border-radius:10px;background:white;color:var(--ink);outline:none}.access-row input:focus{border-color:#78b393;box-shadow:0 0 0 3px #5b9b7818}.primary{height:46px;padding:0 16px;border:0;border-radius:10px;background:var(--green);color:white;font-weight:750;white-space:nowrap}.primary:hover{background:var(--green-dark)}.primary:disabled{opacity:.55;cursor:wait}.form-error{display:block;min-height:1.4em;margin-top:7px;color:var(--red);font-size:.8rem}.chat{flex:1;min-height:300px;max-height:calc(100vh - 250px);overflow:auto;padding:20px 22px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:var(--shadow)}.msg{max-width:84%;margin:13px 0;white-space:pre-wrap;overflow-wrap:anywhere}.msg.user{margin-left:auto;padding:11px 15px;border-radius:15px 15px 4px 15px;background:#e9f4ed;color:#1c3828}.msg.ai{padding:12px 15px;border:1px solid var(--line);border-radius:15px 15px 15px 4px;background:#fbfcfb}.msg.error{color:var(--red)}.source{display:block;margin-top:7px;color:var(--green);font-size:.75rem}.answer-table-wrap{max-width:100%;overflow-x:auto}.answer-table{width:100%;min-width:420px;border-collapse:collapse;font-size:.85rem}.answer-table th,.answer-table td{padding:8px 10px;border:1px solid var(--line);text-align:left;vertical-align:top}.answer-table th{background:var(--mint);color:#204a34}.feedback{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:10px}.feedback button{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:white;color:#52645a;font-size:.76rem}.feedback button:hover{border-color:#9dc3aa;color:var(--green)}.feedback textarea{flex-basis:100%;min-height:68px;padding:8px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);resize:vertical}.feedback-status{color:var(--green);font-size:.77rem}.composer{margin-top:13px;padding:10px;border:1px solid #dbe4dd;border-radius:16px;background:white;box-shadow:var(--shadow)}.composer textarea{display:block;width:100%;min-height:55px;max-height:160px;padding:7px 8px;border:0;outline:0;background:transparent;color:var(--ink);resize:vertical}.composer textarea::placeholder{color:#99a59d}.composer-bottom{display:flex;justify-content:flex-end;padding:3px 2px 0}.hidden{display:none!important}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -34%,#deeee2 0,transparent 56%),var(--bg);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}.page{width:min(1020px,100%);min-height:100vh;margin:auto;padding:0 26px 22px;display:flex;flex-direction:column}.topbar{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:11px;font-size:1.08rem;font-weight:850;letter-spacing:.035em}.brand-name span{color:var(--green)}.logo{width:56px;height:44px;display:block;overflow:hidden}.logo img{display:block;width:100%;height:100%;object-fit:contain}.main{width:min(820px,100%);flex:1;margin:34px auto 0;display:flex;flex-direction:column}.access-panel{width:min(480px,100%);margin:auto;padding:25px;border:1px solid var(--line);border-radius:17px;background:var(--paper);box-shadow:var(--shadow)}.access-panel h1{font-size:1.25rem;margin:0 0 4px}.access-panel p{color:var(--muted);margin:0 0 18px}.access-panel label{display:block;margin:0 0 8px;font-size:.95rem;font-weight:650}.access-row{display:flex;gap:9px}.access-row input{min-width:0;flex:1;height:46px;padding:0 13px;border:1px solid #d5dfd8;border-radius:10px;background:white;color:var(--ink);outline:none}.access-row input:focus{border-color:#78b393;box-shadow:0 0 0 3px #5b9b7818}.primary{height:46px;padding:0 16px;border:0;border-radius:10px;background:var(--green);color:white;font-weight:750;white-space:nowrap}.primary:hover{background:var(--green-dark)}.primary:disabled{opacity:.55;cursor:wait}.secondary{width:100%;margin-top:14px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--ink)}.google-area{display:grid;justify-content:center;min-height:42px}.setup-note{font-size:.82rem;color:var(--muted);text-align:center;margin-top:8px}.form-error{display:block;min-height:1.4em;margin-top:7px;color:var(--red);font-size:.8rem}.chat{flex:1;min-height:300px;max-height:calc(100vh - 250px);overflow:auto;padding:20px 22px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:var(--shadow)}.msg{max-width:84%;margin:13px 0;white-space:pre-wrap;overflow-wrap:anywhere}.msg.user{margin-left:auto;padding:11px 15px;border-radius:15px 15px 4px 15px;background:#e9f4ed;color:#1c3828}.msg.ai{padding:12px 15px;border:1px solid var(--line);border-radius:15px 15px 15px 4px;background:#fbfcfb}.msg.error{color:var(--red)}.source{display:block;margin-top:7px;color:var(--green);font-size:.75rem}.answer-table-wrap{max-width:100%;overflow-x:auto}.answer-table{width:100%;min-width:420px;border-collapse:collapse;font-size:.85rem}.answer-table th,.answer-table td{padding:8px 10px;border:1px solid var(--line);text-align:left;vertical-align:top}.answer-table th{background:var(--mint);color:#204a34}.feedback{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:10px}.feedback button{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:white;color:#52645a;font-size:.76rem}.feedback button:hover{border-color:#9dc3aa;color:var(--green)}.feedback textarea{flex-basis:100%;min-height:68px;padding:8px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);resize:vertical}.feedback-status{color:var(--green);font-size:.77rem}.composer{margin-top:13px;padding:10px;border:1px solid #dbe4dd;border-radius:16px;background:white;box-shadow:var(--shadow)}.composer textarea{display:block;width:100%;min-height:55px;max-height:160px;padding:7px 8px;border:0;outline:0;background:transparent;color:var(--ink);resize:vertical}.composer textarea::placeholder{color:#99a59d}.composer-bottom{display:flex;justify-content:flex-end;padding:3px 2px 0}.hidden{display:none!important}
     @media(max-width:650px){.page{padding:0 13px 15px}.topbar{height:66px}.logo{width:36px;height:36px}.main{margin-top:20px}.access-panel{padding:19px}.access-row{flex-direction:column}.access-row input,.primary{width:100%}.chat{min-height:300px;max-height:none;padding:13px}.msg{max-width:95%}}
   </style>
   <script src="backend-config.js"></script>
@@ -17,17 +17,25 @@
   <main class="page">
     <header class="topbar">
       <div class="brand"><span class="logo"><img src="kathgolap-logo.png" alt="কাঠগোলাপ — Walid AI লোগো"></span><span class="brand-name">WALID<span> AI</span></span></div>
+      <button id="logout" class="secondary hidden" type="button" style="width:auto;margin:0">বের হোন</button>
     </header>
     <section id="accessPanel" class="access-panel">
-      <form id="accessForm">
-        <label for="accessKey">ওয়াকিলের কাছ থেকে পাওয়া অ্যাক্সেস কোড লিখুন।</label>
-        <div class="access-row"><input id="accessKey" type="password" placeholder="অ্যাক্সেস কোড" required autocomplete="current-password"><button id="accessButton" class="primary" type="submit">চ্যাট শুরু করুন</button></div>
-        <span id="accessError" class="form-error" role="status"></span>
+      <h1>Walid AI-তে প্রবেশ</h1>
+      <p>নিজের Google অ্যাকাউন্টে প্রবেশ করুন। আপনার ব্যক্তিগত স্মৃতি শুধু আপনার অ্যাকাউন্টেই থাকবে।</p>
+      <div id="googleButton" class="google-area"></div>
+      <div id="googleSetupNote" class="setup-note">Google প্রবেশ এখনো সেটআপ করা হয়নি।</div>
+      <button id="showAdmin" class="secondary" type="button">ওয়াকিলের অ্যাডমিন প্রবেশ</button>
+      <form id="accessForm" class="hidden" style="margin-top:18px">
+        <label for="accessKey">ওয়াকিলের ব্যক্তিগত অ্যাক্সেস কোড</label>
+        <div class="access-row"><input id="accessKey" type="password" placeholder="অ্যাক্সেস কোড" autocomplete="current-password"><button id="accessButton" class="primary" type="submit">প্রবেশ করুন</button></div>
+        <button id="cancelAdmin" class="secondary" type="button">ফিরে যান</button>
       </form>
+      <span id="accessError" class="form-error" role="status"></span>
     </section>
     <section id="chat" class="chat hidden" aria-live="polite"></section>
     <form id="form" class="composer hidden"><textarea id="question" maxlength="2000" placeholder="এখানে লিখুন…" aria-label="প্রশ্ন লিখুন"></textarea><div class="composer-bottom"><button id="send" class="primary" type="submit">পাঠান ↑</button></div></form>
   </main>
+  <script src="https://accounts.google.com/gsi/client"></script>
   <script>
     const API = String(window.WALID_AI_API || "").trim().replace(/\/$/, "");
     const accessForm = document.getElementById("accessForm");
@@ -35,22 +43,32 @@
     const accessKeyInput = document.getElementById("accessKey");
     const accessButton = document.getElementById("accessButton");
     const accessError = document.getElementById("accessError");
+    const googleButton = document.getElementById("googleButton");
+    const googleSetupNote = document.getElementById("googleSetupNote");
+    const showAdmin = document.getElementById("showAdmin");
+    const cancelAdmin = document.getElementById("cancelAdmin");
+    const logout = document.getElementById("logout");
     const form = document.getElementById("form");
     const input = document.getElementById("question");
     const chat = document.getElementById("chat");
     const send = document.getElementById("send");
-    let ACCESS_KEY = "";
+    let ACCESS_TOKEN = "";
+    let IS_ADMIN = false;
 
-    async function authorize(key) {
+    async function authorize(token) {
       if (!API) throw new Error("Walid AI এখন চালু নেই। পরে আবার চেষ্টা করুন।");
-      const response = await fetch(`${API}/api/hello`, {headers:{Authorization:`Bearer ${key}`}});
+      const response = await fetch(`${API}/api/hello`, {headers:{Authorization:`Bearer ${token}`}});
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "অ্যাক্সেস কোডটি মিলল না।");
-      ACCESS_KEY = key;
-      sessionStorage.setItem("walidKey", key);
+      if (!response.ok) throw new Error(data.error || "প্রবেশ করা যায়নি।");
+      ACCESS_TOKEN = token;
+      IS_ADMIN = data.auth_role === "admin";
+      sessionStorage.setItem("walidToken", token);
       accessPanel.classList.add("hidden");
       chat.classList.remove("hidden");
       form.classList.remove("hidden");
+      logout.classList.remove("hidden");
+      chat.replaceChildren();
+      addMessage("ai", IS_ADMIN ? "ওয়াকিলের অ্যাডমিন হিসেবে প্রবেশ করেছেন।" : `প্রবেশ হয়েছে${data.email ? `: ${data.email}` : ""}। তোমার বলা নাম এই কম্পিউটারের backend-এ শুধু এই Google অ্যাকাউন্টের স্মৃতি হিসেবে রাখা হবে।`);
     }
 
     accessForm.addEventListener("submit", async (event) => {
@@ -60,8 +78,23 @@
       accessError.textContent = "";
       try { await authorize(accessKeyInput.value); }
       catch (error) { accessError.textContent = error.message || "আবার চেষ্টা করুন।"; }
-      finally { accessButton.disabled = false; accessButton.textContent = "চ্যাট শুরু করুন"; }
+      finally { accessButton.disabled = false; accessButton.textContent = "প্রবেশ করুন"; }
     });
+
+    showAdmin.addEventListener("click",()=>{accessForm.classList.remove("hidden");showAdmin.classList.add("hidden");accessError.textContent="";});
+    cancelAdmin.addEventListener("click",()=>{accessForm.classList.add("hidden");showAdmin.classList.remove("hidden");accessError.textContent="";});
+    logout.addEventListener("click",()=>{sessionStorage.removeItem("walidToken");ACCESS_TOKEN="";IS_ADMIN=false;accessPanel.classList.remove("hidden");accessForm.classList.add("hidden");showAdmin.classList.remove("hidden");chat.classList.add("hidden");chat.replaceChildren();form.classList.add("hidden");logout.classList.add("hidden");accessKeyInput.value="";accessError.textContent="";});
+
+    function handleGoogleCredential(response){
+      accessError.textContent="";
+      authorize(response.credential).catch(error=>{accessError.textContent=error.message||"Google অ্যাকাউন্ট দিয়ে প্রবেশ করা যায়নি।";});
+    }
+    const googleClientId=String(window.WALID_AI_GOOGLE_CLIENT_ID||"").trim();
+    if(googleClientId&&window.google?.accounts?.id){
+      google.accounts.id.initialize({client_id:googleClientId,callback:handleGoogleCredential,auto_select:false});
+      google.accounts.id.renderButton(googleButton,{type:"standard",theme:"outline",size:"large",text:"continue_with",shape:"rectangular",width:320,locale:"bn"});
+      googleSetupNote.textContent="প্রতিটি Google অ্যাকাউন্টের ব্যক্তিগত স্মৃতি আলাদা থাকবে।";
+    }else if(googleClientId){googleSetupNote.textContent="Google sign-in লোড হয়নি। পেজটি আবার খুলুন।";}
 
     function addMessage(kind, text, source = "") {
       const bubble = document.createElement("div");
@@ -90,13 +123,14 @@
     async function saveFeedback(question,answer,box,button){
       button.disabled=true;
       try{
-        const response=await fetch(`${API}/api/feedback`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${ACCESS_KEY}`},body:JSON.stringify({question,answer})});
+        const response=await fetch(`${API}/api/feedback`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${ACCESS_TOKEN}`},body:JSON.stringify({question,answer})});
         const data=await response.json();if(!response.ok)throw new Error(data.error||"সংশোধন সেভ করা যায়নি।");
         box.replaceChildren();const status=document.createElement("span");status.className="feedback-status";status.textContent=data.message;box.appendChild(status);
       }catch(error){button.disabled=false;const status=document.createElement("span");status.className="feedback-status";status.textContent=error.message;box.appendChild(status);}
     }
 
     function addFeedback(bubble,question,answer){
+      if(!IS_ADMIN)return;
       const box=document.createElement("div");box.className="feedback";
       const correct=document.createElement("button");correct.type="button";correct.textContent="উত্তর ঠিক";correct.addEventListener("click",()=>saveFeedback(question,answer,box,correct));
       const edit=document.createElement("button");edit.type="button";edit.textContent="সংশোধন দিন";
@@ -118,7 +152,7 @@
       event.preventDefault();const question=input.value.trim();if(!question||send.disabled)return;
       chat.classList.remove("hidden");const userBubble=addMessage("user",question);input.value="";send.disabled=true;send.textContent="খুঁজছে…";
       try{
-        const response=await fetch(`${API}/api/chat`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${ACCESS_KEY}`},body:JSON.stringify({question})});
+        const response=await fetch(`${API}/api/chat`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${ACCESS_TOKEN}`},body:JSON.stringify({question})});
         const data=await response.json();if(!response.ok)throw new Error(data.error||"উত্তর পাওয়া যায়নি।");
         const answer=addMessage("ai",data.answer,sourceLabel(data.answering_mode));addFeedback(answer,question,data.answer);
         if(data.model_answer){const draft=addMessage("ai",data.model_answer,data.model_note||"নিজস্ব মডেলের পরীক্ষামূলক উত্তর");addFeedback(draft,question,data.model_answer);}
@@ -127,8 +161,8 @@
     });
 
     input.addEventListener("keydown",(event)=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();form.requestSubmit();}});
-    const savedKey=sessionStorage.getItem("walidKey");
-    if(savedKey)authorize(savedKey).catch(()=>{sessionStorage.removeItem("walidKey");accessPanel.classList.remove("hidden");});
+    const savedToken=sessionStorage.getItem("walidToken");
+    if(savedToken)authorize(savedToken).catch(()=>{sessionStorage.removeItem("walidToken");accessPanel.classList.remove("hidden");});
   </script>
 </body>
 </html>

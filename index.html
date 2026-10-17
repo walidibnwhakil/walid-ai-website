@@ -3,46 +3,132 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#090d16">
-  <meta name="description" content="Walid AI — নিজের AI তৈরির কাজ চলছে।">
-  <title>Walid AI — নিজের AI তৈরির পথে</title>
+  <meta name="theme-color" content="#f4f7f4">
+  <meta name="description" content="Walid AI">
+  <title>Walid AI</title>
   <style>
-    :root{color-scheme:dark;--bg:#090d16;--panel:#101722;--panel2:#141d2a;--line:#242f3e;--text:#edf3f7;--muted:#8998a9;--mint:#88e7c5;--purple:#b3a2ff;--amber:#ffcf80}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:252px 1fr}.side{border-right:1px solid var(--line);padding:25px 16px;background:#0d121c;display:flex;flex-direction:column}.brand{padding:4px 12px 28px;font-weight:800;letter-spacing:.04em;font-size:1.1rem}.brand span{color:var(--mint)}.small-label{padding:0 12px;margin:5px 0 10px;font-size:.7rem;color:#637286;letter-spacing:.13em;font-weight:750}.nav{display:grid;gap:6px}.nav button{border:0;text-align:left;background:transparent;color:#a8b4c2;padding:11px 12px;border-radius:10px;cursor:default}.nav button.active{background:#18242b;color:var(--mint)}.nav .navicon{display:inline-block;width:27px;color:inherit}.side-note{margin-top:auto;border:1px solid #283644;background:#111a25;padding:15px;border-radius:14px}.side-note b{font-size:.82rem}.side-note p{margin:7px 0 0;color:var(--muted);font-size:.78rem}.owner{display:flex;align-items:center;gap:10px;padding:19px 8px 0;color:#bac6d0;font-size:.84rem}.avatar{width:31px;height:31px;display:grid;place-items:center;border-radius:50%;background:#1c3b37;color:var(--mint);font-weight:800}
-    .main{min-width:0;display:flex;flex-direction:column;min-height:100vh}.top{height:70px;padding:0 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;color:#c5ced8}.top .context{font-size:.9rem}.status{font-size:.76rem;color:var(--amber);border:1px solid #51432d;border-radius:99px;padding:6px 10px;background:#241f17}.content{width:min(900px,calc(100% - 44px));margin:0 auto;flex:1;display:flex;flex-direction:column;padding:55px 0 20px}.heading{text-align:center;margin:5px 0 42px}.mark{width:62px;height:62px;margin:0 auto 20px;display:grid;place-items:center;border:1px solid #315347;border-radius:20px;background:linear-gradient(145deg,#17362f,#142238);color:var(--mint);font-size:1.35rem;font-weight:850;box-shadow:0 0 65px #71ddba16}.heading h1{font-size:clamp(1.8rem,4vw,2.55rem);line-height:1.2;letter-spacing:-.04em;margin:0 0 12px}.heading p{color:var(--muted);max-width:590px;margin:0 auto}.notice{display:flex;gap:13px;align-items:flex-start;border:1px solid #4d412e;background:linear-gradient(100deg,#211d17,#171a1f);border-radius:13px;padding:15px 17px;margin:0 auto 28px;width:min(720px,100%)}.notice .dot{color:var(--amber);font-size:1.1rem}.notice strong{font-size:.87rem;color:#f4dfba}.notice p{margin:3px 0 0;font-size:.82rem;color:#a9a297}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;width:min(720px,100%);margin:0 auto}.feature{border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:16px}.feature .ico{font-size:1.15rem}.feature h2{font-size:.86rem;margin:9px 0 5px}.feature p{font-size:.77rem;color:var(--muted);margin:0}.composer-wrap{width:min(720px,100%);margin:37px auto 0}.composer{border:1px solid #303b4a;background:#121923;padding:12px;border-radius:17px;opacity:.7}.composer textarea{resize:none;display:block;width:100%;height:53px;border:0;outline:0;background:transparent;color:var(--text);padding:7px 8px}.composer textarea::placeholder{color:#788595}.composer-bottom{display:flex;align-items:center;justify-content:space-between;padding:4px 3px 0}.attach,.send{border:0;border-radius:9px;padding:8px 11px;background:#1d2632;color:#758394;font-size:.78rem;cursor:not-allowed}.send{background:#244138;color:#8aa99e;font-weight:700}.composer-hint{text-align:center;font-size:.72rem;color:#6f7c8a;margin:9px 0}.footer{text-align:center;color:#596777;font-size:.72rem;padding:0 18px 18px}.mobile-brand{display:none}
-    @media(max-width:760px){.app{grid-template-columns:1fr}.side{display:none}.top{height:60px;padding:0 18px}.mobile-brand{display:block;font-weight:800}.content{width:calc(100% - 30px);padding:37px 0 15px}.heading{margin-bottom:30px}.features{grid-template-columns:1fr}.feature{display:grid;grid-template-columns:34px 1fr;column-gap:10px;padding:13px}.feature .ico{grid-row:span 2}.feature h2{margin:0}.feature p{margin-top:3px}.composer-wrap{margin-top:26px}}
+    :root{color-scheme:light;--bg:#f4f7f4;--paper:#fff;--ink:#18231e;--muted:#748078;--line:#e1e8e2;--green:#167454;--green-dark:#105d43;--mint:#e8f4ec;--red:#a73535;--shadow:0 20px 60px #123d260d}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -34%,#deeee2 0,transparent 56%),var(--bg);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}.page{width:min(1020px,100%);min-height:100vh;margin:auto;padding:0 26px 22px;display:flex;flex-direction:column}.topbar{height:78px;display:flex;align-items:center;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:11px;font-size:1.08rem;font-weight:850;letter-spacing:.035em}.brand-name span{color:var(--green)}.logo{width:56px;height:44px;display:block;overflow:hidden}.logo img{display:block;width:100%;height:100%;object-fit:contain}.main{width:min(820px,100%);flex:1;margin:34px auto 0;display:flex;flex-direction:column}.access-panel{width:min(480px,100%);margin:auto;padding:25px;border:1px solid var(--line);border-radius:17px;background:var(--paper);box-shadow:var(--shadow)}.access-panel label{display:block;margin:0 0 8px;font-size:.95rem;font-weight:650}.access-row{display:flex;gap:9px}.access-row input{min-width:0;flex:1;height:46px;padding:0 13px;border:1px solid #d5dfd8;border-radius:10px;background:white;color:var(--ink);outline:none}.access-row input:focus{border-color:#78b393;box-shadow:0 0 0 3px #5b9b7818}.primary{height:46px;padding:0 16px;border:0;border-radius:10px;background:var(--green);color:white;font-weight:750;white-space:nowrap}.primary:hover{background:var(--green-dark)}.primary:disabled{opacity:.55;cursor:wait}.form-error{display:block;min-height:1.4em;margin-top:7px;color:var(--red);font-size:.8rem}.chat{flex:1;min-height:300px;max-height:calc(100vh - 250px);overflow:auto;padding:20px 22px;border:1px solid var(--line);border-radius:18px;background:var(--paper);box-shadow:var(--shadow)}.msg{max-width:84%;margin:13px 0;white-space:pre-wrap;overflow-wrap:anywhere}.msg.user{margin-left:auto;padding:11px 15px;border-radius:15px 15px 4px 15px;background:#e9f4ed;color:#1c3828}.msg.ai{padding:12px 15px;border:1px solid var(--line);border-radius:15px 15px 15px 4px;background:#fbfcfb}.msg.error{color:var(--red)}.source{display:block;margin-top:7px;color:var(--green);font-size:.75rem}.answer-table-wrap{max-width:100%;overflow-x:auto}.answer-table{width:100%;min-width:420px;border-collapse:collapse;font-size:.85rem}.answer-table th,.answer-table td{padding:8px 10px;border:1px solid var(--line);text-align:left;vertical-align:top}.answer-table th{background:var(--mint);color:#204a34}.feedback{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:10px}.feedback button{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:white;color:#52645a;font-size:.76rem}.feedback button:hover{border-color:#9dc3aa;color:var(--green)}.feedback textarea{flex-basis:100%;min-height:68px;padding:8px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);resize:vertical}.feedback-status{color:var(--green);font-size:.77rem}.composer{margin-top:13px;padding:10px;border:1px solid #dbe4dd;border-radius:16px;background:white;box-shadow:var(--shadow)}.composer textarea{display:block;width:100%;min-height:55px;max-height:160px;padding:7px 8px;border:0;outline:0;background:transparent;color:var(--ink);resize:vertical}.composer textarea::placeholder{color:#99a59d}.composer-bottom{display:flex;justify-content:flex-end;padding:3px 2px 0}.hidden{display:none!important}
+    @media(max-width:650px){.page{padding:0 13px 15px}.topbar{height:66px}.logo{width:36px;height:36px}.main{margin-top:20px}.access-panel{padding:19px}.access-row{flex-direction:column}.access-row input,.primary{width:100%}.chat{min-height:300px;max-height:none;padding:13px}.msg{max-width:95%}}
   </style>
+  <script src="backend-config.js"></script>
 </head>
 <body>
-  <div class="app">
-    <aside class="side" aria-label="Walid AI menu">
-      <div class="brand">WALID<span> AI</span></div>
-      <div class="small-label">WORKSPACE</div>
-      <nav class="nav"><button class="active"><span class="navicon">◉</span>চ্যাট</button><button><span class="navicon">▤</span>জ্ঞানভাণ্ডার</button><button><span class="navicon">✳</span>শেখানো ও প্রশিক্ষণ</button></nav>
-      <div class="side-note"><b>নিজস্ব AI তৈরির কাজ চলছে</b><p>ধাপে ধাপে শেখা, তথ্য যোগ করা এবং নিজের মডেল তৈরি—এই হলো লক্ষ্য।</p></div>
-      <div class="owner"><span class="avatar">W</span><span>Walid AI Project</span></div>
-    </aside>
-    <main class="main">
-      <header class="top"><span class="mobile-brand">WALID AI</span><span class="context">চ্যাট</span><span class="status">● মডেল এখনো প্রস্তুত নয়</span></header>
-      <div class="content">
-        <section class="heading">
-          <div class="mark" aria-hidden="true">W</div>
-          <h1>Walid AI তৈরি হচ্ছে</h1>
-          <p>এই চ্যাটটি আপনার নিজস্ব AI-এর জন্য তৈরি করা হচ্ছে। এখনো কোনো AI মডেল যুক্ত নেই, তাই এটি প্রশ্নের উত্তর দিতে পারবে না।</p>
-        </section>
-        <section class="notice" aria-label="বর্তমান অবস্থা"><span class="dot">◷</span><div><strong>এখন এটি পরিচিতি ও নকশা</strong><p>অন্য কোনো AI ব্যবহার করা হচ্ছে না। নিজের মডেল প্রস্তুত হলে এই চ্যাটে যুক্ত করা যাবে।</p></div></section>
-        <section class="features" aria-label="পরিকল্পিত সুবিধা">
-          <article class="feature"><span class="ico">💬</span><h2>নিজের AI-এর সঙ্গে চ্যাট</h2><p>মডেল তৈরি হলে প্রশ্ন করুন, উত্তর দেখুন ও উন্নতির জন্য মতামত দিন।</p></article>
-          <article class="feature"><span class="ico">📚</span><h2>নথি ও বাংলা শেখানো</h2><p>নিরাপদে তথ্য যোগ করে, পরে সেগুলো AI-কে শেখানোর কাজে ব্যবহার করুন।</p></article>
-          <article class="feature"><span class="ico">🧠</span><h2>ধীরে ধীরে উন্নতি</h2><p>প্রশ্ন-উত্তর সাজান, ফল যাচাই করুন, তারপর মডেল উন্নত করুন।</p></article>
-        </section>
-        <section class="composer-wrap" aria-label="চ্যাট ইনপুটের নকশা">
-          <div class="composer"><textarea disabled placeholder="নিজস্ব AI প্রস্তুত হলে এখানে লিখতে পারবেন…"></textarea><div class="composer-bottom"><button class="attach" disabled>＋ নথি যোগ</button><button class="send" disabled>পাঠান&nbsp; ↑</button></div></div>
-          <p class="composer-hint">চ্যাট, নথি আপলোড ও প্রশিক্ষণ এখনো চালু হয়নি।</p>
-        </section>
-      </div>
-      <footer class="footer">Walid AI · নিজের AI তৈরির পথে · walid-ai.com</footer>
-    </main>
-  </div>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><span class="logo"><img src="kathgolap-logo.png" alt="কাঠগোলাপ — Walid AI লোগো"></span><span class="brand-name">WALID<span> AI</span></span></div>
+    </header>
+    <section id="accessPanel" class="access-panel">
+      <form id="accessForm">
+        <label for="accessKey">ওয়াকিলের কাছ থেকে পাওয়া অ্যাক্সেস কোড লিখুন।</label>
+        <div class="access-row"><input id="accessKey" type="password" placeholder="অ্যাক্সেস কোড" required autocomplete="current-password"><button id="accessButton" class="primary" type="submit">চ্যাট শুরু করুন</button></div>
+        <span id="accessError" class="form-error" role="status"></span>
+      </form>
+    </section>
+    <section id="chat" class="chat hidden" aria-live="polite"></section>
+    <form id="form" class="composer hidden"><textarea id="question" maxlength="2000" placeholder="এখানে লিখুন…" aria-label="প্রশ্ন লিখুন"></textarea><div class="composer-bottom"><button id="send" class="primary" type="submit">পাঠান ↑</button></div></form>
+  </main>
+  <script>
+    const API = String(window.WALID_AI_API || "").trim().replace(/\/$/, "");
+    const accessForm = document.getElementById("accessForm");
+    const accessPanel = document.getElementById("accessPanel");
+    const accessKeyInput = document.getElementById("accessKey");
+    const accessButton = document.getElementById("accessButton");
+    const accessError = document.getElementById("accessError");
+    const form = document.getElementById("form");
+    const input = document.getElementById("question");
+    const chat = document.getElementById("chat");
+    const send = document.getElementById("send");
+    let ACCESS_KEY = "";
+
+    async function authorize(key) {
+      if (!API) throw new Error("Walid AI এখন চালু নেই। পরে আবার চেষ্টা করুন।");
+      const response = await fetch(`${API}/api/hello`, {headers:{Authorization:`Bearer ${key}`}});
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "অ্যাক্সেস কোডটি মিলল না।");
+      ACCESS_KEY = key;
+      sessionStorage.setItem("walidKey", key);
+      accessPanel.classList.add("hidden");
+      chat.classList.remove("hidden");
+      form.classList.remove("hidden");
+    }
+
+    accessForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      accessButton.disabled = true;
+      accessButton.textContent = "একটু অপেক্ষা করুন…";
+      accessError.textContent = "";
+      try { await authorize(accessKeyInput.value); }
+      catch (error) { accessError.textContent = error.message || "আবার চেষ্টা করুন।"; }
+      finally { accessButton.disabled = false; accessButton.textContent = "চ্যাট শুরু করুন"; }
+    });
+
+    function addMessage(kind, text, source = "") {
+      const bubble = document.createElement("div");
+      bubble.className = `msg ${kind}`;
+      const table = kind === "ai" ? parseMarkdownTable(text) : null;
+      if (table) {
+        const wrapper=document.createElement("div");wrapper.className="answer-table-wrap";
+        const element=document.createElement("table");element.className="answer-table";
+        const head=document.createElement("thead");const row=document.createElement("tr");
+        table.headers.forEach((value)=>{const cell=document.createElement("th");cell.textContent=value;row.appendChild(cell);});
+        head.appendChild(row);element.appendChild(head);const body=document.createElement("tbody");
+        table.rows.forEach((values)=>{const tr=document.createElement("tr");values.forEach((value)=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});body.appendChild(tr);});
+        element.appendChild(body);wrapper.appendChild(element);bubble.appendChild(wrapper);
+      } else { const body=document.createElement("span");body.textContent=text;bubble.appendChild(body); }
+      if(source){const label=document.createElement("span");label.className="source";label.textContent=source;bubble.appendChild(label);}
+      chat.appendChild(bubble);chat.scrollTop=chat.scrollHeight;return bubble;
+    }
+
+    function parseMarkdownTable(text){
+      const lines=String(text).trim().split(/\r?\n/).filter((line)=>line.includes("|"));
+      if(lines.length<3||!/^\s*\|?\s*:?-{3,}/.test(lines[1]))return null;
+      const parseRow=(line)=>line.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map((cell)=>cell.trim().replace(/\\\|/g,"|"));
+      return {headers:parseRow(lines[0]),rows:lines.slice(2).map(parseRow)};
+    }
+
+    async function saveFeedback(question,answer,box,button){
+      button.disabled=true;
+      try{
+        const response=await fetch(`${API}/api/feedback`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${ACCESS_KEY}`},body:JSON.stringify({question,answer})});
+        const data=await response.json();if(!response.ok)throw new Error(data.error||"সংশোধন সেভ করা যায়নি।");
+        box.replaceChildren();const status=document.createElement("span");status.className="feedback-status";status.textContent=data.message;box.appendChild(status);
+      }catch(error){button.disabled=false;const status=document.createElement("span");status.className="feedback-status";status.textContent=error.message;box.appendChild(status);}
+    }
+
+    function addFeedback(bubble,question,answer){
+      const box=document.createElement("div");box.className="feedback";
+      const correct=document.createElement("button");correct.type="button";correct.textContent="উত্তর ঠিক";correct.addEventListener("click",()=>saveFeedback(question,answer,box,correct));
+      const edit=document.createElement("button");edit.type="button";edit.textContent="সংশোধন দিন";
+      edit.addEventListener("click",()=>{if(box.querySelector("textarea"))return;const field=document.createElement("textarea");field.placeholder="সঠিক উত্তরটি লিখুন…";const save=document.createElement("button");save.type="button";save.textContent="সেভ করুন";save.addEventListener("click",()=>{if(field.value.trim())saveFeedback(question,field.value.trim(),box,save);});box.append(field,save);field.focus();});
+      box.append(correct,edit);bubble.appendChild(box);
+    }
+
+    function sourceLabel(mode){
+      if(mode==="dataset_lookup")return "সংরক্ষিত প্রশ্ন–উত্তর";
+      if(mode==="pdf_passages")return "PDF থেকে";
+      if(mode==="pdf_table")return "PDF-এর টেবিল থেকে";
+      if(mode==="not_found")return "তথ্যভাণ্ডারে মেলেনি";
+      if(mode==="setup_required"||mode==="ocr_setup_required")return "সেটআপ প্রয়োজন";
+      if(mode==="ocr_no_text_found")return "PDF-এ পড়ার মতো লেখা পাওয়া যায়নি";
+      return "";
+    }
+
+    form.addEventListener("submit",async(event)=>{
+      event.preventDefault();const question=input.value.trim();if(!question||send.disabled)return;
+      chat.classList.remove("hidden");const userBubble=addMessage("user",question);input.value="";send.disabled=true;send.textContent="খুঁজছে…";
+      try{
+        const response=await fetch(`${API}/api/chat`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${ACCESS_KEY}`},body:JSON.stringify({question})});
+        const data=await response.json();if(!response.ok)throw new Error(data.error||"উত্তর পাওয়া যায়নি।");
+        const answer=addMessage("ai",data.answer,sourceLabel(data.answering_mode));addFeedback(answer,question,data.answer);
+        if(data.model_answer){const draft=addMessage("ai",data.model_answer,data.model_note||"নিজস্ব মডেলের পরীক্ষামূলক উত্তর");addFeedback(draft,question,data.model_answer);}
+      }catch(error){addMessage("error",`উত্তর পাওয়া যায়নি। ${error.message||"আবার চেষ্টা করুন।"}`);}
+      finally{send.disabled=false;send.textContent="পাঠান ↑";input.focus();}
+    });
+
+    input.addEventListener("keydown",(event)=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();form.requestSubmit();}});
+    const savedKey=sessionStorage.getItem("walidKey");
+    if(savedKey)authorize(savedKey).catch(()=>{sessionStorage.removeItem("walidKey");accessPanel.classList.remove("hidden");});
+  </script>
 </body>
 </html>

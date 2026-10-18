@@ -662,6 +662,102 @@
     .admin-form .access-row { flex-direction: column; }
     .admin-form .primary { width: 100%; }
 
+    .admin-celebration {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 22px;
+      background: rgba(255, 255, 255, .78);
+      backdrop-filter: blur(5px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .35s ease, visibility .35s ease;
+    }
+    .admin-celebration.show { opacity: 1; visibility: visible; }
+    .admin-welcome-card {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 620px);
+      padding: 46px 34px 40px;
+      border: 1px solid #eee6c9;
+      border-radius: 26px;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 24px 80px rgba(35, 29, 8, .15);
+      text-align: center;
+      transform: translateY(14px) scale(.97);
+      transition: transform .45s cubic-bezier(.2,.8,.2,1);
+    }
+    .admin-celebration.show .admin-welcome-card { transform: translateY(0) scale(1); }
+    .admin-welcome-card h2 {
+      margin: 0;
+      color: #151515;
+      font-family: "Times New Roman", serif;
+      font-size: clamp(2rem, 6vw, 3.35rem);
+      font-weight: 700;
+      letter-spacing: -.035em;
+    }
+    .admin-welcome-card p {
+      margin: 12px 0 0;
+      color: #5c4b1c;
+      font-family: "Times New Roman", serif;
+      font-size: clamp(1.35rem, 4vw, 2rem);
+      font-weight: 600;
+    }
+    .admin-welcome-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #555;
+      font-size: 1.5rem;
+    }
+    .admin-welcome-close:hover { background: #f5f3eb; }
+    .firework {
+      position: absolute;
+      z-index: 1;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      opacity: 0;
+      animation: firework-burst 1.8s ease-out infinite;
+      pointer-events: none;
+    }
+    .firework.one {
+      top: 28%; left: 20%;
+      background: #e6b92e;
+      box-shadow: 0 -47px #e6b92e, 33px -33px #e56b58, 47px 0 #e6b92e,
+        33px 33px #3a9878, 0 47px #e6b92e, -33px 33px #e56b58,
+        -47px 0 #3a9878, -33px -33px #e6b92e;
+    }
+    .firework.two {
+      top: 31%; right: 20%;
+      background: #3a9878;
+      box-shadow: 0 -42px #3a9878, 30px -30px #e6b92e, 42px 0 #e56b58,
+        30px 30px #e6b92e, 0 42px #3a9878, -30px 30px #e56b58,
+        -42px 0 #e6b92e, -30px -30px #3a9878;
+      animation-delay: .6s;
+    }
+    .firework.three {
+      top: 70%; left: 28%;
+      background: #e56b58;
+      box-shadow: 0 -36px #e6b92e, 25px -25px #3a9878, 36px 0 #e6b92e,
+        25px 25px #e56b58, 0 36px #3a9878, -25px 25px #e6b92e,
+        -36px 0 #e56b58, -25px -25px #3a9878;
+      animation-delay: 1.1s;
+    }
+    @keyframes firework-burst {
+      0% { transform: scale(.15); opacity: 0; }
+      18% { opacity: 1; }
+      75%, 100% { transform: scale(1.35); opacity: 0; }
+    }
+
     @media (max-width: 650px) {
       body:before { left:50%; width:min(92vw,520px); opacity:.055; }
       .sidebar { display:none; }
@@ -752,6 +848,17 @@
     </section>
   </main>
 
+  <div id="adminCelebration" class="admin-celebration" aria-hidden="true">
+    <span class="firework one" aria-hidden="true"></span>
+    <span class="firework two" aria-hidden="true"></span>
+    <span class="firework three" aria-hidden="true"></span>
+    <section class="admin-welcome-card" role="status" aria-live="polite">
+      <button id="closeAdminCelebration" class="admin-welcome-close" type="button" aria-label="Close">×</button>
+      <h2>Welcome Boss,</h2>
+      <p>Whakil Ahamed Shakil</p>
+    </section>
+  </div>
+
   <div id="loginModal" class="modal hidden" role="dialog"
     aria-modal="true" aria-labelledby="loginTitle">
     <section class="login-dialog">
@@ -834,6 +941,8 @@
     const profileAvatar = document.getElementById("profileAvatar");
     const profileCopy = document.getElementById("profileCopy");
     const historyList = document.getElementById("historyList");
+    const adminCelebration = document.getElementById("adminCelebration");
+    let adminCelebrationTimer = null;
 
     let firestoreDB = null;
     let historyOwner = "";
@@ -856,16 +965,32 @@
     function setProfile(name, admin = false) {
       const cleanName = String(name || "Guest").trim() || "Guest";
       profileAvatar.textContent = admin ? "♛" : cleanName.charAt(0).toLocaleUpperCase();
-      profileAvatar.setAttribute("aria-label", admin ? "অ্যাডমিন" : cleanName + "-এর প্রোফাইল");
+      profileAvatar.setAttribute("aria-label", admin ? "Boss" : cleanName + "-এর প্রোফাইল");
       profileCopy.replaceChildren();
-      profileCopy.append(document.createTextNode(admin ? "Admin" : cleanName));
+      profileCopy.append(document.createTextNode(admin ? "Boss" : cleanName));
       const note = document.createElement("small");
-      note.textContent = admin ? "Walid AI Admin" : historyOwner ? "ব্যক্তিগত অ্যাকাউন্ট" : "এই ব্রাউজারে সংরক্ষিত";
+      note.textContent = admin ? "Whakil Ahamed Shakil" : historyOwner ? "ব্যক্তিগত অ্যাকাউন্ট" : "এই ব্রাউজারে সংরক্ষিত";
       profileCopy.appendChild(note);
       const signedIn = Boolean(ACCESS_TOKEN);
       signedInProfile.classList.toggle("hidden", !signedIn);
       sidebarLogin.classList.toggle("hidden", signedIn);
     }
+
+    function showAdminCelebration() {
+      if (!IS_ADMIN || !adminCelebration) return;
+      window.clearTimeout(adminCelebrationTimer);
+      adminCelebration.classList.add("show");
+      adminCelebration.setAttribute("aria-hidden", "false");
+      adminCelebrationTimer = window.setTimeout(hideAdminCelebration, 6200);
+    }
+
+    function hideAdminCelebration() {
+      window.clearTimeout(adminCelebrationTimer);
+      adminCelebration.classList.remove("show");
+      adminCelebration.setAttribute("aria-hidden", "true");
+    }
+
+    document.getElementById("closeAdminCelebration").addEventListener("click", hideAdminCelebration);
 
     function drawHistory(records) {
       historyList.replaceChildren();
@@ -991,7 +1116,7 @@
       setProfile(firebaseAuth?.currentUser?.displayName || email || "User", IS_ADMIN);
     }
 
-    async function authorize(token) {
+    async function authorize(token, options = {}) {
       if (!API) {
         throw new Error("Walid AI এখন চালু নেই। পরে আবার চেষ্টা করুন।");
       }
@@ -1012,10 +1137,10 @@
 
       updateAccountUI(data.email || "");
 
-      if (IS_ADMIN) addMessage("ai", "🎉 👑 স্বাগতম, Admin! Walid AI-এর বিশেষ অ্যাডমিন অভিজ্ঞতায় আপনাকে স্বাগতম।");
+      if (IS_ADMIN && options.celebrate) showAdminCelebration();
     }
 
-    async function useFirebaseUser(user) {
+    async function useFirebaseUser(user, options = {}) {
       if (
         !user ||
         user.isAnonymous ||
@@ -1035,7 +1160,7 @@
       currentConversationId = newConversationId();
 
       try {
-        await authorize(await user.getIdToken());
+        await authorize(await user.getIdToken(), options);
         setProfile(user.displayName || user.email, IS_ADMIN);
         drawHistory(await loadAccountRecords(false));
         authorizedUid = user.uid;
@@ -1055,9 +1180,12 @@
         firestoreDB = firebase.firestore();
         emailButton.disabled = false;
 
+        let initialAuthStateHandled = false;
         firebaseAuth.onAuthStateChanged((user) => {
+          const isFreshLogin = initialAuthStateHandled;
+          initialAuthStateHandled = true;
           if (user && !user.isAnonymous) {
-            useFirebaseUser(user);
+            useFirebaseUser(user, { celebrate: isFreshLogin });
           }
         });
 
@@ -1231,7 +1359,7 @@
       accessButton.textContent = "অপেক্ষা করুন…";
 
       try {
-        await authorize(accessKeyInput.value);
+        await authorize(accessKeyInput.value, { celebrate: true });
         accessKeyInput.value = "";
       } catch (error) {
         loginStatus.textContent =

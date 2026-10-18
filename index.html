@@ -11,23 +11,23 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f8f5;
+      --bg: #ffffff;
       --paper: #ffffff;
-      --ink: #17231d;
-      --muted: #68766e;
-      --line: #e0e8e1;
-      --green: #176b4c;
-      --green-dark: #10583e;
-      --mint: #e8f3eb;
+      --ink: #0d0d0d;
+      --muted: #6b6b6b;
+      --line: #e5e5e5;
+      --green: #111111;
+      --green-dark: #000000;
+      --mint: #f7f7f7;
       --red: #a73535;
       --shadow: 0 18px 55px #183b2510;
       --field: #ffffff;
-      --soft: #f7fbf7;
-      --user-bubble: #e9f4ed;
-      --ai-bubble: #fbfcfb;
-      --header-line: #d9e4db;
-      --composer-bg: linear-gradient(145deg, #ffffff, #f4faf5);
-      --focus-ring: #176b4c20;
+      --soft: #f7f7f7;
+      --user-bubble: #f4f4f4;
+      --ai-bubble: #ffffff;
+      --header-line: #ffffff;
+      --composer-bg: #ffffff;
+      --focus-ring: #00000014;
     }
 
     :root[data-theme="dark"] {
@@ -58,28 +58,20 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 50% -25%, #dcece0 0, transparent 54%),
-        radial-gradient(ellipse at 7% 90%, #e4efe6 0, transparent 36%),
-        var(--bg);
+      background: var(--bg);
       color: var(--ink);
       font: 15px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
-      transition: background .2s, color .2s;
     }
 
     :root[data-theme="dark"] body { background: var(--bg); }
 
+    body { isolation:isolate; }
     body:before {
-      content: "";
-      position: fixed;
-      z-index: -1;
-      right: 4vw;
-      bottom: 8vh;
-      width: min(31vw, 360px);
-      aspect-ratio: 1;
-      background: url("kathgolap-logo.png") center/contain no-repeat;
-      opacity: .08;
-      pointer-events: none;
+      content:""; position:fixed; z-index:0;
+      left:calc(50% + 125px); top:50%; width:min(68vw,760px); aspect-ratio:1;
+      transform:translate(-50%,-50%);
+      background:url("kathgolap-logo.png") center/contain no-repeat;
+      opacity:.08; pointer-events:none;
     }
 
     button, input, textarea { font: inherit; }
@@ -93,22 +85,59 @@
     }
 
     .page {
-      width: min(1100px, 100%);
+      position:relative;
+      z-index:1;
+      width: calc(100% - 260px);
       min-height: 100vh;
-      margin: auto;
-      padding: 0 30px 26px;
+      margin: 0 0 0 260px;
+      padding: 0 32px 24px;
       display: flex;
       flex-direction: column;
     }
 
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      width: 248px;
+      padding: 22px 16px 16px;
+      border-right: 1px solid #e5e5e5;
+      background: #fff;
+      color: #17231d;
+      box-shadow: none;
+    }
+    .side-brand { display:flex; align-items:center; gap:10px; padding:0 8px 22px; }
+    .side-brand img { width:40px; height:40px; object-fit:contain; }
+    .side-brand strong { display:block; font: bold 20px "Times New Roman", Times, serif; }
+    .side-brand .brand-tagline { margin-top:2px; font-size:.68rem; }
+    .new-chat { width:100%; padding:10px 12px; border:1px solid #e5e5e5; border-radius:10px; background:#fff; color:#111; text-align:left; font-weight:600; }
+    .side-link { width:100%; padding:9px 12px; border:0; border-radius:9px; background:transparent; color:#222; text-align:left; }
+    .side-link, .new-chat { display:flex; align-items:center; gap:10px; font:500 15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .side-link svg, .new-chat svg { width:19px; height:19px; flex:none; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+    .side-link:hover { background:#f5f5f5; }
+    .history-title { margin:24px 9px 9px; color:#78847d; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .history-list { flex:1; min-height:0; overflow:auto; }
+    .history-item { width:100%; margin:2px 0; padding:9px 10px; overflow:hidden; border:0; border-radius:9px; background:transparent; color:#38443d; text-align:left; text-overflow:ellipsis; white-space:nowrap; }
+    .history-item:hover, .new-chat:hover { background:#f5f5f5; }
+    .profile { display:flex; align-items:center; gap:10px; padding:14px 7px 3px; border-top:1px solid #e8e8e8; }
+    .avatar { display:grid; place-items:center; flex:none; width:36px; height:36px; border-radius:50%; background:#eeeeee; color:#222; font-weight:700; }
+    .profile-copy { min-width:0; color:#35433a; font-size:.82rem; overflow-wrap:anywhere; }
+    .profile-copy small { display:block; color:#849088; font-size:.72rem; }
+    .sidebar-login { margin-top:auto; padding:14px 4px 0; border-top:1px solid #e8e8e8; }
+    .sidebar-login p { margin:0 0 10px; color:#555; font-size:.82rem; line-height:1.45; }
+    .sidebar-login button { width:100%; padding:10px; border:1px solid #d9d9d9; border-radius:999px; background:#fff; color:#111; font-weight:600; }
+
     .topbar {
-      min-height: 82px;
+      min-height: 62px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      border-bottom: 1px solid var(--header-line);
+      border-bottom: 0;
     }
+    .page-brand { color:#111; font:700 1.3rem/1 "Times New Roman",Times,serif; letter-spacing:.02em; }
 
     .brand {
       display: flex;
@@ -135,6 +164,7 @@
     .brand-copy { line-height: 1.3; }
 
     .brand-name {
+      font-family: "Times New Roman", Times, serif;
       font-size: 1.08rem;
       font-weight: 850;
       letter-spacing: .045em;
@@ -143,12 +173,34 @@
     .brand-name span { color: var(--green); }
 
     .brand-tagline {
+      position: relative;
+      isolation: isolate;
+      width: max-content;
+      font-family: "SolaimanLipi", "Siyam Rupali", serif;
       display: block;
       margin-top: 3px;
       color: var(--muted);
       font-size: .76rem;
       font-weight: 600;
       letter-spacing: 0;
+    }
+
+    .tagline-ribbon {
+      position: absolute;
+      z-index: -1;
+      inset: 1px -5px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      overflow: hidden;
+      border-radius: 2px;
+      opacity: .42;
+      animation: ribbon-wave 2.4s ease-in-out infinite;
+    }
+    .tagline-ribbon i:nth-child(1), .tagline-ribbon i:nth-child(3) { background: #006a4e; }
+    .tagline-ribbon i:nth-child(2) { background: #f42a41; }
+    @keyframes ribbon-wave {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(1px); }
     }
 
     .top-actions {
@@ -169,7 +221,6 @@
       background: var(--paper);
       color: var(--ink);
       font-weight: 650;
-      transition: background .18s, border-color .18s;
     }
 
     .top-login:hover,
@@ -177,6 +228,8 @@
       background: var(--soft);
       border-color: #9dc3aa;
     }
+    .signup-button { padding:10px 16px; border:0; border-radius:999px; background:#111; color:#fff; font-weight:650; }
+    .language-select { padding:8px 10px; border:1px solid #e5e5e5; border-radius:9px; background:#fff; color:#222; }
 
     .account-label {
       max-width: 180px;
@@ -188,16 +241,17 @@
     }
 
     .main {
-      width: min(820px, 100%);
+      width: min(770px, 100%);
       flex: 1;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
+      justify-content: center;
     }
 
     .welcome {
-      margin: auto 0 22px;
-      padding: 35px 0 0;
+      margin: 0 0 24px;
+      padding: 0;
       text-align: center;
     }
 
@@ -215,18 +269,21 @@
     }
 
     .chat {
-      flex: 1;
-      min-height: 130px;
-      max-height: calc(100vh - 300px);
-      margin-bottom: 18px;
+      flex: 0 1 auto;
+      min-height: 0;
+      max-height: 55vh;
+      margin-bottom: 0;
       overflow: auto;
-      padding: 20px 22px;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: var(--paper);
-      box-shadow: var(--shadow);
+      padding: 8px 6px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
       scroll-behavior: smooth;
     }
+    .chat:empty { display:none; }
+    .main:has(.chat .msg) { justify-content:flex-end; }
+    .main:has(.chat .msg) .chat { flex:1; }
 
     .msg {
       max-width: 84%;
@@ -322,32 +379,37 @@
     /* Modern ChatGPT-inspired composer */
     .composer {
       position: relative;
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
       width: 100%;
-      margin: 0 auto 24px;
-      padding: 13px 14px 11px;
-      border: 1px solid var(--line);
-      border-radius: 25px;
-      background: var(--composer-bg);
-      box-shadow: 0 8px 30px #173c2410, inset 0 1px 0 #ffffff40;
-      transition: border-color .2s, box-shadow .2s, background .2s;
+      margin: 0 auto 0;
+      padding: 7px 9px;
+      border: 1px solid #d9d9d9;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 2px 8px #0000000a;
     }
 
     .composer:focus-within {
       border-color: var(--green);
-      box-shadow: 0 0 0 4px var(--focus-ring), var(--shadow);
+      box-shadow: 0 0 0 2px #0000000a;
     }
 
     .composer textarea {
       display: block;
+      flex:1;
       width: 100%;
-      min-height: 54px;
-      max-height: 180px;
-      padding: 8px 7px 10px;
+      min-height: 42px;
+      height:42px;
+      max-height: 140px;
+      padding: 9px 10px;
       border: 0;
       outline: 0;
       background: transparent;
       color: var(--ink);
-      resize: vertical;
+      resize: none;
+      overflow-y:hidden;
       line-height: 1.65;
     }
 
@@ -361,9 +423,9 @@
     .composer-bottom {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 12px;
-      padding: 3px 1px 0;
+      padding: 0;
     }
 
     .composer-hint {
@@ -376,16 +438,14 @@
       padding: 0 19px;
       border: 0;
       border-radius: 999px;
-      background: var(--green);
+      background: #111;
       color: #fff;
       font-weight: 750;
       white-space: nowrap;
-      transition: transform .15s, background .15s;
     }
 
     .primary:hover {
-      background: var(--green-dark);
-      transform: translateY(-1px);
+      background: #000;
     }
 
     .primary:disabled { opacity: .55; cursor: wait; transform: none; }
@@ -394,14 +454,24 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      min-width: 105px;
+      min-width:40px;
+      width:40px;
+      height:40px;
+      padding:0;
+      border-radius:50%;
     }
+    .composer-hint { display:none; }
 
     .send-arrow {
-      font-size: 1.25rem;
-      line-height: 1;
+      width:20px;
+      height:20px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
     .hidden { display: none !important; }
 
@@ -428,7 +498,6 @@
       color: var(--ink);
       box-shadow: 0 30px 90px #0003;
       text-align: center;
-      animation: dialog-in .2s ease-out;
     }
 
     .login-dialog:before {
@@ -593,20 +662,10 @@
     .admin-form .access-row { flex-direction: column; }
     .admin-form .primary { width: 100%; }
 
-    @keyframes dialog-in {
-      from { opacity: 0; transform: translateY(8px) scale(.985); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
     @media (max-width: 650px) {
-      body:before {
-        right: -48px;
-        bottom: 13vh;
-        width: 220px;
-        opacity: .06;
-      }
-
-      .page { padding: 0 13px 15px; }
+      body:before { left:50%; width:min(92vw,520px); opacity:.055; }
+      .sidebar { display:none; }
+      .page { width:100%; margin:0; padding: 0 13px 15px; }
       .topbar { min-height: 70px; }
       .logo { width: 40px; height: 38px; }
       .brand { gap: 7px; }
@@ -622,7 +681,7 @@
       .composer { margin-bottom: 10px; padding: 10px 11px; border-radius: 21px; }
       .composer textarea { min-height: 49px; }
       .composer-hint { font-size: .68rem; }
-      .send-button { min-width: 88px; min-height: 41px; padding: 0 14px; }
+      .send-button { min-width: 40px; min-height: 40px; padding: 0; }
       .login-dialog { padding: 32px 22px 24px; border-radius: 21px; }
       .access-row { flex-direction: column; }
       .access-row input, .access-row .primary { width: 100%; }
@@ -642,43 +701,51 @@
 </head>
 
 <body>
+  <aside class="sidebar" aria-label="চ্যাট ও প্রোফাইল">
+    <div class="side-brand"><img src="kathgolap-logo.png" alt=""><div><strong>Walid AI</strong><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>বাংলাদেশের AI</span></div></div>
+    <button id="newChat" class="new-chat" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg><span data-i18n="newChat">নতুন চ্যাট</span></button>
+    <button id="helpBtn" class="side-link" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.6 1.3c-.8 1-2.2 1.3-2.2 3"/><path d="M12 17h.01"/></svg><span data-i18n="help">Help</span></button>
+    <button id="settingsBtn" class="side-link" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 13a7 7 0 0 0 0-2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-4L10 6.1a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.5 3.1h4l.5-3.1a7 7 0 0 0 1.7-1l2.4 1 2-3.4Z"/></svg><span data-i18n="settings">Settings</span></button>
+    <div class="history-title" data-i18n="history">চ্যাটের ইতিহাস</div>
+    <div id="historyList" class="history-list" aria-live="polite"></div>
+    <div id="sidebarLogin" class="sidebar-login">
+      <p data-i18n="sidebarInfo">আপনার chat history পেতে লগ ইন করুন।</p>
+      <button id="sidebarLoginBtn" type="button" data-i18n="login">Log in</button>
+    </div>
+    <div class="profile hidden" id="signedInProfile">
+      <span id="profileAvatar" class="avatar" aria-hidden="true">G</span>
+      <span id="profileCopy" class="profile-copy">Guest<small>এই ব্রাউজারে সংরক্ষিত</small></span>
+    </div>
+  </aside>
   <main class="page">
     <header class="topbar">
-      <div class="brand">
-        <span class="logo">
-          <img src="kathgolap-logo.png" alt="কাঠগোলাপ — Walid AI লোগো">
-        </span>
-        <div class="brand-copy">
-          <div class="brand-name">WALID<span> AI</span></div>
-          <span class="brand-tagline">বাংলাদেশের AI</span>
-        </div>
-      </div>
-
+      <div class="page-brand">Walid AI</div>
       <div class="top-actions">
-        <button id="themeToggle" class="theme-toggle" type="button"
-          aria-label="থিম পরিবর্তন করুন">🌙 Dark</button>
+        <select id="languageSelect" class="language-select" aria-label="Language">
+          <option value="bn">বাংলা</option><option value="en">English</option>
+        </select>
         <span id="accountLabel" class="account-label hidden"></span>
-        <button id="loginBtn" class="top-login" type="button">Log in</button>
+        <button id="loginBtn" class="top-login" type="button" data-i18n="login">Log in</button>
+        <button id="signupBtn" class="signup-button" type="button" data-i18n="signup">Sign up for free</button>
         <button id="logout" class="top-login hidden" type="button">Log out</button>
       </div>
     </header>
 
     <section class="main">
       <section class="welcome">
-        <h1>আজ কী জানতে চান?</h1>
-        <p>বাংলাদেশের AI — Walid AI-কে প্রশ্ন করুন</p>
+        <h1 id="welcomeTitle">আজ কী জানতে চান?</h1>
       </section>
 
       <section id="chat" class="chat" aria-live="polite"></section>
 
       <form id="form" class="composer">
         <textarea id="question" maxlength="2000"
-          placeholder="বাংলাদেশের AI-কে যেকোনো প্রশ্ন করুন..."
+          placeholder="Walid AI-কে প্রশ্ন করুন..."
           aria-label="প্রশ্ন লিখুন"></textarea>
         <div class="composer-bottom">
-          <span class="composer-hint">Enter চাপলে পাঠানো হবে · Shift + Enter = নতুন লাইন</span>
-          <button id="send" class="primary send-button" type="submit">
-            <span>পাঠান</span><span class="send-arrow" aria-hidden="true">↑</span>
+          <button id="send" class="primary send-button" type="submit" aria-label="Send">
+            <svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            <span class="sr-only">Send</span>
           </button>
         </div>
       </form>
@@ -692,8 +759,8 @@
         aria-label="বন্ধ করুন">×</button>
 
       <img class="login-flower" src="kathgolap-logo.png" alt="">
-      <h2 id="loginTitle">Log in or sign up</h2>
-      <p>প্রবেশ করলে তোমার ব্যক্তিগত স্মৃতি শুধু তোমার অ্যাকাউন্টেই থাকবে।</p>
+      <h2 id="loginTitle">Log in</h2>
+      <p id="loginDescription">Continue to your Walid AI account.</p>
 
       <div id="googleButton" class="google-area"></div>
       <div class="login-separator">OR</div>
@@ -724,8 +791,17 @@
     </section>
   </div>
 
+  <div id="helpModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <section class="login-dialog">
+      <button id="closeHelp" class="login-close" type="button" aria-label="Close">×</button>
+      <h2 id="helpTitle">Help</h2>
+      <p id="helpText">Write your question in the box in the middle and press Send.</p>
+    </section>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
 
   <script>
@@ -749,13 +825,105 @@
     const input = document.getElementById("question");
     const chat = document.getElementById("chat");
     const send = document.getElementById("send");
-    const themeToggle = document.getElementById("themeToggle");
+    const welcome = document.querySelector(".welcome");
+    const languageSelect = document.getElementById("languageSelect");
+    const signupBtn = document.getElementById("signupBtn");
+    const signedInProfile = document.getElementById("signedInProfile");
+    const sidebarLogin = document.getElementById("sidebarLogin");
+    const helpModal = document.getElementById("helpModal");
+    const profileAvatar = document.getElementById("profileAvatar");
+    const profileCopy = document.getElementById("profileCopy");
+    const historyList = document.getElementById("historyList");
+
+    let firestoreDB = null;
+    let historyOwner = "";
+    let currentConversationId = newConversationId();
+    let chatMessages = [];
+    let restoringChat = false;
+    let persistQueue = Promise.resolve();
 
     let ACCESS_TOKEN = sessionStorage.getItem("walidToken") || "";
     let IS_ADMIN = false;
     let firebaseAuth = null;
     let authorizedUid = "";
     let authorizingUid = "";
+
+    function newConversationId() {
+      return window.crypto?.randomUUID?.() ||
+        "chat-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+    }
+
+    function setProfile(name, admin = false) {
+      const cleanName = String(name || "Guest").trim() || "Guest";
+      profileAvatar.textContent = admin ? "♛" : cleanName.charAt(0).toLocaleUpperCase();
+      profileAvatar.setAttribute("aria-label", admin ? "অ্যাডমিন" : cleanName + "-এর প্রোফাইল");
+      profileCopy.replaceChildren();
+      profileCopy.append(document.createTextNode(admin ? "Admin" : cleanName));
+      const note = document.createElement("small");
+      note.textContent = admin ? "Walid AI Admin" : historyOwner ? "ব্যক্তিগত অ্যাকাউন্ট" : "এই ব্রাউজারে সংরক্ষিত";
+      profileCopy.appendChild(note);
+      const signedIn = Boolean(ACCESS_TOKEN);
+      signedInProfile.classList.toggle("hidden", !signedIn);
+      sidebarLogin.classList.toggle("hidden", signedIn);
+    }
+
+    function drawHistory(records) {
+      historyList.replaceChildren();
+      records.slice().sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0)).forEach((record) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "history-item";
+        button.textContent = record.title || "নতুন চ্যাট";
+        button.addEventListener("click", () => openConversation(record));
+        historyList.appendChild(button);
+      });
+    }
+
+    function guestRecords() {
+      try { return JSON.parse(sessionStorage.getItem("walidGuestChats") || "[]"); }
+      catch { return []; }
+    }
+
+    function persistConversation() {
+      if (restoringChat || !chatMessages.length) return;
+      const record = {
+        id: currentConversationId,
+        title: (chatMessages.find((item) => item.kind === "user")?.text || "নতুন চ্যাট").slice(0, 72),
+        messages: chatMessages,
+        updatedAt: Date.now()
+      };
+      const ownerAtSave = historyOwner;
+      persistQueue = persistQueue.then(async () => {
+        if (ownerAtSave && firestoreDB) {
+          await firestoreDB.collection("users").doc(ownerAtSave)
+            .collection("chats").doc(record.id).set(record, { merge: true });
+        } else {
+          const records = guestRecords().filter((item) => item.id !== record.id);
+          records.unshift(record);
+          sessionStorage.setItem("walidGuestChats", JSON.stringify(records.slice(0, 50)));
+        }
+        drawHistory(ownerAtSave ? await loadAccountRecords(false) : guestRecords());
+      }).catch((error) => console.warn("Chat history could not be saved.", error));
+      return persistQueue;
+    }
+
+    async function loadAccountRecords(render = true) {
+      if (!historyOwner || !firestoreDB) return [];
+      const snapshot = await firestoreDB.collection("users").doc(historyOwner).collection("chats").get();
+      const records = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      if (render) drawHistory(records);
+      return records;
+    }
+
+    function openConversation(record) {
+      restoringChat = true;
+      currentConversationId = record.id;
+      chatMessages = Array.isArray(record.messages) ? record.messages : [];
+      chat.replaceChildren();
+      chatMessages.forEach((item) => addMessage(item.kind, item.text, item.source || ""));
+      welcome.classList.toggle("hidden", chatMessages.length > 0);
+      restoringChat = false;
+    }
 
     const firebaseConfig = window.WALID_FIREBASE_CONFIG || {};
     const firebaseReady = Boolean(
@@ -765,65 +933,62 @@
       firebaseConfig.appId
     );
 
-    // Light / Dark theme
-    function applyTheme(theme) {
-      const selectedTheme = theme === "dark" ? "dark" : "light";
-      document.documentElement.dataset.theme = selectedTheme;
-
-      themeToggle.textContent =
-        selectedTheme === "dark" ? "☀️ Light" : "🌙 Dark";
-
-      themeToggle.setAttribute(
-        "aria-label",
-        selectedTheme === "dark"
-          ? "লাইট মোড চালু করুন"
-          : "ডার্ক মোড চালু করুন"
-      );
-
-      document.querySelector('meta[name="theme-color"]')
-        ?.setAttribute(
-          "content",
-          selectedTheme === "dark" ? "#111713" : "#f4f8f4"
-        );
+    setProfile("Guest");
+    drawHistory(guestRecords());
+    function setLanguage(language) {
+      const lang = language === "en" ? "en" : "bn";
+      document.documentElement.lang = lang;
+      languageSelect.value = lang;
+      const text = {
+        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আপনার chat history পেতে লগ ইন করুন।", welcome:"আজ কী জানতে চান?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"মাঝের বক্সে প্রশ্ন লিখে Send চাপুন।" },
+        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in to access your chat history.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send." }
+      }[lang];
+      document.querySelector('[data-i18n="newChat"]').textContent = text.newChat;
+      document.querySelector('[data-i18n="history"]').textContent = text.history;
+      document.querySelector('[data-i18n="sidebarInfo"]').textContent = text.sidebarInfo;
+      document.getElementById("welcomeTitle").textContent = text.welcome;
+      input.placeholder = text.placeholder;
+      send.setAttribute("aria-label", lang === "bn" ? "পাঠান" : "Send");
+      loginBtn.textContent = text.login;
+      signupBtn.textContent = text.signup;
+      logoutBtn.textContent = text.logout;
+      document.getElementById("sidebarLoginBtn").textContent = text.login;
+      document.getElementById("loginDescription").textContent = text.loginDesc;
+      document.getElementById("helpText").textContent = text.helpText;
+      document.getElementById("loginTitle").textContent = loginMode === "signup" ? text.signupTitle : text.login;
+      try { localStorage.setItem("walidLanguage", lang); } catch {}
     }
 
-    try {
-      applyTheme(localStorage.getItem("walidTheme") || "light");
-    } catch {
-      applyTheme("light");
-    }
+    let loginMode = "login";
+    try { languageSelect.value = localStorage.getItem("walidLanguage") || "bn"; } catch { languageSelect.value = "bn"; }
+    languageSelect.addEventListener("change", () => setLanguage(languageSelect.value));
+    setLanguage(languageSelect.value);
 
-    themeToggle.addEventListener("click", () => {
-      const nextTheme =
-        document.documentElement.dataset.theme === "dark"
-          ? "light"
-          : "dark";
-
-      applyTheme(nextTheme);
-
-      try {
-        localStorage.setItem("walidTheme", nextTheme);
-      } catch {
-        // Theme works for the current page even if storage is unavailable.
-      }
-    });
-
-    function openLogin() {
+    function openLogin(mode = "login") {
+      loginMode = mode;
+      setLanguage(languageSelect.value);
       loginStatus.textContent = firebaseReady
         ? ""
         : "Google দিয়ে প্রবেশ করা যাবে; ইমেইল প্রবেশের Firebase সেটআপ বাকি।";
       loginModal.classList.remove("hidden");
     }
 
+    document.getElementById("helpBtn").addEventListener("click", () => helpModal.classList.remove("hidden"));
+    document.getElementById("settingsBtn").addEventListener("click", () => languageSelect.focus());
+    document.getElementById("closeHelp").addEventListener("click", () => helpModal.classList.add("hidden"));
+    document.getElementById("sidebarLoginBtn").addEventListener("click", () => openLogin("login"));
+
     function updateAccountUI(email) {
       loginModal.classList.add("hidden");
       loginBtn.classList.add("hidden");
+      signupBtn.classList.add("hidden");
       logoutBtn.classList.remove("hidden");
 
       if (email) {
         accountLabel.textContent = email;
         accountLabel.classList.remove("hidden");
       }
+      setProfile(firebaseAuth?.currentUser?.displayName || email || "User", IS_ADMIN);
     }
 
     async function authorize(token) {
@@ -847,11 +1012,7 @@
 
       updateAccountUI(data.email || "");
 
-      if (IS_ADMIN) {
-        addMessage("ai", "অ্যাডমিন হিসেবে প্রবেশ করেছেন।");
-      } else if (data.email) {
-        addMessage("ai", "প্রবেশ হয়েছে: " + data.email);
-      }
+      if (IS_ADMIN) addMessage("ai", "🎉 👑 স্বাগতম, Admin! Walid AI-এর বিশেষ অ্যাডমিন অভিজ্ঞতায় আপনাকে স্বাগতম।");
     }
 
     async function useFirebaseUser(user) {
@@ -866,11 +1027,20 @@
       }
 
       authorizingUid = user.uid;
+      historyOwner = user.uid;
+      chat.replaceChildren();
+      chatMessages = [];
+      sessionStorage.removeItem("walidGuestChats");
+      welcome.classList.remove("hidden");
+      currentConversationId = newConversationId();
 
       try {
         await authorize(await user.getIdToken());
+        setProfile(user.displayName || user.email, IS_ADMIN);
+        drawHistory(await loadAccountRecords(false));
         authorizedUid = user.uid;
       } catch (error) {
+        historyOwner = "";
         loginStatus.textContent = error.message || "প্রবেশ করা যায়নি।";
       } finally {
         authorizingUid = "";
@@ -882,10 +1052,11 @@
       try {
         firebase.initializeApp(firebaseConfig);
         firebaseAuth = firebase.auth();
+        firestoreDB = firebase.firestore();
         emailButton.disabled = false;
 
         firebaseAuth.onAuthStateChanged((user) => {
-          if (user && !user.isAnonymous && !ACCESS_TOKEN) {
+          if (user && !user.isAnonymous) {
             useFirebaseUser(user);
           }
         });
@@ -925,7 +1096,8 @@
         "ইমেইল প্রবেশ চালু করতে Firebase সেটআপ বাকি।";
     }
 
-    loginBtn.addEventListener("click", openLogin);
+    loginBtn.addEventListener("click", () => openLogin("login"));
+    signupBtn.addEventListener("click", () => openLogin("signup"));
 
     document.getElementById("closeLogin").addEventListener("click", () => {
       loginModal.classList.add("hidden");
@@ -1080,17 +1252,22 @@
       IS_ADMIN = false;
       authorizedUid = "";
       authorizingUid = "";
+      historyOwner = "";
 
       sessionStorage.removeItem("walidToken");
 
       accountLabel.classList.add("hidden");
       logoutBtn.classList.add("hidden");
       loginBtn.classList.remove("hidden");
+      signupBtn.classList.remove("hidden");
 
-      addMessage(
-        "ai",
-        "অ্যাকাউন্ট থেকে বের হয়েছেন। অতিথি হিসেবে চ্যাট চালিয়ে যেতে পারো।"
-      );
+      sessionStorage.removeItem("walidGuestChats");
+      chat.replaceChildren();
+      chatMessages = [];
+      welcome.classList.remove("hidden");
+      currentConversationId = newConversationId();
+      setProfile("Guest");
+      drawHistory(guestRecords());
     });
 
     // Render chat messages safely as text
@@ -1151,6 +1328,12 @@
 
       chat.appendChild(bubble);
       chat.scrollTop = chat.scrollHeight;
+      if (["user", "ai"].includes(kind)) welcome.classList.add("hidden");
+
+      if (!restoringChat && ["user", "ai"].includes(kind)) {
+        chatMessages.push({ kind, text: String(text ?? ""), source });
+        void persistConversation();
+      }
 
       return bubble;
     }
@@ -1294,8 +1477,8 @@
 
       addMessage("user", question);
       input.value = "";
+      resizeComposer();
       send.disabled = true;
-      send.querySelector("span").textContent = "খুঁজছে…";
 
       const headers = { "Content-Type": "application/json" };
 
@@ -1342,7 +1525,6 @@
         );
       } finally {
         send.disabled = false;
-        send.querySelector("span").textContent = "পাঠান";
         input.focus();
       }
     });
@@ -1354,17 +1536,37 @@
       }
     });
 
+    function resizeComposer() {
+      input.style.height = "42px";
+      const nextHeight = Math.min(input.scrollHeight, 140);
+      input.style.height = nextHeight + "px";
+      input.style.overflowY = input.scrollHeight > 140 ? "auto" : "hidden";
+    }
+
+    input.addEventListener("input", resizeComposer);
+
+    document.getElementById("newChat").addEventListener("click", () => {
+      currentConversationId = newConversationId();
+      chatMessages = [];
+      chat.replaceChildren();
+      welcome.classList.remove("hidden");
+      input.focus();
+    });
+
     // Restore existing session
     if (ACCESS_TOKEN) {
       authorize(ACCESS_TOKEN).catch(() => {
         ACCESS_TOKEN = "";
         IS_ADMIN = false;
         authorizedUid = "";
+        historyOwner = "";
 
         sessionStorage.removeItem("walidToken");
         loginBtn.classList.remove("hidden");
+        signupBtn.classList.remove("hidden");
         logoutBtn.classList.add("hidden");
         accountLabel.classList.add("hidden");
+        setProfile("Guest");
       });
     }
   </script>

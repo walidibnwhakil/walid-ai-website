@@ -292,7 +292,10 @@
       background: transparent;
       box-shadow: none;
       scroll-behavior: smooth;
+      scrollbar-width: none;
+      overscroll-behavior: contain;
     }
+    .chat::-webkit-scrollbar { display: none; }
     .chat:empty { display:none; }
     .main:has(.chat .msg) { justify-content:flex-end; }
     .main:has(.chat .msg) .chat { flex:1; }
@@ -302,7 +305,9 @@
       margin: 13px 0;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+      font-family: "Times New Roman", Times, serif;
     }
+    .msg.bengali { font-family: "SolaimanLipi", "Siyam Rupali", serif; }
 
     .msg.user {
       margin-left: auto;
@@ -1016,6 +1021,20 @@
         "chat-" + Date.now() + "-" + Math.random().toString(36).slice(2);
     }
 
+    function getGuestClientId() {
+      try {
+        let id = localStorage.getItem("walidGuestId");
+        if (!id) {
+          id = window.crypto?.randomUUID?.() ||
+            "guest-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+          localStorage.setItem("walidGuestId", id);
+        }
+        return id;
+      } catch {
+        return "";
+      }
+    }
+
     function setProfile(name, admin = false) {
       const cleanName = String(name || "Guest").trim() || "Guest";
       profileAvatar.textContent = admin ? "♛" : cleanName.charAt(0).toLocaleUpperCase();
@@ -1152,7 +1171,7 @@
       languageSelect.value = lang;
       const text = {
         bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আপনার chat history পেতে লগ ইন করুন।", welcome:"আজ কী জানতে চান?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"মাঝের বক্সে প্রশ্ন লিখে Send চাপুন।", help:"Help", settings:"Settings", language:"ভাষা", tagline:"বাংলাদেশের AI" },
-        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in to access your chat history.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladesh AI" }
+        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in to access your chat history.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"বাংলাদেশের AI" }
       }[lang];
       document.querySelector('[data-i18n="newChat"]').textContent = text.newChat;
       document.querySelector('[data-i18n="history"]').textContent = text.history;
@@ -1542,6 +1561,7 @@
     function addMessage(kind, text, source = "") {
       const bubble = document.createElement("div");
       bubble.className = "msg " + kind;
+      if (/[\u0980-\u09FF]/.test(String(text ?? ""))) bubble.classList.add("bengali");
 
       const table = kind === "ai" ? parseMarkdownTable(text) : null;
 
@@ -1595,7 +1615,7 @@
       }
 
       chat.appendChild(bubble);
-      chat.scrollTop = chat.scrollHeight;
+      chat.scrollTo({ top: chat.scrollHeight, behavior: restoringChat ? "auto" : "smooth" });
       if (["user", "ai"].includes(kind)) welcome.classList.add("hidden");
 
       if (!restoringChat && ["user", "ai"].includes(kind)) {
@@ -1760,7 +1780,7 @@
         const response = await fetch(API + "/api/chat", {
           method: "POST",
           headers,
-          body: JSON.stringify({ question })
+          body: JSON.stringify({ question, language: languageSelect.value, guest_id: getGuestClientId() })
         });
 
         const data = await response.json();
@@ -1847,3 +1867,4 @@
   </script>
 </body>
 </html>
+

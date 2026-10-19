@@ -141,6 +141,8 @@
       border-bottom: 0;
     }
     .page-brand { display:grid; justify-items:center; gap:2px; color:#111; font:700 1.3rem/1 "Times New Roman",Times,serif; letter-spacing:.02em; white-space:nowrap; }
+    .page-brand-title { display:flex; align-items:center; justify-content:center; gap:7px; }
+    .page-brand-logo { display:none; width:27px; height:27px; object-fit:contain; }
     .page-brand .brand-tagline { margin:0; font-size:.68rem; }
 
     .brand {
@@ -778,6 +780,7 @@
       .mobile-menu { display:grid; place-items:center; justify-self:start; width:40px; height:40px; padding:0; border:1px solid #e8e8e8; border-radius:50%; background:#fff; color:#222; box-shadow:0 1px 5px #0001; }
       .mobile-menu svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; }
       .page-brand { font-size:1.05rem; }
+      .page-brand-logo { display:block; width:26px; height:26px; }
       .logo { width: 40px; height: 38px; }
       .brand { gap: 7px; }
       .brand-name { font-size: .95rem; white-space:nowrap; }
@@ -804,6 +807,7 @@
       .topbar { gap:5px; }
       .mobile-menu { width:30px; height:34px; }
       .page-brand { font-size:.92rem; }
+      .page-brand-logo { width:23px; height:23px; }
       .top-actions { gap:3px; }
       .top-login { padding:8px 12px; font-size:.82rem; }
       .account-avatar-button { width:36px!important; height:36px; }
@@ -844,7 +848,7 @@
   <main class="page">
     <header class="topbar">
       <button id="mobileMenu" class="mobile-menu" type="button" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="page-brand"><span>Walid AI</span><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>বাংলাদেশের AI</span></div>
+      <div class="page-brand"><span class="page-brand-title"><img class="page-brand-logo" src="kathgolap-logo.png" alt=""><span>Walid AI</span></span><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>বাংলাদেশের AI</span></div>
       <div class="top-actions">
         <button id="loginBtn" class="top-login" type="button" data-i18n="login">Log in</button>
         <button id="signupBtn" class="signup-button" type="button" data-i18n="signup">Sign up for free</button>

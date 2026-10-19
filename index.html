@@ -71,7 +71,7 @@
       left:calc(50% + 125px); top:50%; width:min(68vw,760px); aspect-ratio:1;
       transform:translate(-50%,-50%);
       background:url("kathgolap-logo.png") center/contain no-repeat;
-      opacity:.08; pointer-events:none;
+      opacity:.12; pointer-events:none;
     }
 
     button, input, textarea { font: inherit; }
@@ -184,7 +184,7 @@
       width: max-content;
       font-family: "SolaimanLipi", "Siyam Rupali", serif;
       display: block;
-      margin-top: 3px;
+      margin: 3px auto 0;
       color: var(--muted);
       font-size: .76rem;
       font-weight: 600;
@@ -271,7 +271,7 @@
       margin: 0;
       color: var(--ink);
       font-size: clamp(1.7rem, 4vw, 2.4rem);
-      font-weight: 700;
+      font-weight: 400;
       letter-spacing: -.04em;
     }
 
@@ -771,7 +771,7 @@
     }
 
     @media (max-width: 650px) {
-      body:before { left:50%; width:min(92vw,520px); opacity:.055; }
+      body:before { left:50%; width:min(92vw,520px); opacity:.09; }
       .sidebar { display:flex; position:fixed; inset:0 auto 0 0; z-index:30; width:min(300px,86vw); padding:20px 16px 16px; transform:translateX(-105%); transition:transform .2s ease; box-shadow:0 12px 36px #0002; }
       .sidebar.open { transform:translateX(0); }
       .sidebar-backdrop.open { display:block; position:fixed; inset:0; z-index:29; border:0; background:#0005; }

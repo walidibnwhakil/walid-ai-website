@@ -951,7 +951,14 @@
     let restoringChat = false;
     let persistQueue = Promise.resolve();
 
-    let ACCESS_TOKEN = sessionStorage.getItem("walidToken") || "";
+    const legacySessionToken = sessionStorage.getItem("walidToken") || "";
+    let ACCESS_TOKEN = sessionStorage.getItem("walidAdminAccess") || "";
+    if (!ACCESS_TOKEN && legacySessionToken && legacySessionToken.split(".").length !== 3) {
+      ACCESS_TOKEN = legacySessionToken;
+    }
+    if (legacySessionToken.split(".").length === 3) {
+      sessionStorage.removeItem("walidToken");
+    }
     let IS_ADMIN = false;
     let firebaseAuth = null;
     let authorizedUid = "";
@@ -1009,8 +1016,33 @@
       catch { return []; }
     }
 
+    function accountChatKey(uid) {
+      return "walidActiveChatId:" + uid;
+    }
+
+    function rememberActiveConversation() {
+      if (historyOwner) {
+        localStorage.setItem(accountChatKey(historyOwner), currentConversationId);
+      } else {
+        sessionStorage.setItem("walidActiveChatId", currentConversationId);
+      }
+    }
+
+    function restoreGuestConversation() {
+      const records = guestRecords().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      drawHistory(records);
+      const savedId = sessionStorage.getItem("walidActiveChatId");
+      const active = records.find((record) => record.id === savedId) || (!savedId ? records[0] : null);
+      if (active) {
+        openConversation(active);
+      } else if (savedId) {
+        currentConversationId = savedId;
+      }
+    }
+
     function persistConversation() {
       if (restoringChat || !chatMessages.length) return;
+      rememberActiveConversation();
       const record = {
         id: currentConversationId,
         title: (chatMessages.find((item) => item.kind === "user")?.text || "নতুন চ্যাট").slice(0, 72),
@@ -1048,6 +1080,7 @@
       chatMessages.forEach((item) => addMessage(item.kind, item.text, item.source || ""));
       welcome.classList.toggle("hidden", chatMessages.length > 0);
       restoringChat = false;
+      rememberActiveConversation();
     }
 
     const firebaseConfig = window.WALID_FIREBASE_CONFIG || {};
@@ -1059,7 +1092,7 @@
     );
 
     setProfile("Guest");
-    drawHistory(guestRecords());
+    restoreGuestConversation();
     function setLanguage(language) {
       const lang = language === "en" ? "en" : "bn";
       document.documentElement.lang = lang;
@@ -1133,11 +1166,21 @@
 
       ACCESS_TOKEN = token;
       IS_ADMIN = data.auth_role === "admin";
-      sessionStorage.setItem("walidToken", token);
+      if (IS_ADMIN) sessionStorage.setItem("walidAdminAccess", token);
+      else sessionStorage.removeItem("walidAdminAccess");
+      sessionStorage.removeItem("walidToken");
 
       updateAccountUI(data.email || "");
 
       if (IS_ADMIN && options.celebrate) showAdminCelebration();
+    }
+
+    async function getAuthorizationToken() {
+      const user = firebaseAuth?.currentUser;
+      if (user && !user.isAnonymous) {
+        ACCESS_TOKEN = await user.getIdToken();
+      }
+      return ACCESS_TOKEN;
     }
 
     async function useFirebaseUser(user, options = {}) {
@@ -1155,14 +1198,25 @@
       historyOwner = user.uid;
       chat.replaceChildren();
       chatMessages = [];
-      sessionStorage.removeItem("walidGuestChats");
       welcome.classList.remove("hidden");
-      currentConversationId = newConversationId();
 
       try {
         await authorize(await user.getIdToken(), options);
         setProfile(user.displayName || user.email, IS_ADMIN);
-        drawHistory(await loadAccountRecords(false));
+        const records = (await loadAccountRecords(false))
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        drawHistory(records);
+        const savedId = localStorage.getItem(accountChatKey(user.uid));
+        const active = records.find((record) => record.id === savedId) || (!savedId ? records[0] : null);
+        if (active) {
+          openConversation(active);
+        } else {
+          currentConversationId = savedId || newConversationId();
+          localStorage.setItem(accountChatKey(user.uid), currentConversationId);
+          chat.replaceChildren();
+          chatMessages = [];
+          welcome.classList.remove("hidden");
+        }
         authorizedUid = user.uid;
       } catch (error) {
         historyOwner = "";
@@ -1178,6 +1232,8 @@
         firebase.initializeApp(firebaseConfig);
         firebaseAuth = firebase.auth();
         firestoreDB = firebase.firestore();
+        // Keep the Firebase account signed in across refreshes and browser restarts.
+        await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         emailButton.disabled = false;
 
         let initialAuthStateHandled = false;
@@ -1383,6 +1439,8 @@
       historyOwner = "";
 
       sessionStorage.removeItem("walidToken");
+      sessionStorage.removeItem("walidAdminAccess");
+      sessionStorage.removeItem("walidActiveChatId");
 
       accountLabel.classList.add("hidden");
       logoutBtn.classList.add("hidden");
@@ -1394,6 +1452,7 @@
       chatMessages = [];
       welcome.classList.remove("hidden");
       currentConversationId = newConversationId();
+      rememberActiveConversation();
       setProfile("Guest");
       drawHistory(guestRecords());
     });
@@ -1495,11 +1554,12 @@
       button.disabled = true;
 
       try {
+        const authToken = await getAuthorizationToken();
         const response = await fetch(API + "/api/feedback", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + ACCESS_TOKEN
+            Authorization: "Bearer " + authToken
           },
           body: JSON.stringify({ question, answer })
         });
@@ -1610,8 +1670,9 @@
 
       const headers = { "Content-Type": "application/json" };
 
-      if (ACCESS_TOKEN) {
-        headers.Authorization = "Bearer " + ACCESS_TOKEN;
+      const authToken = await getAuthorizationToken();
+      if (authToken) {
+        headers.Authorization = "Bearer " + authToken;
       }
 
       try {
@@ -1675,21 +1736,26 @@
 
     document.getElementById("newChat").addEventListener("click", () => {
       currentConversationId = newConversationId();
+      rememberActiveConversation();
       chatMessages = [];
       chat.replaceChildren();
       welcome.classList.remove("hidden");
       input.focus();
     });
 
-    // Restore existing session
+    // Restore admin access-code session. Firebase users are restored through
+    // onAuthStateChanged and receive a fresh ID token there.
     if (ACCESS_TOKEN) {
-      authorize(ACCESS_TOKEN).catch(() => {
+      authorize(ACCESS_TOKEN).then(() => {
+        restoreGuestConversation();
+      }).catch(() => {
         ACCESS_TOKEN = "";
         IS_ADMIN = false;
         authorizedUid = "";
         historyOwner = "";
 
         sessionStorage.removeItem("walidToken");
+        sessionStorage.removeItem("walidAdminAccess");
         loginBtn.classList.remove("hidden");
         signupBtn.classList.remove("hidden");
         logoutBtn.classList.add("hidden");

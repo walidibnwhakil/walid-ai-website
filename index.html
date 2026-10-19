@@ -1786,7 +1786,9 @@
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || "উত্তর পাওয়া যায়নি।");
+          const error = new Error(data.error || "উত্তর পাওয়া যায়নি।");
+          error.quota = data.quota || "";
+          throw error;
         }
 
         const answer = addMessage(
@@ -1808,11 +1810,10 @@
           addFeedback(draft, question, data.model_answer);
         }
       } catch (error) {
-        addMessage(
-          "error",
-          "উত্তর পাওয়া যায়নি। " +
-          (error.message || "আবার চেষ্টা করুন।")
-        );
+        const message = error.quota === "daily_limit"
+          ? error.message
+          : "উত্তর পাওয়া যায়নি। " + (error.message || "আবার চেষ্টা করুন।");
+        addMessage("error", message);
       } finally {
         send.disabled = false;
         input.focus();

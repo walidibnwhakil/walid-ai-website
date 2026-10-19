@@ -128,6 +128,9 @@
     .sidebar-login { margin-top:auto; padding:14px 4px 0; border-top:1px solid #e8e8e8; }
     .sidebar-login p { margin:0 0 10px; color:#555; font-size:.82rem; line-height:1.45; }
     .sidebar-login button { width:100%; padding:10px; border:1px solid #d9d9d9; border-radius:999px; background:#fff; color:#111; font-weight:600; }
+    .sidebar-language { display:grid; gap:7px; margin:18px 8px 0; color:#69736d; font-size:.8rem; }
+    .sidebar-language select { width:100%; padding:9px 10px; border:1px solid #e5e5e5; border-radius:9px; background:#fff; color:#222; }
+    .mobile-menu, .sidebar-backdrop { display:none; }
 
     .topbar {
       min-height: 62px;
@@ -137,7 +140,8 @@
       gap: 12px;
       border-bottom: 0;
     }
-    .page-brand { color:#111; font:700 1.3rem/1 "Times New Roman",Times,serif; letter-spacing:.02em; }
+    .page-brand { display:grid; justify-items:center; gap:2px; color:#111; font:700 1.3rem/1 "Times New Roman",Times,serif; letter-spacing:.02em; white-space:nowrap; }
+    .page-brand .brand-tagline { margin:0; font-size:.68rem; }
 
     .brand {
       display: flex;
@@ -207,8 +211,9 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 8px;
+      justify-self:end;
     }
 
     .top-actions button { width: auto; margin: 0; }
@@ -239,6 +244,11 @@
       color: var(--muted);
       font-size: .84rem;
     }
+    .account-menu-wrap { position:relative; }
+    .account-avatar-button { display:grid; place-items:center; width:40px!important; height:40px; padding:0; border:0; border-radius:50%; background:#eee; color:#222; font-weight:700; font-size:1rem; }
+    .account-popover { position:absolute; top:calc(100% + 10px); right:0; z-index:20; width:220px; padding:12px; border:1px solid #e5e5e5; border-radius:14px; background:#fff; box-shadow:0 12px 36px #0002; }
+    .account-popover-name { margin:2px 4px 10px; overflow-wrap:anywhere; font-size:.88rem; }
+    .account-popover .top-login { width:100%; }
 
     .main {
       width: min(770px, 100%);
@@ -760,15 +770,21 @@
 
     @media (max-width: 650px) {
       body:before { left:50%; width:min(92vw,520px); opacity:.055; }
-      .sidebar { display:none; }
+      .sidebar { display:flex; position:fixed; inset:0 auto 0 0; z-index:30; width:min(300px,86vw); padding:20px 16px 16px; transform:translateX(-105%); transition:transform .2s ease; box-shadow:0 12px 36px #0002; }
+      .sidebar.open { transform:translateX(0); }
+      .sidebar-backdrop.open { display:block; position:fixed; inset:0; z-index:29; border:0; background:#0005; }
       .page { width:100%; margin:0; padding: 0 13px 15px; }
-      .topbar { min-height: 70px; }
+      .topbar { min-height: 70px; gap:8px; display:grid; grid-template-columns:1fr auto 1fr; }
+      .mobile-menu { display:grid; place-items:center; justify-self:start; width:40px; height:40px; padding:0; border:1px solid #e8e8e8; border-radius:50%; background:#fff; color:#222; box-shadow:0 1px 5px #0001; }
+      .mobile-menu svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; }
+      .page-brand { font-size:1.05rem; }
       .logo { width: 40px; height: 38px; }
       .brand { gap: 7px; }
-      .brand-name { font-size: .95rem; }
+      .brand-name { font-size: .95rem; white-space:nowrap; }
       .brand-tagline { font-size: .69rem; }
-      .top-actions { gap: 5px; }
-      .top-login, .theme-toggle { padding: 7px 9px; font-size: .78rem; }
+      .top-actions { flex:none; flex-wrap:nowrap; gap:4px; }
+      .top-login, .theme-toggle { padding: 9px 15px; font-size: .9rem; white-space:nowrap; }
+      .signup-button { display:none!important; }
       .account-label { display: none; }
       .welcome { padding-top: 20px; margin-bottom: 16px; }
       .welcome p { font-size: .9rem; }
@@ -781,6 +797,16 @@
       .login-dialog { padding: 32px 22px 24px; border-radius: 21px; }
       .access-row { flex-direction: column; }
       .access-row input, .access-row .primary { width: 100%; }
+    }
+
+    @media (max-width: 380px) {
+      .page { padding-left:9px; padding-right:9px; }
+      .topbar { gap:5px; }
+      .mobile-menu { width:30px; height:34px; }
+      .page-brand { font-size:.92rem; }
+      .top-actions { gap:3px; }
+      .top-login { padding:8px 12px; font-size:.82rem; }
+      .account-avatar-button { width:36px!important; height:36px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -797,11 +823,13 @@
 </head>
 
 <body>
+  <button id="sidebarBackdrop" class="sidebar-backdrop" type="button" aria-label="Close menu"></button>
   <aside class="sidebar" aria-label="চ্যাট ও প্রোফাইল">
     <div class="side-brand"><img src="kathgolap-logo.png" alt=""><div><strong>Walid AI</strong><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>বাংলাদেশের AI</span></div></div>
     <button id="newChat" class="new-chat" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg><span data-i18n="newChat">নতুন চ্যাট</span></button>
     <button id="helpBtn" class="side-link" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.6 1.3c-.8 1-2.2 1.3-2.2 3"/><path d="M12 17h.01"/></svg><span data-i18n="help">Help</span></button>
     <button id="settingsBtn" class="side-link" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 13a7 7 0 0 0 0-2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-4L10 6.1a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.5 3.1h4l.5-3.1a7 7 0 0 0 1.7-1l2.4 1 2-3.4Z"/></svg><span data-i18n="settings">Settings</span></button>
+    <label class="sidebar-language"><span data-i18n="language">Language</span><select id="languageSelect" aria-label="Language"><option value="bn">বাংলা</option><option value="en">English</option></select></label>
     <div class="history-title" data-i18n="history">চ্যাটের ইতিহাস</div>
     <div id="historyList" class="history-list" aria-live="polite"></div>
     <div id="sidebarLogin" class="sidebar-login">
@@ -815,15 +843,18 @@
   </aside>
   <main class="page">
     <header class="topbar">
-      <div class="page-brand">Walid AI</div>
+      <button id="mobileMenu" class="mobile-menu" type="button" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="page-brand"><span>Walid AI</span><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>বাংলাদেশের AI</span></div>
       <div class="top-actions">
-        <select id="languageSelect" class="language-select" aria-label="Language">
-          <option value="bn">বাংলা</option><option value="en">English</option>
-        </select>
-        <span id="accountLabel" class="account-label hidden"></span>
         <button id="loginBtn" class="top-login" type="button" data-i18n="login">Log in</button>
         <button id="signupBtn" class="signup-button" type="button" data-i18n="signup">Sign up for free</button>
-        <button id="logout" class="top-login hidden" type="button">Log out</button>
+        <div id="accountMenuWrap" class="account-menu-wrap hidden">
+          <button id="accountAvatar" class="account-avatar-button" type="button" aria-label="Account menu" aria-expanded="false">W</button>
+          <div id="accountPopover" class="account-popover hidden">
+            <div id="accountPopoverName" class="account-popover-name"></div>
+            <button id="logout" class="top-login" type="button" data-i18n="logout">Log out</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -919,7 +950,10 @@
     const loginModal = document.getElementById("loginModal");
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logout");
-    const accountLabel = document.getElementById("accountLabel");
+    const accountMenuWrap = document.getElementById("accountMenuWrap");
+    const accountAvatar = document.getElementById("accountAvatar");
+    const accountPopover = document.getElementById("accountPopover");
+    const accountPopoverName = document.getElementById("accountPopoverName");
     const loginStatus = document.getElementById("loginStatus");
     const googleButton = document.getElementById("googleButton");
     const emailInput = document.getElementById("emailInput");
@@ -942,6 +976,9 @@
     const profileCopy = document.getElementById("profileCopy");
     const historyList = document.getElementById("historyList");
     const adminCelebration = document.getElementById("adminCelebration");
+    const sidebar = document.querySelector(".sidebar");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
     let adminCelebrationTimer = null;
 
     let firestoreDB = null;
@@ -952,10 +989,16 @@
     let persistQueue = Promise.resolve();
 
     const legacySessionToken = sessionStorage.getItem("walidToken") || "";
-    let ACCESS_TOKEN = sessionStorage.getItem("walidAdminAccess") || "";
+    let ACCESS_TOKEN = localStorage.getItem("walidAdminAccess") || sessionStorage.getItem("walidAdminAccess") || "";
     if (!ACCESS_TOKEN && legacySessionToken && legacySessionToken.split(".").length !== 3) {
       ACCESS_TOKEN = legacySessionToken;
     }
+    if (ACCESS_TOKEN.split(".").length === 3) {
+      localStorage.removeItem("walidAdminAccess");
+      ACCESS_TOKEN = "";
+    }
+    if (ACCESS_TOKEN) localStorage.setItem("walidAdminAccess", ACCESS_TOKEN);
+    sessionStorage.removeItem("walidAdminAccess");
     if (legacySessionToken.split(".").length === 3) {
       sessionStorage.removeItem("walidToken");
     }
@@ -981,6 +1024,12 @@
       const signedIn = Boolean(ACCESS_TOKEN);
       signedInProfile.classList.toggle("hidden", !signedIn);
       sidebarLogin.classList.toggle("hidden", signedIn);
+      accountMenuWrap.classList.toggle("hidden", !signedIn);
+      loginBtn.classList.toggle("hidden", signedIn);
+      signupBtn.classList.toggle("hidden", signedIn);
+      accountAvatar.textContent = admin ? "♛" : cleanName.charAt(0).toLocaleUpperCase();
+      accountAvatar.setAttribute("aria-label", admin ? "Boss account menu" : cleanName + " account menu");
+      accountPopoverName.textContent = admin ? "Boss · Whakil Ahamed Shakil" : cleanName;
     }
 
     function showAdminCelebration() {
@@ -1098,12 +1147,18 @@
       document.documentElement.lang = lang;
       languageSelect.value = lang;
       const text = {
-        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আপনার chat history পেতে লগ ইন করুন।", welcome:"আজ কী জানতে চান?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"মাঝের বক্সে প্রশ্ন লিখে Send চাপুন।" },
-        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in to access your chat history.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send." }
+        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আপনার chat history পেতে লগ ইন করুন।", welcome:"আজ কী জানতে চান?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"মাঝের বক্সে প্রশ্ন লিখে Send চাপুন।", help:"Help", settings:"Settings", language:"ভাষা", tagline:"বাংলাদেশের AI" },
+        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in to access your chat history.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladesh AI" }
       }[lang];
       document.querySelector('[data-i18n="newChat"]').textContent = text.newChat;
       document.querySelector('[data-i18n="history"]').textContent = text.history;
       document.querySelector('[data-i18n="sidebarInfo"]').textContent = text.sidebarInfo;
+      document.querySelector('[data-i18n="help"]').textContent = text.help;
+      document.querySelector('[data-i18n="settings"]').textContent = text.settings;
+      document.querySelector('[data-i18n="language"]').textContent = text.language;
+      document.querySelectorAll(".brand-tagline").forEach((tagline) => {
+        tagline.lastChild.nodeValue = text.tagline;
+      });
       document.getElementById("welcomeTitle").textContent = text.welcome;
       input.placeholder = text.placeholder;
       send.setAttribute("aria-label", lang === "bn" ? "পাঠান" : "Send");
@@ -1136,16 +1191,36 @@
     document.getElementById("closeHelp").addEventListener("click", () => helpModal.classList.add("hidden"));
     document.getElementById("sidebarLoginBtn").addEventListener("click", () => openLogin("login"));
 
+    function closeMobileSidebar() {
+      sidebar.classList.remove("open");
+      sidebarBackdrop.classList.remove("open");
+      mobileMenu.setAttribute("aria-expanded", "false");
+    }
+
+    mobileMenu.addEventListener("click", () => {
+      const opening = !sidebar.classList.contains("open");
+      sidebar.classList.toggle("open", opening);
+      sidebarBackdrop.classList.toggle("open", opening);
+      mobileMenu.setAttribute("aria-expanded", String(opening));
+    });
+    sidebarBackdrop.addEventListener("click", closeMobileSidebar);
+    sidebar.addEventListener("click", (event) => {
+      if (event.target.closest("button, .history-item")) closeMobileSidebar();
+    });
+    accountAvatar.addEventListener("click", () => {
+      const opening = accountPopover.classList.contains("hidden");
+      accountPopover.classList.toggle("hidden", !opening);
+      accountAvatar.setAttribute("aria-expanded", String(opening));
+    });
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".account-menu-wrap")) {
+        accountPopover.classList.add("hidden");
+        accountAvatar.setAttribute("aria-expanded", "false");
+      }
+    });
+
     function updateAccountUI(email) {
       loginModal.classList.add("hidden");
-      loginBtn.classList.add("hidden");
-      signupBtn.classList.add("hidden");
-      logoutBtn.classList.remove("hidden");
-
-      if (email) {
-        accountLabel.textContent = email;
-        accountLabel.classList.remove("hidden");
-      }
       setProfile(firebaseAuth?.currentUser?.displayName || email || "User", IS_ADMIN);
     }
 
@@ -1166,8 +1241,9 @@
 
       ACCESS_TOKEN = token;
       IS_ADMIN = data.auth_role === "admin";
-      if (IS_ADMIN) sessionStorage.setItem("walidAdminAccess", token);
-      else sessionStorage.removeItem("walidAdminAccess");
+      if (IS_ADMIN && token.split(".").length !== 3) localStorage.setItem("walidAdminAccess", token);
+      else localStorage.removeItem("walidAdminAccess");
+      sessionStorage.removeItem("walidAdminAccess");
       sessionStorage.removeItem("walidToken");
 
       updateAccountUI(data.email || "");
@@ -1232,8 +1308,7 @@
         firebase.initializeApp(firebaseConfig);
         firebaseAuth = firebase.auth();
         firestoreDB = firebase.firestore();
-        // Keep the Firebase account signed in across refreshes and browser restarts.
-        await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        // Firebase Auth's default browser persistence is LOCAL unless changed in Firebase setup.
         emailButton.disabled = false;
 
         let initialAuthStateHandled = false;
@@ -1439,11 +1514,13 @@
       historyOwner = "";
 
       sessionStorage.removeItem("walidToken");
+      localStorage.removeItem("walidAdminAccess");
       sessionStorage.removeItem("walidAdminAccess");
       sessionStorage.removeItem("walidActiveChatId");
 
-      accountLabel.classList.add("hidden");
-      logoutBtn.classList.add("hidden");
+      accountPopover.classList.add("hidden");
+      accountAvatar.setAttribute("aria-expanded", "false");
+      accountMenuWrap.classList.add("hidden");
       loginBtn.classList.remove("hidden");
       signupBtn.classList.remove("hidden");
 
@@ -1670,12 +1747,12 @@
 
       const headers = { "Content-Type": "application/json" };
 
-      const authToken = await getAuthorizationToken();
-      if (authToken) {
-        headers.Authorization = "Bearer " + authToken;
-      }
-
       try {
+        const authToken = await getAuthorizationToken();
+        if (authToken) {
+          headers.Authorization = "Bearer " + authToken;
+        }
+
         const response = await fetch(API + "/api/chat", {
           method: "POST",
           headers,
@@ -1755,11 +1832,11 @@
         historyOwner = "";
 
         sessionStorage.removeItem("walidToken");
+        localStorage.removeItem("walidAdminAccess");
         sessionStorage.removeItem("walidAdminAccess");
         loginBtn.classList.remove("hidden");
         signupBtn.classList.remove("hidden");
-        logoutBtn.classList.add("hidden");
-        accountLabel.classList.add("hidden");
+        accountMenuWrap.classList.add("hidden");
         setProfile("Guest");
       });
     }

@@ -134,6 +134,10 @@
     .history-list { flex:1; min-height:0; overflow:auto; }
     .history-item { width:100%; margin:2px 0; padding:9px 10px; overflow:hidden; border:0; border-radius:9px; background:transparent; color:#38443d; text-align:left; text-overflow:ellipsis; white-space:nowrap; }
     .history-item:hover, .new-chat:hover { background:#f5f5f5; }
+    .history-row { display:flex; align-items:center; }
+    .history-row .history-item { flex:1; min-width:0; }
+    .history-delete { border:0; background:transparent; border-radius:7px; color:var(--muted); padding:5px 8px; opacity:.65; }
+    .history-delete:hover { color:#b42318; background:#fff0ef; opacity:1; }
     .profile { display:flex; align-items:center; gap:10px; padding:14px 7px 3px; border-top:1px solid #e8e8e8; }
     .avatar { display:grid; place-items:center; flex:none; width:36px; height:36px; border-radius:50%; background:#eeeeee; color:#222; font-weight:700; }
     .profile-copy { min-width:0; color:#35433a; font-size:.82rem; overflow-wrap:anywhere; }
@@ -409,6 +413,17 @@
       color: var(--green);
       font-size: .77rem;
     }
+
+    .answer-actions, .question-actions { display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; }
+    .answer-actions button, .question-actions button { border:0; background:transparent; color:var(--muted); padding:5px 7px; border-radius:8px; cursor:pointer; font-size:.76rem; }
+    .answer-actions button:hover, .question-actions button:hover, .answer-actions button.active { background:var(--mint); color:var(--green); }
+    .thinking-status { color:var(--muted); font-size:.82rem; }
+    .attachment-list { display:flex; gap:7px; flex-wrap:wrap; width:100%; }
+    .attachment-chip { background:var(--mint); border-radius:12px; padding:5px 9px; font-size:.75rem; }
+    .help-form { display:grid; gap:10px; margin-top:14px; }
+    .help-form textarea { min-height:120px; }
+    .help-form input, .help-form textarea { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px; background:var(--field); color:var(--ink); }
+    .help-status { font-size:.88rem; color:var(--green); }
 
     /* Modern ChatGPT-inspired composer */
     .composer {
@@ -894,10 +909,14 @@
       <section id="chat" class="chat" aria-live="polite"></section>
 
       <form id="form" class="composer">
+        <input id="fileInput" type="file" accept="image/*,.pdf,.txt,.md,.csv" multiple hidden>
+        <div id="attachmentList" class="attachment-list hidden"></div>
         <textarea id="question" maxlength="2000"
           placeholder="Walid AI-কে প্রশ্ন করুন..."
           aria-label="প্রশ্ন লিখুন"></textarea>
         <div class="composer-bottom">
+          <span id="uploadQuotaHint" class="composer-hint">ফাইল/ছবি AI-তে পাঠানো হবে · <a href="privacy.html" target="_blank" rel="noopener">গোপনীয়তা</a></span>
+          <button id="attachBtn" type="button" aria-label="ফাইল বা ছবি যোগ করুন" title="ফাইল/ছবি যোগ করুন">＋</button>
           <button id="send" class="primary send-button" type="submit" aria-label="Send">
             <svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             <span class="sr-only">Send</span>
@@ -961,7 +980,13 @@
     <section class="login-dialog">
       <button id="closeHelp" class="login-close" type="button" aria-label="Close">×</button>
       <h2 id="helpTitle">Help</h2>
-      <p id="helpText">Write your question in the box in the middle and press Send.</p>
+      <p id="helpText">আপনার সমস্যাটি লিখে পাঠান। আমরা দেখে জানাব।</p>
+      <form id="helpForm" class="help-form">
+        <input id="helpEmail" type="email" maxlength="254" autocomplete="email" placeholder="ইমেইল (ঐচ্ছিক)">
+        <textarea id="helpMessage" maxlength="3000" required placeholder="আপনার সমস্যাটি লিখুন"></textarea>
+        <button class="primary" type="submit">পাঠান</button>
+        <div id="helpStatus" class="help-status" role="status"></div>
+      </form>
     </section>
   </div>
 
@@ -1008,6 +1033,8 @@
     const mobileMenu = document.getElementById("mobileMenu");
     const sidebarBackdrop = document.getElementById("sidebarBackdrop");
     let adminCelebrationTimer = null;
+    let pendingUploads = [];
+    let uploadQuota = null;
 
     let firestoreDB = null;
     let historyOwner = "";
@@ -1093,12 +1120,27 @@
     function drawHistory(records) {
       historyList.replaceChildren();
       records.slice().sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0)).forEach((record) => {
+        const row = document.createElement("div"); row.className = "history-row";
         const button = document.createElement("button");
         button.type = "button";
         button.className = "history-item";
         button.textContent = record.title || "নতুন চ্যাট";
         button.addEventListener("click", () => openConversation(record));
-        historyList.appendChild(button);
+        const remove = document.createElement("button"); remove.type = "button"; remove.className = "history-delete"; remove.textContent = "×"; remove.title = "এই চ্যাট মুছুন"; remove.setAttribute("aria-label", "এই চ্যাট মুছুন");
+        remove.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const confirmed = confirm(languageSelect.value === "en" ? "Delete this chat?" : "এই চ্যাটটি মুছে ফেলবেন?");
+          if (!confirmed) return;
+          try {
+            if (historyOwner && firestoreDB) await firestoreDB.collection("users").doc(historyOwner).collection("chats").doc(record.id).delete();
+            else sessionStorage.setItem("walidGuestChats", JSON.stringify(guestRecords().filter((item) => item.id !== record.id)));
+            if (currentConversationId === record.id) {
+              currentConversationId = newConversationId(); chatMessages = []; chat.replaceChildren(); welcome.classList.remove("hidden"); rememberActiveConversation();
+            }
+            drawHistory(historyOwner ? await loadAccountRecords(false) : guestRecords());
+          } catch { addMessage("error", "চ্যাটটি মোছা যায়নি। পরে আবার চেষ্টা করুন।"); }
+        });
+        row.append(button, remove); historyList.appendChild(row);
       });
     }
 
@@ -1231,6 +1273,69 @@
     document.getElementById("helpBtn").addEventListener("click", () => helpModal.classList.remove("hidden"));
     document.getElementById("settingsBtn").addEventListener("click", () => languageSelect.focus());
     document.getElementById("closeHelp").addEventListener("click", () => helpModal.classList.add("hidden"));
+
+    document.getElementById("helpForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const status = document.getElementById("helpStatus");
+      const button = event.currentTarget.querySelector("button[type=submit]");
+      button.disabled = true;
+      status.textContent = "পাঠানো হচ্ছে…";
+      try {
+        const response = await fetch(API + "/api/help", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: document.getElementById("helpEmail").value.trim(), message: document.getElementById("helpMessage").value.trim() })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "বার্তাটি পাঠানো যায়নি।");
+        status.textContent = "ধন্যবাদ—আপনার বার্তাটি পেয়েছি। আমরা দেখে জানাব।";
+        document.getElementById("helpMessage").value = "";
+      } catch (error) { status.textContent = error.message || "বার্তাটি পাঠানো যায়নি। পরে আবার চেষ্টা করুন।"; }
+      finally { button.disabled = false; }
+    });
+
+    const fileInput = document.getElementById("fileInput");
+    const attachBtn = document.getElementById("attachBtn");
+    const attachmentList = document.getElementById("attachmentList");
+    attachBtn.addEventListener("click", async () => {
+      if (!IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
+        loginModal.classList.remove("hidden");
+        loginStatus.textContent = "ফাইল বা ছবি দিতে আগে লগ ইন করুন।";
+        return;
+      }
+      try {
+        const headers = {};
+        const token = await getAuthorizationToken();
+        if (token) headers.Authorization = "Bearer " + token;
+        const response = await fetch(API + "/api/upload-quota", { headers });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "আপলোড সীমা দেখা যাচ্ছে না।");
+        uploadQuota = data;
+        document.getElementById("uploadQuotaHint").textContent = data.unlimited ? "অ্যাডমিন অ্যাকাউন্টে আপলোড সীমা নেই" : (data.claim_bonus ? "আজ ৩টি বাড়তি সুযোগসহ " : "আজকের আপলোড: ") + data.remaining + "/" + data.limit + " বাকি";
+        if (data.remaining <= 0) { addMessage("error", "আজকের ফայլ/ছবি আপলোডের সীমা শেষ। আগামীকাল আবার চেষ্টা করুন।"); return; }
+        fileInput.click();
+      } catch (error) { addMessage("error", error.message || "আপলোড সীমা যাচাই করা যায়নি।"); }
+    });
+    fileInput.addEventListener("change", async () => {
+      const files = Array.from(fileInput.files || []);
+      for (const file of files) {
+        if (pendingUploads.length >= 5) { addMessage("error", "একটি বার্তায় সর্বোচ্চ ৫টি ফাইল যোগ করা যাবে।"); break; }
+        if (file.size > 5 * 1024 * 1024) { addMessage("error", `${file.name}: ফাইলটি ৫ MB-এর বেশি।`); continue; }
+        if (!/^(image\/(png|jpeg|webp|gif)|application\/pdf|text\/(plain|markdown|csv))$/i.test(file.type)) { addMessage("error", `${file.name}: এই ফাইলের ধরন সমর্থিত নয়।`); continue; }
+        try {
+          const data = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
+          pendingUploads.push({ name: file.name, type: file.type, data });
+        } catch { addMessage("error", file.name + ": ফাইলটি পড়া যায়নি।"); }
+      }
+      fileInput.value = "";
+      attachmentList.replaceChildren();
+      pendingUploads.forEach((item, index) => {
+        const chip = document.createElement("span"); chip.className = "attachment-chip";
+        const remove = document.createElement("button"); remove.type = "button"; remove.textContent = " ×"; remove.setAttribute("aria-label", item.name + " সরান");
+        remove.addEventListener("click", () => { pendingUploads.splice(index, 1); fileInput.dispatchEvent(new Event("change")); });
+        chip.append(document.createTextNode(item.name), remove); attachmentList.appendChild(chip);
+      });
+      attachmentList.classList.toggle("hidden", pendingUploads.length === 0);
+    });
     document.getElementById("sidebarLoginBtn").addEventListener("click", () => openLogin("login"));
 
     function closeMobileSidebar() {
@@ -1577,7 +1682,7 @@
     });
 
     // Render chat messages safely as text
-    function addMessage(kind, text, source = "") {
+    function addMessage(kind, text, source = "", meta = {}) {
       const bubble = document.createElement("div");
       bubble.className = "msg " + kind;
       if (/[\u0980-\u09FF]/.test(String(text ?? ""))) bubble.classList.add("bengali");
@@ -1640,6 +1745,36 @@
       if (!restoringChat && ["user", "ai"].includes(kind)) {
         chatMessages.push({ kind, text: String(text ?? ""), source });
         void persistConversation();
+      }
+      if (["user", "ai"].includes(kind)) bubble.dataset.messageIndex = String(chat.querySelectorAll(".msg.user, .msg.ai").length - 1);
+
+      if (kind === "user") {
+        const actions = document.createElement("div"); actions.className = "question-actions";
+        const edit = document.createElement("button"); edit.type = "button"; edit.textContent = "✎ সম্পাদনা";
+        edit.addEventListener("click", () => {
+          const index = Number(bubble.dataset.messageIndex);
+          input.value = String(text ?? ""); resizeComposer(); input.focus();
+          chatMessages = chatMessages.slice(0, index);
+          const previous = chatMessages.slice(); chat.replaceChildren();
+          restoringChat = true; previous.forEach((item) => addMessage(item.kind, item.text, item.source || "")); restoringChat = false;
+          void persistConversation();
+        });
+        actions.appendChild(edit); bubble.appendChild(actions);
+      }
+      if (kind === "ai") {
+        const answerIndex = Number(bubble.dataset.messageIndex);
+        const previousQuestion = meta.question || [...chatMessages.slice(0, answerIndex)].reverse().find((item) => item.kind === "user")?.text || "";
+        const actions = document.createElement("div"); actions.className = "answer-actions";
+        const button = (label, title, callback) => { const element = document.createElement("button"); element.type = "button"; element.textContent = label; element.title = title; element.addEventListener("click", callback); actions.appendChild(element); };
+        button("⧉ কপি", "উত্তর কপি করুন", async () => { try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", "কপি করা যায়নি—উত্তরটি চেপে ধরে কপি করুন।"); } });
+        button("↗ শেয়ার", "উত্তর শেয়ার করুন", async () => { try { if (navigator.share) await navigator.share({ title:"Walid AI", text:String(text ?? "") }); else { await navigator.clipboard.writeText(String(text ?? "")); } } catch {} });
+        button("↻ আবার", "আবার উত্তর তৈরি করুন", () => { input.value = String(previousQuestion); resizeComposer(); form.requestSubmit(); });
+        const liked = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]"));
+        const like = document.createElement("button"); like.type = "button"; like.textContent = liked.has(String(text ?? "")) ? "♥ ভালো লেগেছে" : "♡ ভালো লেগেছে"; like.classList.toggle("active", liked.has(String(text ?? "")));
+        like.addEventListener("click", () => { const next = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]")); if (next.has(String(text ?? ""))) next.delete(String(text ?? "")); else next.add(String(text ?? "")); localStorage.setItem("walidLikedAnswers", JSON.stringify([...next].slice(-100))); like.classList.toggle("active", next.has(String(text ?? ""))); like.textContent = next.has(String(text ?? "")) ? "♥ ভালো লেগেছে" : "♡ ভালো লেগেছে"; });
+        actions.appendChild(like);
+        if (Number.isFinite(meta.seconds)) { const duration = document.createElement("span"); duration.className = "source"; duration.textContent = `⏱ ${meta.seconds.toFixed(1)} সেকেন্ড`; actions.appendChild(duration); }
+        bubble.appendChild(actions);
       }
 
       return bubble;
@@ -1749,6 +1884,7 @@
 
     function sourceLabel(mode) {
       if (mode === "dataset_lookup") return "";
+      if (mode === "uploaded_file") return "আপনার ফাইল থেকে";
       if (mode === "pdf_passages") return "PDF থেকে";
       if (mode === "pdf_table") return "PDF-এর টেবিল থেকে";
       if (mode === "not_found") return "তথ্যভাণ্ডারে মেলেনি";
@@ -1783,10 +1919,20 @@
         return;
       }
 
+      if (pendingUploads.length && !IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
+        loginModal.classList.remove("hidden"); loginStatus.textContent = "ফাইল পাঠাতে আগে লগ ইন করুন।"; return;
+      }
+      if (pendingUploads.length && uploadQuota && !uploadQuota.unlimited && pendingUploads.length > uploadQuota.remaining) { addMessage("error", `আজ আর মাত্র ${uploadQuota.remaining}টি ফাইল/ছবি পাঠানো যাবে।`); return; }
       addMessage("user", question);
+      const filesToSend = pendingUploads.slice();
       input.value = "";
+      pendingUploads = []; attachmentList.replaceChildren(); attachmentList.classList.add("hidden");
       resizeComposer();
       send.disabled = true;
+      const requestStarted = performance.now();
+      let streamedBubble = null, streamedBody = null, streamedText = "";
+      const thinking = addMessage("thinking", "উত্তর তৈরি হচ্ছে… 0.0 সেকেন্ড");
+      const timer = setInterval(() => { thinking.textContent = `উত্তর তৈরি হচ্ছে… ${((performance.now() - requestStarted) / 1000).toFixed(1)} সেকেন্ড`; }, 100);
 
       const headers = { "Content-Type": "application/json" };
 
@@ -1799,10 +1945,41 @@
         const response = await fetch(API + "/api/chat", {
           method: "POST",
           headers,
-          body: JSON.stringify({ question, language: languageSelect.value, guest_id: getGuestClientId() })
+          body: JSON.stringify({ question, language: languageSelect.value, guest_id: getGuestClientId(), files: filesToSend })
         });
 
-        const data = await response.json();
+        let data;
+        if ((response.headers.get("Content-Type") || "").includes("application/x-ndjson") && response.body) {
+          data = {};
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = "";
+          while (true) {
+            const { value, done } = await reader.read();
+            buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+            const lines = buffer.split("\n"); buffer = lines.pop() || "";
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              const event = JSON.parse(line);
+              if (event.event === "delta") {
+                if (!streamedBubble) {
+                  const elapsed = (performance.now() - requestStarted) / 1000;
+                  clearInterval(timer); thinking.remove();
+                  streamedBubble = addMessage("ai", "", "", { question, seconds: elapsed });
+                  streamedBody = streamedBubble.querySelector(":scope > span:not(.source)");
+                }
+                streamedText += event.text || "";
+                if (streamedBody) streamedBody.textContent = streamedText;
+              } else if (event.event === "done") {
+                Object.assign(data, event);
+              }
+            }
+            if (done) break;
+          }
+          data.answer = streamedText;
+        } else {
+          data = await response.json();
+        }
 
         if (!response.ok) {
           const error = new Error(data.error || "উত্তর পাওয়া যায়নি।");
@@ -1810,11 +1987,25 @@
           throw error;
         }
 
-        const answer = addMessage(
-          "ai",
-          data.answer,
-          sourceLabel(data.answering_mode)
-        );
+        const seconds = (performance.now() - requestStarted) / 1000;
+        if (uploadQuota && filesToSend.length && !uploadQuota.unlimited) {
+          uploadQuota.used += filesToSend.length; uploadQuota.remaining = Math.max(0, uploadQuota.remaining - filesToSend.length);
+          document.getElementById("uploadQuotaHint").textContent = "আজকের আপলোড: " + uploadQuota.remaining + "/" + uploadQuota.limit + " বাকি";
+        }
+        clearInterval(timer); thinking.remove();
+        const answer = streamedBubble || addMessage("ai", data.answer, sourceLabel(data.answering_mode), { question, seconds });
+        if (streamedBubble) {
+          const label = sourceLabel(data.answering_mode);
+          if (label) { const source = document.createElement("span"); source.className = "source"; source.textContent = label; answer.insertBefore(source, answer.querySelector(".answer-actions")); }
+        }
+        const savedAnswer = chatMessages.at(-1); if (savedAnswer?.kind === "ai") { savedAnswer.text = data.answer; void persistConversation(); }
+        const bodyNode = answer.querySelector(":scope > span:not(.source)");
+        if (!streamedBubble && bodyNode && data.answer.length < 12000) {
+          bodyNode.textContent = "";
+          const target = String(data.answer); let offset = 0; const step = Math.max(1, Math.ceil(target.length / 160));
+          const typeNext = () => { offset = Math.min(target.length, offset + step); bodyNode.textContent = target.slice(0, offset); if (offset < target.length) { chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }); setTimeout(typeNext, 12); } };
+          typeNext();
+        }
 
         addFeedback(answer, question, data.answer);
 
@@ -1829,7 +2020,8 @@
           addFeedback(draft, question, data.model_answer);
         }
       } catch (error) {
-        const message = error.quota === "daily_limit"
+        clearInterval(timer); thinking.remove();
+        const message = ["daily_limit", "upload_daily_limit"].includes(error.quota)
           ? error.message
           : "উত্তর পাওয়া যায়নি। " + (error.message || "আবার চেষ্টা করুন।");
         addMessage("error", message);

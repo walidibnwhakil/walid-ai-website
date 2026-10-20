@@ -415,7 +415,7 @@
     }
 
     .answer-actions, .question-actions { display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; }
-    .answer-actions button, .question-actions button { border:0; background:transparent; color:var(--muted); padding:5px 7px; border-radius:8px; cursor:pointer; font-size:.76rem; }
+    .answer-actions button, .question-actions button { display:inline-grid; place-items:center; width:34px; height:34px; border:0; background:transparent; color:var(--muted); padding:6px; border-radius:10px; cursor:pointer; }
     .answer-actions button:hover, .question-actions button:hover, .answer-actions button.active { background:var(--mint); color:var(--green); }
     .thinking-status { color:var(--muted); font-size:.82rem; }
     .attachment-list { display:flex; gap:7px; flex-wrap:wrap; width:100%; }
@@ -462,7 +462,7 @@
       line-height: 1.65;
     }
 
-    .composer textarea:focus-visible { outline: none; }
+    .composer textarea:focus-visible { outline: none; } .attach-button { display:inline-grid; place-items:center; flex:0 0 40px; width:40px; height:40px; border:0; border-radius:50%; background:#f2f5f2; color:#26342b; cursor:pointer; } .attach-button:hover { background:#e5eee7; }
 
     .composer textarea::placeholder {
       color: var(--muted);
@@ -911,12 +911,12 @@
       <form id="form" class="composer">
         <input id="fileInput" type="file" accept="image/*,.pdf,.txt,.md,.csv" multiple hidden>
         <div id="attachmentList" class="attachment-list hidden"></div>
-        <textarea id="question" maxlength="2000"
+        <button id="attachBtn" class="attach-button" type="button" aria-label="ফাইল বা ছবি যোগ করুন" title="ফাইল/ছবি যোগ করুন"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><textarea id="question" maxlength="2000"
           placeholder="Walid AI-কে প্রশ্ন করুন..."
           aria-label="প্রশ্ন লিখুন"></textarea>
         <div class="composer-bottom">
           <span id="uploadQuotaHint" class="composer-hint">ফাইল/ছবি AI-তে পাঠানো হবে · <a href="privacy.html" target="_blank" rel="noopener">গোপনীয়তা</a></span>
-          <button id="attachBtn" type="button" aria-label="ফাইল বা ছবি যোগ করুন" title="ফাইল/ছবি যোগ করুন">＋</button>
+          
           <button id="send" class="primary send-button" type="submit" aria-label="Send">
             <svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             <span class="sr-only">Send</span>
@@ -1750,7 +1750,7 @@
 
       if (kind === "user") {
         const actions = document.createElement("div"); actions.className = "question-actions";
-        const edit = document.createElement("button"); edit.type = "button"; edit.textContent = "✎ সম্পাদনা";
+        const edit = document.createElement("button"); edit.type = "button"; edit.title = "প্রশ্ন সম্পাদনা করুন"; edit.setAttribute("aria-label", edit.title); edit.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
         edit.addEventListener("click", () => {
           const index = Number(bubble.dataset.messageIndex);
           input.value = String(text ?? ""); resizeComposer(); input.focus();
@@ -1765,13 +1765,13 @@
         const answerIndex = Number(bubble.dataset.messageIndex);
         const previousQuestion = meta.question || [...chatMessages.slice(0, answerIndex)].reverse().find((item) => item.kind === "user")?.text || "";
         const actions = document.createElement("div"); actions.className = "answer-actions";
-        const button = (label, title, callback) => { const element = document.createElement("button"); element.type = "button"; element.textContent = label; element.title = title; element.addEventListener("click", callback); actions.appendChild(element); };
-        button("⧉ কপি", "উত্তর কপি করুন", async () => { try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", "কপি করা যায়নি—উত্তরটি চেপে ধরে কপি করুন।"); } });
-        button("↗ শেয়ার", "উত্তর শেয়ার করুন", async () => { try { if (navigator.share) await navigator.share({ title:"Walid AI", text:String(text ?? "") }); else { await navigator.clipboard.writeText(String(text ?? "")); } } catch {} });
-        button("↻ আবার", "আবার উত্তর তৈরি করুন", () => { input.value = String(previousQuestion); resizeComposer(); form.requestSubmit(); });
+        const button = (svg, title, callback) => { const element = document.createElement("button"); element.type = "button"; element.innerHTML = svg; element.title = title; element.setAttribute("aria-label", title); element.addEventListener("click", callback); actions.appendChild(element); };
+        button('<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>', "উত্তর কপি করুন", async () => { try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", "কপি করা যায়নি—উত্তরটি চেপে ধরে কপি করুন।"); } });
+        button('<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"/></svg>', "উত্তর শেয়ার করুন", async () => { try { if (navigator.share) await navigator.share({ title:"Walid AI", text:String(text ?? "") }); else { await navigator.clipboard.writeText(String(text ?? "")); } } catch {} });
+        button('<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 0 2 5"/></svg>', "আবার উত্তর তৈরি করুন", () => { input.value = String(previousQuestion); resizeComposer(); form.requestSubmit(); });
         const liked = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]"));
-        const like = document.createElement("button"); like.type = "button"; like.textContent = liked.has(String(text ?? "")) ? "♥ ভালো লেগেছে" : "♡ ভালো লেগেছে"; like.classList.toggle("active", liked.has(String(text ?? "")));
-        like.addEventListener("click", () => { const next = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]")); if (next.has(String(text ?? ""))) next.delete(String(text ?? "")); else next.add(String(text ?? "")); localStorage.setItem("walidLikedAnswers", JSON.stringify([...next].slice(-100))); like.classList.toggle("active", next.has(String(text ?? ""))); like.textContent = next.has(String(text ?? "")) ? "♥ ভালো লেগেছে" : "♡ ভালো লেগেছে"; });
+        const like = document.createElement("button"); like.type = "button"; like.title = "ভালো লেগেছে"; like.setAttribute("aria-label", like.title); like.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>'; like.classList.toggle("active", liked.has(String(text ?? "")));
+        like.addEventListener("click", () => { const next = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]")); if (next.has(String(text ?? ""))) next.delete(String(text ?? "")); else next.add(String(text ?? "")); localStorage.setItem("walidLikedAnswers", JSON.stringify([...next].slice(-100))); like.classList.toggle("active", next.has(String(text ?? ""))); });
         actions.appendChild(like);
         if (Number.isFinite(meta.seconds)) { const duration = document.createElement("span"); duration.className = "source"; duration.textContent = `⏱ ${meta.seconds.toFixed(1)} সেকেন্ড`; actions.appendChild(duration); }
         bubble.appendChild(actions);

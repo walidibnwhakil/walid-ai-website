@@ -414,7 +414,7 @@
       font-size: .77rem;
     }
 
-    .answer-actions, .question-actions { display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; }
+    .answer-actions, .question-actions { display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; } .question-actions { display:none; position:absolute; z-index:5; left:0; bottom:-43px; padding:4px 7px; border:1px solid var(--line); border-radius:12px; background:var(--field); box-shadow:0 5px 18px #0002; } .msg.user.question-menu-open .question-actions { display:flex; } .msg.user { position:relative; } .msg.ai > span a { color:var(--green); text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere; } .typing-cursor::after { content:"▋"; display:inline-block; margin-left:2px; color:var(--green); animation:walid-caret .8s steps(2,start) infinite; } @keyframes walid-caret { to { visibility:hidden; } }
     .answer-actions button, .question-actions button { display:inline-grid; place-items:center; width:34px; height:34px; border:0; background:transparent; color:var(--muted); padding:6px; border-radius:10px; cursor:pointer; }
     .answer-actions button:hover, .question-actions button:hover, .answer-actions button.active { background:var(--mint); color:var(--green); }
     .thinking-status { color:var(--muted); font-size:.82rem; }
@@ -1727,7 +1727,7 @@
         bubble.appendChild(wrapper);
       } else {
         const body = document.createElement("span");
-        body.textContent = String(text ?? "");
+        body.textContent = String(text ?? ""); if (kind === "ai") renderCabinetSource(body, String(text ?? ""));
         bubble.appendChild(body);
       }
 
@@ -1759,7 +1759,7 @@
           restoringChat = true; previous.forEach((item) => addMessage(item.kind, item.text, item.source || "")); restoringChat = false;
           void persistConversation();
         });
-        actions.appendChild(edit); bubble.appendChild(actions);
+        const copy = document.createElement("button"); copy.type = "button"; copy.title = "প্রশ্ন কপি করুন"; copy.setAttribute("aria-label", copy.title); copy.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>'; copy.addEventListener("click", async (event) => { event.stopPropagation(); try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", "প্রশ্নটি কপি করা যায়নি।"); } bubble.classList.remove("question-menu-open"); }); actions.append(edit, copy); bubble.appendChild(actions); let holdTimer = null; const reveal = () => { chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); bubble.classList.add("question-menu-open"); }; bubble.addEventListener("contextmenu", (event) => { event.preventDefault(); reveal(); }); bubble.addEventListener("pointerdown", (event) => { if (event.button === 0) holdTimer = setTimeout(reveal, 500); }); ["pointerup", "pointerleave", "pointercancel"].forEach((name) => bubble.addEventListener(name, () => clearTimeout(holdTimer))); bubble.addEventListener("click", (event) => { if (!event.target.closest(".question-actions")) chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); });
       }
       if (kind === "ai") {
         const answerIndex = Number(bubble.dataset.messageIndex);
@@ -1780,7 +1780,7 @@
       return bubble;
     }
 
-    function parseMarkdownTable(text) {
+    function renderCabinetSource(node, text) { const pattern = new RegExp("https://cabinet" + String.fromCharCode(46) + "gov" + String.fromCharCode(46) + "bd/[^" + String.fromCharCode(32) + "]+","g"); const fragment = document.createDocumentFragment(); let cursor = 0, match; while ((match = pattern.exec(text))) { let url = match[0], suffix = (url.match(/[.,;!?।]+$/) || [""])[0]; url = url.slice(0, url.length - suffix.length); fragment.append(document.createTextNode(text.slice(cursor, match.index))); const link = document.createElement("a"); link.href = url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "বাংলাদেশ মন্ত্রিপরিষদ বিভাগ"; fragment.append(link, document.createTextNode(suffix)); cursor = pattern.lastIndex; } fragment.appendChild(document.createTextNode(text.slice(cursor))); node.replaceChildren(fragment); } function parseMarkdownTable(text) {
       const lines = String(text).trim()
         .split(/\r?\n/)
         .filter((line) => line.includes("|"));
@@ -1930,7 +1930,7 @@
       resizeComposer();
       send.disabled = true;
       const requestStarted = performance.now();
-      let streamedBubble = null, streamedBody = null, streamedText = "";
+      let streamedBubble = null, streamedBody = null, streamedText = "", streamVisible = 0, streamTicker = null;
       const thinking = addMessage("thinking", "উত্তর তৈরি হচ্ছে… 0.0 সেকেন্ড");
       const timer = setInterval(() => { thinking.textContent = `উত্তর তৈরি হচ্ছে… ${((performance.now() - requestStarted) / 1000).toFixed(1)} সেকেন্ড`; }, 100);
 
@@ -1969,14 +1969,14 @@
                   streamedBody = streamedBubble.querySelector(":scope > span:not(.source)");
                 }
                 streamedText += event.text || "";
-                if (streamedBody) streamedBody.textContent = streamedText;
+                if (streamedBody && !streamTicker) { streamedBody.classList.add("typing-cursor"); streamTicker = setInterval(() => { if (streamVisible < streamedText.length) { streamVisible = Math.min(streamedText.length, streamVisible + Math.max(1, Math.ceil((streamedText.length - streamVisible) / 90))); streamedBody.textContent = streamedText.slice(0, streamVisible); chat.scrollTo({top:chat.scrollHeight,behavior:"smooth"}); } },18); }
               } else if (event.event === "done") {
                 Object.assign(data, event);
               }
             }
             if (done) break;
           }
-          data.answer = streamedText;
+          while (streamVisible < streamedText.length) await new Promise((resolve) => setTimeout(resolve,24)); if(streamTicker) clearInterval(streamTicker); if(streamedBody) streamedBody.classList.remove("typing-cursor"); data.answer = streamedText;
         } else {
           data = await response.json();
         }

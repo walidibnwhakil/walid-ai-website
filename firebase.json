@@ -5,7 +5,10 @@
       "firebase.json",
       ".firebaserc",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "app.py",
+      "**/__pycache__/**",
+      "**/*.pyc"
     ],
     "cleanUrls": false
   }

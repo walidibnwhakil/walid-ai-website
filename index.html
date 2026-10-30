@@ -519,8 +519,11 @@
     .attach-button svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; }
     .attach-menu { position:absolute; z-index:18; left:10px; bottom:calc(100% + 10px); min-width:210px; padding:7px; display:grid; gap:3px; border:1px solid var(--line); border-radius:14px; background:var(--paper); box-shadow:0 12px 35px #0002; }
     .attach-menu.hidden { display:none; }
-    .attach-menu button { display:flex; align-items:center; width:100%; padding:10px 12px; border:0; border-radius:9px; background:transparent; color:var(--ink); text-align:left; font:inherit; }
+    .attach-menu button { display:flex; align-items:center; gap:12px; width:100%; padding:10px 12px; border:0; border-radius:9px; background:transparent; color:var(--ink); text-align:left; font:inherit; }
     .attach-menu button:hover, .attach-menu button:focus-visible { background:var(--soft); }
+    .attach-menu-icon { width:20px; height:20px; flex:0 0 20px; display:grid; place-items:center; color:var(--muted); }
+    .attach-menu-icon svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+    #chatToolsBtn { display:none!important; }
     .composer { flex-wrap:wrap; align-items:center; }
     .composer .attachment-list { order:-1; flex:0 0 100%; align-self:stretch; min-width:0; }
     .composer #attachBtn, .composer #chatToolsBtn { order:0; }
@@ -996,7 +999,7 @@
         <button id="attachBtn" class="attach-button" type="button" aria-label="Add files or photos" title="Add files or photos" aria-expanded="false" aria-controls="attachMenu">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         </button>
-        <div id="attachMenu" class="attach-menu hidden" role="menu" aria-label="Add to chat"><button type="button" role="menuitem" data-upload-kind="file">Upload files</button><button type="button" role="menuitem" data-upload-kind="photo">Upload photos</button></div>
+        <div id="attachMenu" class="attach-menu hidden" role="menu" aria-label="Add to chat"><button type="button" role="menuitem" data-upload-kind="file"><span class="attach-menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2H7zM14 3.75v4.5h4.25M9.5 12h6M9.5 15.5h6"/></svg></span><span>Upload files</span></button><button type="button" role="menuitem" data-upload-kind="photo"><span class="attach-menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.2"/><circle cx="9" cy="9" r="1.5"/><path d="m5.5 17 4.5-4.6 3.1 3 2.3-2.2 3.1 3.8"/></svg></span><span>Upload photos</span></button></div>
         <button id="chatToolsBtn" class="attach-button tools-chat-button hidden" type="button" aria-label="Open file tools" title="Tools">Tools</button>
         <textarea id="question" maxlength="2000"
           placeholder="Ask Walid AI..."

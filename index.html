@@ -1670,6 +1670,8 @@
 
     loginBtn.addEventListener("click", () => openLogin("login"));
     signupBtn.addEventListener("click", () => openLogin("signup"));
+    const authIntent = new URLSearchParams(location.search).get("auth");
+    if (authIntent === "login" || authIntent === "signup") { history.replaceState(null, "", location.pathname); requestAnimationFrame(() => openLogin(authIntent)); }
     chatToolsBtn.addEventListener("click", () => {
       if (!IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
         openLogin("login");

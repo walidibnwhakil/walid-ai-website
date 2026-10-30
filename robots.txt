@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://walid-ai.com/sitemap.xml

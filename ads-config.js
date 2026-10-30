@@ -1,3 +1,2 @@
-// Add the real publisher ID and ad unit IDs after AdSense approves walid-ai.com.
-// Keep empty until then; the website intentionally renders no test ads.
-window.WALID_ADS = { publisherId: "", slots: { tools: "", landing: "" } };
+// AdSense placements are limited to the tools section and tool landing pages.
+window.WALID_ADS = { publisherId: "ca-pub-1822896326992509", slots: { tools: "", landing: "" } };

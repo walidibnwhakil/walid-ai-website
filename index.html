@@ -921,7 +921,12 @@
         transition-duration: .01ms !important;
       }
     }
-  </style>
+  
+    .chat-ad-wrap { width:min(320px,calc(100% - 24px)); margin:12px auto 14px; text-align:center; }
+    .chat-ad-wrap[hidden] { display:none !important; }
+    .chat-ad-label { display:block; margin-bottom:4px; color:var(--muted); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; }
+    #chatAdSlot { max-width:320px; min-height:50px; margin:0 auto; overflow:hidden; }
+</style>
   <style>
     .chat-tools-modal{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;padding:16px;background:#1119}
     .chat-tools-modal.hidden{display:none}
@@ -982,6 +987,7 @@
       </section>
 
       <section id="chat" class="chat" aria-live="polite"></section>
+      <aside id="chatAdWrap" class="chat-ad-wrap" aria-label="Advertisement" hidden><span class="chat-ad-label">Advertisement</span><div id="chatAdSlot"></div></aside>
 
       <form id="form" class="composer">
         <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.txt,.md,.csv" multiple hidden>
@@ -2314,6 +2320,7 @@
       });
     }
   </script>
+<script src="/ads-config.js"></script><script src="/chat-ad.js"></script>
 </body>
 </html>
 

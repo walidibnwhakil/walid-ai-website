@@ -1,25 +1,25 @@
 
 <!doctype html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f8f4">
-  <meta name="description" content="Walid AI — বাংলাদেশের AI">
+  <meta name="description" content="Walid AI — Bangladeshi AI">
   <link rel="canonical" href="https://walid-ai.com/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://walid-ai.com/">
-  <meta property="og:title" content="Walid AI — বাংলাদেশের AI">
-  <meta property="og:description" content="Walid AI — বাংলাদেশের AI">
+  <meta property="og:title" content="Walid AI — Bangladeshi AI">
+  <meta property="og:description" content="Walid AI — Bangladeshi AI">
   <meta property="og:image" content="https://walid-ai.com/walid-ai-preview.jpg">
   <meta property="og:image:width" content="640">
   <meta property="og:image:height" content="336">
-  <meta property="og:image:alt" content="Walid AI — বাংলাদেশের AI">
+  <meta property="og:image:alt" content="Walid AI — Bangladeshi AI">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Walid AI — বাংলাদেশের AI">
-  <meta name="twitter:description" content="Walid AI — বাংলাদেশের AI">
+  <meta name="twitter:title" content="Walid AI — Bangladeshi AI">
+  <meta name="twitter:description" content="Walid AI — Bangladeshi AI">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
-  <title>Walid AI — বাংলাদেশের AI</title>
+  <title>Walid AI — Bangladeshi AI</title>
 
   <style>
     :root {
@@ -73,7 +73,7 @@
       min-height: 100vh;
       background: var(--bg);
       color: var(--ink);
-      font: 15px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+      font: 15px/1.65 "Times New Roman", Times, serif;
     }
 
     :root[data-theme="dark"] body { background: var(--bg); }
@@ -84,7 +84,8 @@
       left:calc(50% + 125px); top:50%; width:min(68vw,760px); aspect-ratio:1;
       transform:translate(-50%,-50%);
       background:url("kathgolap-logo.png") center/contain no-repeat;
-      opacity:.12; pointer-events:none;
+      opacity:.17; pointer-events:none;
+      filter:drop-shadow(0 8px 18px #8a641f30) saturate(1.08);
     }
 
     button, input, textarea { font: inherit; }
@@ -121,13 +122,13 @@
       color: #17231d;
       box-shadow: none;
     }
-    .side-brand { display:flex; align-items:center; gap:10px; padding:0 8px 22px; }
-    .side-brand img { width:40px; height:40px; object-fit:contain; }
+    .side-brand { display:flex; align-items:center; gap:4px; padding:0 8px 22px; }
+    .side-brand img { width:44px; height:44px; object-fit:contain; }
     .side-brand strong { display:block; font: bold 20px "Times New Roman", Times, serif; }
     .side-brand .brand-tagline { margin-top:2px; font-size:.68rem; }
     .new-chat { width:100%; padding:10px 12px; border:1px solid #e5e5e5; border-radius:10px; background:#fff; color:#111; text-align:left; font-weight:600; }
     .side-link { width:100%; padding:9px 12px; border:0; border-radius:9px; background:transparent; color:#222; text-align:left; }
-    .side-link, .new-chat { display:flex; align-items:center; gap:10px; font:500 15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .side-link, .new-chat { display:flex; align-items:center; gap:10px; font:500 15px/1.4 "Times New Roman",Times,serif; }
     .side-link svg, .new-chat svg { width:19px; height:19px; flex:none; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
     .side-link:hover { background:#f5f5f5; }
     .history-title { margin:24px 9px 9px; color:#78847d; font-size:.74rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
@@ -147,6 +148,10 @@
     .sidebar-login button { width:100%; padding:10px; border:1px solid #d9d9d9; border-radius:999px; background:#fff; color:#111; font-weight:600; }
     .sidebar-language { display:grid; gap:7px; margin:18px 8px 0; color:#69736d; font-size:.8rem; }
     .sidebar-language select { width:100%; padding:9px 10px; border:1px solid #e5e5e5; border-radius:9px; background:#fff; color:#222; }
+    .brand-version { margin:6px 8px 12px; color:#69736d; font-size:.78rem; }
+    .settings-dialog { width:min(400px,100%); text-align:left; }
+    .settings-dialog .sidebar-language { margin:18px 0 0; }
+    .settings-dialog .brand-version { margin:14px 0 0; padding-top:12px; border-top:1px solid var(--line); }
     .mobile-menu, .sidebar-backdrop { display:none; }
 
     .topbar {
@@ -158,7 +163,7 @@
       border-bottom: 0;
     }
     .page-brand { display:grid; justify-items:center; gap:2px; color:#111; font:700 1.3rem/1 "Times New Roman",Times,serif; letter-spacing:.02em; white-space:nowrap; }
-    .page-brand-title { display:flex; align-items:center; justify-content:center; gap:7px; }
+    .page-brand-title { display:flex; align-items:center; justify-content:center; gap:2px; }
     .page-brand-logo { display:none; width:27px; height:27px; object-fit:contain; }
     .page-brand .brand-tagline { margin:0; font-size:.68rem; }
 
@@ -195,11 +200,25 @@
 
     .brand-name span { color: var(--green); }
 
+    .page-brand-logo, .side-brand img { filter: drop-shadow(0 1px 2px #7d641d35); animation: logo-bloom 34s ease-in-out 2s infinite; }
+    .flower-flight { position:fixed; z-index:1200; width:clamp(110px,20vw,190px); height:auto; pointer-events:none; opacity:0; filter:drop-shadow(0 7px 14px #8a641f30); animation: flower-flight 1.65s cubic-bezier(.18,.72,.22,1) both; }
+    @keyframes flower-flight {
+      0% { opacity:0; transform:translate(-50%,-50%) scale(.42) rotate(-12deg); }
+      14% { opacity:.92; transform:translate(-50%,-50%) scale(1.18) rotate(4deg); }
+      76% { opacity:.94; }
+      100% { opacity:0; transform:translate(calc(-50% + var(--flower-dx)),calc(-50% + var(--flower-dy))) scale(.24) rotate(16deg); }
+    }
+    @keyframes logo-bloom {
+      0%,88%,100% { transform:scale(1) rotate(0); }
+      92% { transform:scale(1.15) rotate(9deg); }
+      96% { transform:scale(1.03) rotate(-5deg); }
+    }
+
     .brand-tagline {
       position: relative;
       isolation: isolate;
       width: max-content;
-      font-family: "SolaimanLipi", "Siyam Rupali", serif;
+      font-family: "Times New Roman", Times, serif;
       display: block;
       margin: 3px auto 0;
       color: var(--muted);
@@ -212,18 +231,28 @@
       position: absolute;
       z-index: -1;
       inset: 1px -5px;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      overflow: hidden;
-      border-radius: 2px;
-      opacity: .42;
-      animation: ribbon-wave 2.4s ease-in-out infinite;
+      display:block;
+      overflow:hidden;
+      border-radius:2px;
+      background:#006a4e;
+      opacity:.3;
+      transform-origin:left center;
+      animation:ribbon-wave 3.2s ease-in-out infinite;
     }
-    .tagline-ribbon i:nth-child(1), .tagline-ribbon i:nth-child(3) { background: #006a4e; }
-    .tagline-ribbon i:nth-child(2) { background: #f42a41; }
+    .tagline-ribbon i { display:none; }
+    .tagline-ribbon::after { content:""; position:absolute; width:.58em; height:.58em; left:36%; top:50%; transform:translateY(-50%); border-radius:50%; background:#f42a41; }
     @keyframes ribbon-wave {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(1px); }
+      0%,100% { transform:perspective(90px) rotateY(0) skewY(0); }
+      36% { transform:perspective(90px) rotateY(12deg) skewY(-1.5deg); }
+      72% { transform:perspective(90px) rotateY(-8deg) skewY(1deg); }
+    }
+    html[lang="bn"] body { font-family:"SolaimanLipi","Noto Sans Bengali",serif; }
+    html[lang="bn"] .brand-tagline { font-family:"SolaimanLipi","Noto Sans Bengali",serif; }
+    html[data-ui-language="en"] body,
+    html[data-ui-language="en"] body :not(svg):not(path) { font-family:"Times New Roman",Times,serif !important; }
+    .msg.bengali { font-family:"SolaimanLipi","Noto Sans Bengali",serif !important; }
+    @media (prefers-reduced-motion: reduce) {
+      .page-brand-logo, .side-brand img, .tagline-ribbon, .flower-flight { animation:none !important; }
     }
 
     .top-actions {
@@ -414,11 +443,23 @@
       font-size: .77rem;
     }
 
-    .answer-actions, .question-actions { display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; } .question-actions { display:none; position:absolute; z-index:5; left:0; bottom:-43px; padding:4px 7px; border:1px solid var(--line); border-radius:12px; background:var(--field); box-shadow:0 5px 18px #0002; } .msg.user.question-menu-open .question-actions { display:flex; } .msg.user { position:relative; } .msg.ai > span a { color:var(--green); text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere; } .typing-cursor::after { content:"▋"; display:inline-block; margin-left:2px; color:var(--green); animation:walid-caret .8s steps(2,start) infinite; } @keyframes walid-caret { to { visibility:hidden; } }
+    .answer-actions, .question-actions { display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; }
+    .question-actions { display:none; position:absolute; z-index:5; left:0; bottom:-43px; padding:4px 7px; border:1px solid var(--line); border-radius:12px; background:var(--field); box-shadow:0 5px 18px #0002; }
+    .msg.user.question-menu-open .question-actions { display:flex; }
+    .msg.user { position:relative; }
+    .msg.ai > span a { color:var(--green); text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere; }
+    .typing-cursor::after { content:"▋"; display:inline-block; margin-left:2px; color:var(--green); animation:walid-caret .8s steps(2,start) infinite; }
+    @keyframes walid-caret { to { visibility:hidden; } }
     .answer-actions button, .question-actions button { display:inline-grid; place-items:center; width:34px; height:34px; border:0; background:transparent; color:var(--muted); padding:6px; border-radius:10px; cursor:pointer; }
     .answer-actions button:hover, .question-actions button:hover, .answer-actions button.active { background:var(--mint); color:var(--green); }
+    .answer-actions button.active svg { fill:currentColor; }
+    .action-icon { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
     .thinking-status { color:var(--muted); font-size:.82rem; }
     .attachment-list { display:flex; gap:7px; flex-wrap:wrap; width:100%; }
+    .composer { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; }
+    .composer .attachment-list { grid-column:1 / -1; min-width:0; }
+    .composer textarea { grid-column:1; grid-row:2; width:100%; min-width:0; }
+    .composer-bottom { grid-column:2; grid-row:2; min-width:max-content; }
     .attachment-chip { background:var(--mint); border-radius:12px; padding:5px 9px; font-size:.75rem; }
     .help-form { display:grid; gap:10px; margin-top:14px; }
     .help-form textarea { min-height:120px; }
@@ -462,12 +503,32 @@
       line-height: 1.65;
     }
 
-    .composer textarea:focus-visible { outline: none; } .attach-button { display:inline-grid; place-items:center; flex:0 0 40px; width:40px; height:40px; border:0; border-radius:50%; background:#f2f5f2; color:#26342b; cursor:pointer; } .attach-button:hover { background:#e5eee7; }
+    .composer textarea:focus-visible { outline: none; }
 
     .composer textarea::placeholder {
       color: var(--muted);
       opacity: .9;
     }
+
+    .attach-button {
+      display:inline-grid; place-items:center; flex:0 0 40px; width:40px; height:40px;
+      border:0; border-radius:50%; background:#f2f5f2; color:#26342b; cursor:pointer;
+      transition:background .18s ease, transform .18s ease;
+    }
+    .attach-button:hover { background:#e5eee7; transform:scale(1.04); }
+    .attach-button svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; }
+    .attach-menu { position:absolute; z-index:18; left:10px; bottom:calc(100% + 10px); min-width:210px; padding:7px; display:grid; gap:3px; border:1px solid var(--line); border-radius:14px; background:var(--paper); box-shadow:0 12px 35px #0002; }
+    .attach-menu.hidden { display:none; }
+    .attach-menu button { display:flex; align-items:center; width:100%; padding:10px 12px; border:0; border-radius:9px; background:transparent; color:var(--ink); text-align:left; font:inherit; }
+    .attach-menu button:hover, .attach-menu button:focus-visible { background:var(--soft); }
+    .composer { flex-wrap:wrap; align-items:center; }
+    .composer .attachment-list { order:-1; flex:0 0 100%; align-self:stretch; min-width:0; }
+    .composer #attachBtn, .composer #chatToolsBtn { order:0; }
+    .composer textarea { order:1; flex:1 1 130px; width:auto; min-width:120px; }
+    .composer-bottom { order:2; flex:0 0 auto; }
+    .attachment-chip { display:flex; align-items:center; gap:5px; max-width:min(100%,320px); min-width:0; }
+    .attachment-chip-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .attachment-chip button { flex:none; border:0; background:transparent; color:inherit; padding:0 2px; }
 
     .composer-bottom {
       display: flex;
@@ -809,7 +870,7 @@
 
     @media (max-width: 650px) {
       html, body { height:100%; overflow:hidden; }
-      body:before { left:50%; width:min(92vw,520px); opacity:.09; }
+      body:before { left:50%; width:min(92vw,520px); opacity:.15; }
       .sidebar { display:flex; position:fixed; inset:0 auto 0 0; z-index:30; width:min(300px,86vw); padding:20px 16px 16px; transform:translateX(-105%); transition:transform .2s ease; box-shadow:0 12px 36px #0002; }
       .sidebar.open { transform:translateX(0); }
       .sidebar-backdrop.open { display:block; position:fixed; inset:0; z-index:29; border:0; background:#0005; }
@@ -819,6 +880,7 @@
       .mobile-menu svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; }
       .page-brand { font-size:1.05rem; }
       .page-brand-logo { display:block; width:26px; height:26px; }
+      .page-brand-title { gap:0; }
       .logo { width: 40px; height: 38px; }
       .brand { gap: 7px; }
       .brand-name { font-size: .95rem; white-space:nowrap; }
@@ -832,8 +894,8 @@
       .main { min-height:0; height:100%; }
       .chat { flex:1 1 0; max-height:none; min-height:0; padding:13px; overflow-y:auto; }
       .msg { max-width: 95%; }
-      .composer { margin-bottom: 10px; padding: 10px 11px; border-radius: 21px; }
-      .composer textarea { min-height: 49px; }
+      .composer { margin-bottom: 10px; padding: 10px 11px; border-radius: 21px; gap:7px; }
+      .composer textarea { min-height: 49px; min-width:100px; flex:1 1 110px; }
       .composer-hint { font-size: .68rem; }
       .send-button { min-width: 40px; min-height: 40px; padding: 0; }
       .login-dialog { padding: 32px 22px 24px; border-radius: 21px; }
@@ -860,6 +922,18 @@
       }
     }
   </style>
+  <style>
+    .chat-tools-modal{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;padding:16px;background:#1119}
+    .chat-tools-modal.hidden{display:none}
+    .chat-tools-dialog{width:min(1120px,100%);height:min(92vh,900px);display:flex;flex-direction:column;overflow:hidden;border-radius:16px;background:#f7f7f8;box-shadow:0 20px 70px #0004}
+    .chat-tools-head{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#fff;border-bottom:1px solid #e4e6ea;font-weight:650}
+    .chat-tools-head button{border:0;background:none;font-size:1.5rem;cursor:pointer;color:#51565d}
+    .chat-tools-dialog iframe{width:100%;flex:1;border:0;background:#f7f7f8}
+    .tools-chat-button{font-size:.75rem;font-weight:650;flex-basis:42px;width:auto;padding:0 10px;border-radius:18px}
+    .tools-chat-button.hidden{display:none}
+    .tool-result-link{display:inline-block;margin:10px 0;color:#146c54;font-weight:650;text-decoration:underline}
+    @media(max-width:560px){.chat-tools-modal{padding:0}.chat-tools-dialog{height:100dvh;border-radius:0}.chat-tools-head{height:48px;flex-basis:48px}}
+  </style>
 
   <script src="backend-config.js"></script>
   <script src="firebase-config.js"></script>
@@ -867,27 +941,27 @@
 
 <body>
   <button id="sidebarBackdrop" class="sidebar-backdrop" type="button" aria-label="Close menu"></button>
-  <aside class="sidebar" aria-label="চ্যাট ও প্রোফাইল">
-    <div class="side-brand"><img src="kathgolap-logo.png" alt=""><div><strong>Walid AI</strong><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>বাংলাদেশের AI</span></div></div>
-    <button id="newChat" class="new-chat" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg><span data-i18n="newChat">নতুন চ্যাট</span></button>
+  <aside class="sidebar" aria-label="Chat and profile">
+    <div class="side-brand"><img src="kathgolap-logo.png" alt="ওয়ালিদ AI"><div><strong aria-label="ওয়ালিদ AI">Walid AI</strong><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>Bangladeshi AI</span></div></div>
+    <button id="newChat" class="new-chat" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg><span data-i18n="newChat">New chat</span></button>
+    <a class="side-link" href="tools.html" style="text-decoration:none"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg><span>Tools</span></a>
     <button id="helpBtn" class="side-link" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.6 1.3c-.8 1-2.2 1.3-2.2 3"/><path d="M12 17h.01"/></svg><span data-i18n="help">Help</span></button>
     <button id="settingsBtn" class="side-link" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 13a7 7 0 0 0 0-2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-4L10 6.1a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.5 3.1h4l.5-3.1a7 7 0 0 0 1.7-1l2.4 1 2-3.4Z"/></svg><span data-i18n="settings">Settings</span></button>
-    <label class="sidebar-language"><span data-i18n="language">Language</span><select id="languageSelect" aria-label="Language"><option value="bn">বাংলা</option><option value="en">English</option></select></label>
-    <div class="history-title" data-i18n="history">চ্যাটের ইতিহাস</div>
+    <div class="history-title" data-i18n="history">Recent chats</div>
     <div id="historyList" class="history-list" aria-live="polite"></div>
     <div id="sidebarLogin" class="sidebar-login">
-      <p data-i18n="sidebarInfo">আপনার chat history পেতে লগ ইন করুন।</p>
+      <p data-i18n="sidebarInfo">Log in to access your chat history.</p>
       <button id="sidebarLoginBtn" type="button" data-i18n="login">Log in</button>
     </div>
     <div class="profile hidden" id="signedInProfile">
       <span id="profileAvatar" class="avatar" aria-hidden="true">G</span>
-      <span id="profileCopy" class="profile-copy">Guest<small>এই ব্রাউজারে সংরক্ষিত</small></span>
+      <span id="profileCopy" class="profile-copy">Guest<small>Saved on this browser</small></span>
     </div>
   </aside>
   <main class="page">
     <header class="topbar">
       <button id="mobileMenu" class="mobile-menu" type="button" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="page-brand"><span class="page-brand-title"><img class="page-brand-logo" src="kathgolap-logo.png" alt=""><span>Walid AI</span></span><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>বাংলাদেশের AI</span></div>
+      <div class="page-brand"><span class="page-brand-title"><img class="page-brand-logo" src="kathgolap-logo.png" alt=""><span aria-label="ওয়ালিদ AI">Walid AI</span></span><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>Bangladeshi AI</span></div>
       <div class="top-actions">
         <button id="loginBtn" class="top-login" type="button" data-i18n="login">Log in</button>
         <button id="signupBtn" class="signup-button" type="button" data-i18n="signup">Sign up for free</button>
@@ -903,20 +977,24 @@
 
     <section class="main">
       <section class="welcome">
-        <h1 id="welcomeTitle">আজ কী জানতে চান?</h1>
+        <h1 id="welcomeTitle">Where should we begin?</h1>
       </section>
 
       <section id="chat" class="chat" aria-live="polite"></section>
 
       <form id="form" class="composer">
-        <input id="fileInput" type="file" accept="image/*,.pdf,.txt,.md,.csv" multiple hidden>
+        <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.txt,.md,.csv" multiple hidden>
         <div id="attachmentList" class="attachment-list hidden"></div>
-        <button id="attachBtn" class="attach-button" type="button" aria-label="ফাইল বা ছবি যোগ করুন" title="ফাইল/ছবি যোগ করুন"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button><textarea id="question" maxlength="2000"
-          placeholder="Walid AI-কে প্রশ্ন করুন..."
-          aria-label="প্রশ্ন লিখুন"></textarea>
+        <button id="attachBtn" class="attach-button" type="button" aria-label="Add files or photos" title="Add files or photos" aria-expanded="false" aria-controls="attachMenu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div id="attachMenu" class="attach-menu hidden" role="menu" aria-label="Add to chat"><button type="button" role="menuitem" data-upload-kind="file">Upload files</button><button type="button" role="menuitem" data-upload-kind="photo">Upload photos</button></div>
+        <button id="chatToolsBtn" class="attach-button tools-chat-button hidden" type="button" aria-label="Open file tools" title="Tools">Tools</button>
+        <textarea id="question" maxlength="2000"
+          placeholder="Ask Walid AI..."
+          aria-label="Ask a question"></textarea>
         <div class="composer-bottom">
-          <span id="uploadQuotaHint" class="composer-hint">ফাইল/ছবি AI-তে পাঠানো হবে · <a href="privacy.html" target="_blank" rel="noopener">গোপনীয়তা</a></span>
-          
+          <span id="uploadQuotaHint" class="composer-hint">Files and photos are processed to answer your request · <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></span>
           <button id="send" class="primary send-button" type="submit" aria-label="Send">
             <svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             <span class="sr-only">Send</span>
@@ -959,20 +1037,6 @@
 
       <div id="loginStatus" class="login-status" role="status"></div>
 
-      <button id="showAdmin" class="login-owner" type="button">
-        অ্যাডমিন প্রবেশ
-      </button>
-
-      <form id="accessForm" class="admin-form hidden">
-        <label for="accessKey">অ্যাডমিন অ্যাক্সেস কোড</label>
-        <div class="access-row">
-          <input id="accessKey" type="password"
-            placeholder="অ্যাক্সেস কোড" autocomplete="current-password">
-          <button id="accessButton" class="primary" type="submit">
-            প্রবেশ করুন
-          </button>
-        </div>
-      </form>
     </section>
   </div>
 
@@ -988,6 +1052,19 @@
         <div id="helpStatus" class="help-status" role="status"></div>
       </form>
     </section>
+  </div>
+
+  <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <section class="login-dialog settings-dialog">
+      <button id="closeSettings" class="login-close" type="button" aria-label="Close">×</button>
+      <h2 id="settingsTitle">Settings</h2>
+      <label class="sidebar-language"><span data-i18n="language">Language</span><select id="languageSelect" aria-label="Language"><option value="en">English</option><option value="bn">বাংলা</option></select></label>
+      <div class="brand-version">Walid AI 1.0</div>
+    </section>
+  </div>
+
+  <div id="chatToolsModal" class="chat-tools-modal hidden" role="dialog" aria-modal="true" aria-labelledby="chatToolsTitle">
+    <section class="chat-tools-dialog"><div class="chat-tools-head"><span id="chatToolsTitle">PDF &amp; Image Tools</span><button id="closeChatTools" type="button" aria-label="Close tools">×</button></div><iframe title="PDF and image tools" src="tools.html?embedded=1"></iframe></section>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1011,10 +1088,8 @@
     const googleButton = document.getElementById("googleButton");
     const emailInput = document.getElementById("emailInput");
     const emailButton = document.getElementById("emailButton");
-    const accessForm = document.getElementById("accessForm");
-    const accessKeyInput = document.getElementById("accessKey");
-    const accessButton = document.getElementById("accessButton");
-    const showAdmin = document.getElementById("showAdmin");
+    const chatToolsBtn = document.getElementById("chatToolsBtn");
+    const chatToolsModal = document.getElementById("chatToolsModal");
     const form = document.getElementById("form");
     const input = document.getElementById("question");
     const chat = document.getElementById("chat");
@@ -1025,6 +1100,7 @@
     const signedInProfile = document.getElementById("signedInProfile");
     const sidebarLogin = document.getElementById("sidebarLogin");
     const helpModal = document.getElementById("helpModal");
+    const settingsModal = document.getElementById("settingsModal");
     const profileAvatar = document.getElementById("profileAvatar");
     const profileCopy = document.getElementById("profileCopy");
     const historyList = document.getElementById("historyList");
@@ -1044,16 +1120,15 @@
     let persistQueue = Promise.resolve();
 
     const legacySessionToken = sessionStorage.getItem("walidToken") || "";
-    let ACCESS_TOKEN = localStorage.getItem("walidAdminAccess") || sessionStorage.getItem("walidAdminAccess") || "";
+    try { localStorage.removeItem("walidAdminAccess"); } catch {}
+    let ACCESS_TOKEN = sessionStorage.getItem("walidAdminAccess") || "";
     if (!ACCESS_TOKEN && legacySessionToken && legacySessionToken.split(".").length !== 3) {
       ACCESS_TOKEN = legacySessionToken;
     }
     if (ACCESS_TOKEN.split(".").length === 3) {
-      localStorage.removeItem("walidAdminAccess");
+      sessionStorage.removeItem("walidAdminAccess");
       ACCESS_TOKEN = "";
     }
-    if (ACCESS_TOKEN) localStorage.setItem("walidAdminAccess", ACCESS_TOKEN);
-    sessionStorage.removeItem("walidAdminAccess");
     if (legacySessionToken.split(".").length === 3) {
       sessionStorage.removeItem("walidToken");
     }
@@ -1088,9 +1163,12 @@
       profileCopy.replaceChildren();
       profileCopy.append(document.createTextNode(admin ? "Boss" : cleanName));
       const note = document.createElement("small");
-      note.textContent = admin ? "Whakil Ahamed Shakil" : historyOwner ? "ব্যক্তিগত অ্যাকাউন্ট" : "এই ব্রাউজারে সংরক্ষিত";
+      note.textContent = admin ? "Whakil Ahamed Shakil" : historyOwner
+        ? (languageSelect.value === "bn" ? "ব্যক্তিগত অ্যাকাউন্ট" : "Personal account")
+        : (languageSelect.value === "bn" ? "এই ব্রাউজারে সংরক্ষিত" : "Saved on this browser");
       profileCopy.appendChild(note);
       const signedIn = Boolean(ACCESS_TOKEN);
+      chatToolsBtn.classList.toggle("hidden", !signedIn);
       signedInProfile.classList.toggle("hidden", !signedIn);
       sidebarLogin.classList.toggle("hidden", signedIn);
       accountMenuWrap.classList.toggle("hidden", !signedIn);
@@ -1124,9 +1202,9 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "history-item";
-        button.textContent = record.title || "নতুন চ্যাট";
+        button.textContent = record.title || (languageSelect.value === "bn" ? "নতুন চ্যাট" : "New chat");
         button.addEventListener("click", () => openConversation(record));
-        const remove = document.createElement("button"); remove.type = "button"; remove.className = "history-delete"; remove.textContent = "×"; remove.title = "এই চ্যাট মুছুন"; remove.setAttribute("aria-label", "এই চ্যাট মুছুন");
+        const remove = document.createElement("button"); remove.type = "button"; remove.className = "history-delete"; remove.textContent = "×"; remove.title = languageSelect.value === "bn" ? "এই চ্যাট মুছুন" : "Delete this chat"; remove.setAttribute("aria-label", remove.title);
         remove.addEventListener("click", async (event) => {
           event.stopPropagation();
           const confirmed = confirm(languageSelect.value === "en" ? "Delete this chat?" : "এই চ্যাটটি মুছে ফেলবেন?");
@@ -1138,7 +1216,7 @@
               currentConversationId = newConversationId(); chatMessages = []; chat.replaceChildren(); welcome.classList.remove("hidden"); rememberActiveConversation();
             }
             drawHistory(historyOwner ? await loadAccountRecords(false) : guestRecords());
-          } catch { addMessage("error", "চ্যাটটি মোছা যায়নি। পরে আবার চেষ্টা করুন।"); }
+          } catch { addMessage("error", languageSelect.value === "bn" ? "চ্যাটটি মোছা যায়নি। পরে আবার চেষ্টা করুন।" : "This chat could not be deleted. Try again later."); }
         });
         row.append(button, remove); historyList.appendChild(row);
       });
@@ -1178,7 +1256,7 @@
       rememberActiveConversation();
       const record = {
         id: currentConversationId,
-        title: (chatMessages.find((item) => item.kind === "user")?.text || "নতুন চ্যাট").slice(0, 72),
+        title: (chatMessages.find((item) => item.kind === "user")?.text || (languageSelect.value === "bn" ? "নতুন চ্যাট" : "New chat")).slice(0, 72),
         messages: chatMessages,
         updatedAt: Date.now()
       };
@@ -1227,12 +1305,14 @@
     setProfile("Guest");
     restoreGuestConversation();
     function setLanguage(language) {
-      const lang = language === "en" ? "en" : "bn";
+      const lang = language === "bn" ? "bn" : "en";
       document.documentElement.lang = lang;
+      document.documentElement.dataset.uiLanguage = lang;
+      document.title = lang === "bn" ? "Walid AI — বাংলাদেশের AI" : "Walid AI — Bangladeshi AI";
       languageSelect.value = lang;
       const text = {
-        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আপনার chat history পেতে লগ ইন করুন।", welcome:"আজ কী জানতে চান?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"মাঝের বক্সে প্রশ্ন লিখে Send চাপুন।", help:"Help", settings:"Settings", language:"ভাষা", tagline:"বাংলাদেশের AI" },
-        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in to access your chat history.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"বাংলাদেশের AI" }
+        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"আজ কী জানতে চান?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"আপনার সমস্যাটি লিখে পাঠান; আমরা দেখে জানাব।", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI" },
+        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in for more questions and file uploads.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladeshi AI" }
       }[lang];
       document.querySelector('[data-i18n="newChat"]').textContent = text.newChat;
       document.querySelector('[data-i18n="history"]').textContent = text.history;
@@ -1244,6 +1324,15 @@
         tagline.lastChild.nodeValue = text.tagline;
       });
       document.getElementById("welcomeTitle").textContent = text.welcome;
+      input.setAttribute("aria-label", lang === "bn" ? "প্রশ্ন লিখুন" : "Ask a question");
+      document.getElementById("attachBtn").setAttribute("aria-label", lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos");
+      document.getElementById("attachBtn").title = lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos";
+      document.querySelector('#attachMenu [data-upload-kind="file"]').textContent = lang === "bn" ? "ফাইল আপলোড" : "Upload files";
+      document.querySelector('#attachMenu [data-upload-kind="photo"]').textContent = lang === "bn" ? "ছবি আপলোড" : "Upload photos";
+      document.getElementById("helpEmail").placeholder = lang === "bn" ? "ইমেইল (ঐচ্ছিক)" : "Email (optional)";
+      document.getElementById("helpMessage").placeholder = lang === "bn" ? "আপনার সমস্যাটি লিখুন" : "Describe the issue";
+      document.querySelector("#helpForm button[type=submit]").textContent = lang === "bn" ? "পাঠান" : "Send";
+      document.getElementById("closeLogin").setAttribute("aria-label", lang === "bn" ? "বন্ধ করুন" : "Close");
       input.placeholder = text.placeholder;
       send.setAttribute("aria-label", lang === "bn" ? "পাঠান" : "Send");
       loginBtn.textContent = text.login;
@@ -1253,25 +1342,51 @@
       document.getElementById("loginDescription").textContent = text.loginDesc;
       document.getElementById("helpText").textContent = text.helpText;
       document.getElementById("loginTitle").textContent = loginMode === "signup" ? text.signupTitle : text.login;
-      try { localStorage.setItem("walidLanguage", lang); } catch {}
+      
     }
 
     let loginMode = "login";
-    try { languageSelect.value = localStorage.getItem("walidLanguage") || "bn"; } catch { languageSelect.value = "bn"; }
-    languageSelect.addEventListener("change", () => setLanguage(languageSelect.value));
+    try { languageSelect.value = localStorage.getItem("walidLanguagePreference") || "en"; } catch { languageSelect.value = "en"; }
+    languageSelect.addEventListener("change", () => { try { localStorage.setItem("walidLanguagePreference", languageSelect.value); } catch {} setLanguage(languageSelect.value); });
     setLanguage(languageSelect.value);
+
+    function animateFlowerToLogo() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const headerFlower = document.querySelector(".page-brand-logo");
+      const target = headerFlower && headerFlower.getBoundingClientRect().width
+        ? headerFlower
+        : document.querySelector(".side-brand img");
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      const startX = window.innerWidth / 2 + (window.innerWidth > 650 ? 125 : 0);
+      const startY = window.innerHeight / 2;
+      const flower = document.createElement("img");
+      flower.className = "flower-flight";
+      flower.src = "kathgolap-logo.png";
+      flower.alt = "";
+      flower.setAttribute("aria-hidden", "true");
+      flower.style.left = startX + "px";
+      flower.style.top = startY + "px";
+      flower.style.setProperty("--flower-dx", (rect.left + rect.width / 2 - startX) + "px");
+      flower.style.setProperty("--flower-dy", (rect.top + rect.height / 2 - startY) + "px");
+      document.body.appendChild(flower);
+      flower.addEventListener("animationend", () => flower.remove(), { once: true });
+    }
+    requestAnimationFrame(() => requestAnimationFrame(animateFlowerToLogo));
 
     function openLogin(mode = "login") {
       loginMode = mode;
       setLanguage(languageSelect.value);
       loginStatus.textContent = firebaseReady
         ? ""
-        : "Google দিয়ে প্রবেশ করা যাবে; ইমেইল প্রবেশের Firebase সেটআপ বাকি।";
+        : (languageSelect.value === "bn" ? "Google দিয়ে প্রবেশ করা যাবে; ইমেইল প্রবেশের Firebase সেটআপ বাকি।" : "Google sign-in is available. Email sign-in still needs Firebase setup.");
       loginModal.classList.remove("hidden");
     }
 
     document.getElementById("helpBtn").addEventListener("click", () => helpModal.classList.remove("hidden"));
-    document.getElementById("settingsBtn").addEventListener("click", () => languageSelect.focus());
+    document.getElementById("settingsBtn").addEventListener("click", () => settingsModal.classList.remove("hidden"));
+    document.getElementById("closeSettings").addEventListener("click", () => settingsModal.classList.add("hidden"));
+    settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) settingsModal.classList.add("hidden"); });
     document.getElementById("closeHelp").addEventListener("click", () => helpModal.classList.add("hidden"));
 
     document.getElementById("helpForm").addEventListener("submit", async (event) => {
@@ -1279,60 +1394,101 @@
       const status = document.getElementById("helpStatus");
       const button = event.currentTarget.querySelector("button[type=submit]");
       button.disabled = true;
-      status.textContent = "পাঠানো হচ্ছে…";
+      status.textContent = languageSelect.value === "bn" ? "পাঠানো হচ্ছে…" : "Sending…";
       try {
         const response = await fetch(API + "/api/help", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: document.getElementById("helpEmail").value.trim(), message: document.getElementById("helpMessage").value.trim() })
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "বার্তাটি পাঠানো যায়নি।");
-        status.textContent = "ধন্যবাদ—আপনার বার্তাটি পেয়েছি। আমরা দেখে জানাব।";
+        if (!response.ok) throw new Error(data.error || (languageSelect.value === "bn" ? "বার্তাটি পাঠানো যায়নি।" : "Your message could not be sent."));
+        status.textContent = languageSelect.value === "bn" ? "ধন্যবাদ—আপনার বার্তাটি পেয়েছি। আমরা দেখে জানাব।" : "Thanks, we received your message and will review it.";
         document.getElementById("helpMessage").value = "";
-      } catch (error) { status.textContent = error.message || "বার্তাটি পাঠানো যায়নি। পরে আবার চেষ্টা করুন।"; }
+      } catch (error) { status.textContent = error.message || (languageSelect.value === "bn" ? "বার্তাটি পাঠানো যায়নি। পরে আবার চেষ্টা করুন।" : "Your message could not be sent. Try again later."); }
       finally { button.disabled = false; }
     });
 
     const fileInput = document.getElementById("fileInput");
     const attachBtn = document.getElementById("attachBtn");
     const attachmentList = document.getElementById("attachmentList");
-    attachBtn.addEventListener("click", async () => {
+    const attachMenu = document.getElementById("attachMenu");
+    attachBtn.addEventListener("click", () => {
       if (!IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
         loginModal.classList.remove("hidden");
-        loginStatus.textContent = "ফাইল বা ছবি দিতে আগে লগ ইন করুন।";
+        loginStatus.textContent = languageSelect.value === "bn" ? "ফাইল বা ছবি দিতে আগে লগ ইন করুন।" : "Log in to upload files or photos.";
         return;
       }
-      try {
-        const headers = {};
-        const token = await getAuthorizationToken();
-        if (token) headers.Authorization = "Bearer " + token;
-        const response = await fetch(API + "/api/upload-quota", { headers });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "আপলোড সীমা দেখা যাচ্ছে না।");
-        uploadQuota = data;
-        document.getElementById("uploadQuotaHint").textContent = data.unlimited ? "অ্যাডমিন অ্যাকাউন্টে আপলোড সীমা নেই" : (data.claim_bonus ? "আজ ৩টি বাড়তি সুযোগসহ " : "আজকের আপলোড: ") + data.remaining + "/" + data.limit + " বাকি";
-        if (data.remaining <= 0) { addMessage("error", "আজকের ফայլ/ছবি আপলোডের সীমা শেষ। আগামীকাল আবার চেষ্টা করুন।"); return; }
-        fileInput.click();
-      } catch (error) { addMessage("error", error.message || "আপলোড সীমা যাচাই করা যায়নি।"); }
+      const open = attachMenu.classList.contains("hidden");
+      attachMenu.classList.toggle("hidden", !open);
+      attachBtn.setAttribute("aria-expanded", String(open));
+    });
+    function openUploadPicker(kind) {
+      attachMenu.classList.add("hidden");
+      attachBtn.setAttribute("aria-expanded", "false");
+      fileInput.accept = kind === "photo"
+        ? "image/png,image/jpeg,image/webp,image/gif"
+        : ".pdf,.docx,.txt,.md,.csv,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,text/csv";
+      fileInput.click();
+    }
+    attachMenu.addEventListener("click", (event) => {
+      const choice = event.target.closest("[data-upload-kind]");
+      if (choice) void openUploadPicker(choice.dataset.uploadKind);
+    });
+    document.addEventListener("click", (event) => {
+      if (!attachMenu.contains(event.target) && event.target !== attachBtn && !attachBtn.contains(event.target)) {
+        attachMenu.classList.add("hidden");
+        attachBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        attachMenu.classList.add("hidden");
+        attachBtn.setAttribute("aria-expanded", "false");
+      }
     });
     fileInput.addEventListener("change", async () => {
       const files = Array.from(fileInput.files || []);
+      if (files.length) {
+        try {
+          const headers = {};
+          const token = await getAuthorizationToken();
+          if (token) headers.Authorization = "Bearer " + token;
+          const quotaResponse = await fetch(API + "/api/upload-quota", { headers });
+          const quota = await quotaResponse.json();
+          if (!quotaResponse.ok) throw new Error(quota.error || (languageSelect.value === "bn" ? "আপলোড সীমা যাচাই করা যায়নি।" : "Could not check upload quota."));
+          uploadQuota = quota;
+          const hint = document.getElementById("uploadQuotaHint");
+          hint.textContent = quota.unlimited
+            ? (languageSelect.value === "bn" ? "অ্যাডমিন অ্যাকাউন্টে আপলোড সীমা নেই" : "No upload limit for admin")
+            : (languageSelect.value === "bn" ? `আজকের আপলোড: ${quota.remaining}/${quota.limit} বাকি` : `Today's uploads: ${quota.remaining}/${quota.limit} remaining`);
+          if (files.length + pendingUploads.length > quota.remaining) {
+            addMessage("error", languageSelect.value === "bn" ? `আজ আর মাত্র ${Math.max(0, quota.remaining - pendingUploads.length)}টি ফাইল/ছবি যোগ করা যাবে।` : `You can add ${Math.max(0, quota.remaining - pendingUploads.length)} more file(s) today.`);
+            fileInput.value = "";
+            return;
+          }
+        } catch (error) {
+          addMessage("error", error.message || (languageSelect.value === "bn" ? "আপলোড সীমা যাচাই করা যায়নি।" : "Could not check upload quota."));
+          fileInput.value = "";
+          return;
+        }
+      }
       for (const file of files) {
-        if (pendingUploads.length >= 5) { addMessage("error", "একটি বার্তায় সর্বোচ্চ ৫টি ফাইল যোগ করা যাবে।"); break; }
-        if (file.size > 5 * 1024 * 1024) { addMessage("error", `${file.name}: ফাইলটি ৫ MB-এর বেশি।`); continue; }
-        if (!/^(image\/(png|jpeg|webp|gif)|application\/pdf|text\/(plain|markdown|csv))$/i.test(file.type)) { addMessage("error", `${file.name}: এই ফাইলের ধরন সমর্থিত নয়।`); continue; }
+        if (pendingUploads.length >= 5) { addMessage("error", languageSelect.value === "bn" ? "একটি বার্তায় সর্বোচ্চ ৫টি ফাইল যোগ করা যাবে।" : "You can attach up to 5 files to one message."); break; }
+        if (file.size > 5 * 1024 * 1024) { addMessage("error", languageSelect.value === "bn" ? `${file.name}: ফাইলটি ৫ MB-এর বেশি।` : `${file.name}: files must be 5 MB or smaller.`); continue; }
+        if (!/^(image\/(png|jpeg|webp|gif)|application\/pdf|application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document|text\/(plain|markdown|csv))$/i.test(file.type)) { addMessage("error", languageSelect.value === "bn" ? `${file.name}: এই ফাইলের ধরন সমর্থিত নয়।` : `${file.name}: this file type is not supported.`); continue; }
         try {
           const data = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
-          pendingUploads.push({ name: file.name, type: file.type, data });
+          pendingUploads.push({ name: file.name, type: file.type, data: "data:" + file.type + ";base64," + String(data).split(",").pop() });
         } catch { addMessage("error", file.name + ": ফাইলটি পড়া যায়নি।"); }
       }
       fileInput.value = "";
       attachmentList.replaceChildren();
       pendingUploads.forEach((item, index) => {
         const chip = document.createElement("span"); chip.className = "attachment-chip";
-        const remove = document.createElement("button"); remove.type = "button"; remove.textContent = " ×"; remove.setAttribute("aria-label", item.name + " সরান");
+        const filename = document.createElement("span"); filename.className = "attachment-chip-name"; filename.textContent = item.name; filename.title = item.name;
+        const remove = document.createElement("button"); remove.type = "button"; remove.textContent = " ×"; remove.setAttribute("aria-label", item.name + (languageSelect.value === "bn" ? " সরান" : " remove"));
         remove.addEventListener("click", () => { pendingUploads.splice(index, 1); fileInput.dispatchEvent(new Event("change")); });
-        chip.append(document.createTextNode(item.name), remove); attachmentList.appendChild(chip);
+        chip.append(filename, remove); attachmentList.appendChild(chip);
       });
       attachmentList.classList.toggle("hidden", pendingUploads.length === 0);
     });
@@ -1388,9 +1544,8 @@
 
       ACCESS_TOKEN = token;
       IS_ADMIN = data.auth_role === "admin";
-      if (IS_ADMIN && token.split(".").length !== 3) localStorage.setItem("walidAdminAccess", token);
-      else localStorage.removeItem("walidAdminAccess");
-      sessionStorage.removeItem("walidAdminAccess");
+      if (IS_ADMIN && token.split(".").length !== 3) sessionStorage.setItem("walidAdminAccess", token);
+      else sessionStorage.removeItem("walidAdminAccess");
       sessionStorage.removeItem("walidToken");
 
       updateAccountUI(data.email || "");
@@ -1399,6 +1554,7 @@
     }
 
     async function getAuthorizationToken() {
+      if (IS_ADMIN && ACCESS_TOKEN && ACCESS_TOKEN.split(".").length !== 3) return ACCESS_TOKEN;
       const user = firebaseAuth?.currentUser;
       if (user && !user.isAnonymous) {
         ACCESS_TOKEN = await user.getIdToken();
@@ -1407,6 +1563,8 @@
     }
 
     async function useFirebaseUser(user, options = {}) {
+      const adminSessionToken = sessionStorage.getItem("walidAdminAccess") || "";
+      if (adminSessionToken && adminSessionToken.split(".").length !== 3) return;
       if (
         !user ||
         user.isAnonymous ||
@@ -1504,6 +1662,27 @@
 
     loginBtn.addEventListener("click", () => openLogin("login"));
     signupBtn.addEventListener("click", () => openLogin("signup"));
+    chatToolsBtn.addEventListener("click", () => {
+      if (!IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
+        openLogin("login");
+        return;
+      }
+      chatToolsModal.classList.remove("hidden");
+    });
+    window.addEventListener("message", async (event) => {
+      if (event.origin !== window.location.origin || event.source !== chatToolsModal.querySelector("iframe")?.contentWindow) return;
+      if (event.data?.type !== "walid-tools-token-request" || typeof event.data.id !== "string") return;
+      try {
+        const token = await getAuthorizationToken();
+        event.source.postMessage({ type: "walid-tools-token", id: event.data.id, token: token || "" }, event.origin);
+      } catch {
+        event.source.postMessage({ type: "walid-tools-token", id: event.data.id, token: "" }, event.origin);
+      }
+    });
+    document.getElementById("closeChatTools").addEventListener("click", () => chatToolsModal.classList.add("hidden"));
+    chatToolsModal.addEventListener("click", (event) => {
+      if (event.target === chatToolsModal) chatToolsModal.classList.add("hidden");
+    });
 
     document.getElementById("closeLogin").addEventListener("click", () => {
       loginModal.classList.add("hidden");
@@ -1625,29 +1804,6 @@
       googleButton.textContent = "Google sign-in setup required";
     }
 
-    // Admin login
-    showAdmin.addEventListener("click", () => {
-      accessForm.classList.toggle("hidden");
-    });
-
-    accessForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      accessButton.disabled = true;
-      accessButton.textContent = "অপেক্ষা করুন…";
-
-      try {
-        await authorize(accessKeyInput.value, { celebrate: true });
-        accessKeyInput.value = "";
-      } catch (error) {
-        loginStatus.textContent =
-          error.message || "অ্যাক্সেস কোডটি যাচাই করা যায়নি।";
-      } finally {
-        accessButton.disabled = false;
-        accessButton.textContent = "প্রবেশ করুন";
-      }
-    });
-
     // Logout
     logoutBtn.addEventListener("click", async () => {
       if (firebaseAuth && firebaseAuth.currentUser) {
@@ -1661,7 +1817,7 @@
       historyOwner = "";
 
       sessionStorage.removeItem("walidToken");
-      localStorage.removeItem("walidAdminAccess");
+      
       sessionStorage.removeItem("walidAdminAccess");
       sessionStorage.removeItem("walidActiveChatId");
 
@@ -1727,7 +1883,8 @@
         bubble.appendChild(wrapper);
       } else {
         const body = document.createElement("span");
-        body.textContent = String(text ?? ""); if (kind === "ai") renderCabinetSource(body, String(text ?? ""));
+        body.textContent = String(text ?? "");
+        if (kind === "ai" && !table) renderAnswerContent(body, String(text ?? ""));
         bubble.appendChild(body);
       }
 
@@ -1750,7 +1907,7 @@
 
       if (kind === "user") {
         const actions = document.createElement("div"); actions.className = "question-actions";
-        const edit = document.createElement("button"); edit.type = "button"; edit.title = "প্রশ্ন সম্পাদনা করুন"; edit.setAttribute("aria-label", edit.title); edit.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
+        const edit = document.createElement("button"); edit.type = "button"; edit.title = languageSelect.value === "bn" ? "প্রশ্ন সম্পাদনা করুন" : "Edit question"; edit.setAttribute("aria-label", edit.title); edit.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
         edit.addEventListener("click", () => {
           const index = Number(bubble.dataset.messageIndex);
           input.value = String(text ?? ""); resizeComposer(); input.focus();
@@ -1759,28 +1916,36 @@
           restoringChat = true; previous.forEach((item) => addMessage(item.kind, item.text, item.source || "")); restoringChat = false;
           void persistConversation();
         });
-        const copy = document.createElement("button"); copy.type = "button"; copy.title = "প্রশ্ন কপি করুন"; copy.setAttribute("aria-label", copy.title); copy.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>'; copy.addEventListener("click", async (event) => { event.stopPropagation(); try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", "প্রশ্নটি কপি করা যায়নি।"); } bubble.classList.remove("question-menu-open"); }); actions.append(edit, copy); bubble.appendChild(actions); let holdTimer = null; const reveal = () => { chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); bubble.classList.add("question-menu-open"); }; bubble.addEventListener("contextmenu", (event) => { event.preventDefault(); reveal(); }); bubble.addEventListener("pointerdown", (event) => { if (event.button === 0) holdTimer = setTimeout(reveal, 500); }); ["pointerup", "pointerleave", "pointercancel"].forEach((name) => bubble.addEventListener(name, () => clearTimeout(holdTimer))); bubble.addEventListener("click", (event) => { if (!event.target.closest(".question-actions")) chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); });
+        const copy = document.createElement("button"); copy.type = "button"; copy.title = languageSelect.value === "bn" ? "প্রশ্ন কপি করুন" : "Copy question"; copy.setAttribute("aria-label", copy.title); copy.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>';
+        copy.addEventListener("click", async (event) => { event.stopPropagation(); try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", languageSelect.value === "bn" ? "প্রশ্নটি কপি করা যায়নি।" : "The question could not be copied."); } bubble.classList.remove("question-menu-open"); });
+        actions.append(edit, copy); bubble.appendChild(actions);
+        let holdTimer = null;
+        const reveal = () => { chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); bubble.classList.add("question-menu-open"); };
+        bubble.addEventListener("contextmenu", (event) => { event.preventDefault(); reveal(); });
+        bubble.addEventListener("pointerdown", (event) => { if (event.button !== 0) return; holdTimer = setTimeout(reveal, 500); });
+        ["pointerup", "pointerleave", "pointercancel"].forEach((name) => bubble.addEventListener(name, () => { clearTimeout(holdTimer); }));
+        bubble.addEventListener("click", (event) => { if (!event.target.closest(".question-actions")) chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); });
       }
       if (kind === "ai") {
         const answerIndex = Number(bubble.dataset.messageIndex);
         const previousQuestion = meta.question || [...chatMessages.slice(0, answerIndex)].reverse().find((item) => item.kind === "user")?.text || "";
         const actions = document.createElement("div"); actions.className = "answer-actions";
-        const button = (svg, title, callback) => { const element = document.createElement("button"); element.type = "button"; element.innerHTML = svg; element.title = title; element.setAttribute("aria-label", title); element.addEventListener("click", callback); actions.appendChild(element); };
-        button('<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>', "উত্তর কপি করুন", async () => { try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", "কপি করা যায়নি—উত্তরটি চেপে ধরে কপি করুন।"); } });
-        button('<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"/></svg>', "উত্তর শেয়ার করুন", async () => { try { if (navigator.share) await navigator.share({ title:"Walid AI", text:String(text ?? "") }); else { await navigator.clipboard.writeText(String(text ?? "")); } } catch {} });
-        button('<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 0 2 5"/></svg>', "আবার উত্তর তৈরি করুন", () => { input.value = String(previousQuestion); resizeComposer(); form.requestSubmit(); });
+        const iconButton = (svg, title, callback) => { const element = document.createElement("button"); element.type = "button"; element.innerHTML = svg; element.title = title; element.setAttribute("aria-label", title); element.addEventListener("click", callback); actions.appendChild(element); };
+        iconButton('<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>', languageSelect.value === "bn" ? "উত্তর কপি করুন" : "Copy answer", async () => { try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", languageSelect.value === "bn" ? "কপি করা যায়নি—উত্তরটি চেপে ধরে কপি করুন।" : "Copy failed. Press and hold the answer to copy it."); } });
+        iconButton('<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"/></svg>', languageSelect.value === "bn" ? "উত্তর শেয়ার করুন" : "Share answer", async () => { try { if (navigator.share) await navigator.share({ title:"Walid AI", text:String(text ?? "") }); else { await navigator.clipboard.writeText(String(text ?? "")); } } catch {} });
+        iconButton('<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 0 2 5"/></svg>', languageSelect.value === "bn" ? "আবার উত্তর তৈরি করুন" : "Regenerate answer", () => { input.value = String(previousQuestion); resizeComposer(); form.requestSubmit(); });
         const liked = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]"));
-        const like = document.createElement("button"); like.type = "button"; like.title = "ভালো লেগেছে"; like.setAttribute("aria-label", like.title); like.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>'; like.classList.toggle("active", liked.has(String(text ?? "")));
+        const like = document.createElement("button"); like.type = "button"; like.title = languageSelect.value === "bn" ? "ভালো লেগেছে" : "Like answer"; like.setAttribute("aria-label", like.title); like.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>'; like.classList.toggle("active", liked.has(String(text ?? "")));
         like.addEventListener("click", () => { const next = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]")); if (next.has(String(text ?? ""))) next.delete(String(text ?? "")); else next.add(String(text ?? "")); localStorage.setItem("walidLikedAnswers", JSON.stringify([...next].slice(-100))); like.classList.toggle("active", next.has(String(text ?? ""))); });
         actions.appendChild(like);
-        if (Number.isFinite(meta.seconds)) { const duration = document.createElement("span"); duration.className = "source"; duration.textContent = `⏱ ${meta.seconds.toFixed(1)} সেকেন্ড`; actions.appendChild(duration); }
+        if (Number.isFinite(meta.seconds)) { const duration = document.createElement("span"); duration.className = "source"; duration.textContent = languageSelect.value === "bn" ? `⏱ ${meta.seconds.toFixed(1)} সেকেন্ড` : `⏱ ${meta.seconds.toFixed(1)} sec`; actions.appendChild(duration); }
         bubble.appendChild(actions);
       }
 
       return bubble;
     }
 
-    function renderCabinetSource(node, text) { const pattern = new RegExp("https://cabinet" + String.fromCharCode(46) + "gov" + String.fromCharCode(46) + "bd/[^" + String.fromCharCode(32) + "]+","g"); const fragment = document.createDocumentFragment(); let cursor = 0, match; while ((match = pattern.exec(text))) { let url = match[0], suffix = (url.match(/[.,;!?।]+$/) || [""])[0]; url = url.slice(0, url.length - suffix.length); fragment.append(document.createTextNode(text.slice(cursor, match.index))); const link = document.createElement("a"); link.href = url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "বাংলাদেশ মন্ত্রিপরিষদ বিভাগ"; fragment.append(link, document.createTextNode(suffix)); cursor = pattern.lastIndex; } fragment.appendChild(document.createTextNode(text.slice(cursor))); node.replaceChildren(fragment); } function parseMarkdownTable(text) {
+    function parseMarkdownTable(text) {
       const lines = String(text).trim()
         .split(/\r?\n/)
         .filter((line) => line.includes("|"));
@@ -1802,6 +1967,19 @@
         headers: parseRow(lines[0]),
         rows: lines.slice(2).map(parseRow)
       };
+    }
+
+    function renderAnswerContent(node, text) {
+      const pattern = /\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g;
+      const fragment = document.createDocumentFragment();
+      let last = 0, match;
+      while ((match = pattern.exec(text))) {
+        fragment.appendChild(document.createTextNode(text.slice(last, match.index)));
+        const link = document.createElement("a"); link.textContent = match[1]; link.href = match[2]; link.target = "_blank"; link.rel = "noopener noreferrer";
+        fragment.appendChild(link); last = pattern.lastIndex;
+      }
+      fragment.appendChild(document.createTextNode(text.slice(last)));
+      node.replaceChildren(fragment);
     }
 
     // Admin feedback
@@ -1883,31 +2061,42 @@
     }
 
     function sourceLabel(mode) {
+      const bn = languageSelect.value === "bn";
       if (mode === "dataset_lookup") return "";
-      if (mode === "uploaded_file") return "আপনার ফাইল থেকে";
-      if (mode === "pdf_passages") return "PDF থেকে";
-      if (mode === "pdf_table") return "PDF-এর টেবিল থেকে";
-      if (mode === "not_found") return "তথ্যভাণ্ডারে মেলেনি";
+      if (mode === "uploaded_file") return bn ? "আপনার ফাইল থেকে" : "From your file";
+      if (mode === "pdf_passages") return bn ? "PDF থেকে" : "From PDF";
+      if (mode === "pdf_table") return bn ? "PDF-এর টেবিল থেকে" : "From a PDF table";
+      if (mode === "not_found") return bn ? "তথ্যভাণ্ডারে মেলেনি" : "Not found in the knowledge base";
 
       if (mode === "setup_required" || mode === "ocr_setup_required") {
-        return "সেটআপ প্রয়োজন";
+        return bn ? "সেটআপ প্রয়োজন" : "Setup required";
       }
 
       if (mode === "ocr_no_text_found") {
-        return "PDF-এ পড়ার মতো লেখা পাওয়া যায়নি";
+        return bn ? "PDF-এ পড়ার মতো লেখা পাওয়া যায়নি" : "No readable text was found in the PDF";
       }
 
       if (
         mode === "personal_memory_saved" ||
         mode === "personal_memory"
       ) {
-        return "ব্যক্তিগত স্মৃতি";
+        return bn ? "ব্যক্তিগত স্মৃতি" : "Personal memory";
       }
 
       return "";
     }
 
     // Chat submit
+    function detectPdfChatTool(question, files) {
+      if (!files.length || files.some((file) => file.type !== "application/pdf")) return "";
+      const text = String(question || "").toLocaleLowerCase();
+      if (/(pdf\s*(?:to|into|→)\s*word|word\s*(?:from|for)\s*pdf|pdf\s*থেকে\s*(?:word|ওয়ার্ড|ওয়ার্ড)|পিডিএফ\s*থেকে\s*(?:word|ওয়ার্ড|ওয়ার্ড))/i.test(text)) return "pdf-to-word";
+      if (/(merge|combine|join|মার্জ|একত্র|একসাথে|জোড়া|জোড়া)/i.test(text)) return "merge-pdf";
+      if (/(split|extract pages|separate pages|ভাগ|আলাদা পৃষ্ঠা|পৃষ্ঠা আলাদা)/i.test(text)) return "split-pdf";
+      if (/(compress|shrink|reduce.*size|file size|কমপ্রেস|সাইজ কম|ছোট করে)/i.test(text)) return "compress-pdf";
+      return "";
+    }
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -1942,10 +2131,46 @@
           headers.Authorization = "Bearer " + authToken;
         }
 
+        const pdfTool = detectPdfChatTool(question, filesToSend);
+        if (pdfTool) {
+          const encoded = filesToSend.map((file) => String(file.data || "").split(",")[1] || "");
+          const toolBody = pdfTool === "merge-pdf"
+            ? { files: encoded }
+            : pdfTool === "split-pdf"
+              ? { file: encoded[0], pages: question.match(/(?:pages?|পৃষ্ঠা)\s*[:=]?\s*([0-9,\-\s]+)/i)?.[1]?.replace(/\s/g, "") || "" }
+              : { file: encoded[0] };
+          const toolResponse = await fetch(API + "/api/chat-tool/" + pdfTool, {
+            method: "POST", headers,
+            body: JSON.stringify(toolBody)
+          });
+          const toolResult = await toolResponse.json();
+          if (!toolResponse.ok) {
+            const error = new Error(toolResult.error || "The PDF could not be processed.");
+            error.quota = toolResult.quota || "";
+            throw error;
+          }
+          const fileBytes = Uint8Array.from(atob(toolResult.file), (character) => character.charCodeAt(0));
+          const downloadUrl = URL.createObjectURL(new Blob([fileBytes], { type: toolResult.type }));
+          const toolAnswer = addMessage("ai", "Your file is ready.", "File tool", { question });
+          const download = document.createElement("a");
+          download.className = "tool-result-link";
+          download.href = downloadUrl;
+          download.download = toolResult.name;
+          download.textContent = "Download " + toolResult.name;
+          toolAnswer.insertBefore(download, toolAnswer.querySelector(".answer-actions"));
+          if (uploadQuota && !uploadQuota.unlimited) {
+            uploadQuota.used += filesToSend.length;
+            uploadQuota.remaining = Math.max(0, uploadQuota.remaining - filesToSend.length);
+            document.getElementById("uploadQuotaHint").textContent = "Today's uploads: " + uploadQuota.remaining + "/" + uploadQuota.limit + " remaining";
+          }
+          clearInterval(timer); thinking.remove();
+          return;
+        }
+
         const response = await fetch(API + "/api/chat", {
           method: "POST",
           headers,
-          body: JSON.stringify({ question, language: languageSelect.value, guest_id: getGuestClientId(), files: filesToSend })
+          body: JSON.stringify({ question, guest_id: getGuestClientId(), files: filesToSend })
         });
 
         let data;
@@ -1967,16 +2192,26 @@
                   clearInterval(timer); thinking.remove();
                   streamedBubble = addMessage("ai", "", "", { question, seconds: elapsed });
                   streamedBody = streamedBubble.querySelector(":scope > span:not(.source)");
+                  streamedBody.classList.add("typing-cursor");
+                  streamTicker = setInterval(() => {
+                    if (streamVisible < streamedText.length) {
+                      streamVisible = Math.min(streamedText.length, streamVisible + Math.max(1, Math.ceil((streamedText.length - streamVisible) / 90)));
+                      streamedBody.textContent = streamedText.slice(0, streamVisible);
+                      chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+                    }
+                  }, 18);
                 }
                 streamedText += event.text || "";
-                if (streamedBody && !streamTicker) { streamedBody.classList.add("typing-cursor"); streamTicker = setInterval(() => { if (streamVisible < streamedText.length) { streamVisible = Math.min(streamedText.length, streamVisible + Math.max(1, Math.ceil((streamedText.length - streamVisible) / 90))); streamedBody.textContent = streamedText.slice(0, streamVisible); chat.scrollTo({top:chat.scrollHeight,behavior:"smooth"}); } },18); }
               } else if (event.event === "done") {
                 Object.assign(data, event);
               }
             }
             if (done) break;
           }
-          while (streamVisible < streamedText.length) await new Promise((resolve) => setTimeout(resolve,24)); if(streamTicker) clearInterval(streamTicker); if(streamedBody) streamedBody.classList.remove("typing-cursor"); data.answer = streamedText;
+          while (streamVisible < streamedText.length) await new Promise((resolve) => setTimeout(resolve, 24));
+          if (streamTicker) clearInterval(streamTicker);
+          if (streamedBody) { streamedBody.classList.remove("typing-cursor"); renderAnswerContent(streamedBody, streamedText); }
+          data.answer = streamedText;
         } else {
           data = await response.json();
         }
@@ -2002,8 +2237,9 @@
         const bodyNode = answer.querySelector(":scope > span:not(.source)");
         if (!streamedBubble && bodyNode && data.answer.length < 12000) {
           bodyNode.textContent = "";
+          bodyNode.classList.add("typing-cursor");
           const target = String(data.answer); let offset = 0; const step = Math.max(1, Math.ceil(target.length / 160));
-          const typeNext = () => { offset = Math.min(target.length, offset + step); bodyNode.textContent = target.slice(0, offset); if (offset < target.length) { chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }); setTimeout(typeNext, 12); } };
+          const typeNext = () => { offset = Math.min(target.length, offset + step); bodyNode.textContent = target.slice(0, offset); if (offset < target.length) { chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }); setTimeout(typeNext, 12); } else { bodyNode.classList.remove("typing-cursor"); renderAnswerContent(bodyNode, target); } };
           typeNext();
         }
 
@@ -2068,7 +2304,7 @@
         historyOwner = "";
 
         sessionStorage.removeItem("walidToken");
-        localStorage.removeItem("walidAdminAccess");
+        
         sessionStorage.removeItem("walidAdminAccess");
         loginBtn.classList.remove("hidden");
         signupBtn.classList.remove("hidden");

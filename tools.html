@@ -11,20 +11,20 @@
 </style>
 <style id="walid-brand-motion-fix">
 @keyframes walidVisibleFlagWave {
-  0%,100% { transform:perspective(420px) rotateY(-26deg) skewY(-1.8deg) scaleX(.94); clip-path:polygon(0 6%,16% 0,32% 9%,48% 0,64% 9%,80% 0,100% 6%,100% 94%,84% 100%,68% 91%,52% 100%,36% 91%,20% 100%,0 94%); }
-  50% { transform:perspective(420px) rotateY(26deg) skewY(1.8deg) scaleX(1.03); clip-path:polygon(0 0,16% 10%,32% 0,48% 10%,64% 0,80% 10%,100% 0,100% 100%,84% 90%,68% 100%,52% 90%,36% 100%,20% 90%,0 100%); }
+  0%,100% { transform:perspective(420px) rotateY(-38deg) skewY(-2.8deg) scaleX(.92); clip-path:polygon(0 6%,16% 0,32% 9%,48% 0,64% 9%,80% 0,100% 6%,100% 94%,84% 100%,68% 91%,52% 100%,36% 91%,20% 100%,0 94%); }
+  50% { transform:perspective(420px) rotateY(38deg) skewY(2.8deg) scaleX(1.04); clip-path:polygon(0 0,16% 10%,32% 0,48% 10%,64% 0,80% 10%,100% 0,100% 100%,84% 90%,68% 100%,52% 90%,36% 100%,20% 90%,0 100%); }
 }
 @keyframes walidFlowerTurnEveryTen {
-  0%,90% { rotate:0deg; }
+  0%,80% { rotate:0deg; }
   100% { rotate:360deg; }
 }
-.brand small img,.brand-copy small img,.site-header .brand-copy small img,.site-brand small img { animation:walidVisibleFlagWave 3s ease-in-out infinite!important; transform-origin:left center; }
-.tagline-ribbon { animation:walidVisibleFlagWave 3s ease-in-out infinite!important; transform-origin:left center; }
+.brand small img,.brand-copy small img,.site-header .brand-copy small img,.site-brand small img { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; transform-origin:left center; }
+.tagline-ribbon { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; transform-origin:left center; }
 body:before { animation:home-flower-turn 10s linear infinite!important; }
 .wrap:before { animation:walidFlowerTurnEveryTen 10s linear infinite!important; }
 @media(prefers-reduced-motion:reduce) {
- .brand small img,.brand-copy small img,.site-header .brand-copy small img,.site-brand small img { animation:walidVisibleFlagWave 3s ease-in-out infinite!important; }
- .tagline-ribbon { animation:walidVisibleFlagWave 3s ease-in-out infinite!important; transform-origin:left center; }
+ .brand small img,.brand-copy small img,.site-header .brand-copy small img,.site-brand small img { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; }
+ .tagline-ribbon { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; transform-origin:left center; }
  body:before { animation:home-flower-turn 10s linear infinite!important; }
  .wrap:before { animation:walidFlowerTurnEveryTen 10s linear infinite!important; }
 }

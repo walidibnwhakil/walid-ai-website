@@ -83,7 +83,7 @@
       content:""; position:fixed; z-index:0;
       left:calc(50% + 125px); top:50%; width:min(68vw,760px); aspect-ratio:1;
       transform:translate(-50%,-50%);
-      background:url("kathgolap-logo.png") center/contain no-repeat;
+      background:url("/walid-ai-approved-flower.png") center/contain no-repeat;
       opacity:.17; pointer-events:none;
       animation:home-flower-turn 10s linear infinite;
       filter:drop-shadow(0 8px 18px #8a641f30) saturate(1.08);
@@ -944,32 +944,28 @@
 
   <script src="backend-config.js"></script>
   <script src="firebase-config.js"></script>
-<style id="walid-brand-motion-fix">
-@keyframes walidVisibleFlagWave {
-  0%,100% { transform:perspective(420px) rotateY(-38deg) skewY(-2.8deg) scaleX(.92); clip-path:polygon(0 6%,16% 0,32% 9%,48% 0,64% 9%,80% 0,100% 6%,100% 94%,84% 100%,68% 91%,52% 100%,36% 91%,20% 100%,0 94%); }
-  50% { transform:perspective(420px) rotateY(38deg) skewY(2.8deg) scaleX(1.04); clip-path:polygon(0 0,16% 10%,32% 0,48% 10%,64% 0,80% 10%,100% 0,100% 100%,84% 90%,68% 100%,52% 90%,36% 100%,20% 90%,0 100%); }
-}
-@keyframes walidFlowerTurnEveryTen {
-  0%,80% { rotate:0deg; }
-  100% { rotate:360deg; }
-}
-.brand small img,.brand-copy small img,.site-header .brand-copy small img,.site-brand small img { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; transform-origin:left center; }
-.tagline-ribbon { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; transform-origin:left center; }
-body:before { animation:home-flower-turn 10s linear infinite!important; }
-.wrap:before { animation:walidFlowerTurnEveryTen 10s linear infinite!important; }
-@media(prefers-reduced-motion:reduce) {
- .brand small img,.brand-copy small img,.site-header .brand-copy small img,.site-brand small img { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; }
- .tagline-ribbon { animation:walidVisibleFlagWave 2.6s ease-in-out infinite!important; transform-origin:left center; }
- body:before { animation:home-flower-turn 10s linear infinite!important; }
- .wrap:before { animation:walidFlowerTurnEveryTen 10s linear infinite!important; }
-}
+<style id="walid-approved-branding">
+.approved-brand-logo{display:block;width:clamp(132px,13vw,154px);height:50px;max-width:40vw;object-fit:contain;flex:0 0 auto}
+.site-header .brand,.top .brand{gap:4px}
+.page-brand{gap:0}
+.page-brand>.approved-brand-logo{width:154px;height:52px;max-width:42vw}
+.side-brand>.approved-brand-logo{width:150px;height:50px;object-fit:contain}
+a.approved-brand-link{display:flex;align-items:center;text-decoration:none}
+a.approved-brand-link>.approved-brand-logo{width:150px;height:50px}
+.welcome{transition:opacity .4s ease,transform .4s ease}
+.welcome-logo{display:block;width:min(230px,58vw);height:auto;max-height:82px;object-fit:contain;margin:0 auto 12px}
+.welcome.fade-out{opacity:0;transform:translateY(-6px)}
+body:before,.wrap:before{background-image:url('/walid-ai-approved-flower.png')!important;opacity:.04!important;pointer-events:none!important;animation:walid-approved-flower-turn 10s linear infinite!important}
+@keyframes walid-approved-flower-turn{from{rotate:0deg}to{rotate:360deg}}
+@media(max-width:620px){.approved-brand-logo{width:clamp(116px,38vw,145px);height:44px}.page-brand>.approved-brand-logo,.side-brand>.approved-brand-logo,a.approved-brand-link>.approved-brand-logo{width:clamp(118px,39vw,144px);height:46px}.welcome-logo{width:min(190px,58vw)}}
+@media(prefers-reduced-motion:reduce){body:before,.wrap:before{animation:none!important}.welcome{transition:none!important}}
 </style>
 </head>
 
 <body>
   <button id="sidebarBackdrop" class="sidebar-backdrop" type="button" aria-label="Close menu"></button>
   <aside class="sidebar" aria-label="Chat and profile">
-    <div class="side-brand"><img src="kathgolap-logo.png" alt="ওয়ালিদ AI"><div><strong aria-label="ওয়ালিদ AI">Walid AI</strong><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>Bangladeshi AI</span></div></div>
+    <div class="side-brand"><img class="approved-brand-logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></div>
     <button id="newChat" class="new-chat" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg><span data-i18n="newChat">New chat</span></button>
     <a class="side-link" href="/tools.html" style="text-decoration:none"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg><span>Tools</span></a>
     <button id="helpBtn" class="side-link" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.6 1.3c-.8 1-2.2 1.3-2.2 3"/><path d="M12 17h.01"/></svg><span data-i18n="help">Help</span></button>
@@ -988,7 +984,7 @@ body:before { animation:home-flower-turn 10s linear infinite!important; }
   <main class="page">
     <header class="topbar">
       <button id="mobileMenu" class="mobile-menu" type="button" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="page-brand"><span class="page-brand-title"><img class="page-brand-logo" src="kathgolap-logo.png" alt=""><span aria-label="ওয়ালিদ AI">Walid AI</span></span><span class="brand-tagline"><span class="tagline-ribbon" aria-hidden="true"><i></i><i></i><i></i></span>Bangladeshi AI</span></div>
+      <div class="page-brand"><img class="approved-brand-logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></div>
       <div class="top-actions">
         <button id="loginBtn" class="top-login" type="button" data-i18n="login">Log in</button>
         <button id="signupBtn" class="signup-button" type="button" data-i18n="signup">Sign up for free</button>
@@ -1004,7 +1000,8 @@ body:before { animation:home-flower-turn 10s linear infinite!important; }
 
     <section class="main">
       <section class="welcome">
-        <h1 id="welcomeTitle">Where should we begin?</h1>
+        <img class="welcome-logo" src="/walid-ai-approved-logo.png" alt="Walid AI">
+        <h1 id="welcomeTitle">Ask Walid AI...</h1>
       </section>
 
       <section id="chat" class="chat" aria-live="polite"></section>

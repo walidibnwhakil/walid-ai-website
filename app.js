@@ -139,7 +139,7 @@
             if (historyOwner && firestoreDB) await firestoreDB.collection("users").doc(historyOwner).collection("chats").doc(record.id).delete();
             else sessionStorage.setItem("walidGuestChats", JSON.stringify(guestRecords().filter((item) => item.id !== record.id)));
             if (currentConversationId === record.id) {
-              currentConversationId = newConversationId(); chatMessages = []; chat.replaceChildren(); welcome.classList.remove("hidden"); rememberActiveConversation();
+              currentConversationId = newConversationId(); chatMessages = []; chat.replaceChildren(); welcome.classList.remove("hidden"); welcome.classList.remove("fade-out"); rememberActiveConversation();
             }
             drawHistory(historyOwner ? await loadAccountRecords(false) : guestRecords());
           } catch { addMessage("error", languageSelect.value === "bn" ? "চ্যাটটি মোছা যায়নি। পরে আবার চেষ্টা করুন।" : "This chat could not be deleted. Try again later."); }
@@ -237,8 +237,8 @@
       document.title = lang === "bn" ? "Walid AI — বাংলাদেশের AI" : "Walid AI — Bangladeshi AI";
       languageSelect.value = lang;
       const text = {
-        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"আজ কী জানতে চান?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"আপনার সমস্যাটি লিখে পাঠান; আমরা দেখে জানাব।", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI" },
-        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in for more questions and file uploads.", welcome:"Where should we begin?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladeshi AI" }
+        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"Ask Walid AI...", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"আপনার সমস্যাটি লিখে পাঠান; আমরা দেখে জানাব।", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI" },
+        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in for more questions and file uploads.", welcome:"Ask Walid AI...", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladeshi AI" }
       }[lang];
       document.querySelector('[data-i18n="newChat"]').textContent = text.newChat;
       document.querySelector('[data-i18n="history"]').textContent = text.history;
@@ -505,7 +505,7 @@
       historyOwner = user.uid;
       chat.replaceChildren();
       chatMessages = [];
-      welcome.classList.remove("hidden");
+      welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
 
       try {
         await authorize(await user.getIdToken(), options);
@@ -522,7 +522,7 @@
           localStorage.setItem(accountChatKey(user.uid), currentConversationId);
           chat.replaceChildren();
           chatMessages = [];
-          welcome.classList.remove("hidden");
+          welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
         }
         authorizedUid = user.uid;
       } catch (error) {
@@ -756,7 +756,7 @@
       sessionStorage.removeItem("walidGuestChats");
       chat.replaceChildren();
       chatMessages = [];
-      welcome.classList.remove("hidden");
+      welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
       currentConversationId = newConversationId();
       rememberActiveConversation();
       setProfile("Guest");
@@ -823,7 +823,7 @@
 
       chat.appendChild(bubble);
       chat.scrollTo({ top: chat.scrollHeight, behavior: restoringChat ? "auto" : "smooth" });
-      if (["user", "ai"].includes(kind)) welcome.classList.add("hidden");
+      if (["user", "ai"].includes(kind)) { welcome.classList.add("fade-out"); window.setTimeout(() => welcome.classList.add("hidden"), 400); }
 
       if (!restoringChat && ["user", "ai"].includes(kind)) {
         chatMessages.push({ kind, text: String(text ?? ""), source });
@@ -1215,7 +1215,7 @@
       rememberActiveConversation();
       chatMessages = [];
       chat.replaceChildren();
-      welcome.classList.remove("hidden");
+      welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
       input.focus();
     });
 

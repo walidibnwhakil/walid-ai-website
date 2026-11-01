@@ -959,6 +959,18 @@ body:before,.wrap:before{background-image:url('/walid-ai-approved-flower.png')!i
 @keyframes walid-approved-flower-turn{from{rotate:0deg}to{rotate:360deg}}
 @media(max-width:620px){.approved-brand-logo{width:clamp(116px,38vw,145px);height:44px}.page-brand>.approved-brand-logo,.side-brand>.approved-brand-logo,a.approved-brand-link>.approved-brand-logo{width:clamp(118px,39vw,144px);height:46px}.welcome-logo{width:min(190px,58vw)}}
 @media(prefers-reduced-motion:reduce){body:before,.wrap:before{animation:none!important}.welcome{transition:none!important}}
+
+/* Desktop uses the sidebar as the sole navigation logo; mobile keeps its compact header logo. */
+@media(min-width:651px){.topbar>.page-brand{display:none!important}}
+@media(max-width:650px){.topbar>.page-brand{display:grid!important;grid-column:2;justify-self:center}}
+/* Tools are already available in the sidebar. Keep attachments and send controls unchanged. */
+#chatToolsBtn{display:none!important}
+
+/* Branding correction: keep the approved flattened logo stationary. */
+.approved-brand-logo{animation:none!important;transform:none!important;rotate:none!important}
+/* Only the existing background flower rotates. */
+body:before,.wrap:before{opacity:.04!important;pointer-events:none!important;animation:walid-approved-flower-turn 10s linear infinite normal!important}
+@media(prefers-reduced-motion:reduce){body:before,.wrap:before{animation:none!important}}
 </style>
 </head>
 
@@ -1001,7 +1013,7 @@ body:before,.wrap:before{background-image:url('/walid-ai-approved-flower.png')!i
     <section class="main">
       <section class="welcome">
         <img class="welcome-logo" src="/walid-ai-approved-logo.png" alt="Walid AI">
-        <h1 id="welcomeTitle">Ask Walid AI...</h1>
+        <h1 id="welcomeTitle">What would you like to know today?</h1>
       </section>
 
       <section id="chat" class="chat" aria-live="polite"></section>

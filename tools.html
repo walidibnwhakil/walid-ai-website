@@ -24,6 +24,12 @@ body:before,.wrap:before{background-image:url('/walid-ai-approved-flower.png')!i
 @keyframes walid-approved-flower-turn{from{rotate:0deg}to{rotate:360deg}}
 @media(max-width:620px){.approved-brand-logo{width:clamp(116px,38vw,145px);height:44px}.page-brand>.approved-brand-logo,.side-brand>.approved-brand-logo,a.approved-brand-link>.approved-brand-logo{width:clamp(118px,39vw,144px);height:46px}.welcome-logo{width:min(190px,58vw)}}
 @media(prefers-reduced-motion:reduce){body:before,.wrap:before{animation:none!important}.welcome{transition:none!important}}
+
+/* Branding correction: keep the approved flattened logo stationary. */
+.approved-brand-logo{animation:none!important;transform:none!important;rotate:none!important}
+/* Only the existing background flower rotates. */
+body:before,.wrap:before{opacity:.04!important;pointer-events:none!important;animation:walid-approved-flower-turn 10s linear infinite normal!important}
+@media(prefers-reduced-motion:reduce){body:before,.wrap:before{animation:none!important}}
 </style>
 </head>
 <body>

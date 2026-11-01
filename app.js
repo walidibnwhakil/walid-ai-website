@@ -1081,8 +1081,9 @@
           const download = document.createElement("a");
           download.className = "tool-result-link";
           download.href = downloadUrl;
-          download.download = toolResult.name;
-          download.textContent = "Download " + toolResult.name;
+          download.download = String(toolResult.name || "file").startsWith("Walid AI_") ? toolResult.name : `Walid AI_${toolResult.name || "file"}`;
+          download.textContent = `Download ${download.download}`;
+          download.textContent = "Download " + download.download;
           toolAnswer.insertBefore(download, toolAnswer.querySelector(".answer-actions"));
           if (uploadQuota && !uploadQuota.unlimited) {
             uploadQuota.used += filesToSend.length;

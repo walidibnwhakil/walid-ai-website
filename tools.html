@@ -31,6 +31,26 @@ body:before,.wrap:before{background-image:url('/walid-ai-approved-flower.png')!i
 body:before,.wrap:before{opacity:.04!important;pointer-events:none!important;animation:walid-approved-flower-turn 10s linear infinite normal!important}
 @media(prefers-reduced-motion:reduce){body:before,.wrap:before{animation:none!important}}
 </style>
+<style id="walid-production-ui-correction">
+
+/* Restore the approved logo to the existing header footprint. */
+.site-header .brand>img.approved-brand-logo,
+.header .brand>img.approved-brand-logo,
+.top .brand>img.approved-brand-logo{
+  width:162px!important;height:52px!important;max-width:min(42vw,162px)!important;
+  object-fit:contain!important;flex:0 0 auto!important
+}
+@media(max-width:700px){
+  .site-header .brand>img.approved-brand-logo,
+  .header .brand>img.approved-brand-logo,
+  .top .brand>img.approved-brand-logo{
+    width:clamp(120px,38vw,148px)!important;height:46px!important;max-width:42vw!important
+  }
+}
+/* Restore the centered background flower used by the original tools listing. */
+.wrap:before{width:min(620px,78vw)!important;height:min(620px,78vw)!important;left:50%!important;top:55%!important;transform:translate(-50%,-50%)!important;background-position:center!important;opacity:.04!important;pointer-events:none!important;animation:walid-approved-flower-turn 10s linear infinite!important}
+@media(prefers-reduced-motion:reduce){.wrap:before{animation:none!important}}
+</style>
 </head>
 <body>
 <header class="site-header"><a class="brand" href="/"><img class="approved-brand-logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><nav class="account" aria-label="Account"><a href="#">Log in</a><a class="signup" href="#">Sign up</a></nav></header>

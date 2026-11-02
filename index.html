@@ -972,6 +972,13 @@ body:before,.wrap:before{background-image:url('/walid-ai-approved-flower.png')!i
 body:before,.wrap:before{opacity:.04!important;pointer-events:none!important;animation:walid-approved-flower-turn 10s linear infinite normal!important}
 @media(prefers-reduced-motion:reduce){body:before,.wrap:before{animation:none!important}}
 </style>
+<style id="walid-production-ui-correction">
+/* Keep the account actions in their original desktop top-right position. */
+@media(min-width:651px){.topbar{justify-content:flex-end!important}.topbar>.top-actions{margin-left:auto!important}}
+/* Restore the faint background flower's original desktop/mobile placement. */
+body:before{left:calc(50% + 125px)!important;top:50%!important;width:min(68vw,760px)!important;opacity:.04!important;pointer-events:none!important}
+@media(max-width:650px){body:before{left:50%!important;top:50%!important;width:min(92vw,520px)!important}}
+</style>
 </head>
 
 <body>

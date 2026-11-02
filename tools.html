@@ -51,6 +51,11 @@ body:before,.wrap:before{opacity:.04!important;pointer-events:none!important;ani
 .wrap:before{width:min(620px,78vw)!important;height:min(620px,78vw)!important;left:50%!important;top:55%!important;transform:translate(-50%,-50%)!important;background-position:center!important;opacity:.04!important;pointer-events:none!important;animation:walid-approved-flower-turn 10s linear infinite!important}
 @media(prefers-reduced-motion:reduce){.wrap:before{animation:none!important}}
 </style>
+<style id="walid-centered-flower-fix">
+.wrap:before{position:fixed!important;left:50vw!important;top:50vh!important;width:min(620px,72vw)!important;height:min(620px,72vw)!important;aspect-ratio:1;transform:translate(-50%,-50%)!important;background-position:center!important;opacity:.04!important;pointer-events:none!important;}
+@media(max-width:700px){.wrap:before{width:min(88vw,480px)!important;height:min(88vw,480px)!important}}
+@media(prefers-reduced-motion:reduce){.wrap:before{animation:none!important}}
+</style>
 </head>
 <body>
 <header class="site-header"><a class="brand" href="/"><img class="approved-brand-logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><nav class="account" aria-label="Account"><a href="#">Log in</a><a class="signup" href="#">Sign up</a></nav></header>

@@ -1,0 +1,61 @@
+/* Shared Walid AI branding adjustments. Header dimensions and page layout stay in each page's existing styles. */
+a.brand > img,
+a.brand-logo-link > img,
+a.site-brand > img,
+.side-brand > img,
+.page-brand > img {
+  display: block;
+  width: 132px !important;
+  height: 44px !important;
+  max-width: min(132px, 42vw);
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+.side-brand { gap: 4px !important; align-items: center; }
+.page-brand { min-height: 44px; align-items: center; justify-items: center; }
+.page-brand > img { display: none; }
+.brand > .brand-copy, .brand-tagline, .tagline-ribbon, .site-brand small { display: none !important; }
+.site-brand, a.brand { gap: 0 !important; }
+body:has(.welcome)::before,
+.wrap::before {
+  background-image: url("/walid-ai-approved-flower.png") !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  opacity: .04 !important;
+  pointer-events: none !important;
+  animation: walid-approved-flower-turn 10s linear infinite !important;
+}
+@keyframes walid-approved-flower-turn {
+  from { rotate: 0deg; }
+  to { rotate: 360deg; }
+}
+.welcome {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.welcome.is-exiting {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+.welcome-brand {
+  display: block;
+  width: min(180px, 48vw);
+  height: auto;
+  margin: 0 auto 12px;
+  object-fit: contain;
+}
+@media (max-width: 650px) {
+  .page-brand > img { display: block; width: 112px !important; height: 38px !important; }
+  .welcome-brand { width: min(156px, 44vw); margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body:has(.welcome)::before, .wrap::before { animation: none !important; }
+  .welcome { transition: none !important; }
+}
+

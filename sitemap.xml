@@ -2,7 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://walid-ai.com/</loc></url>
   <url><loc>https://walid-ai.com/tools.html</loc></url>
-  <url><loc>https://walid-ai.com/privacy.html</loc></url>
+  <url><loc>https://walid-ai.com/about-us.html</loc></url>
+  <url><loc>https://walid-ai.com/contact-us.html</loc></url>
+  <url><loc>https://walid-ai.com/zip.html</loc></url>
   <url><loc>https://walid-ai.com/tools/merge-pdf/</loc></url>
   <url><loc>https://walid-ai.com/tools/split-pdf/</loc></url>
   <url><loc>https://walid-ai.com/tools/compress-pdf/</loc></url>
@@ -11,5 +13,7 @@
   <url><loc>https://walid-ai.com/tools/compress-image/</loc></url>
   <url><loc>https://walid-ai.com/tools/convert-image/</loc></url>
   <url><loc>https://walid-ai.com/tools/background-remover/</loc></url>
+  <url><loc>https://walid-ai.com/tools/signature-remover/</loc></url>
   <url><loc>https://walid-ai.com/tools/watermark-remover/</loc></url>
 </urlset>
+

@@ -21,6 +21,22 @@
     const chat = document.getElementById("chat");
     const send = document.getElementById("send");
     const welcome = document.querySelector(".welcome");
+    let welcomeHideTimer = 0;
+    function restoreWelcome() {
+      window.clearTimeout(welcomeHideTimer);
+      welcome.classList.remove("is-exiting", "hidden");
+      welcome.setAttribute("aria-hidden", "false");
+    }
+    function dismissWelcome() {
+      if (welcome.classList.contains("hidden") || welcome.classList.contains("is-exiting")) return;
+      welcome.setAttribute("aria-hidden", "true");
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        welcome.classList.add("hidden");
+        return;
+      }
+      welcome.classList.add("is-exiting");
+      welcomeHideTimer = window.setTimeout(() => welcome.classList.add("hidden"), 400);
+    }
     const languageSelect = document.getElementById("languageSelect");
     const signupBtn = document.getElementById("signupBtn");
     const signedInProfile = document.getElementById("signedInProfile");
@@ -139,7 +155,7 @@
             if (historyOwner && firestoreDB) await firestoreDB.collection("users").doc(historyOwner).collection("chats").doc(record.id).delete();
             else sessionStorage.setItem("walidGuestChats", JSON.stringify(guestRecords().filter((item) => item.id !== record.id)));
             if (currentConversationId === record.id) {
-              currentConversationId = newConversationId(); chatMessages = []; chat.replaceChildren(); welcome.classList.remove("hidden"); welcome.classList.remove("fade-out"); rememberActiveConversation();
+              currentConversationId = newConversationId(); chatMessages = []; chat.replaceChildren(); restoreWelcome(); rememberActiveConversation();
             }
             drawHistory(historyOwner ? await loadAccountRecords(false) : guestRecords());
           } catch { addMessage("error", languageSelect.value === "bn" ? "চ্যাটটি মোছা যায়নি। পরে আবার চেষ্টা করুন।" : "This chat could not be deleted. Try again later."); }
@@ -215,7 +231,7 @@
       chatMessages = Array.isArray(record.messages) ? record.messages : [];
       chat.replaceChildren();
       chatMessages.forEach((item) => addMessage(item.kind, item.text, item.source || ""));
-      welcome.classList.toggle("hidden", chatMessages.length > 0);
+      if (chatMessages.length > 0) dismissWelcome(); else restoreWelcome();
       restoringChat = false;
       rememberActiveConversation();
     }
@@ -237,8 +253,12 @@
       document.title = lang === "bn" ? "Walid AI — বাংলাদেশের AI" : "Walid AI — Bangladeshi AI";
       languageSelect.value = lang;
       const text = {
-        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"What would you like to know today?", placeholder:"Ask Walid AI...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", helpText:"আপনার সমস্যাটি লিখে পাঠান; আমরা দেখে জানাব।", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI" },
-        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in for more questions and file uploads.", welcome:"What would you like to know today?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", helpText:"Type your question in the box in the middle and press Send.", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladeshi AI" }
+        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"ওয়ালিদ AI-কে প্রশ্ন করুন...", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI", aboutUs:"আমাদের সম্পর্কে", contactUs:"যোগাযোগ", privacyPolicy:"গোপনীয়তা নীতি", termsOfService:"ব্যবহারের শর্তাবলি", thirdPartyLicenses:"তৃতীয় পক্ষের লাইসেন্স",
+          helpTitle:"সহায়তা কেন্দ্র", faqTab:"সাধারণ প্রশ্ন", contactTab:"সহায়তায় যোগাযোগ", helpMailNote:"Send Email চাপলে আপনার ইমেইল অ্যাপে নিচের তথ্যসহ খসড়া খুলবে। খসড়াটি দেখে সেই অ্যাপ থেকেই Send চাপুন।", helpCategoryLabel:"সমস্যার ধরন", catGeneral:"সাধারণ প্রশ্ন", catAccount:"অ্যাকাউন্ট বা লগইন", catChat:"চ্যাট বা উত্তর", catTool:"ফাইল বা টুল", catOther:"অন্যান্য", helpSubjectLabel:"বিষয়", helpMessageLabel:"বার্তা", sendEmail:"ইমেইল পাঠান", helpAlternative:"অথবা ইমেইল করুন:", mailReady:"আপনার ইমেইল অ্যাপে খসড়াটি খোলা হয়েছে। পাঠাতে সেখানে Send চাপুন।", mailFallback:"ইমেইল অ্যাপ খুলছে না? এই ঠিকানায় লিখুন: support@walid-ai.com",
+          faqChatQ:"চ্যাট কীভাবে শুরু করব?", faqChatA:"চ্যাটের ঘরে প্রশ্ন লিখে Send চাপুন।", faqLangQ:"ওয়েবসাইটের ভাষা কোথায় বদলাব?", faqLangA:"Settings খুলে English বা বাংলা বেছে নিন। পছন্দটি এই ব্রাউজারে সংরক্ষিত থাকে।", faqFilesQ:"চ্যাটে ফাইল কীভাবে যোগ করব?", faqFilesA:"চ্যাট বক্সের পাশের প্লাস বোতাম ব্যবহার করুন। চ্যাটে ফাইল যোগ করতে লগইন প্রয়োজন।", faqToolsQ:"PDF, ছবি ও ZIP টুল কোথায়?", faqToolsA:"সাইডবারের Tools বা Tools পেজ খুলে প্রয়োজনীয় টুল বেছে নিন।", faqConvertQ:"কোন ছবির ফরম্যাট বদলানো যায়?", faqConvertA:"Convert Image টুলে JPG, PNG ও WebP ব্যবহার করা যায়." },
+        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in for more questions and file uploads.", welcome:"Ask Walid AI...", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladeshi AI", aboutUs:"About Us", contactUs:"Contact Us", privacyPolicy:"Privacy Policy", termsOfService:"Terms of Service", thirdPartyLicenses:"Third-Party Licenses",
+          helpTitle:"Help Center", faqTab:"FAQs", contactTab:"Contact Support", helpMailNote:"Send Email opens your email app with the details below. Review the draft and press Send in that app.", helpCategoryLabel:"Issue category", catGeneral:"General question", catAccount:"Account or sign-in", catChat:"Chat or answer", catTool:"File or tool", catOther:"Other", helpSubjectLabel:"Subject", helpMessageLabel:"Message", sendEmail:"Send Email", helpAlternative:"Or email:", mailReady:"Your email app should open with a draft. Press Send there to send it.", mailFallback:"If your email app did not open, email support@walid-ai.com directly.",
+          faqChatQ:"How do I start a chat?", faqChatA:"Type your question in the chat box and press Send.", faqLangQ:"Where can I change the interface language?", faqLangA:"Open Settings and choose English or বাংলা. The choice is saved in this browser.", faqFilesQ:"How do I attach a file in chat?", faqFilesA:"Use the plus button beside the chat box. Sign-in is required for chat file uploads.", faqToolsQ:"Where are the PDF, image, and ZIP tools?", faqToolsA:"Open Tools from the sidebar or the Tools page to choose a tool.", faqConvertQ:"Which image formats can I convert?", faqConvertA:"The Convert Image tool supports JPG, PNG, and WebP." }
       }[lang];
       document.querySelector('[data-i18n="newChat"]').textContent = text.newChat;
       document.querySelector('[data-i18n="history"]').textContent = text.history;
@@ -246,18 +266,20 @@
       document.querySelector('[data-i18n="help"]').textContent = text.help;
       document.querySelector('[data-i18n="settings"]').textContent = text.settings;
       document.querySelector('[data-i18n="language"]').textContent = text.language;
-      document.querySelectorAll(".brand-tagline").forEach((tagline) => {
-        tagline.lastChild.nodeValue = text.tagline;
-      });
+      document.getElementById("settingsAboutLink").textContent = text.aboutUs;
+      document.getElementById("settingsContactLink").textContent = text.contactUs;
       document.getElementById("welcomeTitle").textContent = text.welcome;
       input.setAttribute("aria-label", lang === "bn" ? "প্রশ্ন লিখুন" : "Ask a question");
       document.getElementById("attachBtn").setAttribute("aria-label", lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos");
       document.getElementById("attachBtn").title = lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos";
       document.querySelector('#attachMenu [data-upload-kind="file"]').textContent = lang === "bn" ? "ফাইল আপলোড" : "Upload files";
       document.querySelector('#attachMenu [data-upload-kind="photo"]').textContent = lang === "bn" ? "ছবি আপলোড" : "Upload photos";
-      document.getElementById("helpEmail").placeholder = lang === "bn" ? "ইমেইল (ঐচ্ছিক)" : "Email (optional)";
+      document.getElementById("helpTitle").textContent = text.helpTitle;
+      document.getElementById("helpFaqTab").textContent = text.faqTab;
+      document.getElementById("helpContactTab").textContent = text.contactTab;
+      document.querySelectorAll("[data-help-i18n]").forEach((element) => { const key = element.dataset.helpI18n; if (text[key]) element.textContent = text[key]; });
+      document.getElementById("helpSubject").placeholder = lang === "bn" ? "যেমন: ফাইল আপলোড হচ্ছে না" : "For example: File upload is not working";
       document.getElementById("helpMessage").placeholder = lang === "bn" ? "আপনার সমস্যাটি লিখুন" : "Describe the issue";
-      document.querySelector("#helpForm button[type=submit]").textContent = lang === "bn" ? "পাঠান" : "Send";
       document.getElementById("closeLogin").setAttribute("aria-label", lang === "bn" ? "বন্ধ করুন" : "Close");
       input.placeholder = text.placeholder;
       send.setAttribute("aria-label", lang === "bn" ? "পাঠান" : "Send");
@@ -266,7 +288,6 @@
       logoutBtn.textContent = text.logout;
       document.getElementById("sidebarLoginBtn").textContent = text.login;
       document.getElementById("loginDescription").textContent = text.loginDesc;
-      document.getElementById("helpText").textContent = text.helpText;
       document.getElementById("loginTitle").textContent = loginMode === "signup" ? text.signupTitle : text.login;
       
     }
@@ -276,29 +297,6 @@
     languageSelect.addEventListener("change", () => { try { localStorage.setItem("walidLanguagePreference", languageSelect.value); } catch {} setLanguage(languageSelect.value); });
     setLanguage(languageSelect.value);
 
-    function animateFlowerToLogo() {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const headerFlower = document.querySelector(".page-brand-logo");
-      const target = headerFlower && headerFlower.getBoundingClientRect().width
-        ? headerFlower
-        : document.querySelector(".side-brand img");
-      if (!target) return;
-      const rect = target.getBoundingClientRect();
-      const startX = window.innerWidth / 2 + (window.innerWidth > 650 ? 125 : 0);
-      const startY = window.innerHeight / 2;
-      const flower = document.createElement("img");
-      flower.className = "flower-flight";
-      flower.src = "kathgolap-logo.png";
-      flower.alt = "";
-      flower.setAttribute("aria-hidden", "true");
-      flower.style.left = startX + "px";
-      flower.style.top = startY + "px";
-      flower.style.setProperty("--flower-dx", (rect.left + rect.width / 2 - startX) + "px");
-      flower.style.setProperty("--flower-dy", (rect.top + rect.height / 2 - startY) + "px");
-      document.body.appendChild(flower);
-      flower.addEventListener("animationend", () => flower.remove(), { once: true });
-    }
-    requestAnimationFrame(() => requestAnimationFrame(animateFlowerToLogo));
 
     function openLogin(mode = "login") {
       loginMode = mode;
@@ -309,30 +307,47 @@
       loginModal.classList.remove("hidden");
     }
 
+    // Tool pages link back to the existing sign-in dialog through this query parameter.
+    const authAction = new URLSearchParams(window.location.search).get("auth");
+    if (authAction === "login" || authAction === "signup") {
+      openLogin(authAction);
+      window.history.replaceState(null, "", window.location.pathname + window.location.hash);
+    }
+
     document.getElementById("helpBtn").addEventListener("click", () => helpModal.classList.remove("hidden"));
     document.getElementById("settingsBtn").addEventListener("click", () => settingsModal.classList.remove("hidden"));
     document.getElementById("closeSettings").addEventListener("click", () => settingsModal.classList.add("hidden"));
     settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) settingsModal.classList.add("hidden"); });
     document.getElementById("closeHelp").addEventListener("click", () => helpModal.classList.add("hidden"));
+    const helpFaqTab = document.getElementById("helpFaqTab"), helpContactTab = document.getElementById("helpContactTab");
+    function selectHelpTab(tab) {
+      const faq = tab === "faq";
+      document.getElementById("helpFaqPanel").hidden = !faq;
+      document.getElementById("helpContactPanel").hidden = faq;
+      helpFaqTab.classList.toggle("active", faq); helpContactTab.classList.toggle("active", !faq);
+      helpFaqTab.setAttribute("aria-selected", String(faq)); helpContactTab.setAttribute("aria-selected", String(!faq));
+    }
+    helpFaqTab.addEventListener("click", () => selectHelpTab("faq"));
+    helpContactTab.addEventListener("click", () => selectHelpTab("contact"));
 
-    document.getElementById("helpForm").addEventListener("submit", async (event) => {
+    document.getElementById("helpForm").addEventListener("submit", (event) => {
       event.preventDefault();
-      const status = document.getElementById("helpStatus");
-      const button = event.currentTarget.querySelector("button[type=submit]");
-      button.disabled = true;
-      status.textContent = languageSelect.value === "bn" ? "পাঠানো হচ্ছে…" : "Sending…";
-      try {
-        const response = await fetch(API + "/api/help", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: document.getElementById("helpEmail").value.trim(), message: document.getElementById("helpMessage").value.trim() })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || (languageSelect.value === "bn" ? "বার্তাটি পাঠানো যায়নি।" : "Your message could not be sent."));
-        status.textContent = languageSelect.value === "bn" ? "ধন্যবাদ—আপনার বার্তাটি পেয়েছি। আমরা দেখে জানাব।" : "Thanks, we received your message and will review it.";
-        document.getElementById("helpMessage").value = "";
-      } catch (error) { status.textContent = error.message || (languageSelect.value === "bn" ? "বার্তাটি পাঠানো যায়নি। পরে আবার চেষ্টা করুন।" : "Your message could not be sent. Try again later."); }
-      finally { button.disabled = false; }
+      const form = event.currentTarget;
+      if (!form.reportValidity()) return;
+      const lang = languageSelect.value === "bn" ? "bn" : "en";
+      const categorySelect = document.getElementById("helpCategory");
+      const category = categorySelect.options[categorySelect.selectedIndex].textContent.trim();
+      const subject = document.getElementById("helpSubject").value.trim();
+      const message = document.getElementById("helpMessage").value.trim();
+      const emailSubject = `[Walid AI] ${subject}`;
+      const body = `${lang === "bn" ? "সমস্যার ধরন" : "Issue category"}: ${category}\n\n${message}`;
+      const mailto = `mailto:support@walid-ai.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(body)}`;
+      document.getElementById("helpStatus").textContent = textForHelpStatus(lang);
+      window.location.href = mailto;
     });
+    function textForHelpStatus(lang) {
+      return lang === "bn" ? "আপনার ইমেইল অ্যাপে খসড়াটি খোলা হয়েছে। পাঠাতে সেখানে Send চাপুন।" : "Your email app should open with a draft. Press Send there to send it.";
+    }
 
     const fileInput = document.getElementById("fileInput");
     const attachBtn = document.getElementById("attachBtn");
@@ -505,7 +520,7 @@
       historyOwner = user.uid;
       chat.replaceChildren();
       chatMessages = [];
-      welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
+      restoreWelcome();
 
       try {
         await authorize(await user.getIdToken(), options);
@@ -522,7 +537,7 @@
           localStorage.setItem(accountChatKey(user.uid), currentConversationId);
           chat.replaceChildren();
           chatMessages = [];
-          welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
+          restoreWelcome();
         }
         authorizedUid = user.uid;
       } catch (error) {
@@ -756,7 +771,7 @@
       sessionStorage.removeItem("walidGuestChats");
       chat.replaceChildren();
       chatMessages = [];
-      welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
+      restoreWelcome();
       currentConversationId = newConversationId();
       rememberActiveConversation();
       setProfile("Guest");
@@ -823,7 +838,7 @@
 
       chat.appendChild(bubble);
       chat.scrollTo({ top: chat.scrollHeight, behavior: restoringChat ? "auto" : "smooth" });
-      if (["user", "ai"].includes(kind)) { welcome.classList.add("fade-out"); window.setTimeout(() => welcome.classList.add("hidden"), 400); }
+      if (["user", "ai"].includes(kind) && !restoringChat) dismissWelcome();
 
       if (!restoringChat && ["user", "ai"].includes(kind)) {
         chatMessages.push({ kind, text: String(text ?? ""), source });
@@ -1215,7 +1230,7 @@
       rememberActiveConversation();
       chatMessages = [];
       chat.replaceChildren();
-      welcome.classList.remove("hidden"); welcome.classList.remove("fade-out");
+      restoreWelcome();
       input.focus();
     });
 
@@ -1240,3 +1255,4 @@
       });
     }
   
+

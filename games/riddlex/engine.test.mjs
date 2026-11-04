@@ -125,3 +125,13 @@ test('Bengali question translations refer only to known questions',async()=>{
   assert.ok(typeof value==='string'&&value.trim().length>5,'Missing Bengali text for '+key);
  }
 });
+
+test('changing an earlier answer restores guesses rejected using later evidence',async()=>{
+ const {rejectGuess,rewindRejections,rejectedIds}=await import('./history.js');
+ let history=rejectGuess([], 'first', 3);
+ history=rejectGuess(history,'second',6);
+ history=rejectGuess(history,'second',6);
+ assert.deepEqual([...rejectedIds(history)],['first','second']);
+ assert.deepEqual([...rejectedIds(rewindRejections(history,4))],['first']);
+ assert.deepEqual([...rejectedIds(rewindRejections(history,2))],[]);
+});

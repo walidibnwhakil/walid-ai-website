@@ -5,10 +5,13 @@ import {entries,questions} from './casebook.js';
 export function validateImport(input){
  if(!Array.isArray(input)||input.length>100000)throw Error('Expected at most 100000 records');
  const seen=new Set(entries.map(e=>e.id)),accepted=[],rejected=[];
+ const signature=(category,facts)=>category+':'+JSON.stringify(Object.entries(facts).sort(([a],[b])=>a.localeCompare(b)));
+ const seenFacts=new Set(entries.map(e=>signature(e.category,e.facts)));
  for(const [index,item] of input.entries()){
   if(!item||typeof item!=='object'||Array.isArray(item)||typeof item.id!=='string'||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.id)||item.id.length>80||typeof item.name!=='string'||!item.name.trim()||item.name.length>160||!['characters','animals','objects'].includes(item.category)||!item.facts||typeof item.facts!=='object'||Array.isArray(item.facts)||seen.has(item.id)){rejected.push(index);continue;}
   const facts=Object.fromEntries(Object.entries(item.facts).filter(([key,value])=>typeof value==='boolean'&&Object.hasOwn(questions,key)));
-  if(Object.keys(facts).length<2){rejected.push(index);continue;}
+  if(Object.keys(facts).length<2||seenFacts.has(signature(item.category,facts))){rejected.push(index);continue;}
+  seenFacts.add(signature(item.category,facts));
   seen.add(item.id);accepted.push({id:item.id,name:item.name,category:item.category,facts});
  }
  return {accepted,rejected};

@@ -54,3 +54,15 @@ test('all five answer modes are supported',async()=>{
  const {ANSWERS}=await import('./engine.js');
  assert.deepEqual(ANSWERS,['yes','no','probably','probably-not','unknown']);
 });
+
+test('bulk importer rejects unknown facts and duplicate entries',async()=>{
+ const {validateImport}=await import('./import-knowledge.mjs');
+ const result=validateImport([
+  {id:'cat',name:'Duplicate cat',category:'animals',facts:{mammal:true,bird:false}},
+  {id:'new-animal-1',name:'Example animal',category:'animals',facts:{mammal:true,bird:false,unsupported:true}},
+  {id:'new-animal-2',name:'Insufficient',category:'animals',facts:{mammal:true}}
+ ]);
+ assert.equal(result.accepted.length,1);
+ assert.deepEqual(result.rejected,[0,2]);
+ assert.equal(Object.hasOwn(result.accepted[0].facts,'unsupported'),false);
+});

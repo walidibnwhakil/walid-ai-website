@@ -26,7 +26,7 @@ function showNote(){
  // Only explicitly reviewed, local casebook image paths may be displayed.
  const path=guess.image;
  const safe=typeof path==="string"&&/^\.\/images\/[a-z0-9-]+\.(?:png|jpg|jpeg|webp)$/.test(path);
- if(safe){photo.src=path;photo.alt=guess.name;photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};photo.hidden=false;}
+ if(safe){if(photo.getAttribute("src")!==path)photo.src=path;photo.alt=guess.name;photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};photo.hidden=false;}
  else{photo.hidden=true;photo.removeAttribute("src");photo.alt="";}
 }
 function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
@@ -40,10 +40,10 @@ function render(){
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
  if(!ranked.length){currentKey=null;guess=null;mood("unsure");$("status").textContent=t("I have no more guesses in my casebook. Start a new game.","আমার তথ্যভান্ডারে আর কোনো অনুমান নেই। নতুন খেলা শুরু করুন।");return;}
  const suggestion=selectGuess(ranked,answers,allQuestions);
- if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);return;}
+ if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);visible($("wrong"),true);showNote();return;}
  currentKey=nextQuestion(ranked,answers,allQuestions);
  if(!currentKey){
-   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);showNote();}
+   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);visible($("wrong"),true);showNote();}
    else $("status").textContent="I don't have enough evidence to make a reliable guess. You can correct an answer or start a new game.";
    return;
  }

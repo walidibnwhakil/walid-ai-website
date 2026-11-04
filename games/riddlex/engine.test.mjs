@@ -79,3 +79,17 @@ test('after eight answers a leading plausible candidate may be guessed early',()
  const ranked=scoreCandidates(sample,answers);
  assert.equal(selectGuess(ranked,answers,{a:'A?',b:'B?'}).id,'lead');
 });
+
+test('five consecutive unknown answers trigger broad question exploration',()=>{
+ const sample=[
+  ...Array.from({length:20},(_,i)=>({id:'short'+i,name:'Short '+i,facts:{focused:true}})),
+  {id:'sparse',name:'Sparse',facts:{rare:true}}
+ ];
+ const ranked=scoreCandidates(sample,[]);
+ const questions={focused:'Focused?',rare:'Rare?'};
+ const answers=Array.from({length:5},(_,i)=>({key:'already'+i,value:'unknown'}));
+ // Focused shortlist asks about "focused"; broad search must also consider "rare".
+ const choice=nextQuestion(ranked,answers,questions);
+ assert.ok(['focused','rare'].includes(choice));
+ assert.ok(choice);
+});

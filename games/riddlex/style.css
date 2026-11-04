@@ -141,3 +141,16 @@ button:active{transform:translateY(1px)}
 .character-art{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
 .detective .glasses-gesture{font-size:36px;line-height:1}
 @media(max-width:500px){.detective{left:27%;top:12px;width:140px}.cat{right:7%;bottom:32px;width:74px}}
+
+/* Retry: the detective crumples only the paper into a ball before tossing it.
+   The previous guess's photo and lettering are not displayed during disposal. */
+.office[data-mood="discard"] .case-note{overflow:hidden;animation:crumpled-note-to-bin 1.4s ease-in forwards}
+.office[data-mood="discard"] .case-note > *{visibility:hidden!important}
+@keyframes crumpled-note-to-bin{
+  0%,20%{opacity:1;border-radius:2px;clip-path:inset(0 round 2px);transform:translate(-50%,0) rotate(-3deg) scale(1)}
+  37%{opacity:1;border-radius:38%;clip-path:inset(13% 19% round 35%);transform:translate(-50%,0) rotate(-25deg) scale(.55)}
+  53%{opacity:1;border-radius:50%;clip-path:inset(22% 30% round 50%);transform:translate(calc(-50% + var(--throw-x-mid,0px)),var(--throw-y-mid,0px)) rotate(65deg) scale(.38)}
+  83%{opacity:1;border-radius:50%;clip-path:inset(22% 30% round 50%);transform:translate(calc(-50% + var(--throw-x-late,0px)),var(--throw-y-late,0px)) rotate(220deg) scale(.30)}
+  100%{opacity:0;border-radius:50%;clip-path:inset(22% 30% round 50%);transform:translate(calc(-50% + var(--throw-x,0px)),var(--throw-y,0px)) rotate(320deg) scale(.18)}
+}
+@media(prefers-reduced-motion:reduce){.office[data-mood="discard"] .case-note{animation:none!important}}

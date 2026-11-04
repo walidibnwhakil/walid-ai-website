@@ -129,3 +129,83 @@ carrom-board|Carrom board|objects|!electronic,!vehicle,sports,board_game|Is this
 chessboard|Chessboard|objects|!electronic,!vehicle,board_game|Does this board have 64 alternating light and dark squares for kings and other pieces?|রাজাসহ ঘুঁটি চালার বোর্ডটিতে কি পর্যায়ক্রমে হালকা ও গাঢ় ৬৪টি ঘর থাকে?|Chessboard|64
 badminton-racket|Badminton racket|objects|!electronic,!vehicle,sports,portable|Is this a stringed racket used to hit a shuttlecock over a net?|এটি কি জালের ওপর দিয়ে শাটলকক মারার তার লাগানো র‍্যাকেট?|Badminton|shuttlecock
 hockey-stick|Field hockey stick|objects|!electronic,!vehicle,sports,portable|Is this a stick with a curved head used to strike a ball in field hockey?|এটি কি ফিল্ড হকিতে বল মারার বাঁকা মাথাওয়ালা স্টিক?|Field_hockey|stick
+nonte|Nonte (Nonte Phonte)|characters|fictional,bangla,comic,boy|Is he Phonte's friend in Narayan Debnath's boarding-school comic?|সে কি নারায়ণ দেবনাথের বোর্ডিং স্কুলের কমিকসে ফন্টের বন্ধু?|Nonte_Phonte|Nonte
+phonte|Phonte (Nonte Phonte)|characters|fictional,bangla,comic,boy|Is he Nonte's friend in Narayan Debnath's boarding-school comic?|সে কি নারায়ণ দেবনাথের বোর্ডিং স্কুলের কমিকসে নন্টের বন্ধু?|Nonte_Phonte|Phonte
+handa|Handa (Handa Bhonda)|characters|fictional,bangla,comic,boy|Is he the slimmer mischievous boy in the Handa Bhonda comic?|সে কি হাঁদা ভোঁদা কমিকসের রোগা দুষ্টু ছেলেটি?|Handa_Bhonda|Handa
+bhonda|Bhonda (Handa Bhonda)|characters|fictional,bangla,comic,boy|Is he the heavier boy in the Handa Bhonda comic?|সে কি হাঁদা ভোঁদা কমিকসের মোটা ছেলেটি?|Handa_Bhonda|Bhonda
+shizuka|Shizuka Minamoto|characters|fictional,japanese,cartoon,girl|Is she Nobita's friend who loves playing the violin?|সে কি নবিতার বান্ধবী যে বেহালা বাজাতে ভালোবাসে?|Shizuka_Minamoto|Nobita
+suneo|Suneo Honekawa|characters|fictional,japanese,cartoon,boy|Is he Nobita's wealthy friend with a fox-like face?|সে কি নবিতার ধনী বন্ধু যার মুখ শিয়ালের মতো?|Suneo_Honekawa|wealthy
+gian|Takeshi Goda (Gian)|characters|fictional,japanese,cartoon,boy|Is he Nobita's bullying friend who loves singing badly?|সে কি নবিতার দাপুটে বন্ধু যে বেসুরো গান গাইতে ভালোবাসে?|Takeshi_Goda|singing
+snoopy|Snoopy|characters|fictional,american,cartoon,dog_character|Is this Charlie Brown's pet beagle?|এটি কি চার্লি ব্রাউনের পোষা বিগল কুকুর?|Snoopy|beagle
+garfield|Garfield|characters|fictional,american,cartoon,feline|Is this the orange cat who loves lasagna and hates Mondays?|এটি কি কমলা রঙের বিড়াল যে লাসানিয়া ভালোবাসে ও সোমবার অপছন্দ করে?|Garfield|lasagna
+bugs-bunny|Bugs Bunny|characters|fictional,american,cartoon|Is this the rabbit who says What's up Doc?|এটি কি সেই খরগোশ যে হোয়াটস আপ ডক বলে?|Bugs_Bunny|Doc
+road-runner|Road Runner (Looney Tunes)|characters|fictional,american,cartoon|Is this the fast bird chased by Wile E. Coyote?|এটি কি সেই দ্রুতগামী পাখি যাকে ওয়াইলি ই. কায়োটি তাড়া করে?|Wile_E._Coyote_and_the_Road_Runner|Road Runner
+wiley-coyote|Wile E. Coyote|characters|fictional,american,cartoon|Does this coyote repeatedly try to catch the Road Runner using elaborate contraptions?|এই কায়োটি কি নানা জটিল যন্ত্র দিয়ে বারবার রোড রানারকে ধরার চেষ্টা করে?|Wile_E._Coyote_and_the_Road_Runner|Coyote
+sylvester|Sylvester (Looney Tunes)|characters|fictional,american,cartoon,feline|Is this the black-and-white cat who pursues Tweety?|এটি কি সেই সাদা কালো বিড়াল যে টুইটিকে ধরার চেষ্টা করে?|Sylvester_the_Cat|Tweety
+tweety|Tweety|characters|fictional,american,cartoon|Is this the yellow canary pursued by Sylvester?|এটি কি সেই হলুদ ক্যানারি পাখি যাকে সিলভেস্টার তাড়া করে?|Tweety|canary
+velma|Velma Dinkley|characters|fictional,american,cartoon,female,glasses,mystery|Is she the glasses-wearing Mystery Inc. member who often loses her spectacles?|সে কি মিস্ট্রি ইনকের চশমা পরা সদস্য যে প্রায়ই চশমা হারায়?|Velma_Dinkley|glasses
+shaggy|Shaggy Rogers|characters|fictional,american,cartoon,male,mystery|Is he Scooby-Doo's perpetually hungry best friend?|সে কি স্কুবি ডুর সব সময় ক্ষুধার্ত ঘনিষ্ঠ বন্ধু?|Shaggy_Rogers|Scooby
+sandy-cheeks|Sandy Cheeks|characters|fictional,american,cartoon,female,underwater|Is this the squirrel from Texas who lives in an underwater treedome?|এটি কি টেক্সাসের কাঠবিড়ালি যে সমুদ্রের নিচে ট্রিডোমে থাকে?|Sandy_Cheeks|Texas
+squidward|Squidward Tentacles|characters|fictional,american,cartoon,underwater|Is this SpongeBob's grumpy neighbor who plays the clarinet?|এটি কি স্পঞ্জববের খিটখিটে প্রতিবেশী যে ক্ল্যারিনেট বাজায়?|Squidward_Tentacles|clarinet
+sakura|Sakura Haruno|characters|fictional,japanese,anime,ninja,female|Is she the pink-haired medical ninja on Naruto's Team 7?|সে কি নারুটোর টিম সেভেনের গোলাপি চুলের চিকিৎসক নিনজা?|Sakura_Haruno|Team 7
+sasuke|Sasuke Uchiha|characters|fictional,japanese,anime,ninja,male|Is he Naruto's rival and Itachi Uchiha's younger brother?|সে কি নারুটোর প্রতিদ্বন্দ্বী এবং ইতাচি উচিহার ছোট ভাই?|Sasuke_Uchiha|Itachi
+sloth|Sloth|animals|mammal,wild,climbs|Is this a slow-moving tree-dwelling mammal that hangs upside down?|এটি কি ধীরগতির গাছে থাকা স্তন্যপায়ী যা উল্টো হয়ে ঝোলে?|Sloth|upside down
+pangolin|Pangolin|animals|mammal,wild,scales|Is this a mammal covered in protective keratin scales?|এটি কি সুরক্ষামূলক কেরাটিনের আঁশে ঢাকা স্তন্যপায়ী?|Pangolin|keratin
+platypus|Platypus|animals|mammal,aquatic,swims|Is this an egg-laying mammal with a duck-like bill?|এটি কি হাঁসের মতো ঠোঁটযুক্ত ডিম পাড়া স্তন্যপায়ী?|Platypus|egg-laying
+echidna|Echidna|animals|mammal,wild|Is this a spiny egg-laying mammal also called a spiny anteater?|এটি কি কাঁটাযুক্ত ডিম পাড়া স্তন্যপায়ী যাকে স্পাইনি অ্যান্টইটারও বলে?|Echidna|spiny
+okapi|Okapi|animals|mammal,wild,hoof|Is this a giraffe relative with zebra-like striped hindquarters?|এটি কি জিরাফের আত্মীয় যার পেছনের অংশে জেব্রার মতো ডোরা আছে?|Okapi|giraffe
+capybara|Capybara|animals|mammal,wild,aquatic|Is this the largest living rodent?|এটি কি বর্তমানে জীবিত সবচেয়ে বড় তীক্ষ্ণদন্তী প্রাণী?|Capybara|largest
+wombat|Wombat|animals|mammal,wild,marsupial|Is this a burrowing Australian marsupial known for cube-shaped droppings?|এটি কি গর্তে থাকা অস্ট্রেলীয় মারসুপিয়াল যার মল ঘনকের মতো?|Wombat|cube
+tasmanian-devil|Tasmanian devil|animals|mammal,wild,marsupial|Is this a carnivorous marsupial now found in the wild mainly in Tasmania?|এটি কি মাংসাশী মারসুপিয়াল যা বুনো অবস্থায় মূলত তাসমানিয়ায় পাওয়া যায়?|Tasmanian_devil|Tasmania
+meerkat|Meerkat|animals|mammal,wild|Is this a small mongoose from southern Africa that often stands upright on guard?|এটি কি দক্ষিণ আফ্রিকার ছোট বেজিজাতীয় প্রাণী যা প্রায়ই সোজা দাঁড়িয়ে পাহারা দেয়?|Meerkat|mongoose
+mongoose|Mongoose|animals|mammal,wild,predator|Is this a herpestid mammal family including species famous for fighting snakes?|এটি কি হারপেস্টিড স্তন্যপায়ী পরিবারের প্রাণী যার কিছু প্রজাতি সাপের সঙ্গে লড়াইয়ের জন্য পরিচিত?|Mongoose|Herpestidae
+hyena|Hyena|animals|mammal,wild,predator|Is this a carnivoran of the family Hyaenidae whose spotted species makes laugh-like calls?|এটি কি হায়েনিডি পরিবারের মাংসাশী যার দাগযুক্ত প্রজাতি হাসির মতো ডাক দেয়?|Hyena|Hyaenidae
+walrus|Walrus|animals|mammal,wild,marine|Is this an Arctic marine mammal with long tusks and whiskers?|এটি কি লম্বা দাঁত ও গোঁফযুক্ত আর্কটিক সামুদ্রিক স্তন্যপায়ী?|Walrus|tusks
+manatee|Manatee|animals|mammal,aquatic,marine|Is this a large herbivorous aquatic mammal also called a sea cow?|এটি কি বড় তৃণভোজী জলজ স্তন্যপায়ী যাকে সি কাউও বলে?|Manatee|sea cows
+narwhal|Narwhal|animals|mammal,marine|Is this an Arctic whale whose males usually have a long spiral tusk?|এটি কি আর্কটিক তিমি যার পুরুষের সাধারণত লম্বা প্যাঁচানো দাঁত থাকে?|Narwhal|tusk
+kiwi-bird|Kiwi (bird)|animals|bird,!mammal,!reptile,wild|Is this a flightless New Zealand bird with nostrils near the tip of its long bill?|এটি কি নিউজিল্যান্ডের উড়তে না পারা পাখি যার লম্বা ঠোঁটের ডগার কাছে নাসারন্ধ্র আছে?|Kiwi_(bird)|nostrils
+cassowary|Cassowary|animals|bird,!mammal,!reptile,wild|Is this a large flightless bird with a helmet-like casque on its head?|এটি কি বড় উড়তে না পারা পাখি যার মাথায় শিরস্ত্রাণের মতো ক্যাস্ক আছে?|Cassowary|casque
+hoopoe|Hoopoe|animals|bird,!mammal,!reptile,wild,flies|Is this a bird with a distinctive crown of feathers that it can raise or lower?|এটি কি বিশেষ পালকের মুকুটওয়ালা পাখি যা মুকুটটি উঁচু বা নিচু করতে পারে?|Hoopoe|crown
+sunbird|Sunbird|animals|bird,!mammal,!reptile,wild,flies|Is this a nectar-feeding bird from the family Nectariniidae?|এটি কি নেকটারিনিডি পরিবারের ফুলের মধু খাওয়া পাখি?|Sunbird|Nectariniidae
+weaver-bird|Weaverbird|animals|bird,!mammal,!reptile,wild,flies|Is this a bird of the family Ploceidae known for weaving elaborate nests?|এটি কি প্লোসিডি পরিবারের পাখি যা জটিল বাসা বোনার জন্য পরিচিত?|Ploceidae|nests
+praying-mantis|Praying mantis|animals|insect,wild,predator|Is this an insect with folded grasping forelegs resembling a praying posture?|এটি কি এমন পোকা যার শিকার ধরার সামনের পা প্রার্থনার ভঙ্গিতে ভাঁজ থাকে?|Mantis|forelegs
+stapler|Stapler|objects|portable,metal|Does it join sheets of paper using bent metal staples?|এটি কি ধাতব স্ট্যাপল বাঁকিয়ে কাগজের পাতা জোড়া লাগায়?|Stapler|staples
+hole-punch|Hole punch|objects|portable,metal|Does this office tool punch holes in sheets of paper for binding?|এই অফিসের যন্ত্র কি বাঁধাইয়ের জন্য কাগজে ছিদ্র করে?|Hole_punch|holes
+compass-drawing|Drawing compass|objects|portable,metal|Is this a two-legged drafting tool used to draw circles?|এটি কি বৃত্ত আঁকার দুই পাযুক্ত জ্যামিতির যন্ত্র?|Compass_(drawing_tool)|circles
+protractor|Protractor|objects|portable|Is this a geometry tool used to measure angles in degrees?|এটি কি ডিগ্রিতে কোণ মাপার জ্যামিতির যন্ত্র?|Protractor|angles
+abacus|Abacus|objects|portable|Is this a calculating device with beads sliding on rods or wires?|এটি কি দণ্ড বা তারে গুটি সরিয়ে হিসাব করার যন্ত্র?|Abacus|beads
+magnifying-glass|Magnifying glass|objects|portable|Is this a convex lens used to produce an enlarged image?|এটি কি বড় প্রতিবিম্ব দেখার উত্তল লেন্স?|Magnifying_glass|convex
+stethoscope|Stethoscope|objects|portable|Is this a medical instrument used to listen to heart and lung sounds?|এটি কি হৃদযন্ত্র ও ফুসফুসের শব্দ শোনার চিকিৎসার যন্ত্র?|Stethoscope|auscultation
+syringe|Syringe|objects|portable|Is this a piston-and-barrel device commonly used for injections?|এটি কি পিস্টন ও নলযুক্ত যন্ত্র যা সাধারণত ইনজেকশনে ব্যবহৃত হয়?|Syringe|plunger
+microscope|Microscope|objects|science_tool|Is this an instrument for viewing objects too small for the unaided eye?|এটি কি খালি চোখে দেখা যায় না এমন ছোট বস্তু দেখার যন্ত্র?|Microscope|small
+telescope|Telescope|objects|science_tool|Is this an instrument used to observe distant objects such as stars?|এটি কি তারার মতো দূরের বস্তু পর্যবেক্ষণের যন্ত্র?|Telescope|distant
+screwdriver|Screwdriver|objects|portable,metal|Is this a hand tool for turning screws?|এটি কি স্ক্রু ঘোরানোর হাতিয়ার?|Screwdriver|screws
+hammer-tool|Hammer|objects|portable,metal|Is this a striking tool often used to drive nails into wood?|এটি কি কাঠে পেরেক ঠোকার আঘাত করার হাতিয়ার?|Hammer|nails
+pliers|Pliers|objects|portable,metal|Is this a pivoted hand tool used to grip or bend materials?|এটি কি কবজাযুক্ত হাতিয়ার যা দিয়ে বস্তু ধরা বা বাঁকানো হয়?|Pliers|grip
+wrench|Wrench|objects|portable,metal|Is this a tool used to turn nuts and bolts?|এটি কি নাট ও বোল্ট ঘোরানোর হাতিয়ার?|Wrench|bolts
+saw|Saw|objects|metal|Is this a cutting tool with a toothed blade?|এটি কি দাঁতযুক্ত ফলার কাটার হাতিয়ার?|Saw|toothed
+ladle|Ladle|objects|kitchen|Is this a deep-bowled spoon with a long handle for serving liquids?|এটি কি তরল পরিবেশনের গভীর পাত্রযুক্ত লম্বা হাতলের চামচ?|Ladle_(spoon)|soup
+colander|Colander|objects|kitchen|Is this a perforated bowl used to drain food such as pasta?|এটি কি পাস্তার মতো খাবারের পানি ঝরানোর ছিদ্রযুক্ত বাটি?|Colander|drain
+whisk|Whisk|objects|kitchen|Is this a kitchen utensil with wire loops used for beating or whipping?|এটি কি ফেটানো বা মেশানোর তারের ফাঁসযুক্ত রান্নাঘরের সরঞ্জাম?|Whisk|blend
+spatula|Spatula|objects|kitchen|Is this a broad flat kitchen utensil used to lift or turn food?|এটি কি খাবার তোলা বা উল্টানোর চওড়া চ্যাপ্টা রান্নাঘরের সরঞ্জাম?|Spatula|broad
+funnel|Funnel|objects|portable|Is this a wide-mouthed tube narrowing to a small opening for pouring liquids?|এটি কি তরল ঢালার চওড়া মুখ ও সরু নলযুক্ত সরঞ্জাম?|Funnel|tube
+devdas|Devdas|characters|fictional,bangla,novel,male|Is he Sarat Chandra's tragic hero who loves Parvati and turns to alcohol?|সে কি শরৎচন্দ্রের করুণ নায়ক যে পার্বতীকে ভালোবাসে ও মদে আসক্ত হয়?|Devdas|Devdas
+parvati-devdas|Parvati (Devdas)|characters|fictional,bangla,novel,female|Is she Devdas's childhood love, also called Paro?|সে কি দেবদাসের ছোটবেলার ভালোবাসা যাকে পারোও বলা হয়?|Devdas|Parvati
+chandramukhi|Chandramukhi (Devdas)|characters|fictional,bangla,novel,female|Is she the courtesan who falls in love with Devdas?|সে কি সেই নর্তকী যে দেবদাসের প্রেমে পড়ে?|Devdas|Chandramukhi
+gora|Gora (Tagore novel)|characters|fictional,bangla,novel,male|Is he Tagore's orthodox Hindu protagonist who discovers his Irish parentage?|সে কি রবীন্দ্রনাথের গোঁড়া হিন্দু নায়ক যে নিজের আইরিশ বংশপরিচয় জানতে পারে?|Gora_(novel)|Irish
+bimala|Bimala (The Home and the World)|characters|fictional,bangla,novel,female|Is she Nikhilesh's wife who becomes drawn to Sandip?|সে কি নিখিলেশের স্ত্রী যে সন্দীপের প্রতি আকৃষ্ট হয়?|The_Home_and_the_World|Bimala
+nikhilesh|Nikhilesh (The Home and the World)|characters|fictional,bangla,novel,male|Is he Bimala's liberal husband in The Home and the World?|সে কি ঘরে বাইরের বিমলার উদারমনা স্বামী?|The_Home_and_the_World|Nikhil
+sandip|Sandip (The Home and the World)|characters|fictional,bangla,novel,male|Is he the charismatic nationalist who influences Bimala in The Home and the World?|সে কি ঘরে বাইরের আকর্ষণীয় জাতীয়তাবাদী নেতা যে বিমলাকে প্রভাবিত করে?|The_Home_and_the_World|Sandip
+apu|Apu (Pather Panchali)|characters|fictional,bangla,novel,male|Is he Harihar and Sarbajaya's son and Durga's younger brother?|সে কি হরিহর ও সর্বজয়ার ছেলে এবং দুর্গার ছোট ভাই?|Pather_Panchali_(novel)|Apu
+durga-pather|Durga (Pather Panchali)|characters|fictional,bangla,novel,female|Is she Apu's elder sister in Pather Panchali?|সে কি পথের পাঁচালীর অপুর বড় বোন?|Pather_Panchali_(novel)|Durga
+harihar|Harihar Roy (Pather Panchali)|characters|fictional,bangla,novel,male|Is he Apu and Durga's father and Sarbajaya's husband?|সে কি অপু ও দুর্গার বাবা এবং সর্বজয়ার স্বামী?|Pather_Panchali_(novel)|Horihor
+sarbajaya|Sarbajaya (Pather Panchali)|characters|fictional,bangla,novel,female|Is she Apu and Durga's mother and Harihar's wife?|সে কি অপু ও দুর্গার মা এবং হরিহরের স্ত্রী?|Pather_Panchali_(novel)|Shorbojoya
+kuber|Kuber (Padma Nadir Majhi)|characters|fictional,bangla,novel,male|Is he the fisherman at the center of Manik Bandyopadhyay's Padma Nadir Majhi?|সে কি মানিক বন্দ্যোপাধ্যায়ের পদ্মা নদীর মাঝির কেন্দ্রীয় জেলে চরিত্র?|https://bn.wikipedia.org/wiki/পদ্মানদীর_মাঝি|কুবের
+kapila|Kapila (Padma Nadir Majhi)|characters|fictional,bangla,novel,female|Is she Kuber's sister-in-law in Padma Nadir Majhi?|সে কি পদ্মা নদীর মাঝির কুবেরের শ্যালিকা?|https://bn.wikipedia.org/wiki/পদ্মানদীর_মাঝি|কপিলা
+hossain-mia|Hossain Mia (Padma Nadir Majhi)|characters|fictional,bangla,novel,male|Is he the man who plans a settlement on Moynadwip in Padma Nadir Majhi?|সে কি পদ্মা নদীর মাঝির সেই ব্যক্তি যে ময়নাদ্বীপে বসতি গড়ার পরিকল্পনা করে?|https://bn.wikipedia.org/wiki/পদ্মানদীর_মাঝি|হোসেন মিয়া
+srikanta|Srikanta (Sarat Chandra novel)|characters|fictional,bangla,novel,male|Is he the wandering narrator of Sarat Chandra's four-part novel named after him?|সে কি শরৎচন্দ্রের নিজের নামে চার খণ্ডের উপন্যাসের ভবঘুরে কথক?|Srikanta_(book)|Srikanta
+rajlakshmi|Rajlakshmi (Srikanta)|characters|fictional,bangla,novel,female|Is she Srikanta's childhood companion who later appears as the dancer Piyari?|সে কি শ্রীকান্তের ছোটবেলার সঙ্গী যে পরে পিয়ারী নামে নর্তকী হিসেবে দেখা দেয়?|Srikanta_(book)|Rajlakshmi
+charulata|Charulata (Nastanirh)|characters|fictional,bangla,female|Is she Bhupati's lonely wife who grows close to Amal in Nastanirh?|সে কি নষ্টনীড়ের ভূপতির নিঃসঙ্গ স্ত্রী যে অমলের কাছাকাছি আসে?|Nastanirh|Charu
+bhupati|Bhupati (Nastanirh)|characters|fictional,bangla,male|Is he Charulata's husband and Amal's cousin in Nastanirh?|সে কি নষ্টনীড়ের চারুলতার স্বামী এবং অমলের আত্মীয়?|Nastanirh|Bhupati
+amal-nastanirh|Amal (Nastanirh)|characters|fictional,bangla,male|Is he Bhupati's cousin who arouses romantic feelings in Charulata?|সে কি ভূপতির সেই আত্মীয় যার প্রতি চারুলতার প্রেমের অনুভূতি জাগে?|Nastanirh|Amal
+kapalkundala|Kapalkundala|characters|fictional,bangla,novel,female|Is she Bankim Chandra's heroine brought up in the forest by a Kapalik?|সে কি বঙ্কিমচন্দ্রের সেই নায়িকা যাকে কাপালিক বনে লালন করে?|Kapalkundala|Kapalik

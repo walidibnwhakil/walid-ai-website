@@ -1,3 +1,4 @@
+import {wikidataBanglaQuestions} from './knowledge.wikidata.generated.js';
 // Human-reviewed starter Bengali question translations; English fallback for missing keys.
 import {generatedBanglaQuestions} from './knowledge.questions.generated.js';
 export const banglaQuestions={
@@ -115,3 +116,5 @@ export const banglaQuestions={
 };
 Object.assign(banglaQuestions,generatedBanglaQuestions);
 
+
+Object.assign(banglaQuestions,wikidataBanglaQuestions);

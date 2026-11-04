@@ -2717,5 +2717,1536 @@ export const generatedEntries=[
         "checkedOn": "2026-11-04"
       }
     ]
+  },
+  {
+    "id": "nonte",
+    "name": "Nonte (Nonte Phonte)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "comic": true,
+      "boy": true,
+      "cue_nonte": true
+    },
+    "diagnostic": "cue_nonte",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Nonte_Phonte",
+        "locator": "Nonte",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "phonte",
+    "name": "Phonte (Nonte Phonte)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "comic": true,
+      "boy": true,
+      "cue_phonte": true
+    },
+    "diagnostic": "cue_phonte",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Nonte_Phonte",
+        "locator": "Phonte",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "handa",
+    "name": "Handa (Handa Bhonda)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "comic": true,
+      "boy": true,
+      "cue_handa": true
+    },
+    "diagnostic": "cue_handa",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Handa_Bhonda",
+        "locator": "Handa",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "bhonda",
+    "name": "Bhonda (Handa Bhonda)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "comic": true,
+      "boy": true,
+      "cue_bhonda": true
+    },
+    "diagnostic": "cue_bhonda",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Handa_Bhonda",
+        "locator": "Bhonda",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "shizuka",
+    "name": "Shizuka Minamoto",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "japanese": true,
+      "cartoon": true,
+      "girl": true,
+      "cue_shizuka": true
+    },
+    "diagnostic": "cue_shizuka",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Shizuka_Minamoto",
+        "locator": "Nobita",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "suneo",
+    "name": "Suneo Honekawa",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "japanese": true,
+      "cartoon": true,
+      "boy": true,
+      "cue_suneo": true
+    },
+    "diagnostic": "cue_suneo",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Suneo_Honekawa",
+        "locator": "wealthy",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "gian",
+    "name": "Takeshi Goda (Gian)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "japanese": true,
+      "cartoon": true,
+      "boy": true,
+      "cue_gian": true
+    },
+    "diagnostic": "cue_gian",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Takeshi_Goda",
+        "locator": "singing",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "snoopy",
+    "name": "Snoopy",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "dog_character": true,
+      "cue_snoopy": true
+    },
+    "diagnostic": "cue_snoopy",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Snoopy",
+        "locator": "beagle",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "garfield",
+    "name": "Garfield",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "feline": true,
+      "cue_garfield": true
+    },
+    "diagnostic": "cue_garfield",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Garfield",
+        "locator": "lasagna",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "bugs-bunny",
+    "name": "Bugs Bunny",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "cue_bugs_bunny": true
+    },
+    "diagnostic": "cue_bugs_bunny",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Bugs_Bunny",
+        "locator": "Doc",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "road-runner",
+    "name": "Road Runner (Looney Tunes)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "cue_road_runner": true
+    },
+    "diagnostic": "cue_road_runner",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Wile_E._Coyote_and_the_Road_Runner",
+        "locator": "Road Runner",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "wiley-coyote",
+    "name": "Wile E. Coyote",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "cue_wiley_coyote": true
+    },
+    "diagnostic": "cue_wiley_coyote",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Wile_E._Coyote_and_the_Road_Runner",
+        "locator": "Coyote",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sylvester",
+    "name": "Sylvester (Looney Tunes)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "feline": true,
+      "cue_sylvester": true
+    },
+    "diagnostic": "cue_sylvester",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Sylvester_the_Cat",
+        "locator": "Tweety",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "tweety",
+    "name": "Tweety",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "cue_tweety": true
+    },
+    "diagnostic": "cue_tweety",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Tweety",
+        "locator": "canary",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "velma",
+    "name": "Velma Dinkley",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "female": true,
+      "glasses": true,
+      "mystery": true,
+      "cue_velma": true
+    },
+    "diagnostic": "cue_velma",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Velma_Dinkley",
+        "locator": "glasses",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "shaggy",
+    "name": "Shaggy Rogers",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "male": true,
+      "mystery": true,
+      "cue_shaggy": true
+    },
+    "diagnostic": "cue_shaggy",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Shaggy_Rogers",
+        "locator": "Scooby",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sandy-cheeks",
+    "name": "Sandy Cheeks",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "female": true,
+      "underwater": true,
+      "cue_sandy_cheeks": true
+    },
+    "diagnostic": "cue_sandy_cheeks",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Sandy_Cheeks",
+        "locator": "Texas",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "squidward",
+    "name": "Squidward Tentacles",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "american": true,
+      "cartoon": true,
+      "underwater": true,
+      "cue_squidward": true
+    },
+    "diagnostic": "cue_squidward",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Squidward_Tentacles",
+        "locator": "clarinet",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sakura",
+    "name": "Sakura Haruno",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "japanese": true,
+      "anime": true,
+      "ninja": true,
+      "female": true,
+      "cue_sakura": true
+    },
+    "diagnostic": "cue_sakura",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Sakura_Haruno",
+        "locator": "Team 7",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sasuke",
+    "name": "Sasuke Uchiha",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "japanese": true,
+      "anime": true,
+      "ninja": true,
+      "male": true,
+      "cue_sasuke": true
+    },
+    "diagnostic": "cue_sasuke",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Sasuke_Uchiha",
+        "locator": "Itachi",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sloth",
+    "name": "Sloth",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "climbs": true,
+      "cue_sloth": true
+    },
+    "diagnostic": "cue_sloth",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Sloth",
+        "locator": "upside down",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "pangolin",
+    "name": "Pangolin",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "scales": true,
+      "cue_pangolin": true
+    },
+    "diagnostic": "cue_pangolin",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Pangolin",
+        "locator": "keratin",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "platypus",
+    "name": "Platypus",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "aquatic": true,
+      "swims": true,
+      "cue_platypus": true
+    },
+    "diagnostic": "cue_platypus",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Platypus",
+        "locator": "egg-laying",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "echidna",
+    "name": "Echidna",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "cue_echidna": true
+    },
+    "diagnostic": "cue_echidna",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Echidna",
+        "locator": "spiny",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "okapi",
+    "name": "Okapi",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "hoof": true,
+      "cue_okapi": true
+    },
+    "diagnostic": "cue_okapi",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Okapi",
+        "locator": "giraffe",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "capybara",
+    "name": "Capybara",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "aquatic": true,
+      "cue_capybara": true
+    },
+    "diagnostic": "cue_capybara",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Capybara",
+        "locator": "largest",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "wombat",
+    "name": "Wombat",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "marsupial": true,
+      "cue_wombat": true
+    },
+    "diagnostic": "cue_wombat",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Wombat",
+        "locator": "cube",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "tasmanian-devil",
+    "name": "Tasmanian devil",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "marsupial": true,
+      "cue_tasmanian_devil": true
+    },
+    "diagnostic": "cue_tasmanian_devil",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Tasmanian_devil",
+        "locator": "Tasmania",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "meerkat",
+    "name": "Meerkat",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "cue_meerkat": true
+    },
+    "diagnostic": "cue_meerkat",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Meerkat",
+        "locator": "mongoose",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "mongoose",
+    "name": "Mongoose",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "predator": true,
+      "cue_mongoose": true
+    },
+    "diagnostic": "cue_mongoose",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Mongoose",
+        "locator": "Herpestidae",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "hyena",
+    "name": "Hyena",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "predator": true,
+      "cue_hyena": true
+    },
+    "diagnostic": "cue_hyena",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Hyena",
+        "locator": "Hyaenidae",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "walrus",
+    "name": "Walrus",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "marine": true,
+      "cue_walrus": true
+    },
+    "diagnostic": "cue_walrus",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Walrus",
+        "locator": "tusks",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "manatee",
+    "name": "Manatee",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "aquatic": true,
+      "marine": true,
+      "cue_manatee": true
+    },
+    "diagnostic": "cue_manatee",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Manatee",
+        "locator": "sea cows",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "narwhal",
+    "name": "Narwhal",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "marine": true,
+      "cue_narwhal": true
+    },
+    "diagnostic": "cue_narwhal",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Narwhal",
+        "locator": "tusk",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "kiwi-bird",
+    "name": "Kiwi (bird)",
+    "category": "animals",
+    "facts": {
+      "bird": true,
+      "mammal": false,
+      "reptile": false,
+      "wild": true,
+      "cue_kiwi_bird": true
+    },
+    "diagnostic": "cue_kiwi_bird",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Kiwi_(bird)",
+        "locator": "nostrils",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "cassowary",
+    "name": "Cassowary",
+    "category": "animals",
+    "facts": {
+      "bird": true,
+      "mammal": false,
+      "reptile": false,
+      "wild": true,
+      "cue_cassowary": true
+    },
+    "diagnostic": "cue_cassowary",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Cassowary",
+        "locator": "casque",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "hoopoe",
+    "name": "Hoopoe",
+    "category": "animals",
+    "facts": {
+      "bird": true,
+      "mammal": false,
+      "reptile": false,
+      "wild": true,
+      "flies": true,
+      "cue_hoopoe": true
+    },
+    "diagnostic": "cue_hoopoe",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Hoopoe",
+        "locator": "crown",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sunbird",
+    "name": "Sunbird",
+    "category": "animals",
+    "facts": {
+      "bird": true,
+      "mammal": false,
+      "reptile": false,
+      "wild": true,
+      "flies": true,
+      "cue_sunbird": true
+    },
+    "diagnostic": "cue_sunbird",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Sunbird",
+        "locator": "Nectariniidae",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "weaver-bird",
+    "name": "Weaverbird",
+    "category": "animals",
+    "facts": {
+      "bird": true,
+      "mammal": false,
+      "reptile": false,
+      "wild": true,
+      "flies": true,
+      "cue_weaver_bird": true
+    },
+    "diagnostic": "cue_weaver_bird",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Ploceidae",
+        "locator": "nests",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "praying-mantis",
+    "name": "Praying mantis",
+    "category": "animals",
+    "facts": {
+      "insect": true,
+      "wild": true,
+      "predator": true,
+      "cue_praying_mantis": true
+    },
+    "diagnostic": "cue_praying_mantis",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Mantis",
+        "locator": "forelegs",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "stapler",
+    "name": "Stapler",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "metal": true,
+      "cue_stapler": true
+    },
+    "diagnostic": "cue_stapler",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Stapler",
+        "locator": "staples",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "hole-punch",
+    "name": "Hole punch",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "metal": true,
+      "cue_hole_punch": true
+    },
+    "diagnostic": "cue_hole_punch",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Hole_punch",
+        "locator": "holes",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "compass-drawing",
+    "name": "Drawing compass",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "metal": true,
+      "cue_compass_drawing": true
+    },
+    "diagnostic": "cue_compass_drawing",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Compass_(drawing_tool)",
+        "locator": "circles",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "protractor",
+    "name": "Protractor",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "cue_protractor": true
+    },
+    "diagnostic": "cue_protractor",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Protractor",
+        "locator": "angles",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "abacus",
+    "name": "Abacus",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "cue_abacus": true
+    },
+    "diagnostic": "cue_abacus",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Abacus",
+        "locator": "beads",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "magnifying-glass",
+    "name": "Magnifying glass",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "cue_magnifying_glass": true
+    },
+    "diagnostic": "cue_magnifying_glass",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Magnifying_glass",
+        "locator": "convex",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "stethoscope",
+    "name": "Stethoscope",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "cue_stethoscope": true
+    },
+    "diagnostic": "cue_stethoscope",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Stethoscope",
+        "locator": "auscultation",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "syringe",
+    "name": "Syringe",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "cue_syringe": true
+    },
+    "diagnostic": "cue_syringe",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Syringe",
+        "locator": "plunger",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "microscope",
+    "name": "Microscope",
+    "category": "objects",
+    "facts": {
+      "science_tool": true,
+      "cue_microscope": true
+    },
+    "diagnostic": "cue_microscope",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Microscope",
+        "locator": "small",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "telescope",
+    "name": "Telescope",
+    "category": "objects",
+    "facts": {
+      "science_tool": true,
+      "cue_telescope": true
+    },
+    "diagnostic": "cue_telescope",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Telescope",
+        "locator": "distant",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "screwdriver",
+    "name": "Screwdriver",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "metal": true,
+      "cue_screwdriver": true
+    },
+    "diagnostic": "cue_screwdriver",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Screwdriver",
+        "locator": "screws",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "hammer-tool",
+    "name": "Hammer",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "metal": true,
+      "cue_hammer_tool": true
+    },
+    "diagnostic": "cue_hammer_tool",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Hammer",
+        "locator": "nails",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "pliers",
+    "name": "Pliers",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "metal": true,
+      "cue_pliers": true
+    },
+    "diagnostic": "cue_pliers",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Pliers",
+        "locator": "grip",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "wrench",
+    "name": "Wrench",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "metal": true,
+      "cue_wrench": true
+    },
+    "diagnostic": "cue_wrench",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Wrench",
+        "locator": "bolts",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "saw",
+    "name": "Saw",
+    "category": "objects",
+    "facts": {
+      "metal": true,
+      "cue_saw": true
+    },
+    "diagnostic": "cue_saw",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Saw",
+        "locator": "toothed",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "ladle",
+    "name": "Ladle",
+    "category": "objects",
+    "facts": {
+      "kitchen": true,
+      "cue_ladle": true
+    },
+    "diagnostic": "cue_ladle",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Ladle_(spoon)",
+        "locator": "soup",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "colander",
+    "name": "Colander",
+    "category": "objects",
+    "facts": {
+      "kitchen": true,
+      "cue_colander": true
+    },
+    "diagnostic": "cue_colander",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Colander",
+        "locator": "drain",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "whisk",
+    "name": "Whisk",
+    "category": "objects",
+    "facts": {
+      "kitchen": true,
+      "cue_whisk": true
+    },
+    "diagnostic": "cue_whisk",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Whisk",
+        "locator": "blend",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "spatula",
+    "name": "Spatula",
+    "category": "objects",
+    "facts": {
+      "kitchen": true,
+      "cue_spatula": true
+    },
+    "diagnostic": "cue_spatula",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Spatula",
+        "locator": "broad",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "funnel",
+    "name": "Funnel",
+    "category": "objects",
+    "facts": {
+      "portable": true,
+      "cue_funnel": true
+    },
+    "diagnostic": "cue_funnel",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Funnel",
+        "locator": "tube",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "devdas",
+    "name": "Devdas",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_devdas": true
+    },
+    "diagnostic": "cue_devdas",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Devdas",
+        "locator": "Devdas",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "parvati-devdas",
+    "name": "Parvati (Devdas)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_parvati_devdas": true
+    },
+    "diagnostic": "cue_parvati_devdas",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Devdas",
+        "locator": "Parvati",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "chandramukhi",
+    "name": "Chandramukhi (Devdas)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_chandramukhi": true
+    },
+    "diagnostic": "cue_chandramukhi",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Devdas",
+        "locator": "Chandramukhi",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "gora",
+    "name": "Gora (Tagore novel)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_gora": true
+    },
+    "diagnostic": "cue_gora",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Gora_(novel)",
+        "locator": "Irish",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "bimala",
+    "name": "Bimala (The Home and the World)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_bimala": true
+    },
+    "diagnostic": "cue_bimala",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/The_Home_and_the_World",
+        "locator": "Bimala",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "nikhilesh",
+    "name": "Nikhilesh (The Home and the World)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_nikhilesh": true
+    },
+    "diagnostic": "cue_nikhilesh",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/The_Home_and_the_World",
+        "locator": "Nikhil",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sandip",
+    "name": "Sandip (The Home and the World)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_sandip": true
+    },
+    "diagnostic": "cue_sandip",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/The_Home_and_the_World",
+        "locator": "Sandip",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "apu",
+    "name": "Apu (Pather Panchali)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_apu": true
+    },
+    "diagnostic": "cue_apu",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Pather_Panchali_(novel)",
+        "locator": "Apu",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "durga-pather",
+    "name": "Durga (Pather Panchali)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_durga_pather": true
+    },
+    "diagnostic": "cue_durga_pather",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Pather_Panchali_(novel)",
+        "locator": "Durga",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "harihar",
+    "name": "Harihar Roy (Pather Panchali)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_harihar": true
+    },
+    "diagnostic": "cue_harihar",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Pather_Panchali_(novel)",
+        "locator": "Horihor",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "sarbajaya",
+    "name": "Sarbajaya (Pather Panchali)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_sarbajaya": true
+    },
+    "diagnostic": "cue_sarbajaya",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Pather_Panchali_(novel)",
+        "locator": "Shorbojoya",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "kuber",
+    "name": "Kuber (Padma Nadir Majhi)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_kuber": true
+    },
+    "diagnostic": "cue_kuber",
+    "sources": [
+      {
+        "url": "https://bn.wikipedia.org/wiki/পদ্মানদীর_মাঝি",
+        "locator": "কুবের",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "kapila",
+    "name": "Kapila (Padma Nadir Majhi)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_kapila": true
+    },
+    "diagnostic": "cue_kapila",
+    "sources": [
+      {
+        "url": "https://bn.wikipedia.org/wiki/পদ্মানদীর_মাঝি",
+        "locator": "কপিলা",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "hossain-mia",
+    "name": "Hossain Mia (Padma Nadir Majhi)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_hossain_mia": true
+    },
+    "diagnostic": "cue_hossain_mia",
+    "sources": [
+      {
+        "url": "https://bn.wikipedia.org/wiki/পদ্মানদীর_মাঝি",
+        "locator": "হোসেন মিয়া",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "srikanta",
+    "name": "Srikanta (Sarat Chandra novel)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "male": true,
+      "cue_srikanta": true
+    },
+    "diagnostic": "cue_srikanta",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Srikanta_(book)",
+        "locator": "Srikanta",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "rajlakshmi",
+    "name": "Rajlakshmi (Srikanta)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_rajlakshmi": true
+    },
+    "diagnostic": "cue_rajlakshmi",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Srikanta_(book)",
+        "locator": "Rajlakshmi",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "charulata",
+    "name": "Charulata (Nastanirh)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "female": true,
+      "cue_charulata": true
+    },
+    "diagnostic": "cue_charulata",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Nastanirh",
+        "locator": "Charu",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "bhupati",
+    "name": "Bhupati (Nastanirh)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "male": true,
+      "cue_bhupati": true
+    },
+    "diagnostic": "cue_bhupati",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Nastanirh",
+        "locator": "Bhupati",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "amal-nastanirh",
+    "name": "Amal (Nastanirh)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "male": true,
+      "cue_amal_nastanirh": true
+    },
+    "diagnostic": "cue_amal_nastanirh",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Nastanirh",
+        "locator": "Amal",
+        "checkedOn": "2026-11-04"
+      }
+    ]
+  },
+  {
+    "id": "kapalkundala",
+    "name": "Kapalkundala",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "bangla": true,
+      "novel": true,
+      "female": true,
+      "cue_kapalkundala": true
+    },
+    "diagnostic": "cue_kapalkundala",
+    "sources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Kapalkundala",
+        "locator": "Kapalik",
+        "checkedOn": "2026-11-04"
+      }
+    ]
   }
 ];

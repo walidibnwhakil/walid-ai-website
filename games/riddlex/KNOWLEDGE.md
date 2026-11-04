@@ -1,73 +1,99 @@
 # Riddlex offline knowledge
 
-The casebook contains **301 unique playable targets**: 146 characters (real and
-fictional), 75 animals, and 80 objects. The separate relationship branch contains
-15 roles; those are not counted toward 301. No raw Wikidata rows are counted.
+The casebook now contains **1,791 distinct playable targets**: **1,596** real /
+fictional characters and people, **95** animals and **100** objects. The separate
+relationship branch contains **15** roles and is not included in that total.
 
-The original 171 targets are in `casebook.js` and `expansion.js`. The reviewed
-2026-11-04 batch adds 130 targets: 40 real people, 30 fictional characters,
-30 animals, and 30 objects. It emphasizes Bengal, Bangladesh, and India through
-history, literature, music, cricket, familiar wildlife, clothing, instruments,
-transport, and household tools.
+Relative to recovery baseline `a1d6b30d2f447c7da643e598fce9ea95c182cb1c`, this
+batch adds **1,490** targets: 1,410 sourced Wikidata people, 20 cartoons/comics,
+20 Bengali literary characters, 20 animals and 20 objects. No aliases or raw
+staging rows are counted. All gameplay data is local; there are no AI API calls.
 
-## Reviewed batch and provenance
+See [knowledge/README.md](knowledge/README.md) for selection criteria, provenance,
+exact category additions, reproducible import commands and limitations.
 
-`curated-batch.tsv` is the editable source. Its eight pipe-delimited fields are:
+## Editable sources
 
-`id | name | category | known tags | English clue | Bengali clue | source | locator`
+- `curated-batch.tsv`: 210 curated targets, including the original 130 and 80 new
+  targets. Eight pipe-delimited fields: id, name, category, known tags, English
+  clue, Bengali clue, source article / HTTPS URL, evidence locator.
+- `knowledge/wikidata-snapshot.json`: 1,410 selected CC0 entities, source statement
+  IDs, revisions, original reference metadata and English/Bengali labels.
+- `knowledge/baseline-targets.json` and `baseline-wikidata-ids.json`: frozen
+  duplicate-exclusion baseline.
 
-Sources are encyclopedia or institutional pages, with a few supplementary
-publication sources where needed. A source can be a Wikipedia article title or
-a complete HTTPS URL. The locator identifies the relevant passage or subject;
-`checkedOn` records the review date, not a promise that a page never changes.
-Questions are newly worded summaries, not copied article descriptions. No
-third-party images, downloaded article text, or live API are needed during play.
+`build-curated.mjs` and `build-wikidata.mjs` compile these sources deterministically.
+`knowledge.generated.js`, `knowledge.questions.generated.js` and
+`knowledge.wikidata.generated.js` are generated outputs; do not edit by hand.
 
-Every new target has broad known facts and a positive distinguishing clue in
-both languages. `!tag` records an explicit false fact, such as a fish not being
-a mammal. **Omission always means unknown**, including other targets' diagnostic
-clues. Absence from a source never establishes a negative fact. Generic targets
-and narrower targets (such as Snake and King cobra) may overlap; they are not
-artificially marked mutually exclusive.
+**Omission means unknown, never no.** Explicit negatives in the new structured
+batch only derive from being a real human and from documented birth-date
+comparisons. Missing awards, jobs, sources or other targets' diagnostics provide
+no negative evidence. Conflicting source gender assertions remain unknown.
 
-Compile and check offline with the existing Node runtime; no install or build:
+The legacy `import-knowledge.mjs` replaces the curated generated module and does
+not retain this provenance format; do not use it to rebuild these batches.
+
+## Validation
+
+From `games/riddlex`, with Node installed and no dependency installation:
 
 ```sh
-node build-curated.mjs
-node build-curated.mjs --check
+npm run validate
 npm test
+npm run benchmark
 ```
 
-On a restricted desktop where test worker processes cannot start, Node 24 can
-run the identical suite in one process:
+Run cheap `validate` checks incrementally. Full tests and benchmarks follow a
+substantial import batch. Node 24 can also run the suite in one process with
+`--test-isolation=none` if worker processes are restricted.
 
-```sh
-node --test --test-isolation=none engine.test.mjs quality.test.mjs curated.test.mjs simulation.test.mjs
-```
+## Limits
 
-The compiler produces `knowledge.generated.js` and
-`knowledge.questions.generated.js`. Tests check that these exactly match the
-reviewed source, all fact keys have questions, names/IDs/signatures are unique,
-and each new target has enough positive evidence to outrank the other targets
-without rejecting guesses. A definite diagnostic answer needs supporting facts;
-an unknown/probable clue alone cannot force an early identity.
+These are evidence-backed, distinguishable targets, not a human accuracy claim.
+Structured source assertions can be wrong even when they carry references.
+Many new people rely on birth-date/place diagnostics that real players may not
+know. Bengali labels come directly from Wikidata and need further editorial
+review. Animals, objects and modern Bengali fiction need more coverage.
+The 10k+ goal remains unfinished; thin or duplicate rows are not admitted just
+to reach that number. This branch has not been merged, published or deployed.
 
-`import-knowledge.mjs` remains a legacy validator for separate reviewed JSON
-experiments. Its CLI **replaces** `knowledge.generated.js` and does not preserve
-this batch's diagnostic/provenance metadata. Do not use it to rebuild this batch;
-edit the TSV and run `build-curated.mjs` instead.
+## Verified results for this batch
 
-## Verified limits (2026-11-04)
+**46 tests pass**, including full ideal-answer discovery, positive-evidence
+separation for every imported person, source/generated equality, unknown
+neutrality, duplicate validation, answer correction and all relationship roles.
+The suite completed in 131.76 seconds in the cloud workspace; no install was used.
 
-37 tests pass. The ideal-answer simulation identifies 301/301 casebook targets
-and 15/15 roles. Casebook first guesses are correct for 295/301, averaging 27.41
-questions, with a maximum of 180. All 130 new targets are first-guess correct,
-averaging 23.86 questions; the new-batch maximum is 129 (Tintin). These are
-deterministic answers from known facts, with all omitted facts answered unknown,
-not a real-user accuracy claim. Long sparse paths remain a limitation.
+| Category | Ideal eventual | First guess correct | Mean questions | Maximum | Noisy correct within 60 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Characters / people | 1,596/1,596 | 1,590 | 33.01 | 291 | 467/1,596 |
+| Animals | 95/95 | 95 | 11.56 | 35 | 62/95 |
+| Objects | 100/100 | 99 | 16.91 | 83 | 62/100 |
+| Casebook total | 1,791/1,791 | 1,784 | 30.98 | 291 | 591/1,791 |
 
-Question counting now visits only present facts rather than scanning every
-question against every candidate. A regression test checks identical picker
-choices, including ties and unknowns. The full local suite completed in about
-two seconds after this optimization. No live deployment was performed.
+Relationship roles: **15/15**, all first-guess correct, mean 5.2 questions,
+maximum 13. The teacher's existing direct single-question identity behavior is
+preserved. Casebook confidence gates were not reduced; the exhausted-question
+fallback now requires at least two matches.
 
+Ideal discovery includes rejecting wrong guesses and continuing: there were
+168 wrong guesses across the full ideal casebook run, with a maximum of 85
+rejections for one legacy target. Satyajit Ray needed the longest question path
+(291). These sparse legacy profiles need enrichment; 100% eventual discovery
+does not imply 100% first guesses or short human games.
+
+The noisy run deterministically changes known answers to 25% unknown, 15%
+same-sign probable, 5% flipped and 55% correct definite; absent facts always
+remain unknown. At 60 questions, 591 targets were identified and 1,200 remained
+unresolved. It included 2,408 wrong guesses before rejections. The first guess
+was correct for 542 targets. This deliberately contradictory synthetic input is
+not a real-user accuracy estimate. Wrong definite answers often require answer
+correction under the existing conflict gate.
+
+The combined ideal/noisy benchmark took 318.17 seconds with concurrent tests.
+`knowledge/benchmark-results.json` contains exact category metrics, policy,
+longest cases and an engine SHA-256. Roles were rechecked after restoring their
+single-question teacher fallback; the casebook behavior was unchanged by that
+relationship-only correction. No browser/mobile or human-play validation,
+production deployment or paid-service test was performed.

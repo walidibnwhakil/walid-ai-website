@@ -1,4 +1,9 @@
-# Riddlex recovery status
+# Riddlex recovery history
+
+**Current state:** 1,791 distinct casebook targets plus 15 relationship roles.
+See [KNOWLEDGE.md](KNOWLEDGE.md) and [knowledge/README.md](knowledge/README.md).
+The original reconstruction checklist below is historical, not the current
+knowledge-base status.
 
 This branch is an **independent reconstruction**, not a recovery of the uncommitted files on the failed PC.
 

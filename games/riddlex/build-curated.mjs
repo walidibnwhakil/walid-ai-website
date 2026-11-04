@@ -4,6 +4,9 @@ import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 
 export const sharedQuestions={
+ educator:['Was this person an educator?','ব্যক্তিটি কি শিক্ষাবিদ ছিলেন?'],
+ comic:['Is this character from a comic strip?','চরিত্রটি কি কমিক স্ট্রিপ থেকে এসেছে?'],
+ science_tool:['Is it an instrument used for scientific observation?','এটি কি বৈজ্ঞানিক পর্যবেক্ষণের যন্ত্র?'],
  politician:['Was this person a political leader?','ব্যক্তিটি কি রাজনৈতিক নেতা ছিলেন?'],
  military:['Did this person serve in the military?','ব্যক্তিটি কি সামরিক বাহিনীতে কাজ করেছেন?'],
  revolutionary:['Was this person involved in the anti-colonial revolutionary movement?','ব্যক্তিটি কি ঔপনিবেশিক শাসনের বিরুদ্ধে বিপ্লবী আন্দোলনে যুক্ত ছিলেন?'],

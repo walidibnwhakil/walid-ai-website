@@ -2,7 +2,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test engine.test.mjs simulation.test.mjs quality.test.mjs curated.test.mjs"
+    "test": "node --test engine.test.mjs simulation.test.mjs quality.test.mjs curated.test.mjs wikidata.test.mjs",
+    "validate": "node build-curated.mjs --check && node build-wikidata.mjs --check && node validate-knowledge.mjs",
+    "benchmark": "node benchmark.mjs --output knowledge/benchmark-results.json"
   }
 }
-

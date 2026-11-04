@@ -59,3 +59,27 @@ The uncommitted PC-only implementation and original image assets cannot be recov
 - Forcing full-casebook questions after five consecutive unknown answers: **171/171 correct, mean 47.79 questions, max 102**. Reverted this slower strategy.
 - Added a focused regression test ensuring a sparse target outside the top twenty can still supply a question when the focused shortlist is exhausted.
 - These are independently replayed simulations, **not** a confirmed passing GitHub Actions or browser test run. Some targets still take 102 questions and need work.
+
+## 2026-11-04 — evidence-grounded cloud expansion
+
+- Recovery baseline: `a1d6b30d2f447c7da643e598fce9ea95c182cb1c` (301 targets).
+- Added 1,490 distinct targets: 1,450 people/characters, 20 animals, 20 objects.
+- Total 1,791: 1,596 characters/people, 95 animals, 100 objects; plus 15 separate roles.
+- Added 1,410 screened Wikidata CC0 people with bilingual source labels, statement
+  IDs, revisions, original reference metadata and birth/place/work/occupation clues.
+- Added 80 manually curated cartoons, Bengali literary characters, animals and
+  objects with bilingual questions and source locators.
+- Cheap offline validation and deterministic import compilation; no installs,
+  paid APIs, PC-local work, UI/animation changes, merge or deployment.
+- After expansion, addressed runaway question scans with unchanged score weights:
+  filter unknown history once; ask consistent evidence leaders; retain all other
+  candidates for Retry / answer correction. Confidence requirements not lowered.
+- 46 tests pass. Ideal casebook 1,791/1,791 eventually identified; first guesses
+  1,784/1,791; mean 30.98 questions; maximum 291. Roles 15/15.
+- Synthetic noisy benchmark: 591/1,791 identified by 60 questions; 1,200 unresolved.
+  Policy includes 25% unknown, 15% probable and 5% flipped known answers.
+- Limits: long legacy paths and repeated rejected guesses remain; birth trivia
+  and source-label quality need further enrichment. Wikidata assertions are not
+  all independently publication-verified. No 10k+ or human accuracy claim.
+- Exact results and reproduction: `KNOWLEDGE.md`, `knowledge/README.md`, and
+  `knowledge/benchmark-results.json`. Only `riddlex-recovery` is to be pushed.

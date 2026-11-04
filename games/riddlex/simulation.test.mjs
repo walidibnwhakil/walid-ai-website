@@ -23,7 +23,7 @@ function simulate(target,pool,questionBank){
  return {correct:false,questions:answers.length,rejected:rejected.size};
 }
 
-test('all 301 casebook entries are eventually identified using ideal factual answers',()=>{
+test('all 1791 casebook entries are eventually identified using ideal factual answers',()=>{
  const failures=[],totals=[],slow=[],batch=[],results=[];
  const batchIds=new Set(generatedEntries.map(e=>e.id));
  for(const target of entries){
@@ -42,7 +42,7 @@ test('all 301 casebook entries are eventually identified using ideal factual ans
   maxQuestions:Math.max(...rows.map(r=>r.questions)),
   firstGuessCorrect:rows.filter(r=>r.rejected===0&&r.correct).length,
   maxRejected:Math.max(...rows.map(r=>r.rejected))});
- console.log('Casebook simulation:',{casebook:summarize(results),newBatch:summarize(batch),slowTargets:slow});
+ console.log('Casebook simulation:',{casebook:summarize(results),curated:summarize(batch),slowTargets:slow.sort((a,b)=>b.questions-a.questions).slice(0,10)});
  assert.ok(mean<35,'Average question count has regressed above 35');
 });
 

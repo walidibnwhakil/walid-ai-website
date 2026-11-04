@@ -1,10 +1,13 @@
 // Riddlex offline engine: score known facts; unanswered and unknown facts stay neutral.
 export const ANSWERS=Object.freeze(["yes","no","probably","probably-not","unknown"]);
 export function scoreCandidates(entries,answers,rejected=new Set()){
+ // Unknown answers contribute no evidence. Remove them once, rather than
+ // visiting a growing history of unknowns for every candidate at every turn.
+ const knownAnswers=answers.filter(a=>a.value!=="unknown");
  return entries.filter(e=>!rejected.has(e.id)).map(entry=>{
   let score=0,conflicts=0,matches=0;
-  for(const {key,value} of answers){
-   if(value==="unknown"||!Object.prototype.hasOwnProperty.call(entry.facts,key))continue;
+  for(const {key,value} of knownAnswers){
+   if(!Object.prototype.hasOwnProperty.call(entry.facts,key))continue;
    const expected=value==="yes"||value==="probably";
    const weight=value==="probably"||value==="probably-not"?0.4:1;
    if(entry.facts[key]===expected){score+=weight;matches+=weight;}
@@ -36,7 +39,16 @@ export function nextQuestion(ranked,answers,questions){
   return best;
  }
  // Prioritize plausible candidates for speed, but never abandon sparse entries.
- return choose(ranked.slice(0,20)) ?? choose(ranked);
+ // A contradicted candidate cannot pass selectGuess's existing confidence gate.
+ // Do not exhaust its unrelated facts while consistent candidates still exist.
+ // Keep every candidate in ranking so changing an answer can restore it.
+ const consistent=ranked.filter(row=>row.conflicts===0);
+ const pool=consistent.length?consistent:ranked;
+ // Once the evidence leaders have no unasked facts, let the existing
+ // tentative-guess/retry flow proceed. Lower-ranked unknown candidates stay
+ // available after rejection; unrelated lower-score facts cannot settle a tie.
+ const leaders=pool[0]?.matches>0?pool.filter(row=>row.score===pool[0].score):pool;
+ return choose(leaders.slice(0,20)) ?? choose(leaders);
 }
 export function selectGuess(ranked,answers,questions){
  if(!ranked.length)return null;
@@ -52,7 +64,8 @@ export function selectGuess(ranked,answers,questions){
  // After several answers, try a plausible guess instead of asking dozens of low-value questions.
  // A wrong guess is rejected by Retry and will never be repeated in this game.
  if(answers.length>=8&&top.matches>=2&&top.score>=second.score+1)return top.entry;
- if(!nextQuestion(ranked,answers,questions)&&top.matches>0)return top.entry;
+ if(!nextQuestion(ranked,answers,questions)&&(top.matches>=2||
+    (top.entry.category==='relationships'&&top.matches>0)))return top.entry;
  return null;
 }
 

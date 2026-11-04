@@ -7,15 +7,15 @@ import {generatedQuestions,generatedBanglaQuestions} from './knowledge.questions
 import {compileCurated} from './build-curated.mjs';
 import {scoreCandidates,nextQuestion,selectGuess} from './engine.js';
 
-test('130 reviewed records compile exactly to the shipped data and bilingual questions',async()=>{
+test('210 reviewed records compile exactly to the shipped data and bilingual questions',async()=>{
  const data=compileCurated(await readFile(new URL('./curated-batch.tsv',import.meta.url),'utf8'));
- assert.equal(data.entries.length,130);
+ assert.equal(data.entries.length,210);
  assert.deepEqual(data.entries,generatedEntries);
  assert.deepEqual(data.questions,generatedQuestions);
  assert.deepEqual(data.bangla,generatedBanglaQuestions);
- assert.equal(entries.length,301);
+ assert.equal(entries.length,1791);
  const counts=Object.fromEntries(['characters','animals','objects'].map(c=>[c,entries.filter(e=>e.category===c).length]));
- assert.deepEqual(counts,{characters:146,animals:75,objects:80});
+ assert.deepEqual(counts,{characters:1596,animals:95,objects:100});
 });
 
 test('new entries have provenance, translated diagnostic questions and unique normalized names',()=>{
@@ -62,7 +62,7 @@ test('a diagnostic alone or a probable/unknown diagnostic cannot force an early 
  ])assert.equal(selectGuess(scoreCandidates([e,other],answers),answers,questions),null);
 });
 
-test('sparse question counting preserves the original picker, including ties and unknowns',()=>{
+test('sparse counting matches a dense picker over evidence leaders, including ties and unknowns',()=>{
  function reference(ranked,answers,bank){
   const asked=new Set(answers.map(a=>a.key));
   function choose(pool){
@@ -79,7 +79,9 @@ test('sparse question counting preserves the original picker, including ties and
    }
    return best;
   }
-  return choose(ranked.slice(0,20))??choose(ranked);
+  const consistent=ranked.filter(r=>r.conflicts===0),pool=consistent.length?consistent:ranked;
+  const leaders=pool[0]?.matches>0?pool.filter(r=>r.score===pool[0].score):pool;
+  return choose(leaders.slice(0,20))??choose(leaders);
  }
  for(const category of ['characters','animals','objects']){
   const pool=entries.filter(e=>e.category===category),answers=[];

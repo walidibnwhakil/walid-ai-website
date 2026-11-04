@@ -13,6 +13,8 @@ let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="start"
 function mood(value){document.querySelector(".office").dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?t("Questions answered: ","উত্তর দেওয়া প্রশ্ন: ")+answers.length+t(" · Wrong guesses: "," · ভুল অনুমান: ")+rejected.size:"";}
 const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
+const answerKeys=["yes","no","probably","probably-not","unknown"];
+function submitAnswer(value){if(mode!=="ask"||!currentKey||!answerKeys.includes(value))return;answers.push({key:currentKey,value});currentKey=null;mode="ask";render();}
 function visible(node,yes){node.hidden=!yes;}
 function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
@@ -34,8 +36,12 @@ function render(){
  mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=lang==="bn"?(banglaQuestions[currentKey]||allQuestions[currentKey]):allQuestions[currentKey];visible(answerPanel,true);
 }
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
-document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>{if(!currentKey)return;answers.push({key:currentKey,value:b.dataset.answer});mode="ask";render();}));
+document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
 $("correct").addEventListener("click",()=>{mode="done";render();});
 $("retry").addEventListener("click",()=>{if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}guess=null;mode="ask";render();});
+document.addEventListener("keydown",event=>{
+ if(event.altKey||event.ctrlKey||event.metaKey||event.repeat||event.target.closest("input,textarea,select,[contenteditable]"))return;
+ if(mode==="ask"&&/^[1-5]$/.test(event.key)){event.preventDefault();submitAnswer(answerKeys[Number(event.key)-1]);}
+});
 back.addEventListener("click",()=>{if(answers.length){answers.pop();rejectionHistory=rewindRejections(rejectionHistory,answers.length);rejected=rejectedIds(rejectionHistory);guess=null;currentKey=null;mode="ask";render();}});
 $("new").addEventListener("click",reset);$("language").addEventListener("click",()=>{lang=lang==="en"?"bn":"en";render();});render();

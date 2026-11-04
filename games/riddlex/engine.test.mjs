@@ -66,3 +66,16 @@ test('bulk importer rejects unknown facts and duplicate entries',async()=>{
  assert.deepEqual(result.rejected,[0,2]);
  assert.equal(Object.hasOwn(result.accepted[0].facts,'unsupported'),false);
 });
+
+test('after eight answers a leading plausible candidate may be guessed early',()=>{
+ const sample=[
+  {id:'lead',name:'Lead',facts:{a:true,b:true}},
+  {id:'other',name:'Other',facts:{a:true,b:false}}
+ ];
+ const answers=[
+  {key:'a',value:'yes'},{key:'b',value:'yes'},
+  ...Array.from({length:6},(_,i)=>({key:'unknown'+i,value:'unknown'}))
+ ];
+ const ranked=scoreCandidates(sample,answers);
+ assert.equal(selectGuess(ranked,answers,{a:'A?',b:'B?'}).id,'lead');
+});

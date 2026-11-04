@@ -8,12 +8,12 @@ let lang="en";
 const translations={characters:"চরিত্র",animals:"প্রাণী",objects:"বস্তু",relationships:"পরিচিত কেউ",yes:"হ্যাঁ",no:"না",probably:"সম্ভবত", "probably-not":"সম্ভবত না",unknown:"জানি না"};
 function t(en,bn){return lang==="bn"?bn:en;}
 function updateLabels(){document.documentElement.lang=lang;$("language").textContent=lang==="bn"?"English":"বাংলা";document.querySelectorAll("[data-category]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.category]:({characters:"Characters",animals:"Animals",objects:"Objects",relationships:"Someone I know"})[b.dataset.category]);document.querySelectorAll("[data-answer]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.answer]:({yes:"Yes",no:"No",probably:"Probably","probably-not":"Probably Not",unknown:"Don\'t Know"})[b.dataset.answer]);$("correct").textContent=t("Correct!","সঠিক!");$("retry").textContent=t("Retry","আবার চেষ্টা");$("back").textContent=t("↶ Change last answer","↶ আগের উত্তর বদলাও");$("new").textContent=t("New Game","নতুন খেলা");}
-let category=null,answers=[],rejected=new Set(),mode="start",currentKey=null,guess=null;
+let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="start",currentKey=null,guess=null;
 function mood(value){document.querySelector(".office").dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?t("Questions answered: ","উত্তর দেওয়া প্রশ্ন: ")+answers.length+t(" · Wrong guesses: "," · ভুল অনুমান: ")+rejected.size:"";}
 const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
 function visible(node,yes){node.hidden=!yes;}
-function reset(){category=null;answers=[];rejected=new Set();mode="start";currentKey=null;guess=null;render();}
+function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  updateLabels();progress();
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);
@@ -32,9 +32,9 @@ function render(){
  }
  mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=lang==="bn"?(banglaQuestions[currentKey]||allQuestions[currentKey]):allQuestions[currentKey];visible(answerPanel,true);
 }
-document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();mode="ask";render();}));
+document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>{if(!currentKey)return;answers.push({key:currentKey,value:b.dataset.answer});mode="ask";render();}));
 $("correct").addEventListener("click",()=>{mode="done";render();});
-$("retry").addEventListener("click",()=>{if(guess)rejected.add(guess.id);guess=null;mode="ask";render();});
-back.addEventListener("click",()=>{if(answers.length){answers.pop();guess=null;mode="ask";render();}});
+$("retry").addEventListener("click",()=>{if(guess){rejected.add(guess.id);rejectionHistory.push({id:guess.id,atAnswerCount:answers.length});}guess=null;mode="ask";render();});
+back.addEventListener("click",()=>{if(answers.length){answers.pop();rejectionHistory=rejectionHistory.filter(item=>item.atAnswerCount<=answers.length);rejected=new Set(rejectionHistory.map(item=>item.id));guess=null;currentKey=null;mode="ask";render();}});
 $("new").addEventListener("click",reset);$("language").addEventListener("click",()=>{lang=lang==="en"?"bn":"en";render();});render();

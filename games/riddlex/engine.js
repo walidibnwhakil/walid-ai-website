@@ -1,0 +1,3 @@
+// Conservative evidence-based guessing: unknown facts are never treated as false.
+export function candidates(entries,answers,rejected){return entries.filter(e=>!rejected.has(e.id)&&answers.every(a=>{const v=e.facts[a.key];return v===undefined||v===a.value}));}
+export function nextQuestion(pool,answers,questions){const asked=new Set(answers.map(a=>a.key));let best=null,bestScore=-1;for(const key of Object.keys(questions)){if(asked.has(key))continue;let yes=0,no=0;for(const e of pool){if(e.facts[key]===true)yes++;if(e.facts[key]===false)no++}const score=Math.min(yes,no)+Math.min(yes+no,pool.length)*0.01;if(yes+no>0&&score>bestScore){bestScore=score;best=key}}return best;}

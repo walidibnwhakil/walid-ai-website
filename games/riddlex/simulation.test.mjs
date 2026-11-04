@@ -40,3 +40,13 @@ test('all relationship roles are eventually identified with ideal answers',()=>{
  for(const role of roles)if(!simulate(role,roles,relationshipQuestions).correct)failures.push(role.id);
  assert.deepEqual(failures,[]);
 });
+
+test('sparse everyday objects remain discoverable after focused candidates are exhausted',()=>{
+ const ids=['scissors','toothbrush','soap','mirror'];
+ for(const id of ids){
+  const target=entries.find(e=>e.id===id);
+  assert.ok(target,'Missing target '+id);
+  const result=simulate(target,entries.filter(e=>e.category===target.category),questions);
+  assert.equal(result.correct,true,id+' must be discoverable after retry');
+ }
+});

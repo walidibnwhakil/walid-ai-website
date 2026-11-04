@@ -76,7 +76,7 @@ function render(){
  }
  mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=lang==="bn"?(banglaQuestions[currentKey]||allQuestions[currentKey]):allQuestions[currentKey];visible(answerPanel,true);visible($("keyboard-hint"),true);
 }
-document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
+document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{cancelDiscard();category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
 $("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode="done";render();});
 $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
@@ -101,7 +101,9 @@ $("retry").addEventListener("click",()=>{
   if(discardTimer!==null){clearTimeout(discardTimer);discardTimer=null;}
   if(discardListener){note.removeEventListener("animationend",discardListener);discardListener=null;}
   for(const key of ["--throw-x","--throw-y","--throw-x-mid","--throw-y-mid","--throw-x-late","--throw-y-late"])note.style.removeProperty(key);
-  guess=null;mode="ask";render();mood("retry");
+  guess=null;mode="ask";render();
+  // render() may immediately find another guess; do not overwrite its mood.
+  if(mode==="ask")mood("retry");
  };
  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){finish();return;}
  discardListener=event=>{

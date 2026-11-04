@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {scoreCandidates,nextQuestion,selectGuess} from './engine.js';
 import {entries,questions} from './casebook.js';
 import {roles,relationshipQuestions} from './relationships.js';
-test('starter entries and roles are unique',()=>{const all=[...entries,...roles];assert.equal(new Set(all.map(e=>e.id)).size,all.length);assert.equal(roles.length,15);assert.equal(entries.length,70);});
+test('starter entries and roles are unique',()=>{const all=[...entries,...roles];assert.equal(new Set(all.map(e=>e.id)).size,all.length);assert.equal(roles.length,15);assert.equal(entries.length,171);});
 test('missing facts are not treated as false',()=>{const ranked=scoreCandidates([{id:'a',name:'A',facts:{}},{id:'b',name:'B',facts:{x:false}}],[{key:'x',value:'no'}]);assert.equal(ranked[0].entry.id,'b');assert.equal(ranked[1].score,0);});
 test('unknown answer does not penalize candidates',()=>{const ranked=scoreCandidates(entries,[{key:'mammal',value:'unknown'}]);assert.ok(ranked.every(e=>e.score===0));});
 test('rejecting a guess excludes it',()=>{const ranked=scoreCandidates(entries,[],new Set(['cat']));assert.ok(!ranked.some(e=>e.entry.id==='cat'));});
@@ -34,9 +34,9 @@ test('casebook contains expected Bangladesh-first coverage',()=>{
  for(const id of ['himu','misir-ali','feluda','byomkesh','padmaja','meena','gopal-bhar']){
   assert.ok(entries.some(e=>e.id===id),'Missing '+id);
  }
- assert.equal(entries.filter(e=>e.category==='characters').length,30);
- assert.equal(entries.filter(e=>e.category==='animals').length,20);
- assert.equal(entries.filter(e=>e.category==='objects').length,20);
+ assert.ok(entries.filter(e=>e.category==='characters').length>=70);
+ assert.ok(entries.filter(e=>e.category==='animals').length>=40);
+ assert.ok(entries.filter(e=>e.category==='objects').length>=45);
 });
 test('each fact key has a matching question',()=>{
  for(const e of entries)for(const key of Object.keys(e.facts))assert.ok(questions[key],e.id+': '+key);

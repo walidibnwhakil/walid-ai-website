@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test engine.test.mjs simulation.test.mjs quality.test.mjs"
+    "test": "node --test engine.test.mjs simulation.test.mjs quality.test.mjs curated.test.mjs"
   }
 }
+

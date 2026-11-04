@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {entries,questions} from './casebook.js';
 import {roles,relationshipQuestions} from './relationships.js';
 import {scoreCandidates,nextQuestion,selectGuess} from './engine.js';
+import {generatedEntries} from './knowledge.generated.js';
 
 function simulate(target,pool,questionBank){
  const answers=[],rejected=new Set(),maxTurns=Object.keys(questionBank).length+pool.length+2;
@@ -22,18 +23,26 @@ function simulate(target,pool,questionBank){
  return {correct:false,questions:answers.length,rejected:rejected.size};
 }
 
-test('all 171 casebook entries are eventually identified using ideal factual answers',()=>{
- const failures=[],totals=[],slow=[];
+test('all 301 casebook entries are eventually identified using ideal factual answers',()=>{
+ const failures=[],totals=[],slow=[],batch=[],results=[];
+ const batchIds=new Set(generatedEntries.map(e=>e.id));
  for(const target of entries){
   const pool=entries.filter(e=>e.category===target.category);
   const result=simulate(target,pool,questions);
   if(!result.correct)failures.push(target.id);
   totals.push(result.questions);
+  results.push(result);
+  if(batchIds.has(target.id))batch.push(result);
   if(result.questions>=60)slow.push({id:target.id,questions:result.questions});
  }
  assert.deepEqual(failures,[]);
  const mean=totals.reduce((a,b)=>a+b,0)/totals.length;
- console.log('Casebook simulation:',{entries:entries.length,averageQuestions:mean,maxQuestions:Math.max(...totals),slowTargets:slow});
+ const summarize=rows=>({targets:rows.length,correct:rows.filter(r=>r.correct).length,
+  averageQuestions:rows.reduce((a,r)=>a+r.questions,0)/rows.length,
+  maxQuestions:Math.max(...rows.map(r=>r.questions)),
+  firstGuessCorrect:rows.filter(r=>r.rejected===0&&r.correct).length,
+  maxRejected:Math.max(...rows.map(r=>r.rejected))});
+ console.log('Casebook simulation:',{casebook:summarize(results),newBatch:summarize(batch),slowTargets:slow});
  assert.ok(mean<35,'Average question count has regressed above 35');
 });
 
@@ -52,3 +61,4 @@ test('sparse everyday objects remain discoverable after focused candidates are e
   assert.equal(result.correct,true,id+' must be discoverable after retry');
  }
 });
+

@@ -1,4 +1,5 @@
 // Human-reviewed starter Bengali question translations; English fallback for missing keys.
+import {generatedBanglaQuestions} from './knowledge.questions.generated.js';
 export const banglaQuestions={
   "real": "এটি কি বাস্তবের কোনো ব্যক্তি?",
   "fictional": "এটি কি কাল্পনিক চরিত্র?",
@@ -112,3 +113,5 @@ export const banglaQuestions={
   "audio": "এটি কি শব্দ বা অডিওর সঙ্গে সম্পর্কিত?",
   "bag": "এটি কি জিনিস বহনের ব্যাগ?"
 };
+Object.assign(banglaQuestions,generatedBanglaQuestions);
+

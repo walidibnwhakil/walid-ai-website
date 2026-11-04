@@ -16,14 +16,19 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
 export function nextQuestion(ranked,answers,questions){
  const asked=new Set(answers.map(a=>a.key));
  function choose(pool){
+  // Count only facts actually present. Scanning every question for every candidate
+  // becomes expensive as reviewed batches add hundreds of sparse questions.
+  const counts=new Map();
+  for(const {entry} of pool)for(const [key,value] of Object.entries(entry.facts)){
+   if(asked.has(key)||!Object.hasOwn(questions,key))continue;
+   const count=counts.get(key)??[0,0];
+   if(value===true)count[0]++;else if(value===false)count[1]++;
+   counts.set(key,count);
+  }
   let best=null,bestScore=-Infinity;
   for(const key of Object.keys(questions)){
-   if(asked.has(key))continue;
-   let yes=0,no=0,unknown=0;
-   for(const {entry} of pool){
-    const v=entry.facts[key];
-    if(v===true)yes++;else if(v===false)no++;else unknown++;
-   }
+   const [yes,no]=counts.get(key)??[0,0];
+   const unknown=pool.length-yes-no;
    if(yes+no===0)continue;
    const quality=Math.min(yes,no)*4+(yes+no)*0.2-unknown*0.5;
    if(quality>bestScore){bestScore=quality;best=key;}
@@ -38,6 +43,10 @@ export function selectGuess(ranked,answers,questions){
  const [top,second]=ranked;
  if(top.matches<=0||top.conflicts>0)return null;
  if(!second)return top.entry;
+ // A reviewed distinguishing clue plus supporting facts can break a one-point
+ // lead. Missing clues on other candidates remain unknown in scoring.
+ if(top.matches>=2&&top.score>second.score&&top.entry.diagnostic&&
+    answers.some(a=>a.key===top.entry.diagnostic&&a.value==='yes'))return top.entry;
  // Strong evidence is needed before naming a person or object.
  if(top.matches>=2&&top.score-second.score>=2)return top.entry;
  // After several answers, try a plausible guess instead of asking dozens of low-value questions.
@@ -46,3 +55,4 @@ export function selectGuess(ranked,answers,questions){
  if(!nextQuestion(ranked,answers,questions)&&top.matches>0)return top.entry;
  return null;
 }
+

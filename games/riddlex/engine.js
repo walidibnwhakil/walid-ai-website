@@ -1,4 +1,4 @@
-// Offline Riddlex guessing engine. Unknown facts are never assumed false.
+// Riddlex offline engine: score known facts; unanswered and unknown facts stay neutral.
 export const ANSWERS=Object.freeze(["yes","no","probably","probably-not","unknown"]);
 export function scoreCandidates(entries,answers,rejected=new Set()){
  return entries.filter(e=>!rejected.has(e.id)).map(entry=>{
@@ -15,14 +15,15 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
 }
 export function nextQuestion(ranked,answers,questions){
  const asked=new Set(answers.map(a=>a.key));
- const top=ranked.slice(0,Math.min(16,ranked.length));
+ const top=ranked.slice(0,Math.min(20,ranked.length));
  let best=null,bestScore=-Infinity;
  for(const key of Object.keys(questions)){
   if(asked.has(key))continue;
   let yes=0,no=0,unknown=0;
   for(const {entry} of top){const v=entry.facts[key];if(v===true)yes++;else if(v===false)no++;else unknown++;}
   if(yes+no===0)continue;
-  const quality=Math.min(yes,no)*4+(yes+no)*0.1-unknown*0.15;
+  // Balance the candidate split and prioritize questions with recorded evidence.
+  const quality=Math.min(yes,no)*4+(yes+no)*0.2-unknown*0.5;
   if(quality>bestScore){bestScore=quality;best=key;}
  }
  return best;
@@ -32,7 +33,8 @@ export function selectGuess(ranked,answers,questions){
  const [top,second]=ranked;
  if(top.matches<=0||top.conflicts>0)return null;
  if(!second)return top.entry;
- if(top.matches>=2&&top.score-second.score>=1.5)return top.entry;
+ // Strong evidence is needed before naming a person or object.
+ if(top.matches>=2&&top.score-second.score>=2)return top.entry;
  if(!nextQuestion(ranked,answers,questions)&&top.matches>0)return top.entry;
  return null;
 }

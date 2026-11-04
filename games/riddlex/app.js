@@ -17,6 +17,7 @@ let discardTimer=null;
 let discardListener=null;
 function cancelDiscard(){
  discardToken++;
+ $("case-note").style.removeProperty("--throw-x");$("case-note").style.removeProperty("--throw-y");
  if(discardTimer!==null){clearTimeout(discardTimer);discardTimer=null;}
  if(discardListener){$("case-note").removeEventListener("animationend",discardListener);discardListener=null;}
 }
@@ -84,11 +85,17 @@ $("retry").addEventListener("click",()=>{
  cancelDiscard();mode="discard";const token=discardToken;
  visible(guessPanel,false);visible(back,false);
  const note=$("case-note"),office=document.querySelector(".office");
+ const bin=document.querySelector(".wastebasket");
+ const paperRect=note.getBoundingClientRect(),binRect=bin.getBoundingClientRect();
+ // The paper travels to the actual bin even on narrow phone screens.
+ note.style.setProperty("--throw-x",`${binRect.left+binRect.width/2-paperRect.left-paperRect.width/2}px`);
+ note.style.setProperty("--throw-y",`${binRect.top+binRect.height/2-paperRect.top-paperRect.height/2}px`);
  office.dataset.mood="discard";
  const finish=()=>{
   if(token!==discardToken||mode!=="discard")return;
   if(discardTimer!==null){clearTimeout(discardTimer);discardTimer=null;}
   if(discardListener){note.removeEventListener("animationend",discardListener);discardListener=null;}
+  note.style.removeProperty("--throw-x");note.style.removeProperty("--throw-y");
   guess=null;mode="ask";render();mood("retry");
  };
  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){finish();return;}

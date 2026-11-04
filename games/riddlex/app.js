@@ -13,6 +13,13 @@ function updateLabels(){document.documentElement.lang=lang;$("language").textCon
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="start",currentKey=null,guess=null;
 let photoRequest=0;
 let discardToken=0;
+let discardTimer=null;
+let discardListener=null;
+function cancelDiscard(){
+ discardToken++;
+ if(discardTimer!==null){clearTimeout(discardTimer);discardTimer=null;}
+ if(discardListener){$("case-note").removeEventListener("animationend",discardListener);discardListener=null;}
+}
 function mood(value){document.querySelector(".office").dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?t("Questions answered: ","উত্তর দেওয়া প্রশ্ন: ")+answers.length+t(" · Wrong guesses: "," · ভুল অনুমান: ")+rejected.size:"";}
 const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
@@ -46,13 +53,13 @@ function showNote(){
  photo.onerror=()=>{if(request===photoRequest){photo.hidden=true;photo.removeAttribute("src");}};
  photo.src=path;
 }
-function reset(){discardToken++;category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
+function reset(){cancelDiscard();category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  updateLabels();progress();
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);visible($("keyboard-hint"),false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong");
  visible(back,mode!=="start"&&mode!=="done"&&mode!=="discard"&&answers.length>0);
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
- if(mode==="discard"){mood("discard");$("status").textContent=t("Clearing the old clue…","পুরোনো সূত্র সরিয়ে ফেলছি…");return;}
+ if(mode==="discard"){mood("discard");visible(guessPanel,false);$("status").textContent=t("Clearing the old clue…","পুরোনো সূত্র সরিয়ে ফেলছি…");return;}
  if(mode==="wrong"){mood("wrong");$("status").textContent=t("That guess was wrong. Shall I try again?","অনুমানটি ভুল হয়েছে। আবার চেষ্টা করব?");visible(guessPanel,true);showNote();return;}
  if(mode==="done"){mood("happy");$("status").textContent=t("Case closed! 🕵️","রহস্যের সমাধান! 🕵️");showNote();return;}
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
@@ -74,18 +81,24 @@ $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";r
 $("retry").addEventListener("click",()=>{
  if(mode!=="wrong")return;
  if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}
- mode="discard";const token=++discardToken;
+ cancelDiscard();mode="discard";const token=discardToken;
  visible(guessPanel,false);visible(back,false);
  const note=$("case-note"),office=document.querySelector(".office");
  office.dataset.mood="discard";
  const finish=()=>{
   if(token!==discardToken||mode!=="discard")return;
+  if(discardTimer!==null){clearTimeout(discardTimer);discardTimer=null;}
+  if(discardListener){note.removeEventListener("animationend",discardListener);discardListener=null;}
   guess=null;mode="ask";render();mood("retry");
  };
  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){finish();return;}
- note.addEventListener("animationend",event=>{
+ discardListener=event=>{
+  // Ignore bubbling photo animations; only the paper reaching the bin completes Retry.
   if(event.target===note&&event.animationName==="note-to-bin")finish();
- },{once:true});
+ };
+ note.addEventListener("animationend",discardListener);
+ // If CSS animation is unavailable or interrupted, the player must never get stuck.
+ discardTimer=setTimeout(finish,1900);
 });
 document.addEventListener("keydown",event=>{
  if(event.altKey||event.ctrlKey||event.metaKey||event.repeat||event.target.closest("input,textarea,select,[contenteditable]"))return;

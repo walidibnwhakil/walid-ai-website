@@ -154,3 +154,26 @@ button:active{transform:translateY(1px)}
   100%{opacity:0;border-radius:50%;clip-path:inset(22% 30% round 50%);transform:translate(calc(-50% + var(--throw-x,0px)),var(--throw-y,0px)) rotate(320deg) scale(.18)}
 }
 @media(prefers-reduced-motion:reduce){.office[data-mood="discard"] .case-note{animation:none!important}}
+
+/* The discarded note is a visibly wrinkled paper ball, not a shrinking photograph.
+   The ball's folds are drawn with CSS; no external assets or requests. */
+.office[data-mood="discard"] .case-note{
+  background:
+    linear-gradient(42deg,transparent 42%,#b99c6c88 44%,transparent 47%),
+    linear-gradient(125deg,transparent 39%,#b99c6c99 41%,transparent 44%),
+    linear-gradient(165deg,transparent 60%,#d6c099 63%,transparent 66%),
+    radial-gradient(circle at 35% 28%,#fff7de 0%,#e9d6ad 55%,#bda47b 100%);
+  box-shadow:inset -6px -5px 8px #856d4966,2px 4px 5px #24170e66;
+  border-color:#bca47e;
+}
+.office[data-mood="discard"] .case-note::before,
+.office[data-mood="discard"] .case-note::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+}
+.office[data-mood="discard"] .case-note::before{
+  background:linear-gradient(75deg,transparent 35%,#947b5455 37%,transparent 40%),
+             linear-gradient(150deg,transparent 50%,#fff8e5bb 52%,transparent 55%);
+}
+.office[data-mood="discard"] .case-note::after{
+  background:radial-gradient(ellipse at 65% 65%,transparent 34%,#aa906a44 55%,transparent 70%);
+}

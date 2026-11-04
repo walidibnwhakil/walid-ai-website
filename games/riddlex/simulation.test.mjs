@@ -23,16 +23,18 @@ function simulate(target,pool,questionBank){
 }
 
 test('all 171 casebook entries are eventually identified using ideal factual answers',()=>{
- const failures=[],totals=[];
+ const failures=[],totals=[],slow=[];
  for(const target of entries){
   const pool=entries.filter(e=>e.category===target.category);
   const result=simulate(target,pool,questions);
   if(!result.correct)failures.push(target.id);
   totals.push(result.questions);
+  if(result.questions>=60)slow.push({id:target.id,questions:result.questions});
  }
  assert.deepEqual(failures,[]);
  const mean=totals.reduce((a,b)=>a+b,0)/totals.length;
- console.log('Casebook simulation:',{entries:entries.length,averageQuestions:mean,maxQuestions:Math.max(...totals)});
+ console.log('Casebook simulation:',{entries:entries.length,averageQuestions:mean,maxQuestions:Math.max(...totals),slowTargets:slow});
+ assert.ok(mean<35,'Average question count has regressed above 35');
 });
 
 test('all relationship roles are eventually identified with ideal answers',()=>{

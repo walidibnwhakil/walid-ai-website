@@ -101,8 +101,8 @@ $("retry").addEventListener("click",()=>{
  discardTimer=setTimeout(finish,1900);
 });
 document.addEventListener("keydown",event=>{
- if(event.altKey||event.ctrlKey||event.metaKey||event.repeat||event.target.closest("input,textarea,select,[contenteditable]"))return;
+ if(event.altKey||event.ctrlKey||event.metaKey||event.repeat||event.target instanceof Element&&event.target.closest("input,textarea,select,[contenteditable]"))return;
  if(mode==="ask"&&/^[1-5]$/.test(event.key)){event.preventDefault();submitAnswer(answerKeys[Number(event.key)-1]);}
 });
 back.addEventListener("click",()=>{if(answers.length){answers.pop();rejectionHistory=rewindRejections(rejectionHistory,answers.length);rejected=rejectedIds(rejectionHistory);guess=null;currentKey=null;mode="ask";render();}});
-$("new").addEventListener("click",reset);$("language").addEventListener("click",()=>{lang=lang==="en"?"bn":"en";render();});render();
+$("new").addEventListener("click",reset);$("language").addEventListener("click",()=>{lang=lang==="en"?"bn":"en";if(mode==="discard"){updateLabels();$("status").textContent=t("Clearing the old clue…","পুরোনো সূত্র সরিয়ে ফেলছি…");}else render();});render();

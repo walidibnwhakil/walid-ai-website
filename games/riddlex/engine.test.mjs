@@ -90,3 +90,18 @@ test('question picker can reach a sparse entry outside the top twenty',()=>{
  const next=nextQuestion(ranked,[{key:'common',value:'unknown'}],{common:'Common?',rare:'Rare?'});
  assert.equal(next,'rare');
 });
+
+test('bulk importer rejects blank names, unsafe IDs and malformed facts',async()=>{
+ const {validateImport}=await import('./import-knowledge.mjs');
+ const input=[
+  {id:'',name:'Empty ID',category:'animals',facts:{mammal:true,bird:false}},
+  {id:'../escape',name:'Bad ID',category:'animals',facts:{mammal:true,bird:false}},
+  {id:'valid-new',name:'   ',category:'animals',facts:{mammal:true,bird:false}},
+  {id:'array-facts',name:'Array',category:'animals',facts:[true,false]},
+  {id:'safe-new',name:'Safe',category:'animals',facts:{mammal:true,bird:false}},
+  {id:'safe-new',name:'Duplicate',category:'animals',facts:{mammal:true,bird:false}}
+ ];
+ const result=validateImport(input);
+ assert.deepEqual(result.accepted.map(x=>x.id),['safe-new']);
+ assert.deepEqual(result.rejected,[0,1,2,3,5]);
+});

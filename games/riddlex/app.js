@@ -2,6 +2,7 @@ import {entries,questions} from "./casebook.js";
 import {roles,relationshipQuestions} from "./relationships.js";
 import {banglaQuestions} from "./questions.bn.js";
 import {scoreCandidates,nextQuestion,selectGuess} from "./engine.js";
+import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
 const allEntries=[...entries,...roles],allQuestions={...questions,...relationshipQuestions};
 const $=id=>document.getElementById(id);
 let lang="en";
@@ -35,6 +36,6 @@ function render(){
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>{if(!currentKey)return;answers.push({key:currentKey,value:b.dataset.answer});mode="ask";render();}));
 $("correct").addEventListener("click",()=>{mode="done";render();});
-$("retry").addEventListener("click",()=>{if(guess){rejected.add(guess.id);rejectionHistory.push({id:guess.id,atAnswerCount:answers.length});}guess=null;mode="ask";render();});
-back.addEventListener("click",()=>{if(answers.length){answers.pop();rejectionHistory=rejectionHistory.filter(item=>item.atAnswerCount<=answers.length);rejected=new Set(rejectionHistory.map(item=>item.id));guess=null;currentKey=null;mode="ask";render();}});
+$("retry").addEventListener("click",()=>{if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}guess=null;mode="ask";render();});
+back.addEventListener("click",()=>{if(answers.length){answers.pop();rejectionHistory=rewindRejections(rejectionHistory,answers.length);rejected=rejectedIds(rejectionHistory);guess=null;currentKey=null;mode="ask";render();}});
 $("new").addEventListener("click",reset);$("language").addEventListener("click",()=>{lang=lang==="en"?"bn":"en";render();});render();

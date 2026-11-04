@@ -1,0 +1,165 @@
+{
+  "formatVersion": 2,
+  "license": "CC0-1.0",
+  "properties": {
+    "P106": {
+      "group": "occupation",
+      "en": "Has this person worked as: ",
+      "bn": "ব্যক্তিটির পেশার মধ্যে কি এটি আছে: "
+    },
+    "P27": {
+      "group": "citizenship",
+      "en": "Has this person held citizenship of: ",
+      "bn": "ব্যক্তিটির কি এই দেশের নাগরিকত্ব ছিল বা আছে: "
+    },
+    "P19": {
+      "group": "birthplace",
+      "en": "Was this person born in: ",
+      "bn": "ব্যক্তিটি কি এখানে জন্মেছেন: "
+    },
+    "P166": {
+      "group": "award",
+      "en": "Has this person received: ",
+      "bn": "ব্যক্তিটি কি এই পুরস্কার পেয়েছেন: "
+    },
+    "P800": {
+      "group": "work",
+      "en": "Is this person known for the work: ",
+      "bn": "ব্যক্তিটি কি এই কাজের জন্য পরিচিত: "
+    },
+    "P641": {
+      "group": "sport",
+      "en": "Is this person associated with the sport: ",
+      "bn": "ব্যক্তিটি কি এই খেলার সঙ্গে যুক্ত: "
+    },
+    "P108": {
+      "group": "employer",
+      "en": "Has this person worked for: ",
+      "bn": "ব্যক্তিটি কি এই প্রতিষ্ঠানে কাজ করেছেন: "
+    },
+    "P69": {
+      "group": "education",
+      "en": "Has this person studied at: ",
+      "bn": "ব্যক্তিটি কি এখানে পড়াশোনা করেছেন: "
+    },
+    "P463": {
+      "group": "membership",
+      "en": "Has this person been a member of: ",
+      "bn": "ব্যক্তিটি কি এর সদস্য ছিলেন বা আছেন: "
+    },
+    "P413": {
+      "group": "position",
+      "en": "Has this person played in the position: ",
+      "bn": "ব্যক্তিটি কি এই অবস্থানে খেলেছেন: "
+    },
+    "P136": {
+      "group": "genre",
+      "en": "Is it associated with the genre: ",
+      "bn": "এটি কি এই ধারার সঙ্গে যুক্ত: "
+    },
+    "P101": {
+      "group": "field",
+      "en": "Has this person worked in the field: ",
+      "bn": "ব্যক্তিটি কি এই ক্ষেত্রে কাজ করেছেন: "
+    },
+    "P1303": {
+      "group": "instrument",
+      "en": "Has this person played: ",
+      "bn": "ব্যক্তিটি কি এই বাদ্যযন্ত্র বাজিয়েছেন: "
+    },
+    "P1412": {
+      "group": "language",
+      "en": "Has this person used the language: ",
+      "bn": "ব্যক্তিটি কি এই ভাষা ব্যবহার করেছেন: "
+    },
+    "P1441": {
+      "group": "appearance",
+      "en": "Does this character appear in: ",
+      "bn": "চরিত্রটি কি এই রচনায় আছে: "
+    },
+    "P170": {
+      "group": "creator",
+      "en": "Was it created by: ",
+      "bn": "এটির স্রষ্টা কি: "
+    },
+    "P50": {
+      "group": "author",
+      "en": "Was it written by: ",
+      "bn": "এটি কি লিখেছেন: "
+    },
+    "P171": {
+      "group": "taxonomy",
+      "en": "Does it belong to the taxon: ",
+      "bn": "এটি কি এই জীববৈজ্ঞানিক গোষ্ঠীর অন্তর্ভুক্ত: "
+    },
+    "P105": {
+      "group": "rank",
+      "en": "Does it have the taxonomic rank: ",
+      "bn": "এটির জীববৈজ্ঞানিক শ্রেণিবিন্যাসের স্তর কি: "
+    },
+    "P279": {
+      "group": "subclass",
+      "en": "Is it a type of: ",
+      "bn": "এটি কি এই ধরনের: "
+    },
+    "P186": {
+      "group": "material",
+      "en": "Is it made using: ",
+      "bn": "এটি তৈরিতে কি এই উপাদান ব্যবহৃত হয়: "
+    },
+    "P366": {
+      "group": "use",
+      "en": "Is it used for: ",
+      "bn": "এটি কি এই কাজে ব্যবহৃত হয়: "
+    },
+    "P176": {
+      "group": "maker",
+      "en": "Has it been manufactured by: ",
+      "bn": "এটি কি এই নির্মাতা তৈরি করেছেন: "
+    },
+    "P495": {
+      "group": "origin",
+      "en": "Does it originate from: ",
+      "bn": "এটির উৎপত্তি কি এই দেশে: "
+    },
+    "P361": {
+      "group": "system",
+      "en": "Is it part of: ",
+      "bn": "এটি কি এর অংশ: "
+    },
+    "P527": {
+      "group": "component",
+      "en": "Does it include: ",
+      "bn": "এটিতে কি এই অংশ আছে: "
+    },
+    "P183": {
+      "group": "endemic",
+      "en": "Is this species endemic to: ",
+      "bn": "প্রজাতিটি কি শুধু এই অঞ্চলে স্বাভাবিকভাবে পাওয়া যায়: "
+    },
+    "P2974": {
+      "group": "habitat",
+      "en": "Does it have the habitat: ",
+      "bn": "এটির আবাসস্থল কি এই ধরনের: "
+    },
+    "P141": {
+      "group": "conservation",
+      "en": "Has Wikidata recorded its IUCN status as: ",
+      "bn": "উইকিউপাত্তে কি এটির আইইউসিএন সংরক্ষণ অবস্থা এটি বলা হয়েছে: "
+    }
+  },
+  "requirements": {
+    "characters": {
+      "groups": 4,
+      "clues": 6
+    },
+    "animals": {
+      "groups": 3,
+      "clues": 4
+    },
+    "objects": {
+      "groups": 3,
+      "clues": 4
+    }
+  }
+}

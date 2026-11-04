@@ -89,3 +89,40 @@ button:active{transform:translateY(1px)}
 }
 @keyframes bin-bounce{50%{transform:translateY(4px) rotate(5deg)}}
 @media(prefers-reduced-motion:reduce){.office[data-mood="discard"] .case-note,.office[data-mood="discard"] .cat,.office[data-mood="discard"] .detective,.office[data-mood="discard"] .wastebasket{animation:none!important}}
+
+/* Correct guess: the detective confidently straightens his glasses; the cat celebrates. */
+.office[data-mood="happy"] .detective{
+ animation:expert-pose 1.5s cubic-bezier(.2,.7,.3,1) both;
+ transform-origin:50% 80%;
+}
+.office[data-mood="happy"] .glasses-gesture{
+ animation:expert-glasses 1.5s ease-in-out both;
+}
+.office[data-mood="happy"] .cat{
+ z-index:7;
+ animation:cat-celebrate 1.5s ease-in-out both;
+ transform-origin:center bottom;
+}
+@keyframes expert-pose{
+ 0%{transform:translateY(2px) rotate(-2deg)}
+ 25%{transform:translateY(-7px) rotate(-5deg)}
+ 55%{transform:translateY(-9px) rotate(2deg)}
+ 75%,100%{transform:translateY(-6px) rotate(1deg)}
+}
+@keyframes expert-glasses{
+ 0%,12%{opacity:0;transform:translate(0,10px) rotate(-10deg)}
+ 25%,53%{opacity:1;transform:translate(4px,-5px) rotate(0)}
+ 70%,100%{opacity:0;transform:translate(6px,-8px)}
+}
+@keyframes cat-celebrate{
+ 0%,100%{transform:translateY(0) rotate(0)}
+ 24%{transform:translateY(-19px) rotate(-9deg)}
+ 42%{transform:translateY(0) rotate(5deg)}
+ 63%{transform:translateY(-13px) rotate(8deg)}
+ 80%{transform:translateY(0) rotate(-4deg)}
+}
+@media(prefers-reduced-motion:reduce){
+ .office[data-mood="happy"] .detective{animation:none!important;transform:translateY(-5px)}
+ .office[data-mood="happy"] .cat{animation:none!important}
+ .office[data-mood="happy"] .glasses-gesture{animation:none!important;opacity:0}
+}

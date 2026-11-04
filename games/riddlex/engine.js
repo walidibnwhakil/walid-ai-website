@@ -15,7 +15,7 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
 }
 export function nextQuestion(ranked,answers,questions){
  const asked=new Set(answers.map(a=>a.key));
- const top=ranked.slice(0,Math.min(20,ranked.length));
+ const top=ranked;
  let best=null,bestScore=-Infinity;
  for(const key of Object.keys(questions)){
   if(asked.has(key))continue;

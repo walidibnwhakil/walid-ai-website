@@ -28,7 +28,7 @@ const answerKeys=["yes","no","probably","probably-not","unknown"];
 function submitAnswer(value){if(mode!=="ask"||!currentKey||!answerKeys.includes(value))return;answers.push({key:currentKey,value});currentKey=null;mode="ask";render();}
 function visible(node,yes){node.hidden=!yes;}
 function showNote(){
- const show=Boolean(guess)&&(mode==="guess"||mode==="wrong"||mode==="done");
+ const show=Boolean(guess)&&(mode==="guess"||mode==="wrong"||mode==="done"||mode==="discard");
  const note=$("case-note"),photo=$("case-photo");
  visible(note,show);
  if(!show){

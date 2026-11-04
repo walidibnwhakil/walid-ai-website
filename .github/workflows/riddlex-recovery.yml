@@ -1,10 +1,5 @@
 name: Riddlex recovery tests
 on:
-  push:
-    branches: [riddlex-recovery]
-    paths:
-      - 'games/riddlex/**'
-      - '.github/workflows/riddlex-recovery.yml'
   workflow_dispatch:
 jobs:
   test:

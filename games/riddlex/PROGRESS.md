@@ -52,3 +52,10 @@ The uncommitted PC-only implementation and original image assets cannot be recov
 - Independently simulated 171 targets with the then-current engine: 167 correct, 4 unresolved (scissors, toothbrush, soap, mirror), mean 32.03 questions; worst case 40. This is a simulated replay of the engine logic, not browser or Node test execution.
 - Root cause: question selection considered only the top 20 ranked entries, which could exclude sparse entries indefinitely. Changed selection to consider all remaining candidates.
 - **Post-change results still need verification**; 171/171 accuracy must not be claimed until re-run.
+
+## Question-selection regression check (2026-11-04)
+- Replayed all 171 casebook targets with ideal factual answers against two algorithms.
+- Focused top-20 with full-casebook fallback and evidence-backed early guesses: **171/171 correct, mean 26.12 questions, max 102**.
+- Forcing full-casebook questions after five consecutive unknown answers: **171/171 correct, mean 47.79 questions, max 102**. Reverted this slower strategy.
+- Added a focused regression test ensuring a sparse target outside the top twenty can still supply a question when the focused shortlist is exhausted.
+- These are independently replayed simulations, **not** a confirmed passing GitHub Actions or browser test run. Some targets still take 102 questions and need work.

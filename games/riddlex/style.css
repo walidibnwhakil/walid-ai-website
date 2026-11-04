@@ -134,3 +134,10 @@ button:active{transform:translateY(1px)}
  85%{opacity:1;transform:translate(calc(-50% + var(--throw-x-late, 0px)),var(--throw-y-late, 0px)) rotate(170deg) scale(.25)}
  100%{opacity:0;transform:translate(calc(-50% + var(--throw-x, 0px)),var(--throw-y, 0px)) rotate(250deg) scale(.1)}
 }
+
+/* Original vector character artwork: crisp and lightweight on phones. */
+.detective{width:clamp(126px,27vw,188px);font-size:initial;line-height:0}
+.cat{width:clamp(67px,13vw,96px);font-size:initial;line-height:0}
+.character-art{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.detective .glasses-gesture{font-size:36px;line-height:1}
+@media(max-width:500px){.detective{left:27%;top:12px;width:140px}.cat{right:7%;bottom:32px;width:74px}}

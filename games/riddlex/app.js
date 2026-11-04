@@ -11,6 +11,7 @@ const translations={characters:"চরিত্র",animals:"প্রাণী"
 function t(en,bn){return lang==="bn"?bn:en;}
 function updateLabels(){document.documentElement.lang=lang;$("language").textContent=lang==="bn"?"English":"বাংলা";document.querySelectorAll("[data-category]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.category]:({characters:"Characters",animals:"Animals",objects:"Objects",relationships:"Someone I know"})[b.dataset.category]);document.querySelectorAll("[data-answer]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.answer]:({yes:"Yes",no:"No",probably:"Probably","probably-not":"Probably Not",unknown:"Don\'t Know"})[b.dataset.answer]);$("correct").textContent=t("Correct!","সঠিক!");$("retry").textContent=t("Retry","আবার চেষ্টা");$("wrong").textContent=t("Wrong","ভুল");$("back").textContent=t("↶ Change last answer","↶ আগের উত্তর বদলাও");$("new").textContent=t("New Game","নতুন খেলা");$("keyboard-hint").textContent=t("Keyboard: 1 Yes · 2 No · 3 Probably · 4 Probably Not · 5 Don’t Know","কিবোর্ড: ১ হ্যাঁ · ২ না · ৩ সম্ভবত · ৪ সম্ভবত না · ৫ জানি না");}
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="start",currentKey=null,guess=null;
+let photoRequest=0;
 function mood(value){document.querySelector(".office").dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?t("Questions answered: ","উত্তর দেওয়া প্রশ্ন: ")+answers.length+t(" · Wrong guesses: "," · ভুল অনুমান: ")+rejected.size:"";}
 const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
@@ -19,15 +20,30 @@ function submitAnswer(value){if(mode!=="ask"||!currentKey||!answerKeys.includes(
 function visible(node,yes){node.hidden=!yes;}
 function showNote(){
  const show=Boolean(guess)&&(mode==="guess"||mode==="wrong"||mode==="done");
- visible($("case-note"),show);
- if(!show){const photo=$("case-photo");photo.hidden=true;photo.removeAttribute("src");photo.alt="";return;}
- $("case-note-label").textContent=t("Detective’s note","গোয়েন্দার নোট");
+ const note=$("case-note"),photo=$("case-photo");
+ visible(note,show);
+ if(!show){
+  photoRequest++;photo.onload=null;photo.onerror=null;
+  photo.hidden=true;photo.removeAttribute("src");photo.alt="";
+  note.dataset.guessId="";
+  return;
+ }
+ $("case-note-label").textContent=t(mode==="done"?"Case solved":"Detective’s note",mode==="done"?"রহস্যের সমাধান":"গোয়েন্দার নোট");
  $("case-note-name").textContent=guess.name;
- const photo=$("case-photo");
- // Only explicitly reviewed, local casebook image paths may be displayed.
  const path=localPhotoPath(guess);
- if(path){if(photo.getAttribute("src")!==path){photo.hidden=true;photo.src=path;}photo.alt=guess.name;photo.onload=()=>{if(guess?.image===path)photo.hidden=false;};photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};}
- else{photo.hidden=true;photo.removeAttribute("src");photo.alt="";}
+ const sameGuess=note.dataset.guessId===guess.id;
+ note.dataset.guessId=guess.id;
+ if(!path){
+  photoRequest++;photo.onload=null;photo.onerror=null;
+  photo.hidden=true;photo.removeAttribute("src");photo.alt="";
+  return;
+ }
+ if(sameGuess&&photo.getAttribute("src")===path)return;
+ const request=++photoRequest;
+ photo.hidden=true;photo.alt=guess.name;
+ photo.onload=()=>{if(request===photoRequest&&guess?.id===note.dataset.guessId)photo.hidden=false;};
+ photo.onerror=()=>{if(request===photoRequest){photo.hidden=true;photo.removeAttribute("src");}};
+ photo.src=path;
 }
 function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
@@ -36,7 +52,7 @@ function render(){
  visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
  if(mode==="wrong"){mood("wrong");$("status").textContent=t("That guess was wrong. Shall I try again?","অনুমানটি ভুল হয়েছে। আবার চেষ্টা করব?");visible(guessPanel,true);showNote();return;}
- if(mode==="done"){mood("happy");$("status").textContent=t("Case closed! 🕵️","রহস্যের সমাধান! 🕵️");$("case-note-label").textContent=t("Case solved","রহস্যের সমাধান");$("case-note-name").textContent=guess?.name||"";return;}
+ if(mode==="done"){mood("happy");$("status").textContent=t("Case closed! 🕵️","রহস্যের সমাধান! 🕵️");showNote();return;}
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
  if(!ranked.length){currentKey=null;guess=null;mood("unsure");$("status").textContent=t("I have no more guesses in my casebook. Start a new game.","আমার তথ্যভান্ডারে আর কোনো অনুমান নেই। নতুন খেলা শুরু করুন।");return;}
  const suggestion=selectGuess(ranked,answers,allQuestions);

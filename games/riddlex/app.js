@@ -7,6 +7,7 @@ import {localPhotoPath} from "./print-photo.js";
 const allEntries=[...entries,...roles],allQuestions={...questions,...relationshipQuestions};
 const $=id=>document.getElementById(id);
 let lang="en";
+try{lang=localStorage.getItem("riddlex-language")==="bn"?"bn":"en";}catch{/* Private browsing or storage restrictions must not block the game. */}
 const translations={characters:"চরিত্র",animals:"প্রাণী",objects:"বস্তু",relationships:"পরিচিত কেউ",yes:"হ্যাঁ",no:"না",probably:"সম্ভবত", "probably-not":"সম্ভবত না",unknown:"জানি না"};
 function t(en,bn){return lang==="bn"?bn:en;}
 function updateLabels(){document.documentElement.lang=lang;$("language").textContent=lang==="bn"?"English":"বাংলা";document.querySelectorAll("[data-category]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.category]:({characters:"Characters",animals:"Animals",objects:"Objects",relationships:"Someone I know"})[b.dataset.category]);document.querySelectorAll("[data-answer]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.answer]:({yes:"Yes",no:"No",probably:"Probably","probably-not":"Probably Not",unknown:"Don\'t Know"})[b.dataset.answer]);$("correct").textContent=t("Correct!","সঠিক!");$("retry").textContent=t("Retry","আবার চেষ্টা");$("wrong").textContent=t("Wrong","ভুল");$("back").textContent=t("↶ Change last answer","↶ আগের উত্তর বদলাও");$("new").textContent=t("New Game","নতুন খেলা");$("keyboard-hint").textContent=t("Keyboard: 1 Yes · 2 No · 3 Probably · 4 Probably Not · 5 Don’t Know","কিবোর্ড: ১ হ্যাঁ · ২ না · ৩ সম্ভবত · ৪ সম্ভবত না · ৫ জানি না");}
@@ -116,4 +117,4 @@ document.addEventListener("keydown",event=>{
  if(mode==="ask"&&/^[1-5]$/.test(event.key)){event.preventDefault();submitAnswer(answerKeys[Number(event.key)-1]);}
 });
 back.addEventListener("click",()=>{if(answers.length){answers.pop();rejectionHistory=rewindRejections(rejectionHistory,answers.length);rejected=rejectedIds(rejectionHistory);guess=null;currentKey=null;mode="ask";render();}});
-$("new").addEventListener("click",reset);$("language").addEventListener("click",()=>{lang=lang==="en"?"bn":"en";if(mode==="discard"){updateLabels();$("status").textContent=t("Clearing the old clue…","পুরোনো সূত্র সরিয়ে ফেলছি…");}else render();});render();
+$("new").addEventListener("click",reset);$("language").addEventListener("click",()=>{lang=lang==="en"?"bn":"en";try{localStorage.setItem("riddlex-language",lang);}catch{/* Keep language toggle usable without storage. */}if(mode==="discard"){updateLabels();$("status").textContent=t("Clearing the old clue…","পুরোনো সূত্র সরিয়ে ফেলছি…");}else render();});render();

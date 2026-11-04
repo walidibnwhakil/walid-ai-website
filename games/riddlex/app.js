@@ -8,7 +8,7 @@ const $=id=>document.getElementById(id);
 let lang="en";
 const translations={characters:"চরিত্র",animals:"প্রাণী",objects:"বস্তু",relationships:"পরিচিত কেউ",yes:"হ্যাঁ",no:"না",probably:"সম্ভবত", "probably-not":"সম্ভবত না",unknown:"জানি না"};
 function t(en,bn){return lang==="bn"?bn:en;}
-function updateLabels(){document.documentElement.lang=lang;$("language").textContent=lang==="bn"?"English":"বাংলা";document.querySelectorAll("[data-category]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.category]:({characters:"Characters",animals:"Animals",objects:"Objects",relationships:"Someone I know"})[b.dataset.category]);document.querySelectorAll("[data-answer]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.answer]:({yes:"Yes",no:"No",probably:"Probably","probably-not":"Probably Not",unknown:"Don\'t Know"})[b.dataset.answer]);$("correct").textContent=t("Correct!","সঠিক!");$("retry").textContent=t("Retry","আবার চেষ্টা");$("back").textContent=t("↶ Change last answer","↶ আগের উত্তর বদলাও");$("new").textContent=t("New Game","নতুন খেলা");$("keyboard-hint").textContent=t("Keyboard: 1 Yes · 2 No · 3 Probably · 4 Probably Not · 5 Don’t Know","কিবোর্ড: ১ হ্যাঁ · ২ না · ৩ সম্ভবত · ৪ সম্ভবত না · ৫ জানি না");}
+function updateLabels(){document.documentElement.lang=lang;$("language").textContent=lang==="bn"?"English":"বাংলা";document.querySelectorAll("[data-category]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.category]:({characters:"Characters",animals:"Animals",objects:"Objects",relationships:"Someone I know"})[b.dataset.category]);document.querySelectorAll("[data-answer]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.answer]:({yes:"Yes",no:"No",probably:"Probably","probably-not":"Probably Not",unknown:"Don\'t Know"})[b.dataset.answer]);$("correct").textContent=t("Correct!","সঠিক!");$("retry").textContent=t("Retry","আবার চেষ্টা");$("wrong").textContent=t("Wrong","ভুল");$("back").textContent=t("↶ Change last answer","↶ আগের উত্তর বদলাও");$("new").textContent=t("New Game","নতুন খেলা");$("keyboard-hint").textContent=t("Keyboard: 1 Yes · 2 No · 3 Probably · 4 Probably Not · 5 Don’t Know","কিবোর্ড: ১ হ্যাঁ · ২ না · ৩ সম্ভবত · ৪ সম্ভবত না · ৫ জানি না");}
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="start",currentKey=null,guess=null;
 function mood(value){document.querySelector(".office").dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?t("Questions answered: ","উত্তর দেওয়া প্রশ্ন: ")+answers.length+t(" · Wrong guesses: "," · ভুল অনুমান: ")+rejected.size:"";}
@@ -16,12 +16,26 @@ const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),
 const answerKeys=["yes","no","probably","probably-not","unknown"];
 function submitAnswer(value){if(mode!=="ask"||!currentKey||!answerKeys.includes(value))return;answers.push({key:currentKey,value});currentKey=null;mode="ask";render();}
 function visible(node,yes){node.hidden=!yes;}
+function showNote(){
+ const show=Boolean(guess)&&(mode==="guess"||mode==="wrong"||mode==="done");
+ visible($("case-note"),show);
+ if(!show)return;
+ $("case-note-label").textContent=t("Detective’s note","গোয়েন্দার নোট");
+ $("case-note-name").textContent=guess.name;
+ const photo=$("case-photo");
+ // Only explicitly reviewed, local casebook image paths may be displayed.
+ const path=guess.image;
+ const safe=typeof path==="string"&&/^\.\/images\/[a-z0-9-]+\.(?:png|jpg|jpeg|webp)$/.test(path);
+ if(safe){photo.src=path;photo.alt=guess.name;photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};photo.hidden=false;}
+ else{photo.hidden=true;photo.removeAttribute("src");photo.alt="";}
+}
 function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  updateLabels();progress();
- visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);visible($("keyboard-hint"),false);visible($("case-note"),mode==="done"&&Boolean(guess));
+ visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);visible($("keyboard-hint"),false);showNote();visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong");
  visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
+ if(mode==="wrong"){mood("wrong");$("status").textContent=t("That guess was wrong. Shall I try again?","অনুমানটি ভুল হয়েছে। আবার চেষ্টা করব?");visible(guessPanel,true);showNote();return;}
  if(mode==="done"){mood("happy");$("status").textContent=t("Case closed! 🕵️","রহস্যের সমাধান! 🕵️");$("case-note-label").textContent=t("Case solved","রহস্যের সমাধান");$("case-note-name").textContent=guess?.name||"";return;}
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
  if(!ranked.length){currentKey=null;guess=null;mood("unsure");$("status").textContent=t("I have no more guesses in my casebook. Start a new game.","আমার তথ্যভান্ডারে আর কোনো অনুমান নেই। নতুন খেলা শুরু করুন।");return;}
@@ -29,7 +43,7 @@ function render(){
  if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);return;}
  currentKey=nextQuestion(ranked,answers,allQuestions);
  if(!currentKey){
-   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);}
+   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);showNote();}
    else $("status").textContent="I don't have enough evidence to make a reliable guess. You can correct an answer or start a new game.";
    return;
  }
@@ -38,7 +52,8 @@ function render(){
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
 $("correct").addEventListener("click",()=>{mode="done";render();});
-$("retry").addEventListener("click",()=>{if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}guess=null;mode="ask";render();});
+$("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
+$("retry").addEventListener("click",()=>{if(mode!=="wrong")return;if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}guess=null;mode="ask";render();mood("retry");});
 document.addEventListener("keydown",event=>{
  if(event.altKey||event.ctrlKey||event.metaKey||event.repeat||event.target.closest("input,textarea,select,[contenteditable]"))return;
  if(mode==="ask"&&/^[1-5]$/.test(event.key)){event.preventDefault();submitAnswer(answerKeys[Number(event.key)-1]);}

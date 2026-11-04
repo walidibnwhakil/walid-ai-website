@@ -84,7 +84,7 @@ test('after eight answers a leading plausible candidate may be guessed early',()
 test('question picker can reach a sparse entry outside the top twenty',()=>{
  const sample=[
   ...Array.from({length:20},(_,i)=>({id:'top'+i,name:'Top '+i,facts:{common:true}})),
-  {id:'sparse',name:'Sparse',facts:{rare:true}}
+  {id:'sparse',name:'Zzz Sparse',facts:{rare:true}}
  ];
  const ranked=scoreCandidates(sample,[]);
  const next=nextQuestion(ranked,[{key:'common',value:'unknown'}],{common:'Common?',rare:'Rare?'});

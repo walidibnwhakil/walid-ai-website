@@ -25,3 +25,19 @@ test('no candidate is returned after every guess is rejected',()=>{
  const sample=[{id:'one',name:'One',facts:{x:true}}];
  assert.equal(scoreCandidates(sample,[],new Set(['one'])).length,0);
 });
+
+test('conflicting evidence does not yield a confident guess',()=>{
+ const ranked=scoreCandidates([{id:'a',name:'A',facts:{x:false}}],[{key:'x',value:'yes'}]);
+ assert.equal(selectGuess(ranked,[{key:'x',value:'yes'}],{x:'Question'}),null);
+});
+test('casebook contains expected Bangladesh-first coverage',()=>{
+ for(const id of ['himu','misir-ali','feluda','byomkesh','padmaja','meena','gopal-bhar']){
+  assert.ok(entries.some(e=>e.id===id),'Missing '+id);
+ }
+ assert.equal(entries.filter(e=>e.category==='characters').length,30);
+ assert.equal(entries.filter(e=>e.category==='animals').length,20);
+ assert.equal(entries.filter(e=>e.category==='objects').length,20);
+});
+test('each fact key has a matching question',()=>{
+ for(const e of entries)for(const key of Object.keys(e.facts))assert.ok(questions[key],e.id+': '+key);
+});

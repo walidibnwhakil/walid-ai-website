@@ -31,6 +31,10 @@ export function nextQuestion(ranked,answers,questions){
   return best;
  }
  // Prioritize plausible candidates for speed, but never abandon sparse entries.
+ const recent=answers.slice(-5);
+ // Repeated "Don\'t Know" answers mean the focused shortlist lacks useful clues.
+ // Explore the full casebook instead of repeatedly interrogating the wrong shortlist.
+ if(recent.length===5&&recent.every(a=>a.value==="unknown"))return choose(ranked);
  return choose(ranked.slice(0,20)) ?? choose(ranked);
 }
 export function selectGuess(ranked,answers,questions){

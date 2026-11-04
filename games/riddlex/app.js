@@ -19,20 +19,20 @@ function visible(node,yes){node.hidden=!yes;}
 function showNote(){
  const show=Boolean(guess)&&(mode==="guess"||mode==="wrong"||mode==="done");
  visible($("case-note"),show);
- if(!show)return;
+ if(!show){const photo=$("case-photo");photo.hidden=true;photo.removeAttribute("src");photo.alt="";return;}
  $("case-note-label").textContent=t("Detective’s note","গোয়েন্দার নোট");
  $("case-note-name").textContent=guess.name;
  const photo=$("case-photo");
  // Only explicitly reviewed, local casebook image paths may be displayed.
  const path=guess.image;
  const safe=typeof path==="string"&&/^\.\/images\/[a-z0-9-]+\.(?:png|jpg|jpeg|webp)$/.test(path);
- if(safe){if(photo.getAttribute("src")!==path)photo.src=path;photo.alt=guess.name;photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};photo.hidden=false;}
+ if(safe){if(photo.getAttribute("src")!==path){photo.hidden=true;photo.src=path;}photo.alt=guess.name;photo.onload=()=>{if(guess?.image===path)photo.hidden=false;};photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};}
  else{photo.hidden=true;photo.removeAttribute("src");photo.alt="";}
 }
 function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  updateLabels();progress();
- visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);visible($("keyboard-hint"),false);showNote();visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong");
+ visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);visible($("keyboard-hint"),false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong");
  visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
  if(mode==="wrong"){mood("wrong");$("status").textContent=t("That guess was wrong. Shall I try again?","অনুমানটি ভুল হয়েছে। আবার চেষ্টা করব?");visible(guessPanel,true);showNote();return;}
@@ -40,10 +40,10 @@ function render(){
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
  if(!ranked.length){currentKey=null;guess=null;mood("unsure");$("status").textContent=t("I have no more guesses in my casebook. Start a new game.","আমার তথ্যভান্ডারে আর কোনো অনুমান নেই। নতুন খেলা শুরু করুন।");return;}
  const suggestion=selectGuess(ranked,answers,allQuestions);
- if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);visible($("wrong"),true);showNote();return;}
+ if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();return;}
  currentKey=nextQuestion(ranked,answers,allQuestions);
  if(!currentKey){
-   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);visible($("wrong"),true);showNote();}
+   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();}
    else $("status").textContent="I don't have enough evidence to make a reliable guess. You can correct an answer or start a new game.";
    return;
  }
@@ -51,7 +51,7 @@ function render(){
 }
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
-$("correct").addEventListener("click",()=>{mode="done";render();});
+$("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode="done";render();});
 $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
 $("retry").addEventListener("click",()=>{if(mode!=="wrong")return;if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}guess=null;mode="ask";render();mood("retry");});
 document.addEventListener("keydown",event=>{

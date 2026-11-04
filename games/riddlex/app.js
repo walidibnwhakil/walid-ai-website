@@ -1,10 +1,9 @@
-import {entries,questions} from "./casebook.js";
-import {roles,relationshipQuestions} from "./relationships.js";
-import {banglaQuestions} from "./questions.bn.js";
-import {scoreCandidates,nextQuestion,selectGuess} from "./engine.js";
+import {loadCategory} from "./runtime-loader.js";
+import {scoreCandidates,nextQuestion,selectGuess} from "./engine-v2.js";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
 import {localPhotoPath} from "./print-photo.js";
-const allEntries=[...entries,...roles],allQuestions={...questions,...relationshipQuestions};
+let allEntries=[],allQuestions={},banglaQuestions={};
+let loadToken=0;
 const $=id=>document.getElementById(id);
 let lang="en";
 try{lang=localStorage.getItem("riddlex-language")==="bn"?"bn":"en";}catch{/* Private browsing or storage restrictions must not block the game. */}
@@ -39,7 +38,7 @@ function showNote(){
   return;
  }
  $("case-note-label").textContent=t(mode==="done"?"Case solved":"Detective’s note",mode==="done"?"রহস্যের সমাধান":"গোয়েন্দার নোট");
- $("case-note-name").textContent=guess.name;
+ $("case-note-name").textContent=lang==="bn"?(guess.nameBn||guess.name):guess.name;
  const path=localPhotoPath(guess);
  const sameGuess=note.dataset.guessId===guess.id;
  note.dataset.guessId=guess.id;
@@ -55,11 +54,12 @@ function showNote(){
  photo.onerror=()=>{if(request===photoRequest){photo.hidden=true;photo.removeAttribute("src");}};
  photo.src=path;
 }
-function reset(){cancelDiscard();category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
+function reset(){loadToken++;cancelDiscard();category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  updateLabels();progress();
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);visible($("keyboard-hint"),false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong");
  visible(back,mode!=="start"&&mode!=="done"&&mode!=="discard"&&answers.length>0);
+ if(mode==="loading"){mood("thinking");$("status").textContent=t("Opening the casebook…","তথ্যভান্ডার খুলছি…");return;}
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
  if(mode==="discard"){mood("discard");visible(guessPanel,false);$("status").textContent=t("Clearing the old clue…","পুরোনো সূত্র সরিয়ে ফেলছি…");return;}
  if(mode==="wrong"){mood("wrong");$("status").textContent=t("That guess was wrong. Shall I try again?","অনুমানটি ভুল হয়েছে। আবার চেষ্টা করব?");visible(guessPanel,true);showNote();return;}
@@ -67,16 +67,19 @@ function render(){
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
  if(!ranked.length){currentKey=null;guess=null;mood("unsure");$("status").textContent=t("I have no more guesses in my casebook. Start a new game.","আমার তথ্যভান্ডারে আর কোনো অনুমান নেই। নতুন খেলা শুরু করুন।");return;}
  const suggestion=selectGuess(ranked,answers,allQuestions);
- if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();return;}
+ if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+(lang==="bn"?(guess.nameBn||guess.name):guess.name)+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();return;}
  currentKey=nextQuestion(ranked,answers,allQuestions);
  if(!currentKey){
-   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent=t("I’m not certain. Could it be ","আমি পুরোপুরি নিশ্চিত নই। এটি কি ")+guess.name+"?";visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();}
-   else $("status").textContent=t("I don’t have enough evidence to make a reliable guess. You can correct an answer or start a new game.","নির্ভরযোগ্য অনুমানের জন্য যথেষ্ট তথ্য নেই। আগের উত্তর বদলাতে পারেন অথবা নতুন খেলা শুরু করতে পারেন।");
+   $("status").textContent=t("I don’t have enough evidence to make a reliable guess. You can correct an answer or start a new game.","নির্ভরযোগ্য অনুমানের জন্য যথেষ্ট তথ্য নেই। আগের উত্তর বদলাতে পারেন অথবা নতুন খেলা শুরু করতে পারেন।");
    return;
  }
  mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=lang==="bn"?(banglaQuestions[currentKey]||allQuestions[currentKey]):allQuestions[currentKey];visible(answerPanel,true);visible($("keyboard-hint"),true);
 }
-document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{cancelDiscard();category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="ask";render();}));
+document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",async()=>{
+ cancelDiscard();const token=++loadToken;category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="loading";render();
+ try{const data=await loadCategory(category);if(token!==loadToken)return;allEntries=data.entries;allQuestions=data.questions;banglaQuestions=data.bangla;mode="ask";render();}
+ catch{if(token!==loadToken)return;mode="start";render();$("status").textContent=t("The casebook could not load. Please choose a category to retry.","তথ্যভান্ডার লোড হয়নি। আবার একটি বিভাগ বেছে নিন।");}
+}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
 $("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode="done";render();});
 $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});

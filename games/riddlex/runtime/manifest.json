@@ -1,0 +1,147 @@
+{
+  "formatVersion": 1,
+  "sourceCommit": "c13c05e5e48eb5875d98961e2907de616d920f99",
+  "categories": {
+    "characters": {
+      "count": 1596,
+      "shards": [
+        {
+          "path": "characters-000-1b9a99610a66.json",
+          "count": 256,
+          "bytes": 173612,
+          "sha256": "1b9a99610a66126c24aa30c7bc4df248ad394917e02143517a3c325a2ae0f830"
+        },
+        {
+          "path": "characters-001-2666d7690e74.json",
+          "count": 256,
+          "bytes": 280819,
+          "sha256": "2666d7690e744c192e2929bb0af54d7ac429d3a21939938affa7cab9dc055dcd"
+        },
+        {
+          "path": "characters-002-e4b8ba24425b.json",
+          "count": 256,
+          "bytes": 253823,
+          "sha256": "e4b8ba24425b73090c9844bd15ba243a77f451f2116b9382b6e37ff9fbd6eeab"
+        },
+        {
+          "path": "characters-003-fa3e46e0efad.json",
+          "count": 256,
+          "bytes": 259301,
+          "sha256": "fa3e46e0efadae9fb9c111e7b7453a6745e5e5cac5f1dee9a8f7998f31bad366"
+        },
+        {
+          "path": "characters-004-cbec9a279803.json",
+          "count": 256,
+          "bytes": 251913,
+          "sha256": "cbec9a279803703b3152d2352dae2e91c3dfe85c885e7efc288b32d73d185be5"
+        },
+        {
+          "path": "characters-005-eab777050eda.json",
+          "count": 256,
+          "bytes": 236883,
+          "sha256": "eab777050eda149fb0a776d0cc465c10f3290c8e7fb811a59d4df963c62d2c1f"
+        },
+        {
+          "path": "characters-006-47056df6b129.json",
+          "count": 60,
+          "bytes": 67638,
+          "sha256": "47056df6b12959f2b1dee7503014df573353eb689b771fa33626b8ba3e434be0"
+        }
+      ]
+    },
+    "animals": {
+      "count": 95,
+      "shards": [
+        {
+          "path": "animals-000-fb43350c4326.json",
+          "count": 95,
+          "bytes": 33601,
+          "sha256": "fb43350c4326ad62a34683f6da42ba33b731c6d9d769e3471cb3537cb59eab29"
+        }
+      ]
+    },
+    "objects": {
+      "count": 100,
+      "shards": [
+        {
+          "path": "objects-000-790e80d25b97.json",
+          "count": 100,
+          "bytes": 35189,
+          "sha256": "790e80d25b977b384b6948ef82f380f5e1028977c070a3dd397be016e61fef4b"
+        }
+      ]
+    },
+    "relationships": {
+      "count": 15,
+      "shards": [
+        {
+          "path": "relationships-000-fce1e75fd81f.json",
+          "count": 15,
+          "bytes": 3653,
+          "sha256": "fce1e75fd81fbdb190e8bf3f775d106623f2fc7b2c8d6fbf09dddcec25a38c53"
+        }
+      ]
+    }
+  },
+  "search": {
+    "h": "search-68.json",
+    "m": "search-6d.json",
+    "f": "search-66.json",
+    "b": "search-62.json",
+    "p": "search-70.json",
+    "a": "search-61.json",
+    "g": "search-67.json",
+    "d": "search-64.json",
+    "n": "search-6e.json",
+    "s": "search-73.json",
+    "t": "search-74.json",
+    "j": "search-6a.json",
+    "i": "search-69.json",
+    "r": "search-72.json",
+    "k": "search-6b.json",
+    "l": "search-6c.json",
+    "c": "search-63.json",
+    "o": "search-6f.json",
+    "e": "search-65.json",
+    "w": "search-77.json",
+    "v": "search-76.json",
+    "ই": "search-987.json",
+    "ম": "search-9ae.json",
+    "শ": "search-9b6.json",
+    "জ": "search-99c.json",
+    "ত": "search-9a4.json",
+    "আ": "search-986.json",
+    "খ": "search-996.json",
+    "z": "search-7a.json",
+    "হ": "search-9b9.json",
+    "ঐ": "search-990.json",
+    "প": "search-9aa.json",
+    "র": "search-9b0.json",
+    "ফ": "search-9ab.json",
+    "ব": "search-9ac.json",
+    "অ": "search-985.json",
+    "চ": "search-99a.json",
+    "দ": "search-9a6.json",
+    "স": "search-9b8.json",
+    "ও": "search-993.json",
+    "এ": "search-98f.json",
+    "ক": "search-995.json",
+    "ল": "search-9b2.json",
+    "ন": "search-9a8.json",
+    "ঝ": "search-99d.json",
+    "গ": "search-997.json",
+    "ধ": "search-9a7.json",
+    "ট": "search-99f.json",
+    "y": "search-79.json",
+    "য": "search-9af.json",
+    "ড": "search-9a1.json",
+    "u": "search-75.json",
+    "উ": "search-989.json",
+    "থ": "search-9a5.json",
+    "ভ": "search-9ad.json",
+    "q": "search-71.json",
+    "ঈ": "search-988.json",
+    "ঋ": "search-98b.json",
+    "ঊ": "search-98a.json"
+  }
+}

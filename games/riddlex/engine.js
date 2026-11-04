@@ -40,6 +40,9 @@ export function selectGuess(ranked,answers,questions){
  if(!second)return top.entry;
  // Strong evidence is needed before naming a person or object.
  if(top.matches>=2&&top.score-second.score>=2)return top.entry;
+ // After several answers, try a plausible guess instead of asking dozens of low-value questions.
+ // A wrong guess is rejected by Retry and will never be repeated in this game.
+ if(answers.length>=8&&top.matches>=2&&top.score>=second.score+1)return top.entry;
  if(!nextQuestion(ranked,answers,questions)&&top.matches>0)return top.entry;
  return null;
 }

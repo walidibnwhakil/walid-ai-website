@@ -41,3 +41,16 @@ test('casebook contains expected Bangladesh-first coverage',()=>{
 test('each fact key has a matching question',()=>{
  for(const e of entries)for(const key of Object.keys(e.facts))assert.ok(questions[key],e.id+': '+key);
 });
+
+test('no two casebook entries share identical known facts in one category',()=>{
+ const seen=new Map();
+ for(const e of entries){
+  const signature=e.category+':'+JSON.stringify(Object.entries(e.facts).sort(([a],[b])=>a.localeCompare(b)));
+  assert.ok(!seen.has(signature),e.id+' cannot be distinguished from '+seen.get(signature));
+  seen.set(signature,e.id);
+ }
+});
+test('all five answer modes are supported',async()=>{
+ const {ANSWERS}=await import('./engine.js');
+ assert.deepEqual(ANSWERS,['yes','no','probably','probably-not','unknown']);
+});

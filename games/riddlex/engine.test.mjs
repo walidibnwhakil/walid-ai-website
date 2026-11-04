@@ -116,3 +116,12 @@ test('bulk importer rejects different IDs with identical known facts',async()=>{
  assert.ok(result.accepted.length<=1,'Indistinguishable records cannot both be imported');
  assert.ok(result.rejected.includes(1),'Later duplicate fact signature must be rejected');
 });
+
+test('Bengali question translations refer only to known questions',async()=>{
+ const {banglaQuestions}=await import('./questions.bn.js');
+ assert.ok(Object.keys(banglaQuestions).length>=100);
+ for(const [key,value] of Object.entries(banglaQuestions)){
+  assert.ok(questions[key], 'Missing source question for '+key);
+  assert.ok(typeof value==='string'&&value.trim().length>5,'Missing Bengali text for '+key);
+ }
+});

@@ -10,7 +10,7 @@ Updated: 2026-11-04
 | Personal relationship roles | Reconstructed | 15 generic roles; no private names |
 | Guessing engine | Implemented, unverified | Weighted answers, candidate rejection, no-evidence guard |
 | Answer correction | Implemented, unverified | Change last answer without restarting |
-| Automated tests | Written, result unverified | 16 unit test cases plus 2 simulations; updated to cover 171 entries, CI unconfirmed |
+| Automated tests | Written, result unverified | 17 unit test cases plus 2 simulations; updated to cover 171 entries, CI unconfirmed |
 | Original cinematic artwork | Missing | Placeholder emojis only |
 | Mobile preview | Not deployed | No playable public link confirmed |
 | Main / live website | Unchanged | No merge or deployment |
@@ -41,3 +41,9 @@ The uncommitted PC-only implementation and original image assets cannot be recov
 - Total casebook is now 171 entries (plus 15 relationship roles), wired into `casebook.js` and the game.
 - Updated regression counts and simulation target to 171. **Expanded data has not yet passed a full executed Node test run**; count and coverage are implementation targets, not measured gameplay success.
 - Earlier 70/70 simulation result applies only to the old 70-entry set, not to the expanded 171.
+
+## Bulk knowledge workflow (2026-11-04)
+- Added `import-knowledge.mjs` to validate reviewed JSON records, reject duplicate IDs and unsupported facts, and cap imports at 100,000 records per run.
+- Added empty `knowledge.generated.js` and wired it into the casebook. No bulk dataset has been imported yet; live count remains 171.
+- Added importer regression test and `KNOWLEDGE.md` with source/licensing caveats.
+- Automated test success and full gameplay quality remain unverified.

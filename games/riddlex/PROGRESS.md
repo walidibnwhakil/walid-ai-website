@@ -47,3 +47,8 @@ The uncommitted PC-only implementation and original image assets cannot be recov
 - Added empty `knowledge.generated.js` and wired it into the casebook. No bulk dataset has been imported yet; live count remains 171.
 - Added importer regression test and `KNOWLEDGE.md` with source/licensing caveats.
 - Automated test success and full gameplay quality remain unverified.
+
+## Expanded simulation audit (2026-11-04)
+- Independently simulated 171 targets with the then-current engine: 167 correct, 4 unresolved (scissors, toothbrush, soap, mirror), mean 32.03 questions; worst case 40. This is a simulated replay of the engine logic, not browser or Node test execution.
+- Root cause: question selection considered only the top 20 ranked entries, which could exclude sparse entries indefinitely. Changed selection to consider all remaining candidates.
+- **Post-change results still need verification**; 171/171 accuracy must not be claimed until re-run.

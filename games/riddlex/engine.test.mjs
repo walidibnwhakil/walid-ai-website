@@ -105,3 +105,14 @@ test('bulk importer rejects blank names, unsafe IDs and malformed facts',async()
  assert.deepEqual(result.accepted.map(x=>x.id),['safe-new']);
  assert.deepEqual(result.rejected,[0,1,2,3,5]);
 });
+
+test('bulk importer rejects different IDs with identical known facts',async()=>{
+ const {validateImport}=await import('./import-knowledge.mjs');
+ const input=[
+  {id:'import-unique-one',name:'First',category:'animals',facts:{mammal:true,bird:false}},
+  {id:'import-unique-two',name:'Second',category:'animals',facts:{bird:false,mammal:true}}
+ ];
+ const result=validateImport(input);
+ assert.ok(result.accepted.length<=1,'Indistinguishable records cannot both be imported');
+ assert.ok(result.rejected.includes(1),'Later duplicate fact signature must be rejected');
+});

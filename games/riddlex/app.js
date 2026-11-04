@@ -1,5 +1,6 @@
 import {entries,questions} from "./casebook.js";
 import {roles,relationshipQuestions} from "./relationships.js";
+import {banglaQuestions} from "./questions.bn.js";
 import {scoreCandidates,nextQuestion,selectGuess} from "./engine.js";
 const allEntries=[...entries,...roles],allQuestions={...questions,...relationshipQuestions};
 const $=id=>document.getElementById(id);
@@ -29,7 +30,7 @@ function render(){
    else $("status").textContent="I don't have enough evidence to make a reliable guess. You can correct an answer or start a new game.";
    return;
  }
- mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=allQuestions[currentKey];visible(answerPanel,true);
+ mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=lang==="bn"?(banglaQuestions[currentKey]||allQuestions[currentKey]):allQuestions[currentKey];visible(answerPanel,true);
 }
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();mode="ask";render();}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>{if(!currentKey)return;answers.push({key:currentKey,value:b.dataset.answer});mode="ask";render();}));

@@ -1,40 +1,38 @@
-// Riddlex: deterministic, evidence-based, free/offline guessing engine.
+// Offline Riddlex guessing engine. Unknown facts are never assumed false.
 export const ANSWERS=Object.freeze(["yes","no","probably","probably-not","unknown"]);
 export function scoreCandidates(entries,answers,rejected=new Set()){
-  return entries.filter(e=>!rejected.has(e.id)).map(entry=>{
-    let score=0,conflicts=0,matches=0;
-    for(const {key,value} of answers){
-      if(value==="unknown"||!Object.hasOwn(entry.facts,key))continue;
-      const expected=value==="yes"||value==="probably";
-      const weight=value==="probably"||value==="probably-not"?0.4:1;
-      if(entry.facts[key]===expected){score+=weight;matches+=weight;}
-      else{score-=2*weight;conflicts+=weight;}
-    }
-    return {entry,score,conflicts,matches};
-  }).sort((a,b)=>b.score-a.score||a.conflicts-b.conflicts||b.matches-a.matches||a.entry.name.localeCompare(b.entry.name));
+ return entries.filter(e=>!rejected.has(e.id)).map(entry=>{
+  let score=0,conflicts=0,matches=0;
+  for(const {key,value} of answers){
+   if(value==="unknown"||!Object.prototype.hasOwnProperty.call(entry.facts,key))continue;
+   const expected=value==="yes"||value==="probably";
+   const weight=value==="probably"||value==="probably-not"?0.4:1;
+   if(entry.facts[key]===expected){score+=weight;matches+=weight;}
+   else{score-=2*weight;conflicts+=weight;}
+  }
+  return {entry,score,conflicts,matches};
+ }).sort((a,b)=>b.score-a.score||a.conflicts-b.conflicts||b.matches-a.matches||a.entry.name.localeCompare(b.entry.name));
 }
 export function nextQuestion(ranked,answers,questions){
-  const asked=new Set(answers.map(a=>a.key));
-  const top=ranked.slice(0,Math.min(16,ranked.length));
-  let best=null,bestScore=-Infinity;
-  for(const key of Object.keys(questions)){
-    if(asked.has(key))continue;
-    let yes=0,no=0,unknown=0;
-    for(const {entry} of top){const v=entry.facts[key];if(v===true)yes++;else if(v===false)no++;else unknown++;}
-    if(yes+no===0)continue;
-    // Favor questions that split the known candidates, and don't reward unknown facts.
-    const quality=Math.min(yes,no)*4+(yes+no)*0.1-unknown*0.15;
-    if(quality>bestScore){bestScore=quality;best=key;}
-  }
-  return best;
+ const asked=new Set(answers.map(a=>a.key));
+ const top=ranked.slice(0,Math.min(16,ranked.length));
+ let best=null,bestScore=-Infinity;
+ for(const key of Object.keys(questions)){
+  if(asked.has(key))continue;
+  let yes=0,no=0,unknown=0;
+  for(const {entry} of top){const v=entry.facts[key];if(v===true)yes++;else if(v===false)no++;else unknown++;}
+  if(yes+no===0)continue;
+  const quality=Math.min(yes,no)*4+(yes+no)*0.1-unknown*0.15;
+  if(quality>bestScore){bestScore=quality;best=key;}
+ }
+ return best;
 }
 export function selectGuess(ranked,answers,questions){
-  if(!ranked.length)return null;
-  const [top,second]=ranked;
-  const knownAnswers=answers.filter(a=>a.value!=="unknown").length;
-  if(knownAnswers===0)return null;
-  if(!second)return top.entry;
-  if(top.matches>=2&&top.conflicts===0&&top.score-second.score>=1.5)return top.entry;
-  if(!nextQuestion(ranked,answers,questions)&&top.matches>0)return top.entry;
-  return null;
+ if(!ranked.length)return null;
+ const [top,second]=ranked;
+ if(top.matches<=0||top.conflicts>0)return null;
+ if(!second)return top.entry;
+ if(top.matches>=2&&top.score-second.score>=1.5)return top.entry;
+ if(!nextQuestion(ranked,answers,questions)&&top.matches>0)return top.entry;
+ return null;
 }

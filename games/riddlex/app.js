@@ -70,8 +70,8 @@ function render(){
  if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();return;}
  currentKey=nextQuestion(ranked,answers,allQuestions);
  if(!currentKey){
-   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();}
-   else $("status").textContent="I don't have enough evidence to make a reliable guess. You can correct an answer or start a new game.";
+   if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent=t("I’m not certain. Could it be ","আমি পুরোপুরি নিশ্চিত নই। এটি কি ")+guess.name+"?";visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();}
+   else $("status").textContent=t("I don’t have enough evidence to make a reliable guess. You can correct an answer or start a new game.","নির্ভরযোগ্য অনুমানের জন্য যথেষ্ট তথ্য নেই। আগের উত্তর বদলাতে পারেন অথবা নতুন খেলা শুরু করতে পারেন।");
    return;
  }
  mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=lang==="bn"?(banglaQuestions[currentKey]||allQuestions[currentKey]):allQuestions[currentKey];visible(answerPanel,true);visible($("keyboard-hint"),true);
@@ -86,6 +86,8 @@ $("retry").addEventListener("click",()=>{
  cancelDiscard();mode="discard";const token=discardToken;
  visible(guessPanel,false);visible(back,false);
  const note=$("case-note"),office=document.querySelector(".office");
+ // Ensure the existing note and any loaded photo remain visible throughout the throw.
+ showNote();
  const bin=document.querySelector(".wastebasket");
  const paperRect=note.getBoundingClientRect(),binRect=bin.getBoundingClientRect();
  // The paper travels to the actual bin even on narrow phone screens.

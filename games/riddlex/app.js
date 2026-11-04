@@ -9,14 +9,14 @@ function visible(node,yes){node.hidden=!yes;}
 function reset(){category=null;answers=[];rejected=new Set();mode="start";currentKey=null;guess=null;render();}
 function render(){
   visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);
-  if(mode==="start"){$("status").textContent="Think of a character, animal or object.";return;}
+  if(mode==="start"){$("status").textContent="Think of a character, animal, object or someone you know.";return;}
   if(mode==="done"){$("status").textContent="Case closed! 🕵️";return;}
   const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
-  if(!ranked.length){$("status").textContent="I am out of guesses. Start a new game.";return;}
+  if(!ranked.length){$("status").textContent="I have no more matches in this casebook. Please start a new game.";return;}
   const suggestion=selectGuess(ranked,answers,allQuestions);
   if(suggestion){guess=suggestion;mode="guess";$("status").textContent=(ranked.length>1?"My tentative guess: ":"Are you thinking of ")+guess.name+"?";visible(guessPanel,true);return;}
   currentKey=nextQuestion(ranked,answers,allQuestions);
-  if(!currentKey){guess=ranked[0].entry;mode="guess";$("status").textContent="Could it be "+guess.name+"?";visible(guessPanel,true);return;}
+  if(!currentKey){if(answers.every(a=>a.value==="unknown")){$("status").textContent="I need at least one Yes, No or Probably answer to make a useful guess. Try New Game.";return;}guess=ranked[0].entry;mode="guess";$("status").textContent="I am not certain. Could it be "+guess.name+"?";visible(guessPanel,true);return;}
   $("status").textContent=allQuestions[currentKey];visible(answerPanel,true);
 }
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();mode="ask";render();}));

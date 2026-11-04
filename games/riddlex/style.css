@@ -130,7 +130,7 @@ button:active{transform:translateY(1px)}
 /* Use measured bin coordinates instead of percentage offsets based on paper width. */
 @keyframes note-to-bin{
  0%,35%{opacity:1;transform:translate(-50%,0) rotate(-3deg) scale(1)}
- 55%{opacity:1;transform:translate(calc(-50% + var(--throw-x, 0px) * .35),calc(var(--throw-y, 0px) * -.35)) rotate(25deg) scale(.7)}
- 85%{opacity:1;transform:translate(calc(-50% + var(--throw-x, 0px) * .85),calc(var(--throw-y, 0px) * .7)) rotate(170deg) scale(.25)}
+ 55%{opacity:1;transform:translate(calc(-50% + var(--throw-x-mid, 0px)),var(--throw-y-mid, 0px)) rotate(25deg) scale(.7)}
+ 85%{opacity:1;transform:translate(calc(-50% + var(--throw-x-late, 0px)),var(--throw-y-late, 0px)) rotate(170deg) scale(.25)}
  100%{opacity:0;transform:translate(calc(-50% + var(--throw-x, 0px)),var(--throw-y, 0px)) rotate(250deg) scale(.1)}
 }

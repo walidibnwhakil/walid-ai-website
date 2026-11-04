@@ -3,6 +3,7 @@ import {roles,relationshipQuestions} from "./relationships.js";
 import {banglaQuestions} from "./questions.bn.js";
 import {scoreCandidates,nextQuestion,selectGuess} from "./engine.js";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
+import {localPhotoPath} from "./print-photo.js";
 const allEntries=[...entries,...roles],allQuestions={...questions,...relationshipQuestions};
 const $=id=>document.getElementById(id);
 let lang="en";
@@ -24,9 +25,8 @@ function showNote(){
  $("case-note-name").textContent=guess.name;
  const photo=$("case-photo");
  // Only explicitly reviewed, local casebook image paths may be displayed.
- const path=guess.image;
- const safe=typeof path==="string"&&/^\.\/images\/[a-z0-9-]+\.(?:png|jpg|jpeg|webp)$/.test(path);
- if(safe){if(photo.getAttribute("src")!==path){photo.hidden=true;photo.src=path;}photo.alt=guess.name;photo.onload=()=>{if(guess?.image===path)photo.hidden=false;};photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};}
+ const path=localPhotoPath(guess);
+ if(path){if(photo.getAttribute("src")!==path){photo.hidden=true;photo.src=path;}photo.alt=guess.name;photo.onload=()=>{if(guess?.image===path)photo.hidden=false;};photo.onerror=()=>{photo.hidden=true;photo.removeAttribute("src");};}
  else{photo.hidden=true;photo.removeAttribute("src");photo.alt="";}
 }
 function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}

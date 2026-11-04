@@ -37,3 +37,6 @@ button:active{transform:translateY(1px)}
 @keyframes cat-upset{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
 @keyframes cat-happy{50%{transform:translateY(-12px)}}
 @media(prefers-reduced-motion:reduce){.office[data-mood] .detective,.office[data-mood] .cat{animation:none!important}}
+
+#keyboard-hint{font-size:12px;color:#725336;margin:6px auto 12px;line-height:1.5}
+@media(hover:none) and (pointer:coarse){#keyboard-hint{display:none!important}}

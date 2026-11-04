@@ -110,7 +110,7 @@ $("retry").addEventListener("click",()=>{
  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){finish();return;}
  discardListener=event=>{
   // Ignore bubbling photo animations; only the paper reaching the bin completes Retry.
-  if(event.target===note&&event.animationName==="note-to-bin")finish();
+  if(event.target===note&&event.animationName==="crumpled-note-to-bin")finish();
  };
  note.addEventListener("animationend",discardListener);
  // If CSS animation is unavailable or interrupted, the player must never get stuck.

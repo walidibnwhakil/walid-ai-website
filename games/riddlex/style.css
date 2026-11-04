@@ -26,3 +26,14 @@ button:active{transform:translateY(1px)}
 @keyframes detective-breathe{50%{transform:translateY(3px) rotate(1deg)}}
 @media(max-width:500px){main{margin:0 auto;padding:7px}.office{height:220px}.detective{left:29%;top:28px}.portrait{right:18%}.panel{padding:14px 8px}button{flex:1 1 40%;max-width:260px}#back,#new{width:calc(100% - 20px);max-width:340px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+#progress{font-size:13px;color:#725336;min-height:20px;margin:0 auto 10px;font-variant-numeric:tabular-nums}
+.office[data-mood="thinking"] .detective{animation:detective-think 2.8s ease-in-out infinite}
+.office[data-mood="guess"] .detective{transform:rotate(-5deg) translateY(-4px)}
+.office[data-mood="retry"] .cat{animation:cat-upset .65s ease-in-out 2;transform-origin:center bottom}
+.office[data-mood="unsure"] .cat{filter:grayscale(.6) drop-shadow(2px 4px 2px #2c1c19aa)}
+.office[data-mood="happy"] .cat{animation:cat-happy .8s ease-in-out 3}
+@keyframes detective-think{50%{transform:rotate(-3deg) translateY(3px)}}
+@keyframes cat-upset{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@keyframes cat-happy{50%{transform:translateY(-12px)}}
+@media(prefers-reduced-motion:reduce){.office[data-mood] .detective,.office[data-mood] .cat{animation:none!important}}

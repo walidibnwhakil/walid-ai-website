@@ -13,7 +13,7 @@ a{color:#604225;text-underline-offset:3px}
 .panel{padding:clamp(14px,4vw,28px);background:var(--cream);border:1px solid #d7c3a6;border-radius:0 0 20px 20px;text-align:center;box-shadow:0 12px 28px #4b342b22}
 h1{font-family:Georgia,serif;letter-spacing:.05em;font-size:clamp(30px,6vw,42px);margin:0 0 8px}
 #status{min-height:64px;font-size:clamp(17px,3vw,20px);max-width:540px;margin:12px auto 20px}
-button{margin:5px;padding:13px 17px;min-height:46px;border-radius:12px;border:1px solid #a98863;background:#f0d6aa;color:#362416;cursor:pointer;font:600 15px/1.3 inherit;transition:background .15s,transform .15s}
+button{margin:5px;padding:13px 17px;min-height:46px;border-radius:12px;border:1px solid #a98863;background:#f0d6aa;color:#362416;cursor:pointer;font-family:inherit;font-weight:600;font-size:15px;line-height:1.3;transition:background .15s,transform .15s}
 button:hover{background:#e8c78c;transform:translateY(-1px)}
 button:focus-visible,a:focus-visible{outline:3px solid #245f8b;outline-offset:3px}
 button:active{transform:translateY(1px)}

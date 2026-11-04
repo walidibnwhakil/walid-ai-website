@@ -15,18 +15,23 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
 }
 export function nextQuestion(ranked,answers,questions){
  const asked=new Set(answers.map(a=>a.key));
- const top=ranked;
- let best=null,bestScore=-Infinity;
- for(const key of Object.keys(questions)){
-  if(asked.has(key))continue;
-  let yes=0,no=0,unknown=0;
-  for(const {entry} of top){const v=entry.facts[key];if(v===true)yes++;else if(v===false)no++;else unknown++;}
-  if(yes+no===0)continue;
-  // Balance the candidate split and prioritize questions with recorded evidence.
-  const quality=Math.min(yes,no)*4+(yes+no)*0.2-unknown*0.5;
-  if(quality>bestScore){bestScore=quality;best=key;}
+ function choose(pool){
+  let best=null,bestScore=-Infinity;
+  for(const key of Object.keys(questions)){
+   if(asked.has(key))continue;
+   let yes=0,no=0,unknown=0;
+   for(const {entry} of pool){
+    const v=entry.facts[key];
+    if(v===true)yes++;else if(v===false)no++;else unknown++;
+   }
+   if(yes+no===0)continue;
+   const quality=Math.min(yes,no)*4+(yes+no)*0.2-unknown*0.5;
+   if(quality>bestScore){bestScore=quality;best=key;}
+  }
+  return best;
  }
- return best;
+ // Prioritize plausible candidates for speed, but never abandon sparse entries.
+ return choose(ranked.slice(0,20)) ?? choose(ranked);
 }
 export function selectGuess(ranked,answers,questions){
  if(!ranked.length)return null;

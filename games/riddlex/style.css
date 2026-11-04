@@ -66,3 +66,10 @@ button:active{transform:translateY(1px)}
 @keyframes cat-rise{0%{transform:translate(-100%,10px) rotate(-75deg)}100%{transform:translate(0,0) rotate(0)}}
 @keyframes detective-hopeful{50%{transform:translateY(-7px) rotate(-3deg)}}
 @media(prefers-reduced-motion:reduce){.case-note img,.office[data-mood] .glasses-gesture{animation:none!important}.office[data-mood="wrong"] .cat{transform:translate(-100%,10px) rotate(-75deg)}}
+
+/* Keep the cat visibly over the note on a failed guess, then stand it up on retry. */
+.office[data-mood="wrong"] .cat{right:calc(50% - 38px);bottom:22px;z-index:8;animation:cat-fall-on-note .7s ease-out both}
+.office[data-mood="retry"] .cat{right:calc(50% - 38px);bottom:22px;z-index:8;animation:cat-stand-from-note .7s ease-out both}
+@keyframes cat-fall-on-note{0%{transform:translate(70px,-12px) rotate(0deg)}65%{transform:translate(0,0) rotate(-85deg)}100%{transform:translate(0,5px) rotate(-75deg)}}
+@keyframes cat-stand-from-note{0%{transform:translate(0,5px) rotate(-75deg)}100%{transform:translate(70px,-12px) rotate(0deg)}}
+@media(prefers-reduced-motion:reduce){.office[data-mood="wrong"] .cat{animation:none!important;transform:rotate(-75deg)}.office[data-mood="retry"] .cat{animation:none!important;transform:none}}

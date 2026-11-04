@@ -90,6 +90,8 @@ $("retry").addEventListener("click",()=>{
  showNote();
  const bin=document.querySelector(".wastebasket");
  const paperRect=note.getBoundingClientRect(),binRect=bin.getBoundingClientRect();
+ // Both centers are measured in viewport coordinates; transforms animate from the note center.
+ // Hide the photo only during disposal, not while presenting the guess.
  // The paper travels to the actual bin even on narrow phone screens.
  note.style.setProperty("--throw-x",`${binRect.left+binRect.width/2-paperRect.left-paperRect.width/2}px`);
  note.style.setProperty("--throw-y",`${binRect.top+binRect.height/2-paperRect.top-paperRect.height/2}px`);

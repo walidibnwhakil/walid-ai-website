@@ -48,3 +48,21 @@ button:active{transform:translateY(1px)}
 .office[data-mood="happy"] .case-note{animation:case-reveal .35s ease-out both}
 @keyframes case-reveal{from{opacity:0;transform:translate(-50%,16px) rotate(2deg)}to{opacity:1;transform:translate(-50%,0) rotate(-3deg)}}
 @media(prefers-reduced-motion:reduce){.office[data-mood="happy"] .case-note{animation:none}}
+
+/* Guess scene: written name first; a reviewed local image, when present, prints over it. */
+.case-note{bottom:9px;min-height:58px;z-index:4}
+.case-note strong{font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive;font-style:italic}
+.case-note img{position:absolute;left:50%;bottom:12px;transform:translateX(-50%) rotate(5deg);width:clamp(65px,15vw,105px);height:clamp(62px,13vw,95px);object-fit:cover;background:white;padding:5px 5px 12px;border:1px solid #d7c5a3;box-shadow:2px 3px 5px #3d2b2288;animation:photo-print .8s ease-out both}
+@keyframes photo-print{from{opacity:0;transform:translate(-50%,-45px) rotate(5deg)}to{opacity:1;transform:translate(-50%,0) rotate(5deg)}}
+.glasses-gesture{position:absolute;top:35%;left:30%;font-size:32px;opacity:0;pointer-events:none}
+.office[data-mood="happy"] .glasses-gesture{animation:adjust-glasses 1s ease-in-out both}
+.office[data-mood="wrong"] .detective{animation:detective-embarrassed 1s ease-in-out both;filter:grayscale(.3) drop-shadow(4px 8px 4px #2c1c19aa)}
+.office[data-mood="wrong"] .cat{z-index:6;animation:cat-collapse .65s ease-out both}
+.office[data-mood="retry"] .cat{z-index:6;animation:cat-rise .65s ease-out both}
+.office[data-mood="retry"] .detective{animation:detective-hopeful .8s ease-in-out both}
+@keyframes adjust-glasses{0%,100%{opacity:0;transform:translateY(12px)}40%,70%{opacity:1;transform:translateY(-6px)}}
+@keyframes detective-embarrassed{50%,100%{transform:rotate(9deg) translateY(9px)}}
+@keyframes cat-collapse{0%{transform:translate(0,0) rotate(0)}100%{transform:translate(-100%,10px) rotate(-75deg)}}
+@keyframes cat-rise{0%{transform:translate(-100%,10px) rotate(-75deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes detective-hopeful{50%{transform:translateY(-7px) rotate(-3deg)}}
+@media(prefers-reduced-motion:reduce){.case-note img,.office[data-mood] .glasses-gesture{animation:none!important}.office[data-mood="wrong"] .cat{transform:translate(-100%,10px) rotate(-75deg)}}

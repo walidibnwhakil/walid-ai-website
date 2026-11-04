@@ -1,4 +1,4 @@
-import {entries,questions} from "./data.js";
+import {entries,questions} from "./casebook.js";
 import {roles,relationshipQuestions} from "./relationships.js";
 import {scoreCandidates,nextQuestion,selectGuess} from "./engine.js";
 const allEntries=[...entries,...roles];const allQuestions={...questions,...relationshipQuestions};

@@ -17,7 +17,7 @@ let discardTimer=null;
 let discardListener=null;
 function cancelDiscard(){
  discardToken++;
- $("case-note").style.removeProperty("--throw-x");$("case-note").style.removeProperty("--throw-y");
+ for(const key of ["--throw-x","--throw-y","--throw-x-mid","--throw-y-mid","--throw-x-late","--throw-y-late"])$("case-note").style.removeProperty(key);
  if(discardTimer!==null){clearTimeout(discardTimer);discardTimer=null;}
  if(discardListener){$("case-note").removeEventListener("animationend",discardListener);discardListener=null;}
 }
@@ -90,12 +90,16 @@ $("retry").addEventListener("click",()=>{
  // The paper travels to the actual bin even on narrow phone screens.
  note.style.setProperty("--throw-x",`${binRect.left+binRect.width/2-paperRect.left-paperRect.width/2}px`);
  note.style.setProperty("--throw-y",`${binRect.top+binRect.height/2-paperRect.top-paperRect.height/2}px`);
+ note.style.setProperty("--throw-x-mid",`${(binRect.left+binRect.width/2-paperRect.left-paperRect.width/2)*.35}px`);
+ note.style.setProperty("--throw-y-mid",`${(binRect.top+binRect.height/2-paperRect.top-paperRect.height/2)*-.35}px`);
+ note.style.setProperty("--throw-x-late",`${(binRect.left+binRect.width/2-paperRect.left-paperRect.width/2)*.85}px`);
+ note.style.setProperty("--throw-y-late",`${(binRect.top+binRect.height/2-paperRect.top-paperRect.height/2)*.7}px`);
  office.dataset.mood="discard";
  const finish=()=>{
   if(token!==discardToken||mode!=="discard")return;
   if(discardTimer!==null){clearTimeout(discardTimer);discardTimer=null;}
   if(discardListener){note.removeEventListener("animationend",discardListener);discardListener=null;}
-  note.style.removeProperty("--throw-x");note.style.removeProperty("--throw-y");
+  for(const key of ["--throw-x","--throw-y","--throw-x-mid","--throw-y-mid","--throw-x-late","--throw-y-late"])note.style.removeProperty(key);
   guess=null;mode="ask";render();mood("retry");
  };
  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){finish();return;}

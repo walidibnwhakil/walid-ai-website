@@ -19,12 +19,12 @@ function visible(node,yes){node.hidden=!yes;}
 function reset(){category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  updateLabels();progress();
- visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);
+ visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);visible($("keyboard-hint"),false);visible($("case-note"),mode==="done"&&Boolean(guess));
  visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
- if(mode==="done"){mood("happy");$("status").textContent=t("Case closed! 🕵️","রহস্যের সমাধান! 🕵️");return;}
+ if(mode==="done"){mood("happy");$("status").textContent=t("Case closed! 🕵️","রহস্যের সমাধান! 🕵️");$("case-note-label").textContent=t("Case solved","রহস্যের সমাধান");$("case-note-name").textContent=guess?.name||"";return;}
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
- if(!ranked.length){mood("unsure");$("status").textContent=t("I have no more guesses in my casebook. Start a new game.","আমার তথ্যভান্ডারে আর কোনো অনুমান নেই। নতুন খেলা শুরু করুন।");return;}
+ if(!ranked.length){currentKey=null;guess=null;mood("unsure");$("status").textContent=t("I have no more guesses in my casebook. Start a new game.","আমার তথ্যভান্ডারে আর কোনো অনুমান নেই। নতুন খেলা শুরু করুন।");return;}
  const suggestion=selectGuess(ranked,answers,allQuestions);
  if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent=t("Are you thinking of ","আপনি কি ")+guess.name+t("?","-এর কথা ভাবছেন?");visible(guessPanel,true);return;}
  currentKey=nextQuestion(ranked,answers,allQuestions);

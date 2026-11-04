@@ -4,25 +4,28 @@ import {scoreCandidates,nextQuestion,selectGuess} from "./engine.js";
 const allEntries=[...entries,...roles],allQuestions={...questions,...relationshipQuestions};
 const $=id=>document.getElementById(id);
 let category=null,answers=[],rejected=new Set(),mode="start",currentKey=null,guess=null;
+function mood(value){document.querySelector(".office").dataset.mood=value;}
+function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?"Questions answered: "+answers.length+" · Wrong guesses: "+rejected.size:"";}
 const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
 function visible(node,yes){node.hidden=!yes;}
 function reset(){category=null;answers=[];rejected=new Set();mode="start";currentKey=null;guess=null;render();}
 function render(){
+ progress();
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);
  visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
- if(mode==="start"){$("status").textContent="Think of a character, animal, object or someone you know.";return;}
- if(mode==="done"){$("status").textContent="Case closed! 🕵️";return;}
+ if(mode==="start"){mood("ready");$("status").textContent="Think of a character, animal, object or someone you know.";return;}
+ if(mode==="done"){mood("happy");$("status").textContent="Case closed! 🕵️";return;}
  const ranked=scoreCandidates(allEntries.filter(e=>e.category===category),answers,rejected);
- if(!ranked.length){$("status").textContent="I have no more guesses in my casebook. Start a new game.";return;}
+ if(!ranked.length){mood("unsure");$("status").textContent="I have no more guesses in my casebook. Start a new game.";return;}
  const suggestion=selectGuess(ranked,answers,allQuestions);
- if(suggestion){guess=suggestion;mode="guess";$("status").textContent="Are you thinking of "+guess.name+"?";visible(guessPanel,true);return;}
+ if(suggestion){mood("guess");guess=suggestion;mode="guess";$("status").textContent="Are you thinking of "+guess.name+"?";visible(guessPanel,true);return;}
  currentKey=nextQuestion(ranked,answers,allQuestions);
  if(!currentKey){
    if(ranked[0].matches>0){guess=ranked[0].entry;mode="guess";$("status").textContent="I'm not certain. Could it be "+guess.name+"?";visible(guessPanel,true);}
    else $("status").textContent="I don't have enough evidence to make a reliable guess. You can correct an answer or start a new game.";
    return;
  }
- mode="ask";$("status").textContent=allQuestions[currentKey];visible(answerPanel,true);
+ mode="ask";mood(rejected.size?"retry":"thinking");$("status").textContent=allQuestions[currentKey];visible(answerPanel,true);
 }
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category;answers=[];rejected=new Set();mode="ask";render();}));
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>{if(!currentKey)return;answers.push({key:currentKey,value:b.dataset.answer});mode="ask";render();}));

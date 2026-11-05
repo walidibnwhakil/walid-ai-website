@@ -38,15 +38,9 @@ button:active{transform:translateY(1px)}
 .case-note{position:absolute;z-index:5;left:50%;bottom:8px;transform:translateX(-50%) rotate(-3deg);width:min(68%,320px);padding:10px 16px;background:#f7eacb;color:#3f2b20;border:1px solid #c9ae7a;box-shadow:3px 5px 10px #28170e80;text-align:center;pointer-events:none}
 .case-note span{display:block;font:11px/1.4 Georgia,serif;text-transform:uppercase;letter-spacing:.13em}
 .case-note strong{display:block;font:italic 600 clamp(16px,3vw,24px)/1.2 Georgia,serif;overflow-wrap:anywhere}
-.office[data-mood="happy"] .case-note{animation:case-reveal .35s ease-out both}
-@keyframes case-reveal{from{opacity:0;transform:translate(-50%,16px) rotate(2deg)}to{opacity:1;transform:translate(-50%,0) rotate(-3deg)}}
-@media(prefers-reduced-motion:reduce){.office[data-mood="happy"] .case-note{animation:none}}
-
-/* Guess scene: written name first; a reviewed local image, when present, prints over it. */
 .case-note{bottom:9px;min-height:58px;z-index:4}
 .case-note strong{font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive;font-style:italic}
-.case-note img{grid-area:photo;transform:rotate(5deg);width:clamp(65px,15vw,105px);height:clamp(62px,13vw,95px);object-fit:cover;background:white;padding:5px 5px 12px;border:1px solid #d7c5a3;box-shadow:2px 3px 5px #3d2b2288;animation:photo-print .8s ease-out both}
-@keyframes photo-print{from{opacity:0;transform:translateY(-24px) rotate(5deg)}to{opacity:1;transform:rotate(5deg)}}
+.case-note img{grid-area:photo;transform:rotate(5deg);width:clamp(65px,15vw,105px);height:clamp(62px,13vw,95px);object-fit:cover;background:white;padding:5px 5px 12px;border:1px solid #d7c5a3;box-shadow:2px 3px 5px #3d2b2288}
 /* The Games destination stays in reach when the sidebar folds above the room. */
 body{display:grid;grid-template-columns:170px minmax(0,1fr)}
 main{width:100%;min-width:0}
@@ -115,3 +109,34 @@ main{width:100%;min-width:0}
 .character-art{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
 .office[data-mood="wrong"] .detective{animation:none}
 @media(max-width:500px){.cat{right:7%}.desk-tools{left:2%;bottom:34px}}
+
+/* Recovery staging. Character layers retain the legacy art until approved masters are recovered. */
+.panel:has(#play:not([hidden])){border-radius:20px;padding-block:clamp(44px,12vw,100px)}
+.panel:has(#play:not([hidden])) h1{color:#4c3121;font-size:clamp(48px,12vw,90px);text-shadow:0 2px #e3c38a}
+#play{display:block;min-width:120px;margin:18px auto}
+.printer{position:absolute;right:5%;bottom:24px;width:clamp(56px,13%,90px);height:27px;
+ z-index:3;border:2px solid #34281e;border-radius:8px;background:linear-gradient(#706253,#3e342a);
+ box-shadow:2px 4px 5px #26180c88}
+.printer::after{content:"";display:block;width:68%;height:4px;margin:8px auto;background:#201912;border-radius:2px}
+.office[data-mood="happy"] .case-note[data-result="loading"]{visibility:hidden}
+.office[data-mood="happy"] .case-note[data-result="printed"]{animation:feed-and-lift 1.9s ease-in-out both}
+.office[data-mood="happy"] .case-note[data-result="written"]{animation:write-note .55s ease-out both}
+@keyframes feed-and-lift{
+ 0%{left:89%;bottom:37px;scale:.25;clip-path:inset(100% 0 0)}
+ 42%{left:89%;bottom:40px;scale:.44;clip-path:inset(0)}
+ 57%{left:79%;bottom:47px;scale:.54}
+ 100%{left:50%;bottom:9px;scale:1}
+}
+@keyframes write-note{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
+.discarded-note,.resting-note{display:none;position:absolute;background:#f7eacb;pointer-events:none}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) :is(.discarded-note,.resting-note){display:block}
+.discarded-note{left:48%;bottom:26px;width:48px;height:30px;z-index:3;animation:crumple-and-toss .95s ease-in both}
+.resting-note{left:50%;bottom:23px;width:92px;height:21px;z-index:3;transform:translateX(-50%) rotate(-6deg)}
+@keyframes crumple-and-toss{
+ 32%{transform:translateY(-25px) scale(.3) rotate(45deg);border-radius:40%}
+ 70%{opacity:1;transform:translate(-110px,-115px) scale(.24) rotate(230deg)}
+ 100%{opacity:0;transform:translate(-185px,-70px) scale(.11) rotate(420deg)}
+}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .detective{animation:disappointed .58s ease-out both}
+@keyframes disappointed{to{transform:translateY(6px) rotate(-7deg)}}
+@media(prefers-reduced-motion:reduce){.discarded-note{visibility:hidden}}

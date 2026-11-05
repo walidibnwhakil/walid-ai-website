@@ -13,11 +13,13 @@ try{lang=localStorage.getItem("riddlex-language")==="bn"?"bn":"en";}catch{/* Pri
 const translations={characters:"চরিত্র",animals:"প্রাণী",objects:"বস্তু",yes:"হ্যাঁ",no:"না",probably:"সম্ভবত", "probably-not":"সম্ভবত না",unknown:"জানি না"};
 function t(en,bn){return lang==="bn"?bn:en;}
 function updateLabels(){
+ $("play").textContent=t("Play","খেলুন");
  $("games-link").textContent=t("Games","গেমস");
 document.documentElement.lang=lang;$("language").textContent=lang==="bn"?"English":"বাংলা";document.querySelectorAll("[data-category]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.category]:({characters:"Characters",animals:"Animals",objects:"Objects"})[b.dataset.category]);document.querySelectorAll("[data-answer]").forEach(b=>b.textContent=lang==="bn"?translations[b.dataset.answer]:({yes:"Yes",no:"No",probably:"Probably","probably-not":"Probably Not",unknown:"Don\'t Know"})[b.dataset.answer]);$("correct").textContent=t("Correct!","সঠিক!");$("retry").textContent=t("Retry","আবার চেষ্টা");$("wrong").textContent=t("Wrong","ভুল");$("back").textContent=t("↶ Change last answer","↶ আগের উত্তর বদলাও");$("new").textContent=t("New Game","নতুন খেলা");}
-let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="start",currentKey=null,guess=null;
+let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
 let photoRequest=0;
-function mood(value){document.querySelector(".office").dataset.mood=value;}
+const office=document.querySelector(".office");
+function mood(value){office.dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?t("Questions answered: ","উত্তর দেওয়া প্রশ্ন: ")+answers.length+t(" · Wrong guesses: "," · ভুল অনুমান: ")+rejected.size:"";}
 const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
 
@@ -29,30 +31,38 @@ function showQuestion(){
  visible(answerPanel,true);
 }
 function showNote(){
- const show=mode==="unsure"||Boolean(guess)&&(mode==="guess"||mode==="wrong"||mode==="done");
  const note=$("case-note"),photo=$("case-photo");
+ const show=mode==="guess"||mode==="done";
  visible(note,show);
- if(!show){
-  photoRequest++;photo.onload=null;photo.onerror=null;
-  photo.hidden=true;photo.removeAttribute("src");photo.alt="";
-  note.dataset.guessId="";
-  return;
+ if(!show||mode!=="done"){
+  photoRequest++;
+  photo.onload=null;
+  photo.onerror=null;
+  photo.hidden=true;
+  photo.removeAttribute("src");
+  note.dataset.result="";
  }
+ note.dataset.guessId=show?guess.id:"";
+ if(!show)return;
  $("case-note-label").textContent=t(mode==="done"?"Case solved":"Detective’s note",mode==="done"?"রহস্যের সমাধান":"গোয়েন্দার নোট");
- $("case-note-name").textContent=guess?(lang==="bn"?(guess.nameBn||guess.name):guess.name):t("Case still open","রহস্য এখনো অমীমাংসিত");
+ $("case-note-name").textContent=lang==="bn"?(guess.nameBn||guess.name):guess.name;
+ if(mode!=="done"||note.dataset.result)return;
+
  const path=localPhotoPath(guess);
- const sameGuess=note.dataset.guessId===guess?.id;
- note.dataset.guessId=guess?.id??"";
- if(!path){
-  photoRequest++;photo.onload=null;photo.onerror=null;
-  photo.hidden=true;photo.removeAttribute("src");photo.alt="";
-  return;
- }
- if(sameGuess&&photo.getAttribute("src")===path)return;
+ if(!path){note.dataset.result="written";return;}
  const request=++photoRequest;
- photo.hidden=true;photo.alt=guess.name;
- photo.onload=()=>{if(request===photoRequest&&guess?.id===note.dataset.guessId)photo.hidden=false;};
- photo.onerror=()=>{if(request===photoRequest){photo.hidden=true;photo.removeAttribute("src");}};
+ note.dataset.result="loading";
+ photo.alt="";
+ photo.onload=()=>{
+  if(request!==photoRequest)return;
+  photo.hidden=false;
+  note.dataset.result="printed";
+ };
+ photo.onerror=()=>{
+  if(request!==photoRequest)return;
+  photo.removeAttribute("src");
+  note.dataset.result="written";
+ };
  photo.src=path;
 }
 function presentGuess(){
@@ -67,8 +77,13 @@ function showUnresolved(){
 function reset(){loadToken++;category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  updateLabels();progress();
+ const splash=mode==="splash";
+ visible(office,!splash);
+ for(const id of ["status","progress","new","privacy-note"])visible($(id),!splash);
+ visible($("play"),splash);
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong"||mode==="unsure");
  visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
+ if(splash)return;
  if(mode==="loading"){mood("thinking");$("status").textContent=t("Opening the casebook…","তথ্যভান্ডার খুলছি…");return;}
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
  if(mode==="wrong"){mood("wrong");$("status").textContent=t("That guess was wrong. Shall I try again?","অনুমানটি ভুল হয়েছে। আবার চেষ্টা করব?");visible(guessPanel,true);showNote();return;}
@@ -116,15 +131,27 @@ document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("clic
   $("status").textContent=t("The casebook could not load. Please choose a category to retry.","তথ্যভান্ডার লোড হয়নি। আবার একটি বিভাগ বেছে নিন।");
  }
 }));
+$("play").addEventListener("click",()=>{reset();categories.querySelector("button").focus();});
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
 $("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode="done";render();});
 $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
 $("retry").addEventListener("click",()=>{
- if(mode==="unsure"){reset();return;}
- if(mode!=="wrong")return;
+ if(mode!=="wrong"&&mode!=="unsure")return;
+ const cat=office.querySelector(".cat");
+ cat.getAnimations().filter(animation=>animation.id==="retry").forEach(animation=>animation.cancel());
+ const left=cat.getBoundingClientRect().left;
+ if(mode==="unsure")reset();
+ else retryGuess();
+ if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
+  const distance=left-cat.getBoundingClientRect().left;
+  cat.animate([{transform:"translate("+distance+"px, 12px) scaleY(.65)"},{transform:"none"}],
+   {id:"retry",duration:420,easing:"ease-out"});
+ }
+});
+function retryGuess(){
  if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}
  guess=null;mode="ask";render();
-});
+}
 document.addEventListener("keydown",event=>{
  if(event.altKey||event.ctrlKey||event.metaKey||event.repeat||event.target instanceof Element&&event.target.closest("input,textarea,select,[contenteditable]"))return;
  if((mode==="ask"||mode==="edit")&&/^[1-5]$/.test(event.key)){event.preventDefault();submitAnswer(answerKeys[Number(event.key)-1]);}

@@ -15,7 +15,12 @@ export const roles=[
 ["teacher","Teacher",{education:true}],
 ["girlfriend","Girlfriend",{romantic:true,female:true,spouse:false}],
 ["boyfriend","Boyfriend",{romantic:true,male:true,spouse:false}]
-].map(([id,name,facts])=>({id:"role-"+id,name:"Your "+name.toLowerCase(),category:"relationships",facts}));
+].map(([id,name,facts])=>({id:"role-"+id,name:"Your "+name.toLowerCase(),category:"relationships",facts}))
+ .map(entry=>{
+  if(entry.facts.male)return {...entry,facts:{...entry.facts,female:false}};
+  if(entry.facts.female)return {...entry,facts:{...entry.facts,male:false}};
+  return entry;
+ });
 export const relationshipQuestions={
 family:"Is this person part of your family?",spouse:"Are you married to this person?",
 male:"Is this person a man?",female:"Is this person a woman?",

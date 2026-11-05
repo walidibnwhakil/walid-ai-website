@@ -87,10 +87,10 @@
       "count": 15,
       "shards": [
         {
-          "path": "relationships-000-fce1e75fd81f.json",
+          "path": "relationships-000-b4d74d36184d.json",
           "count": 15,
-          "bytes": 3653,
-          "sha256": "fce1e75fd81fbdb190e8bf3f775d106623f2fc7b2c8d6fbf09dddcec25a38c53"
+          "bytes": 3793,
+          "sha256": "b4d74d36184dcbe0e24873ffb65cd2d207d19d82539ce651b28eac935baa6650"
         }
       ]
     }

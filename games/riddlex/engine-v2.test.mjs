@@ -2,6 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from './engine-v2.js';
 import {readFile} from 'node:fs/promises';
 import {loadCategory} from './runtime-loader.js';
+import {roles} from './relationships.js';
 const entry=(id,facts)=>({id,name:id,category:'characters',facts});
 test('seeds vary equally useful questions and replay the same choice',()=>{
  const entries=[entry('a',{x:true,y:false,z:true}),entry('b',{x:false,y:true})];
@@ -16,6 +17,13 @@ test('fictional cases exclude family prompts even when they would separate the c
  const answers=[{key:'fictional',value:'yes'}];
  const questions={x:'Is he the king’s son?',y:'Does he wear a mask?'};
  for(let seed=0;seed<8;seed++)assert.equal(nextQuestion(scoreCandidates(entries,answers),answers,questions,seed),'y');
+});
+test('known-gender relationship roles remain distinguishable by matching gender answers',async()=>{
+ const target=roles.find(role=>role.id==='role-wife');
+ const entries=roles;
+ const answers=[{key:'family',value:'yes'},{key:'male',value:'no'},{key:'spouse',value:'yes'}];
+ assert.equal(target.facts.male,false);
+ assert.equal(selectGuess(scoreCandidates(entries,answers),answers)?.id,'role-wife');
 });
 test('unknown answers and unrecorded facts have zero likelihood contribution',()=>{
  const es=[entry('a',{}),entry('b',{x:false})];

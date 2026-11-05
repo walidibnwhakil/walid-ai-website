@@ -14,7 +14,10 @@ export function evidenceGroup(key){
  if(key==='real'||key==='fictional')return 'existence';
  if(['male','female','boy','girl'].includes(key))return 'gender';
  if(['actor','poet','writer','filmmaker','singer','cricket','scientist','physicist','economist','composer','educator','military','politician','psychologist'].includes(key))return 'occupation';
- if(['indian','bangladeshi'].includes(key))return 'citizenship';
+ if(countries.has(key)||key.startsWith('v2_citizenship_'))return 'citizenship';
+ if(politicalRoles.has(key))return 'political-office';
+ if(politicalParties.has(key))return 'political-party';
+ if(key==='liberation_era'||key==='politics_this_century')return 'political-era';
  if(key.startsWith('v2_'))return key.split('_')[1];
  if(key.startsWith('wd_'))return key.split('_')[1];
  return key;
@@ -57,10 +60,23 @@ const familiar=new Set([
  'japanese','bangla','actor','singer','writer','poet','politician','cricket','scientist',
  'filmmaker','composer','novel','cartoon','anime','comic','superhero','glasses','detective'
 ]);
+const countries=new Set(['indian','bangladeshi','british','american','japanese','v2_citizenship_q843']);
+const politicalRoles=new Set(['prime_minister','national_president','first_indian_pm','cue_tajuddin_ahmad','cue_suhrawardy']);
+const politicalHistory=new Set(['liberation_era','politics_this_century','cue_sheikh_mujibur_rahman','cue_bhashani','cue_fazlul_huq']);
+const politicalParties=new Set(['led_awami_league','led_bnp']);
+const actingClues=new Set(['bollywood','hollywood','king_khan','bhaijaan','big_b','aamir']);
+const careerRoutes={
+ politician:new Set([...politicalRoles,...politicalHistory,...politicalParties]),
+ actor:actingClues
+};
+const overlaps={
+ politician:new Set(['actor','writer','military','cricket']),
+ actor:new Set(['politician','singer','filmmaker','writer','v2_occupation_q2526255','v2_occupation_q3282637'])
+};
 const equivalentOccupations={
  v2_occupation_q33999:'actor',v2_occupation_q177220:'singer',v2_occupation_q49757:'poet',
  v2_occupation_q36834:'composer',v2_occupation_q169470:'physicist',
- v2_occupation_q12299841:'cricket',v2_occupation_q901:'scientist'
+ v2_occupation_q12299841:'cricket',v2_occupation_q901:'scientist',v2_occupation_q82955:'politician'
 };
 const questionIdentity=key=>{
  const canonical=canonicalQuestionKey(key);
@@ -77,6 +93,17 @@ const questionPrerequisites={
  bird:['mimic','peacock','flightless'],insect:['mosquito'],marine:['jelly'],
  friend:['best']
 };
+const denied=(entry,answers)=>answers.some(({key,value})=>
+ (value==='yes'||value==='no')&&factValue(entry,key)===(value==='no'));
+const routeFor=answers=>answers.find(({key,value})=>value==='yes'&&Object.hasOwn(careerRoutes,questionIdentity(key)));
+const careerFact=(entry,key)=>factValue(entry,key)??Object.entries(equivalentOccupations)
+ .some(([alias,broad])=>broad===key&&factValue(entry,alias)===true);
+const commonCareerClue=key=>countries.has(key)||['male','female','bangla'].includes(key);
+const politicalDiagnostic=new Set(['first_indian_pm','cue_sheikh_mujibur_rahman','cue_bhashani','cue_fazlul_huq','cue_tajuddin_ahmad','cue_suhrawardy']);
+const bangladeshPolitics=new Set(['liberation_era',...politicalParties,'cue_sheikh_mujibur_rahman','cue_bhashani','cue_fazlul_huq','cue_tajuddin_ahmad']);
+const questionFamily=key=>countries.has(key)?'country':politicalDiagnostic.has(key)||['king_khan','bhaijaan','big_b','aamir'].includes(key)?'signature':evidenceGroup(key);
+const broadCareerClue=key=>commonCareerClue(key)||['bollywood','hollywood','prime_minister','national_president','liberation_era','politics_this_century'].includes(key);
+
 function questionBank(questions,answers){
  const excluded=new Set();
  for(const {key,value} of answers){
@@ -84,8 +111,14 @@ function questionBank(questions,answers){
   // Ask each paired dimension once. This suppresses follow-ups without
   // turning No or Don't Know into evidence for a different gender.
   if(Object.hasOwn(questionPairs,key))excluded.add(questionPairs[key]);
-  if(value==='no')for(const child of questionPrerequisites[questionIdentity(key)]??[])excluded.add(child);
+  if(value==='no'||value==='probably-not'||value==='unknown'){
+   for(const child of questionPrerequisites[questionIdentity(key)]??[])excluded.add(child);
+  }
   if(key==='boy'&&value==='yes'||key==='girl'&&value==='yes')excluded.add('cartoon');
+ }
+ const explicit=new Map(answers.map(({key,value})=>[questionIdentity(key),value]));
+ if(explicit.has('male')||explicit.has('female')||explicit.has('boy')||explicit.has('girl')){
+  for(const key of ['male','female','boy','girl'])excluded.add(key);
  }
  const askedText=new Set(answers.flatMap(({key})=>questions[key]?[normalize(questions[key])]:[]));
  const isFictional=answers.some(({key,value})=>key==='fictional'&&value==='yes'||key==='real'&&value==='no');
@@ -93,19 +126,33 @@ function questionBank(questions,answers){
  for(const [key,question] of Object.entries(questions)){
   const canonical=canonicalQuestionKey(key);
   if(excluded.has(questionIdentity(key))||askedText.has(normalize(question)))continue;
-  if(isFictional&&/^(?:v2|wd)_(?:birthplace|citizenship|education|award)_/.test(key))continue;
+  if(isFictional&&/^(?:v2|wd)_/.test(key))continue;
   if(/^(born_before_|birth_first_half$|cue_wd_)/.test(key))continue;
-  // Human-first play: obscure birthplace and award trivia are not fair questions.
-  if(/^(?:v2|wd)_(?:birthplace|award)_/.test(key))continue;
+  // Generated metadata is admitted only where a recognizable clue was reviewed.
+  if(/^(?:v2|wd)_/.test(key)&&!countries.has(canonical)&&!politicalRoles.has(canonical)&&
+    !equivalentOccupations[canonical]&&!overlaps.actor.has(canonical))continue;
+  if(/\b(?:award|prize|medal|oscars?)\b|\bborn in\b/i.test(question))continue;
+  if(['prime_minister','national_president','liberation_era','politics_this_century'].includes(key)&&explicit.get('politician')!=='yes')continue;
+  if(bangladeshPolitics.has(key)&&explicit.get('bangladeshi')!=='yes')continue;
+  if(key==='first_indian_pm'&&(explicit.get('indian')!=='yes'||explicit.get('prime_minister')!=='yes'))continue;
+  if(key==='cue_suhrawardy'&&explicit.get('v2_citizenship_q843')!=='yes')continue;
+  if(politicalParties.has(key)&&[...politicalParties].some(party=>explicit.get(party)==='unknown'))continue;
+  if(['cue_tajuddin_ahmad','cue_suhrawardy'].includes(key)&&explicit.has('prime_minister')&&explicit.get('prime_minister')!=='yes')continue;
+  if(isFictional&&careerRoutes.politician.has(canonical))continue;
   if(!bank.has(canonical)||key===canonical)bank.set(canonical,key);
  }
  return bank;
 }
 export function nextQuestion(ranked,answers,questions){
- if(!ranked.length)return null;
+ if(!ranked.length||answers.length>=8&&answers.every(({value})=>value==='unknown'))return null;
  const bank=questionBank(questions,answers),counts=new Map();
- const leading=ranked[0].score;
- const focus=leading>0?ranked.filter(row=>row.score>=leading-Math.log(9)):ranked;
+ const route=routeFor(answers);
+ const career=route&&questionIdentity(route.key);
+ const plausible=ranked.filter(row=>!denied(row.entry,answers));
+ const eligible=plausible.length?plausible:ranked;
+ const aligned=career?eligible.filter(row=>careerFact(row.entry,career)===true):[];
+ const leading=eligible[0].score;
+ const focus=aligned.length?aligned:leading>0?eligible.filter(row=>row.score>=leading-Math.log(9)):eligible;
  const mass=focus.reduce((sum,row)=>sum+row.probability,0);
  for(const row of focus){
   for(const [fact,value] of Object.entries(row.entry.facts)){
@@ -116,29 +163,63 @@ export function nextQuestion(ranked,answers,questions){
    counts.set(key,count);
   }
  }
- const skipped=new Map();
+ const asked=new Map(),skipped=new Map();
+ const knownCountry=answers.some(({key,value})=>countries.has(key)&&value==='yes');
  for(const {key,value} of answers){
-  if(value==='unknown')skipped.set(evidenceGroup(key),(skipped.get(evidenceGroup(key))??0)+1);
+  const family=questionFamily(key);
+  asked.set(family,(asked.get(family)??0)+1);
+  if(value==='unknown')skipped.set(family,(skipped.get(family)??0)+1);
  }
  let best=null,bestQuality=-Infinity;
  const roots=new Set(['real','fictional','mammal','bird','reptile','electronic','vehicle','furniture','family','work','friend']);
  const rootStage=ranked[0].support===0&&[...counts].some(([key,[yes,no]])=>roots.has(key)&&(yes>1e-9&&no>1e-9||yes+no>.1&&yes+no<.95));
  for(const [key,[yes,no]] of counts){
   if(rootStage&&!roots.has(key))continue;
+  if(yes<1e-9||yes>1-1e-9)continue;
+  const canonical=canonicalQuestionKey(key),family=questionFamily(canonical);
+  const recentFamily=answers.length&&questionFamily(answers.at(-1).key)===family;
+  if(family==='country'&&(knownCountry||(asked.get(family)??0)>=2||recentFamily))continue;
+  if(family==='signature'&&((asked.get(family)??0)>=3||recentFamily))continue;
+  const contextual=career&&careerRoutes[career].has(canonical);
+  const overlap=career&&overlaps[career].has(questionIdentity(key));
+  // Ask about another career only when it is recorded for a meaningful share
+  // of the current career pool and the obvious context has been established.
+  const overlapAllowed=overlap&&aligned.length>1&&yes>=.12&&yes<=.85&&
+   answers.some(({key,value})=>value==='yes'&&broadCareerClue(key))&&!answers.some(({key})=>overlaps[career].has(questionIdentity(key)));
+  if(career&&!contextual&&!commonCareerClue(key)&&!overlapAllowed)continue;
   const coverage=Math.min(1,yes+no),unknown=Math.max(0,1-coverage);
   // Unknown candidate facts are marginalized. Fine-grained clues are a fallback.
   const information=entropy(yes+unknown*.5)-unknown;
   const group=evidenceGroup(key);
-  const weight=familiar.has(key)?2.2:group==='occupation'||group==='citizenship'?1.5:group==='birthplace'||group==='award'?.05:1;
-  const quality=(information+.06*coverage)*weight/(1+.3*(skipped.get(group)??0));
-  if(quality>bestQuality+1e-12||(Math.abs(quality-bestQuality)<=1e-12&&key<best)){
-   bestQuality=quality;best=key;
+  const weight=familiar.has(key)?2.2:group==='occupation'||group==='citizenship'?1.5:1;
+  const quality=(information+.06*coverage)*weight/(1+.45*(skipped.get(family)??0));
+  // Broad clues precede role or signature details. Genuine career overlaps
+  // remain a fallback even when their information gain would be higher.
+  const tier=career?(broadCareerClue(canonical)?3:contextual?2:1):0;
+  const priority=tier*4+quality;
+  if(priority>bestQuality+1e-12||(Math.abs(priority-bestQuality)<=1e-12&&key<best)){
+   bestQuality=priority;best=key;
   }
  }
  return best;
 }
 export function selectGuess(ranked,answers){
  const [top,second]=ranked;if(!top)return null;
+ const route=routeFor(answers);
+ if(route){
+  const career=questionIdentity(route.key);
+  const signature=answers.find(({key,value})=>value==='yes'&&questionFamily(key)==='signature'&&careerRoutes[career].has(key));
+  if(signature){
+   // A confirmed, distinctive clue can break a tie within one evidence group
+   // after other groups have established independent support.
+   const matches=ranked.filter(row=>factValue(row.entry,signature.key)===true);
+   const [match]=matches;
+   if(matches.length===1&&match.support>=3&&match.conflicts===0&&careerFact(match.entry,career)===true){
+    return match.entry;
+   }
+  }
+  if(denied(top.entry,answers)||careerFact(top.entry,career)!==true)return null;
+ }
  const margin=second?top.score-second.score:Infinity;
  const groups=top.entry.category==='relationships'?1:Object.keys(top.entry.facts).some(k=>k.startsWith('v2_'))?3:2;
  if(top.support<groups||top.conflicts>1||top.matches<top.conflicts+groups)return null;

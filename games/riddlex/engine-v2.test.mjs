@@ -1,5 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {scoreCandidates,nextQuestion,selectGuess} from './engine-v2.js';
+import {readFile} from 'node:fs/promises';
+import {loadCategory} from './runtime-loader.js';
 const entry=(id,facts)=>({id,name:id,category:'characters',facts});
 test('unknown answers and unrecorded facts have zero likelihood contribution',()=>{
  const es=[entry('a',{}),entry('b',{x:false})];
@@ -49,4 +51,83 @@ test('human-friendly questions exclude birthplace and award trivia',()=>{
  const questions={v2_birthplace_q1:'Born in Barishal?',v2_award_q2:'Won a particular medal?',actor:'Is this person an actor?'};
  assert.equal(nextQuestion(scoreCandidates(es,[]),[],questions),'actor');
  assert.equal(nextQuestion(scoreCandidates(es,[{key:'actor',value:'unknown'}]),[{key:'actor',value:'unknown'}],questions),null);
+});
+
+const ask=(entries,answers,questions)=>nextQuestion(scoreCandidates(entries,answers),answers,questions);
+
+test('Politician Yes follows the political pool through country, office and era',()=>{
+ const entries=[
+  entry('a',{politician:true,bangladeshi:true,prime_minister:true,liberation_era:true,writer:true}),
+  entry('b',{politician:true,bangladeshi:true,prime_minister:false,liberation_era:false,writer:false}),
+  entry('c',{politician:true,bangladeshi:false,prime_minister:false,liberation_era:false}),
+  entry('d',{politician:false,scientist:true,actor:true})
+ ];
+ const questions={bangladeshi:'From Bangladesh?',prime_minister:'Served as prime minister?',
+  liberation_era:'Political leader during the Liberation War?',scientist:'Scientist?',actor:'Actor?',
+  wd_occupation_q82955:'Worked as a politician?',v2_award_q1:'Won an award?',born_before_1980:'Born before 1980?'};
+ const answers=[{key:'politician',value:'yes'}];
+ assert.equal(ask(entries,answers,questions),'bangladeshi');
+ answers.push({key:'bangladeshi',value:'yes'});
+ assert.ok(['prime_minister','liberation_era'].includes(ask(entries,answers,questions)));
+ answers.push({key:'prime_minister',value:'unknown'},{key:'liberation_era',value:'unknown'});
+ assert.equal(ask(entries,answers,questions),null);
+ assert.deepEqual(scoreCandidates(entries,answers),scoreCandidates(entries,answers.slice(0,2)));
+});
+
+test('Actor Yes uses screen context and asks about a supported overlapping career only afterward',()=>{
+ const entries=[
+  entry('a',{actor:true,bollywood:true,filmmaker:true,scientist:true}),
+  entry('b',{actor:true,bollywood:true,filmmaker:false,scientist:false}),
+  entry('c',{actor:true,bollywood:false,filmmaker:false,scientist:true}),
+  entry('d',{actor:false,filmmaker:true,scientist:true})
+ ];
+ const questions={bollywood:'Known for Bollywood?',filmmaker:'Filmmaker?',scientist:'Scientist?'};
+ const answers=[{key:'actor',value:'yes'}];
+ assert.equal(ask(entries,answers,questions),'bollywood');
+ answers.push({key:'bollywood',value:'yes'});
+ assert.equal(ask(entries,answers,questions),'filmmaker');
+ answers.push({key:'filmmaker',value:'unknown'});
+ assert.equal(ask(entries,answers,questions),null);
+});
+
+test('negative and unknown context block contradictory or repetitive follow-ups',()=>{
+ const entries=[
+  entry('a',{politician:true,bangladeshi:true,prime_minister:true,cue_tajuddin_ahmad:true}),
+  entry('b',{politician:true,bangladeshi:false,indian:true,prime_minister:false}),
+  entry('c',{politician:false,cartoon:true,boy:true}),
+  entry('d',{politician:false,cartoon:false,boy:false})
+ ];
+ for(const value of ['no','unknown']){
+  assert.equal(ask(entries,[{key:'politician',value:'yes'},{key:'prime_minister',value}],{
+   cue_tajuddin_ahmad:'First prime minister?',v2_birthplace_q1:'Born in Barishal?',nobel:'Won the Nobel Prize?'
+  }),null);
+ }
+ assert.equal(ask(entries,[{key:'cartoon',value:'no'}],{boy:'Is the cartoon character a boy?'}),null);
+ assert.equal(ask(entries,[{key:'politician',value:'yes'},{key:'bangladeshi',value:'unknown'}],{indian:'Indian?'}),null);
+ const wrong=entry('wrong',{politician:true,prime_minister:true,real:true,male:true,indian:true,writer:true});
+ const answers=['politician','real','male','indian','writer'].map(key=>({key,value:'yes'}));
+ answers.push({key:'prime_minister',value:'no'});
+ assert.equal(selectGuess(scoreCandidates([wrong],answers),answers),null);
+});
+
+test('runtime routes keep categories separate and attach only sourced political facts',async t=>{
+ t.mock.method(globalThis,'fetch',async url=>new Response(await readFile(url)));
+ const [characters,animals,objects,relationships]=await Promise.all(
+  ['characters','animals','objects','relationships'].map(loadCategory)
+ );
+ for(const [pool,category] of [[characters,'characters'],[animals,'animals'],[objects,'objects'],[relationships,'relationships']]){
+  assert.ok(pool.entries.length>0&&pool.entries.every(entry=>entry.category===category));
+  if(category!=='characters')assert.equal(pool.questions.prime_minister,undefined);
+ }
+ const hasina=characters.entries.find(entry=>entry.id==='wd-q52183');
+ assert.equal(hasina.facts.prime_minister,true);
+ assert.equal(hasina.facts.politics_this_century,true);
+ assert.equal(hasina.facts.national_president,undefined);
+ assert.ok(['bangladeshi','indian','male','female','bangla','prime_minister','national_president','politics_this_century'].includes(
+  ask(characters.entries,[{key:'politician',value:'yes'}],characters.questions)
+ ));
+ const nehrusClues=['politician','indian','prime_minister','first_indian_pm'].map(key=>({key,value:'yes'}));
+ assert.equal(selectGuess(scoreCandidates(characters.entries,nehrusClues),nehrusClues)?.id,'wd-q1047');
+ const unknown=Object.keys(characters.questions).slice(0,8).map(key=>({key,value:'unknown'}));
+ assert.equal(ask(characters.entries,unknown,characters.questions),null);
 });

@@ -248,6 +248,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   await view.locator('#retry').click();
   await view.waitForTimeout(750);
   if(await sceneFrame()===disappointedPose)throw Error(label+' Retry kept the rejected pose');
+  await view.locator('#answers').waitFor({state:'visible'});
   await shot('retry-continued',{animations:'disabled'});
   if(await note.getAttribute('data-guess-id')==='cat')throw Error('Retry repeated rejected cat');
   await view.locator('#new').click();

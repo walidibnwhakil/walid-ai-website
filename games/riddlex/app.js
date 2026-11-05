@@ -51,6 +51,7 @@ function showNote(){
  if(!show)return;
  $("case-note-label").textContent=mode==="done"?"Case solved":mode==="wrong"?"Guess ruled out":"Detective’s note";
  $("case-note-name").textContent=guessName();
+ if(mode==="wrong")note.dataset.result="rejected";
  if(mode==="wrong"||mode==="retrying")return;
  reveal.start(guess,guessName(),phase=>{
   note.dataset.result=phase;

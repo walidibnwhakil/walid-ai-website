@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Riddlex — The Guessing Detective</title><link rel="stylesheet" href="./style.css"></head><body><nav class="games-nav" aria-label="Games"><a href="/games/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="11" rx="5"/><path d="M8 11v5M5.5 13.5h5M15 12h.01M18 15h.01"/></svg><span id="games-link">Games</span></a></nav><main>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Riddlex — The Guessing Detective</title><link rel="stylesheet" href="./style.css?v=scene-motion"></head><body><nav class="games-nav" aria-label="Games"><a href="/games/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="11" rx="5"/><path d="M8 11v5M5.5 13.5h5M15 12h.01M18 15h.01"/></svg><span id="games-link">Games</span></a></nav><main>
 <section id="splash-art" class="splash-art" aria-hidden="true">
   <img src="./images/approved/window.jpg" alt="" width="793" height="982">
   <div class="pipe-smoke"></div>
@@ -11,6 +11,7 @@
   </div>
   <div class="scene">
     <img class="scene-art" data-src="./images/approved/seated-office.jpg" width="724" height="404" alt="">
+    <canvas class="scene-motion" aria-hidden="true" hidden></canvas>
     <div class="printer-output" aria-hidden="true">
       <img id="case-photo" alt="" hidden>
     </div>
@@ -22,4 +23,4 @@
 </section>
   <div id="answers" role="group" aria-label="Answer the detective" hidden><button type="button" data-answer="yes" aria-keyshortcuts="1">Yes</button><button type="button" data-answer="no" aria-keyshortcuts="2">No</button><button type="button" data-answer="probably" aria-keyshortcuts="3">Probably</button><button type="button" data-answer="probably-not" aria-keyshortcuts="4">Probably Not</button><button type="button" data-answer="unknown" aria-keyshortcuts="5">Don't Know</button></div>
 </div>
-<section class="panel"><h1>Riddlex</h1><button id="play" type="button">Play</button><p id="status" aria-live="polite">Think of a character, animal, object or someone you know.</p><p id="progress" aria-live="off"></p><div id="categories" role="group" aria-label="Choose a category"><button data-category="characters">Characters</button><button data-category="animals">Animals</button><button data-category="objects">Objects</button></div><div id="guess" role="group" aria-label="Confirm the guess" hidden><button id="correct">Correct!</button><button id="wrong">Wrong</button><button id="retry" hidden>Retry</button></div><button id="back" hidden>↶ Change last answer</button><button id="new">New Game</button><p class="note" id="privacy-note">No personal information is collected.</p></section></main><script type="module" src="./app.js?v=adaptive-rc1"></script></body></html>
+<section class="panel"><h1>Riddlex</h1><button id="play" type="button">Play</button><p id="status" aria-live="polite">Think of a character, animal, object or someone you know.</p><p id="progress" aria-live="off"></p><div id="categories" role="group" aria-label="Choose a category"><button data-category="characters">Characters</button><button data-category="animals">Animals</button><button data-category="objects">Objects</button></div><div id="guess" role="group" aria-label="Confirm the guess" hidden><button id="correct">Correct!</button><button id="wrong">Wrong</button><button id="retry" hidden>Retry</button></div><button id="back" hidden>↶ Change last answer</button><button id="new">New Game</button><p class="note" id="privacy-note">No personal information is collected.</p></section></main><script type="module" src="./app.js?v=scene-motion"></script></body></html>

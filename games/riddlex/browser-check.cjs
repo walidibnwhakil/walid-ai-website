@@ -42,6 +42,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  }
  await captureQuestion(desktop,'desktop');
  await desktop.close();
+ await page.emulateMedia({reducedMotion:"reduce"});
  await captureQuestion(page,'mobile');
  const visualBaseline=process.env.RIDDLEX_VISUAL_BASELINE;
  const visualComparison={};
@@ -50,7 +51,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
    file,execFileSync('git',['show',visualBaseline+':games/riddlex/'+file],{cwd:root})
   ]));
   for(const [label,viewport] of [['desktop',{width:1280,height:900}],['mobile',{width:390,height:844}]]){
-   const original=await browser.newPage({viewport,reducedMotion:label==='desktop'?'reduce':'no-preference'});
+   const original=await browser.newPage({viewport,reducedMotion:'reduce'});
    await original.route(url+'*',async route=>{
     const file=new URL(route.request().url()).pathname.slice(prefix.length)||'index.html';
     if(overrides.has(file))await route.fulfill({body:overrides.get(file),contentType:mime[path.extname(file)]});
@@ -68,13 +69,14 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
    await original.close();
   }
  }
- const manifestBytes=await fs.readFile(path.join(__dirname,'runtime/manifest.json')),manifest=JSON.parse(manifestBytes),manifestSha256=createHash('sha256').update(manifestBytes).digest('hex');
- async function data(category){const parts=await Promise.all(manifest.categories[category].shards.map(s=>fs.readFile(path.join(__dirname,'runtime',s.path),'utf8').then(JSON.parse)));return{entries:parts.flatMap(p=>p.entries),questions:Object.assign({},...parts.map(p=>p.questions))};}
- const {factValue}=await import('./engine-v2.js'),characters=await data('characters'),fresh=characters.entries.find(e=>e.id.startsWith('v2-'));
+ await page.emulateMedia({reducedMotion:"no-preference"});
+ const manifestBytes=await fs.readFile(path.join(__dirname,'runtime/manifest.json')),manifestSha256=createHash('sha256').update(manifestBytes).digest('hex');
+ const data=category=>page.evaluate(category=>import("./runtime-loader.js").then(loader=>loader.loadCategory(category)),category);
+ const {factValue}=await import('./engine-v2.js'),characters=await data('characters');
  const contextQuestion='Are you thinking of someone by their relationship to you, such as a relative or friend?';
  if((await page.locator('[data-category]').allTextContents()).join('|')!=='Characters|Animals|Objects'||await page.locator('#keyboard-hint').count())throw Error('Unexpected lobby controls');
  if((await page.locator('[data-answer]').allTextContents()).join('|')!=="Yes|No|Probably|Probably Not|Don't Know")throw Error('Unexpected answer labels');
- const specs=[['animals','cat'],['objects','phone'],['relationships','role-wife'],['characters','himu']];if(fresh)specs.push(['characters',fresh.id]);
+ const specs=[['animals','cat'],['objects','phone'],['relationships','role-wife'],['characters','himu'],['characters','sheikh-mujibur-rahman']];
  const games=[];
  for(const [category,id] of specs){
   await page.locator('#new').click();
@@ -178,6 +180,12 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   }
   await view.goto(url);
   await view.locator('#play').click();
+  const sceneFrame=()=>view.locator(".scene-motion").evaluate(canvas=>canvas.toDataURL());
+  await view.locator(".scene-motion").waitFor({state:"visible"});
+  const initialPose=await sceneFrame();
+  await view.waitForFunction(initial=>document.querySelector(".scene-motion").toDataURL()!==initial,initialPose);
+  await view.waitForTimeout(1300);
+  await shot("thinking-motion");
   await playCase('characters',characters.questions,einstein);
   if(await photo.isVisible())throw Error('Photo shown before confirmation');
   await view.locator('#correct').click();
@@ -207,12 +215,19 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   await playCase('animals',d.questions,cat);
   await view.locator('#correct').click();
   if(await photo.isVisible()||await note.getAttribute('data-result')!=='written')throw Error('Expected name-only note');
+  await view.waitForTimeout(750);
+  const pleasedPose=await sceneFrame();
   await shot('name-written',{animations:'disabled'});
   await playCase('animals',d.questions,cat);
   await view.locator('#wrong').click();
   if(await note.getAttribute('data-result')!=='rejected')throw Error(label+' missing rejected note');
+  await view.waitForTimeout(750);
+  const disappointedPose=await sceneFrame();
+  if(disappointedPose===pleasedPose)throw Error(label+' reactions use the same frame');
   await shot('guess-rejected');
   await view.locator('#retry').click();
+  await view.waitForTimeout(750);
+  if(await sceneFrame()===disappointedPose)throw Error(label+' Retry kept the rejected pose');
   await shot('retry-continued',{animations:'disabled'});
   if(await note.getAttribute('data-guess-id')==='cat')throw Error('Retry repeated rejected cat');
   await view.locator('#new').click();
@@ -222,12 +237,13 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
    await view.locator('[data-answer="unknown"]').click();
   }
   if(await office.getAttribute('data-mood')!=='unsure')throw Error(label+' unknown answers did not end unresolved');
+  await view.waitForTimeout(750);
   await shot('unresolved',{animations:'disabled'});
   await view.locator('#retry').click();
   await view.locator('#categories').waitFor({state:'visible'});
   if(await note.isVisible()||await photo.isVisible())throw Error(label+' Retry left an old result');
   await shot('retry-reset');
-  animationChecks[label]=['fixed-size printer feed','handwritten fallback','rejected guess and continuation','unresolved retry'];
+  animationChecks[label]=['thinking movement','distinct solved and rejected poses','pose recovery after Retry','fixed-size printer feed','handwritten fallback','rejected guess and continuation','unresolved retry'];
   const video=view.video();
   await motionContext.close();
   if(video)await video.saveAs(path.join(output,'browser',label+'-gameplay.webm'));

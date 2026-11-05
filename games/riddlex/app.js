@@ -1,3 +1,4 @@
+import {animateOffice} from "./scene-motion.js";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
 import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess} from "./engine-v2.js?v=adaptive-rc1";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
@@ -10,6 +11,7 @@ const $=id=>document.getElementById(id);
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
 let photoRequest=0;
 const office=document.querySelector(".office");
+animateOffice(office);
 const status=$("status"), statusHome=status.parentElement;
 function mood(value){office.dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?"Questions answered: "+answers.length+" · Wrong guesses: "+rejected.size:"";}

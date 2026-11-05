@@ -76,6 +76,7 @@ main:has(#play:not([hidden])){
 }
 .scene{position:relative;aspect-ratio:724/404;isolation:isolate}
 .scene-art{display:block;width:100%;height:100%}
+.scene-motion{position:absolute;pointer-events:none}
 .office-wordmark{
  position:absolute;z-index:5;top:4%;left:2.5%;display:flex;align-items:center;gap:.28em;
  padding:.18em .42em .23em;border:3px double #cf9b52;border-radius:.34em;

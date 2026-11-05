@@ -133,7 +133,7 @@ function questionBank(questions,answers){
   const canonical=canonicalQuestionKey(key);
   if(excluded.has(questionIdentity(key))||askedText.has(normalize(question)))continue;
   if(isFictional&&/^(?:v2|wd)_/.test(key))continue;
-  if(isFictional&&/\b(?:father|mother|parent|son|daughter|sibling|spouse|husband|wife|cousin)\b/i.test(question))continue;
+  if(isFictional&&/\b(?:family|father|mother|parent|son|daughter|brother|sister|sibling|spouse|husband|wife|cousin|grandparent|grandfather|grandmother|grandchild|aunt|uncle|nephew|niece)\b/i.test(question))continue;
   if(/^(born_before_|birth_first_half$|cue_wd_)/.test(key))continue;
   // Generated metadata is admitted only where a recognizable clue was reviewed.
   if(/^(?:v2|wd)_/.test(key)&&!countries.has(canonical)&&!politicalRoles.has(canonical)&&

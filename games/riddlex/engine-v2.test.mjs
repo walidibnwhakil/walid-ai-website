@@ -13,10 +13,10 @@ test('seeds vary equally useful questions and replay the same choice',()=>{
  assert.deepEqual(sequence,sequence.map((_,seed)=>nextQuestion(ranked,[],questions,seed)));
 });
 test('fictional cases exclude family prompts even when they would separate the candidates',()=>{
- const entries=[entry('a',{fictional:true,x:true,y:true}),entry('b',{fictional:true,x:false,y:false})];
+ const entries=[entry('a',{fictional:true,x:true,y:true,z:true}),entry('b',{fictional:true,x:false,y:false,z:false})];
  const answers=[{key:'fictional',value:'yes'}];
- const questions={x:'Is he the king’s son?',y:'Does he wear a mask?'};
- for(let seed=0;seed<8;seed++)assert.equal(nextQuestion(scoreCandidates(entries,answers),answers,questions,seed),'y');
+ const questions={x:'Is he the king’s son?',y:'Is this character the hero’s brother?',z:'Does he wear a mask?'};
+ for(let seed=0;seed<8;seed++)assert.equal(nextQuestion(scoreCandidates(entries,answers),answers,questions,seed),'z');
 });
 test('known-gender relationship roles remain distinguishable by matching gender answers',async()=>{
  const target=roles.find(role=>role.id==='role-wife');

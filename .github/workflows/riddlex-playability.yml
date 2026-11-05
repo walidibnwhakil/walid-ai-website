@@ -1,0 +1,31 @@
+name: Riddlex playability
+on:
+  push:
+    branches: [riddlex-recovery]
+    paths:
+      - '.devcontainer/devcontainer.json'
+      - '.github/workflows/riddlex-playability.yml'
+      - 'games/riddlex/**'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: games/riddlex
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run validate
+      - run: npm test
+      - name: Play English and Bengali games in Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.60.0
+          RIDDLEX_CHROME="$(command -v google-chrome || command -v chromium)"
+          test -n "$RIDDLEX_CHROME"
+          export RIDDLEX_CHROME
+          node browser-check.cjs

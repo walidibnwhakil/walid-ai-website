@@ -1,5 +1,5 @@
-import {loadCategory} from "./runtime-loader.js";
-import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess} from "./engine-v2.js";
+import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
+import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess} from "./engine-v2.js?v=adaptive-rc1";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
 import {localPhotoPath} from "./print-photo.js";
 let allEntries=[],allQuestions={};

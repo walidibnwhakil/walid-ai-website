@@ -15,8 +15,11 @@ button:active{transform:translateY(1px)}
 #retry{background:#f6d2bd;border-color:#bf947e}
 #new,#back{background:transparent}
 .note{font-size:12px;color:#735f4b;max-width:530px;margin:18px auto 0}
-#progress{font-size:13px;color:#725336;min-height:20px;margin:0 auto 10px;font-variant-numeric:tabular-nums}
+#progress{font-size:13px;color:#725336;margin:0 auto 10px;font-variant-numeric:tabular-nums}
 main{width:100%;min-width:0}
+main:has(.office:not([hidden])){max-width:960px}
+.office-shell{position:relative}
+.office-shell:has(.office[hidden]){display:none}
 .games-nav{background:#fff8ed;border-right:1px solid #d7c3a6;padding:24px 14px}
 .games-nav a{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:#f0d6aa;font-weight:600;text-decoration:none;width:max-content}
 .games-nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
@@ -214,6 +217,58 @@ main:has(#play:not([hidden])){
  .panel{padding:14px 8px}
  button{flex:1 1 40%;max-width:260px}
  #back,#new{width:calc(100% - 20px);max-width:340px}
+}
+
+.office #status{
+ position:absolute;z-index:5;inset:14% auto auto 4%;width:28%;
+ min-height:0;margin:0;padding:clamp(10px,1.65vw,22px);
+ background:linear-gradient(145deg,#fff9e8,#f1dfb9);border:1px solid #c5a16c;
+ border-radius:16px;color:#342316;box-shadow:0 6px 18px #20120966;
+ font:600 clamp(15px,2.1vw,24px)/1.28 Georgia,serif;
+ overflow-wrap:anywhere;animation:question-arrive .28s ease-out both
+}
+.office #status::after{
+ content:"";position:absolute;left:100%;top:58%;width:clamp(8px,1.4vw,16px);height:15px;
+ background:#f4e5c3;clip-path:polygon(0 0,100% 70%,0 100%)
+}
+@keyframes question-arrive{
+ from{opacity:0;transform:translateY(4px)}
+}
+#answers{
+ position:absolute;z-index:7;bottom:8px;left:2%;width:73%;
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:6px;
+ border:1px solid #bb87577d;border-radius:12px;
+ background:linear-gradient(180deg,#704326,#4b2c1b);box-shadow:0 4px 10px #1f100a70
+}
+#answers button{
+ width:100%;max-width:none;min-height:44px;margin:0;padding:6px 3px;
+ border-color:#bd9969;border-radius:7px;background:linear-gradient(#fff0cb,#dfbb81);
+ color:#392417;font-size:clamp(12px,1.45vw,15px);box-shadow:0 2px 2px #2110076b
+}
+#answers button:hover{background:#fff2d0}
+#answers button:focus-visible{outline-color:#fff5d9;outline-offset:1px}
+.office-shell:has(#answers:not([hidden])) + .panel{
+ padding:9px 12px 12px
+}
+.office-shell:has(#answers:not([hidden])) + .panel h1{
+ font-size:21px;margin:0
+}
+.office-shell:has(#answers:not([hidden])) + .panel #progress,
+.office-shell:has(#answers:not([hidden])) + .panel .note{
+ margin:3px auto
+}
+.office-shell:has(#answers:not([hidden])) + .panel button{
+ width:auto;margin:2px;padding:7px 9px;font-size:13px
+}
+@media(max-width:600px){
+ .office #status{top:8%;left:3%;width:34%;padding:9px;font-size:clamp(13px,3.45vw,17px)}
+ #answers{
+  position:relative;inset:auto;width:auto;margin:-7px 0 0;
+  border:4px solid #593c29;border-top:1px solid #b08056;border-radius:0;
+  padding:7px;grid-template-columns:repeat(6,minmax(0,1fr))
+ }
+ #answers button{grid-column:span 2}
+ #answers button:nth-child(n+4){grid-column:span 3}
 }
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{animation:none!important;transition:none!important}

@@ -10,6 +10,7 @@ const $=id=>document.getElementById(id);
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
 let photoRequest=0;
 const office=document.querySelector(".office");
+const status=$("status"), statusHome=status.parentElement;
 function mood(value){office.dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?"Questions answered: "+answers.length+" · Wrong guesses: "+rejected.size:"";}
 const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
@@ -20,9 +21,16 @@ function guessName(){
  // This imported label appends a Kannada transliteration to the English name.
  return guess.id==="wd-q3351726"?"Tarasankar Bandyopadhyay":guess.name;
 }
+function setStatus(message, parent=statusHome){
+ if(status.parentElement!==parent){
+  if(parent===statusHome)parent.insertBefore(status,$("progress"));
+  else parent.append(status);
+ }
+ status.textContent=message;
+}
 function showQuestion(){
  mood("thinking");
- $("status").textContent=allQuestions[currentKey];
+ setStatus(allQuestions[currentKey],office);
  visible(answerPanel,true);
 }
 function showNote(){
@@ -62,12 +70,12 @@ function showNote(){
 }
 function presentGuess(){
  mood("guess");
- $("status").textContent=`Are you thinking of ${guessName()}?`;
+ setStatus(`Are you thinking of ${guessName()}?`);
  visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();
 }
 function showUnresolved(){
  mood("unsure");showNote();visible(guessPanel,true);visible($("retry"),true);
- $("status").textContent="I don’t have enough evidence to make a reliable guess. You can change an answer or retry with a new case.";
+ setStatus("I don’t have enough evidence to make a reliable guess. You can change an answer or retry with a new case.");
 }
 function reset(){loadToken++;category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
@@ -84,10 +92,10 @@ function render(){
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong"||mode==="unsure");
  visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
  if(splash)return;
- if(mode==="loading"){mood("thinking");$("status").textContent="Opening the casebook…";return;}
- if(mode==="start"){mood("ready");$("status").textContent="Think of a character, animal, object or someone you know.";return;}
- if(mode==="wrong"){mood("wrong");$("status").textContent="That guess was wrong. Shall I try again?";visible(guessPanel,true);showNote();return;}
- if(mode==="done"){mood("happy");$("status").textContent="Case closed!";showNote();return;}
+ if(mode==="loading"){mood("thinking");setStatus("Opening the casebook…");return;}
+ if(mode==="start"){mood("ready");setStatus("Think of a character, animal, object or someone you know.");return;}
+ if(mode==="wrong"){mood("wrong");setStatus("That guess was wrong. Shall I try again?");visible(guessPanel,true);showNote();return;}
+ if(mode==="done"){mood("happy");setStatus("Case closed!");showNote();return;}
  if(mode==="edit"){showQuestion();return;}
  if(mode==="guess"){presentGuess();return;}
  if(mode==="unsure"){showUnresolved();return;}
@@ -126,7 +134,7 @@ document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("clic
  }catch{
   if(token!==loadToken)return;
   reset();
-  $("status").textContent="The casebook could not load. Please choose a category to retry.";
+  setStatus("The casebook could not load. Please choose a category to retry.");
  }
 }));
 $("play").addEventListener("click",()=>{reset();categories.querySelector("button").focus();});

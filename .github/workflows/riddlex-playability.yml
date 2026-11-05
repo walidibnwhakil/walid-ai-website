@@ -29,3 +29,12 @@ jobs:
           test -n "$RIDDLEX_CHROME"
           export RIDDLEX_CHROME
           node browser-check.cjs
+        env:
+          RIDDLEX_BROWSER_OUTPUT: ${{ runner.temp }}/riddlex-browser
+      - name: Upload question layout screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-question-layout
+          path: ${{ runner.temp }}/riddlex-browser/browser/*-question.png
+          if-no-files-found: warn

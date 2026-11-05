@@ -25,7 +25,24 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await desktop.locator('#play').click();
  await desktop.locator('.founder').evaluate(img=>img.decode());
  await desktop.screenshot({path:path.join(output,'browser','desktop-office.png'),fullPage:true});
+ async function captureQuestion(view, label){
+  await view.locator('[data-category="characters"]').click();
+  await view.locator('#answers').waitFor({state:'visible'});
+  await view.locator('.detective').evaluate(img=>img.decode());
+  await view.locator('.cat-alert').evaluate(img=>img.decode());
+  if(await view.locator('.office #status').innerText()!=='Are you thinking of someone by their relationship to you, such as a relative or friend?')throw Error('Question is missing from the office');
+  const overflow=await view.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
+  if(overflow)throw Error(label+' question overflows the viewport');
+  const buttons=view.locator('#answers button');
+  for(const button of await buttons.all()){
+   const bounds=await button.boundingBox();
+   if(!bounds||bounds.height<44)throw Error(label+' answer target is too small');
+  }
+  await view.screenshot({path:path.join(output,'browser',label+'-question.png'),fullPage:true,animations:'disabled'});
+ }
+ await captureQuestion(desktop,'desktop');
  await desktop.close();
+ await captureQuestion(page,'mobile');
  const manifestBytes=await fs.readFile(path.join(__dirname,'runtime/manifest.json')),manifest=JSON.parse(manifestBytes),manifestSha256=createHash('sha256').update(manifestBytes).digest('hex');
  async function data(category){const parts=await Promise.all(manifest.categories[category].shards.map(s=>fs.readFile(path.join(__dirname,'runtime',s.path),'utf8').then(JSON.parse)));return{entries:parts.flatMap(p=>p.entries),questions:Object.assign({},...parts.map(p=>p.questions))};}
  const {factValue}=await import('./engine-v2.js'),characters=await data('characters'),fresh=characters.entries.find(e=>e.id.startsWith('v2-'));

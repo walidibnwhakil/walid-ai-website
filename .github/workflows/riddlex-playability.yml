@@ -21,7 +21,6 @@ jobs:
         with:
           node-version: '22'
       - run: npm run validate
-      - run: npm test
       - name: Play the English game in Chromium
         run: |
           npm install --no-save --package-lock=false playwright@1.60.0
@@ -29,7 +28,8 @@ jobs:
           test -n "$RIDDLEX_CHROME"
           export RIDDLEX_CHROME
           git fetch --no-tags --depth=1 origin "$RIDDLEX_VISUAL_BASELINE"
-          npx playwright install ffmpeg
+          # Playwright 1.60 uses the same x64 Linux recorder across supported Ubuntu versions.
+          PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64 npx playwright install ffmpeg
           node browser-check.cjs
         env:
           RIDDLEX_VIDEO: '1'
@@ -45,3 +45,4 @@ jobs:
             ${{ runner.temp }}/riddlex-browser/browser/*.webm
             ${{ runner.temp }}/riddlex-browser/browser-results.json
           if-no-files-found: warn
+      - run: npm test

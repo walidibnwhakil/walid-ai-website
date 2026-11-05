@@ -43,3 +43,10 @@ test('rejected guesses stay excluded; changing answers restores likelihoods',()=
  assert.equal(scoreCandidates(es,[{key:'x',value:'yes'}])[0].entry.id,'a');
  assert.equal(scoreCandidates(es,[],new Set(['a']))[0].entry.id,'b');
 });
+
+test('human-friendly questions exclude birthplace and award trivia',()=>{
+ const es=[entry('a',{v2_birthplace_q1:true,v2_award_q2:true,actor:true}),entry('b',{v2_birthplace_q1:false,v2_award_q2:false,actor:false})];
+ const questions={v2_birthplace_q1:'Born in Barishal?',v2_award_q2:'Won a particular medal?',actor:'Is this person an actor?'};
+ assert.equal(nextQuestion(scoreCandidates(es,[]),[],questions),'actor');
+ assert.equal(nextQuestion(scoreCandidates(es,[{key:'actor',value:'unknown'}]),[{key:'actor',value:'unknown'}],questions),null);
+});

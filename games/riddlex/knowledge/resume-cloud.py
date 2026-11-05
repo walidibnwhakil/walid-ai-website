@@ -49,7 +49,7 @@ def main():
  if queuePath.exists():queue=read(queuePath)
  else:
   queries=[q for q in api.QUERIES if q[0] in ('bangladesh','india','fiction','objects')]
-  queries.append(('global','?item wdt:P31 wd:Q5.',60000,'characters'))
+  queries.append(('global','?item wdt:P31 wd:Q5; wdt:P166 ?award.',60000,'characters'))
   knownBaseline={r['qid'] for r in read(ROOT/'wikidata-snapshot.json')['records']}|set(read(ROOT/'baseline-wikidata-ids.json'))
   selected=[];seen=set(state['completed'])|knownBaseline;audit=[]
   # Cultural cohorts are exhausted before global candidates, never crowded out.
@@ -72,16 +72,20 @@ def main():
  for f in (cache/'labels').glob('*.json'):labelIds.update(read(f)['data']['entities'])
  completed=set(state['completed']);pending=[r for r in queue['selected'] if r[0] not in completed]
  def fetch(ids,folder,props):
+  returned=set()
   for i in range(0,len(ids),50):
    xs=ids[i:i+50];time.sleep(1)
    url='https://www.wikidata.org/w/api.php?'+urllib.parse.urlencode({'action':'wbgetentities','ids':'|'.join(xs),'props':props,'languages':'en|bn','format':'json','maxlag':'30'})
    result=api.get(url)
    if 'entities' not in result:raise ValueError('No entities in API response')
+   returned.update(result['entities'])
    identity=hashlib.sha256('|'.join(xs).encode()).hexdigest()[:20];save(cache/folder/(identity+'.json'),{'source':url,'retrievedAt':api.now(),'license':'CC0-1.0','data':result})
    print(folder,i+len(xs),'/',len(ids),flush=True)
+  return returned
  for offset in range(0,len(pending),a.batch):
   batch=pending[offset:offset+a.batch];ids=[r[0] for r in batch if r[0] not in cached]
-  fetch(ids,'entities','labels|aliases|claims|sitelinks|info');cached.update(ids)
+  cached.update(fetch(ids,'entities','labels|aliases|claims|sitelinks|info'))
+  batch=[r for r in batch if r[0] in cached]
   related=set()
   # Read current batch only, with all previously retrieved labels reused.
   wanted={r[0] for r in batch}
@@ -92,15 +96,16 @@ def main():
      for c in e.get('claims',{}).get(prop,[]):
       v=c.get('mainsnak',{}).get('datavalue',{}).get('value')
       if isinstance(v,dict) and 'id' in v:related.add(v['id'])
-  newLabels=sorted(related-labelIds);fetch(newLabels,'labels','labels|info');labelIds.update(newLabels)
+  newLabels=sorted(related-labelIds);labelIds.update(fetch(newLabels,'labels','labels|info'))
+  if related-labelIds:raise RuntimeError('Related label response incomplete; no batch checkpoint published')
   # Selection includes exact committed eligible seeds plus only freshly completed
   # batches. Previously rejected raw entities stay in the historical ledger.
   seedIds={r[0] for r in seeds}
   cumulative=[r for r in queue['selected'] if (r[0] in completed or r in batch) and r[0] not in seedIds]
   save(cache/'selection.json',{'formatVersion':2,'license':'CC0-1.0','selected':seeds+cumulative,'queries':queue['queries'],'limit':len(seeds)+len(cumulative)})
   command(['python','knowledge/pack-v2.py',str(cache)]);command(['node','validate-v2.mjs'])
-  completed.update(r[0] for r in batch);state.update(completed=sorted(completed),newScreened=state['newScreened']+len(batch),newDownloaded=state['newDownloaded']+len(ids),updatedAt=api.now(),status='screening')
+  completed.update(r[0] for r in batch);state.update(completed=sorted(completed),newScreened=state['newScreened']+len(batch),newDownloaded=state['newDownloaded']+len(batch),updatedAt=api.now(),status='screening')
   save(statePath,state);checkpoint('Checkpoint Riddlex: '+str(state['newScreened'])+' new raw records screened; eligibility is not playability',a.push)
- state.update(status='acquisition-complete',completedAt=api.now());save(statePath,state);checkpoint('Complete bounded Riddlex acquisition; final playability gate pending',a.push)
+ remaining=sum(r[0] not in completed for r in queue['selected']);state.update(status='acquisition-complete' if not remaining else 'acquisition-partial',remaining=remaining,completedAt=api.now());save(statePath,state);checkpoint('Checkpoint bounded Riddlex acquisition; final playability gate pending',a.push)
  print('completed',state['newScreened'],'new raw records; no playable claim',flush=True)
 if __name__=='__main__':main()

@@ -20,16 +20,19 @@ export function evidenceGroup(key){
  return key;
 }
 export function scoreCandidates(entries,answers,rejected=new Set()){
- const known=answers.filter(a=>a.value!=='unknown'&&ANSWERS.includes(a.value));
+ // Normalize each answer once per turn, rather than once per candidate.
+ const known=answers.filter(a=>a.value!=='unknown'&&ANSWERS.includes(a.value)).map(({key,value})=>{
+  const canonical=canonicalQuestionKey(key),other=canonical!==key?canonical:key.replace(/^v2_(occupation|birthplace|award|work|sport)_/,'wd_$1_');
+  return {key,other,expected:value==='yes'||value==='probably',weight:value==='probably'||value==='probably-not'?Math.log(.7/.3):Math.log(.9/.1),group:evidenceGroup(key)};
+ });
  const ranked=[];
  for(const entry of entries){
   if(rejected.has(entry.id))continue;
   const groups=new Map();let matches=0,conflicts=0;
-  for(const {key,value} of known){
-   const fact=factValue(entry,key);if(fact===undefined)continue;
-   const expected=value==='yes'||value==='probably';
-   const weight=value==='probably'||value==='probably-not'?Math.log(.7/.3):Math.log(.9/.1);
-   const agrees=fact===expected,group=evidenceGroup(key);
+  for(const {key,other,expected,weight,group} of known){
+   const fact=Object.hasOwn(entry.facts,key)?entry.facts[key]:other!==key&&Object.hasOwn(entry.facts,other)?entry.facts[other]:undefined;
+   if(fact===undefined)continue;
+   const agrees=fact===expected;
    // Correlated assertions (e.g. ten birth cutoffs) cannot multiply confidence.
    const pair=groups.get(group)??[0,0];pair[agrees?0:1]=Math.max(pair[agrees?0:1],weight);groups.set(group,pair);
   }
@@ -57,7 +60,7 @@ export function nextQuestion(ranked,answers,questions){
  const focus=leading>0?ranked.filter(r=>r.score>=leading-Math.log(9)):ranked;
  const mass=focus.reduce((s,r)=>s+r.probability,0);
  for(const row of focus)for(const [key,value] of Object.entries(row.entry.facts)){
-  if(asked.has(canonicalQuestionKey(key))||!Object.hasOwn(questions,key)||key.startsWith('cue_wd_'))continue;
+  if(asked.has(key.startsWith('wd_')?canonicalQuestionKey(key):key)||!Object.hasOwn(questions,key)||key.startsWith('cue_wd_'))continue;
   const c=counts.get(key)??[0,0];c[value?0:1]+=row.probability/mass;counts.set(key,c);
  }
  let best=null,bestQuality=-Infinity;

@@ -6,8 +6,8 @@ The checkpoint archives 760 eligible records and 2,123 other completed QID
 screening decisions, including canonical exclusions. Its historic raw cache
 count was 2,880; that count and the distinct decision ledger are separate.
 
-The branch-scoped GitHub Actions run first verifies and admits a stable subset
-of the saved evidence. It then resumes pending acquisition independently of
+The branch-scoped GitHub Actions run validates the archived source, then resumes
+pending acquisition before the full activation audit, independently of
 ChatGPT or a local PC. It seeds exact committed statements and related labels
 without refetching them, preserves the queue and completed-QID ledger, and
 commits each 500-record evidence-validated source batch. Earlier rejected
@@ -26,7 +26,6 @@ quota. The committed report and manifests give authoritative verified counts.
 Commands from `games/riddlex` (the workflow runs these automatically):
 
 ```sh
-python knowledge/finalize-cloud.py --phase saved-checkpoint --push
 python knowledge/resume-cloud.py /path/to/cloud-cache --new-limit 25000 --batch 500 --push
 python knowledge/finalize-cloud.py --phase bulk-final --push
 ```

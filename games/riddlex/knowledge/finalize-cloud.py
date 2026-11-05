@@ -24,13 +24,15 @@ def main():
  run(['node','audit-v2.mjs'],'baseline-audit.log')
  run(['node','audit-v2.mjs','--candidates'],'candidate-audit.log')
  for iteration in range(12):
-  run(['node','build-runtime.mjs'],'runtime-build.log')
-  run(['node','audit-v2.mjs','--final'],'final-audit.log')
-  final=read('v2-final-audit.json');accepted=read('v2-accepted.json');correct={r['id'] for cat in final['rows'].values() for r in cat['ideal'] if r['correct']}
+  run(['node','audit-v2.mjs','--final','--admitted-only'],'admission-audit.log')
+  final=read('v2-admission-audit.json');accepted=read('v2-accepted.json');correct={r['id'] for cat in final['rows'].values() for r in cat['ideal'] if r['correct']}
   failed=[e['id'] for e in accepted['entries'] if e['id'] not in correct]
   if not failed:break
-  accepted['entries']=[e for e in accepted['entries'] if e['id'] not in failed];save('v2-accepted.json',accepted);print('Pruned final-pool failures',len(failed),flush=True)
+  accepted['entries']=[e for e in accepted['entries'] if e['id'] not in failed];keys={k for e in accepted['entries'] for k in e['facts']}
+  for bank in ['questions','bangla']:accepted[bank]={k:v for k,v in accepted[bank].items() if k in keys}
+  save('v2-accepted.json',accepted);print('Pruned final-pool failures',len(failed),flush=True)
  else:raise RuntimeError('Final admission did not stabilize; no activation published')
+ run(['node','build-runtime.mjs'],'runtime-build.log');run(['node','audit-v2.mjs','--final'],'final-audit.log');final=read('v2-final-audit.json')
  validation=run(['npm','run','validate'],'validation.log');tests=run(['npm','test'],'tests.log')
  browser=run(['node','browser-check.cjs'],'browser.log');run(['node','performance-v2.mjs'],'performance.log')
  manifest=json.loads((APP/'runtime/manifest.json').read_text());measured=read('browser-results.json');performance=read('performance-results.json')

@@ -1,6 +1,6 @@
 import {identityKeys} from './runtime-translations.js';
 import {canonicalQuestionKey} from './engine-v2.js';
-const norm=s=>s.toLocaleLowerCase().normalize('NFKC').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+const norm=s=>s.toLocaleLowerCase().normalize('NFKC').replace(/[^\p{L}\p{M}\p{N}]+/gu,' ').trim();
 export function sanitizeEntries(source,questions,bangla={}){
  const banned=new Set(identityKeys);
  for(const bank of [questions,bangla]){

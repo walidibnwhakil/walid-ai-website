@@ -6,7 +6,7 @@ on:
     paths: ['.github/workflows/riddlex-recovery.yml']
 concurrency:
   group: riddlex-recovery-cloud
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   expand:
     if: github.repository == 'walidibnwhakil/walid-ai-website' && github.ref == 'refs/heads/riddlex-recovery' && !github.event.repository.private
@@ -39,13 +39,10 @@ jobs:
           printf 'RIDDLEX_CHROME=%s\n' "$chrome" >> "$GITHUB_ENV"
           sudo apt-get -qq update
           sudo apt-get -qq install -y fonts-noto-core
-      - name: Verify and activate previously saved evidence
-        run: |
-          if [ ! -f knowledge/resume-summary.json ]; then
-            python knowledge/finalize-cloud.py --phase saved-checkpoint --push
-          fi
       - name: Acquire and persist new verified source batches
-        run: python knowledge/resume-cloud.py "$RUNNER_TEMP/riddlex-source" --new-limit 25000 --batch 500 --push
+        run: |
+          node validate-v2.mjs
+          python knowledge/resume-cloud.py "$RUNNER_TEMP/riddlex-source" --new-limit 25000 --batch 500 --push
       - name: Verify and activate the final bulk pool
         run: python knowledge/finalize-cloud.py --phase bulk-final --push
       - uses: actions/cache/save@v4

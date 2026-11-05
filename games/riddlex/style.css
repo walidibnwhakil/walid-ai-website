@@ -171,6 +171,9 @@ main:has(#play:not([hidden])){
  width:auto;margin:2px;padding:7px 9px;font-size:13px
 }
 @media(max-width:600px){
+ .case-note:is([data-result="loading"],[data-result="printed"]){
+  width:52%;bottom:3%;padding:4px 8px
+ }
  .office:has(> #status){display:flex;flex-direction:column}
  .office-wordmark{position:relative;inset:auto;width:max-content;margin:7px 8px;font-size:23px}
  .office:has(> #status) .office-wordmark{margin-bottom:0}

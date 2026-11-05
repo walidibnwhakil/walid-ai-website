@@ -11,11 +11,28 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  const manifestBytes=await fs.readFile(path.join(__dirname,'runtime/manifest.json')),manifest=JSON.parse(manifestBytes),manifestSha256=createHash('sha256').update(manifestBytes).digest('hex');
  async function data(category){const parts=await Promise.all(manifest.categories[category].shards.map(s=>fs.readFile(path.join(__dirname,'runtime',s.path),'utf8').then(JSON.parse)));return{entries:parts.flatMap(p=>p.entries),questions:Object.assign({},...parts.map(p=>p.questions)),bangla:Object.assign({},...parts.map(p=>p.bangla))};}
  const {factValue}=await import('./engine-v2.js'),characters=await data('characters'),fresh=characters.entries.find(e=>e.id.startsWith('v2-')&&e.nameBn);
+ const contextQuestion = {
+  en:'Are you thinking of someone by their relationship to you, such as a relative or friend?',
+  bn:'আপনি কি কাউকে আপনার সঙ্গে তাঁর সম্পর্ক দিয়ে ভাবছেন, যেমন পরিবারের সদস্য বা বন্ধু?',
+ };
+ if(await page.locator('[data-category]').count()!==3||await page.locator('#keyboard-hint').count())throw Error('Unexpected lobby controls');
  const specs=[['en','animals','cat'],['bn','objects','phone'],['bn','relationships','role-wife'],['en','characters','himu']];if(fresh)specs.push(['en','characters',fresh.id],['bn','characters',fresh.id]);
  const games=[];await fs.mkdir(path.join(__dirname,'knowledge/browser'),{recursive:true});
  for(const [language,category,id] of specs){
   await page.locator('#new').click();if(await page.locator('html').getAttribute('lang')!==language)await page.locator('#language').click();
-  const d=await data(category),target=d.entries.find(e=>e.id===id),bank=language==='bn'?d.bangla:d.questions,started=performance.now();await page.locator('[data-category="'+category+'"]').click();await page.locator('#answers').waitFor({state:'visible'});const loadMs=performance.now()-started;
+  const d=await data(category),target=d.entries.find(e=>e.id===id),bank=language==='bn'?d.bangla:d.questions,started=performance.now();
+  await page.locator('[data-category="'+(category==='relationships'?'characters':category)+'"]').click();
+  await page.locator('#answers').waitFor({state:'visible'});
+  if(category==='characters'||category==='relationships'){
+   if(await page.locator('#status').innerText()!==contextQuestion[language])throw Error('Missing relationship context');
+   if(category==='relationships'){
+    await page.locator('[data-answer="no"]').click();
+    await page.locator('#back').click();
+    if(await page.locator('#status').innerText()!==contextQuestion[language])throw Error('Cannot correct relationship context');
+   }
+   await page.locator('[data-answer="'+(category==='relationships'?'yes':'no')+'"]').click();
+  }
+  const loadMs=performance.now()-started;
   let count=0;while(count<60&&await page.locator('#answers').isVisible()){
    const text=await page.locator('#status').innerText(),key=Object.keys(bank).find(k=>bank[k]===text);if(!key)throw Error('Unmapped '+language+' question '+text);
    const fact=factValue(target,key);await page.locator('[data-answer="'+(fact===undefined?'unknown':fact?'yes':'no')+'"]').click();count++;
@@ -31,9 +48,9 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  for(const value of ['unknown','probably','probably-not']){await page.locator('[data-answer="'+value+'"]').click();await page.locator('#back').click();}
  const d=await data('animals'),cat=d.entries.find(e=>e.id==='cat');
  for(let i=0;i<60&&await page.locator('#answers').isVisible();i++){const text=await page.locator('#status').innerText(),key=Object.keys(d.questions).find(k=>d.questions[k]===text),fact=factValue(cat,key);await page.locator('[data-answer="'+(fact===undefined?'unknown':fact?'yes':'no')+'"]').click();}
- await page.locator('#wrong').click();await page.locator('#retry').click();if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
+ await page.locator('#wrong').click();if(!await page.locator('.cat-resting').isVisible())throw Error('Missing resting cat');await page.locator('#retry').click();if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
  await page.locator('#new').click();await page.route('**/runtime/characters-*.json',async r=>{await new Promise(resolve=>setTimeout(resolve,150));await r.continue();});await page.locator('[data-category="characters"]').click();await page.locator('#new').click();await page.evaluate(()=>import('./runtime-loader.js').then(m=>m.loadCategory('characters')).then(()=>true));await page.unrouteAll({behavior:'wait'});if(!await page.locator('#categories').isVisible())throw Error('Late load overwrote reset');
  const memory=await page.evaluate(()=>performance.memory?.usedJSHeapSize/1048576??null);
- const result={environment:'Cloud Chromium, local uncompressed HTTP; 390x844 viewport; not Bangladesh WAN',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true};
+ const result={environment:'Chromium, local uncompressed HTTP; 390x844 viewport',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true};
  await fs.writeFile(path.join(__dirname,'knowledge/browser-results.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));await browser.close();server.close();if(errors.length)process.exitCode=1;
 })().catch(e=>{console.error(e);process.exit(1);});

@@ -19,9 +19,25 @@ test('skips inverse existence questions and occupations with equivalent wording'
   assert.equal(ask([{key:'actor', value:'yes'}], {v2_occupation_q33999:'Worked as an actor?'}), null);
 });
 
-test('a definite answer suppresses implied follow-ups, while unknown adds no evidence', () => {
-  assert.equal(ask([{key:'male', value:'yes'}], {female:'Female?'}), null);
-  const answers = [{key:'male', value:'unknown'}];
-  assert.deepEqual(scoreCandidates(entries, answers), scoreCandidates(entries, []));
-  assert.equal(ask(answers, {female:'Female?'}), 'female');
+test('asks one gender question without inferring another gender', () => {
+  const openWorld = [
+    ...entries,
+    {id:'other', facts:{male:false, female:false}},
+    {id:'unrecorded', facts:{}},
+  ];
+  for (const [key, inverse] of [['male','female'], ['female','male'], ['boy','girl'], ['girl','boy']]) {
+    const pool = openWorld.map(entry => ({...entry, facts:{
+      ...entry.facts, boy:entry.facts.male, girl:entry.facts.female,
+    }}));
+    for (const value of ['yes','no','probably','probably-not','unknown']) {
+      const answers = [{key,value}];
+      assert.equal(nextQuestion(scoreCandidates(pool, answers), answers, {[inverse]:'Opposite?'}), null);
+    }
+  }
+  const negative = scoreCandidates(openWorld, [{key:'male',value:'no'}]);
+  assert.equal(negative.find(row=>row.entry.id==='b').score, negative.find(row=>row.entry.id==='other').score);
+  assert.equal(negative.find(row=>row.entry.id==='unrecorded').score, 0);
+  const unknown = [{key:'male',value:'unknown'}];
+  assert.deepEqual(scoreCandidates(openWorld, unknown), scoreCandidates(openWorld, []));
+  assert.equal(ask(unknown, {female:'Female?', actor:'Actor?'}), 'actor');
 });

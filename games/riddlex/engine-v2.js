@@ -51,7 +51,7 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
  return ranked;
 }
 const entropy=p=>p<=0||p>=1?0:-p*Math.log2(p)-(1-p)*Math.log2(1-p);
-const opposites={real:'fictional',fictional:'real',male:'female',female:'male',boy:'girl',girl:'boy'};
+const questionPairs={real:'fictional',fictional:'real',male:'female',female:'male',boy:'girl',girl:'boy'};
 const familiar=new Set([
  'real','fictional','male','female','boy','girl','bangladeshi','indian','british','american',
  'japanese','bangla','actor','singer','writer','poet','politician','cricket','scientist',
@@ -71,10 +71,9 @@ function questionBank(questions,answers){
  const excluded=new Set();
  for(const {key,value} of answers){
   excluded.add(questionIdentity(key));
-  // Rephrasing the same existence question adds nothing, even after a skip.
-  if(key==='real'||key==='fictional'||value==='yes'&&Object.hasOwn(opposites,key)){
-   excluded.add(opposites[key]);
-  }
+  // Ask each paired dimension once. This suppresses follow-ups without
+  // turning No or Don't Know into evidence for a different gender.
+  if(Object.hasOwn(questionPairs,key))excluded.add(questionPairs[key]);
   if(key==='cartoon'&&value==='no'){excluded.add('boy');excluded.add('girl');}
   if(key==='boy'&&value==='yes'||key==='girl'&&value==='yes')excluded.add('cartoon');
  }

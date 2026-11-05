@@ -76,8 +76,20 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await photoPage.waitForFunction(()=>document.querySelector('#case-note').dataset.result==='printed');
  const motion=await photoPage.locator('#case-note').evaluate(note=>note.getAnimations().some(animation=>animation.animationName==='feed-and-lift'));
  if(!motion||!await photoPage.locator('#case-photo').isVisible())throw Error('Photo did not enter the print animation');
+ await photoPage.screenshot({path:path.join(__dirname,'knowledge/browser/printed-result.png'),fullPage:true,animations:'disabled'});
  await photoPage.close();
+ await page.locator('[data-category="animals"]').click();
+ await page.locator('#answers').waitFor({state:'visible'});
+ for(let i=0;i<=Object.keys(d.questions).length&&await page.locator('#answers').isVisible();i++){
+  await page.locator('[data-answer="unknown"]').click();
+ }
+ if(await page.locator('.office').getAttribute('data-mood')!=='unsure'||!await page.locator('.cat-resting').isVisible()){
+  throw Error('Unknown-only case did not end unresolved');
+ }
+ await page.screenshot({path:path.join(__dirname,'knowledge/browser/unresolved.png'),fullPage:true,animations:'disabled'});
+ await page.locator('#retry').click();
+ if(!await page.locator('#categories').isVisible()||await page.locator('.cat-resting').isVisible())throw Error('Unresolved Retry did not reset the room');
  const memory=await page.evaluate(()=>performance.memory?.usedJSHeapSize/1048576??null);
- const result={environment:'Chromium, local uncompressed HTTP; 390x844 viewport',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true};
+ const result={environment:'Chromium, local uncompressed HTTP; 390x844 viewport',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true,photoPrint:true,unresolvedRetry:true};
  await fs.writeFile(path.join(__dirname,'knowledge/browser-results.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));await browser.close();server.close();if(errors.length)process.exitCode=1;
 })().catch(e=>{console.error(e);process.exit(1);});

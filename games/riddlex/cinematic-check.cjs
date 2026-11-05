@@ -20,6 +20,7 @@ const {chromium} = require('playwright');
    response.writeHead(404).end();
   }
  });
+ server.unref();
  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
  const url = process.env.RIDDLEX_TEST_URL || 'http://127.0.0.1:' + server.address().port + '/';
  const reduced = process.env.RIDDLEX_REDUCED === '1';
@@ -41,7 +42,27 @@ const {chromium} = require('playwright');
      if (request.url().endsWith('/images/einstein.jpg')) photoRequests.push(request.url());
     });
     await page.goto(url);
+    const shot = value => page.screenshot({path:path.join(output,label+'-'+id+'-'+value+'.png')});
+    if (!reduced) {
+     const welcome = page.locator('.welcome-motion');
+     await welcome.waitFor();
+     const before = await welcome.evaluate(canvas => canvas.toDataURL());
+     await shot('welcome-pipe');
+     await page.waitForTimeout(2950);
+     assert.notEqual(await welcome.evaluate(canvas => canvas.toDataURL()), before);
+     await shot('welcome-window');
+    } else {
+     assert.equal(await page.locator('.welcome-motion').isVisible(), false);
+    }
     await page.locator('#play').click();
+    if (!reduced) {
+     const props = page.locator('.scene-props');
+     await props.waitFor();
+     const before = await props.evaluate(canvas => canvas.toDataURL());
+     await page.waitForTimeout(550);
+     assert.notEqual(await props.evaluate(canvas => canvas.toDataURL()), before);
+     await shot('office-idle');
+    }
     const data = await page.evaluate(async ({category,id}) => {
      const {loadCategory} = await import('./runtime-loader.js');
      const {factValue} = await import('./engine-v2.js');
@@ -61,7 +82,7 @@ const {chromium} = require('playwright');
      const reveal = office.querySelector('.guess-reveal');
      window.cinematicFrames = {};
      const captured = {};
-     const hold = {feeding:880, reaching:225, carrying:575, writing:640};
+     const hold = {feeding:850, carrying:575, writing:760, turning:470};
      let last, started;
      function record(now) {
       const phase = office.dataset.reveal;
@@ -96,11 +117,10 @@ const {chromium} = require('playwright');
      }
     }, data);
     const phase = value => page.locator('.office[data-reveal="'+value+'"]').waitFor({timeout:10000});
-    const shot = value => page.screenshot({path:path.join(output,label+'-'+id+'-'+value+'.png')});
     assert.equal(await page.locator('#case-note').getAttribute('data-guess-id'), id);
     await phase(final);
     const frames = await page.evaluate(() => window.cinematicFrames);
-    const expected = reduced ? [] : final === 'printed' ? ['feeding','reaching','carrying'] : ['writing'];
+    const expected = reduced ? [] : final === 'printed' ? ['writing','feeding','carrying','turning'] : ['writing','turning'];
     for (const step of expected) {
      assert.ok(frames[step], 'Missing frame during ' + step);
      await fs.writeFile(path.join(output,label+'-'+id+'-'+step+'.png'), Buffer.from(frames[step].split(',')[1], 'base64'));
@@ -109,8 +129,44 @@ const {chromium} = require('playwright');
     assert.equal(photoRequests.length, final === 'printed' ? 1 : 0);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await shot(reduced ? final+'-reduced' : final);
-    await page.locator('#correct').click();
-    await page.waitForTimeout(700);
+    await page.locator('#wrong').click();
+    const cat = page.locator('.evidence-cat');
+    await cat.waitFor();
+    if (!reduced) await page.waitForTimeout(950);
+    assert.equal(await page.locator('.guess-reveal').isVisible(), true);
+    assert.ok(await cat.evaluate(canvas => canvas.getContext('2d').getImageData(460, 339, 1, 1).data[3] > 0));
+    await shot(reduced ? 'wrong-reduced' : 'wrong');
+    const retryFrame = await page.evaluate(async reduced => {
+     const office = document.querySelector('.office');
+     document.querySelector('#retry').click();
+     if (reduced) return null;
+     if (office.dataset.mood !== 'retrying') throw Error('Retry did not start');
+     const cat = office.querySelector('.evidence-cat');
+     const before = cat.toDataURL();
+     const started = performance.now();
+     return new Promise((resolve, reject) => {
+      function capture(now) {
+       if (office.dataset.mood !== 'retrying') return reject(Error('Missing cat retreat frame'));
+       if (now - started > 330 && cat.toDataURL() !== before) {
+        const frame = document.createElement('canvas');
+        frame.width = 724;
+        frame.height = 404;
+        const context = frame.getContext('2d');
+        for (const selector of ['.scene-art', '.scene-props', '.guess-reveal', '.evidence-cat']) {
+         context.drawImage(office.querySelector(selector), 0, 0);
+        }
+        return resolve(frame.toDataURL());
+       }
+       requestAnimationFrame(capture);
+      }
+      requestAnimationFrame(capture);
+     });
+    }, reduced);
+    if (retryFrame) await fs.writeFile(path.join(output,label+'-'+id+'-retry.png'),
+     Buffer.from(retryFrame.split(',')[1], 'base64'));
+    await page.locator('#answers').waitFor();
+    assert.match(await page.locator('#progress').textContent(), /Wrong guesses: 1/);
+    assert.equal(await cat.isVisible(), false);
     await page.locator('#new').click();
     assert.equal(await page.locator('.guess-reveal').isVisible(), false);
     assert.deepEqual(errors, []);

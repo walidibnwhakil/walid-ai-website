@@ -56,19 +56,7 @@ main:has(#play:not([hidden])){
  border-color:#ffce7b;box-shadow:0 4px 12px #1d100b
 }
 #play[hidden]{display:none}
-.pipe-smoke{position:absolute;top:max(40cqw,32%);left:40%;width:20px;height:50px;pointer-events:none}
-.pipe-smoke::before,.pipe-smoke::after{
- content:"";position:absolute;bottom:0;left:0;width:100%;height:100%;border-radius:50%;
- background:radial-gradient(ellipse,#ffeadb95,transparent 70%);filter:blur(2px);
- opacity:0;animation:smoke-rise 3.8s ease-out infinite
-}
-.pipe-smoke::after{animation-delay:-1.9s}
-@keyframes smoke-rise{
- from{transform:translate(-50%,-85%) scale(.55)}
- 18%{opacity:.62}
- to{opacity:0;transform:translate(12px,-100px) rotate(18deg) scale(1.85)}
-}
-
+.welcome-motion{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;pointer-events:none}
 
 .office{
  position:relative;isolation:isolate;overflow:hidden;
@@ -87,27 +75,9 @@ main:has(#play:not([hidden])){
 }
 .office-wordmark svg{width:.87em;height:.87em}
 .case-note{
- position:absolute;z-index:6;left:50%;bottom:5%;transform:translateX(-50%) rotate(-3deg);
- width:min(67%,300px);padding:8px 12px;text-align:center;color:#402b1b;background:#f8eccd;
- border:1px solid #c8a976;box-shadow:3px 5px 10px #25160e90;pointer-events:none
+ position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap
 }
-.case-note span{display:block;font:10px/1.4 Georgia,serif;text-transform:uppercase;letter-spacing:.1em}
-.case-note strong{
- display:block;font:italic 600 clamp(16px,3vw,24px)/1.15 "Segoe Print","Bradley Hand",cursive;
- overflow-wrap:anywhere
-}
-.guess-reveal{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.case-note:is([data-result="loading"],[data-result="feeding"],[data-result="reaching"],[data-result="carrying"],[data-result="placing"],[data-result="writing"]){visibility:hidden}
-.case-note:is([data-result="printed"],[data-result="written"]){
- left:3%;bottom:3%;width:min(32%,215px);transform:rotate(-2deg);
- padding:4px 6px
-}
-.case-note:is([data-result="printed"],[data-result="written"]) strong{
- font-size:clamp(11px,1.8vw,18px)
-}
-.case-note[data-result="rejected"] span {
- color:#883d2e;font-weight:bold;
-}
+.guess-reveal,.evidence-cat{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 @media(max-width:720px){
  body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
  .games-nav{align-self:start;border-right:0;border-bottom:1px solid #d7c3a6;padding:4px 8px}

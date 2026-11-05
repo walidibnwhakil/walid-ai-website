@@ -1,9 +1,9 @@
-import {animateProps} from "./scene-props.js?v=guess-reveal";
-import {animateOffice} from "./scene-motion.js?v=soft-motion";
+import {animateWelcome,animateProps} from "./scene-props.js?v=desk-reveal";
+import {animateOffice} from "./scene-motion.js?v=desk-reveal";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
 import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=soft-motion";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
-import {createGuessReveal} from "./guess-reveal.js";
+import {createGuessReveal} from "./guess-reveal.js?v=desk-reveal";
 let allEntries=[],allQuestions={};
 const contextKey="relationship_context";
 const contextQuestion="Are you thinking of someone by their relationship to you, such as a relative or friend?";
@@ -14,6 +14,7 @@ let tentative=false;
 const office=document.querySelector(".office");
 const reveal=createGuessReveal(office);
 animateOffice(office);
+animateWelcome($("splash-art"));
 animateProps(office,office.querySelector(".scene-art"));
 const status=$("status"), statusHome=status.parentElement;
 function mood(value){office.dataset.mood=value;}
@@ -40,17 +41,17 @@ function showQuestion(){
 }
 function showNote(){
  const note=$("case-note");
- const show=mode==="guess"||mode==="done"||mode==="wrong";
+ const show=mode==="guess"||mode==="done"||mode==="wrong"||mode==="retrying";
  visible(note,show);
  note.dataset.guessId=show?guess.id:"";
- if(!show||mode==="wrong"){
+ if(!show&&mode!=="retrying"){
   reveal.clear();
-  note.dataset.result=mode==="wrong"?"rejected":"";
+  note.dataset.result="";
  }
  if(!show)return;
  $("case-note-label").textContent=mode==="done"?"Case solved":mode==="wrong"?"Guess ruled out":"Detective’s note";
  $("case-note-name").textContent=guessName();
- if(mode==="wrong")return;
+ if(mode==="wrong"||mode==="retrying")return;
  reveal.start(guess,guessName(),phase=>{
   note.dataset.result=phase;
   if(mode==="guess"&&(phase==="printed"||phase==="written"))presentGuess();
@@ -92,6 +93,7 @@ function render(){
  if(mode==="loading"){mood("thinking");setStatus("Opening the casebook…");return;}
  if(mode==="start"){mood("ready");setStatus("Think of a character, animal, object or someone you know.");return;}
  if(mode==="wrong"){mood("wrong");setStatus("That guess was wrong. Shall I try again?");visible(guessPanel,true);showNote();return;}
+ if(mode==="retrying"){mood("retrying");setStatus("Reopening the case…");return;}
  if(mode==="done"){mood("happy");setStatus("Case closed!");showNote();return;}
  if(mode==="edit"){showQuestion();return;}
  if(mode==="guess"){presentGuess();return;}
@@ -140,11 +142,18 @@ $("play").addEventListener("click",()=>{reset();categories.querySelector("button
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
 $("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode="done";render();});
 $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
-$("retry").addEventListener("click",()=>{
+$("retry").addEventListener("click",async()=>{
  if(mode==="unsure"){reset();return;}
  if(mode!=="wrong")return;
 
- if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}
+ const token=++loadToken;
+ mode="retrying";render();
+ if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
+  await new Promise(resolve=>setTimeout(resolve,1650));
+ }
+ if(token!==loadToken||mode!=="retrying")return;
+ rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);
+ rejected=rejectedIds(rejectionHistory);
  guess=null;mode="ask";render();
 });
 document.addEventListener("keydown",event=>{

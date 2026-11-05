@@ -126,7 +126,7 @@ export function animateOffice(office) {
     from[i][1] * (1 - ease) + dy * amount * ease,
    ]);
    const wrong = mood === "wrong" || mood === "unsure";
-   const visible = [mood === "happy", wrong, wrong];
+   const visible = [mood === "happy", wrong, mood === "unsure"];
    opacity = visible.map((show, i) => {
     // Let the cat dip its head before revealing the tucked pose.
     const mix = i === 2 && show ? Math.max(0, (ease - .35) / .65) : ease;

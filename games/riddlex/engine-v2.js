@@ -51,27 +51,75 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
  return ranked;
 }
 const entropy=p=>p<=0||p>=1?0:-p*Math.log2(p)-(1-p)*Math.log2(1-p);
+const opposites={real:'fictional',fictional:'real',male:'female',female:'male',boy:'girl',girl:'boy'};
+const familiar=new Set([
+ 'real','fictional','male','female','boy','girl','bangladeshi','indian','british','american',
+ 'japanese','bangla','actor','singer','writer','poet','politician','cricket','scientist',
+ 'filmmaker','composer','novel','cartoon','anime','comic','superhero','glasses','detective'
+]);
+const equivalentOccupations={
+ v2_occupation_q33999:'actor',v2_occupation_q177220:'singer',v2_occupation_q49757:'poet',
+ v2_occupation_q36834:'composer',v2_occupation_q169470:'physicist',
+ v2_occupation_q12299841:'cricket',v2_occupation_q901:'scientist'
+};
+const questionIdentity=key=>{
+ const canonical=canonicalQuestionKey(key);
+ return equivalentOccupations[canonical]??canonical;
+};
+const normalize=text=>text.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu,'');
+function questionBank(questions,answers){
+ const excluded=new Set();
+ for(const {key,value} of answers){
+  excluded.add(questionIdentity(key));
+  // Rephrasing the same existence question adds nothing, even after a skip.
+  if(key==='real'||key==='fictional'||value==='yes'&&Object.hasOwn(opposites,key)){
+   excluded.add(opposites[key]);
+  }
+  if(key==='cartoon'&&value==='no'){excluded.add('boy');excluded.add('girl');}
+  if(key==='boy'&&value==='yes'||key==='girl'&&value==='yes')excluded.add('cartoon');
+ }
+ const askedText=new Set(answers.flatMap(({key})=>questions[key]?[normalize(questions[key])]:[]));
+ const isFictional=answers.some(({key,value})=>key==='fictional'&&value==='yes'||key==='real'&&value==='no');
+ const bank=new Map();
+ for(const [key,question] of Object.entries(questions)){
+  const canonical=canonicalQuestionKey(key);
+  if(excluded.has(questionIdentity(key))||askedText.has(normalize(question)))continue;
+  if(isFictional&&/^(?:v2|wd)_(?:birthplace|citizenship|education|award)_/.test(key))continue;
+  if(/^(born_before_|birth_first_half$|cue_wd_)/.test(key))continue;
+  if(!bank.has(canonical)||key===canonical)bank.set(canonical,key);
+ }
+ return bank;
+}
 export function nextQuestion(ranked,answers,questions){
  if(!ranked.length)return null;
- const asked=new Set(answers.map(a=>canonicalQuestionKey(a.key))),counts=new Map();
- // Hierarchy emerges from posterior mass: broad separators first, then useful
- // occupation/work/place questions in the surviving cohort. No hard elimination.
+ const bank=questionBank(questions,answers),counts=new Map();
  const leading=ranked[0].score;
- const focus=leading>0?ranked.filter(r=>r.score>=leading-Math.log(9)):ranked;
- const mass=focus.reduce((s,r)=>s+r.probability,0);
- for(const row of focus)for(const [key,value] of Object.entries(row.entry.facts)){
-  if(asked.has(key.startsWith('wd_')?canonicalQuestionKey(key):key)||!Object.hasOwn(questions,key)||key.startsWith('cue_wd_'))continue;
-  const c=counts.get(key)??[0,0];c[value?0:1]+=row.probability/mass;counts.set(key,c);
+ const focus=leading>0?ranked.filter(row=>row.score>=leading-Math.log(9)):ranked;
+ const mass=focus.reduce((sum,row)=>sum+row.probability,0);
+ for(const row of focus){
+  for(const [fact,value] of Object.entries(row.entry.facts)){
+   const canonical=canonicalQuestionKey(fact),key=bank.get(canonical);
+   if(!key||fact!==canonical&&Object.hasOwn(row.entry.facts,canonical))continue;
+   const count=counts.get(key)??[0,0];
+   count[value?0:1]+=row.probability/mass;
+   counts.set(key,count);
+  }
+ }
+ const skipped=new Map();
+ for(const {key,value} of answers){
+  if(value==='unknown')skipped.set(evidenceGroup(key),(skipped.get(evidenceGroup(key))??0)+1);
  }
  let best=null,bestQuality=-Infinity;
  const roots=new Set(['real','fictional','mammal','bird','reptile','electronic','vehicle','furniture','family','work','friend']);
- const rootStage=ranked[0].support===0&&[...counts].some(([k,[y,n]])=>roots.has(k)&&(y>1e-9&&n>1e-9||y+n>.1&&y+n<.95));
+ const rootStage=ranked[0].support===0&&[...counts].some(([key,[yes,no]])=>roots.has(key)&&(yes>1e-9&&no>1e-9||yes+no>.1&&yes+no<.95));
  for(const [key,[yes,no]] of counts){
   if(rootStage&&!roots.has(key))continue;
   const coverage=Math.min(1,yes+no),unknown=Math.max(0,1-coverage);
-  // Unknown candidate facts are marginalized, never assigned No.
+  // Unknown candidate facts are marginalized. Fine-grained clues are a fallback.
   const information=entropy(yes+unknown*.5)-unknown;
-  const quality=information+.06*coverage;
+  const group=evidenceGroup(key);
+  const weight=familiar.has(key)?1.35:group==='birthplace'||group==='award'?.25:1;
+  const quality=(information+.06*coverage)*weight/(1+.3*(skipped.get(group)??0));
   if(quality>bestQuality+1e-12||(Math.abs(quality-bestQuality)<=1e-12&&key<best)){
    bestQuality=quality;best=key;
   }

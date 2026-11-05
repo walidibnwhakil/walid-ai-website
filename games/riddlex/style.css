@@ -6,10 +6,9 @@ a{color:#604225;text-underline-offset:3px}
 .office{height:clamp(210px,36vw,290px);position:relative;overflow:hidden;border-radius:20px 20px 0 0;background:radial-gradient(circle at 45% 10%,#d1aa76 0,#91613e 55%,#4c3329 100%);border:5px solid var(--wood);box-shadow:inset 0 0 55px #301f1980}
 .office:before{content:"";position:absolute;left:8%;top:9%;width:18%;height:46%;border:9px solid #68442e;background:linear-gradient(135deg,#e8c58b,#aa784b);box-shadow:0 0 0 3px #d7ac65,inset 0 0 0 4px #65412c;opacity:.8}
 .office:after{content:"";position:absolute;right:4%;top:12%;width:12%;height:32%;background:repeating-linear-gradient(90deg,#513423 0 10px,#a76f40 10px 17px,#745032 17px 25px);border:8px solid #583a2a;opacity:.75}
-.portrait{position:absolute;z-index:2;top:17px;right:24%;width:48px;height:58px;display:grid;place-items:center;border:7px ridge #b98a42;background:#dfcaa2;font-size:22px;transform:rotate(3deg)}
 .detective{position:absolute;left:39%;top:18px;font-size:clamp(95px,18vw,135px);filter:drop-shadow(4px 8px 4px #2c1c19aa);transform-origin:center bottom;animation:detective-breathe 3.5s ease-in-out infinite}
 .cat{position:absolute;right:13%;bottom:27px;font-size:clamp(45px,9vw,65px);z-index:2;filter:drop-shadow(2px 4px 2px #2c1c19aa)}
-.desk{position:absolute;bottom:0;width:100%;padding:10px;text-align:center;background:linear-gradient(#805431,#4c2d1b);border-top:9px solid #a77544;box-shadow:0 -8px 18px #2c1c1955;font-size:28px}
+.desk{position:absolute;bottom:0;width:100%;padding:10px;text-align:center;background:linear-gradient(#805431,#4c2d1b);height:52px;border-top:9px solid #a77544;box-shadow:0 -8px 18px #2c1c1955;font-size:28px}
 .panel{padding:clamp(14px,4vw,28px);background:var(--cream);border:1px solid #d7c3a6;border-radius:0 0 20px 20px;text-align:center;box-shadow:0 12px 28px #4b342b22}
 h1{font-family:Georgia,serif;letter-spacing:.05em;font-size:clamp(30px,6vw,42px);margin:0 0 8px}
 #status{min-height:64px;font-size:clamp(17px,3vw,20px);max-width:540px;margin:12px auto 20px}
@@ -24,24 +23,21 @@ button:active{transform:translateY(1px)}
 #new,#back{background:transparent}
 .note{font-size:12px;color:#735f4b;max-width:530px;margin:18px auto 0}
 @keyframes detective-breathe{50%{transform:translateY(3px) rotate(1deg)}}
-@media(max-width:500px){main{margin:0 auto;padding:7px}.office{height:220px}.detective{left:29%;top:28px}.portrait{right:18%}.panel{padding:14px 8px}button{flex:1 1 40%;max-width:260px}#back,#new{width:calc(100% - 20px);max-width:340px}}
+@media(max-width:500px){main{margin:0 auto;padding:7px}.office{height:220px}.detective{left:29%;top:28px}.panel{padding:14px 8px}button{flex:1 1 40%;max-width:260px}#back,#new{width:calc(100% - 20px);max-width:340px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 
 #progress{font-size:13px;color:#725336;min-height:20px;margin:0 auto 10px;font-variant-numeric:tabular-nums}
 .office[data-mood="thinking"] .detective{animation:detective-think 2.8s ease-in-out infinite}
 .office[data-mood="guess"] .detective{transform:rotate(-5deg) translateY(-4px)}
-.office[data-mood="retry"] .cat{animation:cat-upset .65s ease-in-out 2;transform-origin:center bottom}
-.office[data-mood="unsure"] .cat{filter:grayscale(.6) drop-shadow(2px 4px 2px #2c1c19aa)}
 .office[data-mood="happy"] .cat{animation:cat-happy .8s ease-in-out 3}
 @keyframes detective-think{50%{transform:rotate(-3deg) translateY(3px)}}
-@keyframes cat-upset{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
 @keyframes cat-happy{50%{transform:translateY(-12px)}}
 @media(prefers-reduced-motion:reduce){.office[data-mood] .detective,.office[data-mood] .cat{animation:none!important}}
 
 #keyboard-hint{font-size:12px;color:#725336;margin:6px auto 12px;line-height:1.5}
 @media(hover:none) and (pointer:coarse){#keyboard-hint{display:none!important}}
 
-/* A paper reveal sits on the detective's desk only after a confirmed answer. */
+/* Paper reveal on the detective’s desk. */
 .case-note{position:absolute;z-index:5;left:50%;bottom:8px;transform:translateX(-50%) rotate(-3deg);width:min(68%,320px);padding:10px 16px;background:#f7eacb;color:#3f2b20;border:1px solid #c9ae7a;box-shadow:3px 5px 10px #28170e80;text-align:center;pointer-events:none}
 .case-note span{display:block;font:11px/1.4 Georgia,serif;text-transform:uppercase;letter-spacing:.13em}
 .case-note strong{display:block;font:italic 600 clamp(16px,3vw,24px)/1.2 Georgia,serif;overflow-wrap:anywhere}
@@ -52,31 +48,15 @@ button:active{transform:translateY(1px)}
 /* Guess scene: written name first; a reviewed local image, when present, prints over it. */
 .case-note{bottom:9px;min-height:58px;z-index:4}
 .case-note strong{font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive;font-style:italic}
-.case-note img{position:absolute;left:50%;bottom:12px;transform:translateX(-50%) rotate(5deg);width:clamp(65px,15vw,105px);height:clamp(62px,13vw,95px);object-fit:cover;background:white;padding:5px 5px 12px;border:1px solid #d7c5a3;box-shadow:2px 3px 5px #3d2b2288;animation:photo-print .8s ease-out both}
-@keyframes photo-print{from{opacity:0;transform:translate(-50%,-45px) rotate(5deg)}to{opacity:1;transform:translate(-50%,0) rotate(5deg)}}
-.glasses-gesture{position:absolute;top:35%;left:30%;font-size:32px;opacity:0;pointer-events:none}
-.office[data-mood="happy"] .glasses-gesture{animation:adjust-glasses 1s ease-in-out both}
+.case-note img{grid-area:photo;transform:rotate(5deg);width:clamp(65px,15vw,105px);height:clamp(62px,13vw,95px);object-fit:cover;background:white;padding:5px 5px 12px;border:1px solid #d7c5a3;box-shadow:2px 3px 5px #3d2b2288;animation:photo-print .8s ease-out both}
+@keyframes photo-print{from{opacity:0;transform:translateY(-24px) rotate(5deg)}to{opacity:1;transform:rotate(5deg)}}
 .office[data-mood="wrong"] .detective{animation:detective-embarrassed 1s ease-in-out both;filter:grayscale(.3) drop-shadow(4px 8px 4px #2c1c19aa)}
-.office[data-mood="wrong"] .cat{z-index:6;animation:cat-collapse .65s ease-out both}
-.office[data-mood="retry"] .cat{z-index:6;animation:cat-rise .65s ease-out both}
-.office[data-mood="retry"] .detective{animation:detective-hopeful .8s ease-in-out both}
-@keyframes adjust-glasses{0%,100%{opacity:0;transform:translateY(12px)}40%,70%{opacity:1;transform:translateY(-6px)}}
 @keyframes detective-embarrassed{50%,100%{transform:rotate(9deg) translateY(9px)}}
-@keyframes cat-collapse{0%{transform:translate(0,0) rotate(0)}100%{transform:translate(-100%,10px) rotate(-75deg)}}
-@keyframes cat-rise{0%{transform:translate(-100%,10px) rotate(-75deg)}100%{transform:translate(0,0) rotate(0)}}
 @keyframes detective-hopeful{50%{transform:translateY(-7px) rotate(-3deg)}}
-@media(prefers-reduced-motion:reduce){.case-note img,.office[data-mood] .glasses-gesture{animation:none!important}.office[data-mood="wrong"] .cat{transform:translate(-100%,10px) rotate(-75deg)}}
 
-/* Keep the cat visibly over the note on a failed guess, then stand it up on retry. */
-.office[data-mood="wrong"] .cat{right:calc(50% - 38px);bottom:22px;z-index:8;animation:cat-fall-on-note .7s ease-out both}
-.office[data-mood="retry"] .cat{right:calc(50% - 38px);bottom:22px;z-index:8;animation:cat-stand-from-note .7s ease-out both}
-@keyframes cat-fall-on-note{0%{transform:translate(70px,-12px) rotate(0deg)}65%{transform:translate(0,0) rotate(-85deg)}100%{transform:translate(0,5px) rotate(-75deg)}}
-@keyframes cat-stand-from-note{0%{transform:translate(0,5px) rotate(-75deg)}100%{transform:translate(70px,-12px) rotate(0deg)}}
-@media(prefers-reduced-motion:reduce){.office[data-mood="wrong"] .cat{animation:none!important;transform:rotate(-75deg)}.office[data-mood="retry"] .cat{animation:none!important;transform:none}}
 
 /* Retry choreography: cat gets up, then the detective throws the failed clue into the bin. */
 .wastebasket{position:absolute;right:2%;bottom:14px;z-index:3;font-size:clamp(25px,5vw,39px);filter:drop-shadow(2px 3px 2px #24170e80)}
-.office[data-mood="discard"] .cat{right:calc(50% - 38px);bottom:22px;z-index:8;animation:cat-stand-from-note .55s ease-out both}
 .office[data-mood="discard"] .detective{animation:detective-throw 1.4s ease-in-out both}
 .office[data-mood="discard"] .case-note{animation:note-to-bin 1.4s ease-in forwards;transform-origin:center center}
 .office[data-mood="discard"] .wastebasket{animation:bin-bounce .28s ease-out 1.1s both}
@@ -95,9 +75,6 @@ button:active{transform:translateY(1px)}
  animation:expert-pose 1.5s cubic-bezier(.2,.7,.3,1) both;
  transform-origin:50% 80%;
 }
-.office[data-mood="happy"] .glasses-gesture{
- animation:expert-glasses 1.5s ease-in-out both;
-}
 .office[data-mood="happy"] .cat{
  z-index:7;
  animation:cat-celebrate 1.5s ease-in-out both;
@@ -109,11 +86,6 @@ button:active{transform:translateY(1px)}
  55%{transform:translateY(-9px) rotate(2deg)}
  75%,100%{transform:translateY(-6px) rotate(1deg)}
 }
-@keyframes expert-glasses{
- 0%,12%{opacity:0;transform:translate(0,10px) rotate(-10deg)}
- 25%,53%{opacity:1;transform:translate(4px,-5px) rotate(0)}
- 70%,100%{opacity:0;transform:translate(6px,-8px)}
-}
 @keyframes cat-celebrate{
  0%,100%{transform:translateY(0) rotate(0)}
  24%{transform:translateY(-19px) rotate(-9deg)}
@@ -124,7 +96,6 @@ button:active{transform:translateY(1px)}
 @media(prefers-reduced-motion:reduce){
  .office[data-mood="happy"] .detective{animation:none!important;transform:translateY(-5px)}
  .office[data-mood="happy"] .cat{animation:none!important}
- .office[data-mood="happy"] .glasses-gesture{animation:none!important;opacity:0}
 }
 
 /* Use measured bin coordinates instead of percentage offsets based on paper width. */
@@ -139,7 +110,6 @@ button:active{transform:translateY(1px)}
 .detective{width:clamp(126px,27vw,188px);font-size:initial;line-height:0}
 .cat{width:clamp(67px,13vw,96px);font-size:initial;line-height:0}
 .character-art{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
-.detective .glasses-gesture{font-size:36px;line-height:1}
 @media(max-width:500px){.detective{left:27%;top:12px;width:140px}.cat{right:7%;bottom:32px;width:74px}}
 
 /* Retry: the detective crumples only the paper into a ball before tossing it.
@@ -177,3 +147,58 @@ button:active{transform:translateY(1px)}
 .office[data-mood="discard"] .case-note::after{
   background:radial-gradient(ellipse at 65% 65%,transparent 34%,#aa906a44 55%,transparent 70%);
 }
+
+/* The Games destination stays in reach when the sidebar folds above the room. */
+body{display:grid;grid-template-columns:170px minmax(0,1fr)}
+main{width:100%;min-width:0}
+.games-nav{background:#fff8ed;border-right:1px solid #d7c3a6;padding:24px 14px}
+.games-nav a{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:#f0d6aa;font-weight:600;text-decoration:none;width:max-content}
+.games-nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.detective{left:50%;top:auto;bottom:37px;margin-left:calc(clamp(126px,27vw,188px) / -2)}
+.cat{bottom:45px}
+.cat-resting{display:none;width:100%;height:auto}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat{
+ right:50%;bottom:24px;width:clamp(92px,20vw,135px);z-index:8;
+ transform:translateX(50%);animation:cat-settle .45s ease-out both;
+}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat .character-art{display:none}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat-resting{display:block}
+.office[data-mood="discard"] .cat{z-index:8;animation:cat-get-up .55s ease-out both}
+@keyframes cat-settle{from{transform:translate(75%,-15px)}}
+@keyframes cat-get-up{from{right:50%;bottom:23px;transform:translateX(50%) scaleY(.65)}}
+.case-note:has(img:not([hidden])){
+ display:grid;grid-template-areas:"label photo" "name photo";grid-template-columns:minmax(0,1fr) auto;
+ align-items:center;column-gap:7px;
+}
+.case-note span{grid-area:label}
+.case-note strong{grid-area:name}
+.wastebasket{width:clamp(22px,4vw,35px);height:27px;border:3px solid #755b49;border-top:4px solid #9b7e63;border-radius:2px 2px 8px 8px;background:repeating-linear-gradient(90deg,#593c29 0 3px,#b79a7b 3px 5px);transform:perspective(42px) rotateX(-12deg)}
+@media(max-width:720px){
+ body{grid-template-columns:minmax(0,1fr)}
+ .games-nav{border-right:0;border-bottom:1px solid #d7c3a6;padding:4px 8px}
+}
+@media(max-width:500px){
+ .detective{width:140px;margin-left:-70px;bottom:38px}
+ .cat{bottom:44px}
+ .case-note:has(img:not([hidden])){width:82%}
+}
+
+.detective-concerned{display:none;width:100%;height:auto}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .detective .character-art{display:none}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .detective-concerned{display:block}
+.office[data-mood="unsure"] .detective{transform:rotate(5deg);animation:none}
+
+/* The table overlaps the detective's coat so he sits behind it. */
+.office{background:radial-gradient(ellipse at 38% 35%,#f2bd7860,transparent 57%),
+ repeating-linear-gradient(90deg,#301e160e 0 2px,transparent 2px 57px),
+ linear-gradient(105deg,#916346,#503728)}
+.office::before{
+ border-radius:2px;
+ background:linear-gradient(90deg,transparent 46%,#68442e 46% 54%,transparent 54%),
+ linear-gradient(0deg,transparent 45%,#68442e 45% 54%,transparent 54%),
+ linear-gradient(150deg,#8a9788,#dbab73 70%,#9b6540);
+}
+@media(max-width:720px){body{grid-template-rows:auto 1fr}.games-nav{align-self:start}}
+.desk{background:repeating-linear-gradient(174deg,#40231924 0 2px,transparent 2px 11px),linear-gradient(#916038,#4c2d1b)}
+.desk-lamp{position:absolute;left:8%;bottom:36px;width:clamp(53px,13vw,104px);z-index:2;filter:drop-shadow(2px 3px 2px #2c1c1988)}
+@media(max-width:500px){.desk-lamp{left:4%;bottom:41px}}

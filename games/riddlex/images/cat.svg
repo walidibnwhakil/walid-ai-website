@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 190" role="img" aria-label="Natural white Bangladeshi domestic cat">
-<path d="M138 139Q174 115 161 88Q151 78 148 94Q160 112 136 116" fill="none" stroke="#d9d5ca" stroke-width="17" stroke-linecap="round"/>
-<ellipse cx="89" cy="151" rx="55" ry="33" fill="#f3f0e8" stroke="#9a958d" stroke-width="4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 190" role="img" aria-label="Standing white domestic cat">
+<path d="M142 127Q174 126 169 82Q166 61 153 70" fill="none" stroke="#9a958d" stroke-width="17" stroke-linecap="round"/>
+<path d="M142 127Q174 126 169 82Q166 61 153 70" fill="none" stroke="#d9d5ca" stroke-width="11" stroke-linecap="round"/>
+<path d="M34 121Q52 96 108 106Q154 107 153 134L151 170Q149 181 133 177L128 148L78 152L72 176H55L55 146Q31 147 34 121Z" fill="#f3f0e8" stroke="#9a958d" stroke-width="4"/>
+<path d="M103 149L99 177H86L86 153M41 140L38 174H25L28 140" fill="#e3dfd6" stroke="#9a958d" stroke-width="4" stroke-linejoin="round"/>
+<g transform="translate(-15 26) scale(.76)">
 <path d="M49 78L45 26 78 49Q91 43 105 49L135 26 132 83Z" fill="#f8f7f1" stroke="#8e8981" stroke-width="5"/>
 <path d="M56 59L54 40 73 57M110 57L128 40 123 62" fill="#c9938a"/>
 <ellipse cx="90" cy="92" rx="51" ry="46" fill="#fffdf6" stroke="#8e8981" stroke-width="4"/>
@@ -10,5 +13,5 @@
 <path d="M65 114L36 109M64 122L34 127M114 114L145 109M114 122L146 128" stroke="#aaa49a" stroke-width="2"/>
 
 
-<ellipse cx="60" cy="170" rx="19" ry="11" fill="#eeebe3"/><ellipse cx="118" cy="170" rx="19" ry="11" fill="#eeebe3"/>
+</g>
 </svg>

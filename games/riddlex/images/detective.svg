@@ -1,4 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 270" role="img" aria-label="Elderly detective in a fedora and trench coat">
+<style>
+#concerned{display:none}
+#concerned:target{display:inline}
+svg:has(#concerned:target) #steady{display:none}
+</style>
 <defs><linearGradient id="coat" x2="1" y2="1"><stop stop-color="#e7cda3"/><stop offset="1" stop-color="#aa8054"/></linearGradient><linearGradient id="hat" x2="1" y2="1"><stop stop-color="#94704c"/><stop offset="1" stop-color="#493525"/></linearGradient></defs>
 <ellipse cx="120" cy="254" rx="92" ry="11" fill="#281a14" opacity=".25"/>
 <path d="M34 256Q39 177 82 171L158 171Q203 184 208 256Z" fill="url(#coat)" stroke="#60452d" stroke-width="5"/>
@@ -8,7 +13,13 @@
 <path d="M160 176L138 203 155 225 127 257 188 257Z" fill="#c8a178" stroke="#7d5c3d" stroke-width="3"/>
 <path d="M75 114Q66 86 84 66Q99 50 124 52Q169 53 172 104L167 145Q159 174 121 180Q86 175 78 145Z" fill="#e9bd8e" stroke="#6d4532" stroke-width="4"/>
 <path d="M78 123Q59 114 66 136Q71 151 82 148M167 123Q185 115 177 138Q171 149 166 146" fill="#d6a77c" stroke="#754c35" stroke-width="3"/>
-<path d="M87 116Q102 109 114 117M130 117Q143 109 157 115" fill="none" stroke="#493126" stroke-width="6" stroke-linecap="round"/>
+<path id="steady" d="M87 116Q102 109 114 117M130 117Q143 109 157 115" fill="none" stroke="#493126" stroke-width="6" stroke-linecap="round"/>
+<g id="concerned" fill="none" stroke="#493126" stroke-linecap="round">
+<path d="M88 116Q98 118 110 108M135 108Q146 118 158 116" stroke-width="5"/>
+<path d="M110 173Q120 165 133 172" stroke-width="2.5"/>
+</g>
+<path d="M78 105L83 115M165 105L163 115" stroke="#d0c6b7" stroke-width="7" stroke-linecap="round"/>
+<path d="M91 141L87 145M151 141L156 145M110 102Q122 99 135 102" fill="none" stroke="#ae7e5d" stroke-width="2" stroke-linecap="round"/>
 <circle cx="103" cy="127" r="17" fill="#e8d4ac" fill-opacity=".23" stroke="#45352a" stroke-width="5"/><circle cx="144" cy="127" r="17" fill="#e8d4ac" fill-opacity=".23" stroke="#45352a" stroke-width="5"/>
 <path d="M120 125H127M86 124L77 121M160 125L170 122" stroke="#45352a" stroke-width="5"/>
 <circle cx="105" cy="127" r="3.5" fill="#3b2a22"/><circle cx="142" cy="127" r="3.5" fill="#3b2a22"/>

@@ -1,6 +1,6 @@
 # Riddlex recovery history
 
-**Current state:** 1,791 distinct casebook targets plus 15 relationship roles.
+**Playable runtime:** 2,379 distinct casebook targets (2,184 characters, 95 animals, 100 objects) plus 15 relationship roles. The 1,791-target baseline is retained as a historical checkpoint.
 See [KNOWLEDGE.md](KNOWLEDGE.md) and [knowledge/README.md](knowledge/README.md).
 The original reconstruction checklist below is historical, not the current
 knowledge-base status.

@@ -84,8 +84,12 @@ function render(){
  visible($("splash-art"),splash);
  visible(office,!splash);
  if(!splash){
-  const portrait=office.querySelector(".founder[data-src]");
-  if(portrait){portrait.src=portrait.dataset.src;delete portrait.dataset.src;}
+  const artwork=office.querySelector(".scene-art[data-src]");
+  if(artwork){
+   artwork.src=artwork.dataset.src;
+   office.querySelector(".cat-backdrop image").setAttribute("href",artwork.dataset.src);
+   delete artwork.dataset.src;
+  }
  }
  for(const id of ["status","progress","new","privacy-note"])visible($(id),!splash);
  visible($("play"),splash);
@@ -143,14 +147,12 @@ $("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode
 $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
 $("retry").addEventListener("click",()=>{
  if(mode!=="wrong"&&mode!=="unsure")return;
- const cat=office.querySelector(".cat");
- cat.getAnimations().filter(animation=>animation.id==="retry").forEach(animation=>animation.cancel());
- const left=cat.getBoundingClientRect().left;
+ const scene=office.querySelector(".scene");
+ scene.getAnimations().filter(animation=>animation.id==="retry").forEach(animation=>animation.cancel());
  if(mode==="unsure")reset();
  else retryGuess();
  if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
-  const distance=left-cat.getBoundingClientRect().left;
-  cat.animate([{transform:"translate("+distance+"px, 12px) scaleY(.65)"},{transform:"none"}],
+  scene.animate([{filter:"brightness(.84)"},{filter:"none"}],
    {id:"retry",duration:420,easing:"ease-out"});
  }
 });

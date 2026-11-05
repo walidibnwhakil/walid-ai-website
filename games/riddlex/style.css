@@ -69,53 +69,28 @@ main:has(#play:not([hidden])){
  to{opacity:0;transform:translate(12px,-100px) rotate(18deg) scale(1.85)}
 }
 
+
 .office{
  position:relative;isolation:isolate;overflow:hidden;
- aspect-ratio:2.13;border:4px solid #593c29;border-radius:20px 20px 0 0;background:#392519
+ border:4px solid #593c29;border-radius:20px 20px 0 0;background:#302016
 }
-.rear-wall,.foreground{
- position:absolute;inset:0;background:url("./images/approved/office.jpg") center / 100% 100%;
+.scene{position:relative;aspect-ratio:724/404;isolation:isolate}
+.scene-art{display:block;width:100%;height:100%}
+.office-wordmark{
+ position:absolute;z-index:5;top:4%;left:2.5%;display:flex;align-items:center;gap:.28em;
+ padding:.18em .42em .23em;border:3px double #cf9b52;border-radius:.34em;
+ background:linear-gradient(#502d1c,#24150f);color:#ffe2a2;
+ font:bold clamp(24px,3vw,35px)/1 Georgia,serif;text-shadow:0 2px #1a0d07;
+ box-shadow:0 2px 7px #1a0d07aa
 }
-.rear-wall{z-index:-2}
-.foreground{z-index:2;clip-path:polygon(0 81%,7% 80%,20% 82%,44% 85%,61% 86%,76% 82%,78% 100%,0 100%)}
-.founder{
- position:absolute;top:12%;left:88%;width:5.7%;aspect-ratio:3/4;object-fit:cover;object-position:center 27%;
- border:clamp(2px,.45vw,4px) ridge #ba8546;box-shadow:2px 3px 6px #190e08;
- background:#60472e;transform:rotate(-2deg)
-}
-.detective{
- position:absolute;z-index:1;width:44%;height:auto;left:32%;bottom:17%;
- transform-origin:50% 95%;animation:breathe 4.8s ease-in-out infinite;
- filter:drop-shadow(2px 2px 4px #21140e8c)
-}
-@keyframes breathe{50%{transform:translateY(1.3%) rotate(.75deg)}}
-.office[data-mood="thinking"] .detective{animation:ponder 3.4s ease-in-out infinite}
-@keyframes ponder{50%{transform:translateY(2%) rotate(-2deg)}}
-.office[data-mood="happy"]:has([data-result="printed"]) .detective{animation:collect-print 1.95s ease-in-out both}
-@keyframes collect-print{
- 38%{transform:none}
- 62%{transform:translate(8%,3%) rotate(5deg)}
- to{transform:none}
-}
-.cat{
- position:absolute;z-index:4;right:12.5%;bottom:17%;width:20%;height:auto;
- transform-origin:50% 100%;filter:drop-shadow(1px 3px 3px #1d120c8c)
-}
+.office-wordmark svg{width:.87em;height:.87em}
+.cat-backdrop,.cat{display:none;position:absolute;pointer-events:none}
+.cat-backdrop{inset:0;width:100%;height:100%;z-index:1}
+.cat{z-index:4;left:54%;bottom:24%;width:23%;filter:drop-shadow(1px 3px 3px #1d120c8c)}
 .cat img{display:block;width:100%;height:auto}
-.cat .cat-resting{display:none}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat{
- right:23%;bottom:15%;width:34%;animation:cat-settle .55s .55s ease-out both
-}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat-alert{display:none}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat-resting{display:block}
-@keyframes cat-settle{
- from{transform:translate(23%,-21%) scale(.78,1.14);opacity:.5}
-}
-.printer{
- position:absolute;z-index:3;right:2.5%;bottom:16%;width:13%;aspect-ratio:150/151;
- background:url("./images/approved/printer.png") center / contain no-repeat;
- filter:drop-shadow(1px 3px 3px #20130d90)
-}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) :is(.cat-backdrop,.cat){display:block}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat{animation:cat-settle .45s ease-out both}
+@keyframes cat-settle{from{transform:translateY(-10%) scaleY(.88);opacity:.65}}
 
 .case-note{
  position:absolute;z-index:6;left:50%;bottom:5%;transform:translateX(-50%) rotate(-3deg);
@@ -129,7 +104,7 @@ main:has(#play:not([hidden])){
 }
 .case-note[data-result="loading"]{visibility:hidden}
 .case-note[data-result="printed"]{
- display:grid;justify-items:center;gap:3px;width:clamp(88px,20%,143px);left:58%;bottom:28%;
+ display:grid;justify-items:center;gap:3px;width:clamp(88px,20%,143px);left:43%;bottom:27%;
  padding:7px 7px 9px;background:#fff9e9;
  animation:feed-and-lift 1.95s cubic-bezier(.33,.04,.3,1) both
 }
@@ -143,8 +118,8 @@ main:has(#play:not([hidden])){
  background:url("./images/approved/grip.png") center / contain no-repeat;animation:grip-print 1.95s both
 }
 @keyframes feed-and-lift{
- 0%{left:90%;bottom:27%;transform:translate(-50%,28%) rotate(-12deg) scale(.32);clip-path:inset(0 0 100%)}
- 43%{left:89%;bottom:26%;transform:translate(-50%,28%) rotate(-8deg) scale(.47);clip-path:inset(0 -40% 0 0)}
+ 0%{left:89%;bottom:27%;transform:translate(-50%,28%) rotate(-12deg) scale(.32);clip-path:inset(0 0 100%)}
+ 43%{left:89%;bottom:25%;transform:translate(-50%,28%) rotate(-8deg) scale(.47);clip-path:inset(0 -40% 0 0)}
  60%{left:80%;bottom:29%;transform:translate(-50%,18%) rotate(6deg) scale(.55);clip-path:inset(0 -40% 0 0)}
  100%{clip-path:inset(0 -40% 0 0)}
 }
@@ -166,9 +141,9 @@ main:has(#play:not([hidden])){
  display:none;position:absolute;pointer-events:none;background:#f7eacb
 }
 .office:is([data-mood="wrong"],[data-mood="unsure"]) :is(.discarded-note,.crumple-hands,.paper-ball,.resting-note){display:block}
-.discarded-note{z-index:5;left:53%;bottom:19%;width:11%;height:9%;animation:crumple .37s ease-in both}
+.discarded-note{z-index:5;left:41%;bottom:23%;width:11%;height:9%;animation:crumple .37s ease-in both}
 .crumple-hands{
- z-index:6;left:47%;bottom:20%;width:20%;aspect-ratio:177/103;
+ z-index:6;left:34%;bottom:24%;width:20%;aspect-ratio:177/103;
  background:url("./images/approved/crumple-hands.png") center / contain no-repeat;
  animation:crumple-gesture .59s ease-in-out both
 }
@@ -179,11 +154,11 @@ main:has(#play:not([hidden])){
  to{opacity:0;transform:translate(-30%,-30%) rotate(-17deg)}
 }
 .paper-ball{
- z-index:0;left:55%;bottom:27%;width:5%;aspect-ratio:1;
+ z-index:3;left:43%;bottom:31%;width:5%;aspect-ratio:1;
  background:url("./images/approved/crumpled.png") center / contain no-repeat;animation:toss .78s .29s ease-in both
 }
 .resting-note{
- z-index:3;right:23%;bottom:13%;width:34%;height:6%;
+ z-index:3;left:54%;bottom:23%;width:23%;height:6%;
  transform:rotate(-4deg);box-shadow:2px 3px 4px #271a14;animation:note-ready .7s step-end both
 }
 @keyframes crumple{
@@ -193,15 +168,10 @@ main:has(#play:not([hidden])){
 @keyframes toss{
  from{opacity:0}
  15%{opacity:1}
- 57%{opacity:1;transform:translate(-610%,-600%) scale(.7) rotate(240deg)}
- to{opacity:0;transform:translate(-910%,-360%) scale(.4) rotate(420deg)}
+ 57%{opacity:1;transform:translate(430%,-720%) scale(.7) rotate(240deg)}
+ to{opacity:0;transform:translate(680%,-390%) scale(.4) rotate(420deg)}
 }
 @keyframes note-ready{from{opacity:0}to{opacity:1}}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) .detective{animation:disappointed .65s ease-out both}
-@keyframes disappointed{
- 45%{transform:translateY(-2%) rotate(-3deg)}
- to{transform:translateY(5%) rotate(4deg)}
-}
 @media(max-width:720px){
  body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
  .games-nav{align-self:start;border-right:0;border-bottom:1px solid #d7c3a6;padding:4px 8px}
@@ -212,30 +182,28 @@ main:has(#play:not([hidden])){
  .splash-art{height:clamp(330px,112vw,490px);border:4px solid #68452b;border-bottom:0;border-radius:20px 20px 0 0}
  .splash-art::after{background:linear-gradient(0deg,#26180f 0%,transparent 22%)}
  .panel:has(#play:not([hidden])){border:4px solid #68452b;border-top:0;border-radius:0 0 20px 20px;padding:12px 10px 16px}
- .office{aspect-ratio:1.72}
- .detective{width:49%;left:29%}
  .panel{padding:14px 8px}
  button{flex:1 1 40%;max-width:260px}
  #back,#new{width:calc(100% - 20px);max-width:340px}
 }
 
 .office #status{
- position:absolute;z-index:5;inset:14% auto auto 4%;width:28%;
- min-height:0;margin:0;padding:clamp(10px,1.65vw,22px);
+ position:absolute;z-index:5;inset:5% auto auto 49%;width:34%;
+ min-height:0;margin:0;padding:clamp(10px,1.4vw,18px);
  background:linear-gradient(145deg,#fff9e8,#f1dfb9);border:1px solid #c5a16c;
  border-radius:16px;color:#342316;box-shadow:0 6px 18px #20120966;
  font:600 clamp(15px,2.1vw,24px)/1.28 Georgia,serif;
  overflow-wrap:anywhere;animation:question-arrive .28s ease-out both
 }
 .office #status::after{
- content:"";position:absolute;left:100%;top:58%;width:clamp(8px,1.4vw,16px);height:15px;
- background:#f4e5c3;clip-path:polygon(0 0,100% 70%,0 100%)
+ content:"";position:absolute;right:100%;top:65%;width:17px;height:17px;
+ background:#f8ebcc;clip-path:polygon(100% 0,100% 85%,0 100%)
 }
 @keyframes question-arrive{
  from{opacity:0;transform:translateY(4px)}
 }
 #answers{
- position:absolute;z-index:7;bottom:8px;left:2%;width:73%;
+ position:absolute;z-index:7;bottom:13px;left:28%;width:69%;
  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:6px;
  border:1px solid #bb87577d;border-radius:12px;
  background:linear-gradient(180deg,#704326,#4b2c1b);box-shadow:0 4px 10px #1f100a70
@@ -250,20 +218,28 @@ main:has(#play:not([hidden])){
 .office-shell:has(#answers:not([hidden])) + .panel{
  padding:9px 12px 12px
 }
-.office-shell:has(#answers:not([hidden])) + .panel h1{
- font-size:21px;margin:0
+.office-shell:has(.office:not([hidden])) + .panel h1{
+ position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap
 }
-.office-shell:has(#answers:not([hidden])) + .panel #progress,
-.office-shell:has(#answers:not([hidden])) + .panel .note{
- margin:3px auto
-}
+#progress:empty{display:none}
+.office-shell:has(#answers:not([hidden])) + .panel :is(#progress,.note){margin:3px auto}
+.office-shell:has(#answers:not([hidden])) + .panel .note{font-size:11px}
+.office-shell:has(.office:not([hidden])) + .panel #status{min-height:0;margin:0 auto 10px}
+.office-shell:has(#answers:not([hidden])) + .panel :is(#back,#new){min-height:44px}
 .office-shell:has(#answers:not([hidden])) + .panel button{
  width:auto;margin:2px;padding:7px 9px;font-size:13px
 }
 @media(max-width:600px){
- .office #status{top:8%;left:3%;width:34%;padding:9px;font-size:clamp(13px,3.45vw,17px)}
+ .office:has(> #status){display:flex;flex-direction:column}
+ .office:has(> #status) .office-wordmark{position:relative;inset:auto;align-self:flex-start;margin:7px 8px 0;font-size:23px}
+ .office #status{
+  position:relative;inset:auto;order:1;align-self:flex-start;width:auto;max-width:calc(100% - 24px);
+  margin:7px 12px 12px;padding:9px 12px;font-size:clamp(15px,3.65vw,18px)
+ }
+ .office .scene{order:2}
+ .office #status::after{top:99%;right:auto;left:34%;clip-path:polygon(0 0,100% 0,0 100%)}
  #answers{
-  position:relative;inset:auto;width:auto;margin:-7px 0 0;
+  position:relative;inset:auto;width:auto;margin:-6px 0 0;
   border:4px solid #593c29;border-top:1px solid #b08056;border-radius:0;
   padding:7px;grid-template-columns:repeat(6,minmax(0,1fr))
  }

@@ -10,12 +10,12 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  page.on('pageerror',e=>errors.push(String(e)));page.on('response',async r=>{if(r.url().startsWith(url))requests.push({path:r.url().slice(url.length),bytes:(await r.body().catch(()=>Buffer.alloc(0))).length});});
  await page.addInitScript(()=>localStorage.setItem('riddlex-language','bn'));
  const start=performance.now();await page.goto(url);
- if(await page.locator('#categories').isVisible()||await page.locator('.founder').getAttribute('src'))throw Error('Gameplay leaked onto splash');
+ if(await page.locator('#categories').isVisible()||await page.locator('.scene-art').getAttribute('src'))throw Error('Gameplay leaked onto splash');
  if(await page.locator('html').getAttribute('lang')!=='en'||await page.locator('#language').count()||await page.locator('#play').innerText()!=='Play')throw Error('Splash must be English-only');
  await page.locator('#splash-art img').evaluate(img=>img.decode());
  await page.screenshot({path:path.join(output,'browser-splash.png'),fullPage:true});
  await page.locator('#play').click();await page.locator('#categories').waitFor({state:'visible'});await page.evaluate(()=>document.fonts.ready);
- await page.locator('.founder').evaluate(img=>img.decode());
+ await page.locator('.scene-art').evaluate(img=>img.decode());
  if(await page.locator('#splash-art').isVisible())throw Error('Splash visible in the office');
  const initialMs=performance.now()-start,initial=requests.slice();if(initial.some(r=>/runtime\/|casebook|knowledge/.test(r.path)))throw Error('Eager data payload');
  const desktop=await browser.newPage({viewport:{width:1280,height:900},reducedMotion:'reduce'});
@@ -23,13 +23,12 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await desktop.locator('#splash-art img').evaluate(img=>img.decode());
  await desktop.screenshot({path:path.join(output,'browser','desktop-splash.png'),fullPage:true});
  await desktop.locator('#play').click();
- await desktop.locator('.founder').evaluate(img=>img.decode());
+ await desktop.locator('.scene-art').evaluate(img=>img.decode());
  await desktop.screenshot({path:path.join(output,'browser','desktop-office.png'),fullPage:true});
  async function captureQuestion(view, label){
   await view.locator('[data-category="characters"]').click();
   await view.locator('#answers').waitFor({state:'visible'});
-  await view.locator('.detective').evaluate(img=>img.decode());
-  await view.locator('.cat-alert').evaluate(img=>img.decode());
+  await view.locator('.scene-art').evaluate(img=>img.decode());
   if(await view.locator('.office #status').innerText()!=='Are you thinking of someone by their relationship to you, such as a relative or friend?')throw Error('Question is missing from the office');
   const overflow=await view.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
   if(overflow)throw Error(label+' question overflows the viewport');

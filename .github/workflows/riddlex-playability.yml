@@ -31,10 +31,12 @@ jobs:
           node browser-check.cjs
         env:
           RIDDLEX_BROWSER_OUTPUT: ${{ runner.temp }}/riddlex-browser
-      - name: Upload question layout screenshots
+      - name: Upload Riddlex browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: riddlex-question-layout
-          path: ${{ runner.temp }}/riddlex-browser/browser/*-question.png
+          name: riddlex-visual-repair
+          path: |
+            ${{ runner.temp }}/riddlex-browser/browser/*.png
+            ${{ runner.temp }}/riddlex-browser/browser-results.json
           if-no-files-found: warn

@@ -5,26 +5,36 @@
 </section>
 <div class="office-shell">
 <section class="office" hidden>
-  <div class="rear-wall" aria-hidden="true">
-    <img class="founder" data-src="./images/approved/founder.jpg" alt="">
+  <div class="office-wordmark" aria-hidden="true">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 8 8M7 10a4 4 0 0 1 4-3"/></svg>
+    Riddlex
   </div>
-  <img class="detective" src="./images/approved/detective.png" alt="" width="276" height="218">
-  <div class="foreground" aria-hidden="true"></div>
-  <div class="cat" aria-hidden="true">
-    <img class="cat-alert" src="./images/approved/cat.png" alt="" width="167" height="130">
-    <img class="cat-resting" src="./images/approved/cat-resting.png" alt="" width="330" height="134">
-  </div>
-  <div class="printer" aria-hidden="true"></div>
-  <div class="discarded-note" aria-hidden="true"></div>
-  <div class="crumple-hands" aria-hidden="true"></div>
-  <div class="paper-ball" aria-hidden="true"></div>
-  <div class="resting-note" aria-hidden="true"></div>
-  <div id="case-note" class="case-note" hidden>
-    <span id="case-note-label">Detective’s note</span>
-    <strong id="case-note-name"></strong>
-    <img id="case-photo" alt="" hidden>
-    <div class="print-grip" aria-hidden="true"></div>
-    <div class="writing-pen" aria-hidden="true"></div>
+  <div class="scene">
+    <img class="scene-art" data-src="./images/approved/seated-office.jpg" width="724" height="404" alt="">
+    <svg class="cat-backdrop" viewBox="0 0 724 404" aria-hidden="true">
+      <defs><clipPath id="upright-cat">
+        <path d="M410 294 414 263 423 231 418 206 423 179 428 148 448 152 465 166 480 163 500 144 506 148 511 182 523 205 526 229 537 252 543 289 536 301 423 302Z"/>
+      </clipPath></defs>
+      <g clip-path="url(#upright-cat)">
+        <svg x="409" y="142" width="137" height="161" viewBox="524 142 32 161" preserveAspectRatio="none">
+          <image width="724" height="404"/>
+        </svg>
+      </g>
+    </svg>
+    <div class="cat" aria-hidden="true">
+      <img class="cat-resting" src="./images/approved/cat-resting.png" alt="" width="330" height="134">
+    </div>
+    <div class="discarded-note" aria-hidden="true"></div>
+    <div class="crumple-hands" aria-hidden="true"></div>
+    <div class="paper-ball" aria-hidden="true"></div>
+    <div class="resting-note" aria-hidden="true"></div>
+    <div id="case-note" class="case-note" hidden>
+      <span id="case-note-label">Detective’s note</span>
+      <strong id="case-note-name"></strong>
+      <img id="case-photo" alt="" hidden>
+      <div class="print-grip" aria-hidden="true"></div>
+      <div class="writing-pen" aria-hidden="true"></div>
+    </div>
   </div>
 </section>
   <div id="answers" role="group" aria-label="Answer the detective" hidden><button type="button" data-answer="yes" aria-keyshortcuts="1">Yes</button><button type="button" data-answer="no" aria-keyshortcuts="2">No</button><button type="button" data-answer="probably" aria-keyshortcuts="3">Probably</button><button type="button" data-answer="probably-not" aria-keyshortcuts="4">Probably Not</button><button type="button" data-answer="unknown" aria-keyshortcuts="5">Don't Know</button></div>

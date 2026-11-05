@@ -84,16 +84,6 @@ main:has(#play:not([hidden])){
  box-shadow:0 2px 7px #1a0d07aa
 }
 .office-wordmark svg{width:.87em;height:.87em}
-.cat-backdrop,.cat{display:none;position:absolute;pointer-events:none}
-.cat-backdrop{inset:0;width:100%;height:100%;z-index:1}
-.cat{z-index:4;left:54%;bottom:24%;width:23%;filter:drop-shadow(1px 3px 3px #1d120c8c)}
-.cat img{display:block;width:100%;height:auto}
-.office:is([data-mood="wrong"],[data-mood="unsure"],[data-mood="retrying"]) :is(.cat-backdrop,.cat){display:block}
-.office[data-mood="retrying"] .cat-backdrop{animation:cat-reveal .38s linear both}
-@keyframes cat-reveal{0%,55%{opacity:1}to{opacity:0}}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat{animation:cat-settle .45s .47s ease-out both}
-@keyframes cat-settle{from{transform:translateY(-10%) scaleY(.88);opacity:0}}
-
 .case-note{
  position:absolute;z-index:6;left:50%;bottom:5%;transform:translateX(-50%) rotate(-3deg);
  width:min(67%,300px);padding:8px 12px;text-align:center;color:#402b1b;background:#f8eccd;
@@ -104,78 +94,25 @@ main:has(#play:not([hidden])){
  display:block;font:italic 600 clamp(16px,3vw,24px)/1.15 "Segoe Print","Bradley Hand",cursive;
  overflow-wrap:anywhere
 }
-.case-note[data-result="loading"]{visibility:hidden}
-.case-note[data-result="printed"]{
- display:grid;justify-items:center;gap:3px;width:clamp(68px,16%,132px);left:51%;bottom:17%;
- padding:clamp(4px,.65vw,7px);background:#fff9e9;
- animation:feed-and-lift 1.95s cubic-bezier(.33,.04,.3,1) both
+.printer-output {
+ /* The top edge follows the exit slot in the 724 × 404 scene artwork. */
+ position:absolute;z-index:3;left:80.9%;top:71.6%;width:10%;height:12.8%;
+ overflow:hidden;pointer-events:none;transform:skewX(-13deg);transform-origin:top left;
 }
-.case-note[data-result="printed"] img{
- grid-row:1;width:100%;aspect-ratio:1.18;object-fit:contain;background:#e9dec7
+#case-photo {
+ display:block;width:100%;height:100%;object-fit:fill;
+ background:#fbefd5;border:solid #fbefd5;
+ border-width:clamp(2px,.4vw,5px);border-bottom-width:clamp(4px,.7vw,8px);
+ transform:translateY(-7%);
+ animation:printer-feed 1.25s linear both;
 }
-.case-note[data-result="printed"] strong{font:700 clamp(12px,2.5vw,17px)/1.1 Georgia,serif}
-.print-grip,.writing-pen{display:none;position:absolute;pointer-events:none}
-.case-note[data-result="printed"] .print-grip{
- display:block;width:52%;aspect-ratio:86/80;right:-27%;bottom:5%;
- background:url("./images/approved/grip.png") center / contain no-repeat;animation:grip-print 1.95s both
+@keyframes printer-feed {
+ from {transform:translateY(-100%)}
+ to {transform:translateY(-7%)}
 }
-@keyframes feed-and-lift{
- 0%{left:86%;bottom:25%;transform:translate(-50%,41%) rotate(-7deg) scale(.32);clip-path:inset(0 0 100%)}
- 43%{left:86%;bottom:25%;transform:translate(-50%,41%) rotate(-7deg) scale(.47);clip-path:inset(0 -40% 0 0)}
- 60%{left:80%;bottom:29%;transform:translate(-50%,18%) rotate(6deg) scale(.55);clip-path:inset(0 -40% 0 0)}
- 100%{clip-path:inset(0 -40% 0 0)}
+.case-note[data-result="rejected"] span {
+ color:#883d2e;font-weight:bold;
 }
-@keyframes grip-print{0%,47%{opacity:0}55%,100%{opacity:1}}
-.case-note[data-result="written"] strong{animation:write-name .85s steps(14,end) both}
-.case-note[data-result="written"] .writing-pen{
- display:block;bottom:12%;left:82%;width:27px;height:5px;opacity:0;
- background:linear-gradient(90deg,#9a6331,#261e16 22% 87%,#ad8f59 88%);
- border-radius:70% 0 0 50%;animation:write-pen .85s ease-out both
-}
-@keyframes write-name{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
-@keyframes write-pen{
- 0%{left:16%;opacity:1;transform:rotate(-35deg)}
- 80%{opacity:1;transform:rotate(-29deg)}
- to{opacity:0;transform:translateY(-5px) rotate(-35deg)}
-}
-
-.discarded-note,.crumple-hands,.paper-ball,.resting-note{
- display:none;position:absolute;pointer-events:none;background:#f7eacb
-}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) :is(.discarded-note,.crumple-hands,.paper-ball,.resting-note){display:block}
-.discarded-note{z-index:5;left:41%;bottom:23%;width:11%;height:9%;animation:crumple .37s ease-in both}
-.crumple-hands{
- z-index:6;left:34%;bottom:24%;width:20%;aspect-ratio:177/103;
- background:url("./images/approved/crumple-hands.png") center / contain no-repeat;
- animation:crumple-gesture .59s ease-in-out both
-}
-@keyframes crumple-gesture{
- from{opacity:0;transform:translateY(20%) scale(.84)}
- 22%{opacity:1}
- 58%{opacity:1;transform:translateY(-15%) scale(.91) rotate(-6deg)}
- to{opacity:0;transform:translate(-30%,-30%) rotate(-17deg)}
-}
-.paper-ball{
- z-index:3;left:43%;bottom:31%;width:5%;aspect-ratio:1;
- background:url("./images/approved/crumpled.png") center / contain no-repeat;animation:toss .78s .29s ease-in both
-}
-.office[data-mood="retrying"] .resting-note{display:block;animation:note-clear .38s ease-in both}
-@keyframes note-clear{to{opacity:0}}
-.resting-note{
- z-index:3;left:54%;bottom:23%;width:23%;height:6%;
- transform:rotate(-4deg);box-shadow:2px 3px 4px #271a14;animation:note-ready .47s step-end both
-}
-@keyframes crumple{
- 75%{opacity:1}
- to{opacity:0;transform:translateY(-48%) rotate(30deg) scale(.26);border-radius:40%}
-}
-@keyframes toss{
- from{opacity:0}
- 15%{opacity:1}
- 57%{transform:translate(-430%,-740%) scale(.78) rotate(-240deg)}
- to{transform:translate(-1020%,-980%) scale(.55) rotate(-420deg)}
-}
-@keyframes note-ready{from{opacity:0}to{opacity:1}}
 @media(max-width:720px){
  body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
  .games-nav{align-self:start;border-right:0;border-bottom:1px solid #d7c3a6;padding:4px 8px}
@@ -255,5 +192,4 @@ main:has(#play:not([hidden])){
 }
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{animation:none!important;transition:none!important}
- .discarded-note,.crumple-hands,.paper-ball,.writing-pen{visibility:hidden}
 }

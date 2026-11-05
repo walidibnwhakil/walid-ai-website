@@ -46,13 +46,13 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  const visualBaseline=process.env.RIDDLEX_VISUAL_BASELINE;
  const visualComparison={};
  if(visualBaseline){
-  const overrides=new Map(['app.js','style.css','engine-v2.js'].map(file=>[
+  const overrides=new Map(['index.html','app.js','style.css','engine-v2.js'].map(file=>[
    file,execFileSync('git',['show',visualBaseline+':games/riddlex/'+file],{cwd:root})
   ]));
   for(const [label,viewport] of [['desktop',{width:1280,height:900}],['mobile',{width:390,height:844}]]){
    const original=await browser.newPage({viewport,reducedMotion:label==='desktop'?'reduce':'no-preference'});
    await original.route(url+'*',async route=>{
-    const file=new URL(route.request().url()).pathname.slice(prefix.length);
+    const file=new URL(route.request().url()).pathname.slice(prefix.length)||'index.html';
     if(overrides.has(file))await route.fulfill({body:overrides.get(file),contentType:mime[path.extname(file)]});
     else await route.continue();
    });
@@ -109,11 +109,10 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  for(const value of ['unknown','probably','probably-not']){await page.locator('[data-answer="'+value+'"]').click();await page.locator('#back').click();}
  const d=await data('animals'),cat=d.entries.find(e=>e.id==='cat');
  for(let i=0;i<60&&await page.locator('#answers').isVisible();i++){const text=await page.locator('#status').innerText(),key=Object.keys(d.questions).find(k=>d.questions[k]===text),fact=factValue(cat,key);await page.locator('[data-answer="'+(fact===undefined?'unknown':fact?'yes':'no')+'"]').click();}
- await page.locator('#wrong').click();if(!await page.locator('.discarded-note').isVisible()||!await page.locator('.cat-resting').isVisible())throw Error('Missing resting cat');
- const toss=await page.locator('.paper-ball').evaluate(paper=>paper.getAnimations().some(animation=>animation.animationName==='toss'));
- if(!toss)throw Error('Missing paper toss animation');
+ await page.locator('#wrong').click();
+ if(await page.locator('#case-note').getAttribute('data-result')!=='rejected')throw Error('Missing rejected guess note');
  await page.screenshot({path:path.join(output,'browser','wrong-result.png'),fullPage:true,animations:'disabled'});
- await page.locator('#retry').click();await page.waitForFunction(()=>document.querySelector('.office').dataset.mood!=='retrying');if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
+ await page.locator('#retry').click();if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
  await page.locator('#new').click();await page.route('**/runtime/characters-*.json',async r=>{await new Promise(resolve=>setTimeout(resolve,150));await r.continue();});await page.locator('[data-category="characters"]').click();await page.locator('#new').click();await page.evaluate(()=>import('./runtime-loader.js').then(m=>m.loadCategory('characters')).then(()=>true));await page.unrouteAll({behavior:'wait'});if(!await page.locator('#categories').isVisible())throw Error('Late load overwrote reset');
  const photoPage=await context.newPage();
  photoPage.on('pageerror',e=>errors.push(String(e)));
@@ -134,7 +133,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  if(await photoPage.locator('#case-photo').isVisible())throw Error('Photo appeared before confirmation');
  await photoPage.locator('#correct').click();
  await photoPage.waitForFunction(()=>document.querySelector('#case-note').dataset.result==='printed');
- const motion=await photoPage.locator('#case-note').evaluate(note=>note.getAnimations().some(animation=>animation.animationName==='feed-and-lift'));
+ const motion=await photoPage.locator('#case-photo').evaluate(photo=>photo.getAnimations().some(animation=>animation.animationName==='printer-feed'));
  if(!motion||await photoPage.locator('#case-photo').getAttribute('src')!=='./images/einstein.jpg')throw Error('Matching photo did not enter the print animation');
  await photoPage.screenshot({path:path.join(output,'browser','printed-result.png'),fullPage:true,animations:'disabled'});
  await photoPage.close();
@@ -143,13 +142,13 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  for(let i=0;i<=Object.keys(d.questions).length&&await page.locator('#answers').isVisible();i++){
   await page.locator('[data-answer="unknown"]').click();
  }
- if(await page.locator('.office').getAttribute('data-mood')!=='unsure'||!await page.locator('.cat-resting').isVisible()){
+ if(await page.locator('.office').getAttribute('data-mood')!=='unsure'){
   throw Error('Unknown-only case did not end unresolved');
  }
  await page.screenshot({path:path.join(output,'browser','unresolved.png'),fullPage:true,animations:'disabled'});
  await page.locator('#retry').click();
  await page.locator('#categories').waitFor({state:'visible'});
- if(await page.locator('.cat-resting').isVisible())throw Error('Unresolved Retry did not reset the room');
+ if(await page.locator('#case-note').isVisible())throw Error('Unresolved Retry left an old result note');
  const animationChecks={};
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['mobile',{width:390,height:844}]]){
   const motionContext=await browser.newContext({
@@ -182,31 +181,39 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   await playCase('characters',characters.questions,einstein);
   if(await photo.isVisible())throw Error('Photo shown before confirmation');
   await view.locator('#correct').click();
-  await waitMotion('#case-note','feed-and-lift');
+  await waitMotion('#case-photo','printer-feed');
   if(!await photo.evaluate(img=>img.complete&&img.naturalWidth>0))throw Error('Photo failed to decode');
-  await view.waitForFunction(()=>document.querySelector('#case-note').getAnimations().some(a=>a.animationName==='feed-and-lift'&&a.currentTime>=620));
-  await shot('printing');
-  await note.evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
-  await shot('photo-held');
+  const feedFrame=ms=>photo.evaluate((img,time)=>{
+   const feed=img.getAnimations().find(animation=>animation.animationName==='printer-feed');
+   feed.pause();
+   feed.currentTime=time;
+   const {top,bottom,width,height}=img.getBoundingClientRect();
+   const slot=img.parentElement.getBoundingClientRect().top;
+   return {width,height,exposed:Math.max(0,bottom-Math.max(top,slot))};
+  },ms);
+  const start=await feedFrame(0);
+  await shot('print-start');
+  const first=await feedFrame(340);
+  await shot('print-emerging');
+  const second=await feedFrame(800);
+  await shot('print-feeding');
+  const end=await feedFrame(1250);
+  await shot('photo-in-tray');
+  if(start.exposed>.1||!(start.exposed<first.exposed&&first.exposed<second.exposed&&second.exposed<end.exposed)||
+     [first,second,end].some(frame=>Math.abs(frame.width-start.width)>.1||Math.abs(frame.height-start.height)>.1)){
+   throw Error(label+' printer must feed from the slot at a constant size');
+  }
+  await photo.evaluate(img=>{const feed=img.getAnimations()[0];feed.currentTime=0;feed.play();return feed.finished;});
   await playCase('animals',d.questions,cat);
   await view.locator('#correct').click();
-  await waitMotion('#case-note-name','write-name');
   if(await photo.isVisible()||await note.getAttribute('data-result')!=='written')throw Error('Expected name-only note');
   await shot('name-written',{animations:'disabled'});
   await playCase('animals',d.questions,cat);
   await view.locator('#wrong').click();
-  await waitMotion('.crumple-hands','crumple-gesture');
-  await waitMotion('.paper-ball','toss');
-  await view.waitForFunction(()=>document.querySelector('.paper-ball').getAnimations().some(a=>a.animationName==='toss'&&a.currentTime>=460));
-  await shot('paper-toss');
-  await view.locator('.paper-ball').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
-  const offscreen=await view.locator('.paper-ball').evaluate(el=>el.getBoundingClientRect().right<el.closest('.office').getBoundingClientRect().left);
-  if(!offscreen)throw Error(label+' paper stopped inside the office');
-  await shot('cat-resting');
+  if(await note.getAttribute('data-result')!=='rejected')throw Error(label+' missing rejected note');
+  await shot('guess-rejected');
   await view.locator('#retry').click();
-  await waitMotion('.cat','cat-rise');
-  await shot('cat-rising');
-  await view.waitForFunction(()=>document.querySelector('.office').dataset.mood!=='retrying');
+  await shot('retry-continued',{animations:'disabled'});
   if(await note.getAttribute('data-guess-id')==='cat')throw Error('Retry repeated rejected cat');
   await view.locator('#new').click();
   await view.locator('[data-category="animals"]').click();
@@ -215,13 +222,12 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
    await view.locator('[data-answer="unknown"]').click();
   }
   if(await office.getAttribute('data-mood')!=='unsure')throw Error(label+' unknown answers did not end unresolved');
-  await waitMotion('.paper-ball','toss');
-  await shot('unresolved-resting',{animations:'disabled'});
+  await shot('unresolved',{animations:'disabled'});
   await view.locator('#retry').click();
   await view.locator('#categories').waitFor({state:'visible'});
-  if(await view.locator('.cat-resting').isVisible())throw Error(label+' Retry did not restore upright cat');
+  if(await note.isVisible()||await photo.isVisible())throw Error(label+' Retry left an old result');
   await shot('retry-reset');
-  animationChecks[label]=['photo feed and lift','name only','paper crumple and offscreen toss','cat rest and rise','unresolved retry'];
+  animationChecks[label]=['fixed-size printer feed','handwritten fallback','rejected guess and continuation','unresolved retry'];
   const video=view.video();
   await motionContext.close();
   if(video)await video.saveAs(path.join(output,'browser',label+'-gameplay.webm'));

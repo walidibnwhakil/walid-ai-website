@@ -67,6 +67,16 @@ const questionIdentity=key=>{
  return equivalentOccupations[canonical]??canonical;
 };
 const normalize=text=>text.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu,'');
+// These prompts explicitly assume the parent clue in their wording.
+const questionPrerequisites={
+ cartoon:['boy','girl','underwater','duck_character','dog_character','animated_movie','lion_character'],
+ superhero:['dc','gotham','marvel','krypton','armor','shield','green','hammer','lasso'],
+ actor:['king_khan','bhaijaan','big_b','aamir'],
+ poet:['bonolota'],writer:['nonsense_poetry'],singer:['playback'],cricket:['wicketkeeper'],
+ pokemon:['electric_creature','trainer'],
+ bird:['mimic','peacock','flightless'],insect:['mosquito'],marine:['jelly'],
+ friend:['best']
+};
 function questionBank(questions,answers){
  const excluded=new Set();
  for(const {key,value} of answers){
@@ -74,7 +84,7 @@ function questionBank(questions,answers){
   // Ask each paired dimension once. This suppresses follow-ups without
   // turning No or Don't Know into evidence for a different gender.
   if(Object.hasOwn(questionPairs,key))excluded.add(questionPairs[key]);
-  if(key==='cartoon'&&value==='no'){excluded.add('boy');excluded.add('girl');}
+  if(value==='no')for(const child of questionPrerequisites[questionIdentity(key)]??[])excluded.add(child);
   if(key==='boy'&&value==='yes'||key==='girl'&&value==='yes')excluded.add('cartoon');
  }
  const askedText=new Set(answers.flatMap(({key})=>questions[key]?[normalize(questions[key])]:[]));

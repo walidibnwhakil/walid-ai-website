@@ -9,6 +9,7 @@ let loadToken=0;
 const $=id=>document.getElementById(id);
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
 let photoRequest=0;
+let retryAnimation=null;
 const office=document.querySelector(".office");
 const status=$("status"), statusHome=status.parentElement;
 function mood(value){office.dataset.mood=value;}
@@ -77,7 +78,7 @@ function showUnresolved(){
  mood("unsure");showNote();visible(guessPanel,true);visible($("retry"),true);
  setStatus("I don’t have enough evidence to make a reliable guess. You can change an answer or retry with a new case.");
 }
-function reset(){loadToken++;category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
+function reset(){retryAnimation?.cancel();retryAnimation=null;loadToken++;category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
  progress();
  const splash=mode==="splash";
@@ -94,7 +95,7 @@ function render(){
  for(const id of ["status","progress","new","privacy-note"])visible($(id),!splash);
  visible($("play"),splash);
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong"||mode==="unsure");
- visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
+ visible(back,mode!=="start"&&mode!=="done"&&mode!=="retrying"&&answers.length>0);
  if(splash)return;
  if(mode==="loading"){mood("thinking");setStatus("Opening the casebook…");return;}
  if(mode==="start"){mood("ready");setStatus("Think of a character, animal, object or someone you know.");return;}
@@ -145,16 +146,24 @@ $("play").addEventListener("click",()=>{reset();categories.querySelector("button
 document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
 $("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode="done";render();});
 $("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
-$("retry").addEventListener("click",()=>{
+$("retry").addEventListener("click",async()=>{
  if(mode!=="wrong"&&mode!=="unsure")return;
- const scene=office.querySelector(".scene");
- scene.getAnimations().filter(animation=>animation.id==="retry").forEach(animation=>animation.cancel());
- if(mode==="unsure")reset();
- else retryGuess();
+ const unresolved=mode==="unsure";
+ const cat=office.querySelector(".cat");
+ mode="retrying";
+ visible(guessPanel,false);visible(back,false);
+ mood("retrying");
  if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
-  scene.animate([{filter:"brightness(.84)"},{filter:"none"}],
-   {id:"retry",duration:420,easing:"ease-out"});
+  retryAnimation=cat.animate([
+   {transform:"none",opacity:1},
+   {transform:"translateY(-13%) scaleX(.84) scaleY(1.16)",opacity:1,offset:.55},
+   {transform:"translateY(-22%) scaleX(.77) scaleY(1.25)",opacity:0}
+  ],{id:"cat-rise",duration:380,easing:"ease-in-out"});
+  try{await retryAnimation.finished;}catch{return;}
+  retryAnimation=null;
  }
+ if(unresolved)reset();
+ else retryGuess();
 });
 function retryGuess(){
  if(guess){rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);rejected=rejectedIds(rejectionHistory);}

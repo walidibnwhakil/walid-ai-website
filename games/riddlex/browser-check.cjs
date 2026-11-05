@@ -1,3 +1,4 @@
+const {execFileSync}=require('node:child_process');
 const {chromium}=require('playwright'),http=require('node:http'),fs=require('node:fs/promises'),path=require('node:path'),{createHash}=require('node:crypto');
 (async()=>{
  const root=path.resolve(__dirname,'../..'),prefix='/games/riddlex/',mime={'.html':'text/html','.js':'application/javascript','.json':'application/json','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg'};
@@ -42,6 +43,31 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await captureQuestion(desktop,'desktop');
  await desktop.close();
  await captureQuestion(page,'mobile');
+ const visualBaseline=process.env.RIDDLEX_VISUAL_BASELINE;
+ const visualComparison={};
+ if(visualBaseline){
+  const overrides=new Map(['app.js','style.css','engine-v2.js'].map(file=>[
+   file,execFileSync('git',['show',visualBaseline+':games/riddlex/'+file],{cwd:root})
+  ]));
+  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['mobile',{width:390,height:844}]]){
+   const original=await browser.newPage({viewport,reducedMotion:label==='desktop'?'reduce':'no-preference'});
+   await original.route(url+'*',async route=>{
+    const file=new URL(route.request().url()).pathname.slice(prefix.length);
+    if(overrides.has(file))await route.fulfill({body:overrides.get(file),contentType:mime[path.extname(file)]});
+    else await route.continue();
+   });
+   await original.goto(url);
+   await original.locator('#play').click();
+   await original.evaluate(()=>document.fonts.ready);
+   const baselineLabel=label+'-baseline';
+   await captureQuestion(original,baselineLabel);
+   const approved=await fs.readFile(path.join(output,'browser',baselineLabel+'-question.png'));
+   const actual=await fs.readFile(path.join(output,'browser',label+'-question.png'));
+   if(!approved.equals(actual))throw Error(label+' question screenshot differs from '+visualBaseline);
+   visualComparison[label]={baseline:visualBaseline,identical:true,sha256:createHash('sha256').update(actual).digest('hex')};
+   await original.close();
+  }
+ }
  const manifestBytes=await fs.readFile(path.join(__dirname,'runtime/manifest.json')),manifest=JSON.parse(manifestBytes),manifestSha256=createHash('sha256').update(manifestBytes).digest('hex');
  async function data(category){const parts=await Promise.all(manifest.categories[category].shards.map(s=>fs.readFile(path.join(__dirname,'runtime',s.path),'utf8').then(JSON.parse)));return{entries:parts.flatMap(p=>p.entries),questions:Object.assign({},...parts.map(p=>p.questions))};}
  const {factValue}=await import('./engine-v2.js'),characters=await data('characters'),fresh=characters.entries.find(e=>e.id.startsWith('v2-'));
@@ -87,7 +113,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  const toss=await page.locator('.paper-ball').evaluate(paper=>paper.getAnimations().some(animation=>animation.animationName==='toss'));
  if(!toss)throw Error('Missing paper toss animation');
  await page.screenshot({path:path.join(output,'browser','wrong-result.png'),fullPage:true,animations:'disabled'});
- await page.locator('#retry').click();if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
+ await page.locator('#retry').click();await page.waitForFunction(()=>document.querySelector('.office').dataset.mood!=='retrying');if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
  await page.locator('#new').click();await page.route('**/runtime/characters-*.json',async r=>{await new Promise(resolve=>setTimeout(resolve,150));await r.continue();});await page.locator('[data-category="characters"]').click();await page.locator('#new').click();await page.evaluate(()=>import('./runtime-loader.js').then(m=>m.loadCategory('characters')).then(()=>true));await page.unrouteAll({behavior:'wait'});if(!await page.locator('#categories').isVisible())throw Error('Late load overwrote reset');
  const photoPage=await context.newPage();
  photoPage.on('pageerror',e=>errors.push(String(e)));
@@ -122,8 +148,85 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  }
  await page.screenshot({path:path.join(output,'browser','unresolved.png'),fullPage:true,animations:'disabled'});
  await page.locator('#retry').click();
- if(!await page.locator('#categories').isVisible()||await page.locator('.cat-resting').isVisible())throw Error('Unresolved Retry did not reset the room');
+ await page.locator('#categories').waitFor({state:'visible'});
+ if(await page.locator('.cat-resting').isVisible())throw Error('Unresolved Retry did not reset the room');
+ const animationChecks={};
+ for(const [label,viewport] of [['desktop',{width:1280,height:900}],['mobile',{width:390,height:844}]]){
+  const motionContext=await browser.newContext({
+   viewport,reducedMotion:'no-preference',
+   ...(process.env.RIDDLEX_VIDEO?{recordVideo:{dir:path.join(output,'video'),size:viewport}}:{})
+  });
+  const view=await motionContext.newPage();
+  view.on('pageerror',e=>errors.push(String(e)));
+  const note=view.locator('#case-note'),photo=view.locator('#case-photo'),office=view.locator('.office');
+  const shot=(state,options={})=>view.screenshot({path:path.join(output,'browser',label+'-'+state+'.png'),fullPage:true,...options});
+  const waitMotion=(selector,name)=>view.waitForFunction(([selector,name])=>
+   document.querySelector(selector).getAnimations().some(animation=>animation.animationName===name||animation.id===name),
+   [selector,name]);
+  async function playCase(category,bank,target){
+   if(!await view.locator('#categories').isVisible())await view.locator('#new').click();
+   await view.locator('[data-category="'+category+'"]').click();
+   await view.locator('#answers').waitFor({state:'visible'});
+   if(category==='characters')await view.locator('[data-answer="no"]').click();
+   for(let i=0;i<110&&await view.locator('#answers').isVisible();i++){
+    const question=await view.locator('#status').innerText();
+    const key=Object.keys(bank).find(key=>bank[key]===question);
+    if(!key)throw Error('Unmapped result question '+question);
+    const fact=factValue(target,key);
+    await view.locator('[data-answer="'+(fact===undefined?'unknown':fact?'yes':'no')+'"]').click();
+   }
+   if(await note.getAttribute('data-guess-id')!==target.id)throw Error(label+' failed to guess '+target.id);
+  }
+  await view.goto(url);
+  await view.locator('#play').click();
+  await playCase('characters',characters.questions,einstein);
+  if(await photo.isVisible())throw Error('Photo shown before confirmation');
+  await view.locator('#correct').click();
+  await waitMotion('#case-note','feed-and-lift');
+  if(!await photo.evaluate(img=>img.complete&&img.naturalWidth>0))throw Error('Photo failed to decode');
+  await view.waitForFunction(()=>document.querySelector('#case-note').getAnimations().some(a=>a.animationName==='feed-and-lift'&&a.currentTime>=620));
+  await shot('printing');
+  await note.evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
+  await shot('photo-held');
+  await playCase('animals',d.questions,cat);
+  await view.locator('#correct').click();
+  await waitMotion('#case-note-name','write-name');
+  if(await photo.isVisible()||await note.getAttribute('data-result')!=='written')throw Error('Expected name-only note');
+  await shot('name-written',{animations:'disabled'});
+  await playCase('animals',d.questions,cat);
+  await view.locator('#wrong').click();
+  await waitMotion('.crumple-hands','crumple-gesture');
+  await waitMotion('.paper-ball','toss');
+  await view.waitForFunction(()=>document.querySelector('.paper-ball').getAnimations().some(a=>a.animationName==='toss'&&a.currentTime>=460));
+  await shot('paper-toss');
+  await view.locator('.paper-ball').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
+  const offscreen=await view.locator('.paper-ball').evaluate(el=>el.getBoundingClientRect().right<el.closest('.office').getBoundingClientRect().left);
+  if(!offscreen)throw Error(label+' paper stopped inside the office');
+  await shot('cat-resting');
+  await view.locator('#retry').click();
+  await waitMotion('.cat','cat-rise');
+  await shot('cat-rising');
+  await view.waitForFunction(()=>document.querySelector('.office').dataset.mood!=='retrying');
+  if(await note.getAttribute('data-guess-id')==='cat')throw Error('Retry repeated rejected cat');
+  await view.locator('#new').click();
+  await view.locator('[data-category="animals"]').click();
+  await view.locator('#answers').waitFor({state:'visible'});
+  for(let i=0;i<=Object.keys(d.questions).length&&await view.locator('#answers').isVisible();i++){
+   await view.locator('[data-answer="unknown"]').click();
+  }
+  if(await office.getAttribute('data-mood')!=='unsure')throw Error(label+' unknown answers did not end unresolved');
+  await waitMotion('.paper-ball','toss');
+  await shot('unresolved-resting',{animations:'disabled'});
+  await view.locator('#retry').click();
+  await view.locator('#categories').waitFor({state:'visible'});
+  if(await view.locator('.cat-resting').isVisible())throw Error(label+' Retry did not restore upright cat');
+  await shot('retry-reset');
+  animationChecks[label]=['photo feed and lift','name only','paper crumple and offscreen toss','cat rest and rise','unresolved retry'];
+  const video=view.video();
+  await motionContext.close();
+  if(video)await video.saveAs(path.join(output,'browser',label+'-gameplay.webm'));
+ }
  const memory=await page.evaluate(()=>performance.memory?.usedJSHeapSize/1048576??null);
- const result={environment:'Chromium, local uncompressed HTTP; 390x844 viewport',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true,photoPrint:true,unresolvedRetry:true};
+ const result={environment:'Chromium, local uncompressed HTTP; 390x844 viewport',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,visualComparison,animationChecks,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true,photoPrint:true,unresolvedRetry:true};
  await fs.writeFile(path.join(output,'browser-results.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));await browser.close();server.close();if(errors.length)process.exitCode=1;
 })().catch(e=>{console.error(e);process.exit(1);});

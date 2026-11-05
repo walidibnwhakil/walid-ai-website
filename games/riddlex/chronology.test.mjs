@@ -41,3 +41,15 @@ test('asks one gender question without inferring another gender', () => {
   assert.deepEqual(scoreCandidates(openWorld, unknown), scoreCandidates(openWorld, []));
   assert.equal(ask(unknown, {female:'Female?', actor:'Actor?'}), 'actor');
 });
+
+test('explicitly incompatible follow-ups are skipped without treating uncertainty as No', () => {
+ const bank={underwater:'Does this cartoon character live underwater?',marvel:'Is this a Marvel superhero?'};
+ const pool=[
+  {id:'a',facts:{cartoon:true,superhero:true,underwater:true,marvel:true}},
+  {id:'b',facts:{cartoon:false,superhero:false,underwater:false,marvel:false}},
+ ];
+ const next=answers=>nextQuestion(scoreCandidates(pool,answers),answers,bank);
+ assert.equal(next([{key:'cartoon',value:'no'},{key:'superhero',value:'no'}]),null);
+ assert.equal(next([{key:'cartoon',value:'no'},{key:'superhero',value:'unknown'}]),'marvel');
+ assert.equal(next([{key:'cartoon',value:'probably-not'},{key:'superhero',value:'no'}]),'underwater');
+});

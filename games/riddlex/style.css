@@ -88,9 +88,11 @@ main:has(#play:not([hidden])){
 .cat-backdrop{inset:0;width:100%;height:100%;z-index:1}
 .cat{z-index:4;left:54%;bottom:24%;width:23%;filter:drop-shadow(1px 3px 3px #1d120c8c)}
 .cat img{display:block;width:100%;height:auto}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) :is(.cat-backdrop,.cat){display:block}
-.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat{animation:cat-settle .45s ease-out both}
-@keyframes cat-settle{from{transform:translateY(-10%) scaleY(.88);opacity:.65}}
+.office:is([data-mood="wrong"],[data-mood="unsure"],[data-mood="retrying"]) :is(.cat-backdrop,.cat){display:block}
+.office[data-mood="retrying"] .cat-backdrop{animation:cat-reveal .38s linear both}
+@keyframes cat-reveal{0%,55%{opacity:1}to{opacity:0}}
+.office:is([data-mood="wrong"],[data-mood="unsure"]) .cat{animation:cat-settle .45s .47s ease-out both}
+@keyframes cat-settle{from{transform:translateY(-10%) scaleY(.88);opacity:0}}
 
 .case-note{
  position:absolute;z-index:6;left:50%;bottom:5%;transform:translateX(-50%) rotate(-3deg);
@@ -118,8 +120,8 @@ main:has(#play:not([hidden])){
  background:url("./images/approved/grip.png") center / contain no-repeat;animation:grip-print 1.95s both
 }
 @keyframes feed-and-lift{
- 0%{left:89%;bottom:27%;transform:translate(-50%,28%) rotate(-12deg) scale(.32);clip-path:inset(0 0 100%)}
- 43%{left:89%;bottom:25%;transform:translate(-50%,28%) rotate(-8deg) scale(.47);clip-path:inset(0 -40% 0 0)}
+ 0%{left:86%;bottom:25%;transform:translate(-50%,41%) rotate(-7deg) scale(.32);clip-path:inset(0 0 100%)}
+ 43%{left:86%;bottom:25%;transform:translate(-50%,41%) rotate(-7deg) scale(.47);clip-path:inset(0 -40% 0 0)}
  60%{left:80%;bottom:29%;transform:translate(-50%,18%) rotate(6deg) scale(.55);clip-path:inset(0 -40% 0 0)}
  100%{clip-path:inset(0 -40% 0 0)}
 }
@@ -157,9 +159,11 @@ main:has(#play:not([hidden])){
  z-index:3;left:43%;bottom:31%;width:5%;aspect-ratio:1;
  background:url("./images/approved/crumpled.png") center / contain no-repeat;animation:toss .78s .29s ease-in both
 }
+.office[data-mood="retrying"] .resting-note{display:block;animation:note-clear .38s ease-in both}
+@keyframes note-clear{to{opacity:0}}
 .resting-note{
  z-index:3;left:54%;bottom:23%;width:23%;height:6%;
- transform:rotate(-4deg);box-shadow:2px 3px 4px #271a14;animation:note-ready .7s step-end both
+ transform:rotate(-4deg);box-shadow:2px 3px 4px #271a14;animation:note-ready .47s step-end both
 }
 @keyframes crumple{
  75%{opacity:1}
@@ -168,8 +172,8 @@ main:has(#play:not([hidden])){
 @keyframes toss{
  from{opacity:0}
  15%{opacity:1}
- 57%{opacity:1;transform:translate(430%,-720%) scale(.7) rotate(240deg)}
- to{opacity:0;transform:translate(680%,-390%) scale(.4) rotate(420deg)}
+ 57%{transform:translate(-430%,-740%) scale(.78) rotate(-240deg)}
+ to{transform:translate(-1020%,-980%) scale(.55) rotate(-420deg)}
 }
 @keyframes note-ready{from{opacity:0}to{opacity:1}}
 @media(max-width:720px){

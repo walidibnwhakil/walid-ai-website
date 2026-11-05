@@ -1,0 +1,48 @@
+name: Riddlex playability
+on:
+  push:
+    branches: [riddlex-recovery]
+    paths:
+      - '.devcontainer/devcontainer.json'
+      - '.github/workflows/riddlex-playability.yml'
+      - 'games/riddlex/**'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: games/riddlex
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run validate
+      - name: Play the English game in Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.60.0
+          RIDDLEX_CHROME="$(command -v google-chrome || command -v chromium)"
+          test -n "$RIDDLEX_CHROME"
+          export RIDDLEX_CHROME
+          git fetch --no-tags --depth=1 origin "$RIDDLEX_VISUAL_BASELINE"
+          # Playwright 1.60 uses the same x64 Linux recorder across supported Ubuntu versions.
+          PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64 npx playwright install ffmpeg
+          node browser-check.cjs
+        env:
+          RIDDLEX_VIDEO: '1'
+          RIDDLEX_VISUAL_BASELINE: '27588530efda54a97089e4f4f41f5bbc6df7a2e3'
+          RIDDLEX_BROWSER_OUTPUT: ${{ runner.temp }}/riddlex-browser
+      - name: Upload Riddlex browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-gameplay-evidence
+          path: |
+            ${{ runner.temp }}/riddlex-browser/browser/*.png
+            ${{ runner.temp }}/riddlex-browser/browser/*.webm
+            ${{ runner.temp }}/riddlex-browser/browser-results.json
+          if-no-files-found: warn
+      - run: npm test

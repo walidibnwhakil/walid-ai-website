@@ -1,0 +1,44 @@
+characters 50 / 2645 seconds 55
+characters 100 / 2645 seconds 58
+characters 150 / 2645 seconds 59
+characters 200 / 2645 seconds 60
+characters 250 / 2645 seconds 117
+characters 300 / 2645 seconds 118
+characters 350 / 2645 seconds 118
+characters 400 / 2645 seconds 120
+characters 450 / 2645 seconds 179
+characters 500 / 2645 seconds 180
+characters 550 / 2645 seconds 181
+characters 600 / 2645 seconds 183
+characters 650 / 2645 seconds 235
+characters 700 / 2645 seconds 239
+characters 750 / 2645 seconds 240
+characters 800 / 2645 seconds 242
+characters 850 / 2645 seconds 282
+characters 900 / 2645 seconds 288
+characters 950 / 2645 seconds 291
+characters 1000 / 2645 seconds 292
+characters 1050 / 2645 seconds 331
+characters 1100 / 2645 seconds 336
+characters 1150 / 2645 seconds 341
+characters 1200 / 2645 seconds 344
+characters 1250 / 2645 seconds 380
+characters 1300 / 2645 seconds 385
+characters 1350 / 2645 seconds 389
+characters 1400 / 2645 seconds 393
+characters 1450 / 2645 seconds 429
+characters 1455 / 2645 seconds 433
+characters 1505 / 2645 seconds 433
+characters 1555 / 2645 seconds 436
+characters 1560 / 2645 seconds 438
+characters 1565 / 2645 seconds 439
+characters 1615 / 2645 seconds 442
+characters 1620 / 2645 seconds 444
+characters {"ideal":{"targets":1620,"correct":773,"wrongFirstGuesses":0,"unresolved":847,"averageQuestions":48.91975308641975,"p95Questions":60,"maxQuestions":60},"noisy":{"targets":1620,"correct":235,"wrongFirstGuesses":54,"unresolved":1331,"averageQuestions":55.99012345679012,"p95Questions":60,"maxQuestions":60}}
+animals 0 / 95 seconds 445
+animals {"ideal":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null},"noisy":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null}}
+objects 0 / 100 seconds 445
+objects {"ideal":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null},"noisy":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null}}
+relationships 0 / 15 seconds 445
+relationships {"ideal":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null},"noisy":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null}}
+complete {"mode":"candidates","seconds":444.555192786,"promoted":{"additions":600,"enrichments":139}}

@@ -1,0 +1,101 @@
+{
+  "environment": "Cloud Chromium, local uncompressed HTTP; 390x844 viewport; not Bangladesh WAN",
+  "browserVersion": "156.0.8078.79",
+  "manifestSha256": "b99880d0af977219c9fa1dcb997b79f17dbff62f94420b5644b61bf2810db08e",
+  "initialMs": 557.7169990000002,
+  "initialBytes": 40957,
+  "initialRequests": [
+    {
+      "path": "style.css",
+      "bytes": 14278
+    },
+    {
+      "path": "images/detective.svg",
+      "bytes": 2553
+    },
+    {
+      "path": "images/cat.svg",
+      "bytes": 1260
+    },
+    {
+      "path": "app.js",
+      "bytes": 12191
+    },
+    {
+      "path": "",
+      "bytes": 2570
+    },
+    {
+      "path": "runtime-loader.js",
+      "bytes": 1770
+    },
+    {
+      "path": "engine-v2.js",
+      "bytes": 5643
+    },
+    {
+      "path": "history.js",
+      "bytes": 447
+    },
+    {
+      "path": "print-photo.js",
+      "bytes": 245
+    }
+  ],
+  "games": [
+    {
+      "language": "en",
+      "category": "animals",
+      "id": "cat",
+      "correct": true,
+      "questions": 10,
+      "loadMs": 152.30614400000013
+    },
+    {
+      "language": "bn",
+      "category": "objects",
+      "id": "phone",
+      "correct": true,
+      "questions": 5,
+      "loadMs": 60.21229299999868
+    },
+    {
+      "language": "bn",
+      "category": "relationships",
+      "id": "role-wife",
+      "correct": true,
+      "questions": 3,
+      "loadMs": 58.109989000000496
+    },
+    {
+      "language": "en",
+      "category": "characters",
+      "id": "himu",
+      "correct": true,
+      "questions": 8,
+      "loadMs": 199.5342209999999
+    },
+    {
+      "language": "en",
+      "category": "characters",
+      "id": "v2-q148659",
+      "correct": true,
+      "questions": 50,
+      "loadMs": 41.411824000000706
+    },
+    {
+      "language": "bn",
+      "category": "characters",
+      "id": "v2-q148659",
+      "correct": true,
+      "questions": 50,
+      "loadMs": 41.143417999999656
+    }
+  ],
+  "memory": 14.555394172668457,
+  "errors": [],
+  "loadFailureRetry": true,
+  "answerCorrection": true,
+  "wrongGuessRetry": true,
+  "resetDuringLoading": true
+}

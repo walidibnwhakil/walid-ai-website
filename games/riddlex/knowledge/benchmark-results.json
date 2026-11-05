@@ -1,0 +1,212 @@
+{
+  "dataset": 1791,
+  "roles": 15,
+  "seed": "FNV1a(target-id/question-key) modulo 100",
+  "noisyPolicy": "Known answers: 25% unknown, 15% same-sign probable, 5% flipped, 55% correct definite. Missing facts always unknown. 60-question cap; wrong guesses rejected.",
+  "categories": {
+    "characters": {
+      "ideal": {
+        "targets": 1596,
+        "correct": 1596,
+        "unresolved": 0,
+        "firstGuessCorrect": 1590,
+        "averageQuestions": 33.01378446115288,
+        "medianQuestions": 28,
+        "p95Questions": 63,
+        "maxQuestions": 291,
+        "wrongGuesses": 167,
+        "maxRejected": 85
+      },
+      "noisy60": {
+        "targets": 1596,
+        "correct": 467,
+        "unresolved": 1129,
+        "firstGuessCorrect": 435,
+        "averageQuestions": 43.47932330827068,
+        "medianQuestions": 45,
+        "p95Questions": 60,
+        "maxQuestions": 60,
+        "wrongGuesses": 2152,
+        "maxRejected": 40
+      },
+      "longestIdeal": [
+        {
+          "id": "satyajit-ray",
+          "correct": true,
+          "questions": 291,
+          "rejected": 77,
+          "firstGuessCorrect": false
+        },
+        {
+          "id": "salman-khan",
+          "correct": true,
+          "questions": 182,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "shah-rukh-khan",
+          "correct": true,
+          "questions": 181,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "shakib-al-hasan",
+          "correct": true,
+          "questions": 172,
+          "rejected": 85,
+          "firstGuessCorrect": false
+        },
+        {
+          "id": "virat-kohli",
+          "correct": true,
+          "questions": 171,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        }
+      ]
+    },
+    "animals": {
+      "ideal": {
+        "targets": 95,
+        "correct": 95,
+        "unresolved": 0,
+        "firstGuessCorrect": 95,
+        "averageQuestions": 11.557894736842105,
+        "medianQuestions": 10,
+        "p95Questions": 26,
+        "maxQuestions": 35,
+        "wrongGuesses": 0,
+        "maxRejected": 0
+      },
+      "noisy60": {
+        "targets": 95,
+        "correct": 62,
+        "unresolved": 33,
+        "firstGuessCorrect": 52,
+        "averageQuestions": 21.705263157894738,
+        "medianQuestions": 14,
+        "p95Questions": 57,
+        "maxQuestions": 60,
+        "wrongGuesses": 154,
+        "maxRejected": 33
+      },
+      "longestIdeal": [
+        {
+          "id": "pangolin",
+          "correct": true,
+          "questions": 35,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "walrus",
+          "correct": true,
+          "questions": 34,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "meerkat",
+          "correct": true,
+          "questions": 30,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "echidna",
+          "correct": true,
+          "questions": 28,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "panda",
+          "correct": true,
+          "questions": 26,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        }
+      ]
+    },
+    "objects": {
+      "ideal": {
+        "targets": 100,
+        "correct": 100,
+        "unresolved": 0,
+        "firstGuessCorrect": 99,
+        "averageQuestions": 16.91,
+        "medianQuestions": 11,
+        "p95Questions": 49,
+        "maxQuestions": 83,
+        "wrongGuesses": 1,
+        "maxRejected": 1
+      },
+      "noisy60": {
+        "targets": 100,
+        "correct": 62,
+        "unresolved": 38,
+        "firstGuessCorrect": 55,
+        "averageQuestions": 27.1,
+        "medianQuestions": 24,
+        "p95Questions": 60,
+        "maxQuestions": 60,
+        "wrongGuesses": 102,
+        "maxRejected": 25
+      },
+      "longestIdeal": [
+        {
+          "id": "mirror",
+          "correct": true,
+          "questions": 83,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "telescope",
+          "correct": true,
+          "questions": 51,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "soap",
+          "correct": true,
+          "questions": 50,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "microscope",
+          "correct": true,
+          "questions": 50,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        },
+        {
+          "id": "toothbrush",
+          "correct": true,
+          "questions": 49,
+          "rejected": 0,
+          "firstGuessCorrect": true
+        }
+      ]
+    }
+  },
+  "relationships": {
+    "targets": 15,
+    "correct": 15,
+    "unresolved": 0,
+    "firstGuessCorrect": 15,
+    "averageQuestions": 5.2,
+    "medianQuestions": 5,
+    "p95Questions": 13,
+    "maxQuestions": 13,
+    "wrongGuesses": 0,
+    "maxRejected": 0
+  },
+  "elapsedSeconds": 318.16758028400005,
+  "relationshipRecheck": "Recomputed after restoring the baseline single-question teacher-role fallback; casebook gates and casebook benchmark behavior unchanged.",
+  "engineSha256": "f4efbb32c575677dc4d85db9d9f4c11638e1dc662f146d8de2086c79d2012a14"
+}

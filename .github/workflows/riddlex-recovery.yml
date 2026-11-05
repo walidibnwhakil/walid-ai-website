@@ -1,0 +1,52 @@
+name: Riddlex durable cloud expansion
+on:
+  workflow_dispatch:
+  push:
+    branches: [riddlex-recovery]
+    paths: ['.github/workflows/riddlex-recovery.yml']
+concurrency:
+  group: riddlex-recovery-cloud
+  cancel-in-progress: true
+jobs:
+  expand:
+    if: github.repository == 'walidibnwhakil/walid-ai-website' && github.ref == 'refs/heads/riddlex-recovery' && !github.event.repository.private
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: games/riddlex
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: riddlex-recovery
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/riddlex-source
+          key: riddlex-source-v3-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: riddlex-source-v3-
+      - name: Prepare offline and browser verification
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          npm install --no-save --package-lock=false playwright@1.60.0
+          chrome=$(command -v google-chrome || command -v chromium)
+          test -n "$chrome"
+          printf 'RIDDLEX_CHROME=%s\n' "$chrome" >> "$GITHUB_ENV"
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y fonts-noto-core
+      - name: Acquire and persist new verified source batches
+        run: |
+          node validate-v2.mjs
+          python knowledge/resume-cloud.py "$RUNNER_TEMP/riddlex-source" --new-limit 25000 --batch 500 --push
+      - name: Verify and activate the final bulk pool
+        run: python knowledge/finalize-cloud.py --phase bulk-final --push
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: ${{ runner.temp }}/riddlex-source
+          key: riddlex-source-v3-${{ github.run_id }}-${{ github.run_attempt }}

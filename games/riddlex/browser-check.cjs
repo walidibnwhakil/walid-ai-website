@@ -7,7 +7,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  const server=http.createServer(async(req,res)=>{try{let name=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(name.endsWith('/'))name+='index.html';const file=path.resolve(root,'.'+name);if(!file.startsWith(root+path.sep))throw Error();const bytes=await fs.readFile(file);res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});res.end(bytes);}catch{res.writeHead(404);res.end();}});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const url='http://127.0.0.1:'+server.address().port+prefix;
  const browser=await chromium.launch({headless:true,...(process.env.RIDDLEX_CHROME?{executablePath:process.env.RIDDLEX_CHROME}:{}),args:['--no-sandbox']});
- const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'no-preference'}),page=await context.newPage(),errors=[],requests=[];
+ const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),page=await context.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(String(e)));page.on('response',async r=>{if(r.url().startsWith(url))requests.push({path:r.url().slice(url.length),bytes:(await r.body().catch(()=>Buffer.alloc(0))).length});});
  await page.addInitScript(()=>localStorage.setItem('riddlex-language','bn'));
  const start=performance.now();await page.goto(url);
@@ -42,7 +42,6 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  }
  await captureQuestion(desktop,'desktop');
  await desktop.close();
- await page.emulateMedia({reducedMotion:"reduce"});
  await captureQuestion(page,'mobile');
  const visualBaseline=process.env.RIDDLEX_VISUAL_BASELINE;
  const visualComparison={};

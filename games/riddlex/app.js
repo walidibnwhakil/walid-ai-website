@@ -78,7 +78,12 @@ function reset(){loadToken++;category=null;answers=[];rejected=new Set();rejecti
 function render(){
  updateLabels();progress();
  const splash=mode==="splash";
+ visible($("splash-art"),splash);
  visible(office,!splash);
+ if(!splash){
+  const portrait=office.querySelector(".founder[data-src]");
+  if(portrait){portrait.src=portrait.dataset.src;delete portrait.dataset.src;}
+ }
  for(const id of ["status","progress","new","privacy-note"])visible($(id),!splash);
  visible($("play"),splash);
  visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong"||mode==="unsure");
@@ -87,7 +92,7 @@ function render(){
  if(mode==="loading"){mood("thinking");$("status").textContent=t("Opening the casebook…","তথ্যভান্ডার খুলছি…");return;}
  if(mode==="start"){mood("ready");$("status").textContent=t("Think of a character, animal, object or someone you know.","একটি চরিত্র, প্রাণী, বস্তু বা পরিচিত কাউকে মনে মনে ভাবুন।");return;}
  if(mode==="wrong"){mood("wrong");$("status").textContent=t("That guess was wrong. Shall I try again?","অনুমানটি ভুল হয়েছে। আবার চেষ্টা করব?");visible(guessPanel,true);showNote();return;}
- if(mode==="done"){mood("happy");$("status").textContent=t("Case closed! 🕵️","রহস্যের সমাধান! 🕵️");showNote();return;}
+ if(mode==="done"){mood("happy");$("status").textContent=t("Case closed!","রহস্যের সমাধান!");showNote();return;}
  if(mode==="edit"){showQuestion();return;}
  if(mode==="guess"){presentGuess();return;}
  if(mode==="unsure"){showUnresolved();return;}

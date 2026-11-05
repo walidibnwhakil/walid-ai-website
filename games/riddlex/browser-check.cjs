@@ -114,7 +114,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await page.locator('#wrong').click();
  if(await page.locator('#case-note').getAttribute('data-result')!=='rejected')throw Error('Missing rejected guess note');
  await page.screenshot({path:path.join(output,'browser','wrong-result.png'),fullPage:true,animations:'disabled'});
- await page.locator('#retry').click();if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
+ await page.locator('#retry').click();await page.locator('#answers').waitFor({state:'visible'});if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
  await page.locator('#new').click();await page.route('**/runtime/characters-*.json',async r=>{await new Promise(resolve=>setTimeout(resolve,150));await r.continue();});await page.locator('[data-category="characters"]').click();await page.locator('#new').click();await page.evaluate(()=>import('./runtime-loader.js').then(m=>m.loadCategory('characters')).then(()=>true));await page.unrouteAll({behavior:'wait'});if(!await page.locator('#categories').isVisible())throw Error('Late load overwrote reset');
  const photoPage=await context.newPage();
  const photoRequests=[];

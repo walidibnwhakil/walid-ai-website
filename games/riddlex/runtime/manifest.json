@@ -3,49 +3,61 @@
   "sourceCommit": "c13c05e5e48eb5875d98961e2907de616d920f99",
   "categories": {
     "characters": {
-      "count": 1596,
+      "count": 2184,
       "shards": [
         {
-          "path": "characters-000-1b9a99610a66.json",
+          "path": "characters-000-236b53d53631.json",
           "count": 256,
-          "bytes": 173612,
-          "sha256": "1b9a99610a66126c24aa30c7bc4df248ad394917e02143517a3c325a2ae0f830"
+          "bytes": 168048,
+          "sha256": "236b53d53631cc1431bbd2277b3c0e058a66e11bf45a5d7176e24bc4e0bfc772"
         },
         {
-          "path": "characters-001-2666d7690e74.json",
+          "path": "characters-001-6b9836ffb1b9.json",
           "count": 256,
-          "bytes": 280819,
-          "sha256": "2666d7690e744c192e2929bb0af54d7ac429d3a21939938affa7cab9dc055dcd"
+          "bytes": 267869,
+          "sha256": "6b9836ffb1b92627eaf50735f5776df55563c4e5e7b8f3dcb13924b6a1350ec7"
         },
         {
-          "path": "characters-002-e4b8ba24425b.json",
+          "path": "characters-002-929d0152a3c9.json",
           "count": 256,
-          "bytes": 253823,
-          "sha256": "e4b8ba24425b73090c9844bd15ba243a77f451f2116b9382b6e37ff9fbd6eeab"
+          "bytes": 247899,
+          "sha256": "929d0152a3c97725d994afb5b5aa2cd043664f62532685f3749bbbc0ad982c07"
         },
         {
-          "path": "characters-003-fa3e46e0efad.json",
+          "path": "characters-003-85eb310b2630.json",
           "count": 256,
-          "bytes": 259301,
-          "sha256": "fa3e46e0efadae9fb9c111e7b7453a6745e5e5cac5f1dee9a8f7998f31bad366"
+          "bytes": 254021,
+          "sha256": "85eb310b26305f3d81a2432db65b4cc06bb17caadf69e09bfa6b20b7d6a177d8"
         },
         {
-          "path": "characters-004-cbec9a279803.json",
+          "path": "characters-004-e3badebc0ed2.json",
           "count": 256,
-          "bytes": 251913,
-          "sha256": "cbec9a279803703b3152d2352dae2e91c3dfe85c885e7efc288b32d73d185be5"
+          "bytes": 247566,
+          "sha256": "e3badebc0ed2cba1c3a9c0a32a7bd6f76cc7e6351b7ee503bc7a876c2666070b"
         },
         {
-          "path": "characters-005-eab777050eda.json",
+          "path": "characters-005-6177bd451213.json",
           "count": 256,
-          "bytes": 236883,
-          "sha256": "eab777050eda149fb0a776d0cc465c10f3290c8e7fb811a59d4df963c62d2c1f"
+          "bytes": 227530,
+          "sha256": "6177bd451213b54604f1dbe10bcbd74e878b28dbc4b85802a4e8575f20fb02f0"
         },
         {
-          "path": "characters-006-47056df6b129.json",
-          "count": 60,
-          "bytes": 67638,
-          "sha256": "47056df6b12959f2b1dee7503014df573353eb689b771fa33626b8ba3e434be0"
+          "path": "characters-006-0fe11258230f.json",
+          "count": 256,
+          "bytes": 269793,
+          "sha256": "0fe11258230f719f2383f3fe7eb40a92dab399c2c9b3e412daf9df78f45d67bd"
+        },
+        {
+          "path": "characters-007-1b27b2fead08.json",
+          "count": 256,
+          "bytes": 267857,
+          "sha256": "1b27b2fead0812ae3f5f33d5045463c2873d5e4d03a576cec65e3e6e2865fa81"
+        },
+        {
+          "path": "characters-008-636ee70450de.json",
+          "count": 136,
+          "bytes": 151038,
+          "sha256": "636ee70450de6a7451cad0a63c2cb6ca21d62cfb90f3dd26d2d825e973505e2f"
         }
       ]
     },
@@ -53,10 +65,10 @@
       "count": 95,
       "shards": [
         {
-          "path": "animals-000-fb43350c4326.json",
+          "path": "animals-000-e62487395e96.json",
           "count": 95,
-          "bytes": 33601,
-          "sha256": "fb43350c4326ad62a34683f6da42ba33b731c6d9d769e3471cb3537cb59eab29"
+          "bytes": 33478,
+          "sha256": "e62487395e964dd3d6adc7948bef7d733e0814ab18d034b72b7c1b658f674e33"
         }
       ]
     },
@@ -64,10 +76,10 @@
       "count": 100,
       "shards": [
         {
-          "path": "objects-000-790e80d25b97.json",
+          "path": "objects-000-626b22f80eb0.json",
           "count": 100,
-          "bytes": 35189,
-          "sha256": "790e80d25b977b384b6948ef82f380f5e1028977c070a3dd397be016e61fef4b"
+          "bytes": 34889,
+          "sha256": "626b22f80eb09259f5237b8f4be99530ff89b3dcced40b4e0ac0fcc09f68c244"
         }
       ]
     },
@@ -106,6 +118,7 @@
     "w": "search-77.json",
     "v": "search-76.json",
     "ই": "search-987.json",
+    "ড": "search-9a1.json",
     "ম": "search-9ae.json",
     "শ": "search-9b6.json",
     "জ": "search-99c.json",
@@ -121,11 +134,13 @@
     "ব": "search-9ac.json",
     "অ": "search-985.json",
     "চ": "search-99a.json",
+    "ঢ": "search-9a2.json",
+    "ক": "search-995.json",
     "দ": "search-9a6.json",
     "স": "search-9b8.json",
     "ও": "search-993.json",
     "এ": "search-98f.json",
-    "ক": "search-995.json",
+    "ভ": "search-9ad.json",
     "ল": "search-9b2.json",
     "ন": "search-9a8.json",
     "ঝ": "search-99d.json",
@@ -134,14 +149,15 @@
     "ট": "search-99f.json",
     "y": "search-79.json",
     "য": "search-9af.json",
-    "ড": "search-9a1.json",
     "u": "search-75.json",
     "উ": "search-989.json",
     "থ": "search-9a5.json",
-    "ভ": "search-9ad.json",
     "q": "search-71.json",
     "ঈ": "search-988.json",
     "ঋ": "search-98b.json",
-    "ঊ": "search-98a.json"
+    "ঊ": "search-98a.json",
+    "ছ": "search-99b.json",
+    "ā": "search-101.json",
+    "​": "search-200b.json"
   }
 }

@@ -1,0 +1,9 @@
+
+> validate
+> node build-curated.mjs --check && node build-wikidata.mjs --check && node validate-knowledge.mjs && node validate-v2.mjs && node build-runtime.mjs --check
+
+Reviewed batch: 210 entries; diagnostic questions: 210
+Wikidata batch: 1410 distinct targets; 2757 bilingual questions
+{"total":1791,"counts":{"characters":1596,"animals":95,"objects":100},"wikidata":1410}
+{"eligible":1620,"evidence":1681,"accepted":721,"relatedLabels":1072}
+{"runtimeEntries":2394,"files":76,"bytes":3079142,"categories":{"characters":2184,"animals":95,"objects":100,"relationships":15}}

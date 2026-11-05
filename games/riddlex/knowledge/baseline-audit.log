@@ -1,0 +1,40 @@
+characters 50 / 1596 seconds 34
+characters 100 / 1596 seconds 35
+characters 150 / 1596 seconds 36
+characters 200 / 1596 seconds 37
+characters 250 / 1596 seconds 73
+characters 300 / 1596 seconds 75
+characters 350 / 1596 seconds 76
+characters 400 / 1596 seconds 79
+characters 450 / 1596 seconds 116
+characters 500 / 1596 seconds 117
+characters 550 / 1596 seconds 117
+characters 600 / 1596 seconds 119
+characters 650 / 1596 seconds 155
+characters 700 / 1596 seconds 156
+characters 750 / 1596 seconds 158
+characters 800 / 1596 seconds 160
+characters 850 / 1596 seconds 197
+characters 900 / 1596 seconds 198
+characters 950 / 1596 seconds 198
+characters 1000 / 1596 seconds 200
+characters 1050 / 1596 seconds 238
+characters 1100 / 1596 seconds 242
+characters 1150 / 1596 seconds 244
+characters 1200 / 1596 seconds 247
+characters 1250 / 1596 seconds 282
+characters 1300 / 1596 seconds 286
+characters 1350 / 1596 seconds 287
+characters 1400 / 1596 seconds 294
+characters 1449 / 1596 seconds 330
+characters 1498 / 1596 seconds 331
+characters 1547 / 1596 seconds 332
+characters 1596 / 1596 seconds 335
+characters {"ideal":{"targets":1596,"correct":878,"wrongFirstGuesses":0,"unresolved":718,"averageQuestions":44.24937343358396,"p95Questions":60,"maxQuestions":60},"noisy":{"targets":1596,"correct":203,"wrongFirstGuesses":44,"unresolved":1349,"averageQuestions":55.16979949874687,"p95Questions":60,"maxQuestions":60}}
+animals 95 / 95 seconds 335
+animals {"ideal":{"targets":95,"correct":82,"wrongFirstGuesses":0,"unresolved":13,"averageQuestions":12.210526315789474,"p95Questions":24,"maxQuestions":58},"noisy":{"targets":95,"correct":28,"wrongFirstGuesses":1,"unresolved":66,"averageQuestions":29.53684210526316,"p95Questions":60,"maxQuestions":60}}
+objects 100 / 100 seconds 335
+objects {"ideal":{"targets":100,"correct":71,"wrongFirstGuesses":0,"unresolved":29,"averageQuestions":15.46,"p95Questions":46,"maxQuestions":60},"noisy":{"targets":100,"correct":35,"wrongFirstGuesses":1,"unresolved":64,"averageQuestions":28.85,"p95Questions":60,"maxQuestions":60}}
+relationships 15 / 15 seconds 335
+relationships {"ideal":{"targets":15,"correct":15,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":5.333333333333333,"p95Questions":13,"maxQuestions":13},"noisy":{"targets":15,"correct":5,"wrongFirstGuesses":0,"unresolved":10,"averageQuestions":8.8,"p95Questions":13,"maxQuestions":13}}
+complete {"mode":"baseline","seconds":335.214902554}

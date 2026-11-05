@@ -1,0 +1,24 @@
+characters 50 / 2184 seconds 54
+characters 100 / 2184 seconds 55
+characters 150 / 2184 seconds 55
+characters 200 / 2184 seconds 59
+characters 250 / 2184 seconds 94
+characters 300 / 2184 seconds 95
+characters 350 / 2184 seconds 98
+characters 400 / 2184 seconds 102
+characters 450 / 2184 seconds 132
+characters 500 / 2184 seconds 138
+characters 550 / 2184 seconds 141
+characters 600 / 2184 seconds 144
+characters 630 / 2184 seconds 157
+characters 660 / 2184 seconds 160
+characters 690 / 2184 seconds 165
+characters 721 / 2184 seconds 165
+characters {"ideal":{"targets":721,"correct":721,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":36.37309292649098,"p95Questions":53,"maxQuestions":60},"noisy":{"targets":721,"correct":231,"wrongFirstGuesses":35,"unresolved":455,"averageQuestions":52.173370319001386,"p95Questions":60,"maxQuestions":60}}
+animals 0 / 95 seconds 165
+animals {"ideal":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null},"noisy":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null}}
+objects 0 / 100 seconds 165
+objects {"ideal":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null},"noisy":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null}}
+relationships 0 / 15 seconds 165
+relationships {"ideal":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null},"noisy":{"targets":0,"correct":0,"wrongFirstGuesses":0,"unresolved":0,"averageQuestions":null}}
+complete {"mode":"final","seconds":164.789205584}

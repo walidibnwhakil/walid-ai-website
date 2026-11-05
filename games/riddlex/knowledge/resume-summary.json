@@ -1,0 +1,21 @@
+{
+  "phase": "bulk-final",
+  "availableCasebook": 2379,
+  "verifiedIdeal60": 1717,
+  "newVerifiedIdentities": 588,
+  "verifiedEnrichments": 133,
+  "roles": 15,
+  "sourceEligible": 1620,
+  "currentRawCached": 4923,
+  "testsPassed": 59,
+  "initialBytes": 40957,
+  "initialMs": 557.7169990000002,
+  "browserHeapMiB": 14.555394172668457,
+  "target100000Achieved": false,
+  "resumeState": {
+    "resumedFrom": "9ca410138bb22586b47ea1e0ba35009a1e8b1105",
+    "newScreened": 4163,
+    "newDownloaded": 4163,
+    "status": "acquisition-complete"
+  }
+}

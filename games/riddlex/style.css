@@ -104,8 +104,8 @@ main:has(#play:not([hidden])){
 }
 .case-note[data-result="loading"]{visibility:hidden}
 .case-note[data-result="printed"]{
- display:grid;justify-items:center;gap:3px;width:clamp(88px,20%,143px);left:43%;bottom:27%;
- padding:7px 7px 9px;background:#fff9e9;
+ display:grid;justify-items:center;gap:3px;width:clamp(68px,16%,132px);left:51%;bottom:17%;
+ padding:clamp(4px,.65vw,7px);background:#fff9e9;
  animation:feed-and-lift 1.95s cubic-bezier(.33,.04,.3,1) both
 }
 .case-note[data-result="printed"] img{
@@ -231,7 +231,10 @@ main:has(#play:not([hidden])){
 }
 @media(max-width:600px){
  .office:has(> #status){display:flex;flex-direction:column}
- .office:has(> #status) .office-wordmark{position:relative;inset:auto;align-self:flex-start;margin:7px 8px 0;font-size:23px}
+ .office-wordmark{position:relative;inset:auto;width:max-content;margin:7px 8px;font-size:23px}
+ .office:has(> #status) .office-wordmark{margin-bottom:0}
+ .office-shell:has(.office:not([hidden])) + .panel :is(#new,#back){width:auto;margin:3px}
+ .office-shell:has(.office:not([hidden])) + .panel .note{margin-top:7px}
  .office #status{
   position:relative;inset:auto;order:1;align-self:flex-start;width:auto;max-width:calc(100% - 24px);
   margin:7px 12px 12px;padding:9px 12px;font-size:clamp(15px,3.65vw,18px)

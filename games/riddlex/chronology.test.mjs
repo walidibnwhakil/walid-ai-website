@@ -47,6 +47,8 @@ test('explicitly incompatible follow-ups are skipped without treating uncertaint
  const pool=[
   {id:'a',facts:{cartoon:true,superhero:true,underwater:true,marvel:true}},
   {id:'b',facts:{cartoon:false,superhero:false,underwater:false,marvel:false}},
+  {id:'c',facts:{cartoon:false,superhero:true,marvel:true}},
+  {id:'d',facts:{cartoon:true,superhero:false,underwater:true}},
  ];
  const next=answers=>nextQuestion(scoreCandidates(pool,answers),answers,bank);
  assert.equal(next([{key:'cartoon',value:'no'},{key:'superhero',value:'no'}]),null);

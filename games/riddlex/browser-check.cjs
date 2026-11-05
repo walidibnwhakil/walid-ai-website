@@ -151,7 +151,8 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await page.locator('#retry').click();
  await page.locator('#categories').waitFor({state:'visible'});
  if(await page.locator('#case-note').isVisible())throw Error('Unresolved Retry left an old result note');
- const animationChecks={};
+ const animationChecks={},softTranscripts={};
+ const objects=await data('objects');
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['mobile',{width:390,height:844}]]){
   const motionContext=await browser.newContext({
    viewport,reducedMotion:'no-preference',
@@ -186,6 +187,46 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   await view.waitForFunction(initial=>document.querySelector(".scene-motion").toDataURL()!==initial,initialPose);
   await view.waitForTimeout(1300);
   await shot("thinking-motion");
+  const props=view.locator('.scene-props');
+  await props.waitFor({state:'visible'});
+  const propFrame=()=>props.evaluate(canvas=>canvas.toDataURL());
+  const seated=await propFrame();
+  await view.waitForFunction(initial=>document.querySelector('.scene-props').toDataURL()!==initial,seated);
+  await shot('pipe-at-mouth');
+  await view.waitForTimeout(3400);
+  await shot('cat-walking-pipe-lowered');
+  await view.waitForTimeout(10000);
+  await shot('cat-lying-down');
+  await view.emulateMedia({reducedMotion:'reduce'});
+  await props.waitFor({state:'hidden'});
+  await view.emulateMedia({reducedMotion:'no-preference'});
+  await props.waitFor({state:'visible'});
+
+  const transcripts=[];
+  for(const style of ['recorded','repeated']){
+   await view.locator('[data-category="objects"]').click();
+   await view.locator('#answers').waitFor({state:'visible'});
+   const answers=[],target=objects.entries.find(entry=>entry.id==='phone');
+   while(answers.length<30&&await view.locator('#answers').isVisible()){
+    const question=await view.locator('#status').innerText();
+    const key=Object.keys(objects.questions).find(key=>objects.questions[key]===question);
+    if(!key||answers.some(answer=>answer.question===question))throw Error('Unexpected soft-answer question '+question);
+    const fact=factValue(target,key);
+    const answer=style==='repeated'&&answers.length<8?'probably':fact===undefined?'unknown':fact?'probably':'probably-not';
+    answers.push({question,answer});
+    await view.locator('[data-answer="'+answer+'"]').click();
+   }
+   const status=await view.locator('#status').innerText();
+   const guessId=await note.getAttribute('data-guess-id');
+   if(!await view.locator('#correct').isVisible()||!status.startsWith('My best lead is ')){
+    throw Error(label+' '+style+' soft round did not offer a tentative guess: '+status);
+   }
+   if(style==='recorded'&&guessId!==target.id)throw Error(label+' soft facts failed to identify phone: '+status);
+   if(style==='repeated'&&(answers.length<3||answers.slice(0,3).some(({answer})=>answer!=='probably')))throw Error('Expected consecutive Probably answers');
+   transcripts.push({style,answers,guessId,status});
+   await view.locator('#new').click();
+  }
+  softTranscripts[label]=transcripts;
   await playCase('characters',characters.questions,einstein);
   if(await photo.isVisible())throw Error('Photo shown before confirmation');
   await view.locator('#correct').click();
@@ -249,6 +290,6 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   if(video)await video.saveAs(path.join(output,'browser',label+'-gameplay.webm'));
  }
  const memory=await page.evaluate(()=>performance.memory?.usedJSHeapSize/1048576??null);
- const result={environment:'Chromium, local uncompressed HTTP; 390x844 viewport',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,visualComparison,animationChecks,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true,photoPrint:true,unresolvedRetry:true};
+ const result={environment:'Chromium, local uncompressed HTTP; 390x844 viewport',browserVersion:browser.version(),manifestSha256,initialMs,initialBytes:initial.reduce((s,r)=>s+r.bytes,0),initialRequests:initial,games,visualComparison,animationChecks,softTranscripts,memory,errors,loadFailureRetry:true,answerCorrection:true,wrongGuessRetry:true,resetDuringLoading:true,photoPrint:true,unresolvedRetry:true};
  await fs.writeFile(path.join(output,'browser-results.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));await browser.close();server.close();if(errors.length)process.exitCode=1;
 })().catch(e=>{console.error(e);process.exit(1);});

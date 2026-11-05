@@ -1,5 +1,8 @@
 // Open-world likelihood updates: an unrecorded fact and Don't Know add zero evidence.
 // Probabilities are model scores, not empirically calibrated human confidence.
+const softWeight=Math.log(.7/.3);
+const isSoft=value=>value==='probably'||value==='probably-not';
+const leansYes=value=>value==='yes'||value==='probably';
 export const ANSWERS=Object.freeze(['yes','no','probably','probably-not','unknown']);
 export const canonicalQuestionKey=key=>key.replace(/^wd_(occupation|birthplace|award|work|sport)_/,'v2_$1_');
 export function factValue(entry,key){
@@ -12,6 +15,8 @@ export function factValue(entry,key){
 export function evidenceGroup(key){
  if(key.startsWith('born_before_')||key==='birth_first_half'||key.startsWith('cue_wd_'))return 'birth';
  if(key==='real'||key==='fictional')return 'existence';
+ if(animalClasses.has(key))return 'animal-class';
+ if(key==='pet'||key==='domestic'||key==='wild')return 'domestication';
  if(['male','female','boy','girl'].includes(key))return 'gender';
  if(['actor','poet','writer','filmmaker','singer','cricket','scientist','physicist','economist','composer','educator','military','politician','psychologist'].includes(key))return 'occupation';
  if(countries.has(key)||key.startsWith('v2_citizenship_'))return 'citizenship';
@@ -26,7 +31,7 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
  // Normalize each answer once per turn, rather than once per candidate.
  const known=answers.filter(a=>a.value!=='unknown'&&ANSWERS.includes(a.value)).map(({key,value})=>{
   const canonical=canonicalQuestionKey(key),other=canonical!==key?canonical:key.replace(/^v2_(occupation|birthplace|award|work|sport)_/,'wd_$1_');
-  return {key,other,expected:value==='yes'||value==='probably',weight:value==='probably'||value==='probably-not'?Math.log(.7/.3):Math.log(.9/.1),group:evidenceGroup(key)};
+  return {key,other,expected:leansYes(value),weight:isSoft(value)?softWeight:Math.log(9),group:evidenceGroup(key)};
  });
  const ranked=[];
  for(const entry of entries){
@@ -53,6 +58,7 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
  for(const r of ranked)r.probability/=sum;
  return ranked;
 }
+const animalClasses=new Set(['mammal','bird','reptile','amphibian','fish','insect','crustacean']);
 const entropy=p=>p<=0||p>=1?0:-p*Math.log2(p)-(1-p)*Math.log2(1-p);
 const questionPairs={real:'fictional',fictional:'real',male:'female',female:'male',boy:'girl',girl:'boy'};
 const familiar=new Set([
@@ -95,7 +101,7 @@ const questionPrerequisites={
 };
 const denied=(entry,answers)=>answers.some(({key,value})=>
  (value==='yes'||value==='no')&&factValue(entry,key)===(value==='no'));
-const routeFor=answers=>answers.find(({key,value})=>value==='yes'&&Object.hasOwn(careerRoutes,questionIdentity(key)));
+const routeFor=(answers,value='yes')=>answers.find(answer=>answer.value===value&&Object.hasOwn(careerRoutes,questionIdentity(answer.key)));
 const careerFact=(entry,key)=>factValue(entry,key)??Object.entries(equivalentOccupations)
  .some(([alias,broad])=>broad===key&&factValue(entry,alias)===true);
 const commonCareerClue=key=>countries.has(key)||['male','female','bangla'].includes(key);
@@ -111,7 +117,7 @@ function questionBank(questions,answers){
   // Ask each paired dimension once. This suppresses follow-ups without
   // turning No or Don't Know into evidence for a different gender.
   if(Object.hasOwn(questionPairs,key))excluded.add(questionPairs[key]);
-  if(value==='no'||value==='probably-not'||value==='unknown'){
+  if(value==='no'){
    for(const child of questionPrerequisites[questionIdentity(key)]??[])excluded.add(child);
   }
   if(key==='boy'&&value==='yes'||key==='girl'&&value==='yes')excluded.add('cartoon');
@@ -132,12 +138,12 @@ function questionBank(questions,answers){
   if(/^(?:v2|wd)_/.test(key)&&!countries.has(canonical)&&!politicalRoles.has(canonical)&&
     !equivalentOccupations[canonical]&&!overlaps.actor.has(canonical))continue;
   if(/\b(?:award|prize|medal|oscars?)\b|\bborn in\b/i.test(question))continue;
-  if(['prime_minister','national_president','liberation_era','politics_this_century'].includes(key)&&explicit.get('politician')!=='yes')continue;
-  if(bangladeshPolitics.has(key)&&explicit.get('bangladeshi')!=='yes')continue;
-  if(key==='first_indian_pm'&&(explicit.get('indian')!=='yes'||explicit.get('prime_minister')!=='yes'))continue;
-  if(key==='cue_suhrawardy'&&explicit.get('v2_citizenship_q843')!=='yes')continue;
+  if(['prime_minister','national_president','liberation_era','politics_this_century'].includes(key)&&!leansYes(explicit.get('politician')))continue;
+  if(bangladeshPolitics.has(key)&&!leansYes(explicit.get('bangladeshi')))continue;
+  if(key==='first_indian_pm'&&(!leansYes(explicit.get('indian'))||!leansYes(explicit.get('prime_minister'))))continue;
+  if(key==='cue_suhrawardy'&&!leansYes(explicit.get('v2_citizenship_q843')))continue;
   if(politicalParties.has(key)&&[...politicalParties].some(party=>explicit.get(party)==='unknown'))continue;
-  if(['cue_tajuddin_ahmad','cue_suhrawardy'].includes(key)&&explicit.has('prime_minister')&&explicit.get('prime_minister')!=='yes')continue;
+  if(['cue_tajuddin_ahmad','cue_suhrawardy'].includes(key)&&explicit.has('prime_minister')&&!leansYes(explicit.get('prime_minister')))continue;
   if(isFictional&&careerRoutes.politician.has(canonical))continue;
   if(!bank.has(canonical)||key===canonical)bank.set(canonical,key);
  }
@@ -147,12 +153,13 @@ export function nextQuestion(ranked,answers,questions){
  if(!ranked.length||answers.length>=8&&answers.every(({value})=>value==='unknown'))return null;
  const bank=questionBank(questions,answers),counts=new Map();
  const route=routeFor(answers);
- const career=route&&questionIdentity(route.key);
+ const hint=route??routeFor(answers,'probably');
+ const career=hint&&questionIdentity(hint.key);
  const plausible=ranked.filter(row=>!denied(row.entry,answers));
  const eligible=plausible.length?plausible:ranked;
  const aligned=career?eligible.filter(row=>careerFact(row.entry,career)===true):[];
  const leading=eligible[0].score;
- const focus=aligned.length?aligned:leading>0?eligible.filter(row=>row.score>=leading-Math.log(9)):eligible;
+ const focus=route&&aligned.length?aligned:leading>0?eligible.filter(row=>row.score>=leading-Math.log(9)):eligible;
  const mass=focus.reduce((sum,row)=>sum+row.probability,0);
  for(const row of focus){
   for(const [fact,value] of Object.entries(row.entry.facts)){
@@ -164,6 +171,8 @@ export function nextQuestion(ranked,answers,questions){
   }
  }
  const asked=new Map(),skipped=new Map();
+ const usedGroups=new Set(answers.filter(answer=>answer.value!=='unknown').map(answer=>evidenceGroup(answer.key)));
+ const softRun=answers.some(({value})=>isSoft(value));
  const knownCountry=answers.some(({key,value})=>countries.has(key)&&value==='yes');
  for(const {key,value} of answers){
   const family=questionFamily(key);
@@ -186,7 +195,7 @@ export function nextQuestion(ranked,answers,questions){
   // of the current career pool and the obvious context has been established.
   const overlapAllowed=overlap&&aligned.length>1&&yes>=.12&&yes<=.85&&
    answers.some(({key,value})=>value==='yes'&&broadCareerClue(key))&&!answers.some(({key})=>overlaps[career].has(questionIdentity(key)));
-  if(career&&!contextual&&!commonCareerClue(key)&&!overlapAllowed)continue;
+  if(route&&!contextual&&!commonCareerClue(key)&&!overlapAllowed)continue;
   const coverage=Math.min(1,yes+no),unknown=Math.max(0,1-coverage);
   // Unknown candidate facts are marginalized. Fine-grained clues are a fallback.
   const information=entropy(yes+unknown*.5)-unknown;
@@ -196,7 +205,9 @@ export function nextQuestion(ranked,answers,questions){
   // Broad clues precede role or signature details. Genuine career overlaps
   // remain a fallback even when their information gain would be higher.
   const tier=career?(broadCareerClue(canonical)?3:contextual?2:1):0;
-  const priority=tier*4+quality;
+  // A soft career answer gives context a preference without removing other questions.
+  const repeated=softRun&&usedGroups.has(group);
+  const priority=(route?tier*4:contextual?.25:0)+quality*(repeated?.65:1);
   if(priority>bestQuality+1e-12||(Math.abs(priority-bestQuality)<=1e-12&&key<best)){
    bestQuality=priority;best=key;
   }
@@ -230,4 +241,19 @@ export function selectGuess(ranked,answers){
  if(top.entry.category==='relationships'&&margin>=Math.log(3))return top.entry;
  if((informative>=4||supportedClue)&&margin>=Math.log(3)&&top.support>=groups+(top.conflicts?1:0))return top.entry;
  return null;
+}
+
+// Try a clearly labeled guess only when the question bank has run out. One
+// net soft clue can separate the lead, but cannot supply all its support.
+export function selectTentativeGuess(ranked,answers){
+ const [top,second]=ranked;
+ if(!top||denied(top.entry,answers))return null;
+ const groups=new Set(answers.filter(({key,value})=>
+  isSoft(value)&&factValue(top.entry,key)===leansYes(value)
+ ).map(({key})=>evidenceGroup(key)));
+ if(groups.size<2||top.support<2||top.conflicts>1)return null;
+ if(second&&top.score-second.score<softWeight-1e-9)return null;
+ const route=routeFor(answers);
+ if(route&&careerFact(top.entry,questionIdentity(route.key))!==true)return null;
+ return top.entry;
 }

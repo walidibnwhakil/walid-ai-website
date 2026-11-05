@@ -23,6 +23,7 @@ const keyframes = [
 export function animateOffice(office) {
  const art = office.querySelector(".scene-art");
  const layer = office.querySelector(".scene-motion");
+ const props = office.querySelector(".scene-props");
  const {x, y, width, height} = region;
  layer.width = width;
  layer.height = height;
@@ -57,11 +58,12 @@ export function animateOffice(office) {
   frame.data.set(source);
 
   function draw(pose, opacity) {
+   const movingControls = props && !props.hidden ? 6 : controls.length;
    for (const offset of moving) {
     const pixel = offset / 4;
     let sx = pixel % width;
     let sy = Math.floor(pixel / width);
-    for (let control = 0; control < weights.length; control++) {
+    for (let control = 0; control < movingControls; control++) {
      const weight = weights[control][pixel];
      sx -= weight * pose[control][0];
      sy -= weight * pose[control][1];
@@ -80,7 +82,7 @@ export function animateOffice(office) {
    }
    context.putImageData(frame, 0, 0);
    assets.forEach(({image, x: left, y: top}, index) => {
-    if (!image.naturalWidth || opacity[index] <= 0) return;
+    if (!image.naturalWidth || opacity[index] <= 0 || index === 2 && props && !props.hidden) return;
     context.globalAlpha = opacity[index];
     context.drawImage(image, left - x, top - y);
    });

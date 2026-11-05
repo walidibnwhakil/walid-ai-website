@@ -1,6 +1,7 @@
-import {animateOffice} from "./scene-motion.js";
+import {animateProps} from "./scene-props.js?v=soft-motion";
+import {animateOffice} from "./scene-motion.js?v=soft-motion";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
-import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess} from "./engine-v2.js?v=adaptive-rc1";
+import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=soft-motion";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
 import {localPhotoPath} from "./print-photo.js";
 let allEntries=[],allQuestions={};
@@ -9,9 +10,10 @@ const contextQuestion="Are you thinking of someone by their relationship to you,
 let loadToken=0;
 const $=id=>document.getElementById(id);
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
-let photoRequest=0;
+let photoRequest=0,tentative=false;
 const office=document.querySelector(".office");
 animateOffice(office);
+animateProps(office,office.querySelector(".scene-art"));
 const status=$("status"), statusHome=status.parentElement;
 function mood(value){office.dataset.mood=value;}
 function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?"Questions answered: "+answers.length+" · Wrong guesses: "+rejected.size:"";}
@@ -71,7 +73,7 @@ function showNote(){
 }
 function presentGuess(){
  mood("guess");
- setStatus(`Are you thinking of ${guessName()}?`);
+ setStatus(tentative?`My best lead is ${guessName()}. Is that what you had in mind?`:`Are you thinking of ${guessName()}?`);
  visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();
 }
 function showUnresolved(){
@@ -115,9 +117,11 @@ function render(){
  const clues=answers.filter(answer=>answer.key!==contextKey);
  const ranked=scoreCandidates(candidates,clues,rejected);
  const suggestion=selectGuess(ranked,clues);
- if(suggestion){guess=suggestion;mode="guess";presentGuess();return;}
+ if(suggestion){tentative=clues.some(({value})=>value==="probably"||value==="probably-not");guess=suggestion;mode="guess";presentGuess();return;}
  currentKey=nextQuestion(ranked,clues,allQuestions);
  if(!currentKey){
+   guess=selectTentativeGuess(ranked,clues);
+   if(guess){tentative=true;mode="guess";presentGuess();return;}
    guess=null;mode="unsure";showUnresolved();
    return;
  }

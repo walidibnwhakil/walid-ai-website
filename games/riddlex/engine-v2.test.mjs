@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {scoreCandidates,nextQuestion,selectGuess} from './engine-v2.js';
+import {scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from './engine-v2.js';
 import {readFile} from 'node:fs/promises';
 import {loadCategory} from './runtime-loader.js';
 const entry=(id,facts)=>({id,name:id,category:'characters',facts});
@@ -130,4 +130,47 @@ test('runtime routes keep categories separate and attach only sourced political 
  assert.equal(selectGuess(scoreCandidates(characters.entries,nehrusClues),nehrusClues)?.id,'wd-q1047');
  const unknown=Object.keys(characters.questions).slice(0,8).map(key=>({key,value:'unknown'}));
  assert.equal(ask(characters.entries,unknown,characters.questions),null);
+});
+
+test('three to eight Probably answers can justify a tentative guess when questions run out',()=>{
+ for(let count=3;count<=8;count++){
+  const keys=Array.from({length:count},(_,i)=>'clue_'+i);
+  const facts=Object.fromEntries(keys.map(key=>[key,true]));
+  const rivalFacts=Object.fromEntries(keys.slice(1).map(key=>[key,true]));
+  const entries=[entry('lead',facts),entry('rival',rivalFacts)];
+  const clues=keys.map(key=>({key,value:'probably'}));
+  const ranked=scoreCandidates(entries,clues);
+  assert.equal(selectGuess(ranked,clues),null);
+  assert.equal(selectTentativeGuess(ranked,clues)?.id,'lead');
+  assert.equal(selectTentativeGuess(scoreCandidates([...entries,entry('tie',facts)],clues),clues),null);
+  assert.equal(ranked.find(row=>row.entry.id==='rival').support,count-1);
+ }
+});
+
+test('Probably Not supports recorded negatives and unknown or correlated clues cannot break a tie',()=>{
+ const entries=[entry('lead',{x:false,y:true,z:true}),entry('rival',{y:true,z:true})];
+ const clues=[{key:'x',value:'probably-not'},{key:'y',value:'probably'},{key:'z',value:'unknown'}];
+ const ranked=scoreCandidates(entries,clues);
+ assert.equal(selectTentativeGuess(ranked,clues)?.id,'lead');
+ assert.deepEqual(ranked,scoreCandidates(entries,clues.slice(0,2)));
+ const facts={born_before_1980:true,born_before_1990:true,born_before_2000:true};
+ const repeated=Object.keys(facts).map(key=>({key,value:'probably'}));
+ assert.equal(selectTentativeGuess(scoreCandidates([entry('lead',facts),entry('rival',{})],repeated),repeated),null);
+ assert.equal(selectTentativeGuess(scoreCandidates(entries,clues.map(clue=>({...clue,value:'unknown'}))),clues),null);
+});
+
+test('Probably politician encourages an office question without locking out other careers',()=>{
+ const entries=[entry('a',{politician:true,prime_minister:true}),entry('b',{politician:true,prime_minister:false}),entry('c',{actor:true})];
+ const answers=[{key:'politician',value:'probably'}];
+ const questions={prime_minister:'Served as prime minister?',actor:'Actor?'};
+ assert.equal(ask(entries,answers,questions),'prime_minister');
+ assert.equal(ask(entries,[...answers,{key:'prime_minister',value:'probably-not'}],questions),'actor');
+});
+
+test('related animal class and domestication questions count once per group',()=>{
+ const facts={mammal:true,bird:false,reptile:false,pet:true,domestic:true,wild:false};
+ const clues=Object.entries(facts).map(([key,value])=>({key,value:value?'probably':'probably-not'}));
+ const [ranked]=scoreCandidates([entry('cat',facts)],clues);
+ assert.equal(ranked.support,2);
+ assert.equal(ranked.score,2*Math.log(.7/.3));
 });

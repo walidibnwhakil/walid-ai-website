@@ -26,6 +26,9 @@ for(const entry of candidates.entries){
     assert.ok(labels[target]?.en&&labels[target]?.bn);assert.ok(Number.isInteger(labels[target].revision));
     assert.equal(candidates.questions[key],spec.en+labels[target].en+'?');assert.equal(candidates.bangla[key],spec.bn+labels[target].bn+'?');
    }
+  }else if(key.startsWith('born_before_')){
+   const years=new Set();for(const id of pointers){const c=claims.get(id),v=c.mainsnak.datavalue.value;assert.equal(c.mainsnak.property,'P569');assert.ok(!c.qualifiers||!Object.keys(c.qualifiers).length);assert.ok(v.precision>=9);assert.equal(v.calendarmodel,'http://www.wikidata.org/entity/Q1985727');assert.match(v.time,/^\+\d{4}-/);years.add(Number(v.time.slice(1,5)));}
+   assert.equal(years.size,1);const year=[...years][0],cutoff=Number(key.slice(12));assert.ok([1800,1850,1900,1925,1950,1960,1970,1980,1990,2000].includes(cutoff));assert.equal(value,year<cutoff);
   }else{
    assert.ok(key==='real'||key==='fictional');assert.equal(value,key==='real');
    for(const id of pointers){const c=claims.get(id);assert.equal(c.mainsnak.property,'P31');assert.equal(c.mainsnak.datavalue.value.id,'Q5');}

@@ -6,6 +6,7 @@ import {mkdir,readFile,writeFile,rm} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
 import {runtimeBangla,identityKeys} from './runtime-translations.js';
+import {sanitizeEntries} from './knowledge-policy.js';
 const root=new URL('./runtime/',import.meta.url),check=process.argv.includes('--check');
 let extra={entries:[],questions:{},bangla:{}};
 try{extra=JSON.parse(await readFile(new URL('./knowledge/v2-accepted.json',import.meta.url),'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
@@ -14,8 +15,10 @@ const all=[...entries.map(e=>replacements.get(e.id)??e),...extra.entries.filter(
 assert.equal(new Set(all.map(e=>e.id)).size,all.length);
 const manifest={formatVersion:1,sourceCommit:'c13c05e5e48eb5875d98961e2907de616d920f99',categories:{},search:{}};
 const artifacts=new Map(),search=new Map();
+const cleaned=sanitizeEntries(all,bank,bn).entries;
 for(const category of ['characters','animals','objects','relationships']){
- const pool=all.filter(e=>e.category===category),shards=[];
+ const pool=cleaned.filter(e=>e.category===category),shards=[];
+ assert.ok(pool.length<=20000,'Category exceeds tested static loading cap; do not activate');
  for(let i=0;i<pool.length;i+=256){
   const slice=pool.slice(i,i+256),qs={},bs={};
   const compact=slice.map(e=>{
@@ -38,7 +41,7 @@ for(const [prefix,rows] of search){
  const path='search-'+prefix.codePointAt(0).toString(16)+'.json';manifest.search[prefix]=path;artifacts.set(path,JSON.stringify(rows)+'\n');
 }
 artifacts.set('manifest.json',JSON.stringify(manifest,null,2)+'\n');
-if(!check){await rm(root,{force:true,recursive:true});await mkdir(root,{recursive:true});}
+if(!check)await mkdir(root,{recursive:true}); // Retain immutable hashes for older cached manifests.
 for(const [path,content] of artifacts){
  if(check)assert.equal(await readFile(new URL(path,root),'utf8'),content,'Stale runtime '+path);
  else await writeFile(new URL(path,root),content);

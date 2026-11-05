@@ -66,6 +66,15 @@ for q,category,cohort in selection['selected']:
   facts['real']=True;facts['fictional']=False
   for c in claims(e,'P31'):
    if isinstance(val(c),dict) and val(c).get('id')=='Q5':sources['real']=[c['id']];sources['fictional']=[c['id']];usedStatements[c['id']]=c
+  dates=claims(e,'P569');years=set()
+  for c in dates:
+   d=val(c);m=re.match(r'^\+(\d{4})-',d.get('time','')) if isinstance(d,dict) else None
+   years.add(int(m[1]) if m and not c.get('qualifiers') and d.get('precision',0)>=9 and d.get('calendarmodel')=='http://www.wikidata.org/entity/Q1985727' else None)
+  if len(years)==1 and None not in years and 1<=next(iter(years))<=2026:
+   year=next(iter(years))
+   for cutoff in [1800,1850,1900,1925,1950,1960,1970,1980,1990,2000]:
+    key='born_before_'+str(cutoff);facts[key]=year<cutoff;sources[key]=[c['id'] for c in dates];questions[key]=f'Was this person born before {cutoff}?';n=str(cutoff).translate(str.maketrans('0123456789','০১২৩৪৫৬৭৮৯'));bangla[key]=f'ব্যক্তিটি কি {n} সালের আগে জন্মেছেন?'
+   for c in dates:usedStatements[c['id']]=c
  # Eligibility cannot be satisfied by date, gender, existence or identity flags.
  minimumGroups,minimumClues=SCHEMA['requirements'][category]['groups'],SCHEMA['requirements'][category]['clues']
  if len(groups)<minimumGroups or sum(k.startswith('v2_') for k in facts)<minimumClues:
@@ -83,6 +92,17 @@ for q,category,cohort in selection['selected']:
  counts['eligible']+=1
  counts['eligible_enrichment' if q in enrichQids else 'eligible_addition']+=1
  if not names.get('bn'):counts['eligible_missing_bengali_label']+=1
+activePath=ROOT/'v2-accepted.json';activeIds={e['id'] for e in read(activePath)['entries']} if activePath.exists() else set()
+display=collections.defaultdict(list)
+for e in candidates:display[(e['category'],norm(e['name']))].append(e)
+ambiguous={e['id'] for group in display.values() if len(group)>1 for e in group if not any(x['id'] in activeIds for x in group) or e['id'] not in activeIds}
+for e in candidates:
+ if e['id'] in ambiguous:
+  rejected.append({'qid':e['wikidataId'],'reason':'ambiguous_shared_display_label','name':e['name']});counts['ambiguous_shared_display_label']+=1;counts['eligible']-=1;counts['eligible_enrichment' if e['replacement'] else 'eligible_addition']-=1
+candidates=[e for e in candidates if e['id'] not in ambiguous]
+for r in rejected:
+ e=entities.get(r['qid'])
+ if e and e.get('lastrevid'):r.update(revision=e['lastrevid'],retrievedAt=retrieval[r['qid']],license='CC0-1.0')
 out=ROOT/'v2-evidence';out.mkdir(exist_ok=True)
 for p in out.glob('*.json'):p.unlink()
 for i in range(0,len(evidence),100):write(out/f'{i//100:04}.json',{'formatVersion':2,'license':'CC0-1.0','records':evidence[i:i+100]})

@@ -1,0 +1,6 @@
+import {readFile} from 'node:fs/promises';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';import {entries} from './casebook.js';import {canonicalPool} from './knowledge-policy.js';
+const read=async p=>JSON.parse(await readFile(new URL(p,import.meta.url),'utf8')),m=await read('./runtime/manifest.json'),audit=await read('./knowledge/v2-final-audit.json'),accepted=await read('./knowledge/v2-accepted.json'),runtime=[];
+for(const spec of Object.values(m.categories))for(const shard of spec.shards)runtime.push(...(await read('./runtime/'+shard.path)).entries);
+assert.equal(new Set(runtime.map(e=>e.id)).size,runtime.length);for(const e of entries)assert.ok(runtime.some(r=>r.id===e.id),'Lost baseline '+e.id);
+assert.ok(audit.complete);assert.equal(createHash('sha256').update(canonicalPool(runtime)).digest('hex'),audit.poolSha256);assert.equal(createHash('sha256').update(await readFile(new URL('./engine-v2.js',import.meta.url))).digest('hex'),audit.engineSha256);
+const correct=new Set(Object.values(audit.rows).flatMap(c=>c.ideal.filter(r=>r.correct).map(r=>r.id)));for(const e of accepted.entries)assert.ok(correct.has(e.id),'Unverified activation '+e.id);console.log(JSON.stringify({runtime:runtime.length,accepted:accepted.entries.length,baselineRetained:entries.length,poolSha256:audit.poolSha256}));

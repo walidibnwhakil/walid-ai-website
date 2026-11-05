@@ -1,4 +1,4 @@
-name: Riddlex recovery cloud execution
+name: Riddlex durable cloud expansion
 on:
   workflow_dispatch:
   push:
@@ -8,12 +8,15 @@ concurrency:
   group: riddlex-recovery-cloud
   cancel-in-progress: false
 jobs:
-  verify:
-    if: github.ref == 'refs/heads/riddlex-recovery'
+  expand:
+    if: github.repository == 'walidibnwhakil/walid-ai-website' && github.ref == 'refs/heads/riddlex-recovery' && !github.event.repository.private
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 330
     permissions:
-      contents: read
+      contents: write
+    defaults:
+      run:
+        working-directory: games/riddlex
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,6 +24,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify preserved baseline
-        run: npm run validate && npm test
-        working-directory: games/riddlex
+      - uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/riddlex-source
+          key: riddlex-source-v3-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: riddlex-source-v3-
+      - name: Prepare offline and browser verification
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          npm install --no-save --package-lock=false playwright@1.60.0
+          chrome=$(command -v google-chrome || command -v chromium)
+          test -n "$chrome"
+          printf 'RIDDLEX_CHROME=%s\n' "$chrome" >> "$GITHUB_ENV"
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y fonts-noto-core
+      - name: Verify and activate previously saved evidence
+        run: |
+          if [ ! -f knowledge/resume-summary.json ]; then
+            python knowledge/finalize-cloud.py --phase saved-checkpoint --push
+          fi
+      - name: Acquire and persist new verified source batches
+        run: python knowledge/resume-cloud.py "$RUNNER_TEMP/riddlex-source" --new-limit 25000 --batch 500 --push
+      - name: Verify and activate the final bulk pool
+        run: python knowledge/finalize-cloud.py --phase bulk-final --push
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: ${{ runner.temp }}/riddlex-source
+          key: riddlex-source-v3-${{ github.run_id }}-${{ github.run_attempt }}

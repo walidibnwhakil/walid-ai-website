@@ -8,7 +8,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const url='http://127.0.0.1:'+server.address().port+prefix;
  const browser=await chromium.launch({headless:true,...(process.env.RIDDLEX_CHROME?{executablePath:process.env.RIDDLEX_CHROME}:{}),args:['--no-sandbox']});
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),page=await context.newPage(),errors=[],requests=[];
- page.on('pageerror',e=>errors.push(String(e)));page.on('response',async r=>{if(r.url().startsWith(url))requests.push({path:r.url().slice(url.length),bytes:(await r.body().catch(()=>Buffer.alloc(0))).length});});
+ page.on('pageerror',e=>{console.error(e);errors.push(String(e))});page.on('response',async r=>{if(r.url().startsWith(url))requests.push({path:r.url().slice(url.length),bytes:(await r.body().catch(()=>Buffer.alloc(0))).length});});
  await page.addInitScript(()=>localStorage.setItem('riddlex-language','bn'));
  const start=performance.now();await page.goto(url);
  if(await page.locator('#categories').isVisible()||await page.locator('.scene-art').getAttribute('src'))throw Error('Gameplay leaked onto splash');
@@ -96,6 +96,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
    const text=await page.locator('#status').innerText(),key=Object.keys(bank).find(k=>bank[k]===text);if(!key)throw Error('Unmapped English question '+text);
    const fact=factValue(target,key);await page.locator('[data-answer="'+(fact===undefined?'unknown':fact?'yes':'no')+'"]').click();count++;
   }
+  await page.locator("#correct").waitFor({state:"visible"});
   const status=await page.locator('#status').innerText(),correct=await page.locator('#correct').isVisible()&&status==='Are you thinking of '+target.name+'?';
   games.push({language:'en',category,id,correct,questions:count,loadMs});if(!correct)throw Error('Gameplay failed '+JSON.stringify(games.at(-1)));
   await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:path.join(output,'browser','en-'+category+'.png'),fullPage:true});await page.locator('#correct').click();
@@ -116,8 +117,10 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await page.locator('#retry').click();if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
  await page.locator('#new').click();await page.route('**/runtime/characters-*.json',async r=>{await new Promise(resolve=>setTimeout(resolve,150));await r.continue();});await page.locator('[data-category="characters"]').click();await page.locator('#new').click();await page.evaluate(()=>import('./runtime-loader.js').then(m=>m.loadCategory('characters')).then(()=>true));await page.unrouteAll({behavior:'wait'});if(!await page.locator('#categories').isVisible())throw Error('Late load overwrote reset');
  const photoPage=await context.newPage();
+ const photoRequests=[];
+ photoPage.on("request",request=>photoRequests.push(request.url()));
  await photoPage.emulateMedia({reducedMotion:"no-preference"});
- photoPage.on('pageerror',e=>errors.push(String(e)));
+ photoPage.on('pageerror',e=>{console.error(e);errors.push(String(e))});
  await photoPage.goto(url);
  await photoPage.locator('#play').click();
  await photoPage.locator('[data-category="characters"]').click();
@@ -132,11 +135,11 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   await photoPage.locator('[data-answer="'+(fact===undefined?'unknown':fact?'yes':'no')+'"]').click();
  }
  if(await photoPage.locator('#case-note').getAttribute('data-guess-id')!=='einstein')throw Error('Wrong identity in photo case');
- if(await photoPage.locator('#case-photo').isVisible())throw Error('Photo appeared before confirmation');
+ await photoPage.locator('.office[data-reveal="feeding"]').waitFor();
+ if(await photoPage.locator('#correct').isVisible())throw Error('Confirmation appeared during the feed');
+ await photoPage.locator('.office[data-reveal="printed"]').waitFor();
+ if(photoRequests.filter(request=>request.endsWith('/images/einstein.jpg')).length!==1)throw Error('Expected one verified Einstein photo request');
  await photoPage.locator('#correct').click();
- await photoPage.waitForFunction(()=>document.querySelector('#case-note').dataset.result==='printed');
- const motion=await photoPage.locator('#case-photo').evaluate(photo=>photo.getAnimations().some(animation=>animation.animationName==='printer-feed'));
- if(!motion||await photoPage.locator('#case-photo').getAttribute('src')!=='./images/einstein.jpg')throw Error('Matching photo did not enter the print animation');
  await photoPage.screenshot({path:path.join(output,'browser','printed-result.png'),fullPage:true,animations:'disabled'});
  await photoPage.close();
  await page.locator('[data-category="animals"]').click();
@@ -159,12 +162,9 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
    ...(process.env.RIDDLEX_VIDEO?{recordVideo:{dir:path.join(output,'video'),size:viewport}}:{})
   });
   const view=await motionContext.newPage();
-  view.on('pageerror',e=>errors.push(String(e)));
-  const note=view.locator('#case-note'),photo=view.locator('#case-photo'),office=view.locator('.office');
+  view.on('pageerror',e=>{console.error(e);errors.push(String(e))});
+  const note=view.locator('#case-note'),reveal=view.locator('.guess-reveal'),office=view.locator('.office');
   const shot=(state,options={})=>view.screenshot({path:path.join(output,'browser',label+'-'+state+'.png'),fullPage:true,...options});
-  const waitMotion=(selector,name)=>view.waitForFunction(([selector,name])=>
-   document.querySelector(selector).getAnimations().some(animation=>animation.animationName===name||animation.id===name),
-   [selector,name]);
   async function playCase(category,bank,target){
    if(!await view.locator('#categories').isVisible())await view.locator('#new').click();
    await view.locator('[data-category="'+category+'"]').click();
@@ -216,6 +216,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
     answers.push({question,answer});
     await view.locator('[data-answer="'+answer+'"]').click();
    }
+   await view.locator('#correct').waitFor({state:'visible'});
    const status=await view.locator('#status').innerText();
    const guessId=await note.getAttribute('data-guess-id');
    if(!await view.locator('#correct').isVisible()||!status.startsWith('My best lead is ')){
@@ -228,34 +229,12 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   }
   softTranscripts[label]=transcripts;
   await playCase('characters',characters.questions,einstein);
-  if(await photo.isVisible())throw Error('Photo shown before confirmation');
+  await view.locator('.office[data-reveal="printed"]').waitFor();
+  await shot('print-on-note');
   await view.locator('#correct').click();
-  await waitMotion('#case-photo','printer-feed');
-  if(!await photo.evaluate(img=>img.complete&&img.naturalWidth>0))throw Error('Photo failed to decode');
-  const feedFrame=ms=>photo.evaluate((img,time)=>{
-   const feed=img.getAnimations().find(animation=>animation.animationName==='printer-feed');
-   feed.pause();
-   feed.currentTime=time;
-   const {top,bottom,width,height}=img.getBoundingClientRect();
-   const slot=img.parentElement.getBoundingClientRect().top;
-   return {width,height,exposed:Math.max(0,bottom-Math.max(top,slot))};
-  },ms);
-  const start=await feedFrame(0);
-  await shot('print-start');
-  const first=await feedFrame(340);
-  await shot('print-emerging');
-  const second=await feedFrame(800);
-  await shot('print-feeding');
-  const end=await feedFrame(1250);
-  await shot('photo-in-tray');
-  if(start.exposed>.1||!(start.exposed<first.exposed&&first.exposed<second.exposed&&second.exposed<end.exposed)||
-     [first,second,end].some(frame=>Math.abs(frame.width-start.width)>.1||Math.abs(frame.height-start.height)>.1)){
-   throw Error(label+' printer must feed from the slot at a constant size');
-  }
-  await photo.evaluate(img=>{const feed=img.getAnimations()[0];feed.currentTime=0;feed.play();return feed.finished;});
   await playCase('animals',d.questions,cat);
+  await view.locator('.office[data-reveal="written"]').waitFor();
   await view.locator('#correct').click();
-  if(await photo.isVisible()||await note.getAttribute('data-result')!=='written')throw Error('Expected name-only note');
   await view.waitForTimeout(750);
   const pleasedPose=await sceneFrame();
   await shot('name-written',{animations:'disabled'});
@@ -282,9 +261,9 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   await shot('unresolved',{animations:'disabled'});
   await view.locator('#retry').click();
   await view.locator('#categories').waitFor({state:'visible'});
-  if(await note.isVisible()||await photo.isVisible())throw Error(label+' Retry left an old result');
+  if(await note.isVisible()||await reveal.isVisible())throw Error(label+' Retry left an old result');
   await shot('retry-reset');
-  animationChecks[label]=['thinking movement','distinct solved and rejected poses','pose recovery after Retry','fixed-size printer feed','handwritten fallback','rejected guess and continuation','unresolved retry'];
+  animationChecks[label]=['thinking movement','distinct solved and rejected poses','pose recovery after Retry','printer feed, pickup and placement','progressive handwriting','rejected guess and continuation','unresolved retry'];
   const video=view.video();
   await motionContext.close();
   if(video)await video.saveAs(path.join(output,'browser',label+'-gameplay.webm'));

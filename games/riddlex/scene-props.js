@@ -102,9 +102,17 @@ export function animateProps(office, art) {
   layer.hidden = false;
   const {plate, cat, arm, printer} = sprites;
   context.clearRect(0, 0, 724, 404);
-  context.drawImage(plate, 0, 0);
+  if (office.dataset.reveal && office.dataset.reveal !== "loading") {
+   context.save();
+   context.beginPath();
+   context.rect(408, 137, 145, 174);
+   context.clip();
+   context.drawImage(plate, 0, 0);
+   context.restore();
+  } else context.drawImage(plate, 0, 0);
   drawCat(context, cat, time);
   context.drawImage(printer, 0, 0);
+  if (office.dataset.reveal && office.dataset.reveal !== "loading") return;
   const phase = time % 9400;
   const reach = phase < 2400 ? 0 : phase < 3600 ? ease((phase - 2400) / 1200) :
    phase < 6700 ? 1 : 1 - ease((phase - 6700) / 2700);

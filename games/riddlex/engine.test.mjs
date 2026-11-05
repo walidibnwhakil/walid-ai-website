@@ -136,9 +136,11 @@ test('changing an earlier answer restores guesses rejected using later evidence'
  assert.deepEqual([...rejectedIds(rewindRejections(history,2))],[]);
 });
 
-test('casebook photo printer accepts only bundled local images',async()=>{
+test('casebook photo printer requires a verified identity-to-photo mapping',async()=>{
  const {localPhotoPath}=await import('./print-photo.js');
- assert.equal(localPhotoPath({image:'./images/himu.webp'}),'./images/himu.webp');
+ assert.equal(localPhotoPath({id:'einstein'}),'./images/einstein.jpg');
+ assert.equal(localPhotoPath({id:'himu',image:'./images/einstein.jpg'}),null);
+ assert.equal(localPhotoPath({id:'himu',image:'./images/himu.webp'}),null);
  assert.equal(localPhotoPath({image:'https://example.com/photo.png'}),null);
  assert.equal(localPhotoPath({image:'../private.jpg'}),null);
  assert.equal(localPhotoPath({image:'./images/../../secret.png'}),null);

@@ -1,17 +1,18 @@
-import {animateProps} from "./scene-props.js?v=soft-motion";
+import {animateProps} from "./scene-props.js?v=guess-reveal";
 import {animateOffice} from "./scene-motion.js?v=soft-motion";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
 import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=soft-motion";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
-import {localPhotoPath} from "./print-photo.js";
+import {createGuessReveal} from "./guess-reveal.js";
 let allEntries=[],allQuestions={};
 const contextKey="relationship_context";
 const contextQuestion="Are you thinking of someone by their relationship to you, such as a relative or friend?";
 let loadToken=0;
 const $=id=>document.getElementById(id);
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
-let photoRequest=0,tentative=false;
+let tentative=false;
 const office=document.querySelector(".office");
+const reveal=createGuessReveal(office);
 animateOffice(office);
 animateProps(office,office.querySelector(".scene-art"));
 const status=$("status"), statusHome=status.parentElement;
@@ -38,43 +39,33 @@ function showQuestion(){
  visible(answerPanel,true);
 }
 function showNote(){
- const note=$("case-note"),photo=$("case-photo");
+ const note=$("case-note");
  const show=mode==="guess"||mode==="done"||mode==="wrong";
  visible(note,show);
- if(!show||mode!=="done"){
-  photoRequest++;
-  photo.onload=null;
-  photo.onerror=null;
-  photo.hidden=true;
-  photo.removeAttribute("src");
+ note.dataset.guessId=show?guess.id:"";
+ if(!show||mode==="wrong"){
+  reveal.clear();
   note.dataset.result=mode==="wrong"?"rejected":"";
  }
- note.dataset.guessId=show?guess.id:"";
  if(!show)return;
  $("case-note-label").textContent=mode==="done"?"Case solved":mode==="wrong"?"Guess ruled out":"Detective’s note";
  $("case-note-name").textContent=guessName();
- if(mode!=="done"||note.dataset.result)return;
-
- const path=localPhotoPath(guess);
- if(!path){note.dataset.result="written";return;}
- const request=++photoRequest;
- note.dataset.result="loading";
- photo.onload=()=>{
-  if(request!==photoRequest)return;
-  photo.hidden=false;
-  note.dataset.result="printed";
- };
- photo.onerror=()=>{
-  if(request!==photoRequest)return;
-  photo.removeAttribute("src");
-  note.dataset.result="written";
- };
- photo.src=path;
+ if(mode==="wrong")return;
+ reveal.start(guess,guessName(),phase=>{
+  note.dataset.result=phase;
+  if(mode==="guess"&&(phase==="printed"||phase==="written"))presentGuess();
+ });
+}
+function guessPrompt(){
+ const name=guessName();
+ return tentative?"My best lead is "+name+". Is that what you had in mind?":"Are you thinking of "+name+"?";
 }
 function presentGuess(){
+ showNote();
  mood("guess");
- setStatus(tentative?`My best lead is ${guessName()}. Is that what you had in mind?`:`Are you thinking of ${guessName()}?`);
- visible(guessPanel,true);visible($("correct"),true);visible($("wrong"),true);showNote();
+ const ready=["printed","written"].includes($("case-note").dataset.result);
+ setStatus(ready?guessPrompt():"The detective is preparing the evidence…");
+ visible(guessPanel,ready);visible($("correct"),true);visible($("wrong"),true);
 }
 function showUnresolved(){
  mood("unsure");showNote();visible(guessPanel,true);visible($("retry"),true);

@@ -96,21 +96,14 @@ main:has(#play:not([hidden])){
  display:block;font:italic 600 clamp(16px,3vw,24px)/1.15 "Segoe Print","Bradley Hand",cursive;
  overflow-wrap:anywhere
 }
-.printer-output {
- /* The top edge follows the exit slot in the 724 × 404 scene artwork. */
- position:absolute;z-index:3;left:80.9%;top:71.6%;width:10%;height:12.8%;
- overflow:hidden;pointer-events:none;transform:skewX(-13deg);transform-origin:top left;
+.guess-reveal{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.case-note:is([data-result="loading"],[data-result="feeding"],[data-result="reaching"],[data-result="carrying"],[data-result="placing"],[data-result="writing"]){visibility:hidden}
+.case-note:is([data-result="printed"],[data-result="written"]){
+ left:3%;bottom:3%;width:min(32%,215px);transform:rotate(-2deg);
+ padding:4px 6px
 }
-#case-photo {
- display:block;width:100%;height:100%;object-fit:fill;
- background:#fbefd5;border:solid #fbefd5;
- border-width:clamp(2px,.4vw,5px);border-bottom-width:clamp(4px,.7vw,8px);
- transform:translateY(-7%);
- animation:printer-feed 1.25s linear both;
-}
-@keyframes printer-feed {
- from {transform:translateY(-100%)}
- to {transform:translateY(-7%)}
+.case-note:is([data-result="printed"],[data-result="written"]) strong{
+ font-size:clamp(11px,1.8vw,18px)
 }
 .case-note[data-result="rejected"] span {
  color:#883d2e;font-weight:bold;
@@ -173,9 +166,7 @@ main:has(#play:not([hidden])){
  width:auto;margin:2px;padding:7px 9px;font-size:13px
 }
 @media(max-width:600px){
- .case-note:is([data-result="loading"],[data-result="printed"]){
-  width:52%;bottom:3%;padding:4px 8px
- }
+
  .office:has(> #status){display:flex;flex-direction:column}
  .office-wordmark{position:relative;inset:auto;width:max-content;margin:7px 8px;font-size:23px}
  .office:has(> #status) .office-wordmark{margin-bottom:0}

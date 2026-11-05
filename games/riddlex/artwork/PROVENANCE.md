@@ -51,3 +51,7 @@ Paths are relative to `games/riddlex`.
 | images/approved/printer.png | 7a8d3bce1949c362c7edae124923bad9f7ce5718692a8a2128ffb3d0936b2c85 |
 | images/approved/window.jpg | b4f2a286f14cf804cea5ec65265b61dc3e4fa205acbe7b5d4e8677c92a0506f3 |
 | images/einstein.jpg | 06cf1c804559f2c7a380067f7714af710268a8b7b546311ca62bcd1b08006168 |
+
+### Final-guess arm layers
+
+`images/approved/writing-arm.png` and `images/approved/reaching-arm.png` are alpha crops from a pose sheet generated with the built-in image generator. The approved `seated-office.jpg` was the identity, clothing, lighting, and camera reference. The game uses the crop with the left sleeve and pen grip and the crop with the extended right sleeve and pinching hand. The generated face and torso are outside the composited artwork. The Albert Einstein print uses the catalogued photograph listed above.

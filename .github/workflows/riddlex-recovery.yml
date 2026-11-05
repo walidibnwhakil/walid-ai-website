@@ -1,16 +1,26 @@
-name: Riddlex recovery tests
+name: Riddlex recovery cloud execution
 on:
   workflow_dispatch:
+  push:
+    branches: [riddlex-recovery]
+    paths: ['.github/workflows/riddlex-recovery.yml']
+concurrency:
+  group: riddlex-recovery-cloud
+  cancel-in-progress: false
 jobs:
-  test:
+  verify:
+    if: github.ref == 'refs/heads/riddlex-recovery'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: riddlex-recovery
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run offline Riddlex tests
-        run: npm test
+      - name: Verify preserved baseline
+        run: npm run validate && npm test
         working-directory: games/riddlex

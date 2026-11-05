@@ -116,6 +116,7 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await page.locator('#retry').click();if(await page.locator('#case-note').getAttribute('data-guess-id')==='cat')throw Error('Rejected identity repeated');
  await page.locator('#new').click();await page.route('**/runtime/characters-*.json',async r=>{await new Promise(resolve=>setTimeout(resolve,150));await r.continue();});await page.locator('[data-category="characters"]').click();await page.locator('#new').click();await page.evaluate(()=>import('./runtime-loader.js').then(m=>m.loadCategory('characters')).then(()=>true));await page.unrouteAll({behavior:'wait'});if(!await page.locator('#categories').isVisible())throw Error('Late load overwrote reset');
  const photoPage=await context.newPage();
+ await photoPage.emulateMedia({reducedMotion:"no-preference"});
  photoPage.on('pageerror',e=>errors.push(String(e)));
  await photoPage.goto(url);
  await photoPage.locator('#play').click();

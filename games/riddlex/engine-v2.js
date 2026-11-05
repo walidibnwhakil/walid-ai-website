@@ -95,6 +95,8 @@ function questionBank(questions,answers){
   if(excluded.has(questionIdentity(key))||askedText.has(normalize(question)))continue;
   if(isFictional&&/^(?:v2|wd)_(?:birthplace|citizenship|education|award)_/.test(key))continue;
   if(/^(born_before_|birth_first_half$|cue_wd_)/.test(key))continue;
+  // Human-first play: obscure birthplace and award trivia are not fair questions.
+  if(/^(?:v2|wd)_(?:birthplace|award)_/.test(key))continue;
   if(!bank.has(canonical)||key===canonical)bank.set(canonical,key);
  }
  return bank;
@@ -127,7 +129,7 @@ export function nextQuestion(ranked,answers,questions){
   // Unknown candidate facts are marginalized. Fine-grained clues are a fallback.
   const information=entropy(yes+unknown*.5)-unknown;
   const group=evidenceGroup(key);
-  const weight=familiar.has(key)?1.35:group==='birthplace'||group==='award'?.25:1;
+  const weight=familiar.has(key)?2.2:group==='occupation'||group==='citizenship'?1.5:group==='birthplace'||group==='award'?.05:1;
   const quality=(information+.06*coverage)*weight/(1+.3*(skipped.get(group)??0));
   if(quality>bestQuality+1e-12||(Math.abs(quality-bestQuality)<=1e-12&&key<best)){
    bestQuality=quality;best=key;

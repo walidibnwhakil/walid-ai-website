@@ -225,7 +225,12 @@ export const generatedQuestions={
   "cue_charulata": "Is she Bhupati's lonely wife who grows close to Amal in Nastanirh?",
   "cue_bhupati": "Is he Charulata's husband and Amal's cousin in Nastanirh?",
   "cue_amal_nastanirh": "Is he Bhupati's cousin who arouses romantic feelings in Charulata?",
-  "cue_kapalkundala": "Is she Bankim Chandra's heroine brought up in the forest by a Kapalik?"
+  "cue_kapalkundala": "Is she Bankim Chandra's heroine brought up in the forest by a Kapalik?",
+  "cue_meena_unicef": "Is she the girl who wants to attend school in the UNICEF cartoon Count Your Chickens?",
+  "cue_raju_unicef": "Is he the young boy in UNICEF's Meena cartoons?",
+  "cue_mithu_unicef": "Is this the parrot in UNICEF's Meena cartoons?",
+  "cue_saola": "Does this forest animal from Laos and Vietnam have two long straight horns and white face markings?",
+  "cue_sextant": "Does this instrument use mirrors to measure the angle of a celestial object above the horizon?"
 };
 export const generatedBanglaQuestions={
   "educator": "ব্যক্তিটি কি শিক্ষাবিদ ছিলেন?",
@@ -453,5 +458,10 @@ export const generatedBanglaQuestions={
   "cue_charulata": "সে কি নষ্টনীড়ের ভূপতির নিঃসঙ্গ স্ত্রী যে অমলের কাছাকাছি আসে?",
   "cue_bhupati": "সে কি নষ্টনীড়ের চারুলতার স্বামী এবং অমলের আত্মীয়?",
   "cue_amal_nastanirh": "সে কি ভূপতির সেই আত্মীয় যার প্রতি চারুলতার প্রেমের অনুভূতি জাগে?",
-  "cue_kapalkundala": "সে কি বঙ্কিমচন্দ্রের সেই নায়িকা যাকে কাপালিক বনে লালন করে?"
+  "cue_kapalkundala": "সে কি বঙ্কিমচন্দ্রের সেই নায়িকা যাকে কাপালিক বনে লালন করে?",
+  "cue_meena_unicef": "সে কি ইউনিসেফের কাউন্ট ইয়োর চিকেনস কার্টুনে স্কুলে যেতে চাওয়া মেয়েটি?",
+  "cue_raju_unicef": "সে কি ইউনিসেফের মীনা কার্টুনের ছেলেটি?",
+  "cue_mithu_unicef": "এটি কি ইউনিসেফের মীনা কার্টুনের টিয়া পাখি?",
+  "cue_saola": "লাওস ও ভিয়েতনামের বনবাসী এই প্রাণীটির কি দুটি লম্বা সোজা শিং ও মুখে সাদা দাগ আছে?",
+  "cue_sextant": "যন্ত্রটি কি আয়না দিয়ে দিগন্তের ওপর আকাশের কোনো বস্তুর কোণ মাপে?"
 };

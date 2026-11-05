@@ -26,12 +26,26 @@ function clippedLayer(image, left, top, outline, feather = 0) {
 }
 
 function drawCat(context, image, time) {
- const play = Math.max(0, Math.sin(time / 630));
- paintCat(context, image, 6, 478, 301, .88, 1, 1 - .025 * play);
- drawGlass(context, 507 + 4 * play, 298 - 3 * play, .29 * play, .68);
+ const phase = time % 10400;
+ if (phase < 2200 || phase >= 7800) {
+  const outward = phase < 2200;
+  const progress = outward ? phase / 2200 : Math.min(1, (phase - 7800) / 2300);
+  paintCat(context, image, progress === 1 ? 5 : Math.floor(time / 128) % 4,
+   outward ? 484 - 125 * progress : 359 + 125 * progress, 299 + 55 * progress * Number(outward) + 55 * (1 - progress) * Number(!outward),
+   .78, outward ? -1 : 1);
+ } else if (phase < 4900) {
+  const bat = Math.max(0, Math.sin((phase - 2200) / 240));
+  paintCat(context, image, bat > .35 ? 0 : 4, 359 - 6 * bat, 354, .77, -1);
+  drawGlass(context, 314 - 16 * bat, 348 - 15 * bat, Math.PI + .64 * bat, .69);
+  return;
+ } else {
+  const roll = Math.sin(Math.PI * (phase - 4900) / 2900);
+  paintCat(context, image, 7, 359 - 19 * roll, 354, .77, -1, 1 - .25 * roll, .42 * roll);
+ }
+ drawGlass(context, 314, 348, Math.PI, .69);
 }
 
-function paintCat(context, image, frame, x, y, scale, direction = 1, heightScale = 1) {
+function paintCat(context, image, frame, x, y, scale, direction = 1, heightScale = 1, roll = 0) {
  const [sx, sy, width, height] = catFrames[frame];
  context.save();
  context.translate(x, y);
@@ -40,7 +54,9 @@ function paintCat(context, image, frame, x, y, scale, direction = 1, heightScale
  context.beginPath();
  context.ellipse(0, -3, width * .38, 7, 0, 0, Math.PI * 2);
  context.fill();
- context.drawImage(image, sx, sy, width, height, -width / 2, -height * heightScale, width, height * heightScale);
+ context.translate(0, -height * heightScale / 2);
+ context.rotate(roll);
+ context.drawImage(image, sx, sy, width, height, -width / 2, -height * heightScale / 2, width, height * heightScale);
  context.restore();
 }
 
@@ -123,6 +139,28 @@ function pipeCycle(time) {
  return 0;
 }
 
+// The sleeve's inside seam is pinned to the shoulder. Only the upper
+// rows follow the wrist, while the lower rows settle against the desk.
+function drawPipeArm(context, arm, reach, time) {
+ const tipX = 341 - 43 * reach;
+ const tipY = 203 - 72 * reach;
+ const rows = [
+  [0, tipX, tipY - 13],
+  [70, 343, 213],
+  [arm.height, 333, 298],
+ ];
+ for (let index = 1; index < rows.length; index++) {
+  const [top, x, y] = rows[index - 1];
+  const [bottom, nextX, nextY] = rows[index];
+  const height = bottom - top;
+  context.save();
+  context.transform(.54, 0, (nextX - x) / height, (nextY - y) / height, x, y);
+  context.drawImage(arm, 0, top, arm.width, height, 0, 0, arm.width, height);
+  context.restore();
+ }
+ drawSmoke(context, tipX + 36, tipY - 13, time);
+}
+
 export function animateProps(office, art) {
  const layer = office.querySelector('.scene-props');
  const foreground = office.querySelector('.evidence-cat');
@@ -155,26 +193,22 @@ export function animateProps(office, art) {
   const cover = evidence && (mood === 'wrong' || retreat);
   layer.hidden = reduced.matches && !evidence;
   foreground.hidden = !cover;
-  const {plate, cat, arm, printer} = sprites;
+  const {plate, cat, arm, printer, sleevePlate, deskPlate} = sprites;
   context.clearRect(0, 0, 724, 404);
   front.clearRect(0, 0, 724, 404);
   if (!layer.hidden) {
    if (!evidence) drawRain(context, panes, time, 220, 166, 26);
    context.drawImage(plate, 0, 0);
+   if (!evidence) {
+    const reach = pipeCycle(time);
+    context.drawImage(deskPlate, 0, 0);
+    context.drawImage(sleevePlate, 0, 0);
+    drawPipeArm(context, arm, reach, time);
+   }
    if (cover) drawEvidenceCat(front, cat, reduced.matches ? 1000 : now - moodStart, retreat);
    else if (evidence) paintCat(context, cat, 6, 478, 301, .88);
    else drawCat(context, cat, time);
    context.drawImage(printer, 0, 0);
-   if (!evidence) {
-    const reach = pipeCycle(time);
-    context.save();
-    // The end of the pipe meets the mouth at the top of the wrist arc.
-    context.translate(300 + 35 * reach, 131 + 41 * reach);
-    context.transform(1, .09 * reach, -.22 * reach, 1, 0, 0);
-    context.drawImage(arm, 0, -10, 121, 169 - 41 * reach);
-    drawSmoke(context, 52, -12, time);
-    context.restore();
-   }
   }
   if (!reduced.matches && (!evidence || cover && now - moodStart < (retreat ? 1650 : 900))) schedule();
  }
@@ -192,7 +226,18 @@ export function animateProps(office, art) {
     'M405 298 L410 255 418 220 423 185 427 152 447 148 464 164 478 159 498 145 510 147 516 178 522 197 532 229 544 265 544 302 523 309 425 310 Z', 2);
    const printer = clippedLayer(art, 0, 0,
     'M557 304 L557 247 Q558 226 576 223 L631 213 642 195 710 194 704 216 724 221 V316 L685 320 573 306 Z', .7);
-   sprites = {plate, cat, arm, printer};
+   const deskPlate = clippedLayer(art, -125, 2,
+    'M87 344Q107 335 134 335Q139 322 169 322Q206 322 211 334L208 350Q169 360 139 350L90 359Z', 1.5);
+   const sleevePlate = document.createElement('canvas');
+   sleevePlate.width = 724;
+   sleevePlate.height = 404;
+   const sleeveContext = sleevePlate.getContext('2d');
+   sleeveContext.save();
+   sleeveContext.clip(new Path2D('M339 196Q366 200 380 231L418 269V301H353L349 273 342 265 351 245Z'));
+   sleeveContext.drawImage(clean, 126, 155, 105, 110, 338, 191, 105, 110);
+   sleeveContext.drawImage(art, 353, 301, 69, 13, 353, 289, 69, 13);
+   sleeveContext.restore();
+   sprites = {plate, cat, arm, printer, sleevePlate, deskPlate};
    schedule();
   } catch {
    // Leave the original artwork visible if the layers cannot load.
@@ -228,7 +273,7 @@ export function animateWelcome(splash) {
   'M321 500H465V543L413 541 400 595 326 642Z'
  );
  const foliage = new Path2D('M322 434Q344 390 383 371Q392 321 459 308L460 474H322Z M328 502H460V534Q401 532 398 580L328 636Z');
- const oldPipe = new Path2D('M257 309Q278 312 297 322L301 310Q306 273 317 252Q302 233 321 219L321 194Q340 162 361 166Q365 195 343 211L342 239Q356 267 332 279L323 311Q333 318 326 337Q316 360 291 345L256 319Z');
+ const oldPipe = new Path2D('M250 309Q278 312 297 322L301 310Q306 273 317 252Q302 233 321 219L321 194Q340 162 361 166Q365 195 343 211L342 239Q356 267 332 279L323 311Q333 318 326 337Q316 360 291 345L250 319Z');
  let arm, request = 0, last, elapsed = 0;
 
  function tick(now) {
@@ -264,22 +309,18 @@ export function animateWelcome(splash) {
   drawRain(context, panes, elapsed, 474, 660, 72);
 
   const reach = pipeCycle(elapsed);
-  const gripX = 256 + 60 * reach, gripY = 312 + 121 * reach;
-  // Reuse the coat's own pixels along the masked forearm.
+  const gripX = 247 + 72 * reach, gripY = 315 + 120 * reach;
+  const cuffX = gripX + 66, cuffY = gripY + 69;
+  const elbowX = 292 + reach * 8, elbowY = 608;
+  // Lay the moving forearm over the existing sleeve, from elbow to cuff.
   context.save();
-  context.beginPath();
-  context.moveTo(262, 552);
-  context.quadraticCurveTo(244, 470, gripX + 39, gripY + 39);
-  context.lineTo(gripX + 73, gripY + 55);
-  context.quadraticCurveTo(312, 510, 318, 570);
-  context.quadraticCurveTo(287, 589, 262, 552);
-  context.clip();
-  context.drawImage(art, 223, 384, 99, 204, 231, gripY + 23, 224, 265 - reach * 85);
+  context.transform(1, 0, (elbowX - cuffX) / (elbowY - cuffY), 1, cuffX, cuffY);
+  context.clip(new Path2D(`M-20 -9Q0 -19 18 -5L31 ${elbowY - cuffY - 38}Q31 ${elbowY - cuffY + 16} 0 ${elbowY - cuffY + 26}Q-33 ${elbowY - cuffY + 7} -32 ${elbowY - cuffY - 40}Z`));
+  context.drawImage(art, 249, 430, 65, 179, -33, -20, 66, elbowY - cuffY + 47);
   context.restore();
   context.save();
   context.translate(gripX, gripY);
-  context.rotate(.21 * reach);
-  context.drawImage(arm, 0, 0, 112, 105, 0, -16, 109, 103);
+  context.drawImage(arm, 0, 0, 112, 94, 0, -16, 105, 96);
   drawSmoke(context, 66, -13, elapsed);
   context.restore();
 

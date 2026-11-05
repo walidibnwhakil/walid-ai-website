@@ -4248,5 +4248,105 @@ export const generatedEntries=[
         "checkedOn": "2026-11-04"
       }
     ]
+  },
+  {
+    "id": "meena-unicef",
+    "name": "Meena (UNICEF)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "cartoon": true,
+      "girl": true,
+      "bangla": true,
+      "cue_meena_unicef": true
+    },
+    "diagnostic": "cue_meena_unicef",
+    "sources": [
+      {
+        "url": "https://www.unicef.org/bangladesh/en/meena-and-unicef",
+        "locator": "Count Your Chickens",
+        "checkedOn": "2026-11-05"
+      }
+    ]
+  },
+  {
+    "id": "raju-unicef",
+    "name": "Raju (Meena)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "cartoon": true,
+      "boy": true,
+      "bangla": true,
+      "cue_raju_unicef": true
+    },
+    "diagnostic": "cue_raju_unicef",
+    "sources": [
+      {
+        "url": "https://www.unicef.org/bangladesh/en/meena-and-unicef",
+        "locator": "Raju",
+        "checkedOn": "2026-11-05"
+      }
+    ]
+  },
+  {
+    "id": "mithu-unicef",
+    "name": "Mithu (Meena)",
+    "category": "characters",
+    "facts": {
+      "fictional": true,
+      "cartoon": true,
+      "bangla": true,
+      "boy": false,
+      "girl": false,
+      "cue_mithu_unicef": true
+    },
+    "diagnostic": "cue_mithu_unicef",
+    "sources": [
+      {
+        "url": "https://www.unicef.org/bangladesh/en/meena-and-unicef",
+        "locator": "pet parrot Mithu",
+        "checkedOn": "2026-11-05"
+      }
+    ]
+  },
+  {
+    "id": "saola",
+    "name": "Saola",
+    "category": "animals",
+    "facts": {
+      "mammal": true,
+      "wild": true,
+      "bird": false,
+      "fish": false,
+      "reptile": false,
+      "cue_saola": true
+    },
+    "diagnostic": "cue_saola",
+    "sources": [
+      {
+        "url": "https://www.worldwildlife.org/species/saola/",
+        "locator": "parallel horns",
+        "checkedOn": "2026-11-05"
+      }
+    ]
+  },
+  {
+    "id": "sextant",
+    "name": "Sextant",
+    "category": "objects",
+    "facts": {
+      "science_tool": true,
+      "electronic": false,
+      "cue_sextant": true
+    },
+    "diagnostic": "cue_sextant",
+    "sources": [
+      {
+        "url": "https://www.rmg.co.uk/collections/objects/rmgc-object-43340",
+        "locator": "altitude measuring",
+        "checkedOn": "2026-11-05"
+      }
+    ]
   }
 ];

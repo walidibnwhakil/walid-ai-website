@@ -1,1 +1,35 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Games | Walid AI</title><style>body{margin:0;background:#f5f0e6;color:#35291f;font:16px system-ui;padding:32px}main{max-width:780px;margin:auto}a{color:#674328}.tile{display:block;padding:26px;background:#fff8ec;border:1px solid #d5c4a8;border-radius:18px;text-decoration:none;color:inherit}h1{margin-top:35px}</style></head><body><main><a href="/">← Walid AI</a><h1>Games</h1><a class="tile" href="/games/riddlex/"><h2>🔎 Riddlex — The Guessing Detective</h2><p>Think of a character, animal or object. Can the detective guess it?</p><strong>Play free →</strong></a></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Games | Walid AI</title>
+  <meta name="description" content="Play browser games from Walid AI.">
+  <link rel="icon" href="/kathgolap-logo.png">
+  <style>
+    body{margin:0;background:#f5f0e6;color:#35291f;font:16px/1.5 system-ui;padding:clamp(16px,4vw,32px)}
+    main{max-width:780px;margin:auto}
+    nav{display:flex;flex-wrap:wrap;gap:12px}
+    a{color:#674328}
+    a:focus-visible{outline:2px solid #674328;outline-offset:4px}
+    h1{margin-bottom:0}
+    .games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:16px;list-style:none;margin:24px 0;padding:0}
+    .tile{display:block;padding:24px;background:#fff8ec;border:1px solid #d5c4a8;border-radius:18px;text-decoration:none;color:inherit}
+    .tile h2{margin:0;font-size:1.25rem}
+    .tile:hover strong{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/tools.html">Tools</a><span aria-current="page">Games</span></nav>
+    <h1>Games</h1>
+    <ul class="games">
+      <li><a class="tile" href="/games/riddlex/">
+        <h2>Riddlex — The Guessing Detective</h2>
+        <p>Think of a character, animal or object. Can the detective guess it?</p>
+        <strong>Play Riddlex <span aria-hidden="true">→</span></strong>
+      </a></li>
+    </ul>
+  </main>
+</body>
+</html>

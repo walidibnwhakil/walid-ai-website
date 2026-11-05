@@ -7,15 +7,15 @@ import {generatedQuestions,generatedBanglaQuestions} from './knowledge.questions
 import {compileCurated} from './build-curated.mjs';
 import {scoreCandidates,nextQuestion,selectGuess} from './engine.js';
 
-test('210 reviewed records compile exactly to the shipped data and bilingual questions',async()=>{
+test('215 reviewed records compile exactly to the shipped data and bilingual questions',async()=>{
  const data=compileCurated(await readFile(new URL('./curated-batch.tsv',import.meta.url),'utf8'));
- assert.equal(data.entries.length,210);
+ assert.equal(data.entries.length,215);
  assert.deepEqual(data.entries,generatedEntries);
  assert.deepEqual(data.questions,generatedQuestions);
  assert.deepEqual(data.bangla,generatedBanglaQuestions);
- assert.equal(entries.length,1791);
+ assert.equal(entries.length,1796);
  const counts=Object.fromEntries(['characters','animals','objects'].map(c=>[c,entries.filter(e=>e.category===c).length]));
- assert.deepEqual(counts,{characters:1596,animals:95,objects:100});
+ assert.deepEqual(counts,{characters:1599,animals:96,objects:101});
 });
 
 test('new entries have provenance, translated diagnostic questions and unique normalized names',()=>{
@@ -26,7 +26,7 @@ test('new entries have provenance, translated diagnostic questions and unique no
   assert.ok(e.sources.length>0,e.id);
   for(const source of e.sources){
    assert.equal(new URL(source.url).protocol,'https:');
-   assert.ok(source.locator.trim());assert.equal(source.checkedOn,'2026-11-04');
+   assert.ok(source.locator.trim());assert.match(source.checkedOn,/^2026-11-0[45]$/);
   }
  }
 });

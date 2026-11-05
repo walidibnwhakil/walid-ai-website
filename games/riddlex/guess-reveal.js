@@ -66,9 +66,7 @@ function coverArm(context, art, side) {
  context.save();
  if (side === 'writing') {
   context.clip(new Path2D('M207 272Q249 266 278 266L311 261Q333 262 347 281L346 299L205 301Z'));
-  context.drawImage(art, 205, 299, 145, 24, 205, 278, 145, 25);
-  context.clip(new Path2D('M204 270L350 259V281Q308 290 274 285L204 285Z'));
-  context.drawImage(art, 217, 239, 115, 24, 204, 261, 147, 26);
+  context.drawImage(art, 205, 304, 145, 31, 205, 260, 145, 43);
  } else {
   context.clip(new Path2D('M355 272Q384 270 406 275L415 291L411 299L353 300Z'));
   context.drawImage(art, 354, 299, 62, 24, 353, 273, 63, 28);

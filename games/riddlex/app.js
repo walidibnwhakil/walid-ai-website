@@ -1,13 +1,14 @@
-import {animateWelcome,animateProps} from "./scene-props.js?v=desk-reveal";
+import {animateWelcome,animateProps} from "./scene-props.js?v=release";
 import {animateOffice} from "./scene-motion.js?v=desk-reveal";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
-import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=soft-motion";
+import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=release";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
-import {createGuessReveal} from "./guess-reveal.js?v=desk-reveal";
+import {createGuessReveal} from "./guess-reveal.js?v=release";
 let allEntries=[],allQuestions={};
 const contextKey="relationship_context";
 const contextQuestion="Are you thinking of someone by their relationship to you, such as a relative or friend?";
 let loadToken=0;
+let questionSeed;
 const $=id=>document.getElementById(id);
 let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
 let tentative=false;
@@ -105,14 +106,13 @@ function render(){
  }
  const candidates=allEntries.filter(entry=>{
   if(context?.value==="yes")return entry.category==="relationships";
-  if(context?.value==="no")return entry.category==="characters";
-  return true;
+  return entry.category===category;
  });
  const clues=answers.filter(answer=>answer.key!==contextKey);
  const ranked=scoreCandidates(candidates,clues,rejected);
  const suggestion=selectGuess(ranked,clues);
  if(suggestion){tentative=clues.some(({value})=>value==="probably"||value==="probably-not");guess=suggestion;mode="guess";presentGuess();return;}
- currentKey=nextQuestion(ranked,clues,allQuestions);
+ currentKey=nextQuestion(ranked,clues,allQuestions,questionSeed);
  if(!currentKey){
    guess=selectTentativeGuess(ranked,clues);
    if(guess){tentative=true;mode="guess";presentGuess();return;}
@@ -123,6 +123,7 @@ function render(){
 }
 document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",async()=>{
  const token=++loadToken;category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="loading";render();
+ questionSeed=crypto.getRandomValues(new Uint32Array(1))[0];
  try{
   const pools=category==="characters"?["characters","relationships"]:[category];
   const data=await Promise.all(pools.map(loadCategory));
@@ -133,6 +134,7 @@ document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("clic
    allQuestions[contextKey]=contextQuestion;
   }
   mode="ask";render();
+ if(mode==="ask")answerPanel.querySelector("button").focus();
  }catch{
   if(token!==loadToken)return;
   reset();

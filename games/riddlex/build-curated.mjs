@@ -28,8 +28,9 @@ export function compileCurated(text){
  const ids=new Set(),names=new Set();
  for(const line of text.split(/\r?\n/).filter(l=>l.trim()&&!l.startsWith('#'))){
   const fields=line.split('|');
-  assert.equal(fields.length,8,'Expected eight fields: '+line);
-  const [id,name,category,tags,en,bn,article,locator]=fields;
+  assert.ok(fields.length===8||fields.length===9,'Expected eight fields and an optional review date: '+line);
+  const [id,name,category,tags,en,bn,article,locator,checkedOn='2026-11-04']=fields;
+  assert.match(checkedOn,/^\d{4}-\d{2}-\d{2}$/);
   assert.match(id,/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
   assert.ok(!ids.has(id),'Duplicate id: '+id);ids.add(id);
   const normalizedName=name.toLowerCase().normalize('NFKC');
@@ -45,7 +46,7 @@ export function compileCurated(text){
   const diagnostic='cue_'+id.replaceAll('-','_');
   facts[diagnostic]=true;questions[diagnostic]=en;bangla[diagnostic]=bn;
   const url=article.startsWith('https://')?article:'https://en.wikipedia.org/wiki/'+article;
-  entries.push({id,name,category,facts,diagnostic,sources:[{url,locator,checkedOn:'2026-11-04'}]});
+  entries.push({id,name,category,facts,diagnostic,sources:[{url,locator,checkedOn}]});
  }
  return {entries,questions,bangla};
 }

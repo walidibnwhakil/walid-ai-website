@@ -133,6 +133,7 @@ function questionBank(questions,answers){
   const canonical=canonicalQuestionKey(key);
   if(excluded.has(questionIdentity(key))||askedText.has(normalize(question)))continue;
   if(isFictional&&/^(?:v2|wd)_/.test(key))continue;
+  if(isFictional&&/\b(?:father|mother|parent|son|daughter|sibling|spouse|husband|wife|cousin)\b/i.test(question))continue;
   if(/^(born_before_|birth_first_half$|cue_wd_)/.test(key))continue;
   // Generated metadata is admitted only where a recognizable clue was reviewed.
   if(/^(?:v2|wd)_/.test(key)&&!countries.has(canonical)&&!politicalRoles.has(canonical)&&
@@ -149,7 +150,14 @@ function questionBank(questions,answers){
  }
  return bank;
 }
-export function nextQuestion(ranked,answers,questions){
+function questionOrder(seed,key,step){
+ let hash=(seed^Math.imul(step+1,0x9e3779b9))>>>0;
+ for(const character of key)hash=Math.imul(hash^character.charCodeAt(0),0x01000193);
+ hash=Math.imul(hash^(hash>>>16),0x85ebca6b);
+ return (hash^(hash>>>13))>>>0;
+}
+
+export function nextQuestion(ranked,answers,questions,seed){
  if(!ranked.length||answers.length>=8&&answers.every(({value})=>value==='unknown'))return null;
  const bank=questionBank(questions,answers),counts=new Map();
  const route=routeFor(answers);
@@ -180,6 +188,7 @@ export function nextQuestion(ranked,answers,questions){
   if(value==='unknown')skipped.set(family,(skipped.get(family)??0)+1);
  }
  let best=null,bestQuality=-Infinity;
+ const nearTies=[];
  const roots=new Set(['real','fictional','mammal','bird','reptile','electronic','vehicle','furniture','family','work','friend']);
  const rootStage=ranked[0].support===0&&[...counts].some(([key,[yes,no]])=>roots.has(key)&&(yes>1e-9&&no>1e-9||yes+no>.1&&yes+no<.95));
  for(const [key,[yes,no]] of counts){
@@ -208,11 +217,14 @@ export function nextQuestion(ranked,answers,questions){
   // A soft career answer gives context a preference without removing other questions.
   const repeated=softRun&&usedGroups.has(group);
   const priority=(route?tier*4:contextual?.25:0)+quality*(repeated?.65:1);
+  if(seed!==undefined)nearTies.push({key,priority});
   if(priority>bestQuality+1e-12||(Math.abs(priority-bestQuality)<=1e-12&&key<best)){
    bestQuality=priority;best=key;
   }
  }
- return best;
+ if(bestQuality<.1||seed===undefined)return best;
+ return nearTies.filter(({priority})=>bestQuality-priority<=.035)
+  .sort((a,b)=>questionOrder(seed,a.key,answers.length)-questionOrder(seed,b.key,answers.length))[0].key;
 }
 export function selectGuess(ranked,answers){
  const [top,second]=ranked;if(!top)return null;

@@ -3,6 +3,20 @@ import {scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from './e
 import {readFile} from 'node:fs/promises';
 import {loadCategory} from './runtime-loader.js';
 const entry=(id,facts)=>({id,name:id,category:'characters',facts});
+test('seeds vary equally useful questions and replay the same choice',()=>{
+ const entries=[entry('a',{x:true,y:false,z:true}),entry('b',{x:false,y:true})];
+ const questions={x:'Does it use magic?',y:'Does it solve crimes?',z:'Does it go to school?'};
+ const ranked=scoreCandidates(entries,[]);
+ const sequence=Array.from({length:32},(_,seed)=>nextQuestion(ranked,[],questions,seed));
+ assert.deepEqual(new Set(sequence),new Set(['x','y']));
+ assert.deepEqual(sequence,sequence.map((_,seed)=>nextQuestion(ranked,[],questions,seed)));
+});
+test('fictional cases exclude family prompts even when they would separate the candidates',()=>{
+ const entries=[entry('a',{fictional:true,x:true,y:true}),entry('b',{fictional:true,x:false,y:false})];
+ const answers=[{key:'fictional',value:'yes'}];
+ const questions={x:'Is he the king’s son?',y:'Does he wear a mask?'};
+ for(let seed=0;seed<8;seed++)assert.equal(nextQuestion(scoreCandidates(entries,answers),answers,questions,seed),'y');
+});
 test('unknown answers and unrecorded facts have zero likelihood contribution',()=>{
  const es=[entry('a',{}),entry('b',{x:false})];
  assert.ok(scoreCandidates(es,[{key:'x',value:'unknown'}]).every(r=>r.score===0));

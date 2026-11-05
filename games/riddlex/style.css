@@ -53,7 +53,6 @@ main:has(#play:not([hidden])){
  border-color:#ffce7b;box-shadow:0 4px 12px #1d100b
 }
 #play[hidden]{display:none}
-.panel:has(#play:not([hidden])) #language{color:#ffe3ac;background:#3d281b}
 .pipe-smoke{position:absolute;top:max(40cqw,32%);left:40%;width:20px;height:50px;pointer-events:none}
 .pipe-smoke::before,.pipe-smoke::after{
  content:"";position:absolute;bottom:0;left:0;width:100%;height:100%;border-radius:50%;

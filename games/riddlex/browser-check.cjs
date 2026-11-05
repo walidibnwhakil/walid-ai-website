@@ -8,8 +8,10 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  const browser=await chromium.launch({headless:true,...(process.env.RIDDLEX_CHROME?{executablePath:process.env.RIDDLEX_CHROME}:{}),args:['--no-sandbox']});
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'no-preference'}),page=await context.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(String(e)));page.on('response',async r=>{if(r.url().startsWith(url))requests.push({path:r.url().slice(url.length),bytes:(await r.body().catch(()=>Buffer.alloc(0))).length});});
+ await page.addInitScript(()=>localStorage.setItem('riddlex-language','bn'));
  const start=performance.now();await page.goto(url);
  if(await page.locator('#categories').isVisible()||await page.locator('.founder').getAttribute('src'))throw Error('Gameplay leaked onto splash');
+ if(await page.locator('html').getAttribute('lang')!=='en'||await page.locator('#language').count()||await page.locator('#play').innerText()!=='Play')throw Error('Splash must be English-only');
  await page.locator('#splash-art img').evaluate(img=>img.decode());
  await page.screenshot({path:path.join(output,'browser-splash.png'),fullPage:true});
  await page.locator('#play').click();await page.locator('#categories').waitFor({state:'visible'});await page.evaluate(()=>document.fonts.ready);
@@ -25,43 +27,41 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  await desktop.screenshot({path:path.join(output,'browser','desktop-office.png'),fullPage:true});
  await desktop.close();
  const manifestBytes=await fs.readFile(path.join(__dirname,'runtime/manifest.json')),manifest=JSON.parse(manifestBytes),manifestSha256=createHash('sha256').update(manifestBytes).digest('hex');
- async function data(category){const parts=await Promise.all(manifest.categories[category].shards.map(s=>fs.readFile(path.join(__dirname,'runtime',s.path),'utf8').then(JSON.parse)));return{entries:parts.flatMap(p=>p.entries),questions:Object.assign({},...parts.map(p=>p.questions)),bangla:Object.assign({},...parts.map(p=>p.bangla))};}
- const {factValue}=await import('./engine-v2.js'),characters=await data('characters'),fresh=characters.entries.find(e=>e.id.startsWith('v2-')&&e.nameBn);
- const contextQuestion = {
-  en:'Are you thinking of someone by their relationship to you, such as a relative or friend?',
-  bn:'আপনি কি কাউকে আপনার সঙ্গে তাঁর সম্পর্ক দিয়ে ভাবছেন, যেমন পরিবারের সদস্য বা বন্ধু?',
- };
- if(await page.locator('[data-category]').count()!==3||await page.locator('#keyboard-hint').count())throw Error('Unexpected lobby controls');
- const specs=[['en','animals','cat'],['bn','objects','phone'],['bn','relationships','role-wife'],['en','characters','himu']];if(fresh)specs.push(['en','characters',fresh.id],['bn','characters',fresh.id]);
+ async function data(category){const parts=await Promise.all(manifest.categories[category].shards.map(s=>fs.readFile(path.join(__dirname,'runtime',s.path),'utf8').then(JSON.parse)));return{entries:parts.flatMap(p=>p.entries),questions:Object.assign({},...parts.map(p=>p.questions))};}
+ const {factValue}=await import('./engine-v2.js'),characters=await data('characters'),fresh=characters.entries.find(e=>e.id.startsWith('v2-'));
+ const contextQuestion='Are you thinking of someone by their relationship to you, such as a relative or friend?';
+ if((await page.locator('[data-category]').allTextContents()).join('|')!=='Characters|Animals|Objects'||await page.locator('#keyboard-hint').count())throw Error('Unexpected lobby controls');
+ if((await page.locator('[data-answer]').allTextContents()).join('|')!=="Yes|No|Probably|Probably Not|Don't Know")throw Error('Unexpected answer labels');
+ const specs=[['animals','cat'],['objects','phone'],['relationships','role-wife'],['characters','himu']];if(fresh)specs.push(['characters',fresh.id]);
  const games=[];
- for(const [language,category,id] of specs){
-  await page.locator('#new').click();if(await page.locator('html').getAttribute('lang')!==language)await page.locator('#language').click();
-  const d=await data(category),target=d.entries.find(e=>e.id===id),bank=language==='bn'?d.bangla:d.questions,started=performance.now();
+ for(const [category,id] of specs){
+  await page.locator('#new').click();
+  const d=await data(category),target=d.entries.find(e=>e.id===id),bank=d.questions,started=performance.now();
   await page.locator('[data-category="'+(category==='relationships'?'characters':category)+'"]').click();
   await page.locator('#answers').waitFor({state:'visible'});
   if(category==='characters'||category==='relationships'){
-   if(await page.locator('#status').innerText()!==contextQuestion[language])throw Error('Missing relationship context');
+   if(await page.locator('#status').innerText()!==contextQuestion)throw Error('Missing relationship context');
    if(category==='relationships'){
     await page.locator('[data-answer="no"]').click();
     await page.locator('#back').click();
-    if(await page.locator('#status').innerText()!==contextQuestion[language])throw Error('Cannot correct relationship context');
+    if(await page.locator('#status').innerText()!==contextQuestion)throw Error('Cannot correct relationship context');
    }
    await page.locator('[data-answer="'+(category==='relationships'?'yes':'no')+'"]').click();
   }
   const loadMs=performance.now()-started;
   let count=0;while(count<60&&await page.locator('#answers').isVisible()){
-   const text=await page.locator('#status').innerText(),key=Object.keys(bank).find(k=>bank[k]===text);if(!key)throw Error('Unmapped '+language+' question '+text);
+   const text=await page.locator('#status').innerText(),key=Object.keys(bank).find(k=>bank[k]===text);if(!key)throw Error('Unmapped English question '+text);
    const fact=factValue(target,key);await page.locator('[data-answer="'+(fact===undefined?'unknown':fact?'yes':'no')+'"]').click();count++;
   }
-  const status=await page.locator('#status').innerText(),correct=await page.locator('#correct').isVisible()&&(status.includes(target.name)||Boolean(target.nameBn&&status.includes(target.nameBn)));
-  games.push({language,category,id,correct,questions:count,loadMs});if(!correct)throw Error('Gameplay failed '+JSON.stringify(games.at(-1)));
-  await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:path.join(output,'browser',language+'-'+category+'.png'),fullPage:true});await page.locator('#correct').click();
+  const status=await page.locator('#status').innerText(),correct=await page.locator('#correct').isVisible()&&status==='Are you thinking of '+target.name+'?';
+  games.push({language:'en',category,id,correct,questions:count,loadMs});if(!correct)throw Error('Gameplay failed '+JSON.stringify(games.at(-1)));
+  await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:path.join(output,'browser','en-'+category+'.png'),fullPage:true});await page.locator('#correct').click();
+  if(await page.locator('#case-note-name').innerText()!==target.name)throw Error('Result must use the English casebook name');
   if(await page.locator('#case-note').getAttribute('data-result')!=='written')throw Error('Expected handwritten fallback');
   if(id==='cat')await page.screenshot({path:path.join(output,'browser','handwritten-result.png'),fullPage:true,animations:'disabled'});
  }
- const lastLanguage=await page.locator('html').getAttribute('lang');await page.reload();if(await page.locator('html').getAttribute('lang')!==lastLanguage)throw Error('Language not persistent');
+ await page.reload();if(await page.locator('html').getAttribute('lang')!=='en')throw Error('Saved language must not override English');
  await page.locator('#play').click();
- if(lastLanguage!=='en')await page.locator('#language').click();
  await page.route('**/runtime/animals-*.json',r=>r.abort());await page.locator('[data-category="animals"]').click();await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('could not load'));await page.unrouteAll({behavior:'wait'});
  await page.locator('[data-category="animals"]').click();await page.locator('#answers').waitFor({state:'visible'});
  for(const value of ['unknown','probably','probably-not']){await page.locator('[data-answer="'+value+'"]').click();await page.locator('#back').click();}
@@ -72,7 +72,6 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
  const photoPage=await context.newPage();
  photoPage.on('pageerror',e=>errors.push(String(e)));
  await photoPage.goto(url);
- if(await photoPage.locator('html').getAttribute('lang')!=='en')await photoPage.locator('#language').click();
  await photoPage.locator('#play').click();
  await photoPage.locator('[data-category="characters"]').click();
  await photoPage.locator('#answers').waitFor({state:'visible'});

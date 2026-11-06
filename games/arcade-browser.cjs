@@ -41,7 +41,7 @@ const path = require("node:path");
       const button = name => page.getByRole("button", {name, exact:true});
       await go("");
       const tiles = page.locator(".preview");
-      assert.equal(await tiles.count(), 6);
+      assert.equal(await tiles.count(), 7);
       for (const preview of await tiles.all()) {
         await preview.scrollIntoViewIfNeeded();
         await preview.locator("..").focus();
@@ -101,8 +101,18 @@ const path = require("node:path");
       await button("Pause").click();
       assert.match(await status.innerText(), /Paused/);
       await capture("snake");
+      await go("2048/");
+      assert.equal(await page.locator('[role="gridcell"]').count(), 16);
+      assert.equal(await page.locator('[role="gridcell"][data-value="0"]').count(), 14);
+      for (const direction of ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"]) {
+        await page.keyboard.press(direction);
+        if (!(await status.innerText()).includes("No tiles moved")) break;
+      }
+      assert.notEqual(await status.innerText(), "Use the arrow keys or direction buttons to begin.");
+      await button("Move up").click();
+      await capture("2048");
       assert.deepEqual(errors, []);
-      console.log(`${width}px: 6 previews, 5 local games, keyboard and overflow checks; index ${bytes} bytes`);
+      console.log(`${width}px: 7 previews, 6 local games, keyboard and overflow checks; index ${bytes} bytes`);
       await page.close();
     }
   } finally {

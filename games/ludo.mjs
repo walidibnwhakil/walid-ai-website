@@ -19,16 +19,30 @@ const track = starts;
 const playerSelect = document.querySelector("#player-count");
 const modeSelect = document.querySelector("#mode");
 const seatOptions = document.querySelector("#seat-options");
-const dieFace = document.querySelector("#die-face");
+const dice = teams.map((team,teamId)=>{
+  const container=document.querySelector(`#dice-${team.toLowerCase()}`);
+  const label=document.createElement("span");
+  label.className="player-dice-label";
+  label.textContent=team;
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="die-face";
+  button.textContent="⚀";
+  button.setAttribute("aria-label",`Roll ${team} die`);
+  button.addEventListener("click",()=>{if(activeTeams[state.turn]===teamId && !isBot(state.turn)) throwDie();});
+  container.append(label,button);
+  return button;
+});
+const dieSymbols=["⚀","⚁","⚂","⚃","⚄","⚅"];
+const lastDice=[1,1,1,1];
 let activeTeams, state, message, seatBots = [], motions = new Map();
 const game = gameShell({reset() {
   activeTeams = Array.from({length:Number(playerSelect.value)},(_,index)=>index);
   state = newLudo(activeTeams.length);
   message = "";
   motions = new Map();
-  dieFace.textContent="1";
-  dieFace.setAttribute("aria-label","Die: 1");
-  dieFace.classList.remove("rolling");
+  lastDice.fill(1);
+  dice.forEach(button=>button.classList.remove("rolling"));
   configureSeats();
   render();
 }});
@@ -78,17 +92,16 @@ playerSelect.addEventListener("change",game.restart);
 function throwDie() {
   const player=state.turn;
   const rolled=1+Math.floor(Math.random()*6);
-  dieFace.textContent=String(rolled);
-  dieFace.setAttribute("aria-label",`Die: ${rolled}`);
-  dieFace.classList.remove("rolling");
-  requestAnimationFrame(()=>dieFace.classList.add("rolling"));
+  const teamId=activeTeams[player];
+  lastDice[teamId]=rolled;
+  const face=dice[teamId];
+  face.classList.remove("rolling");
+  requestAnimationFrame(()=>face.classList.add("rolling"));
   state=rollLudo(state,rolled);
   message=`${teams[activeTeams[player]]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
   render();
 }
-const roll=control("Roll die",throwDie);
-roll.classList.add("roll-button");
-document.querySelector("#actions").append(roll);
+
 const tokenControls=Array.from({length:4},(_,player)=>Array.from({length:4},(_,index)=>{
   const button=control(`${teams[player]} ${index+1}`,()=>play(index));
   button.hidden=true;
@@ -112,13 +125,21 @@ function play(index) {
 function render() {
   const botTurn=isBot(state.turn)&&state.winner===null;
   const legal=legalTokens(state);
-  roll.disabled=botTurn||state.roll>0||state.winner!==null;
+  dice.forEach((button,teamId)=>{
+    const enabled=activeTeams.includes(teamId);
+    const active=enabled && activeTeams[state.turn]===teamId && state.winner===null;
+    button.closest(".player-dice").classList.toggle("active",active);
+    button.closest(".player-dice").classList.toggle("inactive-seat",!enabled);
+    button.disabled=!active||botTurn||state.roll>0;
+    button.textContent=dieSymbols[lastDice[teamId]-1];
+    button.setAttribute("aria-label",`${teams[teamId]} die: ${lastDice[teamId]}${active?", current turn":""}`);
+  });
   for(const tile of squares.values()) tile.replaceChildren();
   state.pieces.forEach((team,player)=>team.forEach((step,index)=>{
     const teamId=activeTeams[player];
     const label=`${teams[teamId]} token ${index+1}`;
     const button=tokenControls[teamId][index];
-    button.hidden=player!==state.turn;
+    button.hidden=true;
     button.disabled=botTurn||!legal.includes(index);
     button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===57?"home":"step "+(step+1)}`);
     const tile=step===-1 ? yards[teamId][index] : step>=52 ? lanes[teamId][step-52] : track[trackPosition(teamId,step)];
@@ -147,7 +168,7 @@ function render() {
   }));
   motions.clear();
   const currentTeam=teams[activeTeams[state.turn]];
-  dieFace.dataset.turn=currentTeam.toLowerCase();
+
   game.status.dataset.turn=currentTeam.toLowerCase();
   game.status.textContent=message+(state.winner!==null?`${teams[activeTeams[state.winner]]} wins!`
     :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);

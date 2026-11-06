@@ -88,6 +88,16 @@ const game = gameShell({reset() {
 }});
 game.board.classList.add("ludo");
 const squares = new Map();
+for(const [seat,area] of [[0,"1 / 1 / 7 / 7"],[1,"10 / 1 / 16 / 7"],[2,"1 / 10 / 7 / 16"],[3,"10 / 10 / 16 / 16"]]) {
+  const base=document.createElement("div");
+  base.className=`home-base base-${seat}`;
+  base.style.gridArea=area;
+  game.board.append(base);
+}
+const centerBase=document.createElement("div");
+centerBase.className="home-diamond";
+centerBase.style.gridArea="7 / 7 / 10 / 10";
+game.board.append(centerBase);
 track.forEach(([row,column],index) => {
   const color=entrySquares.get(index);
   const kind=["track",safe.has(index)?"safe":"",color!==undefined?"start-square "+teams[color].toLowerCase():""].filter(Boolean).join(" ");

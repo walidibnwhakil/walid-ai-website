@@ -253,3 +253,16 @@
 .ludo-game .board.ludo .track.start-square.safe::before {
   color:#fff;filter:drop-shadow(0 1px 1px #0008);
 }
+
+/* Per-seat custom colors: the physical route never changes. */
+.ludo-game .board.ludo .yard.red,.ludo-game .board.ludo .lane.red,.ludo-game .board.ludo .track.start-square.red {background:var(--seat-0)!important;}
+.ludo-game .board.ludo .yard.blue,.ludo-game .board.ludo .lane.blue,.ludo-game .board.ludo .track.start-square.blue {background:var(--seat-1)!important;}
+.ludo-game .board.ludo .yard.green,.ludo-game .board.ludo .lane.green,.ludo-game .board.ludo .track.start-square.green {background:var(--seat-2)!important;}
+.ludo-game .board.ludo .yard.yellow,.ludo-game .board.ludo .lane.yellow,.ludo-game .board.ludo .track.start-square.yellow {background:var(--seat-3)!important;}
+.ludo-game .board.ludo span.red,.ludo-game .board.ludo span.blue,.ludo-game .board.ludo span.green,.ludo-game .board.ludo span.yellow {
+  background:repeating-linear-gradient(8deg,transparent 0 3px,#3d180b27 4px 5px,transparent 6px 10px),
+  radial-gradient(ellipse at 28% 16%,#ffffffb3,transparent 46%),var(--piece-color)!important;
+}
+.ludo-game .player-dice {border-color:var(--custom-seat-color,#ffffff38);}
+.ludo-game .player-dice.active {background:color-mix(in srgb,var(--custom-seat-color) 23%,#191d46);}
+.ludo-game .color-picker option:disabled {color:#999;}

@@ -1,7 +1,7 @@
 # Walid AI Games release progress
 
 Updated: 2026-11-06  
-Production baseline verified: `main` at `353badccabc6299737c06ecfaa229b205dc768a8`.
+Production baseline verified: `main` at `cb67e7e0bab345ad2bb7f982452222aa4c3491d8`.
 
 This tracker records release state and the outstanding work from the Games quality program. A deployed URL means only that the game is currently available; it does not mean the newly selected visual redesign has been completed.
 
@@ -9,7 +9,7 @@ This tracker records release state and the outstanding work from the Games quali
 
 | Game | Current production URL | Production state | Current selected-design acceptance |
 |---|---|---|---|
-| Ludo | https://walid-ai.com/games/ludo/ | Released in PR #3 (`01b05c1`); 2/3/4 player redesign ready on `codex/ludo-player-count`, not yet published | Colorful four-seat board, glossy tokens, animated die/token moves, bot/friend/mixed seats |
+| Ludo | https://walid-ai.com/games/ludo/ | Redesign merged in PR #9 (`cb67e7e`) and live-verified; original release PR #3 (`01b05c1`) | Colorful four-seat board, glossy tokens, animated die/token moves, bot/friend/mixed seats |
 | Chess | https://walid-ai.com/games/chess/ | Released in PR #3 (`01b05c1`) | Pending: realistic modeled wooden pieces and board |
 | Football Penalty | https://walid-ai.com/games/penalty/ | Released in PR #3 (`01b05c1`) | Pending: goalkeeper-view stadium, visible animated keeper and net |
 | Tic Tac Toe | https://walid-ai.com/games/tic-tac-toe/ | Released in PR #3 (`01b05c1`); neon redesign merged in PR #6 (`cbcc572`) and live-verified | Neon board, placement/win-line motion, bot/friend modes, help and responsive layout |
@@ -24,7 +24,7 @@ The shared Games page currently exposes seven game previews. The previous Chromi
 | Game / workstream | Acceptance criteria | Status | Evidence / checkpoint | Remaining work |
 |---|---|---|---|---|
 | Tic Tac Toe neon | Neon X/O board, animated placements and win line; bot/friend modes; no overflow at 320, 360, 390, 768, 1280; reduced motion; no browser errors | Released and live-verified | PR #6, merge `cbcc572`; `arcade.test.mjs` 4/4; Chromium suite 5/5 widths, all six games and seven previews; inspected 320/390px screenshots; live Chromium at 320/1280 verified stylesheet, bot/friend, win line, no overflow/errors | None identified for this release |
-| Ludo selected redesign | Select 2, 3 or 4 players; bot/human combinations; legal turns, captures, safe squares, home lanes, finish; polished responsive mobile board and dice motion | Ready for isolated release review | 5 rule tests pass, including 3/4-player turn wrap, multi-rival capture and capture bonus; Chromium 5/5 widths checks all games/previews, seat counts, mixed human/bot seats and an actual 4-player bot token move; no overflow/errors; 320/1280 screenshots inspected; found and fixed inactive-seat buttons and missing die glyph | Commit, PR, merge, deploy and verify live route |
+| Ludo selected redesign | Select 2, 3 or 4 players; bot/human combinations; legal turns, captures, safe squares, home lanes, finish; polished responsive mobile board and dice motion | Released and live-verified | PR #9, merge `cb67e7e`; 5 rule tests pass, including 3/4-player turn wrap, multi-rival capture and capture bonus; Chromium 5/5 widths checks all games/previews, seat counts, mixed human/bot seats and a four-player bot move; live Chromium at 320/1280 verified CSS, 2/3/4 seats, friend/mixed/bot movement; no overflow/errors; inspected 320/1280 screenshots | None identified for this release |
 | Chess selected redesign | Distinct modeled wooden pieces/board, legal moves, captures/history, responsive bot/friend play | Pending | Existing move legality and checkmate browser coverage | Replace Unicode-piece visuals; authored lightweight wood/piece assets; regression and responsive checks |
 | Football Penalty selected redesign | Pitch, visible animated goalkeeper, dive, shot trajectory, net/reactions, responsive controls | Pending | Existing bot/friend scoring browser flow | Replace emoji/flat keeper with articulated character; visual QA/performance |
 | Snake selected redesign | Smooth rounded snake/head/eyes, natural turning, responsive keyboard/swipe, score/restart | Pending | Existing keyboard movement and pause coverage | Rendering/control polish, touch tests, mobile visual QA |

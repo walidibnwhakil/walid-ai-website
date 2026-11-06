@@ -3,6 +3,29 @@ import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe} from "./l
 
 const teams = ["Red", "Blue", "Green", "Yellow"];
 const setupScreen=document.querySelector("#ludo-setup");
+for(const [groupId,selectId] of [["mode-buttons","setup-mode"],["player-buttons","setup-players"]]){
+ const group=document.getElementById(groupId),select=document.getElementById(selectId);
+ group.addEventListener("click",event=>{
+  const button=event.target.closest("button[data-value]");
+  if(!button||button.disabled)return;
+  select.value=button.dataset.value;
+  group.querySelectorAll("button[data-value]").forEach(item=>{
+   const chosen=item===button;item.classList.toggle("selected",chosen);item.setAttribute("aria-pressed",String(chosen));
+  });
+ });
+}
+document.getElementById("setup-rules").addEventListener("click",()=>{
+ document.getElementById("ludo-setup").hidden=true;
+ document.getElementById("ludo-play").hidden=false;
+ document.body.classList.add("playing-ludo");
+ document.querySelector(".rules").open=true;
+ document.querySelector(".rules").scrollIntoView({behavior:"smooth",block:"start"});
+});
+document.getElementById("setup-settings").addEventListener("click",()=>{
+ document.getElementById("mode-buttons").scrollIntoView({behavior:"smooth",block:"center"});
+ document.getElementById("mode-buttons").querySelector("button").focus();
+});
+
 const playScreen=document.querySelector("#ludo-play");
 document.querySelector("#start-game").addEventListener("click",()=>{
   document.querySelector("#player-count").value=document.querySelector("#setup-players").value;

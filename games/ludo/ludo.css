@@ -301,3 +301,34 @@
  .ludo-game .color-hint {margin:3px 0;font-size:.68rem;}
  .ludo-game #status {margin:4px auto;font-size:.82rem;}
 }
+
+/* Setup first; game board is never visible before Start Game. */
+.ludo-game [hidden] {display:none!important;}
+.ludo-game .ludo-setup {
+  min-height:min(85dvh,790px);padding:clamp(20px,5vw,44px) 18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:15px;text-align:center;border:2px solid #d5a953;border-radius:26px;
+  background:radial-gradient(circle at 50% 0%,#584175,#211936 65%,#17132c);
+  color:#fff4d7;box-shadow:0 20px 40px #26162930;
+}
+.ludo-game .ludo-setup h2 {font-size:clamp(2.3rem,9vw,4rem);color:#ffd477;letter-spacing:.07em;margin:0;text-shadow:0 3px 9px #0009;}
+.ludo-game .ludo-setup p {margin:0;color:#f6e6cb;}
+.ludo-game .setup-emblem {font-size:clamp(5rem,18vw,8rem);filter:drop-shadow(0 8px 12px #0008);}
+.ludo-game .setup-options {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:min(100%,440px);margin:14px 0;}
+.ludo-game .setup-options label {text-align:left;color:#fff1ce;}
+.ludo-game .setup-options select {width:100%;min-width:0;padding:13px 7px;background:#fff8e7;color:#2b203e;}
+.ludo-game .start-game {width:min(100%,440px);min-height:58px;font-size:1.3rem;font-weight:900;background:linear-gradient(135deg,#ffe29a,#dba13b);color:#292037;border:2px solid #fff0bd;border-radius:16px;}
+.ludo-game .setup-footnote {font-size:.8rem;max-width:360px;}
+.ludo-game .play-toolbar {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;color:#f6d585;font-weight:900;}
+.ludo-game .play-toolbar button {padding:8px;font-size:.8rem;}
+.ludo-game.playing-ludo {background:radial-gradient(ellipse at 50% 35%,#373063,#15102b);}
+.ludo-game.playing-ludo main {max-width:850px;padding:8px;}
+.ludo-game.playing-ludo #ludo-play>h1,.ludo-game.playing-ludo #ludo-play>p:not(#status):not(.color-hint),.ludo-game.playing-ludo .game-settings,.ludo-game.playing-ludo .rules {display:none;}
+.ludo-game.playing-ludo .ludo-stage {margin:4px auto;}
+.ludo-game #ludo-play:fullscreen {overflow:auto;background:#1c1635;padding:8px;}
+@media(max-width:480px) {
+ .ludo-game .setup-options {grid-template-columns:1fr;}
+ .ludo-game .ludo-setup {min-height:80dvh;}
+ .ludo-game.playing-ludo .ludo-stage {gap:3px;}
+ .ludo-game.playing-ludo .player-dice {min-height:48px;}
+}

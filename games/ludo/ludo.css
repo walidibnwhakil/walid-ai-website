@@ -332,3 +332,70 @@
  .ludo-game.playing-ludo .ludo-stage {gap:3px;}
  .ludo-game.playing-ludo .player-dice {min-height:48px;}
 }
+
+/* Premium portrait setup scene: dedicated art, not generic site form. */
+.ludo-game .ludo-setup {
+  box-sizing:border-box;min-height:calc(100dvh - 105px);
+  padding:clamp(12px,3vw,24px);
+  gap:10px;justify-content:flex-start;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 28%,#57417e 0,#281b4a 45%,#13122c 100%);
+  border:2px solid #a77836;border-radius:24px;
+  box-shadow:inset 0 0 0 3px #ffdd7826,0 15px 38px #0004;
+}
+.ludo-game .setup-art {
+  position:relative;width:min(100%,360px);min-height:clamp(240px,37dvh,365px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 0 14px;
+}
+.ludo-game .setup-brand {
+  position:relative;z-index:2;white-space:nowrap;
+  color:#fff1bd;font-family:Georgia,serif;font-size:clamp(2.1rem,9vw,3.8rem);
+  font-weight:1000;letter-spacing:.06em;line-height:.98;
+  text-shadow:0 3px #7a421d,0 5px 0 #392036,0 9px 16px #000c;
+  -webkit-text-stroke:.7px #9e6a31;
+}
+.ludo-game .setup-brand span {color:#ffca55;}
+.ludo-game .setup-brand em {display:block;font-style:normal;color:#f4be5b;font-size:.5em;letter-spacing:.4em;margin:7px 0 0 7px;}
+.ludo-game .mini-ludo-board {
+  width:clamp(172px,51vw,240px);aspect-ratio:1;display:grid;
+  grid-template-columns:2fr 1fr 2fr;grid-template-rows:2fr 1fr 2fr;
+  border:7px ridge #e6b95c;border-radius:10px;
+  transform:perspective(550px) rotateX(13deg) rotateZ(-8deg);
+  box-shadow:0 15px 0 #885225,0 23px 25px #0009,0 0 25px #e6ae5440;
+  overflow:hidden;margin:12px 0 0;
+}
+.ludo-game .mini-yard {display:grid;grid-template-columns:repeat(2,1fr);gap:10%;padding:23%;border:2px solid #fff4d6;}
+.ludo-game .mini-yard.red {background:#e84355;}
+.ludo-game .mini-yard.green {background:#22b76e;}
+.ludo-game .mini-yard.blue {background:#2385d8;}
+.ludo-game .mini-yard.yellow {background:#f5bd2c;}
+.ludo-game .mini-yard i {border-radius:50%;background:radial-gradient(circle at 30% 20%,#fff9,#fff2 30%,#0004 80%),#f5dfb0;border:2px solid #fff7cf;box-shadow:0 2px 2px #0008;}
+.ludo-game .mini-path {display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);background:repeating-linear-gradient(90deg,#fffaf0 0 30%,#c9bbab 31% 33%);border:1px solid #bba887;}
+.ludo-game .mini-path b {font-size:.65rem;display:grid;place-items:center;color:#ae7d2c;}
+.ludo-game .mini-path.top {background:linear-gradient(90deg,#fffaf0 33%,#20b86c 33% 66%,#fffaf0 66%);}
+.ludo-game .mini-path.bottom {background:linear-gradient(90deg,#fffaf0 33%,#2385d8 33% 66%,#fffaf0 66%);}
+.ludo-game .mini-path.left {background:linear-gradient(#fffaf0 33%,#e84355 33% 66%,#fffaf0 66%);}
+.ludo-game .mini-path.right {background:linear-gradient(#fffaf0 33%,#f5bd2c 33% 66%,#fffaf0 66%);}
+.ludo-game .mini-center {background:conic-gradient(#f5bd2c 0 25%,#2385d8 0 50%,#e84355 0 75%,#20b86c 0);border:1px solid #fff2d1;}
+.ludo-game .setup-dice {position:absolute;bottom:2px;right:6%;display:flex;gap:8px;transform:rotate(15deg);font-size:2.5rem;color:#fff8e9;text-shadow:0 5px 6px #0009;}
+.ludo-game .setup-dice span:first-child {transform:rotate(-19deg);}
+.ludo-game .ludo-setup h2 {font-size:clamp(1.25rem,5vw,1.7rem);letter-spacing:.02em;color:#fff3d0;text-shadow:none;}
+.ludo-game .setup-tagline {font-size:.85rem;opacity:.86;}
+.ludo-game .setup-options {width:min(100%,440px);margin:8px 0 4px;gap:10px;}
+.ludo-game .setup-options label {font-size:.85rem;}
+.ludo-game .setup-options select {font-size:1rem;border:1px solid #d4a955;border-radius:12px;box-shadow:0 4px 0 #15112b;}
+.ludo-game .start-game {
+  display:block;width:min(100%,440px);min-height:58px;margin-top:5px;
+  background:linear-gradient(180deg,#ffecaa,#e9ac41 65%,#bd7c27);
+  color:#38213a;font-size:1.25rem;border:2px solid #ffe9aa;
+  box-shadow:0 5px 0 #8d5522,0 9px 18px #0006;
+}
+.ludo-game .setup-footnote {font-size:.73rem;line-height:1.45;opacity:.8;}
+@media(max-width:480px) {
+ .ludo-game .ludo-setup {min-height:calc(100dvh - 80px);gap:7px;padding:12px 15px;}
+ .ludo-game .setup-art {min-height:clamp(225px,35dvh,315px);}
+ .ludo-game .setup-options {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .ludo-game .setup-options select {padding:10px 5px;font-size:.88rem;}
+ .ludo-game .start-game {min-height:55px;}
+}

@@ -250,7 +250,16 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   if(disappointedPose===pleasedPose)throw Error(label+' reactions use the same frame');
   await shot('guess-rejected');
   await view.locator('#retry').click();
-  await view.waitForTimeout(750);
+  await view.waitForTimeout(2100);
+  if(await reveal.isVisible())throw Error(label+' Retry left the rejected sheet in place');
+  const reachingFrame=await view.locator('.evidence-cat').evaluate(canvas=>canvas.toDataURL());
+  await shot('retry-paper-reach');
+  await view.waitForTimeout(700);
+  const crumplingFrame=await view.locator('.evidence-cat').evaluate(canvas=>canvas.toDataURL());
+  await shot('retry-paper-crumple');
+  if(reachingFrame===crumplingFrame)throw Error(label+' Retry paper animation did not advance');
+  await view.waitForTimeout(500);
+  await shot('retry-paper-throw');
   if(await sceneFrame()===disappointedPose)throw Error(label+' Retry kept the rejected pose');
   await view.locator('#answers').waitFor({state:'visible'});
   await shot('retry-continued',{animations:'disabled'});

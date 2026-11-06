@@ -74,7 +74,7 @@ function coverArm(context, art, side) {
  context.restore();
 }
 
-function drawReach(context, arm, x, y) {
+export function drawReach(context, arm, x, y) {
  const wristX = x - 52, wristY = y - 5;
  drawLimb(context, arm, [
   [0, 100, 347, 224],

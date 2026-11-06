@@ -1,9 +1,9 @@
-import {animateWelcome,animateProps} from "./scene-props.js?v=arcade";
+import {animateWelcome,animateProps} from "./scene-props.js?v=retry-paper";
 import {animateOffice} from "./scene-motion.js?v=desk-reveal";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
 import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=arcade";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
-import {createGuessReveal} from "./guess-reveal.js?v=arcade";
+import {createGuessReveal} from "./guess-reveal.js?v=retry-paper";
 let allEntries=[],allQuestions={};
 const contextKey="relationship_context";
 const contextQuestion="Are you thinking of someone by their relationship to you, such as a relative or friend?";
@@ -152,7 +152,7 @@ $("retry").addEventListener("click",async()=>{
  const token=++loadToken;
  mode="retrying";render();
  if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
-  await new Promise(resolve=>setTimeout(resolve,1650));
+  await new Promise(resolve=>setTimeout(resolve,5400));
  }
  if(token!==loadToken||mode!=="retrying")return;
  rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);

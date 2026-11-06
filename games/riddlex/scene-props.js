@@ -1,9 +1,15 @@
+import {drawReach} from './guess-reveal.js?v=retry-paper';
+
 // The overlay uses the original artwork's 724 × 404 coordinate space.
 const catFrames = [
  [23,28,183,161],[244,28,184,161],[462,30,183,159],[683,27,186,162],
  [24,244,184,164],[251,245,177,163],[472,238,144,170],[675,277,190,131],
 ];
-const ease = t => t * t * (3 - 2 * t);
+const ease = t => {
+ const value = Math.max(0, Math.min(1, t));
+ return value * value * (3 - 2 * value);
+};
+const mix = (a, b, t) => a + (b - a) * t;
 const assets = './images/approved/';
 
 function load(name) {
@@ -88,6 +94,80 @@ function drawEvidenceCat(context, cat, time, retreat) {
   .88 + .13 * approach, time < 470 ? -1 : 1, frame === 5 ? 1 - .22 * crouch : 1);
 }
 
+function drawCrumpledPaper(context, x, y, progress) {
+ const radius = 22 * (1 - .45 * progress);
+ context.save();
+ context.translate(x, y);
+ context.rotate(progress * 5.8);
+ const points = Array.from({length:9}, (_, index) => {
+  const angle = index * Math.PI * 2 / 9;
+  const edge = radius * (.84 + .16 * Math.sin(index * 2.7));
+  return [Math.cos(angle) * edge, Math.sin(angle) * edge * .76];
+ });
+ const gradient = context.createRadialGradient(-4, -5, 1, 0, 0, radius);
+ gradient.addColorStop(0, '#fff1d0');
+ gradient.addColorStop(1, '#c8aa79');
+ context.beginPath();
+ context.moveTo(...points[0]);
+ for (const point of points.slice(1)) context.lineTo(...point);
+ context.closePath();
+ context.fillStyle = gradient;
+ context.strokeStyle = '#806446';
+ context.lineWidth = 1.4;
+ context.fill();
+ context.stroke();
+ context.strokeStyle = '#8a6d4a88';
+ context.lineWidth = 1;
+ for (const [index, point] of points.entries()) {
+  if (index % 2 === 0) {
+   context.beginPath();
+   context.moveTo(point[0] * .22, point[1] * .22);
+   context.lineTo(point[0] * .86, point[1] * .86);
+   context.stroke();
+  }
+ }
+ context.restore();
+}
+
+function drawRetryPaper(context, paper, arm, sleevePlate, elapsed) {
+ const reach = ease((elapsed - 1650) / 430);
+ const crumple = ease((elapsed - 2090) / 700);
+ const toss = ease((elapsed - 2790) / 1000);
+ const startX = paper.centerX;
+ const startY = 348;
+ const ballX = startX + 45 - 190 * toss;
+ const ballY = startY - 13 - 105 * toss - 34 * Math.sin(Math.PI * toss);
+
+ context.drawImage(sleevePlate, 0, 0);
+ const handX = mix(startX + 48, ballX + 8, ease((elapsed - 2450) / 1040));
+ const handY = mix(startY + 6, ballY + 5, ease((elapsed - 2450) / 1040));
+ context.save();
+ context.globalAlpha = Math.min(1, reach * 3.2, 1 - ease((elapsed - 4080) / 300));
+ drawReach(context, arm, handX, handY);
+ context.restore();
+
+ if (elapsed < 4160) {
+  const x = mix(startX, ballX, toss);
+  const y = mix(startY, ballY, toss);
+  const squeezeX = 1 - .78 * crumple;
+  const squeezeY = 1 - .64 * crumple;
+  context.save();
+  context.globalAlpha = 1 - .96 * ease((elapsed - 2370) / 450);
+  context.translate(x, y);
+  context.rotate(-.12 + crumple * 3.4 + toss * 4.2);
+  context.scale(squeezeX, squeezeY);
+  context.drawImage(paper.image, 0, 0, paper.width, paper.height,
+   paper.offsetX, paper.offsetY, paper.width, paper.height);
+  context.restore();
+ }
+ if (elapsed >= 2240) {
+  context.save();
+  context.globalAlpha = (1 - ease((elapsed - 4780) / 300)) * (1 - ease((toss - .55) / .30));
+  drawCrumpledPaper(context, ballX, ballY, toss);
+  context.restore();
+ }
+}
+
 function drawRain(context, panes, time, width, height, count) {
  context.save();
  context.clip(panes);
@@ -138,12 +218,13 @@ function drawPipeArm(context, arm, reach, time) {
 export function animateProps(office, art) {
  const layer = office.querySelector('.scene-props');
  const foreground = office.querySelector('.evidence-cat');
+ const reveal = office.querySelector('.guess-reveal');
  const context = layer.getContext('2d');
  const front = foreground.getContext('2d');
  if (!context || !front) return;
  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
  const panes = new Path2D('M44 0H212Q231 33 232 45L192 61 177 107 193 148H124L97 162 77 171 54 151 48 132 74 117 78 91 61 66 42 50Z');
- let sprites, loading = false, pending = 0, time = 0, lastFrame;
+ let sprites, rejectedPaper, loading = false, pending = 0, time = 0, lastFrame;
  let mood, moodStart = 0;
  function frame(now) {
   pending = 0;
@@ -158,11 +239,33 @@ export function animateProps(office, art) {
   if (mood !== office.dataset.mood) {
    mood = office.dataset.mood;
    moodStart = now;
+   if (mood === 'retrying' && !reduced.matches && !reveal.hidden) {
+    const centerX = office.dataset.reveal === 'printed' ? 390 : 436;
+    const source = reveal.getContext('2d').getImageData(0, 0, reveal.width, reveal.height);
+    let left = reveal.width, top = reveal.height, right = 0, bottom = 0;
+    for (let y = 0; y < reveal.height; y++) for (let x = 0; x < reveal.width; x++) {
+     if (source.data[(y * reveal.width + x) * 4 + 3] > 2) {
+      left = Math.min(left, x); top = Math.min(top, y);
+      right = Math.max(right, x + 1); bottom = Math.max(bottom, y + 1);
+     }
+    }
+    const padding = 6;
+    left = Math.max(0, left - padding); top = Math.max(0, top - padding);
+    right = Math.min(reveal.width, right + padding); bottom = Math.min(reveal.height, bottom + padding);
+    const image = document.createElement('canvas');
+    image.width = right - left; image.height = bottom - top;
+    image.getContext('2d').drawImage(reveal, left, top, image.width, image.height, 0, 0, image.width, image.height);
+    rejectedPaper = {image, width:image.width, height:image.height, centerX, centerY:348,
+     offsetX:left-centerX, offsetY:top-348};
+    reveal.hidden = true;
+   } else if (mood !== 'retrying') {
+    rejectedPaper = undefined;
+   }
   }
   time += lastFrame === undefined ? 0 : Math.min(80, now - lastFrame);
   lastFrame = now;
-  const reveal = office.dataset.reveal;
-  const evidence = reveal && reveal !== 'loading';
+  const revealPhase = office.dataset.reveal;
+  const evidence = revealPhase && revealPhase !== 'loading';
   const retreat = mood === 'retrying';
   const cover = evidence && (mood === 'wrong' || retreat);
   layer.hidden = reduced.matches && !evidence;
@@ -174,16 +277,20 @@ export function animateProps(office, art) {
    if (!evidence) drawRain(context, panes, time, 220, 166, 26);
    context.drawImage(plate, 0, 0);
    if (!evidence) {
-    const reach = pipeCycle(time);
+   const reach = pipeCycle(time);
     context.drawImage(sleevePlate, 0, 0);
     drawPipeArm(context, arm, reach, time);
    }
-   if (cover) drawEvidenceCat(front, cat, reduced.matches ? 1000 : now - moodStart, retreat);
+   if (cover) {
+    const elapsed = reduced.matches ? (retreat ? 3900 : 1000) : now - moodStart;
+    drawEvidenceCat(front, cat, elapsed, retreat);
+    if (retreat && rejectedPaper && elapsed >= 1650) drawRetryPaper(front, rejectedPaper, sprites.reachingArm, sleevePlate, elapsed);
+   }
    else if (evidence) paintCat(context, cat, 6, 478, 301, .88);
    else drawCat(context, cat, time);
    context.drawImage(printer, 0, 0);
   }
-  if (!reduced.matches && (!evidence || cover && now - moodStart < (retreat ? 1650 : 900))) schedule();
+  if (!reduced.matches && (!evidence || cover && now - moodStart < (retreat ? 5380 : 900))) schedule();
  }
  function schedule() {
   if (!pending) pending = requestAnimationFrame(frame);
@@ -193,7 +300,7 @@ export function animateProps(office, art) {
   loading = true;
   try {
    await art.decode();
-   const [clean, cat, arm] = await Promise.all(['motion-plate.png','cat-motion.png','pipe-arm.png'].map(load));
+   const [clean, cat, arm, reachingArm] = await Promise.all(['motion-plate.png','cat-motion.png','pipe-arm.png','reaching-arm.png'].map(load));
    const plate = clippedLayer(clean, 292, 35,
     'M315 44 L356 41 365 65 364 128 357 149 333 156 309 144 300 135 305 127 323 126 325 104 316 84 Z ' +
     'M405 298 L410 255 418 220 423 185 427 152 447 148 464 164 478 159 498 145 510 147 516 178 522 197 532 229 544 265 544 302 523 309 425 310 Z', 2);
@@ -208,7 +315,7 @@ export function animateProps(office, art) {
    sleeveContext.drawImage(clean, 126, 155, 105, 110, 338, 191, 105, 110);
    sleeveContext.drawImage(art, 353, 301, 69, 13, 353, 289, 69, 13);
    sleeveContext.restore();
-   sprites = {plate, cat, arm, printer, sleevePlate};
+   sprites = {plate, cat, arm, printer, sleevePlate, reachingArm};
    schedule();
   } catch {
    // Leave the original artwork visible if the layers cannot load.

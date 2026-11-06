@@ -20,6 +20,17 @@
       <button id="restart" type="button">New game</button>
     </div>
     <div id="seat-options" class="seat-options" hidden></div>
+    <div id="color-picker" class="color-picker" hidden>
+      <strong>Choose your color</strong>
+      <input id="color-seat" type="hidden" value="0">
+      <select id="color-choice" aria-label="Player color">
+        <option value="0">Red</option><option value="1">Blue</option>
+        <option value="2">Green</option><option value="3">Yellow</option>
+      </select>
+      <button type="button" id="color-apply">Apply</button>
+      <button type="button" id="color-cancel">Cancel</button>
+    </div>
+    <p class="color-hint">Before rolling, tap your player name to choose a color.</p>
     <p id="status" role="status"></p>
     <div class="ludo-stage">
       <div id="dice-red" class="player-dice red"></div>

@@ -58,6 +58,14 @@ main { max-width: 1050px; }
 .snake-preview { background: #243d38; }
 .mini-food { position: absolute; right: 24%; width: 12px; height: 12px; border-radius: 50%; background: #efb85d; }
 .mini-snake { position: absolute; left: 23%; width: 50px; height: 14px; background: repeating-linear-gradient(90deg, #b9df8b 0 11px, #243d38 11px 13px); animation: snake 1.2s steps(4, end) 3; }
+.twenty48-preview { background: #faf6ef; color: #776e65; }
+.mini2048-board { width: 88px; height: 88px; display: grid; grid-template-columns: repeat(4,1fr); grid-template-rows: repeat(4,1fr); gap: 3px; padding: 4px; border-radius: 6px; background: #b9ad9e; }
+.mini2048-board i { display:grid; place-items:center; border-radius:3px; background:#eee4da; color:#776e65; font:700 13px/1 system-ui,sans-serif; font-style:normal; }
+.mini2048-board i:nth-child(1) { grid-area:1/1; }
+.mini2048-board i:nth-child(2) { grid-area:2/2; background:#ede0c8; }
+.mini2048-board i:nth-child(3) { grid-area:2/3; background:#f2b179; color:#fff; }
+.mini2048-board i:nth-child(4) { grid-area:3/3; background:#f59563; color:#fff; animation:tile-merge 1.5s ease-in-out 2; }
+.twenty48-preview:not(.in-view) .mini2048-board i { animation:none; }
 @keyframes note { from { opacity: 0; transform: translateY(20px) rotate(-12deg); } 55%, to { opacity: 1; transform: rotate(-8deg); } }
 @keyframes die { 50% { transform: rotate(90deg) translateX(-5px); } }
 @keyframes pawn { 55% { transform: translateX(34px); } }
@@ -65,5 +73,6 @@ main { max-width: 1050px; }
 @keyframes kick { 75% { transform: translate(31px, -48px) rotate(120deg) scale(.65); } }
 @keyframes mark { from { opacity: .1; transform: scale(.75); } 75%, to { opacity: 1; transform: scale(1); } }
 @keyframes snake { 75% { transform: translateX(48px); } }
+@keyframes tile-merge { 50% { transform: translate(-17px,-17px) scale(1.14); box-shadow:0 2px 5px #59483c66; } }
 .preview:not(.in-view) span { animation: none; }
-@media (prefers-reduced-motion: reduce) { .preview span { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .preview span, .preview .mini2048-board i:nth-child(4) { animation: none; } }

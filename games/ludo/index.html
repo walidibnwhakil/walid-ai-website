@@ -21,8 +21,13 @@
     </div>
     <div id="seat-options" class="seat-options" hidden></div>
     <p id="status" role="status"></p>
-    <div id="die-face" class="die-face" role="img" aria-label="Die: 1">1</div>
-    <div id="board" class="board" role="group" aria-label="Ludo board"></div>
+    <div class="ludo-stage">
+      <div id="dice-red" class="player-dice red"></div>
+      <div id="dice-green" class="player-dice green"></div>
+      <div id="board" class="board" role="group" aria-label="Ludo board"></div>
+      <div id="dice-blue" class="player-dice blue"></div>
+      <div id="dice-yellow" class="player-dice yellow"></div>
+    </div>
     <div id="actions" class="controls"></div>
     <details class="rules"><summary>How to play</summary><p>Select 2, 3 or 4 seats, then choose bots, same-device friends or a mix. Roll a six to launch a token. Move by the exact die count; landing on an opponent on a regular square sends them to their yard. Star-marked safe squares protect tokens. A six or a capture grants another roll. Move all four tokens around the track and up your colored home lane; the first to finish all four wins.</p></details>
   </main>

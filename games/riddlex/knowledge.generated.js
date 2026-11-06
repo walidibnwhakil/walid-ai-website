@@ -4348,5 +4348,25 @@ export const generatedEntries=[
         "checkedOn": "2026-11-05"
       }
     ]
+  },
+  {
+    "id": "sarjis-alam",
+    "name": "Sarjis Alam",
+    "category": "characters",
+    "facts": {
+      "real": true,
+      "fictional": false,
+      "bangladeshi": true,
+      "politician": true,
+      "cue_sarjis_alam": true
+    },
+    "diagnostic": "cue_sarjis_alam",
+    "sources": [
+      {
+        "url": "https://bdnews24.com/national-election-2026/0f6ef86ac18d",
+        "locator": "candidate for Panchagarh-1",
+        "checkedOn": "2026-11-06"
+      }
+    ]
   }
 ];

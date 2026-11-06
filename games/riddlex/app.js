@@ -1,9 +1,9 @@
-import {animateWelcome,animateProps} from "./scene-props.js?v=release";
+import {animateWelcome,animateProps} from "./scene-props.js?v=arcade";
 import {animateOffice} from "./scene-motion.js?v=desk-reveal";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
-import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=release";
+import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=arcade";
 import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
-import {createGuessReveal} from "./guess-reveal.js?v=release";
+import {createGuessReveal} from "./guess-reveal.js?v=arcade";
 let allEntries=[],allQuestions={};
 const contextKey="relationship_context";
 const contextQuestion="Are you thinking of someone by their relationship to you, such as a relative or friend?";

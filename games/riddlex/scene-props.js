@@ -34,15 +34,11 @@ function drawCat(context, image, time) {
    outward ? 484 - 125 * progress : 359 + 125 * progress, 299 + 55 * progress * Number(outward) + 55 * (1 - progress) * Number(!outward),
    .78, outward ? -1 : 1);
  } else if (phase < 4900) {
-  const bat = Math.max(0, Math.sin((phase - 2200) / 240));
-  paintCat(context, image, bat > .35 ? 0 : 4, 359 - 6 * bat, 354, .77, -1);
-  drawGlass(context, 314 - 16 * bat, 348 - 15 * bat, Math.PI + .64 * bat, .69);
-  return;
+  paintCat(context, image, 4, 359, 354, .77, -1);
  } else {
   const roll = Math.sin(Math.PI * (phase - 4900) / 2900);
-  paintCat(context, image, 7, 359 - 19 * roll, 354, .77, -1, 1 - .25 * roll, .42 * roll);
+  paintCat(context, image, 7, 359 - 9 * roll, 354, .77, -1, 1 - .1 * roll, .16 * roll);
  }
- drawGlass(context, 314, 348, Math.PI, .69);
 }
 
 function paintCat(context, image, frame, x, y, scale, direction = 1, heightScale = 1, roll = 0) {
@@ -73,28 +69,6 @@ function drawSmoke(context, x, y, time) {
   context.fillStyle = smoke;
   context.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
  }
-}
-
-function drawGlass(context, x, y, angle, size) {
- context.save();
- context.translate(x, y);
- context.rotate(angle - .12);
- context.scale(size, size);
- context.strokeStyle = '#412920';
- context.lineWidth = 10;
- context.beginPath();
- context.moveTo(0, 0);
- context.lineTo(23, -5);
- context.stroke();
- context.strokeStyle = '#c29852';
- context.lineWidth = 3;
- context.stroke();
- context.beginPath();
- context.ellipse(40, -9, 17, 10, 0, 0, 2 * Math.PI);
- context.fillStyle = '#acc6bc48';
- context.fill();
- context.stroke();
- context.restore();
 }
 
 function drawEvidenceCat(context, cat, time, retreat) {
@@ -193,7 +167,7 @@ export function animateProps(office, art) {
   const cover = evidence && (mood === 'wrong' || retreat);
   layer.hidden = reduced.matches && !evidence;
   foreground.hidden = !cover;
-  const {plate, cat, arm, printer, sleevePlate, deskPlate} = sprites;
+  const {plate, cat, arm, printer, sleevePlate} = sprites;
   context.clearRect(0, 0, 724, 404);
   front.clearRect(0, 0, 724, 404);
   if (!layer.hidden) {
@@ -201,7 +175,6 @@ export function animateProps(office, art) {
    context.drawImage(plate, 0, 0);
    if (!evidence) {
     const reach = pipeCycle(time);
-    context.drawImage(deskPlate, 0, 0);
     context.drawImage(sleevePlate, 0, 0);
     drawPipeArm(context, arm, reach, time);
    }
@@ -226,8 +199,6 @@ export function animateProps(office, art) {
     'M405 298 L410 255 418 220 423 185 427 152 447 148 464 164 478 159 498 145 510 147 516 178 522 197 532 229 544 265 544 302 523 309 425 310 Z', 2);
    const printer = clippedLayer(art, 0, 0,
     'M557 304 L557 247 Q558 226 576 223 L631 213 642 195 710 194 704 216 724 221 V316 L685 320 573 306 Z', .7);
-   const deskPlate = clippedLayer(art, -125, 2,
-    'M87 344Q107 335 134 335Q139 322 169 322Q206 322 211 334L208 350Q169 360 139 350L90 359Z', 1.5);
    const sleevePlate = document.createElement('canvas');
    sleevePlate.width = 724;
    sleevePlate.height = 404;
@@ -237,7 +208,7 @@ export function animateProps(office, art) {
    sleeveContext.drawImage(clean, 126, 155, 105, 110, 338, 191, 105, 110);
    sleeveContext.drawImage(art, 353, 301, 69, 13, 353, 289, 69, 13);
    sleeveContext.restore();
-   sprites = {plate, cat, arm, printer, sleevePlate, deskPlate};
+   sprites = {plate, cat, arm, printer, sleevePlate};
    schedule();
   } catch {
    // Leave the original artwork visible if the layers cannot load.
@@ -324,12 +295,6 @@ export function animateWelcome(splash) {
   drawSmoke(context, 66, -13, elapsed);
   context.restore();
 
-  const paw = new Path2D('M418 856Q414 877 431 890Q455 906 491 909Q500 893 477 883Z');
-  context.save();
-  context.clip(paw);
-  context.drawImage(art, 418, 820, 79, 65, 415, 852, 89, 62);
-  context.restore();
-  drawGlass(context, 453, 904, Math.PI + Math.sin(elapsed / 530) * .19, 1.14);
  }
  function schedule() {
   if (!request) request = requestAnimationFrame(tick);

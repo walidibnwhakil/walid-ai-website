@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tic Tac Toe | Walid AI Games</title>
+  <link rel="icon" href="/kathgolap-logo.png">
+  <link rel="stylesheet" href="../arcade.css">
+  <script type="module" src="../tic-tac-toe.mjs"></script>
+</head>
+<body>
+  <main>
+    <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Tic Tac Toe</span></nav>
+    <h1>Tic Tac Toe</h1>
+    <p>Choose an empty square. Line up three marks across, down, or diagonally to win.</p>
+    <div class="controls">
+      <label hidden>Mode <select id="mode"><option value="bot">Play the bot</option><option value="friend">Two players</option></select></label>
+      <button id="restart" type="button">New game</button>
+    </div>
+    <p id="status" role="status"></p>
+    <div id="board" class="board" role="group" aria-label="Tic Tac Toe board"></div>
+    <div id="actions" class="controls"></div>
+  </main>
+</body>
+</html>

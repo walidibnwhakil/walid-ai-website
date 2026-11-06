@@ -1,5 +1,9 @@
 // No remote image requests: only reviewed images packaged with the game.
-const casebookPhotos = new Map([["einstein", "./images/einstein.jpg"]]);
+const casebookPhotos = new Map([
+ ["einstein", "./images/einstein.jpg"],
+ ["cat", "./images/reveal-cat.jpg"],
+ ["bicycle", "./images/reveal-bicycle.jpg"],
+]);
 
 export function localPhotoPath(entry){
  return casebookPhotos.get(entry?.id) ?? null;

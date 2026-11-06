@@ -23,7 +23,7 @@ function simulate(target,pool,questionBank){
  return {correct:false,questions:answers.length,rejected:rejected.size};
 }
 
-test('all 1796 casebook entries are eventually identified using ideal factual answers',()=>{
+test('all 1797 casebook entries are eventually identified using ideal factual answers',()=>{
  const failures=[],totals=[],slow=[],batch=[],results=[];
  const batchIds=new Set(generatedEntries.map(e=>e.id));
  for(const target of entries){

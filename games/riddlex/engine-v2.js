@@ -31,16 +31,19 @@ export function scoreCandidates(entries,answers,rejected=new Set()){
  // Normalize each answer once per turn, rather than once per candidate.
  const known=answers.filter(a=>a.value!=='unknown'&&ANSWERS.includes(a.value)).map(({key,value})=>{
   const canonical=canonicalQuestionKey(key),other=canonical!==key?canonical:key.replace(/^v2_(occupation|birthplace|award|work|sport)_/,'wd_$1_');
-  return {key,other,expected:leansYes(value),weight:isSoft(value)?softWeight:Math.log(9),group:evidenceGroup(key)};
+  const group=evidenceGroup(key);
+  const hard=!isSoft(value)&&(group==='existence'||group==='animal-class');
+  return {key,other,expected:leansYes(value),weight:isSoft(value)?softWeight:Math.log(9),group,hard};
  });
  const ranked=[];
- for(const entry of entries){
+ candidate: for(const entry of entries){
   if(rejected.has(entry.id))continue;
   const groups=new Map();let matches=0,conflicts=0;
-  for(const {key,other,expected,weight,group} of known){
+  for(const {key,other,expected,weight,group,hard} of known){
    const fact=Object.hasOwn(entry.facts,key)?entry.facts[key]:other!==key&&Object.hasOwn(entry.facts,other)?entry.facts[other]:undefined;
    if(fact===undefined)continue;
    const agrees=fact===expected;
+   if(hard&&!agrees)continue candidate;
    // Correlated assertions (e.g. ten birth cutoffs) cannot multiply confidence.
    const pair=groups.get(group)??[0,0];pair[agrees?0:1]=Math.max(pair[agrees?0:1],weight);groups.set(group,pair);
   }

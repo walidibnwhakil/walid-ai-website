@@ -4,6 +4,15 @@ import {readFile} from 'node:fs/promises';
 import {loadCategory} from './runtime-loader.js';
 import {roles} from './relationships.js';
 const entry=(id,facts)=>({id,name:id,category:'characters',facts});
+test('definite existence and animal class answers exclude only explicit contradictions',()=>{
+ const entries=[entry('no',{real:false,mammal:false}),entry('unknown',{}),entry('yes',{real:true,mammal:true})];
+ for(const key of ['real','mammal']){
+  assert.deepEqual(scoreCandidates(entries,[{key,value:'yes'}]).map(row=>row.entry.id),['yes','unknown']);
+  assert.deepEqual(scoreCandidates(entries,[{key,value:'no'}]).map(row=>row.entry.id),['no','unknown']);
+  assert.equal(scoreCandidates(entries,[{key,value:'probably'}]).length,3);
+  assert.equal(scoreCandidates(entries,[{key,value:'unknown'}]).length,3);
+ }
+});
 test('seeds vary equally useful questions and replay the same choice',()=>{
  const entries=[entry('a',{x:true,y:false,z:true}),entry('b',{x:false,y:true})];
  const questions={x:'Does it use magic?',y:'Does it solve crimes?',z:'Does it go to school?'};

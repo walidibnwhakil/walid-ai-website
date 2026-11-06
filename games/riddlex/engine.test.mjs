@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {scoreCandidates,nextQuestion,selectGuess} from './engine.js';
 import {entries,questions} from './casebook.js';
 import {roles,relationshipQuestions} from './relationships.js';
-test('1796 casebook entries and 15 roles are unique',()=>{const all=[...entries,...roles];assert.equal(new Set(all.map(e=>e.id)).size,all.length);assert.equal(roles.length,15);assert.equal(entries.length,1796);});
+test('1797 casebook entries and 15 roles are unique',()=>{const all=[...entries,...roles];assert.equal(new Set(all.map(e=>e.id)).size,all.length);assert.equal(roles.length,15);assert.equal(entries.length,1797);});
 test('missing facts are not treated as false',()=>{const ranked=scoreCandidates([{id:'a',name:'A',facts:{}},{id:'b',name:'B',facts:{x:false}}],[{key:'x',value:'no'}]);assert.equal(ranked[0].entry.id,'b');assert.equal(ranked[1].score,0);});
 test('unknown answer does not penalize candidates',()=>{const ranked=scoreCandidates(entries,[{key:'mammal',value:'unknown'}]);assert.ok(ranked.every(e=>e.score===0));});
 test('rejecting a guess excludes it',()=>{const ranked=scoreCandidates(entries,[],new Set(['cat']));assert.ok(!ranked.some(e=>e.entry.id==='cat'));});
@@ -139,6 +139,8 @@ test('changing an earlier answer restores guesses rejected using later evidence'
 test('casebook photo printer requires a verified identity-to-photo mapping',async()=>{
  const {localPhotoPath}=await import('./print-photo.js');
  assert.equal(localPhotoPath({id:'einstein'}),'./images/einstein.jpg');
+ assert.equal(localPhotoPath({id:'cat'}),'./images/reveal-cat.jpg');
+ assert.equal(localPhotoPath({id:'bicycle'}),'./images/reveal-bicycle.jpg');
  assert.equal(localPhotoPath({id:'himu',image:'./images/einstein.jpg'}),null);
  assert.equal(localPhotoPath({id:'himu',image:'./images/himu.webp'}),null);
  assert.equal(localPhotoPath({image:'https://example.com/photo.png'}),null);

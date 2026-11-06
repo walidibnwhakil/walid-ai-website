@@ -101,8 +101,9 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   games.push({language:'en',category,id,correct,questions:count,loadMs});if(!correct)throw Error('Gameplay failed '+JSON.stringify(games.at(-1)));
   await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:path.join(output,'browser','en-'+category+'.png'),fullPage:true});await page.locator('#correct').click();
   if(await page.locator('#case-note-name').innerText()!==target.name)throw Error('Result must use the English casebook name');
-  if(await page.locator('#case-note').getAttribute('data-result')!=='written')throw Error('Expected handwritten fallback');
-  if(id==='cat')await page.screenshot({path:path.join(output,'browser','handwritten-result.png'),fullPage:true,animations:'disabled'});
+  const result=id==='cat'?'printed':'written';
+  if(await page.locator('#case-note').getAttribute('data-result')!==result)throw Error('Expected '+result+' result for '+id);
+  if(id==='cat'||id==='phone')await page.screenshot({path:path.join(output,'browser',id==='cat'?'printed-cat.png':'handwritten-result.png'),fullPage:true,animations:'disabled'});
  }
  await page.reload();if(await page.locator('html').getAttribute('lang')!=='en')throw Error('Saved language must not override English');
  await page.locator('#play').click();
@@ -232,8 +233,11 @@ const {chromium}=require('playwright'),http=require('node:http'),fs=require('nod
   await view.locator('.office[data-reveal="printed"]').waitFor();
   await shot('print-on-note');
   await view.locator('#correct').click();
+  const catPhoto='**/images/reveal-cat.jpg';
+  await view.route(catPhoto,route=>route.abort());
   await playCase('animals',d.questions,cat);
   await view.locator('.office[data-reveal="written"]').waitFor();
+  await view.unroute(catPhoto);
   await view.locator('#correct').click();
   await view.waitForTimeout(750);
   const pleasedPose=await sceneFrame();

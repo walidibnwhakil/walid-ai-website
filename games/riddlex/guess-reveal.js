@@ -1,4 +1,4 @@
-import {localPhotoPath} from './print-photo.js';
+import {localPhotoPath} from './print-photo.js?v=arcade';
 import {makeHandwriting} from './handwriting.js?v=desk-reveal';
 
 const clamp = value => Math.max(0, Math.min(1, value));

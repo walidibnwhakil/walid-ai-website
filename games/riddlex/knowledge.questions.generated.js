@@ -230,7 +230,8 @@ export const generatedQuestions={
   "cue_raju_unicef": "Is he the young boy in UNICEF's Meena cartoons?",
   "cue_mithu_unicef": "Is this the parrot in UNICEF's Meena cartoons?",
   "cue_saola": "Does this forest animal from Laos and Vietnam have two long straight horns and white face markings?",
-  "cue_sextant": "Does this instrument use mirrors to measure the angle of a celestial object above the horizon?"
+  "cue_sextant": "Does this instrument use mirrors to measure the angle of a celestial object above the horizon?",
+  "cue_sarjis_alam": "Did this politician stand for the Panchagarh-1 seat in the 2026 parliamentary election?"
 };
 export const generatedBanglaQuestions={
   "educator": "ব্যক্তিটি কি শিক্ষাবিদ ছিলেন?",
@@ -463,5 +464,6 @@ export const generatedBanglaQuestions={
   "cue_raju_unicef": "সে কি ইউনিসেফের মীনা কার্টুনের ছেলেটি?",
   "cue_mithu_unicef": "এটি কি ইউনিসেফের মীনা কার্টুনের টিয়া পাখি?",
   "cue_saola": "লাওস ও ভিয়েতনামের বনবাসী এই প্রাণীটির কি দুটি লম্বা সোজা শিং ও মুখে সাদা দাগ আছে?",
-  "cue_sextant": "যন্ত্রটি কি আয়না দিয়ে দিগন্তের ওপর আকাশের কোনো বস্তুর কোণ মাপে?"
+  "cue_sextant": "যন্ত্রটি কি আয়না দিয়ে দিগন্তের ওপর আকাশের কোনো বস্তুর কোণ মাপে?",
+  "cue_sarjis_alam": "এই রাজনীতিবিদ কি ২০২৬ সালের সংসদ নির্বাচনে পঞ্চগড়-১ আসনে প্রার্থী ছিলেন?"
 };

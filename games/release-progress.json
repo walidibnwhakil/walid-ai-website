@@ -1,13 +1,13 @@
 {
   "updated": "2026-11-06",
-  "productionBaseline": "add568e82d1772351c38ea9df50a5d4766bad2de",
+  "productionBaseline": "cbcc572f5ff2f8769f1d25675dea97810607c746",
   "releases": [
     {"game":"ludo","url":"https://walid-ai.com/games/ludo/","state":"released","redesign":"pending"},
     {"game":"chess","url":"https://walid-ai.com/games/chess/","state":"released","redesign":"pending"},
     {"game":"football-penalty","url":"https://walid-ai.com/games/penalty/","state":"released","redesign":"pending"},
-    {"game":"tic-tac-toe","url":"https://walid-ai.com/games/tic-tac-toe/","state":"released","redesign":"verification-ready"},
+    {"game":"tic-tac-toe","url":"https://walid-ai.com/games/tic-tac-toe/","state":"released","redesign":"released-pr-6-merge-cbcc572","liveVerification":"HTTP 200; Chromium 320/1280 passed CSS, bot, friend, line, overflow and page-error checks"},
     {"game":"snake","url":"https://walid-ai.com/games/snake/","state":"released","redesign":"pending"},
-    {"game":"2048","url":"https://walid-ai.com/games/2048/","state":"released","redesign":"pending"},
+    {"game":"2048","url":"https://walid-ai.com/games/2048/","state":"released","redesign":"verification-ready-on-codex/2048-neon"},
     {"game":"riddlex","url":"https://walid-ai.com/games/riddlex/","state":"production-baseline-preserved","redesign":"unreleased-animation-failed"}
   ],
   "riddlex": {
@@ -25,6 +25,16 @@
     "bot":"verified reply",
     "sameDeviceFriend":"verified X win",
     "visualInspection":[320,390],
+    "state":"released",
+    "pullRequest":6,
+    "mergeCommit":"cbcc572f5ff2f8769f1d25675dea97810607c746",
+    "productionLiveChromiumWidths":[320,1280]
+  },
+  "2048NeonGate": {
+    "unitTests":"14 core/motion assertions pass",
+    "chromiumWidths":[320,360,390,768,1280],
+    "browserRegression":"all six games and seven previews pass; swipe, best score, restart, keyboard focus, no overflow or page errors",
+    "visualInspection":[320],
     "state":"ready for isolated release review"
   }
 }

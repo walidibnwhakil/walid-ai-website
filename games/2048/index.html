@@ -9,12 +9,12 @@
   <link rel="stylesheet" href="./2048.css">
   <script type="module" src="../2048.mjs"></script>
 </head>
-<body>
+<body class="neon2048">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">2048</span></nav>
     <h1>2048</h1>
-    <p>Slide the tiles with the arrow keys or direction buttons. The board starts with two tiles.</p>
-    <div class="controls"><button id="restart" type="button">New game</button><strong id="score" aria-live="polite">Score 0</strong></div>
+    <p>Slide with the arrow keys, swipe the board, or use the direction buttons.</p>
+    <div class="controls score-panel"><button id="restart" type="button">New game</button><strong id="score" aria-live="polite">Score 0</strong><strong id="best" aria-label="Best score">Best 0</strong></div>
     <p id="status" role="status" aria-live="polite">Use the arrow keys to begin.</p>
     <div id="board" class="board twenty48-board" role="grid" aria-label="2048 game board" tabindex="0"></div>
     <div id="actions" class="controls direction-controls" aria-label="Move tiles">
@@ -25,7 +25,7 @@
     </div>
     <details>
       <summary>How to play</summary>
-      <p>Each move slides every tile in that direction. Matching tiles merge and add their values. A new 2 or 4 appears after a move that changes the board. Reach 2048 to win; the game ends when no moves remain.</p>
+      <p>Each move slides every tile in that direction. Matching tiles merge and add their values. A new 2 or 4 appears after a move that changes the board. Reach 2048 to win; the game ends when no moves remain. Your best score is saved on this device.</p>
     </details>
   </main>
 </body>

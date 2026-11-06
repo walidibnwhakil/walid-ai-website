@@ -33,6 +33,32 @@ export function moveBoard(board, direction) {
   return {board: next, score, changed: next.some((value, index) => value !== board[index])};
 }
 
+export function tileMotions(board, direction) {
+  if (!Array.isArray(board) || board.length !== 16) throw new TypeError("Board must have 16 cells");
+  if (!["left", "right", "up", "down"].includes(direction)) throw new TypeError("Unknown direction");
+  const motions = [];
+  for (let lineIndex = 0; lineIndex < 4; lineIndex++) {
+    const indices = Array.from({length:4}, (_, offset) => {
+      if (direction === "left") return lineIndex * 4 + offset;
+      if (direction === "right") return lineIndex * 4 + (3 - offset);
+      if (direction === "up") return offset * 4 + lineIndex;
+      return (3 - offset) * 4 + lineIndex;
+    });
+    const tiles = indices.flatMap(source => board[source] ? [{source,value:board[source]}] : []);
+    let targetOffset = 0;
+    for (let index = 0; index < tiles.length; index++) {
+      const first = tiles[index];
+      const destination = indices[targetOffset++];
+      if (tiles[index + 1]?.value === first.value) {
+        const second = tiles[++index];
+        if (first.source !== destination) motions.push({source:first.source,destination,merged:true});
+        if (second.source !== destination) motions.push({source:second.source,destination,merged:true,consumed:true});
+      } else if (first.source !== destination) motions.push({source:first.source,destination,merged:false});
+    }
+  }
+  return motions;
+}
+
 export function canMove(board) {
   if (board.some(value => value === 0)) return true;
   for (let row = 0; row < 4; row++) for (let column = 0; column < 4; column++) {

@@ -6,20 +6,24 @@
   <title>Snake | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
   <link rel="stylesheet" href="../arcade.css">
+  <link rel="stylesheet" href="./snake.css">
   <script type="module" src="../snake.mjs"></script>
 </head>
-<body>
+<body class="snake-game">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Snake</span></nav>
     <h1>Snake</h1>
-    <p>Use the arrow keys or direction buttons. Eat the food and avoid the walls and your tail.</p>
+    <p>Swipe on the board or use arrow keys/WASD. Eat the glowing fruit and avoid the walls and your tail.</p>
     <div class="controls">
       <label hidden>Mode <select id="mode"><option value="bot">Play the bot</option><option value="friend">Two players</option></select></label>
-      <button id="restart" type="button">New game</button>
+      <button id="restart" type="button">New Game</button>
     </div>
     <p id="status" role="status"></p>
-    <div id="board" class="board" role="group" aria-label="Snake board"></div>
-    <div id="actions" class="controls"></div>
+    <div class="snake-wrap">
+      <div id="board" class="board snake" role="group" aria-label="Snake game board. Swipe to steer."></div>
+      <div class="snake-hud"><span id="score">Score 0</span><span id="best">Best 0</span><button id="pause" type="button">Start</button></div>
+    </div>
+    <details class="direction-options"><summary>Show direction pad</summary><div id="actions" class="direction-pad" aria-label="Optional direction pad"></div></details>
   </main>
 </body>
 </html>

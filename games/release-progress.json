@@ -1,8 +1,8 @@
 {
   "updated": "2026-11-06",
-  "productionBaseline": "353badccabc6299737c06ecfaa229b205dc768a8",
+  "productionBaseline": "cb67e7e0bab345ad2bb7f982452222aa4c3491d8",
   "releases": [
-    {"game":"ludo","url":"https://walid-ai.com/games/ludo/","state":"released","redesign":"verification-ready-on-codex/ludo-player-count"},
+    {"game":"ludo","url":"https://walid-ai.com/games/ludo/","state":"released","redesign":"released-pr-9-merge-cb67e7e","liveVerification":"HTTP 200; Chromium 320/1280 verified 2/3/4 seats, friend/mixed/bot movement, CSS and no overflow/errors"},
     {"game":"chess","url":"https://walid-ai.com/games/chess/","state":"released","redesign":"pending"},
     {"game":"football-penalty","url":"https://walid-ai.com/games/penalty/","state":"released","redesign":"pending"},
     {"game":"tic-tac-toe","url":"https://walid-ai.com/games/tic-tac-toe/","state":"released","redesign":"released-pr-6-merge-cbcc572","liveVerification":"HTTP 200; Chromium 320/1280 passed CSS, bot, friend, line, overflow and page-error checks"},
@@ -45,6 +45,9 @@
     "chromiumWidths":[320,360,390,768,1280],
     "browserRegression":"all six games and seven previews pass; 2/3/4 seats, mixed human/bot setup, four-player bot move, active controls, no overflow/errors",
     "visualInspection":[320,1280],
-    "state":"ready for isolated release review"
+    "state":"released",
+    "pullRequest":9,
+    "mergeCommit":"cb67e7e0bab345ad2bb7f982452222aa4c3491d8",
+    "productionLiveChromiumWidths":[320,1280]
   }
 }

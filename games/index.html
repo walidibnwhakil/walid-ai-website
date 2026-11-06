@@ -6,30 +6,53 @@
   <title>Games | Walid AI</title>
   <meta name="description" content="Play browser games from Walid AI.">
   <link rel="icon" href="/kathgolap-logo.png">
-  <style>
-    body{margin:0;background:#f5f0e6;color:#35291f;font:16px/1.5 system-ui;padding:clamp(16px,4vw,32px)}
-    main{max-width:780px;margin:auto}
-    nav{display:flex;flex-wrap:wrap;gap:12px}
-    a{color:#674328}
-    a:focus-visible{outline:2px solid #674328;outline-offset:4px}
-    h1{margin-bottom:0}
-    .games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:16px;list-style:none;margin:24px 0;padding:0}
-    .tile{display:block;padding:24px;background:#fff8ec;border:1px solid #d5c4a8;border-radius:18px;text-decoration:none;color:inherit}
-    .tile h2{margin:0;font-size:1.25rem}
-    .tile:hover strong{text-decoration:underline}
-  </style>
+  <link rel="stylesheet" href="./arcade.css">
+  <link rel="stylesheet" href="./previews.css">
+  <script type="module" src="./previews.mjs"></script>
 </head>
 <body>
   <main>
-    <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/tools.html">Tools</a><span aria-current="page">Games</span></nav>
+    <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><span aria-current="page">Games</span></nav>
     <h1>Games</h1>
     <ul class="games">
       <li><a class="tile" href="/games/riddlex/">
+        <div class="preview riddlex-preview" aria-hidden="true"><span class="note">?</span></div>
         <h2>Riddlex — The Guessing Detective</h2>
         <p>Think of a character, animal or object. Can the detective guess it?</p>
         <strong>Play Riddlex <span aria-hidden="true">→</span></strong>
       </a></li>
+      <li><a class="tile" href="/games/ludo/">
+        <div class="preview ludo-preview" aria-hidden="true"><span class="die">⚄</span><span class="pawn"></span></div>
+        <h2>Ludo</h2>
+        <p>Race four tokens home against a bot or a friend.</p>
+        <strong>Play Ludo <span aria-hidden="true">→</span></strong>
+      </a></li>
+      <li><a class="tile" href="/games/chess/">
+        <div class="preview chess-preview" aria-hidden="true"><span class="knight">♞</span></div>
+        <h2>Chess</h2>
+        <p>Play a full chess match on this device.</p>
+        <strong>Play Chess <span aria-hidden="true">→</span></strong>
+      </a></li>
+      <li><a class="tile" href="/games/penalty/">
+        <div class="preview penalty-preview" aria-hidden="true"><span class="mini-goal"></span><span class="mini-ball">⚽</span></div>
+        <h2>Football Penalty</h2>
+        <p>Take turns shooting and saving in a penalty shootout.</p>
+        <strong>Play Football Penalty <span aria-hidden="true">→</span></strong>
+      </a></li>
+      <li><a class="tile" href="/games/tic-tac-toe/">
+        <div class="preview tic-tac-toe-preview" aria-hidden="true"><span class="mini-x">×</span><span class="mini-o">○</span></div>
+        <h2>Tic Tac Toe</h2>
+        <p>Make three in a row against a bot or a friend.</p>
+        <strong>Play Tic Tac Toe <span aria-hidden="true">→</span></strong>
+      </a></li>
+      <li><a class="tile" href="/games/snake/">
+        <div class="preview snake-preview" aria-hidden="true"><span class="mini-snake"></span><span class="mini-food"></span></div>
+        <h2>Snake</h2>
+        <p>Guide your snake, collect food, and beat your score.</p>
+        <strong>Play Snake <span aria-hidden="true">→</span></strong>
+      </a></li>
     </ul>
+    <footer><a href="/games/riddlex/credits.html">Riddlex photo credits</a></footer>
   </main>
 </body>
 </html>

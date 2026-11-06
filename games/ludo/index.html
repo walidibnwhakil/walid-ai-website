@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ludo | Walid AI Games</title>
+  <link rel="icon" href="/kathgolap-logo.png">
+  <link rel="stylesheet" href="../arcade.css">
+  <script type="module" src="../ludo.mjs"></script>
+</head>
+<body>
+  <main>
+    <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
+    <h1>Ludo</h1>
+    <p>Roll a six to leave the yard. Land on a rival to send them back, except on safe squares. A six earns another roll. Reach home with all four tokens using exact rolls.</p>
+    <div class="controls">
+      <label hidden>Mode <select id="mode"><option value="bot">Play the bot</option><option value="friend">Two players</option></select></label>
+      <button id="restart" type="button">New game</button>
+    </div>
+    <p id="status" role="status"></p>
+    <div id="board" class="board" role="group" aria-label="Ludo board"></div>
+    <div id="actions" class="controls"></div>
+  </main>
+</body>
+</html>

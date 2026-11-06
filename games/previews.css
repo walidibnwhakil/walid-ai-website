@@ -1,0 +1,69 @@
+main { max-width: 1050px; }
+.games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 16px;
+  list-style: none;
+  margin: 24px 0;
+  padding: 0;
+}
+.tile {
+  display: block;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px 18px;
+  background: #fff8ec;
+  border: 1px solid #d5c4a8;
+  border-radius: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+.tile h2 { margin: 12px 0 0; font-size: 1.25rem; }
+.tile:hover strong, .tile:focus-visible strong { text-decoration: underline; }
+.preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  height: 120px;
+  border-radius: 9px;
+  color: #fff6df;
+  background: #4e392e;
+  font-size: 2.5rem;
+}
+.riddlex-preview { background: #4e392e url("./riddlex-preview.jpg") center 42% / cover; }
+.note {
+  position: absolute;
+  right: 12%;
+  bottom: 8px;
+  padding-inline: 15px;
+  color: #50341f;
+  background: #fff3d1;
+  font-family: cursive;
+  transform: rotate(-8deg);
+  animation: note 1.3s 2 both;
+}
+.ludo-preview { background: conic-gradient(#f5ddaa 25%, #9bbdc4 0 50%, #f5ddaa 0 75%, #d99e8f 0); }
+.die { color: #302318; animation: die 1.25s 3; }
+.pawn { position: absolute; left: 14%; bottom: 20%; width: 20px; height: 20px; border-radius: 50%; background: #9b2427; animation: pawn 1.25s 3; }
+.chess-preview { background: repeating-conic-gradient(#5a4938 0 25%, #8f745b 0 50%) 50% / 48px 48px; }
+.knight { text-shadow: 0 2px 4px #241a10; animation: knight 1.6s 2; }
+.penalty-preview { background: #326545; }
+.mini-goal { width: 100px; height: 47px; position: absolute; top: 13px; border: 3px solid #f6f1e1; border-bottom: none; }
+.mini-ball { position: absolute; bottom: 4px; font-size: 1.55rem; animation: kick 1.25s 3; }
+.tic-tac-toe-preview { background: #415766; }
+.mini-x, .mini-o { position: absolute; top: 24px; line-height: 1; padding: 8px 14px; border: 1px solid #adc6d0; }
+.mini-x { right: 50%; animation: mark 1.45s 2; }
+.mini-o { left: 50%; animation: mark 1.45s .3s 2 both; }
+.snake-preview { background: #243d38; }
+.mini-food { position: absolute; right: 24%; width: 12px; height: 12px; border-radius: 50%; background: #efb85d; }
+.mini-snake { position: absolute; left: 23%; width: 50px; height: 14px; background: repeating-linear-gradient(90deg, #b9df8b 0 11px, #243d38 11px 13px); animation: snake 1.2s steps(4, end) 3; }
+@keyframes note { from { opacity: 0; transform: translateY(20px) rotate(-12deg); } 55%, to { opacity: 1; transform: rotate(-8deg); } }
+@keyframes die { 50% { transform: rotate(90deg) translateX(-5px); } }
+@keyframes pawn { 55% { transform: translateX(34px); } }
+@keyframes knight { 40% { transform: translate(-36px, -21px); } 75% { transform: translate(-36px, 13px); } }
+@keyframes kick { 75% { transform: translate(31px, -48px) rotate(120deg) scale(.65); } }
+@keyframes mark { from { opacity: .1; transform: scale(.75); } 75%, to { opacity: 1; transform: scale(1); } }
+@keyframes snake { 75% { transform: translateX(48px); } }
+.preview:not(.in-view) span { animation: none; }
+@media (prefers-reduced-motion: reduce) { .preview span { animation: none; } }

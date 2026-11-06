@@ -5,36 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261106logo8">
-  <link rel="stylesheet" href="./ludo.css?v=20261106logo8">
-  <script type="module" src="../ludo.mjs?v=20261106logo8"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261106ludu-final1">
+  <link rel="stylesheet" href="./ludo.css?v=20261106ludu-final1">
+  <script type="module" src="../ludo.mjs?v=20261106ludu-final1"></script>
 
 </head>
 <body class="ludo-game">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
     <section id="ludo-setup" class="ludo-setup">
+      <div class="menu-toolbar"><a href="/games/" aria-label="Back to Games">← Games</a><button id="menu-sound" type="button" aria-pressed="false">Sound: Off</button><a href="#setup-settings">Settings</a></div>
       <div class="mahir-hero">
         <div class="mahir-laurel" aria-hidden="true">❧</div><div class="mahir-crown" aria-hidden="true"><svg viewBox="0 0 180 115" width="126" height="82"><defs><linearGradient id="gold" x2=".3" y2="1"><stop stop-color="#fff6b4"/><stop offset=".35" stop-color="#ffcc38"/><stop offset=".75" stop-color="#bb6b0b"/><stop offset="1" stop-color="#ffe184"/></linearGradient></defs><path d="M24 81 10 26 51 53 89 8 128 53 170 26 155 81Z" fill="url(#gold)" stroke="#8b4109" stroke-width="5"/><path d="M24 82h131v20H24z" fill="url(#gold)" stroke="#8b4109" stroke-width="4"/><g fill="#e52d3c" stroke="#ffe7a5" stroke-width="3"><circle cx="10" cy="23" r="8"/><circle cx="89" cy="9" r="8"/><circle cx="170" cy="23" r="8"/></g><g fill="#18a8e2" stroke="#fff4a7" stroke-width="3"><circle cx="51" cy="51" r="8"/><circle cx="128" cy="51" r="8"/></g><path d="M42 88h96" stroke="#fff3a8" stroke-width="3"/></svg></div>
         <div class="mahir-logo"><span>Ludu</span><strong>Mahir</strong></div><div class="mahir-laurel right" aria-hidden="true">❧</div>
         <div class="mahir-illustration" aria-hidden="true">
-          <span class="mahir-die die-left">⚄</span>
+          <span class="mahir-die die-left"><svg class="die-art" viewBox="0 0 80 80" aria-hidden="true"><rect x="5" y="5" width="70" height="70" rx="17" fill="url(#ivory)" stroke="#a8763e" stroke-width="4"/><g fill="#26170f"><circle cx="24" cy="24" r="5"/><circle cx="56" cy="24" r="5"/><circle cx="40" cy="40" r="5"/><circle cx="24" cy="56" r="5"/><circle cx="56" cy="56" r="5"/></g><defs><linearGradient id="ivory" x2=".8" y2="1"><stop stop-color="#fffef7"/><stop offset="1" stop-color="#cfb894"/></linearGradient></defs></svg></span>
           <span class="ludo-pawn pawn-red"></span><span class="ludo-pawn pawn-green"></span>
           <span class="ludo-pawn pawn-blue"></span><span class="ludo-pawn pawn-yellow"></span>
-          <span class="mahir-die die-right">⚅</span>
+          <span class="mahir-die die-right"><svg class="die-art" viewBox="0 0 80 80" aria-hidden="true"><rect x="5" y="5" width="70" height="70" rx="17" fill="url(#ivory2)" stroke="#a8763e" stroke-width="4"/><g fill="#26170f"><circle cx="23" cy="23" r="5"/><circle cx="40" cy="23" r="5"/><circle cx="57" cy="23" r="5"/><circle cx="23" cy="40" r="5"/><circle cx="40" cy="40" r="5"/><circle cx="57" cy="40" r="5"/></g><defs><linearGradient id="ivory2" x2=".8" y2="1"><stop stop-color="#fffef7"/><stop offset="1" stop-color="#cfb894"/></linearGradient></defs></svg></span>
         </div>
         
         <p>Classic Ludo game. Play with friends or bots,<br>choose your style and enjoy anytime.</p>
       </div>
       <div class="mahir-settings">
-        <div class="mahir-field"><div class="mahir-field-title">🎮 Game Mode</div>
+        <div class="mahir-field"><div class="mahir-field-title"><svg class="field-mark" viewBox="0 0 36 36" aria-hidden="true"><path d="M9 10h18q5 0 6 6l1 8q0 5-5 4l-6-5h-6l-6 5q-5 1-5-4l1-8q1-6 6-6z" fill="#ffe08b" stroke="#8d4b16" stroke-width="2"/><path d="M10 18h8m-4-4v8" stroke="#57300f" stroke-width="2"/><circle cx="26" cy="17" r="1.5" fill="#57300f"/><circle cx="29" cy="20" r="1.5" fill="#57300f"/></svg> Game Mode</div>
           <div class="mahir-choice" id="mode-buttons">
             <button type="button" data-value="bot" class="selected">● vs Bot</button>
             <button type="button" data-value="friend">●● Local (2–4)</button>
             <button type="button" disabled>◎ Online <small>Coming Soon</small></button>
           </div>
         </div>
-        <div class="mahir-field"><div class="mahir-field-title">👥 Players</div>
+        <div class="mahir-field"><div class="mahir-field-title"><svg class="field-mark" viewBox="0 0 36 36" aria-hidden="true"><circle cx="12" cy="10" r="5" fill="#ffe8bd"/><circle cx="24" cy="10" r="5" fill="#ffe8bd"/><path d="M3 29v-5q0-7 9-7t9 7v5zm13 0v-5q0-7 8-7t9 7v5z" fill="#f0d6b4" stroke="#87501e" stroke-width="1.5"/></svg> Players</div>
           <div class="mahir-choice" id="player-buttons">
             <button type="button" data-value="2">2 Players</button>
             <button type="button" data-value="3">3 Players</button>
@@ -45,11 +46,21 @@
         <select id="setup-mode" aria-label="Game Mode" hidden><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select>
       </div>
       <button id="start-game" type="button" class="start-game">▶ Start Game</button>
-      <div class="setup-features"><button type="button" id="setup-colors">🎨<span>Choose Colors</span></button><button type="button" id="setup-rules">🎲<span>Game Rules</span></button><div>🏆<span>Leaderboard<br><small>Coming Soon</small></span></div><button type="button" id="setup-settings">⚙️<span>Game Settings</span></button></div>
+      <div class="setup-features">
+        <button type="button" id="setup-colors"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="16" cy="15" r="6" fill="#ef5652"/><circle cx="31" cy="14" r="6" fill="#ffc839"/><circle cx="15" cy="31" r="6" fill="#358fea"/><circle cx="31" cy="31" r="6" fill="#24bd70"/></svg><span>Choose Colors</span></button>
+        <button type="button" id="setup-rules"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 10q10-4 19 2v28q-9-6-19-2zm38 0q-10-4-19 2v28q9-6 19-2z" fill="#ffe385" stroke="#9c5a17" stroke-width="3"/><path d="M24 13v26" stroke="#8f4f16" stroke-width="2"/></svg><span>Game Rules</span></button>
+        <div><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 4 6 5 8-1 2 8 6 5-4 7 1 8-8 2-5 6-7-4-8 1-2-8-6-5 4-7-1-8 8-2z" fill="#ffd44f" stroke="#8f4f16" stroke-width="3"/><circle cx="24" cy="22" r="6" fill="#fff0a1"/></svg><span>Leaderboard<br><small>Coming Soon</small></span></div>
+        <button type="button" id="setup-settings"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M19 4h10l2 7 6 3 6-2 5 9-5 5v7l5 5-5 9-7-2-6 3-2 7H18l-2-7-6-3-6 2-5-9 5-5v-7l-5-5 5-9 7 2 6-3z" transform="translate(4 -3) scale(.84)" fill="#ffe191" stroke="#874412" stroke-width="3"/><circle cx="24" cy="24" r="7" fill="#60300f"/></svg><span>Game Settings</span></button>
+      </div>
       <p class="setup-footnote">Play together or challenge the bots. Change colors anytime before the first roll by tapping your player header.</p>
     </section>
+    <dialog id="rules-dialog" class="rules-dialog">
+      <h2>Game Rules</h2>
+      <ul><li>Roll a six to release a pawn from your yard.</li><li>Move by the exact dice count; a pawn must reach Home exactly.</li><li>Safe star squares protect pawns from capture.</li><li>A six, capture, or finishing move grants another roll.</li><li>Three consecutive sixes pass the turn without moving.</li><li>Finish all four pawns to earn a place in the rankings.</li></ul>
+      <button id="close-rules" type="button">Back to Menu</button>
+    </dialog>
     <section id="ludo-play" hidden>
-    <div class="play-toolbar"><button id="back-to-setup" type="button">← Setup</button><span>LUDU MAHIR</span><button id="full-screen" type="button">⛶ Full Screen</button></div>
+    <div class="play-toolbar"><button id="back-to-setup" type="button" aria-label="Back to game menu">← Menu</button><span aria-label="Ludu Mahir"><svg class="toolbar-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24" stroke="#8a470e"/></svg> LUDU MAHIR</span><button id="sound-toggle" type="button" aria-pressed="false">Sound: Off</button><button id="board-settings" type="button" aria-expanded="false">Settings</button><button id="board-restart" type="button">New Game</button><button id="full-screen" type="button">⛶ Full Screen</button></div>
     <h1>Ludu <small style="display:block;font-size:.38em;letter-spacing:.35em;margin-top:.1em">MAHIR</small></h1>
     <p>Roll a six to leave the yard. Capture rivals on open squares, use safe squares, and bring all four tokens home.</p>
     <div class="controls game-settings">

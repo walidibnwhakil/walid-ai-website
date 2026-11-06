@@ -1,5 +1,5 @@
 import {gameShell, control, choose} from "./shell.mjs";
-import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe} from "./ludo-rules.mjs";
+import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs";
 
 const teams = ["Red", "Blue", "Green", "Yellow"];
 const setupScreen=document.querySelector("#ludo-setup");
@@ -14,13 +14,8 @@ for(const [groupId,selectId] of [["mode-buttons","setup-mode"],["player-buttons"
   });
  });
 }
-document.getElementById("setup-rules").addEventListener("click",()=>{
- document.getElementById("ludo-setup").hidden=true;
- document.getElementById("ludo-play").hidden=false;
- document.body.classList.add("playing-ludo");
- document.querySelector(".rules").open=true;
- document.querySelector(".rules").scrollIntoView({behavior:"smooth",block:"start"});
-});
+document.getElementById("setup-rules").addEventListener("click",()=>document.getElementById("rules-dialog").showModal());
+document.getElementById("close-rules").addEventListener("click",()=>document.getElementById("rules-dialog").close());
 document.getElementById("setup-settings").addEventListener("click",()=>{
  document.getElementById("mode-buttons").scrollIntoView({behavior:"smooth",block:"center"});
  document.getElementById("mode-buttons").querySelector("button").focus();
@@ -48,6 +43,13 @@ document.querySelector("#back-to-setup").addEventListener("click",()=>{
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   window.scrollTo(0,0);
 });
+document.querySelector("#menu-sound").addEventListener("click",event=>{soundEnabled=!soundEnabled;event.currentTarget.setAttribute("aria-pressed",String(soundEnabled));event.currentTarget.textContent=soundEnabled?"Sound: On":"Sound: Off";});
+document.querySelector("#sound-toggle").addEventListener("click",event=>{
+  soundEnabled=!soundEnabled;const enabled=soundEnabled;const button=event.currentTarget;
+  button.setAttribute("aria-pressed",String(enabled));button.textContent=enabled?"Sound: On":"Sound: Off";
+  const menuSound=document.querySelector("#menu-sound");menuSound.setAttribute("aria-pressed",String(enabled));menuSound.textContent=enabled?"Sound: On":"Sound: Off";
+});
+document.querySelector("#board-settings").addEventListener("click",event=>{const open=playScreen.classList.toggle("show-game-settings");event.currentTarget.setAttribute("aria-expanded",String(open));event.currentTarget.textContent=open?"Close Settings":"Settings";if(open)document.querySelector(".game-settings").scrollIntoView({behavior:"smooth",block:"center"});});
 document.querySelector("#full-screen").addEventListener("click",()=>{
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   else playScreen.requestFullscreen?.().catch(()=>{});
@@ -90,9 +92,9 @@ const dice = teams.map((team,teamId)=>{
   container.append(label,button);
   return button;
 });
-const dieSymbols=["⚀","⚁","⚂","⚃","⚄","⚅"];
+const diePips=[[],[[2]],[[0,4]],[[0,2,4]],[[0,1,3,4]],[[0,1,2,3,4]],[[0,1,3,4,5,6]]];
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], motions = new Map(), started=false;
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, soundEnabled=false;
 let chosenColors=[0,1,2,3];
 const getColor=seat=>palette[chosenColors[seat]];
 const colorPicker=document.querySelector("#color-picker");
@@ -128,14 +130,15 @@ const game = gameShell({reset() {
   state=newLudo(count);
   applySeatColors();
   started=false;
+  locked=false; animationToken=null;
   colorPicker.hidden=true;
   message = "";
-  motions = new Map();
   lastDice.fill(1);
   dice.forEach(button=>button.classList.remove("rolling"));
   configureSeats();
   render();
 }});
+document.querySelector("#board-restart").addEventListener("click",()=>game.restart());
 game.board.classList.add("ludo");
 const squares = new Map();
 for(const [seat,area] of [[0,"1 / 1 / 7 / 7"],[1,"10 / 1 / 16 / 7"],[2,"1 / 10 / 7 / 16"],[3,"10 / 10 / 16 / 16"]]) {
@@ -206,18 +209,22 @@ function isBot(player) {
 }
 playerSelect.addEventListener("change",game.restart);
 
+function playDiceSound(value) {
+  try { const AudioEngine=window.AudioContext||window.webkitAudioContext; if(!AudioEngine)return; const audio=new AudioEngine(); const oscillator=audio.createOscillator(); const gain=audio.createGain(); oscillator.type="triangle"; oscillator.frequency.value=280+value*48; gain.gain.setValueAtTime(.08,audio.currentTime); gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.17); oscillator.connect(gain);gain.connect(audio.destination);oscillator.start();oscillator.stop(audio.currentTime+.18);oscillator.onended=()=>audio.close(); } catch {}
+}
 function throwDie() {
   const player=state.turn;
-  if(state.roll || state.winner!==null) return;
+  if(state.roll || state.winner!==null || locked) return;
   started=true;
   const rolled=1+Math.floor(Math.random()*6);
+  if(soundEnabled) playDiceSound(rolled);
   const teamId=activeTeams[player];
   lastDice[teamId]=rolled;
   const face=dice[teamId];
   face.classList.remove("rolling");
   requestAnimationFrame(()=>face.classList.add("rolling"));
   state=rollLudo(state,rolled);
-  message=`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
+  message=state.threeSixes?`${getColor(player)[0]} rolled three sixes. Turn passed.`:`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
   render();
 }
 
@@ -227,19 +234,31 @@ const tokenControls=Array.from({length:4},(_,player)=>Array.from({length:4},(_,i
   document.querySelector("#actions").append(button);
   return button;
 }));
-function play(index) {
-  if(!legalTokens(state).includes(index)) return;
-  const previous=state.pieces.map(team=>team.slice());
-  state=moveLudo(state,index);
-  motions=new Map();
-  state.pieces.forEach((team,player)=>team.forEach((step,token)=>{
-    if(previous[player][token]!==step) {
-      const oldTile=previous[player][token]<0 ? yards[player][token] : previous[player][token]>=52 ? lanes[player][previous[player][token]-52] : track[trackPosition(activeTeams[player],previous[player][token])];
-      const old=squares.get(oldTile.join(",")).querySelector(`[data-token="${player}-${token}"]`);
-      if(old) motions.set(`${player}-${token}`,old.getBoundingClientRect());
-    }
-  }));
+async function play(index) {
+  if(locked || !legalTokens(state).includes(index)) return;
+  locked=true;
+  const result=moveLudo(state,index);
+  if(result===state) {locked=false;return;}
+  state=result;
+  started=true;
   message="";
+  const move=result.lastMove;
+  const delay=145;
+  const moving=[];
+  if(move) {
+    const steps=movementSteps(move.from,move.to);
+    for(const step of steps) moving.push({player:move.player,token:move.token,step});
+  }
+  for(const hit of result.lastCaptured) {
+    for(const step of captureReturnSteps(hit.step)) moving.push({player:hit.player,token:hit.token,step});
+  }
+  for(const motion of moving) {
+    animationToken=motion;
+    render();
+    await new Promise(resolve=>setTimeout(resolve,delay));
+  }
+  animationToken=null;
+  locked=false;
   render();
 }
 function render() {
@@ -257,8 +276,9 @@ function render() {
     const active=enabled && activeTeams[state.turn]===teamId && state.winner===null;
     button.closest(".player-dice").classList.toggle("active",active);
     button.closest(".player-dice").classList.toggle("inactive-seat",!enabled);
-    button.disabled=!active||botTurn||state.roll>0;
-    button.textContent=dieSymbols[lastDice[teamId]-1];
+    button.disabled=!active||botTurn||locked||state.roll>0;
+    button.className=`die-face pip-face pip-${lastDice[teamId]}`;
+    button.replaceChildren(...diePips[lastDice[teamId]].map((position,index)=>{const pip=document.createElement("i");pip.className="die-pip p"+position;return pip;}));
     button.setAttribute("aria-label",`${teams[teamId]} die: ${lastDice[teamId]}${active?", current turn":""}`);
   });
   for(const tile of squares.values()) tile.replaceChildren();
@@ -267,16 +287,17 @@ function render() {
     const label=`${getColor(player)[0]} token ${index+1}`;
     const button=tokenControls[teamId][index];
     button.hidden=true;
-    button.disabled=botTurn||!legal.includes(index);
+    button.disabled=botTurn||locked||!legal.includes(index);
     button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===57?"home":"step "+(step+1)}`);
-    const tile=step===-1 ? yards[teamId][index] : step>=52 ? lanes[teamId][step-52] : track[trackPosition(teamId,step)];
+    const visualStep=animationToken?.player===player&&animationToken?.token===index ? animationToken.step : step;
+    const tile=visualStep===-1 ? yards[teamId][index] : visualStep>=52 ? lanes[teamId][visualStep-52] : track[trackPosition(teamId,visualStep)];
     const square=squares.get(tile.join(","));
     const marker=document.createElement("span");
     marker.className=teams[teamId].toLowerCase();
     marker.style.setProperty("--piece-color",getColor(player)[1]);
     marker.textContent=String(index+1);
     marker.dataset.token=`${teamId}-${index}`;
-    marker.dataset.step=String(step);
+    marker.dataset.step=String(visualStep);
     if(player===state.turn && !botTurn && legal.includes(index)) {
       marker.setAttribute("role","button");
       marker.setAttribute("tabindex","0");
@@ -285,24 +306,25 @@ function render() {
       marker.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();play(index);}});
       marker.classList.add("playable-token");
     }
-    const from=motions.get(`${player}-${index}`);
-    if(from) {
-      const to=square.getBoundingClientRect();
-      marker.style.setProperty("--dx",`${from.left-to.left}px`);
-      marker.style.setProperty("--dy",`${from.top-to.top}px`);
-      marker.classList.add("moving");
-    }
     square.append(marker);
   }));
-  motions.clear();
+  state.ranks.forEach((rank,player)=>{
+    if(!rank) return;
+    const teamId=activeTeams[player];
+    const badge=document.createElement("div");
+    badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;
+    badge.innerHTML=rank===1 ? `<svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><span>WINNER · 1st</span>` : `<span>${rank}${rank===2?"nd":rank===3?"rd":"th"} PLACE</span>`;
+    game.board.append(badge);
+  });
+
   const currentTeam=getColor(state.turn)[0];
 
   game.status.dataset.turn=teams[activeTeams[state.turn]].toLowerCase();
   game.status.textContent=message+(state.winner!==null?`${getColor(state.winner)[0]} wins!`
     :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);
-  if(state.winner===null && state.roll>0 && legal.length===1) {
+  if(!locked && state.winner===null && state.roll>0 && legal.length===1) {
     game.later(()=>play(legal[0]), 420);
-  } else if(botTurn) {
+  } else if(!locked && botTurn) {
     game.later(()=>state.roll?play(choose(legal)):throwDie());
   }
 }

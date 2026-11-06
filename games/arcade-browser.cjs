@@ -194,12 +194,48 @@ const path = require("node:path");
       assert.equal(await page.locator(".win-line line").getAttribute("x1"), "50");
       assert.equal(await page.locator(".win-line line").getAttribute("x2"), "250");
       await capture("tic-tac-toe");
+      await page.addInitScript(()=>{if(location.pathname==="/games/snake/")Math.random=()=>0;});
       await go("snake/");
-      await page.keyboard.press("ArrowUp");
-      await page.waitForFunction(() => document.querySelectorAll(".snake .segment")[0] === document.querySelector(".snake").children[120]);
+      assert.equal(await page.locator("#board span").count(),256);
+      const snakeBoard=page.locator("#board");
+      if(mobile){
+        const startScroll=await page.evaluate(()=>scrollY),session=await page.context().newCDPSession(page),box=await snakeBoard.boundingBox();
+        const x=box.x+box.width/2,y=box.y+box.height/2;
+        await session.send("Input.dispatchTouchEvent",{type:"touchStart",touchPoints:[{x,y,id:1}]});
+        await session.send("Input.dispatchTouchEvent",{type:"touchMove",touchPoints:[{x,y:y-box.height*.22,id:1}]});
+        await session.send("Input.dispatchTouchEvent",{type:"touchEnd",touchPoints:[]});
+        assert.equal(await page.evaluate(()=>window.__boardPointerType),"touch");
+        assert.equal(await page.evaluate(()=>scrollY),startScroll,"swipe must not scroll the page");
+        await session.detach();
+      }else{
+        await page.keyboard.press("ArrowUp");
+        await page.keyboard.press("ArrowDown");
+      }
+      await page.waitForFunction(()=>document.querySelector(".snake .head")?.dataset.index==="120");
+      if(width===1280){await page.keyboard.press("d");await page.waitForFunction(()=>document.querySelector(".snake .head")?.dataset.index==="121");}
+      assert.match(await status.innerText(),/Playing\. Score 0/);
       await button("Pause").click();
       assert.match(await status.innerText(), /Paused/);
+      await button("Start").click();
+      assert.match(await status.innerText(),/Playing/);
       await capture("snake");
+      if(width===390){
+        await button("New Game").click();
+        await page.keyboard.press("ArrowUp");
+        await page.waitForFunction(()=>document.querySelector(".snake .head")?.dataset.index==="8",null,{timeout:4000});
+        await page.keyboard.press("ArrowLeft");
+        await page.waitForFunction(()=>document.querySelector("#score").textContent==="Score 1",null,{timeout:3000});
+        assert.equal(await page.locator("#best").innerText(),"Best 1");
+        await button("New Game").click();
+        await page.keyboard.press("ArrowRight");
+        await page.waitForFunction(()=>document.querySelector("#status").textContent.includes("Game over"),null,{timeout:5000});
+        assert(await button("Play again").isVisible());
+        await button("Play again").click();
+        assert.match(await status.innerText(),/Playing\. Score 0/);
+        await page.setViewportSize({width:844,height:390});
+        assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),"landscape viewport must not overflow");
+        await page.setViewportSize({width:390,height:850});
+      }
       await go("2048/");
       assert.equal(await page.locator('[role="gridcell"]').count(), 16);
       assert.equal(await page.locator('[role="gridcell"][data-value="0"]').count(), 14);
@@ -226,6 +262,7 @@ const path = require("node:path");
         const box = await page.locator("#board").boundingBox();
         const x = box.x + box.width * .76;
         const y = box.y + box.height * .85;
+        await page.evaluate(() => {window.__boardPointerType=null;});
         await session.send("Input.dispatchTouchEvent", {type:"touchStart",touchPoints:[{x,y,id:1}]});
         await session.send("Input.dispatchTouchEvent", {type:"touchMove",touchPoints:[{x:x-box.width*.5,y,id:1}]});
         await session.send("Input.dispatchTouchEvent", {type:"touchEnd",touchPoints:[]});

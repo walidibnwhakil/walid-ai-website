@@ -2,6 +2,29 @@ import {gameShell, control, choose} from "./shell.mjs";
 import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe} from "./ludo-rules.mjs";
 
 const teams = ["Red", "Blue", "Green", "Yellow"];
+const setupScreen=document.querySelector("#ludo-setup");
+const playScreen=document.querySelector("#ludo-play");
+document.querySelector("#start-game").addEventListener("click",()=>{
+  document.querySelector("#player-count").value=document.querySelector("#setup-players").value;
+  document.querySelector("#mode").value=document.querySelector("#setup-mode").value;
+  setupScreen.hidden=true;
+  playScreen.hidden=false;
+  document.body.classList.add("playing-ludo");
+  game.restart();
+  window.scrollTo(0,0);
+});
+document.querySelector("#back-to-setup").addEventListener("click",()=>{
+  document.body.classList.remove("playing-ludo");
+  playScreen.hidden=true;
+  setupScreen.hidden=false;
+  colorPicker.hidden=true;
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  window.scrollTo(0,0);
+});
+document.querySelector("#full-screen").addEventListener("click",()=>{
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  else playScreen.requestFullscreen?.().catch(()=>{});
+});
 const palette = [
   ["Red","#e83e4e"],["Blue","#2588e8"],["Green","#27bf70"],["Yellow","#f2be30"],
   ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"],

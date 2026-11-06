@@ -5,9 +5,9 @@ const teams = ["Red", "Blue", "Green", "Yellow"];
 const starts = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const lanes = [
   Array.from({length:6},(_,i)=>[7,i+1]),
-  Array.from({length:6},(_,i)=>[7,13-i]),
+  Array.from({length:6},(_,i)=>[13-i,7]),
   Array.from({length:6},(_,i)=>[i+1,7]),
-  Array.from({length:6},(_,i)=>[13-i,7])
+  Array.from({length:6},(_,i)=>[7,13-i])
 ];
 const yards = [
   Array.from({length:4},(_,i)=>[2+(i>>1),2+i%2]),
@@ -16,6 +16,7 @@ const yards = [
   Array.from({length:4},(_,i)=>[11+(i>>1),2+i%2])
 ];
 const track = starts;
+const entrySquares=new Map([[0,"red"],[13,"green"],[26,"yellow"],[39,"blue"]]);
 const playerSelect = document.querySelector("#player-count");
 const modeSelect = document.querySelector("#mode");
 const seatOptions = document.querySelector("#seat-options");
@@ -73,7 +74,11 @@ const game = gameShell({reset() {
 }});
 game.board.classList.add("ludo");
 const squares = new Map();
-track.forEach(([row,column],index) => addSquare(row,column,safe.has(index) ? "safe track" : "track"));
+track.forEach(([row,column],index) => {
+  const color=entrySquares.get(index);
+  const kind=["track",safe.has(index)?"safe":"",color?"start-square "+color:""].filter(Boolean).join(" ");
+  addSquare(row,column,kind);
+});
 for (let player=0;player<4;player++) {
   lanes[player].forEach(([row,column],index)=>addSquare(row,column,`lane ${teams[player].toLowerCase()} lane-${player} lane-step-${index}`));
   yards[player].forEach(([row,column])=>addSquare(row,column,`yard ${teams[player].toLowerCase()}`));
@@ -82,6 +87,7 @@ addSquare(7,7,"home-center");
 function addSquare(row,column,kind) {
   const tile=document.createElement("div");
   tile.className=kind;
+  if(kind.includes("safe")) {tile.setAttribute("aria-label","Safe square");tile.dataset.safe="true";}
   tile.style.gridArea=`${row+1} / ${column+1}`;
   game.board.append(tile);
   squares.set(`${row},${column}`,tile);

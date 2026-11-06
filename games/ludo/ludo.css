@@ -163,3 +163,59 @@
 @media(prefers-reduced-motion:reduce) {
   .ludo-game .board.ludo .playable-token {animation:none;}
 }
+
+/* Four turn-locked player dice: each seat keeps its own die. */
+.ludo-game .ludo-stage {
+  display:grid;grid-template-columns:1fr 1fr;
+  grid-template-areas:"red green" "board board" "blue yellow";
+  width:min(100%,660px);margin:8px auto 22px;gap:8px;
+}
+.ludo-game .ludo-stage #board {grid-area:board;margin:0 auto;width:100%;}
+.ludo-game .player-dice {
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:5px 10px;border-radius:14px;background:#ffffff15;
+  border:2px solid #ffffff38;min-height:64px;opacity:.65;
+  font-family:system-ui,sans-serif;font-weight:900;
+}
+.ludo-game .player-dice.red {grid-area:red;--seat-color:#f8505c;}
+.ludo-game .player-dice.green {grid-area:green;--seat-color:#32d77b;}
+.ludo-game .player-dice.blue {grid-area:blue;--seat-color:#43b8ff;}
+.ludo-game .player-dice.yellow {grid-area:yellow;--seat-color:#ffcb37;}
+.ludo-game .player-dice.active {
+  opacity:1;border-color:var(--seat-color);
+  background:color-mix(in srgb,var(--seat-color) 22%,#191d46);
+  box-shadow:0 0 17px color-mix(in srgb,var(--seat-color) 50%,transparent);
+}
+.ludo-game .player-dice.inactive-seat {opacity:.2;}
+.ludo-game .player-dice .die-face {
+  width:48px;height:48px;margin:0;flex:none;padding:0;
+  font-size:2.45rem;line-height:1;color:#181d37;
+  cursor:pointer;touch-action:manipulation;
+}
+.ludo-game .player-dice .die-face:disabled {cursor:default;filter:grayscale(.45);}
+.ludo-game .player-dice.active .die-face:not(:disabled) {
+  animation:mahir-die-ready 1.5s ease-in-out infinite;
+}
+@keyframes mahir-die-ready {50%{transform:translateY(-3px);box-shadow:0 0 12px #fff9;}}
+/* Glossy carved wooden pieces, color-stained but visibly wood-grained. */
+.ludo-game .board.ludo span {
+  border:2px solid #f8e7bb;
+  border-radius:46% 46% 36% 36%;
+  background-image:
+    repeating-linear-gradient(9deg,transparent 0 3px,#4e260b25 4px 5px,transparent 6px 10px),
+    radial-gradient(ellipse at 30% 18%,#fff9,transparent 46%),
+    linear-gradient(145deg,#c99b59,#7c3d1b 65%,#47230f);
+  box-shadow:inset 1px 2px 3px #fff9,inset -2px -3px 4px #3114079c,0 3px 1px #40230f,0 5px 5px #0008;
+}
+.ludo-game .board.ludo span.red {background-color:#bd2939;background-blend-mode:normal,screen,multiply;}
+.ludo-game .board.ludo span.blue {background-color:#176dc3;background-blend-mode:normal,screen,multiply;}
+.ludo-game .board.ludo span.green {background-color:#16874b;background-blend-mode:normal,screen,multiply;}
+.ludo-game .board.ludo span.yellow {background-color:#d8a016;background-blend-mode:normal,screen,multiply;}
+@media(max-width:480px) {
+  .ludo-game .ludo-stage {gap:5px;}
+  .ludo-game .player-dice {padding:4px;min-height:54px;gap:5px;font-size:.76rem;}
+  .ludo-game .player-dice .die-face {width:43px;height:43px;font-size:2.1rem;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .ludo-game .player-dice.active .die-face:not(:disabled){animation:none;}
+}

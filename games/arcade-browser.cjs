@@ -27,10 +27,12 @@ const path = require("node:path");
     const output = process.env.RIDDLEX_BROWSER_OUTPUT;
     if (output) await fs.mkdir(output, {recursive:true});
     for (const [width, motion] of [[1280, "no-preference"], [768, "reduce"], [390, "reduce"], [360, "no-preference"], [320, "no-preference"]]) {
-      const page = await browser.newPage({viewport:{width,height:850},reducedMotion:motion});
+      const mobile = width <= 390;
+      const page = await browser.newPage({viewport:{width,height:850},reducedMotion:motion,hasTouch:mobile,isMobile:mobile});
       const errors = [];
       page.on("pageerror", error => errors.push(String(error)));
       await page.addInitScript(() => {Math.random = () => .95;});
+      await page.addInitScript(() => document.addEventListener("pointerdown", event => { if (event.target.closest("#board")) window.__boardPointerType = event.pointerType; }, true));
       const go = async name => {
         const response = await page.goto(url + name);
         assert.equal(response.status(), 200);
@@ -110,14 +112,39 @@ const path = require("node:path");
       await go("2048/");
       assert.equal(await page.locator('[role="gridcell"]').count(), 16);
       assert.equal(await page.locator('[role="gridcell"][data-value="0"]').count(), 14);
-      for (const direction of ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"]) {
-        await page.keyboard.press(direction);
-        if (!(await status.innerText()).includes("No tiles moved")) break;
-      }
+      await page.keyboard.press("ArrowLeft");
       assert.notEqual(await status.innerText(), "Use the arrow keys or direction buttons to begin.");
+      assert.match(await page.locator("#best").innerText(), /Best [1-9]\d*/);
+      assert(await page.locator('.twenty48-board [data-moved="true"]').count() > 0);
       await button("Move up").click();
       assert(await page.locator("#board").evaluate(node => document.activeElement === node));
       await page.keyboard.press("ArrowDown");
+      await button("New game").click();
+      const boardBox = await page.locator("#board").boundingBox();
+      await page.mouse.move(boardBox.x + boardBox.width * .75, boardBox.y + boardBox.height * .5);
+      await page.mouse.down();
+      await page.mouse.move(boardBox.x + boardBox.width * .25, boardBox.y + boardBox.height * .5, {steps:4});
+      await page.mouse.up();
+      assert.notEqual(await status.innerText(), "Use the arrow keys or direction buttons to begin.");
+      assert.match(await page.locator("#best").innerText(), /Best [1-9]\d*/);
+      await page.waitForTimeout(250);
+      await capture("2048-swipe");
+      await button("New game").click();
+      if (mobile) {
+        const session = await page.context().newCDPSession(page);
+        const box = await page.locator("#board").boundingBox();
+        const x = box.x + box.width * .76;
+        const y = box.y + box.height * .85;
+        await session.send("Input.dispatchTouchEvent", {type:"touchStart",touchPoints:[{x,y,id:1}]});
+        await session.send("Input.dispatchTouchEvent", {type:"touchMove",touchPoints:[{x:x-box.width*.5,y,id:1}]});
+        await session.send("Input.dispatchTouchEvent", {type:"touchEnd",touchPoints:[]});
+        assert.equal(await page.evaluate(() => window.__boardPointerType), "touch");
+        assert.match(await status.innerText(), /Merged tiles/);
+        await session.detach();
+        await button("New game").click();
+      }
+      assert.equal(await page.locator("#score").innerText(), "Score 0");
+      assert.match(await page.locator("#best").innerText(), /Best [1-9]\d*/);
       await capture("2048");
       assert.deepEqual(errors, []);
       console.log(`${width}px: 7 previews, 6 local games, keyboard and overflow checks; index ${bytes} bytes`);

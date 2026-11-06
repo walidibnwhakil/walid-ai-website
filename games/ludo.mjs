@@ -147,9 +147,14 @@ function render() {
   }));
   motions.clear();
   const currentTeam=teams[activeTeams[state.turn]];
+  dieFace.dataset.turn=currentTeam.toLowerCase();
   game.status.dataset.turn=currentTeam.toLowerCase();
   game.status.textContent=message+(state.winner!==null?`${teams[activeTeams[state.winner]]} wins!`
     :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);
-  if(botTurn) game.later(()=>state.roll?play(choose(legal)):throwDie());
+  if(state.winner===null && state.roll>0 && legal.length===1) {
+    game.later(()=>play(legal[0]), 420);
+  } else if(botTurn) {
+    game.later(()=>state.roll?play(choose(legal)):throwDie());
+  }
 }
 game.restart();

@@ -1,4 +1,4 @@
-export const starts = [0, 26, 13, 39];
+export const starts = [0, 39, 13, 26];
 export const safe = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
 
 export function newLudo(playerCount = 2, colors = Array.from({length:playerCount},(_,i)=>i)) {

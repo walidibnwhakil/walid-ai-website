@@ -110,6 +110,8 @@ const path = require("node:path");
       }
       assert.notEqual(await status.innerText(), "Use the arrow keys or direction buttons to begin.");
       await button("Move up").click();
+      assert(await page.locator("#board").evaluate(node => document.activeElement === node));
+      await page.keyboard.press("ArrowDown");
       await capture("2048");
       assert.deepEqual(errors, []);
       console.log(`${width}px: 7 previews, 6 local games, keyboard and overflow checks; index ${bytes} bytes`);

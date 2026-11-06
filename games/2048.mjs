@@ -58,7 +58,10 @@ function move(direction) {
 document.querySelector("#restart").addEventListener("click", start);
 document.querySelector("#actions").addEventListener("click", event => {
   const direction = event.target.closest("[data-direction]")?.dataset.direction;
-  if (direction) move(direction);
+  if (direction) {
+    move(direction);
+    boardElement.focus();
+  }
 });
 document.addEventListener("keydown", event => {
   const direction = {ArrowUp:"up", ArrowRight:"right", ArrowDown:"down", ArrowLeft:"left"}[event.key];

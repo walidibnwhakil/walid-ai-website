@@ -123,7 +123,7 @@ const dice = teams.map((team,teamId)=>{
 });
 const diePips=[[],[2],[0,4],[0,2,4],[0,1,3,4],[0,1,2,3,4],[0,1,3,4,5,6]];
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, soundEnabled=Boolean(restoredConfig?.sound);
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), soundEnabled=Boolean(restoredConfig?.sound);
 syncSoundControls();
 const initialColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:[0,1,2,3];
 let chosenColors=[...initialColors];
@@ -161,7 +161,7 @@ const game = gameShell({reset() {
   state=newLudo(count,activeTeams);
   applySeatColors();
   started=false;
-  locked=false; animationToken=null;
+  locked=false; animationToken=null; pendingCaptureSteps.clear();
   colorPicker.hidden=true;
   message = "";
   lastDice.fill(1);
@@ -280,6 +280,7 @@ async function play(index) {
   const move=result.lastMove;
   const delay=Number(document.querySelector("#settings-animation-speed").value)||145;
   const moving=[];
+  pendingCaptureSteps=new Map(result.lastCaptured.map(hit=>[`${hit.player}-${hit.token}`,hit.step]));
   if(move) {
     const steps=movementSteps(move.from,move.to);
     for(const step of steps) moving.push({player:move.player,token:move.token,step});
@@ -291,8 +292,10 @@ async function play(index) {
     animationToken=motion;
     render();
     await new Promise(resolve=>setTimeout(resolve,delay));
+    if(motion.step===-1)pendingCaptureSteps.delete(`${motion.player}-${motion.token}`);
   }
   animationToken=null;
+  pendingCaptureSteps.clear();
   locked=false;
   render();
 }
@@ -341,7 +344,8 @@ function render() {
     button.hidden=true;
     button.disabled=botTurn||locked||!legal.includes(index);
     button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===57?"home":"step "+(step+1)}`);
-    const visualStep=animationToken?.player===player&&animationToken?.token===index ? animationToken.step : step;
+    const tokenKey=`${player}-${index}`;
+    const visualStep=animationToken?.player===player&&animationToken?.token===index ? animationToken.step : pendingCaptureSteps.has(tokenKey)?pendingCaptureSteps.get(tokenKey):step;
     const tile=visualStep===-1 ? yards[teamId][index] : visualStep>=52 ? lanes[teamId][visualStep-52] : track[trackPosition(teamId,visualStep)];
     const square=squares.get(tile.join(","));
     const marker=document.createElement("span");
@@ -361,6 +365,7 @@ function render() {
     }
     square.append(marker);
   }));
+  game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
   state.ranks.forEach((rank,player)=>{
     if(!rank) return;
     const teamId=activeTeams[player];

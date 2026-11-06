@@ -219,3 +219,19 @@
 @media(prefers-reduced-motion:reduce) {
   .ludo-game .player-dice.active .die-face:not(:disabled){animation:none;}
 }
+
+/* Color selection is available from each player's header before the first roll. */
+.ludo-game .player-dice-label {
+  background:transparent;border:0;box-shadow:none;color:#fff8e9;
+  font:800 .83rem system-ui,sans-serif;cursor:pointer;padding:8px 3px;
+  text-shadow:0 1px 2px #0008;
+}
+.ludo-game .player-dice-label:disabled {opacity:.75;cursor:default;}
+.ludo-game .color-picker:not([hidden]) {
+  display:flex;gap:9px;flex-wrap:wrap;align-items:center;justify-content:center;
+  margin:10px auto;padding:12px;border:2px solid #e8bd6d;
+  border-radius:16px;background:#272044;color:#fff8dd;
+  font-family:system-ui,sans-serif;
+}
+.ludo-game .color-hint {text-align:center;font-size:.83rem;}
+@media(max-width:480px) {.ludo-game .player-dice-label{font-size:.67rem;}}

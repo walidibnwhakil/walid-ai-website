@@ -901,3 +901,10 @@ body.ludo-game {
 body.ludo-game::before {
   background:radial-gradient(ellipse at 50% 24%,#9b481b70,transparent 62%),repeating-linear-gradient(0deg,transparent 0 82px,#16080288 83px,#7a39174d 86px,transparent 91px),repeating-linear-gradient(2deg,transparent 0 12px,#ad642012 13px,#11060322 15px,transparent 19px)!important;
 }
+body.ludo-game #ludo-setup .brand-artwork {position:absolute;z-index:1;left:50%;top:0;transform:translateX(-50%);width:min(100%,720px);height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 5px 5px #170702)}
+body.ludo-game #ludo-setup .brand-lockup>.brand-laurel,body.ludo-game #ludo-setup .brand-lockup>.brand-die,body.ludo-game #ludo-setup .brand-lockup>.brand-crown {display:none}
+body.ludo-game #ludo-setup .menu-wordmark {z-index:2}
+body.ludo-game #ludo-setup .footer-artwork {position:absolute;z-index:1;left:0;bottom:0;width:100%;height:auto;pointer-events:none;filter:drop-shadow(0 5px 4px #160700)}
+body.ludo-game #ludo-setup .footer-pawns,body.ludo-game #ludo-setup .menu-footer-art>.footer-die {display:none}
+body.ludo-game #ludo-setup .footer-artwork {left:50%;width:min(95vw,840px);height:auto;transform:translateX(-50%)}
+@media(min-width:501px){body.ludo-game #ludo-setup .menu-footer-art{height:clamp(130px,18vw,174px)}}

@@ -59,3 +59,9 @@ test("an overshoot cannot enter or wrap past Home",()=>{
  let s=newLudo(2);s.pieces[0]=[56,57,57,57];
  s=rollLudo(s,2);assert.equal(s.turn,1);assert.equal(s.pieces[0][0],56);
 });
+
+test("a six with no legal pawn move passes the turn without a bonus",()=>{
+ let s=newLudo(2,[0,3]);s.pieces[0]=[52,53,54,55];
+ s=rollLudo(s,6);
+ assert.equal(s.turn,1);assert.equal(s.roll,0);assert.equal(s.sixChain,0);assert.deepEqual(legalTokens(s),[]);
+});

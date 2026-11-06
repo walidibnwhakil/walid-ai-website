@@ -34,7 +34,6 @@ export function rollLudo(state, roll) {
   const sixChain=roll===6 ? state.sixChain+1 : 0;
   const rolled={...state,roll,sixChain,threeSixes:false,lastCaptured:[],lastMove:null};
   if(legalTokens(rolled).length) return rolled;
-  if(roll===6) return {...rolled,roll:0};
   return {...rolled,turn:nextPlayer(rolled,state.turn),roll:0,sixChain:0};
 }
 

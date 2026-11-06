@@ -888,6 +888,7 @@ body.ludo-game .menu-colors-dialog select{width:100%;margin:4px 0 10px}
 body.ludo-game .menu-colors-dialog #menu-color-confirmation{min-height:1.3em;color:#ffdf82}
 body.ludo-game .rules-dialog .dialog-actions{display:flex;justify-content:flex-end;gap:10px}
 body.ludo-game .rules-dialog button{min-height:44px}
+body.ludo-game #ludo-setup .settings-dialog #online-coming{display:block;width:100%;min-height:48px;margin:12px 0}
 
 
 /* Let the portrait reference fill the viewport width at its native 960px design size. */

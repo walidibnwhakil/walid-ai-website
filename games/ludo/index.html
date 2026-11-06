@@ -12,9 +12,23 @@
 <body class="ludo-game">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
+    <section id="ludo-setup" class="ludo-setup">
+      <div class="setup-emblem" aria-hidden="true">🎲</div>
+      <h2>LUDU MAHIR</h2>
+      <p>Classic Ludo · Premium Board</p>
+      <p>Play with friends on one phone or challenge the bots.</p>
+      <div class="setup-options">
+        <label>Players <select id="setup-players"><option value="2">2 Players</option><option value="3">3 Players</option><option value="4">4 Players</option></select></label>
+        <label>Game Mode <select id="setup-mode"><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select></label>
+      </div>
+      <button id="start-game" type="button" class="start-game">Start Game</button>
+      <p class="setup-footnote">Color selection is optional. Tap a player header before the first roll.</p>
+    </section>
+    <section id="ludo-play" hidden>
+    <div class="play-toolbar"><button id="back-to-setup" type="button">← Setup</button><span>LUDU MAHIR</span><button id="full-screen" type="button">⛶ Full Screen</button></div>
     <h1>Ludu <small style="display:block;font-size:.38em;letter-spacing:.35em;margin-top:.1em">MAHIR</small></h1>
     <p>Roll a six to leave the yard. Capture rivals on open squares, use safe squares, and bring all four tokens home.</p>
-    <div class="controls">
+    <div class="controls game-settings">
       <label>Players <select id="player-count"><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option></select></label>
       <label>Mode <select id="mode"><option value="bot">Play against bots</option><option value="friend">Same-device friends</option><option value="mixed">Choose human/bot seats</option></select></label>
       <button id="restart" type="button">New game</button>
@@ -41,6 +55,7 @@
     </div>
     <div id="actions" class="controls"></div>
     <details class="rules"><summary>How to play</summary><p>Select 2, 3 or 4 seats, then choose bots, same-device friends or a mix. Roll a six to launch a token. Move by the exact die count; landing on an opponent on a regular square sends them to their yard. Star-marked safe squares protect tokens. A six or a capture grants another roll. Move all four tokens around the track and up your colored home lane; the first to finish all four wins.</p></details>
+    </section>
   </main>
 </body>
 </html>

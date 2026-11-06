@@ -266,3 +266,38 @@
 .ludo-game .player-dice {border-color:var(--custom-seat-color,#ffffff38);}
 .ludo-game .player-dice.active {background:color-mix(in srgb,var(--custom-seat-color) 23%,#191d46);}
 .ludo-game .color-picker option:disabled {color:#999;}
+
+/* Complete 15x15 classic board with four large colored home quadrants. */
+.ludo-game .board.ludo {position:relative;display:grid;grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));gap:0;touch-action:manipulation;}
+.ludo-game .board.ludo .home-base {border:3px solid #fff7d4;z-index:0;border-radius:0;box-shadow:inset 0 0 0 2px #0002;}
+.ludo-game .board.ludo .home-base.base-0 {background:var(--seat-0,#e83e4e);}
+.ludo-game .board.ludo .home-base.base-1 {background:var(--seat-1,#2588e8);}
+.ludo-game .board.ludo .home-base.base-2 {background:var(--seat-2,#27bf70);}
+.ludo-game .board.ludo .home-base.base-3 {background:var(--seat-3,#f2be30);}
+.ludo-game .board.ludo .home-diamond {
+  background:conic-gradient(from 45deg,var(--seat-3,#f2be30) 0 25%,var(--seat-1,#2588e8) 0 50%,var(--seat-0,#e83e4e) 0 75%,var(--seat-2,#27bf70) 0);
+  z-index:0;border:2px solid #fff5c6;
+}
+.ludo-game .board.ludo .track,.ludo-game .board.ludo .lane,.ludo-game .board.ludo .yard {z-index:1;}
+.ludo-game .board.ludo .yard {
+  background:#fffdf5!important;border-radius:50%;border:2px solid #e3cfa8;
+  box-shadow:0 1px 3px #0005;
+}
+.ludo-game .board.ludo .yard::after {display:none;}
+.ludo-game .board.ludo .lane.red {background:var(--seat-0)!important;}
+.ludo-game .board.ludo .lane.blue {background:var(--seat-1)!important;}
+.ludo-game .board.ludo .lane.green {background:var(--seat-2)!important;}
+.ludo-game .board.ludo .lane.yellow {background:var(--seat-3)!important;}
+.ludo-game .board.ludo .home-center {background:transparent!important;border:0;z-index:2;}
+.ludo-game .board.ludo .track.safe::before {content:"★";color:#fff;font-size:clamp(11px,3vw,22px);}
+.ludo-game main {width:100%;max-width:800px;}
+@media(max-width:600px) {
+ .ludo-game main {padding:8px!important;}
+ .ludo-game h1 {font-size:clamp(1.5rem,7vw,2.3rem);margin:3px 0 5px;}
+ .ludo-game main>p:not(#status):not(.color-hint),.ludo-game .rules {display:none;}
+ .ludo-game .controls {margin:4px 0;}
+ .ludo-game .ludo-stage {width:100%;margin:3px auto;}
+ .ludo-game .board.ludo {width:100%;aspect-ratio:1;padding:4px;border-width:4px;border-radius:9px;}
+ .ludo-game .color-hint {margin:3px 0;font-size:.68rem;}
+ .ludo-game #status {margin:4px auto;font-size:.82rem;}
+}

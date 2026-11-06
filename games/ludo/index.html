@@ -8,6 +8,20 @@
   <link rel="stylesheet" href="../arcade.css?v=20261106setup1">
   <link rel="stylesheet" href="./ludo.css?v=20261106setup1">
   <script type="module" src="../ludo.mjs?v=20261106setup1"></script>
+<style>
+body.ludo-game:not(.playing-ludo){background:radial-gradient(circle at 50% 20%,#39245d 0%,#17142e 70%)!important;color:#fff7dc}
+.ludo-game [hidden]{display:none!important}
+.ludo-game #ludo-setup{box-sizing:border-box;min-height:calc(100dvh - 110px);max-width:620px;margin:20px auto;padding:32px 26px;border:2px solid #e5b85e;border-radius:28px;background:linear-gradient(155deg,#39285c,#1c1735 65%,#151b35);box-shadow:0 16px 55px #0007, inset 0 0 45px #f8c87014;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.ludo-game #ludo-setup .setup-emblem{font-size:80px;line-height:1;filter:drop-shadow(0 7px 7px #0008)}
+.ludo-game #ludo-setup h2{font-family:Georgia,serif;color:#f9cf74;font-size:clamp(2.1rem,7vw,3.7rem);letter-spacing:.09em;margin:0;text-shadow:0 3px 5px #0008}
+.ludo-game #ludo-setup p{color:#e9d9b8;margin:0;font-size:1rem}
+.ludo-game #ludo-setup .setup-options{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:470px;margin:16px 0 8px}
+.ludo-game #ludo-setup label{display:flex;flex-direction:column;gap:8px;text-align:left;color:#ffdf9d;font-weight:700}
+.ludo-game #ludo-setup select{width:100%;box-sizing:border-box;padding:14px 10px;border:1px solid #d8b978;border-radius:13px;background:#fff4dc;color:#30243c;font-size:1rem}
+.ludo-game #ludo-setup #start-game{width:100%;max-width:470px;min-height:62px;border-radius:16px;border:2px solid #ffe3a0;background:linear-gradient(135deg,#ffe7a7,#d59a37);color:#2b2040;font-size:1.3rem;font-weight:900;box-shadow:0 6px 0 #8c622d,0 10px 24px #0006;cursor:pointer}
+.ludo-game #ludo-setup .setup-footnote{font-size:.83rem;color:#cbbad6}
+@media(max-width:540px){.ludo-game #ludo-setup{min-height:calc(100dvh - 90px);margin:8px auto;padding:24px 18px}.ludo-game #ludo-setup .setup-options{grid-template-columns:1fr}.ludo-game #ludo-setup .setup-emblem{font-size:64px}}
+</style>
 </head>
 <body class="ludo-game">
   <main>

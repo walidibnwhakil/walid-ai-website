@@ -1,0 +1,66 @@
+.neon-game {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 18%, #17213c 0, #0b1020 48%, #070a12 100%);
+  color: #eff3ff;
+  color-scheme: dark;
+}
+.neon-game main { max-width: 620px; }
+.neon-game nav { color: #aebbd7; }
+.neon-game nav a { color: #b9c8ee; }
+.neon-game h1 { margin-top: clamp(24px, 8vh, 68px); font-size: clamp(2rem, 8vw, 3.25rem); letter-spacing: -.045em; }
+.neon-game main > p:not(#status) { color: #b6c0d7; }
+.neon-game .controls { gap: 10px; }
+.neon-game button, .neon-game select {
+  color: #f1f5ff;
+  background: #171f33;
+  border: 1px solid #43516d;
+  border-radius: 12px;
+}
+.neon-game button:hover:not(:disabled) { background: #202b45; border-color: #7183ad; }
+.neon-game :focus-visible { outline-color: #f46ddc; }
+.neon-game #status { color: #e3eaff; min-height: 1.8em; }
+.neon-game .ttt {
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, 420px);
+  margin: 16px auto 24px;
+  padding: 10px;
+  gap: 9px;
+  border: 1px solid #33415f;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #131b2e, #0c1220);
+  box-shadow: 0 20px 55px #0008, inset 0 1px #ffffff12;
+}
+.neon-game .ttt .square {
+  position: relative;
+  z-index: 0;
+  border: 1px solid #26334c;
+  border-radius: 16px;
+  background: #0c1322;
+  font-size: clamp(3.1rem, 18vw, 6rem);
+  font-family: ui-rounded, system-ui, sans-serif;
+  font-weight: 750;
+  line-height: 1;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.neon-game .ttt .square:not(:disabled):hover { background: #141e32; border-color: #526384; }
+.neon-game .ttt .square[data-mark="X"] { color: #53d8ff; text-shadow: 0 0 10px #3ecbff88, 0 0 28px #13b9ff66; }
+.neon-game .ttt .square[data-mark="O"] { color: #ff67dc; text-shadow: 0 0 10px #ff5bd988, 0 0 28px #fa3db666; }
+.neon-game .ttt .square[data-mark="X"], .neon-game .ttt .square[data-mark="O"] { animation: mark-in .2s cubic-bezier(.2,.8,.2,1.2) both; }
+.neon-game .ttt .square[data-winning="true"] { background: #17263c; border-color: #8a9fca; }
+.neon-game .win-line { position: absolute; z-index: 2; inset: 10px; width: calc(100% - 20px); height: calc(100% - 20px); pointer-events: none; overflow: visible; }
+.neon-game .win-line line { stroke: #fff; stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 12px #b6d8ff); stroke-dasharray: 500; stroke-dashoffset: 500; }
+.neon-game .win-line.draw line { animation: draw-win .45s ease-out forwards; }
+.neon-game .win-line[hidden] { display: none; }
+.neon-game .rules { color: #bac5dd; border-top: 1px solid #27334c; padding-top: 14px; }
+.neon-game .rules summary { width: fit-content; min-height: 44px; display: flex; align-items: center; cursor: pointer; color: #d9e2f8; }
+.neon-game .rules p { max-width: 58ch; }
+@keyframes mark-in { from { transform: scale(.55); opacity: .3; } to { transform: scale(1); opacity: 1; } }
+@keyframes draw-win { to { stroke-dashoffset: 0; } }
+@media (max-width: 360px) {
+  .neon-game .ttt { padding: 7px; gap: 6px; border-radius: 19px; }
+  .neon-game .ttt .square { border-radius: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .neon-game *, .neon-game *::before, .neon-game *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}

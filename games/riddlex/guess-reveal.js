@@ -1,5 +1,6 @@
 import {localPhotoPath} from './print-photo.js?v=arcade';
 import {makeHandwriting} from './handwriting.js?v=desk-reveal';
+import {loadRevealImage} from './learning-client.js?v=learn1';
 
 const clamp = value => Math.max(0, Math.min(1, value));
 const ease = value => {
@@ -125,7 +126,9 @@ export function createGuessReveal(office) {
    return;
   }
   const path = localPhotoPath(entry);
-  const picture = path ? loadImage(path).catch(() => null) : Promise.resolve(null);
+  const picture = entry.imageAvailable || entry.image?.data
+   ? loadRevealImage(entry).then(image=>image?loadImage(image).catch(()=>null):null).catch(()=>path?loadImage(path).catch(()=>null):null)
+   : path ? loadImage(path).catch(() => null) : Promise.resolve(null);
   const approved = file => loadImage('./images/approved/' + file + '.png').catch(() => null);
   assets ??= Promise.all(['writing-arm', 'reaching-arm'].map(approved));
   Promise.all([picture, assets]).then(([photo, [writing, reaching]]) => {

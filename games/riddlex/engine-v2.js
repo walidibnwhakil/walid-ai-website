@@ -160,8 +160,8 @@ function questionOrder(seed,key,step){
  return (hash^(hash>>>13))>>>0;
 }
 
-export function nextQuestion(ranked,answers,questions,seed){
- if(!ranked.length||answers.length>=8&&answers.every(({value})=>value==='unknown'))return null;
+export function nextQuestion(ranked,answers,questions,seed,allowUnknownProbe=false){
+ if(!ranked.length||!allowUnknownProbe&&answers.length>=8&&answers.every(({value})=>value==='unknown'))return null;
  const bank=questionBank(questions,answers),counts=new Map();
  const route=routeFor(answers);
  const hint=route??routeFor(answers,'probably');

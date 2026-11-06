@@ -1,3 +1,4 @@
+import {loadLearned} from './learning-client.js?v=learn1';
 // Only this small module loads at startup. Category selection fetches bounded shards.
 const base=new URL('./runtime/',import.meta.url);
 const politicalClues={
@@ -47,6 +48,8 @@ function addPoliticalClues(entries,questions){
 }
 
 let manifestPromise;const cache=new Map();
+if(window.firebase?.apps?.length)window.firebase.auth().onAuthStateChanged(()=>cache.clear());
+export function clearRuntimeCache(){cache.clear();}
 async function json(path){const r=await fetch(new URL(path,base));if(!r.ok)throw Error('Knowledge unavailable ('+r.status+')');return r.json();}
 export async function manifest(){return manifestPromise??=json('manifest.json').catch(e=>{manifestPromise=null;throw e;});}
 export async function loadCategory(category){
@@ -62,6 +65,8 @@ export async function loadCategory(category){
   }
   if(entries.length!==spec.count||new Set(entries.map(e=>e.id)).size!==entries.length)throw Error('Invalid knowledge shards');
   if(category==='characters')addPoliticalClues(entries,questions);
+  const localIds=new Set(entries.map(entry=>entry.id));
+  for(const entry of await loadLearned(category))if(!localIds.has(entry.id)){entries.push(entry);localIds.add(entry.id);}
   return {entries,questions,bangla};
  })();
  cache.clear();cache.set(category,promise);

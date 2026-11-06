@@ -1,8 +1,8 @@
 {
   "updated": "2026-11-06",
-  "productionBaseline": "bf8d21cc7d587555b8c5febf0ec7ee5a747d2c6a",
+  "productionBaseline": "48928b0565bc0275f6aa4fb203729e80ee04101f",
   "releases": [
-    {"game":"ludo","url":"https://walid-ai.com/games/ludo/","state":"released","redesign":"released-pr-9-merge-cb67e7e","liveVerification":"HTTP 200; Chromium 320/1280 verified 2/3/4 seats, friend/mixed/bot movement, CSS and no overflow/errors"},
+    {"game":"ludo","url":"https://walid-ai.com/games/ludo/","state":"released","redesign":"touch-first-addendum-pr-12-merge-48928b0","liveVerification":"HTTP 200; Chromium 390/1280 verified dotted die, launch and direct token movement, board fit and no page errors"},
     {"game":"chess","url":"https://walid-ai.com/games/chess/","state":"released","redesign":"released-pr-11-merge-bf8d21c","liveVerification":"Chromium at 320/1280: wood theme, bot/friend, capture, history, checkmate and no overflow/errors"},
     {"game":"football-penalty","url":"https://walid-ai.com/games/penalty/","state":"released","redesign":"pending"},
     {"game":"tic-tac-toe","url":"https://walid-ai.com/games/tic-tac-toe/","state":"released","redesign":"released-pr-6-merge-cbcc572","liveVerification":"HTTP 200; Chromium 320/1280 passed CSS, bot, friend, line, overflow and page-error checks"},
@@ -19,7 +19,7 @@
   },
   "riddlexLearning": {"state":"not implemented","privateSubmissions":"not persisted","globalModeration":"not implemented","safeImageUpload":"not implemented","approvedEntityIngestion":"not implemented","productionReleaseAllowed":false},
   "addendum": {
-    "ludoTouchFirst": {"state":"implemented-local-gates-pass-deployment-pending","acceptance":["on-board graphical pip die","tap-to-roll with animation lock","automatic move for one legal token","direct token tap when multiple","square-by-square animation","animated bots","winner overlay"],"unitTests":"5/5 rule tests pass","chromiumWidths":[320,360,390,768,1280],"browserRegression":"touch taps on die/token; six-dot die; animation lock; direct choice; automatic sole move; bot movement; 2/3/4 players; complete winner/replay; all game routes/previews; no overflow or page errors","visualInspection":[390,1280],"state":"verified-pending-release"},
+    "ludoTouchFirst": {"state":"released-and-live-verified","acceptance":["on-board graphical pip die","tap-to-roll with animation lock","automatic move for one legal token","direct token tap when multiple","square-by-square animation","animated bots","winner overlay"],"unitTests":"5/5 rule tests pass","chromiumWidths":[320,360,390,768,1280],"browserRegression":"touch taps on die/token; six-dot die; animation lock; direct choice; automatic sole move; bot movement; 2/3/4 players; complete winner/replay; all game routes/previews; no overflow or page errors","visualInspection":[390,1280],"pullRequest":12,"mergeCommit":"48928b0565bc0275f6aa4fb203729e80ee04101f","productionLiveChromiumWidths":[390,1280],"state":"released-and-live-verified"},
     "snakeTouchFirst": {"state":"pending","acceptance":["touch swipe","arrows and WASD","accessible optional D-pad","anti-reverse","food/eat/collision","pause/resume/restart","prevent page scroll"]}
   },
   "pendingGames": ["carrom-rules-research","checkers","sudoku","memory","connect-four","solitaire"],

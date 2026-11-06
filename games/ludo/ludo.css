@@ -908,3 +908,18 @@ body.ludo-game #ludo-setup .footer-artwork {position:absolute;z-index:1;left:0;b
 body.ludo-game #ludo-setup .footer-pawns,body.ludo-game #ludo-setup .menu-footer-art>.footer-die {display:none}
 body.ludo-game #ludo-setup .footer-artwork {left:50%;width:min(95vw,840px);height:auto;transform:translateX(-50%)}
 @media(min-width:501px){body.ludo-game #ludo-setup .menu-footer-art{height:clamp(130px,18vw,174px)}}
+body.ludo-game #ludo-setup[hidden],body.ludo-game #ludo-play[hidden]{display:none!important}
+body.ludo-game .board.ludo .home-base.inactive-home{background:linear-gradient(145deg,#faf4e5,#e9ddc4)!important;border-color:#a98a5d}
+body.ludo-game .board.ludo .yard.inactive-yard{display:none!important}
+body.ludo-game .board.ludo .lane.inactive-lane{background:linear-gradient(145deg,#fffef7,#e9dfcb)!important}
+body.ludo-game .ludo-stage{grid-template-areas:"red green" "board board" "blue yellow";max-width:min(100%,940px);width:100%}
+body.ludo-game .board.ludo{width:min(100%,900px)}
+body.ludo-game .player-dice-label{display:flex;flex:1 1 auto;min-width:0;min-height:48px;align-items:center;justify-content:center;gap:6px;padding:4px 7px!important;border:2px solid var(--custom-seat-color,#d7a84d)!important;border-radius:999px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--custom-seat-color,#895329) 74%,#fff2),#32170d)!important;color:#fff5e4!important;font-size:clamp(.72rem,2vw,1rem);text-align:center;text-shadow:0 2px 2px #280e05}
+body.ludo-game .player-dice-label::before{display:none}
+body.ludo-game .player-avatar{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border:3px solid #f5d27a;border-radius:50%;background:radial-gradient(circle at 35% 24%,#a7754d,#422014 72%);box-shadow:0 2px 5px #160700,inset 0 1px #fff9}
+body.ludo-game .player-avatar svg{display:block;width:80%;height:80%;filter:drop-shadow(0 1px 1px #200d06)}
+body.ludo-game .yard-celebration.red{left:3%;right:auto;top:3%;bottom:auto}
+body.ludo-game .yard-celebration.green{left:auto;right:3%;top:3%;bottom:auto}
+body.ludo-game .yard-celebration.blue{left:3%;right:auto;top:auto;bottom:3%}
+body.ludo-game .yard-celebration.yellow{left:auto;right:3%;top:auto;bottom:3%}
+@media(max-width:620px){body.ludo-game .player-dice-label{gap:4px;padding:3px!important;font-size:.66rem}body.ludo-game .player-avatar{width:34px;height:34px;border-width:2px}body.ludo-game .player-dice{gap:4px;padding:3px}}

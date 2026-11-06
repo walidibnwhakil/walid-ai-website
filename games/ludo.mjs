@@ -3,6 +3,18 @@ import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementS
 
 const teams = ["Red", "Blue", "Green", "Yellow"];
 const setupScreen=document.querySelector("#ludo-setup");
+const restoredConfig=(()=>{try{return JSON.parse(sessionStorage.getItem("ludu-mahir-game")||"null")}catch{return null}})();
+const boardLaunch=new URLSearchParams(location.search).get("screen")==="board";
+if(restoredConfig){
+ if(["2","3","4"].includes(String(restoredConfig.players))){
+  document.querySelector("#setup-players").value=String(restoredConfig.players);
+  document.querySelector("#player-count").value=String(restoredConfig.players);
+ }
+ if(["bot","friend","mixed"].includes(restoredConfig.mode)){
+  document.querySelector("#setup-mode").value=restoredConfig.mode;
+  document.querySelector("#mode").value=restoredConfig.mode;
+ }
+}
 for(const [groupId,selectId] of [["mode-buttons","setup-mode"],["player-buttons","setup-players"]]){
  const group=document.getElementById(groupId),select=document.getElementById(selectId);
  group.addEventListener("click",event=>{
@@ -12,6 +24,10 @@ for(const [groupId,selectId] of [["mode-buttons","setup-mode"],["player-buttons"
   group.querySelectorAll("button[data-value]").forEach(item=>{
    const chosen=item===button;item.classList.toggle("selected",chosen);item.setAttribute("aria-pressed",String(chosen));
   });
+ });
+ group.querySelectorAll("button[data-value]").forEach(button=>{
+  const selected=button.dataset.value===select.value;
+  button.classList.toggle("selected",selected);button.setAttribute("aria-pressed",String(selected));
  });
 }
 document.getElementById("setup-rules").addEventListener("click",()=>document.getElementById("rules-dialog").showModal());
@@ -24,22 +40,20 @@ document.getElementById("close-menu-colors").addEventListener("click",()=>docume
 document.getElementById("online-coming").addEventListener("click",()=>document.getElementById("notice-dialog").showModal());
 document.getElementById("close-notice").addEventListener("click",()=>document.getElementById("notice-dialog").close());
 const playScreen=document.querySelector("#ludo-play");
-document.querySelector("#start-game").addEventListener("click",()=>{
-  document.querySelector("#player-count").value=document.querySelector("#setup-players").value;
-  document.querySelector("#mode").value=document.querySelector("#setup-mode").value;
+if(boardLaunch){
   setupScreen.hidden=true;
   playScreen.hidden=false;
   document.body.classList.add("playing-ludo");
-  game.restart();
-  window.scrollTo(0,0);
+}
+document.querySelector("#start-game").addEventListener("click",()=>{
+  document.querySelector("#player-count").value=document.querySelector("#setup-players").value;
+  document.querySelector("#mode").value=document.querySelector("#setup-mode").value;
+  sessionStorage.setItem("ludu-mahir-game",JSON.stringify({players:document.querySelector("#setup-players").value,mode:document.querySelector("#setup-mode").value,colors:chosenColors,sound:soundEnabled}));
+  location.assign(location.pathname+"?screen=board");
 });
 document.querySelector("#back-to-setup").addEventListener("click",()=>{
-  document.body.classList.remove("playing-ludo");
-  playScreen.hidden=true;
-  setupScreen.hidden=false;
-  colorPicker.hidden=true;
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-  window.scrollTo(0,0);
+  location.assign(location.pathname);
 });
 document.querySelector("#menu-sound").addEventListener("click",()=>{soundEnabled=!soundEnabled;syncSoundControls();});
 document.querySelector("#settings-sound").addEventListener("change",event=>{soundEnabled=event.currentTarget.checked;syncSoundControls();});
@@ -109,8 +123,9 @@ const dice = teams.map((team,teamId)=>{
 });
 const diePips=[[],[[2]],[[0,4]],[[0,2,4]],[[0,1,3,4]],[[0,1,2,3,4]],[[0,1,3,4,5,6]]];
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, soundEnabled=false;
-let chosenColors=[0,1,2,3];
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, soundEnabled=Boolean(restoredConfig?.sound);
+const initialColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:[0,1,2,3];
+let chosenColors=[...initialColors];
 const getColor=seat=>palette[chosenColors[seat]];
 const colorPicker=document.querySelector("#color-picker");
 const colorSeat=document.querySelector("#color-seat");
@@ -159,6 +174,7 @@ const squares = new Map();
 for(const [seat,area] of [[0,"1 / 1 / 7 / 7"],[1,"10 / 1 / 16 / 7"],[2,"1 / 10 / 7 / 16"],[3,"10 / 10 / 16 / 16"]]) {
   const base=document.createElement("div");
   base.className=`home-base base-${seat}`;
+  base.dataset.seat=String(seat);
   base.style.gridArea=area;
   game.board.append(base);
 }
@@ -173,7 +189,7 @@ track.forEach(([row,column],index) => {
 });
 for (let player=0;player<4;player++) {
   lanes[player].forEach(([row,column],index)=>addSquare(row,column,`lane ${teams[player].toLowerCase()} lane-${player} lane-step-${index}`));
-  yards[player].forEach(([row,column])=>addSquare(row,column,`yard ${teams[player].toLowerCase()}`));
+  yards[player].forEach(([row,column])=>addSquare(row,column,`yard yard-seat-${player} ${teams[player].toLowerCase()}`));
 }
 addSquare(7,7,"home-center");
 function addSquare(row,column,kind) {
@@ -279,15 +295,29 @@ async function play(index) {
 function render() {
   const botTurn=isBot(state.turn)&&state.winner===null;
   const legal=legalTokens(state);
+  for(let seat=0;seat<4;seat++){
+    const enabled=activeTeams.includes(seat);
+    const base=game.board.querySelector(`.base-${seat}`);
+    base.classList.toggle("inactive-home",!enabled);
+    game.board.querySelectorAll(`.yard-seat-${seat}`).forEach(tile=>tile.classList.toggle("inactive-yard",!enabled));
+    game.board.querySelectorAll(`.lane-${seat}`).forEach(tile=>tile.classList.toggle("inactive-lane",!enabled));
+  }
   dice.forEach((button,teamId)=>{
     const seat=activeTeams.indexOf(teamId);
     const container=button.closest(".player-dice");
     const label=container.querySelector(".player-dice-label");
-    label.textContent=seat<0?teams[teamId]:`Player ${seat+1} · ${getColor(seat)[0]}`;
+    label.replaceChildren();
+    const avatar=document.createElement("span");
+    avatar.className="player-avatar";
+    avatar.innerHTML='<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="16" r="9" fill="#f4e5d2"/><path d="M7 42v-5q0-12 17-12t17 12v5z" fill="#eee0cd"/></svg>';
+    const playerName=document.createElement("span");
+    playerName.textContent=seat<0?teams[teamId]:`Player ${seat+1} · ${getColor(seat)[0]}`;
+    label.append(avatar,playerName);
     label.disabled=started||seat<0;
     label.setAttribute("aria-label",`Choose color for player ${seat+1}`);
     label.onclick=()=>showColorPicker(seat);
     const enabled=activeTeams.includes(teamId);
+    container.hidden=!enabled;
     const active=enabled && activeTeams[state.turn]===teamId && state.winner===null;
     button.closest(".player-dice").classList.toggle("active",active);
     button.closest(".player-dice").classList.toggle("inactive-seat",!enabled);

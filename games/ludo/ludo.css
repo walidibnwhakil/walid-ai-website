@@ -506,3 +506,59 @@ body.ludo-game #ludo-setup .art-cross{position:absolute;inset:34%;background:con
 body.ludo-game #ludo-setup .mahir-hero p{position:relative;z-index:2;background:#2b160c77;padding:3px 7px;border-radius:8px;}
 @media(max-width:480px){body.ludo-game #ludo-setup .mahir-board-art{width:90px;right:0;bottom:45px;opacity:.65}body.ludo-game #ludo-setup .mahir-hero{min-height:285px}}
 
+
+/* Ludu Mahir setup polish — isolated from the site's own header and sidebar. */
+body.ludo-game #ludo-setup.ludo-setup{
+  padding:clamp(10px,2.4vw,20px);
+  background:linear-gradient(135deg,#4c2b1b 0%,#2b1714 52%,#1b1011 100%);
+  border:2px solid #bc8a55;box-shadow:inset 0 0 0 6px #e7ac5820,0 15px 38px #0009;
+}
+body.ludo-game #ludo-setup .mahir-hero{
+  min-height:clamp(230px,35vw,345px);padding:14px 12px 8px;
+  background:radial-gradient(ellipse at 50% 36%,#a55b2688,transparent 66%);
+  overflow:visible;isolation:isolate;
+}
+body.ludo-game #ludo-setup .mahir-crown{
+  height:clamp(48px,7vw,70px);filter:drop-shadow(0 5px 0 #63300f) drop-shadow(0 10px 8px #0009);
+}
+body.ludo-game #ludo-setup .mahir-crown svg{height:100%;width:auto;}
+body.ludo-game #ludo-setup .mahir-logo{
+  font-size:clamp(3.6rem,10vw,6.5rem);letter-spacing:-.055em;
+  transform:rotate(-3deg);line-height:.75;
+  text-shadow:1px 1px 0 #fff1bb,3px 4px 0 #b87936,5px 7px 0 #623015,8px 12px 9px #000c;
+}
+body.ludo-game #ludo-setup .mahir-logo strong{
+  font-size:.7em;letter-spacing:-.03em;
+  text-shadow:1px 1px 0 #fff6db,3px 4px 0 #a66a37,5px 7px 0 #5c2b17,7px 11px 8px #000b;
+}
+body.ludo-game #ludo-setup .mahir-illustration{height:64px;margin-top:14px;gap:clamp(6px,1.5vw,15px);}
+body.ludo-game #ludo-setup .ludo-pawn{height:46px;transform:scale(.95);}
+body.ludo-game #ludo-setup .mahir-die{
+  display:grid;place-items:center;width:39px;height:39px;font-size:2.2rem;
+  color:#fff5df;background:linear-gradient(140deg,#e7caa1,#a8784b);
+  border:2px solid #fff1cf;border-radius:9px;
+  box-shadow:3px 4px 0 #56321d,5px 7px 9px #0009;
+}
+body.ludo-game #ludo-setup .mahir-board-art{
+  width:clamp(85px,17vw,130px);right:0;bottom:28px;
+  transform:perspective(300px) rotateX(22deg) rotateZ(13deg);
+  opacity:.88;z-index:0;pointer-events:none;
+}
+body.ludo-game #ludo-setup .mahir-hero p{
+  margin:10px 0 0;max-width:75%;font-size:clamp(.7rem,1.7vw,.92rem);
+  position:relative;z-index:2;
+}
+body.ludo-game #ludo-setup .mahir-settings{margin-top:5px;max-width:650px;}
+body.ludo-game #ludo-setup .mahir-choice button{min-height:46px;border-radius:12px;}
+body.ludo-game #ludo-setup .start-game{margin:14px auto 13px;}
+@media(max-width:600px){
+ body.ludo-game #ludo-setup .mahir-hero{min-height:265px;padding:8px 3px 5px;}
+ body.ludo-game #ludo-setup .mahir-logo{font-size:clamp(3.1rem,13vw,5rem);}
+ body.ludo-game #ludo-setup .mahir-board-art{width:72px;right:-3px;bottom:43px;opacity:.55;}
+ body.ludo-game #ludo-setup .mahir-hero p{max-width:85%;padding:3px 4px;}
+ body.ludo-game #ludo-setup .mahir-illustration{gap:6px;margin-top:12px;}
+ body.ludo-game #ludo-setup .mahir-die{width:30px;height:30px;font-size:1.6rem;}
+ body.ludo-game #ludo-setup .ludo-pawn{width:25px;height:43px;}
+ body.ludo-game #ludo-setup .mahir-settings{padding:10px;}
+ body.ludo-game #ludo-setup .mahir-choice button{font-size:clamp(.68rem,2.6vw,.83rem);}
+}

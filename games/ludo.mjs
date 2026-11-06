@@ -16,9 +16,9 @@ const lanes = [
 ];
 const yards = [
   Array.from({length:4},(_,i)=>[2+(i>>1),2+i%2]),
-  Array.from({length:4},(_,i)=>[11+(i>>1),11+i%2]),
+  Array.from({length:4},(_,i)=>[11+(i>>1),2+i%2]),
   Array.from({length:4},(_,i)=>[2+(i>>1),11+i%2]),
-  Array.from({length:4},(_,i)=>[11+(i>>1),2+i%2])
+  Array.from({length:4},(_,i)=>[11+(i>>1),11+i%2])
 ];
 const track = starts;
 const entrySquares=new Map([[0,0],[13,2],[26,3],[39,1]]);
@@ -148,6 +148,7 @@ playerSelect.addEventListener("change",game.restart);
 
 function throwDie() {
   const player=state.turn;
+  if(state.roll || state.winner!==null) return;
   started=true;
   const rolled=1+Math.floor(Math.random()*6);
   const teamId=activeTeams[player];
@@ -156,7 +157,7 @@ function throwDie() {
   face.classList.remove("rolling");
   requestAnimationFrame(()=>face.classList.add("rolling"));
   state=rollLudo(state,rolled);
-  message=`${teams[activeTeams[player]]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
+  message=`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
   render();
 }
 
@@ -167,6 +168,7 @@ const tokenControls=Array.from({length:4},(_,player)=>Array.from({length:4},(_,i
   return button;
 }));
 function play(index) {
+  if(!legalTokens(state).includes(index)) return;
   const previous=state.pieces.map(team=>team.slice());
   state=moveLudo(state,index);
   motions=new Map();
@@ -236,7 +238,7 @@ function render() {
   const currentTeam=getColor(state.turn)[0];
 
   game.status.dataset.turn=teams[activeTeams[state.turn]].toLowerCase();
-  game.status.textContent=message+(state.winner!==null?`${teams[activeTeams[state.winner]]} wins!`
+  game.status.textContent=message+(state.winner!==null?`${getColor(state.winner)[0]} wins!`
     :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);
   if(state.winner===null && state.roll>0 && legal.length===1) {
     game.later(()=>play(legal[0]), 420);

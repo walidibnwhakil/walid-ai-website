@@ -506,20 +506,3 @@ body.ludo-game #ludo-setup .art-cross{position:absolute;inset:34%;background:con
 body.ludo-game #ludo-setup .mahir-hero p{position:relative;z-index:2;background:#2b160c77;padding:3px 7px;border-radius:8px;}
 @media(max-width:480px){body.ludo-game #ludo-setup .mahir-board-art{width:90px;right:0;bottom:45px;opacity:.65}body.ludo-game #ludo-setup .mahir-hero{min-height:285px}}
 
-/* Walid AI shared visual identity for the game route */
-body.ludo-game{position:relative;isolation:isolate;}
-body.ludo-game:before{content:"";position:fixed;z-index:-1;inset:0;background:radial-gradient(circle at 15% 75%,#274b4d,#0b1a2b 65%);pointer-events:none;}
-body.ludo-game:after{content:"";position:fixed;z-index:-1;width:min(65vw,480px);aspect-ratio:1;right:-12%;bottom:-12%;background:url("/kathgolap-logo.png") center/contain no-repeat;opacity:.13;pointer-events:none;}
-body.ludo-game .walid-game-header{position:relative;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:8px 20px;background:linear-gradient(100deg,#101c2a,#1d2b35);border-bottom:1px solid #d5b37355;color:#fff4d7;}
-body.ludo-game .walid-game-header a{color:#fff1d0;text-decoration:none;font-weight:700;}
-body.ludo-game .walid-game-brand{display:flex;align-items:center;gap:8px;font-family:Georgia,serif;font-size:1.3rem;}
-body.ludo-game .walid-game-brand img{width:34px;height:34px;object-fit:contain;}
-body.ludo-game .bd-flag{font-size:1.25rem;}
-body.ludo-game .walid-game-sidebar{position:fixed;z-index:3;top:64px;left:0;bottom:0;width:190px;padding:18px 12px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(#101f2d,#102a32);border-right:1px solid #c9a76b44;}
-body.ludo-game .walid-game-sidebar a{color:#e8e4e8;text-decoration:none;padding:10px 12px;border-radius:10px;}
-body.ludo-game .walid-game-sidebar a.active{background:linear-gradient(120deg,#7642b2,#40206d);color:white;}
-body.ludo-game .walid-game-sidebrand{display:flex;align-items:center;gap:8px;font-family:Georgia,serif;font-weight:800;}
-body.ludo-game .walid-game-sidebrand img{width:30px;height:30px;object-fit:contain;}
-body.ludo-game main{margin-left:190px;max-width:none!important;width:auto!important;padding:18px clamp(10px,3vw,28px);}
-body.ludo-game main>nav{max-width:750px!important;}
-@media(max-width:760px){body.ludo-game .walid-game-sidebar{display:none;}body.ludo-game main{margin-left:0;padding:10px;}body.ludo-game .walid-game-header{min-height:54px;padding:7px 13px;}body.ludo-game .walid-game-brand{font-size:1.1rem;}body.ludo-game .walid-game-brand img{width:29px;height:29px;}}

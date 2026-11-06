@@ -2,6 +2,11 @@ import {gameShell, control, choose} from "./shell.mjs";
 import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe} from "./ludo-rules.mjs";
 
 const teams = ["Red", "Blue", "Green", "Yellow"];
+const palette = [
+  ["Red","#e83e4e"],["Blue","#2588e8"],["Green","#27bf70"],["Yellow","#f2be30"],
+  ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"],
+  ["Cyan","#30c9ed"],["Lime","#9bd63d"],["Maroon","#a93455"],["Brown","#a76a3b"]
+];
 const starts = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const lanes = [
   Array.from({length:6},(_,i)=>[7,i+1]),
@@ -16,7 +21,7 @@ const yards = [
   Array.from({length:4},(_,i)=>[11+(i>>1),2+i%2])
 ];
 const track = starts;
-const entrySquares=new Map([[0,"red"],[13,"green"],[26,"yellow"],[39,"blue"]]);
+const entrySquares=new Map([[0,0],[13,2],[26,3],[39,1]]);
 const playerSelect = document.querySelector("#player-count");
 const modeSelect = document.querySelector("#mode");
 const seatOptions = document.querySelector("#seat-options");
@@ -39,6 +44,7 @@ const dieSymbols=["⚀","⚁","⚂","⚃","⚄","⚅"];
 const lastDice=[1,1,1,1];
 let activeTeams, state, message, seatBots = [], motions = new Map(), started=false;
 let chosenColors=[0,1,2,3];
+const getColor=seat=>palette[chosenColors[seat]];
 const colorPicker=document.querySelector("#color-picker");
 const colorSeat=document.querySelector("#color-seat");
 const colorChoice=document.querySelector("#color-choice");
@@ -46,8 +52,7 @@ document.querySelector("#color-cancel").addEventListener("click",()=>colorPicker
 document.querySelector("#color-apply").addEventListener("click",()=>{
   const seat=Number(colorSeat.value), wanted=Number(colorChoice.value);
   if(started || seat>=activeTeams.length) return;
-  const other=chosenColors.indexOf(wanted);
-  if(other!==-1 && other!==seat) chosenColors[other]=chosenColors[seat];
+  if(chosenColors.some((color,index)=>index!==seat && index<activeTeams.length && color===wanted)) return;
   chosenColors[seat]=wanted;
   colorPicker.hidden=true;
   game.restart();
@@ -55,14 +60,23 @@ document.querySelector("#color-apply").addEventListener("click",()=>{
 function showColorPicker(seat) {
   if(started || seat<0 || seat>=activeTeams.length) return;
   colorSeat.value=String(seat);
+  colorChoice.replaceChildren();
+  palette.forEach(([name,hex],index)=>{
+    const option=document.createElement("option");
+    option.value=String(index);
+    option.textContent=name;
+    option.disabled=chosenColors.some((color,other)=>other!==seat && other<activeTeams.length && color===index);
+    colorChoice.append(option);
+  });
   colorChoice.value=String(chosenColors[seat]);
   colorPicker.hidden=false;
 }
 
 const game = gameShell({reset() {
   const count=Number(playerSelect.value);
-  activeTeams=chosenColors.slice(0,count);
-  state=newLudo(count,activeTeams);
+  activeTeams=Array.from({length:count},(_,index)=>index);
+  state=newLudo(count);
+  applySeatColors();
   started=false;
   colorPicker.hidden=true;
   message = "";
@@ -76,7 +90,7 @@ game.board.classList.add("ludo");
 const squares = new Map();
 track.forEach(([row,column],index) => {
   const color=entrySquares.get(index);
-  const kind=["track",safe.has(index)?"safe":"",color?"start-square "+color:""].filter(Boolean).join(" ");
+  const kind=["track",safe.has(index)?"safe":"",color!==undefined?"start-square "+teams[color].toLowerCase():""].filter(Boolean).join(" ");
   addSquare(row,column,kind);
 });
 for (let player=0;player<4;player++) {
@@ -93,6 +107,18 @@ function addSquare(row,column,kind) {
   squares.set(`${row},${column}`,tile);
 }
 
+function applySeatColors() {
+  // Each physical board corner keeps its own route; only its appearance changes.
+  const board=game.board;
+  chosenColors.slice(0,4).forEach((paletteId,seat)=>{
+    const [name,hex]=palette[paletteId];
+    board.style.setProperty(`--seat-${seat}`,hex);
+    const dicePanel=dice[seat].closest(".player-dice");
+    dicePanel.style.setProperty("--seat-color",hex);
+    dicePanel.style.setProperty("--custom-seat-color",hex);
+    dicePanel.dataset.color=name;
+  });
+}
 function configureSeats() {
   seatBots=activeTeams.map((_,player)=>modeSelect.value==="bot" ? player>0 : modeSelect.value==="mixed" && player>0);
   seatOptions.replaceChildren();
@@ -161,7 +187,7 @@ function render() {
     const seat=activeTeams.indexOf(teamId);
     const container=button.closest(".player-dice");
     const label=container.querySelector(".player-dice-label");
-    label.textContent=seat<0?teams[teamId]:`Player ${seat+1} · ${teams[teamId]}`;
+    label.textContent=seat<0?teams[teamId]:`Player ${seat+1} · ${getColor(seat)[0]}`;
     label.disabled=started||seat<0;
     label.setAttribute("aria-label",`Choose color for player ${seat+1}`);
     label.onclick=()=>showColorPicker(seat);
@@ -176,7 +202,7 @@ function render() {
   for(const tile of squares.values()) tile.replaceChildren();
   state.pieces.forEach((team,player)=>team.forEach((step,index)=>{
     const teamId=activeTeams[player];
-    const label=`${teams[teamId]} token ${index+1}`;
+    const label=`${getColor(player)[0]} token ${index+1}`;
     const button=tokenControls[teamId][index];
     button.hidden=true;
     button.disabled=botTurn||!legal.includes(index);
@@ -185,6 +211,7 @@ function render() {
     const square=squares.get(tile.join(","));
     const marker=document.createElement("span");
     marker.className=teams[teamId].toLowerCase();
+    marker.style.setProperty("--piece-color",getColor(player)[1]);
     marker.textContent=String(index+1);
     marker.dataset.token=`${teamId}-${index}`;
     marker.dataset.step=String(step);
@@ -206,9 +233,9 @@ function render() {
     square.append(marker);
   }));
   motions.clear();
-  const currentTeam=teams[activeTeams[state.turn]];
+  const currentTeam=getColor(state.turn)[0];
 
-  game.status.dataset.turn=currentTeam.toLowerCase();
+  game.status.dataset.turn=teams[activeTeams[state.turn]].toLowerCase();
   game.status.textContent=message+(state.winner!==null?`${teams[activeTeams[state.winner]]} wins!`
     :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);
   if(state.winner===null && state.roll>0 && legal.length===1) {

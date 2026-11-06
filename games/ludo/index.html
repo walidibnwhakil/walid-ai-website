@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261106ludu-board1">
-  <link rel="stylesheet" href="./ludo.css?v=20261106ludu-board1">
-  <script type="module" src="../ludo.mjs?v=20261106ludu-board1"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261106ludu-board2">
+  <link rel="stylesheet" href="./ludo.css?v=20261106ludu-board2">
+  <script type="module" src="../ludo.mjs?v=20261106ludu-board2"></script>
 
 </head>
 <body class="ludo-game">
@@ -117,13 +117,14 @@
       <button id="close-rules" type="button">Back to Menu</button>
     </dialog>
     <section id="ludo-play" hidden>
-    <div class="play-toolbar"><button id="back-to-setup" type="button" aria-label="Back to game menu">← Menu</button><span aria-label="Ludu Mahir"><svg class="toolbar-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24" stroke="#8a470e"/></svg> LUDU MAHIR</span><button id="sound-toggle" type="button" aria-pressed="false">Sound: Off</button><button id="board-settings" type="button" aria-expanded="false">Settings</button><button id="board-restart" type="button">New Game</button><button id="full-screen" type="button">⛶ Full Screen</button></div>
+    <div class="play-toolbar"><button id="back-to-setup" type="button" aria-label="Back to game menu">← Menu</button><span aria-label="Ludu Mahir"><svg class="toolbar-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg> LUDU MAHIR</span><button id="sound-toggle" type="button" aria-pressed="false">Sound: Off</button><button id="board-settings" type="button" aria-expanded="false">Settings</button></div>
     <h1>Ludu <small style="display:block;font-size:.38em;letter-spacing:.35em;margin-top:.1em">MAHIR</small></h1>
     <p>Roll a six to leave the yard. Capture rivals on open squares, use safe squares, and bring all four tokens home.</p>
     <div class="controls game-settings">
       <label>Players <select id="player-count"><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option></select></label>
       <label>Mode <select id="mode"><option value="bot">Play against bots</option><option value="friend">Same-device friends</option><option value="mixed">Choose human/bot seats</option></select></label>
       <button id="restart" type="button">New game</button>
+      <button id="full-screen" type="button">⛶ Full Screen</button>
     </div>
     <div id="seat-options" class="seat-options" hidden></div>
     <div id="color-picker" class="color-picker" hidden>

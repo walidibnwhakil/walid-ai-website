@@ -753,7 +753,7 @@ body.ludo-game #ludo-play.show-game-settings .game-settings label{color:#ffe9bb}
 body.ludo-game #ludo-play.show-game-settings .game-settings select{min-height:44px}
 
 @media(max-width:600px){
- body.ludo-game .play-toolbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:5px}
+ body.ludo-game .play-toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:5px}
  body.ludo-game .play-toolbar button{min-width:0;max-width:100%;padding:4px 2px;font-size:.68rem;line-height:1.05;white-space:normal}
  body.ludo-game .play-toolbar>span{min-width:0;text-align:center;font-size:.73rem;line-height:1.05}
  body.ludo-game .toolbar-crown{width:24px;height:18px}

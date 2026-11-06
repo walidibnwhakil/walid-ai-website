@@ -168,7 +168,6 @@ const game = gameShell({reset() {
   configureSeats();
   render();
 }});
-document.querySelector("#board-restart").addEventListener("click",()=>game.restart());
 game.board.classList.add("ludo");
 const squares = new Map();
 for(const [seat,area] of [[0,"1 / 1 / 7 / 7"],[1,"10 / 1 / 16 / 7"],[2,"1 / 10 / 7 / 16"],[3,"10 / 10 / 16 / 16"]]) {

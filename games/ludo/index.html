@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261106ludu-board3">
-  <link rel="stylesheet" href="./ludo.css?v=20261106ludu-board3">
-  <script type="module" src="../ludo.mjs?v=20261106ludu-board3"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261106ludu-board4">
+  <link rel="stylesheet" href="./ludo.css?v=20261106ludu-board4">
+  <script type="module" src="../ludo.mjs?v=20261106ludu-board4"></script>
 
 </head>
 <body class="ludo-game">
@@ -99,7 +99,7 @@
     <dialog id="settings-dialog" class="rules-dialog settings-dialog">
       <h2>Game Settings</h2>
       <label class="setting-row"><span>Sound effects</span><input id="settings-sound" type="checkbox"></label>
-      <label class="setting-row"><span>Pawn animation</span><select id="settings-animation-speed"><option value="145">Normal</option><option value="80">Fast</option><option value="220">Relaxed</option></select></label>
+      <label class="setting-row"><span>Pawn animation</span><select id="settings-animation-speed"><option value="320" selected>Slow</option><option value="440">Relaxed</option><option value="240">Steady</option></select></label>
       <p>Leaderboard <small>Coming Soon</small></p>
       <button class="online-setting" id="online-coming" type="button">Online Multiplayer — Coming Soon</button>
       <button id="close-settings" type="button">Done</button>
@@ -117,7 +117,12 @@
       <button id="close-rules" type="button">Back to Menu</button>
     </dialog>
     <section id="ludo-play" hidden>
-    <div class="play-toolbar"><button id="back-to-setup" type="button" aria-label="Back to game menu">← Menu</button><span aria-label="Ludu Mahir"><svg class="toolbar-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg> LUDU MAHIR</span><button id="sound-toggle" type="button" aria-pressed="false">Sound: Off</button><button id="board-settings" type="button" aria-expanded="false">Settings</button></div>
+    <div class="play-toolbar">
+      <button class="board-round-button" id="back-to-setup" type="button" aria-label="Back to game menu"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M21 9 5 24l16 15v-9c13-2 18 4 22 11-1-18-7-27-22-28z" fill="#fff0c9" stroke="#8d4d14" stroke-width="3" stroke-linejoin="round"/></svg></button>
+      <span class="board-logo" aria-label="Ludu Mahir"><img src="./ludo-menu-header.webp" alt="" width="900" height="300"><strong>Ludu Mahir</strong></span>
+      <button class="board-round-button" id="sound-toggle" type="button" aria-label="Turn sound on" aria-pressed="false"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 19h9l12-9v28l-12-9H7z" fill="#fff0cf" stroke="#704016" stroke-width="2"/><path d="M33 17q9 7 0 14m4-20q14 13 0 26" fill="none" stroke="#fff0cf" stroke-width="4" stroke-linecap="round"/></svg></button>
+      <button class="board-round-button" id="board-settings" type="button" aria-label="Game settings" aria-expanded="false"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m20 4 8 0 2 6 5 2 6-2 4 7-4 5v5l4 5-4 7-6-2-5 2-2 6h-8l-2-6-5-2-6 2-4-7 4-5v-5l-4-5 4-7 6 2 5-2z" fill="#f4e5c9" stroke="#684018" stroke-width="2"/><circle cx="24" cy="24" r="7" fill="#75431b" stroke="#d2ae75" stroke-width="2"/></svg></button>
+    </div>
     <h1>Ludu <small style="display:block;font-size:.38em;letter-spacing:.35em;margin-top:.1em">MAHIR</small></h1>
     <p>Roll a six to leave the yard. Capture rivals on open squares, use safe squares, and bring all four tokens home.</p>
     <div class="controls game-settings">

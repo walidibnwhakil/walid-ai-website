@@ -61,3 +61,86 @@
 @keyframes token-travel { from { transform:translate(var(--dx),var(--dy)) scale(.9); } to { transform:translate(0,0) scale(1); } }
 @media(max-width:480px) { .ludo-game .board.ludo { border-radius:12px; } .ludo-game .board.ludo span { width:46%; font-size:clamp(6px,1.9vw,9px); } .ludo-game .seat-options { align-items:flex-start; } }
 @media(prefers-reduced-motion:reduce) { .ludo-game *, .ludo-game *::before, .ludo-game *::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
+
+
+/* Ludu Mahir — vivid, touch-first arcade treatment */
+.ludo-game {
+  background:
+    radial-gradient(circle at 12% 15%,#ffcf6055 0,transparent 30%),
+    radial-gradient(circle at 90% 72%,#42dcff35 0,transparent 35%),
+    linear-gradient(145deg,#14254c 0%,#23164e 53%,#0c1737 100%);
+  color:#fff8e9;
+}
+.ludo-game main { max-width:850px; }
+.ludo-game nav a,.ludo-game nav span { color:#f7dfae; }
+.ludo-game h1 {
+  text-align:center; text-transform:uppercase; letter-spacing:.1em;
+  font-family:system-ui,sans-serif; font-weight:1000;
+  color:#fff1a3; text-shadow:0 3px #a64c26,0 7px 0 #622858,0 12px 20px #0009;
+}
+.ludo-game main>p:not(#status),.ludo-game label { color:#f5e7d2; }
+.ludo-game .controls { justify-content:center; }
+.ludo-game select,.ludo-game button {
+  background:linear-gradient(160deg,#fffdf1,#ffe8bd);color:#2c2243;
+  border:2px solid #fff6d3;box-shadow:0 4px 0 #0004;
+  font-family:system-ui,sans-serif;font-weight:700;
+}
+.ludo-game #status {
+  margin:12px auto; padding:9px 20px;
+  border:2px solid #ffffff8c;box-shadow:0 6px 20px #0005;
+  font-family:system-ui,sans-serif;font-weight:800;text-align:center;
+}
+.ludo-game .board.ludo {
+  width:min(100%,620px);padding:clamp(7px,1.8vw,13px);
+  border:clamp(5px,1.4vw,10px) solid #f6ce69;
+  border-radius:clamp(13px,3vw,27px);
+  background:linear-gradient(135deg,#ffecab,#b67d2e 40%,#f7dc88 65%,#a96e28);
+  box-shadow:0 8px 0 #73431e,0 16px 0 #3b2750,0 26px 40px #0009,inset 0 3px 2px #fff9;
+  overflow:hidden;isolation:isolate;
+}
+.ludo-game .board.ludo div {
+  border:1px solid #b5a8a4;background:#fffdf6;
+  box-shadow:inset 0 1px 2px #0001;
+}
+.ludo-game .board.ludo .track {background:linear-gradient(150deg,#ffffff,#e9f1f7);}
+.ludo-game .board.ludo .safe {background:linear-gradient(145deg,#fff8c8,#ffc845);}
+.ludo-game .board.ludo .yard.red,.ludo-game .board.ludo .red.lane {background:linear-gradient(145deg,#ff8889,#ef284b 68%,#b80935);}
+.ludo-game .board.ludo .yard.blue,.ludo-game .board.ludo .blue.lane {background:linear-gradient(145deg,#8edbff,#247df6 68%,#1545bb);}
+.ludo-game .board.ludo .yard.green,.ludo-game .board.ludo .green.lane {background:linear-gradient(145deg,#9affb4,#18c977 68%,#06824e);}
+.ludo-game .board.ludo .yard.yellow,.ludo-game .board.ludo .yellow.lane {background:linear-gradient(145deg,#fff4a4,#ffc129 68%,#d77d06);}
+.ludo-game .board.ludo .yard::after {
+  inset:13%;border:2px solid #fff; background:radial-gradient(circle at 30% 22%,#ffffff,#fffdf0 65%,#ddd5c3);
+  box-shadow:0 2px 5px #0005,inset 0 2px 3px #fff;
+}
+.ludo-game .board.ludo span {
+  width:65%; border:2px solid #fff9;
+  border-radius:50% 50% 40% 40%;
+  box-shadow:0 3px 0 #3023429c,0 5px 5px #0006,inset 0 3px 3px #fffa,inset 0 -5px 4px #0005;
+  font-family:system-ui,sans-serif;
+  font-size:clamp(7px,1.5vw,13px);text-shadow:0 1px 2px #0009;
+  cursor:pointer;touch-action:manipulation;
+}
+.ludo-game .board.ludo span::after {
+  content:"";position:absolute;top:8%;left:24%;width:35%;height:20%;
+  border-radius:50%;background:#fff8;transform:rotate(-24deg);pointer-events:none;
+}
+.ludo-game .die-face {
+  width:68px;height:68px;border:3px solid #fff;
+  border-radius:16px;background:linear-gradient(145deg,#fff,#f1e5d5);
+  box-shadow:5px 6px 0 #bbb0a5,8px 11px 18px #0008,inset 0 3px 3px #fff;
+  font:900 2.5rem system-ui,sans-serif;
+  transform:perspective(250px) rotateX(12deg) rotateY(-14deg);
+}
+.ludo-game #actions .roll-button {
+  border:2px solid #fff4a0;border-radius:16px;
+  padding:12px 24px;background:linear-gradient(155deg,#ffdb52,#ff9c20);
+  color:#3d2150;box-shadow:0 5px 0 #a85812,0 9px 20px #0006;
+  text-shadow:none;
+}
+.ludo-game .rules {color:#f3e4ca;border-top-color:#ffffff66;}
+.ludo-game .seat-options {background:#242b5d;border-color:#bca9e0;}
+@media(max-width:480px){
+ .ludo-game .board.ludo {width:100%;padding:5px;border-width:5px;}
+ .ludo-game .board.ludo span {width:68%;font-size:8px;}
+ .ludo-game .die-face {width:56px;height:56px;font-size:2rem;}
+}

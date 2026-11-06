@@ -49,8 +49,9 @@ main { max-width: 1050px; }
 .pawn.blue { left:23%; bottom:37%; background:radial-gradient(circle at 32% 25%,#fff,#48a6f0 48%,#1b59b5); animation-delay:.14s; }
 .pawn.green { left:42%; bottom:20%; background:radial-gradient(circle at 32% 25%,#fff,#43d178 48%,#168045); animation-delay:.28s; }
 .pawn.yellow { left:50%; bottom:38%; background:radial-gradient(circle at 32% 25%,#fff,#ffd341 48%,#b9780d); animation-delay:.42s; }
-.chess-preview { background: repeating-conic-gradient(#5a4938 0 25%, #8f745b 0 50%) 50% / 48px 48px; }
-.knight { text-shadow: 0 2px 4px #241a10; animation: knight 1.6s 2; }
+.chess-preview { background:repeating-conic-gradient(#6b4428 0 25%,#ddb77c 0 50%) 50% / 44px 44px; box-shadow:inset 0 0 0 6px #9c6a38,inset 0 0 0 8px #684322; }
+.knight { filter:drop-shadow(0 3px 3px #241a10aa); animation: knight 1.6s 2; }
+.knight svg { width:54px; height:64px; fill:#e9c98a; stroke:#70451f; stroke-width:3; stroke-linejoin:round; }
 .penalty-preview { background: #326545; }
 .mini-goal { width: 100px; height: 47px; position: absolute; top: 13px; border: 3px solid #f6f1e1; border-bottom: none; }
 .mini-ball { position: absolute; bottom: 4px; font-size: 1.55rem; animation: kick 1.25s 3; }

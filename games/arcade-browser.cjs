@@ -85,9 +85,12 @@ const path = require("node:path");
       await page.waitForSelector('[data-token="1-3"][data-step="1"]',{timeout:5000});
       assert.match(await status.innerText(), /bot|roll the die/i);
       await go("chess/");
+      assert.equal(await page.locator(".chess-piece").count(),32);
+      assert.equal(new Set(await page.locator(".chess-piece use").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href")))).size,6);
       await button("e2, White pawn").click();
       await button("e4, empty, legal move").click();
       await page.waitForFunction(() => document.querySelector("#status").textContent.startsWith("White to move"));
+      await capture("chess-opening");
       assert(await button("e4, White pawn").isVisible());
       await page.locator("#mode").selectOption("friend");
       for (const [from, to] of [["f2, White pawn","f3"],["e7, Black pawn","e5"],["g2, White pawn","g4"],["d8, Black queen","h4"]]) {
@@ -95,7 +98,17 @@ const path = require("node:path");
         await button(to + ", empty, legal move").click();
       }
       assert.match(await status.innerText(), /Checkmate. Black wins/);
+      assert.equal(await page.locator("#move-history li").count(),2);
       await capture("chess");
+      await button("New game").click();
+      for (const [from,to] of [["e2, White pawn","e4, empty, legal move"],["d7, Black pawn","d5, empty, legal move"],["e4, White pawn","d5, Black pawn, legal move"]]) {
+        await button(from).click();
+        await button(to).click();
+      }
+      assert.equal(await page.locator("#captured-white svg").count(),1);
+      assert.equal(await page.locator("#captured-white svg").getAttribute("aria-label"),"pawn captured");
+      assert.equal(await page.locator("#move-history li").count(),2);
+      await capture("chess-capture");
       await go("penalty/");
       await button("Left").click();
       await page.waitForFunction(() => document.querySelector("#status").textContent.includes("choose where to dive"));

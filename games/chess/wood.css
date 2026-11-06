@@ -1,0 +1,41 @@
+.wood-chess { min-height:100vh; background:radial-gradient(ellipse at 50% 15%,#f7edda,#e9dcc4 68%,#dcc9aa); color:#34271d; }
+.wood-chess main { max-width:1000px; }
+.wood-chess nav a { color:#70451f; }
+.wood-chess h1 { margin-top:clamp(18px,5vh,44px); font-size:clamp(2rem,7vw,3rem); }
+.wood-chess main>p:not(#status) { color:#584838; }
+.wood-chess button,.wood-chess select { color:#35271c; background:linear-gradient(150deg,#fffaf0,#e8d7b8); border-color:#a4875d; border-radius:10px; }
+.wood-chess :focus-visible { outline-color:#1d78bc; outline-offset:3px; }
+.wood-chess #status { min-height:1.7em; font-weight:700; }
+.wood-chess .chess-layout { display:grid; grid-template-columns:minmax(0,560px) minmax(220px,1fr); align-items:start; gap:22px; }
+.wood-chess .board.chess { box-sizing:border-box; width:min(100%,560px); aspect-ratio:1; gap:0; padding:clamp(6px,1.4vw,11px); border:2px solid #79512d; border-radius:15px; background:repeating-linear-gradient(3deg,#9d6d3c 0 3px,#b7834d 3px 7px,#86582f 7px 9px); box-shadow:0 16px 34px #5c3b2050,inset 0 1px 0 #ffdda2,inset 0 0 0 4px #684322; }
+.wood-chess .board.chess .square { position:relative; border:0; outline-offset:-3px; transition:filter .12s ease,box-shadow .12s ease; }
+.wood-chess .board.chess .square[data-dark="false"] { background:linear-gradient(140deg,#f4e3bf,#d9bd88 48%,#ecd4a6); box-shadow:inset 0 0 0 1px #b18d59,inset 1px 2px 3px #fff7d533; }
+.wood-chess .board.chess .square[data-dark="true"] { background:linear-gradient(140deg,#9b663a,#704725 52%,#865731); box-shadow:inset 0 0 0 1px #5d3b23,inset 1px 2px 3px #f2c08233; }
+.wood-chess .board.chess .square[data-selected="true"] { z-index:2; box-shadow:inset 0 0 0 4px #ffe080,inset 0 0 18px #ffe08b88; }
+.wood-chess .board.chess .square[data-legal="true"]::after { content:""; position:absolute; z-index:2; pointer-events:none; width:24%; aspect-ratio:1; border-radius:50%; background:#395f39b8; box-shadow:0 1px 3px #1d271b88; }
+.wood-chess .board.chess .square[data-has-piece="true"][data-legal="true"]::after { width:82%; background:transparent; border:3px solid #ad3530; box-shadow:0 0 8px #f6cf8eaa; }
+.wood-chess .board.chess .square[data-last-move="true"] { filter:brightness(1.13) saturate(1.13); }
+.wood-chess .chess-piece { position:relative; z-index:1; width:82%; height:88%; overflow:visible; filter:drop-shadow(0 2px 1px #38251677); }
+.wood-chess .chess-piece.white { color:#fff0cc; }
+.wood-chess .chess-piece.black { color:#d3a16b; }
+.wood-chess .chess-piece use { fill:url(#maple-wood); stroke:url(#maple-edge); stroke-width:1.8; stroke-linejoin:round; }
+.wood-chess .chess-piece.black use { fill:url(#walnut-wood); stroke:url(#walnut-edge); }
+.wood-chess .square[data-last-move="true"] .chess-piece { animation:piece-set .18s ease-out both; }
+.wood-chess .chess-details { display:grid; gap:14px; }
+.wood-chess .chess-details section { min-width:0; padding:13px 15px; border:1px solid #cdb58d; border-radius:13px; background:linear-gradient(145deg,#fff7e8,#ebdec6); box-shadow:0 6px 14px #68472717; }
+.wood-chess .chess-details h2 { margin:0 0 9px; font-size:1.05rem; }
+.wood-chess .chess-details p { margin:5px 0; font-size:.92rem; }
+.wood-chess .captured-piece { width:18px; height:22px; vertical-align:middle; margin:0 1px; }
+.wood-chess .captured-piece.white use { fill:url(#maple-wood); stroke:url(#maple-edge); stroke-width:2; }
+.wood-chess .captured-piece.black use { fill:url(#walnut-wood); stroke:url(#walnut-edge); stroke-width:2; }
+.wood-chess #move-history { max-height:245px; overflow:auto; margin:0; padding:0 5px 0 25px; font-variant-numeric:tabular-nums; }
+.wood-chess #move-history li { display:grid; grid-template-columns:32px 1fr 1fr; gap:4px; padding:3px 5px; border-bottom:1px solid #dfcfb4; }
+.wood-chess #move-history li:nth-child(even) { background:#d9c6a566; }
+.wood-chess #move-history li span:first-child { color:#806442; }
+.wood-chess .rules { max-width:780px; margin-top:18px; border-top:1px solid #cdb58d; padding-top:10px; }
+.wood-chess .rules summary { min-height:44px; cursor:pointer; font-weight:700; }
+.wood-chess .piece-library { position:absolute; width:0; height:0; overflow:hidden; }
+@keyframes piece-set { from { transform:translateY(-5px) scale(.9); opacity:.75; } to { transform:translateY(0) scale(1); opacity:1; } }
+@media(max-width:760px) { .wood-chess .chess-layout { grid-template-columns:minmax(0,1fr); gap:14px; } .wood-chess .chess-details { grid-template-columns:1fr 1.15fr; } }
+@media(max-width:420px) { .wood-chess .board.chess { padding:5px; border-radius:10px; } .wood-chess .chess-details { grid-template-columns:1fr; } .wood-chess .chess-details section { padding:10px 12px; } }
+@media(prefers-reduced-motion:reduce) { .wood-chess *, .wood-chess *::before, .wood-chess *::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }

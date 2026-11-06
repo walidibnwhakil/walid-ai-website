@@ -6,9 +6,10 @@
   <title>Chess | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
   <link rel="stylesheet" href="../arcade.css">
+  <link rel="stylesheet" href="./wood.css">
   <script type="module" src="../chess.mjs"></script>
 </head>
-<body>
+<body class="wood-chess">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Chess</span></nav>
     <h1>Chess</h1>
@@ -18,9 +19,30 @@
       <button id="restart" type="button">New game</button>
     </div>
     <p id="status" role="status"></p>
-    <div id="board" class="board" role="group" aria-label="Chess board"></div>
+    <div class="chess-layout">
+      <div id="board" class="board" role="group" aria-label="Chess board"></div>
+      <aside class="chess-details" aria-label="Game details">
+        <section><h2>Captured pieces</h2><p id="captured-white">White captured: none</p><p id="captured-black">Black captured: none</p></section>
+        <section><h2>Move history</h2><ol id="move-history" aria-label="Chess move history"></ol></section>
+      </aside>
+    </div>
     <div id="actions" class="controls"></div>
+    <details class="rules"><summary>How to play</summary><p>White moves first. Choose one of your pieces to see legal destinations, then choose a highlighted square. The bot uses the Black pieces; choose Two players to take turns on this device. Captures and move history appear beside the board. If a pawn reaches the far side, choose its promotion piece.</p></details>
     <p><a href="../vendor/chess-LICENSE.txt">chess.js license</a></p>
   </main>
+  <svg class="piece-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="maple-wood" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff7dd"/><stop offset=".25" stop-color="#e5c98f"/><stop offset=".52" stop-color="#fff0c5"/><stop offset=".8" stop-color="#c79b58"/><stop offset="1" stop-color="#f4ddb1"/></linearGradient>
+      <linearGradient id="maple-edge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff5d3"/><stop offset=".5" stop-color="#a97636"/><stop offset="1" stop-color="#70491f"/></linearGradient>
+      <linearGradient id="walnut-wood" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8e5b35"/><stop offset=".25" stop-color="#4b2d20"/><stop offset=".52" stop-color="#75482c"/><stop offset=".8" stop-color="#301d18"/><stop offset="1" stop-color="#805234"/></linearGradient>
+      <linearGradient id="walnut-edge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d49b5f"/><stop offset=".45" stop-color="#3d241b"/><stop offset="1" stop-color="#1c120f"/></linearGradient>
+      <symbol id="piece-p" viewBox="0 0 100 120"><ellipse cx="50" cy="108" rx="34" ry="7" class="wood-edge"/><path class="wood-fill" d="M17 99q2-9 12-11l9-3q-3-8-1-13l7-7q-12-8-12-21a18 18 0 1 1 36 0q0 13-12 21l7 7q2 6-1 13l9 3q10 2 12 11z"/><path class="wood-highlight" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M23 97q8-5 20-4M42 66q-6-9-5-19"/></symbol>
+      <symbol id="piece-r" viewBox="0 0 100 120"><ellipse cx="50" cy="108" rx="37" ry="7" class="wood-edge"/><path class="wood-fill" d="M13 100q2-9 12-11h50q10 2 12 11v5H13zM23 88l5-8h44l5 8zM28 78V30h8V19h11v11h8V19h11v11h8v48z"/><path class="wood-highlight" fill="none" stroke="currentColor" stroke-width="2" d="M34 35v37M46 35v37M58 35v37M70 35v37"/></symbol>
+      <symbol id="piece-n" viewBox="0 0 100 120"><ellipse cx="50" cy="108" rx="36" ry="7" class="wood-edge"/><path class="wood-fill" d="M14 100q2-9 12-11h49q10 2 12 11v5H14zM24 88l5-9 14-8q-8-12-4-25l9-22q3-7 9-10l4 18 15 12q7 8 4 18l-7 20 9 6v8H24z"/><path class="wood-highlight" fill="none" stroke="currentColor" stroke-width="2" d="M49 34l-6 17q-2 8 5 15l15-6q8-4 10-10"/><circle cx="67" cy="42" r="2.8" fill="#261710" stroke="none"/><path class="wood-edge-line" fill="none" stroke="currentColor" stroke-width="2" d="M58 25l7 14"/></symbol>
+      <symbol id="piece-b" viewBox="0 0 100 120"><ellipse cx="50" cy="108" rx="36" ry="7" class="wood-edge"/><path class="wood-fill" d="M14 100q2-9 12-11h48q10 2 12 11v5H14zM25 88l6-9h38l6 9zM37 78q5-11 4-21-13-9-13-24a22 22 0 1 1 44 0q0 15-13 24-1 10 4 21z"/><path class="wood-highlight" fill="none" stroke="currentColor" stroke-width="2" d="M39 31l18-18M39 33q0 11 10 16"/><circle cx="50" cy="12" r="5" class="wood-fill"/></symbol>
+      <symbol id="piece-q" viewBox="0 0 100 120"><ellipse cx="50" cy="108" rx="37" ry="7" class="wood-edge"/><path class="wood-fill" d="M13 100q2-9 12-11h50q10 2 12 11v5H13zM23 88l5-9h44l5 9zM31 77l5-29 14 17 15-17 5 29z"/><path class="wood-fill" d="M50 65Q35 52 35 37a15 15 0 1 1 30 0q0 15-15 28z"/><circle cx="24" cy="37" r="6" class="wood-fill"/><circle cx="76" cy="37" r="6" class="wood-fill"/><circle cx="50" cy="17" r="6" class="wood-fill"/><path class="wood-highlight" fill="none" stroke="currentColor" stroke-width="2" d="M29 85h42M39 55l7 13M61 55l-7 13"/></symbol>
+      <symbol id="piece-k" viewBox="0 0 100 120"><ellipse cx="50" cy="108" rx="38" ry="7" class="wood-edge"/><path class="wood-fill" d="M12 100q2-9 12-11h52q10 2 12 11v5H12zM22 88l6-9h44l6 9zM34 77q4-10 4-20l-7-10h38l-7 10q0 10 4 20z"/><path class="wood-fill" d="M47 17h6v11h11v6H53v12h-6V34H36v-6h11z"/><path class="wood-highlight" fill="none" stroke="currentColor" stroke-width="2" d="M30 85h40M40 53h20"/></symbol>
+    </defs>
+  </svg>
 </body>
 </html>

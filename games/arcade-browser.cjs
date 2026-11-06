@@ -26,7 +26,7 @@ const path = require("node:path");
     const url = `http://127.0.0.1:${server.address().port}/games/`;
     const output = process.env.RIDDLEX_BROWSER_OUTPUT;
     if (output) await fs.mkdir(output, {recursive:true});
-    for (const [width, motion] of [[1280, "no-preference"], [390, "reduce"], [320, "no-preference"]]) {
+    for (const [width, motion] of [[1280, "no-preference"], [768, "reduce"], [390, "reduce"], [360, "no-preference"], [320, "no-preference"]]) {
       const page = await browser.newPage({viewport:{width,height:850},reducedMotion:motion});
       const errors = [];
       page.on("pageerror", error => errors.push(String(error)));
@@ -94,6 +94,12 @@ const path = require("node:path");
         await button(`Row ${row}, column ${column}, empty`).click();
       }
       assert.equal(await status.innerText(), "X wins!");
+      await page.waitForFunction(() => {
+        const line = document.querySelector(".win-line line");
+        return line && Number.parseFloat(getComputedStyle(line).strokeDashoffset) === 0;
+      });
+      assert.equal(await page.locator(".win-line line").getAttribute("x1"), "50");
+      assert.equal(await page.locator(".win-line line").getAttribute("x2"), "250");
       await capture("tic-tac-toe");
       await go("snake/");
       await page.keyboard.press("ArrowUp");

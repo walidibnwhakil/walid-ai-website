@@ -1,0 +1,30 @@
+{
+  "updated": "2026-11-06",
+  "productionBaseline": "add568e82d1772351c38ea9df50a5d4766bad2de",
+  "releases": [
+    {"game":"ludo","url":"https://walid-ai.com/games/ludo/","state":"released","redesign":"pending"},
+    {"game":"chess","url":"https://walid-ai.com/games/chess/","state":"released","redesign":"pending"},
+    {"game":"football-penalty","url":"https://walid-ai.com/games/penalty/","state":"released","redesign":"pending"},
+    {"game":"tic-tac-toe","url":"https://walid-ai.com/games/tic-tac-toe/","state":"released","redesign":"verification-ready"},
+    {"game":"snake","url":"https://walid-ai.com/games/snake/","state":"released","redesign":"pending"},
+    {"game":"2048","url":"https://walid-ai.com/games/2048/","state":"released","redesign":"pending"},
+    {"game":"riddlex","url":"https://walid-ai.com/games/riddlex/","state":"production-baseline-preserved","redesign":"unreleased-animation-failed"}
+  ],
+  "riddlex": {
+    "runtimeEntries": 2400,
+    "runtimeCategories": {"realPeople":2053,"fictionalCharacters":130,"unflaggedCharacters":5,"animals":96,"objects":101,"relationshipRoles":15},
+    "mappedEntityImages": {"characters":1,"animals":1,"objects":1,"relationships":0},
+    "idealAnswerSimulation":{"runtimeEntriesSolved":1797,"runtimeEntriesTotal":1797,"curatedSolved":216,"curatedTotal":216,"meanQuestions":30.995,"maximumQuestions":291},
+    "productionReleaseAllowed": false
+  },
+  "pendingGames": ["carrom-rules-research","checkers","sudoku","memory","connect-four","solitaire"],
+  "ticTacToeNeonGate": {
+    "unitTests":"4/4 pass",
+    "chromiumWidths":[320,360,390,768,1280],
+    "chromiumRegression":"all six games and seven previews pass; no overflow or page errors",
+    "bot":"verified reply",
+    "sameDeviceFriend":"verified X win",
+    "visualInspection":[320,390],
+    "state":"ready for isolated release review"
+  }
+}

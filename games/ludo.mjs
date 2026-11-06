@@ -26,6 +26,10 @@ document.getElementById("setup-settings").addEventListener("click",()=>{
  document.getElementById("mode-buttons").querySelector("button").focus();
 });
 
+document.getElementById("setup-colors").addEventListener("click",()=>{
+ document.querySelector("#start-game").click();
+ document.querySelector(".color-hint")?.scrollIntoView({behavior:"smooth",block:"center"});
+});
 const playScreen=document.querySelector("#ludo-play");
 document.querySelector("#start-game").addEventListener("click",()=>{
   document.querySelector("#player-count").value=document.querySelector("#setup-players").value;

@@ -1,189 +1,259 @@
-import {gameShell,choose} from "./shell.mjs";
-import {newLudo,rollLudo,moveLudo,legalTokens,trackPosition,safe} from "./ludo-rules.mjs";
+import {gameShell, control, choose} from "./shell.mjs";
+import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe} from "./ludo-rules.mjs";
 
-const teams=["Red","Blue","Green","Yellow"];
-const track=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
-const lanes=[
+const teams = ["Red", "Blue", "Green", "Yellow"];
+const palette = [
+  ["Red","#e83e4e"],["Blue","#2588e8"],["Green","#27bf70"],["Yellow","#f2be30"],
+  ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"],
+  ["Cyan","#30c9ed"],["Lime","#9bd63d"],["Maroon","#a93455"],["Brown","#a76a3b"]
+];
+const starts = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
+const lanes = [
   Array.from({length:6},(_,i)=>[7,i+1]),
-  Array.from({length:6},(_,i)=>[7,13-i]),
+  Array.from({length:6},(_,i)=>[13-i,7]),
   Array.from({length:6},(_,i)=>[i+1,7]),
-  Array.from({length:6},(_,i)=>[13-i,7])
+  Array.from({length:6},(_,i)=>[7,13-i])
 ];
-const yards=[
+const yards = [
   Array.from({length:4},(_,i)=>[2+(i>>1),2+i%2]),
-  Array.from({length:4},(_,i)=>[11+(i>>1),11+i%2]),
+  Array.from({length:4},(_,i)=>[11+(i>>1),2+i%2]),
   Array.from({length:4},(_,i)=>[2+(i>>1),11+i%2]),
-  Array.from({length:4},(_,i)=>[11+(i>>1),2+i%2])
+  Array.from({length:4},(_,i)=>[11+(i>>1),11+i%2])
 ];
-const dieHomes=[[34,34],[66,66],[66,34],[34,66]];
-const pipSets={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
-const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const playerSelect=document.querySelector("#player-count");
-const modeSelect=document.querySelector("#mode");
-const seatOptions=document.querySelector("#seat-options");
-const winnerOverlay=document.querySelector("#winner-overlay");
-const winnerTitle=document.querySelector("#winner-title");
-let activeTeams,state,message="",seatBots=[],motions=new Map();
-let rolling=false,rollingPlayer=null,dieValue=1,moving=false,visualMove=null;
+const track = starts;
+const entrySquares=new Map([[0,0],[13,2],[26,3],[39,1]]);
+const playerSelect = document.querySelector("#player-count");
+const modeSelect = document.querySelector("#mode");
+const seatOptions = document.querySelector("#seat-options");
+const dice = teams.map((team,teamId)=>{
+  const container=document.querySelector(`#dice-${team.toLowerCase()}`);
+  const label=document.createElement("button");
+  label.type="button";
+  label.className="player-dice-label";
+  label.textContent=team;
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="die-face";
+  button.textContent="⚀";
+  button.setAttribute("aria-label",`Roll ${team} die`);
+  button.addEventListener("click",()=>{if(activeTeams[state.turn]===teamId && !isBot(state.turn)) throwDie();});
+  container.append(label,button);
+  return button;
+});
+const dieSymbols=["⚀","⚁","⚂","⚃","⚄","⚅"];
+const lastDice=[1,1,1,1];
+let activeTeams, state, message, seatBots = [], motions = new Map(), started=false;
+let chosenColors=[0,1,2,3];
+const getColor=seat=>palette[chosenColors[seat]];
+const colorPicker=document.querySelector("#color-picker");
+const colorSeat=document.querySelector("#color-seat");
+const colorChoice=document.querySelector("#color-choice");
+document.querySelector("#color-cancel").addEventListener("click",()=>colorPicker.hidden=true);
+document.querySelector("#color-apply").addEventListener("click",()=>{
+  const seat=Number(colorSeat.value), wanted=Number(colorChoice.value);
+  if(started || seat>=activeTeams.length) return;
+  if(chosenColors.some((color,index)=>index!==seat && index<activeTeams.length && color===wanted)) return;
+  chosenColors[seat]=wanted;
+  colorPicker.hidden=true;
+  game.restart();
+});
+function showColorPicker(seat) {
+  if(started || seat<0 || seat>=activeTeams.length) return;
+  colorSeat.value=String(seat);
+  colorChoice.replaceChildren();
+  palette.forEach(([name,hex],index)=>{
+    const option=document.createElement("option");
+    option.value=String(index);
+    option.textContent=name;
+    option.disabled=chosenColors.some((color,other)=>other!==seat && other<activeTeams.length && color===index);
+    colorChoice.append(option);
+  });
+  colorChoice.value=String(chosenColors[seat]);
+  colorPicker.hidden=false;
+}
 
-const game=gameShell({reset(){
-  activeTeams=Array.from({length:Number(playerSelect.value)},(_,index)=>index);
-  state=newLudo(activeTeams.length);
-  message="";
-  rolling=false;rollingPlayer=null;dieValue=1;moving=false;visualMove=null;motions=new Map();
-  boardDie.classList.remove("rolling");
+const game = gameShell({reset() {
+  const count=Number(playerSelect.value);
+  activeTeams=Array.from({length:count},(_,index)=>index);
+  state=newLudo(count);
+  applySeatColors();
+  started=false;
+  colorPicker.hidden=true;
+  message = "";
+  motions = new Map();
+  lastDice.fill(1);
+  dice.forEach(button=>button.classList.remove("rolling"));
   configureSeats();
   render();
 }});
 game.board.classList.add("ludo");
-const squares=new Map();
-track.forEach(([row,column],index)=>addSquare(row,column,safe.has(index)?"safe track":"track"));
-for(let player=0;player<4;player++){
+const squares = new Map();
+for(const [seat,area] of [[0,"1 / 1 / 7 / 7"],[1,"10 / 1 / 16 / 7"],[2,"1 / 10 / 7 / 16"],[3,"10 / 10 / 16 / 16"]]) {
+  const base=document.createElement("div");
+  base.className=`home-base base-${seat}`;
+  base.style.gridArea=area;
+  game.board.append(base);
+}
+const centerBase=document.createElement("div");
+centerBase.className="home-diamond";
+centerBase.style.gridArea="7 / 7 / 10 / 10";
+game.board.append(centerBase);
+track.forEach(([row,column],index) => {
+  const color=entrySquares.get(index);
+  const kind=["track",safe.has(index)?"safe":"",color!==undefined?"start-square "+teams[color].toLowerCase():""].filter(Boolean).join(" ");
+  addSquare(row,column,kind);
+});
+for (let player=0;player<4;player++) {
   lanes[player].forEach(([row,column],index)=>addSquare(row,column,`lane ${teams[player].toLowerCase()} lane-${player} lane-step-${index}`));
   yards[player].forEach(([row,column])=>addSquare(row,column,`yard ${teams[player].toLowerCase()}`));
 }
 addSquare(7,7,"home-center");
-function addSquare(row,column,kind){
+function addSquare(row,column,kind) {
   const tile=document.createElement("div");
-  tile.className=kind;tile.style.gridArea=`${row+1} / ${column+1}`;
-  game.board.append(tile);squares.set(`${row},${column}`,tile);
+  tile.className=kind;
+  if(kind.includes("safe")) {tile.setAttribute("aria-label","Safe square");tile.dataset.safe="true";}
+  tile.style.gridArea=`${row+1} / ${column+1}`;
+  game.board.append(tile);
+  squares.set(`${row},${column}`,tile);
 }
 
-const boardDie=document.createElement("button");
-boardDie.id="board-die";boardDie.type="button";boardDie.className="board-die";boardDie.dataset.value="1";
-boardDie.addEventListener("click",()=>throwDie(false));
-game.board.append(boardDie);
-const pipNodes=Array.from({length:9},()=>{const pip=document.createElement("span");pip.className="die-pip";boardDie.append(pip);return pip;});
-const playAgain=document.querySelector("#play-again");
-const newGame=document.querySelector("#new-game");
-playAgain.addEventListener("click",()=>game.restart());
-newGame.addEventListener("click",()=>{game.restart();playerSelect.focus();});
-playerSelect.addEventListener("change",game.restart);
-
-function configureSeats(){
-  seatBots=activeTeams.map((_,player)=>modeSelect.value==="bot"?player>0:modeSelect.value==="mixed"&&player>0);
-  seatOptions.replaceChildren();seatOptions.hidden=modeSelect.value!=="mixed";
-  if(modeSelect.value!=="mixed")return;
-  const legend=document.createElement("strong");legend.textContent="Player seats";seatOptions.append(legend);
-  activeTeams.forEach((team,player)=>{
-    const label=document.createElement("label"),select=document.createElement("select");
-    select.setAttribute("aria-label",`${teams[team]} seat type`);
-    select.innerHTML='<option value="human">Human</option><option value="bot">Bot</option>';
-    select.value=seatBots[player]?"bot":"human";
-    if(player===0){seatBots[player]=false;select.value="human";}
-    select.addEventListener("change",()=>{seatBots[player]=select.value==="bot";render();});
-    label.append(`${teams[team]}: `,select);seatOptions.append(label);
+function applySeatColors() {
+  // Each physical board corner keeps its own route; only its appearance changes.
+  const board=game.board;
+  chosenColors.slice(0,4).forEach((paletteId,seat)=>{
+    const [name,hex]=palette[paletteId];
+    board.style.setProperty(`--seat-${seat}`,hex);
+    const dicePanel=dice[seat].closest(".player-dice");
+    dicePanel.style.setProperty("--seat-color",hex);
+    dicePanel.style.setProperty("--custom-seat-color",hex);
+    dicePanel.dataset.color=name;
   });
 }
-function isBot(player){
-  if(modeSelect.value==="bot")return player>0;
-  if(modeSelect.value==="mixed")return Boolean(seatBots[player]);
+function configureSeats() {
+  seatBots=activeTeams.map((_,player)=>modeSelect.value==="bot" ? player>0 : modeSelect.value==="mixed" && player>0);
+  seatOptions.replaceChildren();
+  seatOptions.hidden=modeSelect.value!=="mixed";
+  if (modeSelect.value!=="mixed") return;
+  const legend=document.createElement("strong");
+  legend.textContent="Player seats";
+  seatOptions.append(legend);
+  activeTeams.forEach((team,player)=>{
+    const label=document.createElement("label");
+    const select=document.createElement("select");
+    select.setAttribute("aria-label",`${teams[team]} seat type`);
+    select.innerHTML=`<option value="human">Human</option><option value="bot">Bot</option>`;
+    select.value=seatBots[player]?"bot":"human";
+    if (player===0) { seatBots[player]=false; select.value="human"; }
+    select.addEventListener("change",()=>{seatBots[player]=select.value==="bot";render();});
+    label.append(`${teams[team]}: `,select);
+    seatOptions.append(label);
+  });
+}
+function isBot(player) {
+  if (modeSelect.value==="bot") return player>0;
+  if (modeSelect.value==="mixed") return Boolean(seatBots[player]);
   return false;
 }
-function paintDie(){
-  const teamId=activeTeams[rolling&&rollingPlayer!==null?rollingPlayer:state.turn];
-  boardDie.dataset.team=teams[teamId].toLowerCase();
-  boardDie.dataset.value=String(dieValue);
-  boardDie.setAttribute("aria-label",rolling?`Rolling ${teams[teamId]} die`:`${teams[teamId]} die showing ${dieValue}${isBot(state.turn)||state.roll||state.winner!==null?"":". Tap to roll"}`);
-  boardDie.disabled=rolling||moving||state.roll>0||state.winner!==null||isBot(state.turn);
-  const [x,y]=dieHomes[teamId];boardDie.style.left=`${x}%`;boardDie.style.top=`${y}%`;
-  const active=new Set(pipSets[dieValue]);
-  pipNodes.forEach((pip,index)=>pip.classList.toggle("on",active.has(index)));
-}
+playerSelect.addEventListener("change",game.restart);
 
-function throwDie(automated=false){
-  if(rolling||moving||state.roll||state.winner!==null||isBot(state.turn)&&!automated)return;
-  rolling=true;rollingPlayer=state.turn;
-  dieValue=1+Math.floor(Math.random()*6);
-  state=rollLudo(state,dieValue);
-  message=`${teams[activeTeams[rollingPlayer]]} rolled ${dieValue}.${state.roll?"":" No legal token can move."}`;
-  boardDie.classList.remove("rolling");
-  requestAnimationFrame(()=>boardDie.classList.add("rolling"));
+function throwDie() {
+  const player=state.turn;
+  if(state.roll || state.winner!==null) return;
+  started=true;
+  const rolled=1+Math.floor(Math.random()*6);
+  const teamId=activeTeams[player];
+  lastDice[teamId]=rolled;
+  const face=dice[teamId];
+  face.classList.remove("rolling");
+  requestAnimationFrame(()=>face.classList.add("rolling"));
+  state=rollLudo(state,rolled);
+  message=`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
   render();
-  game.later(()=>{
-    rolling=false;rollingPlayer=null;boardDie.classList.remove("rolling");
-    const legal=legalTokens(state);
-    if(state.roll&&legal.length===1){selectToken(legal[0]);return;}
-    render();
-  },reduceMotion?40:560);
 }
 
-function selectToken(index){
-  const legal=legalTokens(state);
-  if(rolling||moving||state.winner!==null||!legal.includes(index))return;
-  const seat=state.turn,old=state.pieces[seat][index];
-  const target=old<0?0:old+state.roll;
-  moving=true;visualMove={seat,index,step:old<0?0:old,target};message=`${teams[activeTeams[seat]]} token is moving.`;
-  if(old<0){moveVisualTo(0,()=>game.later(finalizeMove,reduceMotion?1:150));return;}
-  advanceStep();
-}
-function advanceStep(){
-  if(!visualMove)return;
-  moveVisualTo(visualMove.step+1,()=>{
-    if(visualMove.step>=visualMove.target)game.later(finalizeMove,reduceMotion?1:100);
-    else game.later(advanceStep,reduceMotion?1:88);
-  });
-}
-function moveVisualTo(step,after){
-  const current=visualMove;
-  const marker=document.querySelector(`[data-token="${current.seat}-${current.index}"]`);
-  if(marker)motions.set(`${current.seat}-${current.index}`,marker.getBoundingClientRect());
-  current.step=step;render();
-  game.later(after,reduceMotion?1:100);
-}
-function finalizeMove(){
-  const moved=visualMove;
-  if(!moved)return;
+const tokenControls=Array.from({length:4},(_,player)=>Array.from({length:4},(_,index)=>{
+  const button=control(`${teams[player]} ${index+1}`,()=>play(index));
+  button.hidden=true;
+  document.querySelector("#actions").append(button);
+  return button;
+}));
+function play(index) {
+  if(!legalTokens(state).includes(index)) return;
   const previous=state.pieces.map(team=>team.slice());
-  state=moveLudo(state,moved.index);
-  visualMove=null;moving=false;message="";
-  state.pieces.forEach((team,seat)=>team.forEach((step,index)=>{
-    if(previous[seat][index]===step)return;
-    const marker=document.querySelector(`[data-token="${seat}-${index}"]`);
-    if(marker)motions.set(`${seat}-${index}`,marker.getBoundingClientRect());
+  state=moveLudo(state,index);
+  motions=new Map();
+  state.pieces.forEach((team,player)=>team.forEach((step,token)=>{
+    if(previous[player][token]!==step) {
+      const oldTile=previous[player][token]<0 ? yards[player][token] : previous[player][token]>=52 ? lanes[player][previous[player][token]-52] : track[trackPosition(activeTeams[player],previous[player][token])];
+      const old=squares.get(oldTile.join(",")).querySelector(`[data-token="${player}-${token}"]`);
+      if(old) motions.set(`${player}-${token}`,old.getBoundingClientRect());
+    }
   }));
+  message="";
   render();
 }
-
-function render(){
+function render() {
   const botTurn=isBot(state.turn)&&state.winner===null;
   const legal=legalTokens(state);
-  for(const tile of squares.values())tile.replaceChildren();
-  state.pieces.forEach((team,seat)=>team.forEach((step,index)=>{
-    const teamId=activeTeams[seat];
-    const shownStep=visualMove&&visualMove.seat===seat&&visualMove.index===index?visualMove.step:step;
-    const tile=shownStep<0?yards[teamId][index]:shownStep>=52?lanes[teamId][shownStep-52]:track[trackPosition(teamId,shownStep)];
+  dice.forEach((button,teamId)=>{
+    const seat=activeTeams.indexOf(teamId);
+    const container=button.closest(".player-dice");
+    const label=container.querySelector(".player-dice-label");
+    label.textContent=seat<0?teams[teamId]:`Player ${seat+1} · ${getColor(seat)[0]}`;
+    label.disabled=started||seat<0;
+    label.setAttribute("aria-label",`Choose color for player ${seat+1}`);
+    label.onclick=()=>showColorPicker(seat);
+    const enabled=activeTeams.includes(teamId);
+    const active=enabled && activeTeams[state.turn]===teamId && state.winner===null;
+    button.closest(".player-dice").classList.toggle("active",active);
+    button.closest(".player-dice").classList.toggle("inactive-seat",!enabled);
+    button.disabled=!active||botTurn||state.roll>0;
+    button.textContent=dieSymbols[lastDice[teamId]-1];
+    button.setAttribute("aria-label",`${teams[teamId]} die: ${lastDice[teamId]}${active?", current turn":""}`);
+  });
+  for(const tile of squares.values()) tile.replaceChildren();
+  state.pieces.forEach((team,player)=>team.forEach((step,index)=>{
+    const teamId=activeTeams[player];
+    const label=`${getColor(player)[0]} token ${index+1}`;
+    const button=tokenControls[teamId][index];
+    button.hidden=true;
+    button.disabled=botTurn||!legal.includes(index);
+    button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===57?"home":"step "+(step+1)}`);
+    const tile=step===-1 ? yards[teamId][index] : step>=52 ? lanes[teamId][step-52] : track[trackPosition(teamId,step)];
     const square=squares.get(tile.join(","));
-    const token=document.createElement("button");token.type="button";
-    token.className=`token ${teams[teamId].toLowerCase()}`;
-    token.dataset.token=`${seat}-${index}`;token.dataset.step=String(shownStep);
-    const movable=seat===state.turn&&legal.includes(index)&&!botTurn&&!rolling&&!moving;
-    token.dataset.legal=String(movable);token.disabled=!movable;
-    token.setAttribute("aria-label",`${teams[teamId]} token ${index+1}, ${shownStep<0?"in yard":shownStep===57?"home":"step "+(shownStep+1)}${movable?", movable":""}`);
-    const from=motions.get(`${seat}-${index}`);
-    if(from){const to=square.getBoundingClientRect();token.style.setProperty("--dx",`${from.left-to.left}px`);token.style.setProperty("--dy",`${from.top-to.top}px`);token.classList.add("moving");}
-    token.addEventListener("click",()=>selectToken(index));
-    square.append(token);
+    const marker=document.createElement("span");
+    marker.className=teams[teamId].toLowerCase();
+    marker.style.setProperty("--piece-color",getColor(player)[1]);
+    marker.textContent=String(index+1);
+    marker.dataset.token=`${teamId}-${index}`;
+    marker.dataset.step=String(step);
+    if(player===state.turn && !botTurn && legal.includes(index)) {
+      marker.setAttribute("role","button");
+      marker.setAttribute("tabindex","0");
+      marker.setAttribute("aria-label",`Move ${label}`);
+      marker.addEventListener("click",()=>play(index));
+      marker.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();play(index);}});
+      marker.classList.add("playable-token");
+    }
+    const from=motions.get(`${player}-${index}`);
+    if(from) {
+      const to=square.getBoundingClientRect();
+      marker.style.setProperty("--dx",`${from.left-to.left}px`);
+      marker.style.setProperty("--dy",`${from.top-to.top}px`);
+      marker.classList.add("moving");
+    }
+    square.append(marker);
   }));
   motions.clear();
-  const currentTeam=teams[activeTeams[state.turn]];
-  game.status.dataset.turn=currentTeam.toLowerCase();
-  game.status.textContent=state.winner!==null?`${teams[activeTeams[state.winner]]} wins!`
-    :rolling?`${teams[activeTeams[rollingPlayer]]} die is rolling…`
-    :moving?message
-    :state.roll?`${currentTeam}: tap one highlighted token.`
-    :botTurn?`${currentTeam} bot's turn.`
-    :message||`${currentTeam}: tap your die.`;
-  paintDie();
-  winnerOverlay.hidden=state.winner===null;
-  if(state.winner!==null){
-    const color=teams[activeTeams[state.winner]].toLowerCase();
-    winnerOverlay.dataset.winner=color;winnerTitle.textContent=`${teams[activeTeams[state.winner]]} wins!`;
+  const currentTeam=getColor(state.turn)[0];
+
+  game.status.dataset.turn=teams[activeTeams[state.turn]].toLowerCase();
+  game.status.textContent=message+(state.winner!==null?`${getColor(state.winner)[0]} wins!`
+    :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);
+  if(state.winner===null && state.roll>0 && legal.length===1) {
+    game.later(()=>play(legal[0]), 420);
+  } else if(botTurn) {
+    game.later(()=>state.roll?play(choose(legal)):throwDie());
   }
-  if(botTurn&&!rolling&&!moving)game.later(()=>{
-    const moves=legalTokens(state);
-    if(state.roll){selectToken(moves.length===1?moves[0]:choose(moves));}
-    else throwDie(true);
-  },state.roll?420:540);
 }
 game.restart();

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261106approved4">
-  <link rel="stylesheet" href="./ludo.css?v=20261106approved4">
-  <script type="module" src="../ludo.mjs?v=20261106approved4"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261106complete5">
+  <link rel="stylesheet" href="./ludo.css?v=20261106complete5">
+  <script type="module" src="../ludo.mjs?v=20261106complete5"></script>
 
 </head>
 <body class="ludo-game">
@@ -15,14 +15,15 @@
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
     <section id="ludo-setup" class="ludo-setup">
       <div class="mahir-hero">
-        <div class="mahir-crown" aria-hidden="true">♛</div>
+        <div class="mahir-crown" aria-hidden="true"><svg viewBox="0 0 180 115" width="126" height="82"><defs><linearGradient id="gold" x2=".3" y2="1"><stop stop-color="#fff6b4"/><stop offset=".35" stop-color="#ffcc38"/><stop offset=".75" stop-color="#bb6b0b"/><stop offset="1" stop-color="#ffe184"/></linearGradient></defs><path d="M24 81 10 26 51 53 89 8 128 53 170 26 155 81Z" fill="url(#gold)" stroke="#8b4109" stroke-width="5"/><path d="M24 82h131v20H24z" fill="url(#gold)" stroke="#8b4109" stroke-width="4"/><g fill="#e52d3c" stroke="#ffe7a5" stroke-width="3"><circle cx="10" cy="23" r="8"/><circle cx="89" cy="9" r="8"/><circle cx="170" cy="23" r="8"/></g><g fill="#18a8e2" stroke="#fff4a7" stroke-width="3"><circle cx="51" cy="51" r="8"/><circle cx="128" cy="51" r="8"/></g><path d="M42 88h96" stroke="#fff3a8" stroke-width="3"/></svg></div>
         <div class="mahir-logo"><span>Ludu</span><strong>Mahir</strong></div>
         <div class="mahir-illustration" aria-hidden="true">
           <span class="mahir-die die-left">⚄</span>
-          <span class="mahir-pawn pawn-red">♟</span><span class="mahir-pawn pawn-green">♟</span>
-          <span class="mahir-pawn pawn-blue">♟</span><span class="mahir-pawn pawn-yellow">♟</span>
+          <span class="ludo-pawn pawn-red"></span><span class="ludo-pawn pawn-green"></span>
+          <span class="ludo-pawn pawn-blue"></span><span class="ludo-pawn pawn-yellow"></span>
           <span class="mahir-die die-right">⚅</span>
         </div>
+        <div class="mahir-board-art" aria-hidden="true"><div class="art-quarter red"></div><div class="art-quarter green"></div><div class="art-quarter blue"></div><div class="art-quarter yellow"></div><div class="art-cross"></div></div>
         <p>Classic Ludo game. Play with friends or bots,<br>choose your style and enjoy anytime.</p>
       </div>
       <div class="mahir-settings">
@@ -33,7 +34,7 @@
             <button type="button" disabled>◎ Online <small>Coming Soon</small></button>
           </div>
         </div>
-        <div class="mahir-field"><div class="mahir-field-title">♟ Players</div>
+        <div class="mahir-field"><div class="mahir-field-title">👥 Players</div>
           <div class="mahir-choice" id="player-buttons">
             <button type="button" data-value="2">2 Players</button>
             <button type="button" data-value="3">3 Players</button>

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261106setup1">
-  <link rel="stylesheet" href="./ludo.css?v=20261106setup1">
-  <script type="module" src="../ludo.mjs?v=20261106setup1"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261106art2">
+  <link rel="stylesheet" href="./ludo.css?v=20261106art2">
+  <script type="module" src="../ludo.mjs?v=20261106art2"></script>
 <style>
 body.ludo-game:not(.playing-ludo){background:radial-gradient(circle at 50% 20%,#39245d 0%,#17142e 70%)!important;color:#fff7dc}
 .ludo-game [hidden]{display:none!important}
@@ -27,16 +27,30 @@ body.ludo-game:not(.playing-ludo){background:radial-gradient(circle at 50% 20%,#
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
     <section id="ludo-setup" class="ludo-setup">
-      <div class="setup-emblem" aria-hidden="true">🎲</div>
-      <h2>LUDU MAHIR</h2>
-      <p>Classic Ludo · Premium Board</p>
-      <p>Play with friends on one phone or challenge the bots.</p>
+      <div class="setup-art" aria-hidden="true">
+        <div class="setup-brand">L<span>U</span>DU <em>MAHIR</em></div>
+        <div class="mini-ludo-board">
+          <div class="mini-yard red"><i></i><i></i><i></i><i></i></div>
+          <div class="mini-path top"><b>★</b><b></b><b></b></div>
+          <div class="mini-yard green"><i></i><i></i><i></i><i></i></div>
+          <div class="mini-path left"><b></b><b>★</b><b></b></div>
+          <div class="mini-center"></div>
+          <div class="mini-path right"><b></b><b>★</b><b></b></div>
+          <div class="mini-yard blue"><i></i><i></i><i></i><i></i></div>
+          <div class="mini-path bottom"><b></b><b></b><b>★</b></div>
+          <div class="mini-yard yellow"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="setup-dice" aria-hidden="true"><span>⚄</span><span>⚅</span></div>
+      </div>
+      <h2>Choose Your Match</h2>
+      <p class="setup-tagline">Classic Ludo · Premium Wooden Pieces</p>
+      
       <div class="setup-options">
         <label>Players <select id="setup-players"><option value="2">2 Players</option><option value="3">3 Players</option><option value="4">4 Players</option></select></label>
         <label>Game Mode <select id="setup-mode"><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select></label>
       </div>
       <button id="start-game" type="button" class="start-game">Start Game</button>
-      <p class="setup-footnote">Color selection is optional. Tap a player header before the first roll.</p>
+      <p class="setup-footnote">Play together or challenge the bots. Change colors anytime before the first roll by tapping your player header.</p>
     </section>
     <section id="ludo-play" hidden>
     <div class="play-toolbar"><button id="back-to-setup" type="button">← Setup</button><span>LUDU MAHIR</span><button id="full-screen" type="button">⛶ Full Screen</button></div>

@@ -43,9 +43,12 @@ main { max-width: 1050px; }
   transform: rotate(-8deg);
   animation: note 1.3s 2 both;
 }
-.ludo-preview { background: conic-gradient(#f5ddaa 25%, #9bbdc4 0 50%, #f5ddaa 0 75%, #d99e8f 0); }
+.ludo-preview { background: conic-gradient(#f28881 0 25%,#8fceec 0 50%,#f2d371 0 75%,#8bd2a0 0); }
 .die { color: #302318; animation: die 1.25s 3; }
-.pawn { position: absolute; left: 14%; bottom: 20%; width: 20px; height: 20px; border-radius: 50%; background: #9b2427; animation: pawn 1.25s 3; }
+.pawn { position: absolute; left: 14%; bottom: 20%; width: 18px; height: 18px; border:1px solid #fff9; border-radius: 50%; background: radial-gradient(circle at 32% 25%,#fff,#ed4751 48%,#a91e35); box-shadow:0 2px 5px #39271977,inset 0 2px 3px #ffffff99; animation: pawn 1.25s 3; }
+.pawn.blue { left:23%; bottom:37%; background:radial-gradient(circle at 32% 25%,#fff,#48a6f0 48%,#1b59b5); animation-delay:.14s; }
+.pawn.green { left:42%; bottom:20%; background:radial-gradient(circle at 32% 25%,#fff,#43d178 48%,#168045); animation-delay:.28s; }
+.pawn.yellow { left:50%; bottom:38%; background:radial-gradient(circle at 32% 25%,#fff,#ffd341 48%,#b9780d); animation-delay:.42s; }
 .chess-preview { background: repeating-conic-gradient(#5a4938 0 25%, #8f745b 0 50%) 50% / 48px 48px; }
 .knight { text-shadow: 0 2px 4px #241a10; animation: knight 1.6s 2; }
 .penalty-preview { background: #326545; }

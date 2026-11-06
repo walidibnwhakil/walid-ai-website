@@ -21,7 +21,8 @@ const modeSelect = document.querySelector("#mode");
 const seatOptions = document.querySelector("#seat-options");
 const dice = teams.map((team,teamId)=>{
   const container=document.querySelector(`#dice-${team.toLowerCase()}`);
-  const label=document.createElement("span");
+  const label=document.createElement("button");
+  label.type="button";
   label.className="player-dice-label";
   label.textContent=team;
   const button=document.createElement("button");
@@ -35,10 +36,34 @@ const dice = teams.map((team,teamId)=>{
 });
 const dieSymbols=["⚀","⚁","⚂","⚃","⚄","⚅"];
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], motions = new Map();
+let activeTeams, state, message, seatBots = [], motions = new Map(), started=false;
+let chosenColors=[0,1,2,3];
+const colorPicker=document.querySelector("#color-picker");
+const colorSeat=document.querySelector("#color-seat");
+const colorChoice=document.querySelector("#color-choice");
+document.querySelector("#color-cancel").addEventListener("click",()=>colorPicker.hidden=true);
+document.querySelector("#color-apply").addEventListener("click",()=>{
+  const seat=Number(colorSeat.value), wanted=Number(colorChoice.value);
+  if(started || seat>=activeTeams.length) return;
+  const other=chosenColors.indexOf(wanted);
+  if(other!==-1 && other!==seat) chosenColors[other]=chosenColors[seat];
+  chosenColors[seat]=wanted;
+  colorPicker.hidden=true;
+  game.restart();
+});
+function showColorPicker(seat) {
+  if(started || seat<0 || seat>=activeTeams.length) return;
+  colorSeat.value=String(seat);
+  colorChoice.value=String(chosenColors[seat]);
+  colorPicker.hidden=false;
+}
+
 const game = gameShell({reset() {
-  activeTeams = Array.from({length:Number(playerSelect.value)},(_,index)=>index);
-  state = newLudo(activeTeams.length);
+  const count=Number(playerSelect.value);
+  activeTeams=chosenColors.slice(0,count);
+  state=newLudo(count,activeTeams);
+  started=false;
+  colorPicker.hidden=true;
   message = "";
   motions = new Map();
   lastDice.fill(1);
@@ -91,6 +116,7 @@ playerSelect.addEventListener("change",game.restart);
 
 function throwDie() {
   const player=state.turn;
+  started=true;
   const rolled=1+Math.floor(Math.random()*6);
   const teamId=activeTeams[player];
   lastDice[teamId]=rolled;
@@ -114,7 +140,7 @@ function play(index) {
   motions=new Map();
   state.pieces.forEach((team,player)=>team.forEach((step,token)=>{
     if(previous[player][token]!==step) {
-      const oldTile=previous[player][token]<0 ? yards[player][token] : previous[player][token]>=52 ? lanes[player][previous[player][token]-52] : track[trackPosition(player,previous[player][token])];
+      const oldTile=previous[player][token]<0 ? yards[player][token] : previous[player][token]>=52 ? lanes[player][previous[player][token]-52] : track[trackPosition(activeTeams[player],previous[player][token])];
       const old=squares.get(oldTile.join(",")).querySelector(`[data-token="${player}-${token}"]`);
       if(old) motions.set(`${player}-${token}`,old.getBoundingClientRect());
     }
@@ -126,6 +152,13 @@ function render() {
   const botTurn=isBot(state.turn)&&state.winner===null;
   const legal=legalTokens(state);
   dice.forEach((button,teamId)=>{
+    const seat=activeTeams.indexOf(teamId);
+    const container=button.closest(".player-dice");
+    const label=container.querySelector(".player-dice-label");
+    label.textContent=seat<0?teams[teamId]:`Player ${seat+1} · ${teams[teamId]}`;
+    label.disabled=started||seat<0;
+    label.setAttribute("aria-label",`Choose color for player ${seat+1}`);
+    label.onclick=()=>showColorPicker(seat);
     const enabled=activeTeams.includes(teamId);
     const active=enabled && activeTeams[state.turn]===teamId && state.winner===null;
     button.closest(".player-dice").classList.toggle("active",active);

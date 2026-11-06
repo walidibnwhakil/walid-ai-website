@@ -124,6 +124,7 @@ const dice = teams.map((team,teamId)=>{
 const diePips=[[],[[2]],[[0,4]],[[0,2,4]],[[0,1,3,4]],[[0,1,2,3,4]],[[0,1,3,4,5,6]]];
 const lastDice=[1,1,1,1];
 let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, soundEnabled=Boolean(restoredConfig?.sound);
+syncSoundControls();
 const initialColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:[0,1,2,3];
 let chosenColors=[...initialColors];
 const getColor=seat=>palette[chosenColors[seat]];

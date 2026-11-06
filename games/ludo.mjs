@@ -16,15 +16,13 @@ for(const [groupId,selectId] of [["mode-buttons","setup-mode"],["player-buttons"
 }
 document.getElementById("setup-rules").addEventListener("click",()=>document.getElementById("rules-dialog").showModal());
 document.getElementById("close-rules").addEventListener("click",()=>document.getElementById("rules-dialog").close());
-document.getElementById("setup-settings").addEventListener("click",()=>{
- document.getElementById("mode-buttons").scrollIntoView({behavior:"smooth",block:"center"});
- document.getElementById("mode-buttons").querySelector("button").focus();
-});
-
-document.getElementById("setup-colors").addEventListener("click",()=>{
- document.querySelector("#start-game").click();
- document.querySelector(".color-hint")?.scrollIntoView({behavior:"smooth",block:"center"});
-});
+document.getElementById("setup-settings").addEventListener("click",()=>document.getElementById("settings-dialog").showModal());
+document.getElementById("menu-settings").addEventListener("click",()=>document.getElementById("settings-dialog").showModal());
+document.getElementById("close-settings").addEventListener("click",()=>document.getElementById("settings-dialog").close());
+document.getElementById("setup-colors").addEventListener("click",()=>{refreshMenuColors();document.getElementById("menu-colors-dialog").showModal();});
+document.getElementById("close-menu-colors").addEventListener("click",()=>document.getElementById("menu-colors-dialog").close());
+document.getElementById("online-coming").addEventListener("click",()=>document.getElementById("notice-dialog").showModal());
+document.getElementById("close-notice").addEventListener("click",()=>document.getElementById("notice-dialog").close());
 const playScreen=document.querySelector("#ludo-play");
 document.querySelector("#start-game").addEventListener("click",()=>{
   document.querySelector("#player-count").value=document.querySelector("#setup-players").value;
@@ -43,12 +41,14 @@ document.querySelector("#back-to-setup").addEventListener("click",()=>{
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   window.scrollTo(0,0);
 });
-document.querySelector("#menu-sound").addEventListener("click",event=>{soundEnabled=!soundEnabled;event.currentTarget.setAttribute("aria-pressed",String(soundEnabled));event.currentTarget.textContent=soundEnabled?"Sound: On":"Sound: Off";});
-document.querySelector("#sound-toggle").addEventListener("click",event=>{
-  soundEnabled=!soundEnabled;const enabled=soundEnabled;const button=event.currentTarget;
-  button.setAttribute("aria-pressed",String(enabled));button.textContent=enabled?"Sound: On":"Sound: Off";
-  const menuSound=document.querySelector("#menu-sound");menuSound.setAttribute("aria-pressed",String(enabled));menuSound.textContent=enabled?"Sound: On":"Sound: Off";
-});
+document.querySelector("#menu-sound").addEventListener("click",()=>{soundEnabled=!soundEnabled;syncSoundControls();});
+document.querySelector("#settings-sound").addEventListener("change",event=>{soundEnabled=event.currentTarget.checked;syncSoundControls();});
+document.querySelector("#sound-toggle").addEventListener("click",()=>{soundEnabled=!soundEnabled;syncSoundControls();});
+function syncSoundControls(){
+  const menu=document.querySelector("#menu-sound"),board=document.querySelector("#sound-toggle"),setting=document.querySelector("#settings-sound");
+  menu.setAttribute("aria-pressed",String(soundEnabled));menu.setAttribute("aria-label",soundEnabled?"Turn sound off":"Turn sound on");menu.classList.toggle("sound-on",soundEnabled);
+  board.setAttribute("aria-pressed",String(soundEnabled));board.textContent=soundEnabled?"Sound: On":"Sound: Off";setting.checked=soundEnabled;
+}
 document.querySelector("#board-settings").addEventListener("click",event=>{const open=playScreen.classList.toggle("show-game-settings");event.currentTarget.setAttribute("aria-expanded",String(open));event.currentTarget.textContent=open?"Close Settings":"Settings";if(open)document.querySelector(".game-settings").scrollIntoView({behavior:"smooth",block:"center"});});
 document.querySelector("#full-screen").addEventListener("click",()=>{
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
@@ -59,6 +59,21 @@ const palette = [
   ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"],
   ["Cyan","#30c9ed"],["Lime","#9bd63d"],["Maroon","#a93455"],["Brown","#a76a3b"]
 ];
+function refreshMenuColors(){
+  const count=Number(document.querySelector('#setup-players').value);
+  const player=document.querySelector('#menu-color-player'),color=document.querySelector('#menu-color-choice');
+  [...player.options].forEach(option=>{option.disabled=Number(option.value)>=count;});
+  if(Number(player.value)>=count)player.value='0';
+  const seat=Number(player.value);color.replaceChildren();
+  palette.forEach(([name,hex],index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=name;option.disabled=chosenColors.some((value,other)=>other<count&&other!==seat&&value===index);color.append(option);});
+  color.value=String(chosenColors[seat]);
+}
+document.querySelector('#menu-color-player').addEventListener('change',refreshMenuColors);
+document.querySelector('#apply-menu-color').addEventListener('click',()=>{
+  const seat=Number(document.querySelector('#menu-color-player').value),color=Number(document.querySelector('#menu-color-choice').value),count=Number(document.querySelector('#setup-players').value);
+  if(seat>=count||chosenColors.some((value,index)=>index<count&&index!==seat&&value===color))return;
+  chosenColors[seat]=color;document.querySelector('#menu-color-confirmation').textContent='Player '+(seat+1)+' color set to '+palette[color][0]+'.';refreshMenuColors();
+});
 const starts = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const lanes = [
   Array.from({length:6},(_,i)=>[7,i+1]),
@@ -243,7 +258,7 @@ async function play(index) {
   started=true;
   message="";
   const move=result.lastMove;
-  const delay=145;
+  const delay=Number(document.querySelector("#settings-animation-speed").value)||145;
   const moving=[];
   if(move) {
     const steps=movementSteps(move.from,move.to);
@@ -329,3 +344,4 @@ function render() {
   }
 }
 game.restart();
+

@@ -5,56 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261106ludu-final1">
-  <link rel="stylesheet" href="./ludo.css?v=20261106ludu-final1">
-  <script type="module" src="../ludo.mjs?v=20261106ludu-final1"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261106ludu-menu2">
+  <link rel="stylesheet" href="./ludo.css?v=20261106ludu-menu2">
+  <script type="module" src="../ludo.mjs?v=20261106ludu-menu2"></script>
 
 </head>
 <body class="ludo-game">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
     <section id="ludo-setup" class="ludo-setup">
-      <div class="menu-toolbar"><a href="/games/" aria-label="Back to Games">← Games</a><button id="menu-sound" type="button" aria-pressed="false">Sound: Off</button><a href="#setup-settings">Settings</a></div>
-      <div class="mahir-hero">
-        <div class="mahir-laurel" aria-hidden="true">❧</div><div class="mahir-crown" aria-hidden="true"><svg viewBox="0 0 180 115" width="126" height="82"><defs><linearGradient id="gold" x2=".3" y2="1"><stop stop-color="#fff6b4"/><stop offset=".35" stop-color="#ffcc38"/><stop offset=".75" stop-color="#bb6b0b"/><stop offset="1" stop-color="#ffe184"/></linearGradient></defs><path d="M24 81 10 26 51 53 89 8 128 53 170 26 155 81Z" fill="url(#gold)" stroke="#8b4109" stroke-width="5"/><path d="M24 82h131v20H24z" fill="url(#gold)" stroke="#8b4109" stroke-width="4"/><g fill="#e52d3c" stroke="#ffe7a5" stroke-width="3"><circle cx="10" cy="23" r="8"/><circle cx="89" cy="9" r="8"/><circle cx="170" cy="23" r="8"/></g><g fill="#18a8e2" stroke="#fff4a7" stroke-width="3"><circle cx="51" cy="51" r="8"/><circle cx="128" cy="51" r="8"/></g><path d="M42 88h96" stroke="#fff3a8" stroke-width="3"/></svg></div>
-        <div class="mahir-logo"><span>Ludu</span><strong>Mahir</strong></div><div class="mahir-laurel right" aria-hidden="true">❧</div>
-        <div class="mahir-illustration" aria-hidden="true">
-          <span class="mahir-die die-left"><svg class="die-art" viewBox="0 0 80 80" aria-hidden="true"><rect x="5" y="5" width="70" height="70" rx="17" fill="url(#ivory)" stroke="#a8763e" stroke-width="4"/><g fill="#26170f"><circle cx="24" cy="24" r="5"/><circle cx="56" cy="24" r="5"/><circle cx="40" cy="40" r="5"/><circle cx="24" cy="56" r="5"/><circle cx="56" cy="56" r="5"/></g><defs><linearGradient id="ivory" x2=".8" y2="1"><stop stop-color="#fffef7"/><stop offset="1" stop-color="#cfb894"/></linearGradient></defs></svg></span>
-          <span class="ludo-pawn pawn-red"></span><span class="ludo-pawn pawn-green"></span>
-          <span class="ludo-pawn pawn-blue"></span><span class="ludo-pawn pawn-yellow"></span>
-          <span class="mahir-die die-right"><svg class="die-art" viewBox="0 0 80 80" aria-hidden="true"><rect x="5" y="5" width="70" height="70" rx="17" fill="url(#ivory2)" stroke="#a8763e" stroke-width="4"/><g fill="#26170f"><circle cx="23" cy="23" r="5"/><circle cx="40" cy="23" r="5"/><circle cx="57" cy="23" r="5"/><circle cx="23" cy="40" r="5"/><circle cx="40" cy="40" r="5"/><circle cx="57" cy="40" r="5"/></g><defs><linearGradient id="ivory2" x2=".8" y2="1"><stop stop-color="#fffef7"/><stop offset="1" stop-color="#cfb894"/></linearGradient></defs></svg></span>
-        </div>
-        
-        <p>Classic Ludo game. Play with friends or bots,<br>choose your style and enjoy anytime.</p>
-      </div>
-      <div class="mahir-settings">
-        <div class="mahir-field"><div class="mahir-field-title"><svg class="field-mark" viewBox="0 0 36 36" aria-hidden="true"><path d="M9 10h18q5 0 6 6l1 8q0 5-5 4l-6-5h-6l-6 5q-5 1-5-4l1-8q1-6 6-6z" fill="#ffe08b" stroke="#8d4b16" stroke-width="2"/><path d="M10 18h8m-4-4v8" stroke="#57300f" stroke-width="2"/><circle cx="26" cy="17" r="1.5" fill="#57300f"/><circle cx="29" cy="20" r="1.5" fill="#57300f"/></svg> Game Mode</div>
-          <div class="mahir-choice" id="mode-buttons">
-            <button type="button" data-value="bot" class="selected">● vs Bot</button>
-            <button type="button" data-value="friend">●● Local (2–4)</button>
-            <button type="button" disabled>◎ Online <small>Coming Soon</small></button>
+      <div class="mahir-menu">
+        <svg class="menu-svg-defs" aria-hidden="true"><defs>
+          <linearGradient id="menuGold" x2=".1" y2="1"><stop stop-color="#fff5ad"/><stop offset=".36" stop-color="#ffcf39"/><stop offset=".73" stop-color="#c37a17"/><stop offset="1" stop-color="#ffe79a"/></linearGradient>
+          <linearGradient id="menuDie" x2=".8" y2="1"><stop stop-color="#fffefa"/><stop offset="1" stop-color="#d1baa0"/></linearGradient>
+          <linearGradient id="menuDie2" x2=".8" y2="1"><stop stop-color="#fffefa"/><stop offset="1" stop-color="#d1baa0"/></linearGradient>
+          <linearGradient id="menuDie3" x2=".8" y2="1"><stop stop-color="#fffefa"/><stop offset="1" stop-color="#d1baa0"/></linearGradient>
+          <linearGradient id="menuDie4" x2=".8" y2="1"><stop stop-color="#fffefa"/><stop offset="1" stop-color="#d1baa0"/></linearGradient>
+        </defs></svg>
+        <header class="menu-topbar">
+          <a class="menu-round-button" href="/games/" aria-label="Back to Games">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M21 9 5 24l16 15v-9c13-2 18 4 22 11-1-18-7-27-22-28z" fill="#fff0c9" stroke="#8d4d14" stroke-width="3" stroke-linejoin="round"/></svg>
+          </a>
+          <div class="brand-lockup" aria-label="Ludu Mahir">
+            <svg class="brand-laurel laurel-left" viewBox="0 0 110 145" aria-hidden="true"><path d="M91 132C31 111 15 70 28 19" fill="none" stroke="#e8ad35" stroke-width="4"/><g fill="#ffdc65" stroke="#a95e18" stroke-width="1.5"><ellipse cx="28" cy="30" rx="7" ry="17" transform="rotate(-27 28 30)"/><ellipse cx="22" cy="53" rx="7" ry="16" transform="rotate(-44 22 53)"/><ellipse cx="29" cy="77" rx="7" ry="16" transform="rotate(-60 29 77)"/><ellipse cx="46" cy="99" rx="7" ry="16" transform="rotate(-70 46 99)"/><ellipse cx="68" cy="116" rx="7" ry="15" transform="rotate(-78 68 116)"/></g></svg>
+            <svg class="brand-laurel laurel-right" viewBox="0 0 110 145" aria-hidden="true"><path d="M19 132c60-21 76-62 63-113" fill="none" stroke="#e8ad35" stroke-width="4"/><g fill="#ffdc65" stroke="#a95e18" stroke-width="1.5"><ellipse cx="82" cy="30" rx="7" ry="17" transform="rotate(27 82 30)"/><ellipse cx="88" cy="53" rx="7" ry="16" transform="rotate(44 88 53)"/><ellipse cx="81" cy="77" rx="7" ry="16" transform="rotate(60 81 77)"/><ellipse cx="64" cy="99" rx="7" ry="16" transform="rotate(70 64 99)"/><ellipse cx="42" cy="116" rx="7" ry="15" transform="rotate(78 42 116)"/></g></svg>
+            <svg class="brand-die die-left" viewBox="0 0 64 64" aria-hidden="true"><rect x="3" y="3" width="58" height="58" rx="16" fill="url(#menuDie)" stroke="#a76725" stroke-width="3"/><g fill="#24150e"><circle cx="19" cy="19" r="4"/><circle cx="45" cy="19" r="4"/><circle cx="19" cy="32" r="4"/><circle cx="45" cy="32" r="4"/><circle cx="19" cy="45" r="4"/><circle cx="45" cy="45" r="4"/></g></svg>
+            <svg class="brand-die die-right" viewBox="0 0 64 64" aria-hidden="true"><rect x="3" y="3" width="58" height="58" rx="16" fill="url(#menuDie2)" stroke="#a76725" stroke-width="3"/><g fill="#24150e"><circle cx="19" cy="19" r="4"/><circle cx="45" cy="19" r="4"/><circle cx="32" cy="32" r="4"/><circle cx="19" cy="45" r="4"/><circle cx="45" cy="45" r="4"/></g></svg>
+            <svg class="brand-crown" viewBox="0 0 150 92" aria-hidden="true"><path d="m14 68-9-47 37 24L74 4l32 41 38-24-10 47z" fill="url(#menuGold)" stroke="#8d470e" stroke-width="5"/><path d="M17 70h112v16H17z" fill="url(#menuGold)" stroke="#8d470e" stroke-width="4"/><g fill="#ed3c35" stroke="#ffe78e" stroke-width="3"><circle cx="6" cy="18" r="7"/><circle cx="74" cy="5" r="7"/><circle cx="145" cy="18" r="7"/></g><circle cx="74" cy="49" r="8" fill="#ec302d" stroke="#ffebaa" stroke-width="3"/></svg>
+            <div class="menu-wordmark"><span>Ludu</span><strong>Mahir</strong></div>
+            <div class="brand-underline"></div>
           </div>
-        </div>
-        <div class="mahir-field"><div class="mahir-field-title"><svg class="field-mark" viewBox="0 0 36 36" aria-hidden="true"><circle cx="12" cy="10" r="5" fill="#ffe8bd"/><circle cx="24" cy="10" r="5" fill="#ffe8bd"/><path d="M3 29v-5q0-7 9-7t9 7v5zm13 0v-5q0-7 8-7t9 7v5z" fill="#f0d6b4" stroke="#87501e" stroke-width="1.5"/></svg> Players</div>
-          <div class="mahir-choice" id="player-buttons">
-            <button type="button" data-value="2">2 Players</button>
-            <button type="button" data-value="3">3 Players</button>
-            <button type="button" data-value="4" class="selected">4 Players</button>
+          <div class="menu-top-actions">
+            <button class="menu-round-button" id="menu-sound" type="button" aria-label="Turn sound on" aria-pressed="false">
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 19h9l12-9v28l-12-9H7z" fill="#fff0cf" stroke="#704016" stroke-width="2"/><path d="M33 17q9 7 0 14m4-20q14 13 0 26" fill="none" stroke="#fff0cf" stroke-width="4" stroke-linecap="round"/></svg>
+            </button>
+            <button class="menu-round-button" id="menu-settings" type="button" aria-label="Game settings">
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="m20 4 8 0 2 6 5 2 6-2 4 7-4 5v5l4 5-4 7-6-2-5 2-2 6h-8l-2-6-5-2-6 2-4-7 4-5v-5l-4-5 4-7 6 2 5-2z" fill="#f4e5c9" stroke="#684018" stroke-width="2"/><circle cx="24" cy="24" r="7" fill="#75431b" stroke="#d2ae75" stroke-width="2"/></svg>
+            </button>
           </div>
+        </header>
+
+        <div class="menu-ribbon"><span>Game Menu</span></div>
+
+        <div class="mode-cards" id="mode-buttons" role="group" aria-label="Game mode">
+          <button class="mode-card selected" data-value="bot" type="button" aria-pressed="true">
+            <svg viewBox="0 0 180 100" aria-hidden="true"><g fill="#fff6e4" stroke="#734b2c" stroke-width="2"><circle cx="50" cy="27" r="19"/><path d="M12 85V74c0-20 16-31 38-31s38 11 38 31v11z"/><rect x="102" y="31" width="66" height="53" rx="17"/><path d="M126 30V18m17 12V18"/><circle cx="123" cy="49" r="4" fill="#74411e"/><circle cx="148" cy="49" r="4" fill="#74411e"/><path d="M124 65q12 10 24 0" fill="none" stroke="#74411e" stroke-width="4"/></g><circle cx="135" cy="12" r="5" fill="#fff3d1"/></svg>
+            <span>Player vs Bot</span>
+          </button>
+          <button class="mode-card" data-value="friend" type="button" aria-pressed="false">
+            <svg viewBox="0 0 180 100" aria-hidden="true"><g fill="#fff6e4" stroke="#734b2c" stroke-width="2"><circle cx="46" cy="29" r="17"/><circle cx="90" cy="19" r="20"/><circle cx="135" cy="29" r="17"/><path d="M9 83V72c0-15 13-26 29-26s29 11 29 26v11zm30 4V70c0-20 21-33 51-33s51 13 51 33v17zm76-15c0-15 13-26 29-26s29 11 29 26v11h-58z"/></g></svg>
+            <span>Local Multiplayer<small>(2 – 4 Players)</small></span>
+          </button>
         </div>
-        <select id="setup-players" aria-label="Players" hidden><option value="2">2 Players</option><option value="3">3 Players</option><option value="4" selected>4 Players</option></select>
-        <select id="setup-mode" aria-label="Game Mode" hidden><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select>
+        <button class="online-note" id="online-coming" type="button">Online Multiplayer <span>Coming Soon</span></button>
+
+        <div class="menu-features">
+          <button id="setup-colors" type="button">
+            <svg viewBox="0 0 72 72" aria-hidden="true"><path d="M36 7C18 7 6 19 6 34s12 24 27 24h7c4 0 6-5 4-8-2-4 1-7 5-7h5c8 0 12-7 12-14C66 16 52 7 36 7z" fill="#ffca20" stroke="#9a5a10" stroke-width="4"/><g fill="#602f13"><circle cx="23" cy="26" r="4"/><circle cx="36" cy="18" r="4"/><circle cx="49" cy="27" r="4"/><circle cx="29" cy="40" r="4"/><circle cx="47" cy="42" r="4"/></g></svg>
+            <span>Choose<br>Colors</span>
+          </button>
+          <button id="setup-settings" type="button">
+            <svg viewBox="0 0 72 72" aria-hidden="true"><path d="m29 4 14 0 3 10 8 4 9-3 7 12-7 7v7l7 7-7 12-9-3-8 4-3 10H29l-3-10-8-4-9 3-7-12 7-7v-7l-7-7 7-12 9 3 8-4z" fill="#f5eddf" stroke="#6f3f18" stroke-width="4"/><circle cx="36" cy="37" r="12" fill="#8a572b" stroke="#fff1d2" stroke-width="3"/></svg>
+            <span>Game Settings</span>
+          </button>
+          <button id="setup-rules" type="button">
+            <svg viewBox="0 0 72 72" aria-hidden="true"><path d="M7 13q16-5 29 5v44Q22 52 7 58zm58 0q-16-5-29 5v44q14-10 29-4z" fill="#ffe168" stroke="#81501d" stroke-width="4"/><path d="M36 18v44M14 25q7-1 14 2m30-2q-7-1-14 2" fill="none" stroke="#865019" stroke-width="3"/></svg>
+            <span>Game Rules</span>
+          </button>
+        </div>
+
+        <div class="player-count-panel">
+          <h2>Number of Players</h2>
+          <div class="player-count-options" id="player-buttons" role="group" aria-label="Number of players">
+            <button type="button" data-value="2" aria-pressed="false"><svg viewBox="0 0 46 50" aria-hidden="true"><circle cx="23" cy="12" r="9" fill="#fff2dc"/><path d="M5 46V37c0-12 8-18 18-18s18 6 18 18v9z" fill="#fff2dc"/></svg><span>2 Players</span></button>
+            <button type="button" data-value="3" aria-pressed="false"><svg viewBox="0 0 66 50" aria-hidden="true"><circle cx="18" cy="13" r="8" fill="#fff2dc"/><circle cx="47" cy="13" r="8" fill="#fff2dc"/><path d="M2 45V37q0-13 16-13t16 13v8zm28 0V37q0-13 17-13t17 13v8z" fill="#fff2dc"/></svg><span>3 Players</span></button>
+            <button type="button" data-value="4" class="selected" aria-pressed="true"><svg viewBox="0 0 46 50" aria-hidden="true"><circle cx="23" cy="12" r="9" fill="#fff2dc"/><path d="M5 46V37c0-12 8-18 18-18s18 6 18 18v9z" fill="#fff2dc"/></svg><span>4 Players</span></button>
+          </div>
+          <select id="setup-players" aria-label="Players" hidden><option value="2">2 Players</option><option value="3">3 Players</option><option value="4" selected>4 Players</option></select>
+          <select id="setup-mode" aria-label="Game Mode" hidden><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select>
+        </div>
+
+        <button id="start-game" type="button" class="start-game"><svg viewBox="0 0 48 54" aria-hidden="true"><path d="M6 4v46l38-23z" fill="#55250a" stroke="#371506" stroke-width="3" stroke-linejoin="round"/></svg><span>Start Game</span></button>
+
+        <div class="menu-footer-art" aria-hidden="true">
+          <div class="footer-pawns left"><i class="pawn red"></i><i class="pawn blue"></i></div>
+          <svg class="footer-die die-one" viewBox="0 0 90 90"><rect x="4" y="4" width="82" height="82" rx="20" fill="url(#menuDie3)" stroke="#87501c" stroke-width="4"/><g fill="#22140d"><circle cx="26" cy="26" r="6"/><circle cx="64" cy="26" r="6"/><circle cx="45" cy="45" r="6"/><circle cx="26" cy="64" r="6"/><circle cx="64" cy="64" r="6"/></g></svg>
+          <svg class="footer-die die-two" viewBox="0 0 90 90"><rect x="4" y="4" width="82" height="82" rx="20" fill="url(#menuDie4)" stroke="#87501c" stroke-width="4"/><g fill="#22140d"><circle cx="26" cy="26" r="6"/><circle cx="64" cy="26" r="6"/><circle cx="26" cy="64" r="6"/><circle cx="64" cy="64" r="6"/></g></svg>
+          <div class="footer-pawns right"><i class="pawn green"></i><i class="pawn yellow"></i></div>
+        </div>
       </div>
-      <button id="start-game" type="button" class="start-game">▶ Start Game</button>
-      <div class="setup-features">
-        <button type="button" id="setup-colors"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="16" cy="15" r="6" fill="#ef5652"/><circle cx="31" cy="14" r="6" fill="#ffc839"/><circle cx="15" cy="31" r="6" fill="#358fea"/><circle cx="31" cy="31" r="6" fill="#24bd70"/></svg><span>Choose Colors</span></button>
-        <button type="button" id="setup-rules"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 10q10-4 19 2v28q-9-6-19-2zm38 0q-10-4-19 2v28q9-6 19-2z" fill="#ffe385" stroke="#9c5a17" stroke-width="3"/><path d="M24 13v26" stroke="#8f4f16" stroke-width="2"/></svg><span>Game Rules</span></button>
-        <div><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 4 6 5 8-1 2 8 6 5-4 7 1 8-8 2-5 6-7-4-8 1-2-8-6-5 4-7-1-8 8-2z" fill="#ffd44f" stroke="#8f4f16" stroke-width="3"/><circle cx="24" cy="22" r="6" fill="#fff0a1"/></svg><span>Leaderboard<br><small>Coming Soon</small></span></div>
-        <button type="button" id="setup-settings"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M19 4h10l2 7 6 3 6-2 5 9-5 5v7l5 5-5 9-7-2-6 3-2 7H18l-2-7-6-3-6 2-5-9 5-5v-7l-5-5 5-9 7 2 6-3z" transform="translate(4 -3) scale(.84)" fill="#ffe191" stroke="#874412" stroke-width="3"/><circle cx="24" cy="24" r="7" fill="#60300f"/></svg><span>Game Settings</span></button>
-      </div>
-      <p class="setup-footnote">Play together or challenge the bots. Change colors anytime before the first roll by tapping your player header.</p>
     </section>
-    <dialog id="rules-dialog" class="rules-dialog">
+    <dialog id="notice-dialog" class="rules-dialog"><h2 id="notice-title">Coming Soon</h2><p id="notice-message">This feature is coming soon.</p><button id="close-notice" type="button">Back to Menu</button></dialog>
+    <dialog id="settings-dialog" class="rules-dialog settings-dialog">
+      <h2>Game Settings</h2>
+      <label class="setting-row"><span>Sound effects</span><input id="settings-sound" type="checkbox"></label>
+      <label class="setting-row"><span>Pawn animation</span><select id="settings-animation-speed"><option value="145">Normal</option><option value="80">Fast</option><option value="220">Relaxed</option></select></label>
+      <p>Leaderboard <small>Coming Soon</small></p>
+      <button id="close-settings" type="button">Done</button>
+    </dialog>
+    <dialog id="menu-colors-dialog" class="rules-dialog menu-colors-dialog">
+      <h2>Choose Player Colors</h2>
+      <label for="menu-color-player">Player</label><select id="menu-color-player"><option value="0">Player 1</option><option value="1">Player 2</option><option value="2">Player 3</option><option value="3">Player 4</option></select>
+      <label for="menu-color-choice">Color</label><select id="menu-color-choice"></select>
+      <p id="menu-color-confirmation" role="status"></p>
+      <div class="dialog-actions"><button id="apply-menu-color" type="button">Apply Color</button><button id="close-menu-colors" type="button">Done</button></div>
+    </dialog>
+        <dialog id="rules-dialog" class="rules-dialog">
       <h2>Game Rules</h2>
       <ul><li>Roll a six to release a pawn from your yard.</li><li>Move by the exact dice count; a pawn must reach Home exactly.</li><li>Safe star squares protect pawns from capture.</li><li>A six, capture, or finishing move grants another roll.</li><li>Three consecutive sixes pass the turn without moving.</li><li>Finish all four pawns to earn a place in the rankings.</li></ul>
       <button id="close-rules" type="button">Back to Menu</button>
@@ -94,3 +150,4 @@
   </main>
 </body>
 </html>
+

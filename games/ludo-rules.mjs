@@ -1,9 +1,10 @@
-export const starts = [0, 26, 13, 39];
+export const starts = [0, 39, 13, 26];
 export const safe = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
 
-export function newLudo(playerCount = 2) {
+export function newLudo(playerCount = 2, colors = Array.from({length:playerCount},(_,i)=>i)) {
   if (![2,3,4].includes(playerCount)) throw new RangeError("Ludo supports 2, 3 or 4 players");
-  return {pieces: Array.from({length:playerCount}, () => Array(4).fill(-1)), turn: 0, roll: 0, winner: null};
+  if(colors.length!==playerCount || new Set(colors).size!==playerCount || colors.some(c=>!Number.isInteger(c)||c<0||c>3)) throw new RangeError('Unique colors required');
+  return {colors:[...colors], pieces: Array.from({length:playerCount}, () => Array(4).fill(-1)), turn: 0, roll: 0, winner: null};
 }
 
 export function trackPosition(player, step) {
@@ -32,10 +33,10 @@ export function moveLudo(state, index) {
   let captured = false;
   pieces[turn][index] = step;
   if (step < 52) {
-    const square = trackPosition(turn, step);
+    const square = trackPosition(state.colors?.[turn] ?? turn, step);
     if (!safe.has(square)) pieces.forEach((team, rival) => {
       if (rival !== turn) pieces[rival] = team.map(other => {
-        const hit = other >= 0 && other < 52 && trackPosition(rival, other) === square;
+        const hit = other >= 0 && other < 52 && trackPosition(state.colors?.[rival] ?? rival, other) === square;
         captured ||= hit;
         return hit ? -1 : other;
       });

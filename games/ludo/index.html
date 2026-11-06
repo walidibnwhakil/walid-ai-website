@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ludo | Walid AI Games</title>
+  <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
   <link rel="stylesheet" href="../arcade.css">
   <link rel="stylesheet" href="./ludo.css">
@@ -12,7 +12,7 @@
 <body class="ludo-game">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
-    <h1>Ludo</h1>
+    <h1>Ludu <small style="display:block;font-size:.38em;letter-spacing:.35em;margin-top:.1em">MAHIR</small></h1>
     <p>Roll a six to leave the yard. Capture rivals on open squares, use safe squares, and bring all four tokens home.</p>
     <div class="controls">
       <label>Players <select id="player-count"><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option></select></label>
@@ -20,14 +20,27 @@
       <button id="restart" type="button">New game</button>
     </div>
     <div id="seat-options" class="seat-options" hidden></div>
-    <p id="status" role="status"></p>
-    <div class="ludo-board-wrap">
-      <div id="board" class="board ludo" role="group" aria-label="Ludo board"></div>
-      <section id="winner-overlay" class="winner-overlay" role="dialog" aria-modal="true" aria-labelledby="winner-title" hidden>
-        <div class="winner-card"><span class="confetti" aria-hidden="true">✦ ✧ ✦</span><h2 id="winner-title">Red wins!</h2><p>All four tokens made it home.</p><div class="controls"><button id="play-again" type="button">Play Again</button><button id="new-game" type="button">New Game</button></div></div>
-      </section>
+    <div id="color-picker" class="color-picker" hidden>
+      <strong>Choose your color</strong>
+      <input id="color-seat" type="hidden" value="0">
+      <select id="color-choice" aria-label="Player color">
+        <option value="0">Red</option><option value="1">Blue</option>
+        <option value="2">Green</option><option value="3">Yellow</option>
+      </select>
+      <button type="button" id="color-apply">Apply</button>
+      <button type="button" id="color-cancel">Cancel</button>
     </div>
-    <details class="rules"><summary>How to play</summary><p>Select 2, 3 or 4 seats, then choose bots, same-device friends or a mix. Tap the active player's dotted die on the board to roll. If multiple tokens can move, tap one glowing token; a sole legal token moves automatically. A six launches a token from the yard and earns another roll. Move by the exact die count; landing on an opponent on an open square captures them, while star-marked safe squares protect tokens. Captures earn another roll. Move all four tokens around the track and up your colored home lane; the first to finish all four wins.</p></details>
+    <p class="color-hint">Before rolling, tap your player name to choose a color.</p>
+    <p id="status" role="status"></p>
+    <div class="ludo-stage">
+      <div id="dice-red" class="player-dice red"></div>
+      <div id="dice-green" class="player-dice green"></div>
+      <div id="board" class="board" role="group" aria-label="Ludo board"></div>
+      <div id="dice-blue" class="player-dice blue"></div>
+      <div id="dice-yellow" class="player-dice yellow"></div>
+    </div>
+    <div id="actions" class="controls"></div>
+    <details class="rules"><summary>How to play</summary><p>Select 2, 3 or 4 seats, then choose bots, same-device friends or a mix. Roll a six to launch a token. Move by the exact die count; landing on an opponent on a regular square sends them to their yard. Star-marked safe squares protect tokens. A six or a capture grants another roll. Move all four tokens around the track and up your colored home lane; the first to finish all four wins.</p></details>
   </main>
 </body>
 </html>

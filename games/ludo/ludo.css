@@ -235,3 +235,21 @@
 }
 .ludo-game .color-hint {text-align:center;font-size:.83rem;}
 @media(max-width:480px) {.ludo-game .player-dice-label{font-size:.67rem;}}
+
+/* Classic board: clear safe stars on all eight protected track cells. */
+.ludo-game .board.ludo .track.safe::before {
+  content:"★";position:absolute;inset:0;display:grid;place-items:center;
+  font-size:clamp(13px,3.5vw,27px);line-height:1;
+  color:#fff;opacity:1;text-shadow:0 2px 2px #38260e9c,0 0 2px #40280c;
+  z-index:0;pointer-events:none;
+}
+.ludo-game .board.ludo .track.safe {
+  background:linear-gradient(145deg,#f9d976,#cf9b31);
+}
+.ludo-game .board.ludo .track.start-square.red {background:#e73b48;}
+.ludo-game .board.ludo .track.start-square.blue {background:#2682df;}
+.ludo-game .board.ludo .track.start-square.green {background:#24b765;}
+.ludo-game .board.ludo .track.start-square.yellow {background:#f2bc2c;}
+.ludo-game .board.ludo .track.start-square.safe::before {
+  color:#fff;filter:drop-shadow(0 1px 1px #0008);
+}

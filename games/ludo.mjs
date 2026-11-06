@@ -128,6 +128,14 @@ function render() {
     marker.textContent=String(index+1);
     marker.dataset.token=`${teamId}-${index}`;
     marker.dataset.step=String(step);
+    if(player===state.turn && !botTurn && legal.includes(index)) {
+      marker.setAttribute("role","button");
+      marker.setAttribute("tabindex","0");
+      marker.setAttribute("aria-label",`Move ${label}`);
+      marker.addEventListener("click",()=>play(index));
+      marker.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();play(index);}});
+      marker.classList.add("playable-token");
+    }
     const from=motions.get(`${player}-${index}`);
     if(from) {
       const to=square.getBoundingClientRect();

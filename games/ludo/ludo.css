@@ -144,3 +144,22 @@
  .ludo-game .board.ludo span {width:68%;font-size:8px;}
  .ludo-game .die-face {width:56px;height:56px;font-size:2rem;}
 }
+
+/* Accessible direct token interaction and active-player die cue */
+.ludo-game .board.ludo .playable-token {
+  outline:2px solid #fff;outline-offset:-2px;
+  animation:mahir-token-pulse 1.35s ease-in-out infinite;
+}
+.ludo-game .board.ludo .playable-token:focus-visible {
+  outline:3px solid #18112f;outline-offset:2px;
+}
+.ludo-game .die-face[data-turn="red"] {border-color:#ff7b8c;}
+.ludo-game .die-face[data-turn="blue"] {border-color:#70b9ff;}
+.ludo-game .die-face[data-turn="green"] {border-color:#7bf3b0;}
+.ludo-game .die-face[data-turn="yellow"] {border-color:#ffe177;}
+@keyframes mahir-token-pulse {
+  50% {filter:brightness(1.2);box-shadow:0 3px 0 #3023429c,0 0 12px 3px #fff9,inset 0 3px 3px #fffa;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .ludo-game .board.ludo .playable-token {animation:none;}
+}

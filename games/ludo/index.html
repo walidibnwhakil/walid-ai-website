@@ -5,39 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261106design3">
-  <link rel="stylesheet" href="./ludo.css?v=20261106design3">
-  <script type="module" src="../ludo.mjs?v=20261106design3"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261106approved4">
+  <link rel="stylesheet" href="./ludo.css?v=20261106approved4">
+  <script type="module" src="../ludo.mjs?v=20261106approved4"></script>
 
 </head>
 <body class="ludo-game">
   <main>
     <nav aria-label="Breadcrumb"><a href="/">Walid AI</a><a href="/games/">Games</a><span aria-current="page">Ludo</span></nav>
     <section id="ludo-setup" class="ludo-setup">
-      <div class="setup-art" aria-hidden="true">
-        <div class="setup-brand">L<span>U</span>DU <em>MAHIR</em></div>
-        <div class="mini-ludo-board">
-          <div class="mini-yard red"><i></i><i></i><i></i><i></i></div>
-          <div class="mini-path top"><b>★</b><b></b><b></b></div>
-          <div class="mini-yard green"><i></i><i></i><i></i><i></i></div>
-          <div class="mini-path left"><b></b><b>★</b><b></b></div>
-          <div class="mini-center"></div>
-          <div class="mini-path right"><b></b><b>★</b><b></b></div>
-          <div class="mini-yard blue"><i></i><i></i><i></i><i></i></div>
-          <div class="mini-path bottom"><b></b><b></b><b>★</b></div>
-          <div class="mini-yard yellow"><i></i><i></i><i></i><i></i></div>
+      <div class="mahir-hero">
+        <div class="mahir-crown" aria-hidden="true">♛</div>
+        <div class="mahir-logo"><span>Ludu</span><strong>Mahir</strong></div>
+        <div class="mahir-illustration" aria-hidden="true">
+          <span class="mahir-die die-left">⚄</span>
+          <span class="mahir-pawn pawn-red">♟</span><span class="mahir-pawn pawn-green">♟</span>
+          <span class="mahir-pawn pawn-blue">♟</span><span class="mahir-pawn pawn-yellow">♟</span>
+          <span class="mahir-die die-right">⚅</span>
         </div>
-        <div class="setup-dice" aria-hidden="true"><span>⚄</span><span>⚅</span></div>
+        <p>Classic Ludo game. Play with friends or bots,<br>choose your style and enjoy anytime.</p>
       </div>
-      <h2 class="setup-heading">Choose Your Match</h2>
-      <p class="setup-tagline">Classic Ludo · Premium Wooden Pieces</p>
-      
-      <div class="setup-options">
-        <label>Players <select id="setup-players"><option value="2">2 Players</option><option value="3">3 Players</option><option value="4">4 Players</option></select></label>
-        <label>Game Mode <select id="setup-mode"><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select></label>
+      <div class="mahir-settings">
+        <div class="mahir-field"><div class="mahir-field-title">🎮 Game Mode</div>
+          <div class="mahir-choice" id="mode-buttons">
+            <button type="button" data-value="bot" class="selected">♟ vs Bot</button>
+            <button type="button" data-value="friend">♟♟ Local (2–4)</button>
+            <button type="button" disabled>◎ Online <small>Coming Soon</small></button>
+          </div>
+        </div>
+        <div class="mahir-field"><div class="mahir-field-title">♟ Players</div>
+          <div class="mahir-choice" id="player-buttons">
+            <button type="button" data-value="2">2 Players</button>
+            <button type="button" data-value="3">3 Players</button>
+            <button type="button" data-value="4" class="selected">4 Players</button>
+          </div>
+        </div>
+        <select id="setup-players" aria-label="Players" hidden><option value="2">2 Players</option><option value="3">3 Players</option><option value="4" selected>4 Players</option></select>
+        <select id="setup-mode" aria-label="Game Mode" hidden><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select>
       </div>
       <button id="start-game" type="button" class="start-game">▶ Start Game</button>
-      <div class="setup-features"><div>🎲<span>Game Rules</span></div><div>🏆<span>Leaderboard<br><small>Coming Soon</small></span></div><div>⚙️<span>Game Settings</span></div></div>
+      <div class="setup-features"><button type="button" id="setup-rules">🎲<span>Game Rules</span></button><div>🏆<span>Leaderboard<br><small>Coming Soon</small></span></div><button type="button" id="setup-settings">⚙️<span>Game Settings</span></button></div>
       <p class="setup-footnote">Play together or challenge the bots. Change colors anytime before the first roll by tapping your player header.</p>
     </section>
     <section id="ludo-play" hidden>

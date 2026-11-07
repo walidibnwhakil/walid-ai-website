@@ -250,7 +250,16 @@
       const lang = language === "bn" ? "bn" : "en";
       document.documentElement.lang = lang;
       document.documentElement.dataset.uiLanguage = lang;
-      document.title = lang === "bn" ? "Walid AI — বাংলাদেশের AI" : "Walid AI — Bangladeshi AI";
+      document.title = lang === "bn" ? "Walid AI — বাংলাদেশের AI চ্যাট, টুল ও গেম" : "Walid AI — Bangladeshi AI chat, tools, and games";
+      const pageDescription = lang === "bn"
+        ? "ইংরেজি বা বাংলায় Walid AI-কে প্রশ্ন করুন। বিনামূল্যে চ্যাট, PDF ও ছবির টুল, ZIP ফাইল এবং ব্রাউজার গেম।"
+        : "Ask Walid AI in English or Bangla. Free chat, PDF and image tools, ZIP files, and browser games from one Bangladeshi site.";
+      document.querySelector('meta[name="description"]')?.setAttribute("content", pageDescription);
+      document.querySelector('meta[property="og:title"]')?.setAttribute("content", document.title);
+      document.querySelector('meta[property="og:description"]')?.setAttribute("content", pageDescription);
+      document.querySelector('meta[property="og:locale"]')?.setAttribute("content", lang === "bn" ? "bn_BD" : "en_US");
+      document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", document.title);
+      document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", pageDescription);
       languageSelect.value = lang;
       const text = {
         bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"ওয়ালিদ AI-কে প্রশ্ন করুন...", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI", aboutUs:"আমাদের সম্পর্কে", contactUs:"যোগাযোগ", privacyPolicy:"গোপনীয়তা নীতি", termsOfService:"ব্যবহারের শর্তাবলি", thirdPartyLicenses:"তৃতীয় পক্ষের লাইসেন্স",
@@ -268,6 +277,8 @@
       document.querySelector('[data-i18n="language"]').textContent = text.language;
       document.getElementById("settingsAboutLink").textContent = text.aboutUs;
       document.getElementById("settingsContactLink").textContent = text.contactUs;
+      document.getElementById("settingsPrivacyLink").textContent = text.privacyPolicy;
+      document.getElementById("settingsTermsLink").textContent = text.termsOfService;
       document.getElementById("welcomeTitle").textContent = text.welcome;
       input.setAttribute("aria-label", lang === "bn" ? "প্রশ্ন লিখুন" : "Ask a question");
       document.getElementById("attachBtn").setAttribute("aria-label", lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos");

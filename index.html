@@ -5,21 +5,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f8f4">
-  <meta name="description" content="Walid AI — Bangladeshi AI">
+  <meta name="description" content="Ask Walid AI in English or Bangla. Free chat, PDF and image tools, ZIP files, and browser games from one Bangladeshi site.">
   <link rel="canonical" href="https://walid-ai.com/">
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://walid-ai.com/">
-  <meta property="og:title" content="Walid AI — Bangladeshi AI">
-  <meta property="og:description" content="Walid AI — Bangladeshi AI">
+  <meta property="og:title" content="Walid AI — Bangladeshi AI chat, tools, and games">
+  <meta property="og:description" content="Ask Walid AI in English or Bangla. Free chat, PDF and image tools, ZIP files, and browser games from one Bangladeshi site.">
   <meta property="og:image" content="https://walid-ai.com/walid-ai-preview.jpg">
   <meta property="og:image:width" content="640">
   <meta property="og:image:height" content="336">
-  <meta property="og:image:alt" content="Walid AI — Bangladeshi AI">
+  <meta property="og:image:alt" content="Walid AI logo and preview">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Walid AI — Bangladeshi AI">
-  <meta name="twitter:description" content="Walid AI — Bangladeshi AI">
+  <meta name="twitter:title" content="Walid AI — Bangladeshi AI chat, tools, and games">
+  <meta name="twitter:description" content="Ask Walid AI in English or Bangla. Free chat, PDF and image tools, ZIP files, and browser games from one Bangladeshi site.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
-  <title>Walid AI — Bangladeshi AI</title>
+  <meta name="google-adsense-account" content="ca-pub-7143554641494116">
+  <title>Walid AI — Bangladeshi AI chat, tools, and games</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7143554641494116" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Walid AI","url":"https://walid-ai.com/","logo":"https://walid-ai.com/walid-ai-approved-logo.png","email":"support@walid-ai.com","founder":{"@type":"Person","name":"Whakil Ahamed Shakil"},"address":{"@type":"PostalAddress","addressCountry":"BD"}},{"@type":"WebSite","name":"Walid AI","url":"https://walid-ai.com/","description":"Ask Walid AI in English or Bangla. Free chat, PDF and image tools, ZIP files, and browser games from one Bangladeshi site.","inLanguage":["en","bn"],"publisher":{"@type":"Organization","name":"Walid AI","url":"https://walid-ai.com/"}}]}
+  </script>
 
   <style>
     :root {
@@ -956,8 +962,8 @@
     @media(max-width:560px){.chat-tools-modal{padding:0}.chat-tools-dialog{height:100dvh;border-radius:0}.chat-tools-head{height:48px;flex-basis:48px}}
   </style>
 
-  <script src="backend-config.js"></script>
-  <script src="firebase-config.js"></script>
+  <script src="backend-config.js" defer></script>
+  <script src="firebase-config.js" defer></script>
 
 <link rel="stylesheet" href="/walid-branding.css">
 </head>
@@ -1046,7 +1052,7 @@
       <button id="closeLogin" class="login-close" type="button"
         aria-label="বন্ধ করুন">×</button>
 
-      <img class="login-flower" src="kathgolap-logo.png" alt="">
+      <img class="login-flower" src="kathgolap-logo.png" alt="Kathgolap">
       <h2 id="loginTitle">Log in</h2>
       <p id="loginDescription">Continue to your Walid AI account.</p>
 
@@ -1111,6 +1117,8 @@
       <nav class="settings-legal-links" aria-label="Information">
         <a id="settingsAboutLink" href="/about-us.html" data-i18n="aboutUs">About Us</a>
         <a id="settingsContactLink" href="/contact-us.html" data-i18n="contactUs">Contact Us</a>
+        <a id="settingsPrivacyLink" href="/privacy-policy.html" data-i18n="privacyPolicy">Privacy Policy</a>
+        <a id="settingsTermsLink" href="/terms-of-service.html" data-i18n="termsOfService">Terms of Service</a>
       </nav>
       <div class="brand-version">Walid AI 1.0</div>
     </section>
@@ -1120,10 +1128,10 @@
     <section class="chat-tools-dialog"><div class="chat-tools-head"><span id="chatToolsTitle">PDF &amp; Image Tools</span><button id="closeChatTools" type="button" aria-label="Close tools">×</button></div><iframe title="PDF and image tools" src="/tools.html?embedded=1"></iframe></section>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://accounts.google.com/gsi/client"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
+  <script src="https://accounts.google.com/gsi/client" defer></script>
 
   <script>
     (()=>{if(!matchMedia('(max-width: 650px)').matches)return;let startX=0,startY=0,reloaded=false;document.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;startX=event.touches[0].clientX;startY=event.touches[0].clientY;reloaded=false},{passive:true});document.addEventListener('touchmove',event=>{if(reloaded||event.touches.length!==1||window.scrollY>0)return;const dx=event.touches[0].clientX-startX,dy=event.touches[0].clientY-startY;if(startY<100&&dy>120&&Math.abs(dx)<70){reloaded=true;location.reload()}},{passive:true})})();

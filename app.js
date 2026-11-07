@@ -199,18 +199,35 @@
       const record = {
         id: currentConversationId,
         title: (chatMessages.find((item) => item.kind === "user")?.text || (languageSelect.value === "bn" ? "নতুন চ্যাট" : "New chat")).slice(0, 72),
-        messages: chatMessages,
+        messages: chatMessages.slice(-40).map((item) => ({
+          kind: item.kind,
+          text: String(item.text || "").slice(0, 8000),
+          source: item.source || ""
+        })),
         updatedAt: Date.now()
       };
       const ownerAtSave = historyOwner;
       persistQueue = persistQueue.then(async () => {
         if (ownerAtSave && firestoreDB) {
-          await firestoreDB.collection("users").doc(ownerAtSave)
-            .collection("chats").doc(record.id).set(record, { merge: true });
+          try {
+            await firestoreDB.collection("users").doc(ownerAtSave)
+              .collection("chats").doc(record.id).set(record, { merge: true });
+          } catch (error) {
+            const smaller = { ...record, messages: record.messages.slice(-12) };
+            await firestoreDB.collection("users").doc(ownerAtSave)
+              .collection("chats").doc(record.id).set(smaller, { merge: true });
+            console.warn("Chat history was saved without the oldest messages.", error);
+          }
         } else {
           const records = guestRecords().filter((item) => item.id !== record.id);
           records.unshift(record);
-          sessionStorage.setItem("walidGuestChats", JSON.stringify(records.slice(0, 50)));
+          const keep = records.slice(0, 50);
+          try {
+            sessionStorage.setItem("walidGuestChats", JSON.stringify(keep));
+          } catch (error) {
+            sessionStorage.setItem("walidGuestChats", JSON.stringify(keep.slice(0, 10)));
+            console.warn("Guest chat history was shortened to fit this browser.", error);
+          }
         }
         drawHistory(ownerAtSave ? await loadAccountRecords(false) : guestRecords());
       }).catch((error) => console.warn("Chat history could not be saved.", error));
@@ -419,7 +436,7 @@
             return;
           }
         } catch (error) {
-          addMessage("error", error.message || (languageSelect.value === "bn" ? "আপলোড সীমা যাচাই করা যায়নি।" : "Could not check upload quota."));
+          addMessage("error", humanizeRequestError(error) || (languageSelect.value === "bn" ? "আপলোড সীমা যাচাই করা যায়নি।" : "Could not check upload quota."));
           fileInput.value = "";
           return;
         }
@@ -1018,6 +1035,7 @@
       if (mode === "uploaded_file") return bn ? "আপনার ফাইল থেকে" : "From your file";
       if (mode === "pdf_passages") return bn ? "PDF থেকে" : "From PDF";
       if (mode === "pdf_table") return bn ? "PDF-এর টেবিল থেকে" : "From a PDF table";
+      if (mode === "web") return bn ? "ওয়েব উৎস থেকে" : "From web sources";
       if (mode === "not_found") return bn ? "তথ্যভাণ্ডারে মেলেনি" : "Not found in the knowledge base";
 
       if (mode === "setup_required" || mode === "ocr_setup_required") {
@@ -1038,6 +1056,76 @@
       return "";
     }
 
+    let chatSending = false;
+    let backendReady = false;
+
+    function humanizeRequestError(error) {
+      const bn = languageSelect.value === "bn";
+      const raw = String(error && error.message || "");
+      const status = Number(error && error.status || 0);
+      if (error && error.quota === "daily_limit") return raw;
+      if (/failed to fetch|failed to patch|networkerror|load failed|network request failed/i.test(raw) || status === 502 || status === 503 || status === 504 || error && error.name === "AbortError") {
+        return bn
+          ? "সংযোগ হয়নি। বিনামূল্যের সার্ভার ঘুম থেকে উঠতে এক মিনিট লাগতে পারে। একটু পরে আবার পাঠান।"
+          : "Could not reach Walid AI. The free server can take about a minute to wake up. Please send the question again shortly.";
+      }
+      if (status === 429 || (error && error.quota === "rate")) {
+        return raw || (bn ? "একসাথে অনেক প্রশ্ন চলে গেছে। এক মিনিট পর আবার চেষ্টা করুন।" : "Too many questions at once. Please wait a minute and try again.");
+      }
+      if (/unexpected end of json|json/i.test(raw)) {
+        return bn ? "সার্ভার উত্তর দিতে পারেনি। একটু পরে আবার চেষ্টা করুন।" : "The server could not return an answer. Please try again shortly.";
+      }
+      if (raw && raw.length < 400) return raw;
+      return bn ? "উত্তর পাওয়া যায়নি। আবার চেষ্টা করুন।" : "No answer came back. Please try again.";
+    }
+
+    function fetchWithTimeout(url, options, timeoutMs) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      return fetch(url, Object.assign({}, options, { signal: controller.signal, cache: "no-store" }))
+        .finally(() => clearTimeout(timer));
+    }
+
+    async function wakeBackend(maxMs) {
+      const started = performance.now();
+      while (performance.now() - started < maxMs) {
+        try {
+          const response = await fetchWithTimeout(API + "/health", { method: "GET" }, 20000);
+          if (response.ok) {
+            backendReady = true;
+            return true;
+          }
+        } catch (error) {
+          backendReady = false;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+      return false;
+    }
+
+    function trimChatHistory(messages) {
+      const recent = messages.filter((item) => item.kind === "user" || item.kind === "ai").slice(-8);
+      let budget = 4000;
+      const kept = [];
+      for (let index = recent.length - 1; index >= 0 && budget > 0; index -= 1) {
+        let text = String(recent[index].text || "").replace(/\s+/g, " ").trim().slice(0, 800);
+        if (!text) continue;
+        text = text.slice(0, budget);
+        budget -= text.length;
+        kept.push({ role: recent[index].kind === "ai" ? "assistant" : "user", text });
+      }
+      return kept.reverse();
+    }
+
+    function thinkingText(seconds, waking) {
+      const bn = languageSelect.value === "bn";
+      const clock = seconds.toFixed(1);
+      if (waking) {
+        return bn ? `সার্ভার ঘুম থেকে উঠছে… ${clock} সেকেন্ড` : `Server is waking up… ${clock}s`;
+      }
+      return bn ? `উত্তর তৈরি হচ্ছে… ${clock} সেকেন্ড` : `Preparing an answer… ${clock}s`;
+    }
+
     // Chat submit
     function detectPdfChatTool(question, files) {
       if (!files.length || files.some((file) => file.type !== "application/pdf")) return "";
@@ -1053,27 +1141,34 @@
       event.preventDefault();
 
       const question = input.value.trim();
-      if (!question || send.disabled) return;
+      if (!question || chatSending) return;
 
       if (!API) {
-        addMessage("error", "Walid AI API সেটআপ পাওয়া যায়নি।");
+        addMessage("error", languageSelect.value === "bn" ? "Walid AI API সেটআপ পাওয়া যায়নি।" : "Walid AI API is not configured.");
         return;
       }
 
       if (pendingUploads.length && !IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
-        loginModal.classList.remove("hidden"); loginStatus.textContent = "ফাইল পাঠাতে আগে লগ ইন করুন।"; return;
+        loginModal.classList.remove("hidden"); loginStatus.textContent = languageSelect.value === "bn" ? "ফাইল পাঠাতে আগে লগ ইন করুন।" : "Log in before sending files."; return;
       }
-      if (pendingUploads.length && uploadQuota && !uploadQuota.unlimited && pendingUploads.length > uploadQuota.remaining) { addMessage("error", `আজ আর মাত্র ${uploadQuota.remaining}টি ফাইল/ছবি পাঠানো যাবে।`); return; }
+      if (pendingUploads.length && uploadQuota && !uploadQuota.unlimited && pendingUploads.length > uploadQuota.remaining) { addMessage("error", languageSelect.value === "bn" ? `আজ আর মাত্র ${uploadQuota.remaining}টি ফাইল/ছবি পাঠানো যাবে।` : `You can send ${uploadQuota.remaining} more file(s) today.`); return; }
+      chatSending = true;
+      send.disabled = true;
+      const priorHistory = trimChatHistory(chatMessages);
       addMessage("user", question);
       const filesToSend = pendingUploads.slice();
       input.value = "";
       pendingUploads = []; attachmentList.replaceChildren(); attachmentList.classList.add("hidden");
       resizeComposer();
-      send.disabled = true;
       const requestStarted = performance.now();
+      const requestId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
       let streamedBubble = null, streamedBody = null, streamedText = "", streamVisible = 0, streamTicker = null;
-      const thinking = addMessage("thinking", "উত্তর তৈরি হচ্ছে… 0.0 সেকেন্ড");
-      const timer = setInterval(() => { thinking.textContent = `উত্তর তৈরি হচ্ছে… ${((performance.now() - requestStarted) / 1000).toFixed(1)} সেকেন্ড`; }, 100);
+      let attempt = 0;
+      const thinking = addMessage("thinking", thinkingText(0, !backendReady));
+      const timer = setInterval(() => {
+        const seconds = (performance.now() - requestStarted) / 1000;
+        thinking.textContent = thinkingText(seconds, !backendReady || seconds >= 8 || attempt > 1);
+      }, 100);
 
       const headers = { "Content-Type": "application/json" };
 
@@ -1120,14 +1215,56 @@
           return;
         }
 
-        const response = await fetch(API + "/api/chat", {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ question, guest_id: getGuestClientId(), files: filesToSend })
+        const payload = JSON.stringify({
+          question,
+          guest_id: getGuestClientId(),
+          files: filesToSend,
+          history: priorHistory,
+          language: languageSelect.value === "bn" ? "bn" : "en",
+          request_id: requestId
         });
+        let response = null;
+        let data = null;
+        let chatError = null;
+        while (attempt < 2 && !data) {
+          attempt += 1;
+          try {
+            response = await fetchWithTimeout(API + "/api/chat", { method: "POST", headers, body: payload }, 90000);
+            const contentType = response.headers.get("Content-Type") || "";
+            if (!response.ok || !contentType.includes("application/x-ndjson")) {
+              const raw = await response.text();
+              let parsed = {};
+              try { parsed = raw ? JSON.parse(raw) : {}; } catch { parsed = {}; }
+              if (!response.ok) {
+                chatError = new Error(parsed.error || "");
+                chatError.status = response.status;
+                chatError.quota = parsed.quota || "";
+                chatError.retryable = Boolean(parsed.retryable);
+                const retryable = chatError.quota !== "daily_limit" && (chatError.retryable || response.status === 502 || response.status === 503 || response.status === 504 || response.status === 429);
+                if (retryable && attempt < 2) {
+                  thinking.textContent = thinkingText((performance.now() - requestStarted) / 1000, true);
+                  await wakeBackend(response.status === 429 ? 5000 : 60000);
+                  continue;
+                }
+                throw chatError;
+              }
+              data = parsed;
+              break;
+            }
+            break;
+          } catch (error) {
+            chatError = error;
+            const network = error.name === "AbortError" || /failed to fetch|networkerror|load failed/i.test(String(error.message || ""));
+            if (network && attempt < 2) {
+              thinking.textContent = thinkingText((performance.now() - requestStarted) / 1000, true);
+              await wakeBackend(60000);
+              continue;
+            }
+            throw error;
+          }
+        }
 
-        let data;
-        if ((response.headers.get("Content-Type") || "").includes("application/x-ndjson") && response.body) {
+        if ((response.headers.get("Content-Type") || "").includes("application/x-ndjson") && response.body && !data) {
           data = {};
           const reader = response.body.getReader();
           const decoder = new TextDecoder();
@@ -1164,15 +1301,13 @@
           while (streamVisible < streamedText.length) await new Promise((resolve) => setTimeout(resolve, 24));
           if (streamTicker) clearInterval(streamTicker);
           if (streamedBody) { streamedBody.classList.remove("typing-cursor"); renderAnswerContent(streamedBody, streamedText); }
-          data.answer = streamedText;
-        } else {
-          data = await response.json();
+          data.answer = streamedText || data.answer || "";
         }
 
-        if (!response.ok) {
-          const error = new Error(data.error || "উত্তর পাওয়া যায়নি।");
-          error.quota = data.quota || "";
-          throw error;
+        if (!data || !data.answer) {
+          const empty = new Error("");
+          empty.status = response ? response.status : 502;
+          throw empty;
         }
 
         const seconds = (performance.now() - requestStarted) / 1000;
@@ -1209,12 +1344,11 @@
           addFeedback(draft, question, data.model_answer);
         }
       } catch (error) {
-        clearInterval(timer); thinking.remove();
-        const message = ["daily_limit", "upload_daily_limit"].includes(error.quota)
-          ? error.message
-          : "উত্তর পাওয়া যায়নি। " + (error.message || "আবার চেষ্টা করুন।");
-        addMessage("error", message);
+        clearInterval(timer); if (thinking) thinking.remove();
+        if (streamTicker) clearInterval(streamTicker);
+        addMessage("error", humanizeRequestError(error));
       } finally {
+        chatSending = false;
         send.disabled = false;
         input.focus();
       }
@@ -1244,6 +1378,8 @@
       restoreWelcome();
       input.focus();
     });
+
+    if (API) void wakeBackend(70000);
 
     // Restore admin access-code session. Firebase users are restored through
     // onAuthStateChanged and receive a fresh ID token there.

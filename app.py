@@ -12,6 +12,12 @@ import unicodedata
 import urllib.error
 import urllib.request
 import threading
+
+from walid_providers import (
+    collect_web_sources,
+    configured_provider_names,
+    generate_fallback_answer,
+)
 from datetime import datetime, timedelta, timezone
 
 try:
@@ -72,6 +78,10 @@ OCR_ENGINE_PATH = None
 _GOOGLE_TOKEN_CACHE = {}
 _CHAT_REQUESTS = {}
 _CHAT_REQUESTS_LOCK = threading.Lock()
+_FLIGHTS = {}
+_FLIGHT_LOCK = threading.Lock()
+_PDF_INDEX_THREAD = None
+_PDF_INDEX_LOCK = threading.Lock()
 FIREBASE_PROJECT_ID = os.environ.get("WALID_FIREBASE_PROJECT_ID", "").strip()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash").strip()
@@ -268,13 +278,7 @@ def known_geography_answer(question):
     return None
 
 
-def consume_gemini_quota(user, is_search, language="bn"):
-    """Reserve one daily question and enforce free Gemini service caps."""
-    global _GEMINI_USAGE_LOADED_DATE
-    dhaka_tz = timezone(timedelta(hours=6))
-    local_date = datetime.now(dhaka_tz).date()
-    today = local_date.isoformat()
-    tomorrow = (local_date + timedelta(days=1)).isoformat()
+def quota_user_key(user):
     identity = user.get("user_id") or user.get("memory_id")
     if not identity and user.get("role") == "admin":
         identity = "admin:owner"
@@ -282,7 +286,17 @@ def consume_gemini_quota(user, is_search, language="bn"):
         identity = user.get("guest_id")
     if not identity:
         identity = f"{user.get('role', 'guest')}:{user.get('ip', 'unknown')}"
-    user_key = hashlib.sha256(str(identity).encode("utf-8")).hexdigest()
+    return hashlib.sha256(str(identity).encode("utf-8")).hexdigest()
+
+
+def consume_gemini_quota(user, is_search, language="bn"):
+    """Reserve one daily question and enforce free Gemini service caps."""
+    global _GEMINI_USAGE_LOADED_DATE
+    dhaka_tz = timezone(timedelta(hours=6))
+    local_date = datetime.now(dhaka_tz).date()
+    today = local_date.isoformat()
+    tomorrow = (local_date + timedelta(days=1)).isoformat()
+    user_key = quota_user_key(user)
 
     with _GEMINI_USAGE_LOCK:
         if _GEMINI_USAGE.get("date") != today:
@@ -352,8 +366,30 @@ def consume_gemini_quota(user, is_search, language="bn"):
         return True, tomorrow
 
 
+def refund_question_quota(user, is_search=False):
+    """Give back a question that produced no answer, so a failure does not burn the free cap."""
+    user_key = quota_user_key(user)
+    with _GEMINI_USAGE_LOCK:
+        questions = _GEMINI_USAGE.setdefault("questions", {})
+        if questions.get(user_key, 0) > 0:
+            questions[user_key] -= 1
+        users = _GEMINI_USAGE.setdefault("users", {})
+        if users.get(user_key, 0) > 0:
+            users[user_key] -= 1
+        if _GEMINI_USAGE.get("total", 0) > 0:
+            _GEMINI_USAGE["total"] -= 1
+        if is_search and _GEMINI_USAGE.get("search", 0) > 0:
+            _GEMINI_USAGE["search"] -= 1
+        try:
+            temporary_path = GEMINI_USAGE_PATH.with_suffix(".tmp")
+            temporary_path.write_text(json.dumps(_GEMINI_USAGE, ensure_ascii=False), encoding="utf-8")
+            temporary_path.replace(GEMINI_USAGE_PATH)
+        except OSError:
+            pass
+
+
 def generate_gemini_answer(question, passages, answer_language="bn"):
-    """Generate a multilingual answer using only the current prompt and relevant PDF excerpts."""
+    """Legacy Gemini-only helper. Live chat uses walid_providers.generate_fallback_answer."""
     if not GEMINI_API_KEY:
         return None
 
@@ -1014,6 +1050,59 @@ def get_pdf_index():
     return passages, pages_with_text, no_text_files, read_errors
 
 
+def get_pdf_index_for_chat():
+    """Return a ready PDF index without making the first chat wait on a full scan."""
+    global _PDF_INDEX_THREAD
+    try:
+        has_pdfs = any(PDF_DIR.glob("*.pdf"))
+    except OSError:
+        return [], 0, [], []
+    if not has_pdfs or PDF_INDEX_SIGNATURE is not None:
+        try:
+            return get_pdf_index()
+        except Exception as error:
+            print(f"Walid AI: PDF index failed ({type(error).__name__}).", flush=True)
+            return [], 0, [], []
+
+    def run():
+        try:
+            get_pdf_index()
+        except Exception as error:
+            print(f"Walid AI: background PDF index failed ({type(error).__name__}).", flush=True)
+
+    with _PDF_INDEX_LOCK:
+        if _PDF_INDEX_THREAD is None or not _PDF_INDEX_THREAD.is_alive():
+            _PDF_INDEX_THREAD = threading.Thread(target=run, name="walid-pdf-index", daemon=True)
+            _PDF_INDEX_THREAD.start()
+    return [], 0, [], []
+
+
+class _ChatFlight:
+    def __init__(self):
+        self.event = threading.Event()
+        self.started = time.time()
+        self.status = None
+        self.content_type = ""
+        self.body = b""
+
+
+def begin_chat_flight(key):
+    now = time.time()
+    with _FLIGHT_LOCK:
+        if len(_FLIGHTS) > 300:
+            for old_key, item in list(_FLIGHTS.items()):
+                if now - item.started > 180:
+                    _FLIGHTS.pop(old_key, None)
+        flight = _FLIGHTS.get(key)
+        if flight and flight.event.is_set() and flight.status == 200 and flight.body and now - flight.started < 180:
+            return "done", flight
+        if flight and not flight.event.is_set() and now - flight.started < 90:
+            return "wait", flight
+        flight = _ChatFlight()
+        _FLIGHTS[key] = flight
+        return "lead", flight
+
+
 def search_pdf(question, passages, limit=3):
     """Rank matching text and structured tables for local retrieval."""
     query_words = set(tokenize(question))
@@ -1218,16 +1307,64 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                         _CHAT_REQUESTS.pop(old_key, None)
             return True
 
-    def send_json(self, status, data):
-        body = json.dumps(data, ensure_ascii=False).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
+    def _cors(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+    def _remember_flight(self, status, content_type, body):
+        flight = getattr(self, "_flight", None)
+        if flight is None or flight.event.is_set():
+            return
+        flight.status = status
+        flight.content_type = content_type
+        flight.body = body
+        flight.event.set()
+
+    def _replay_flight(self, flight):
+        self._replied = True
+        self.send_response(flight.status)
+        self.send_header("Content-Type", flight.content_type)
+        self._cors()
+        self.send_header("Content-Length", str(len(flight.body)))
+        self.end_headers()
+        self.wfile.write(flight.body)
+
+    def send_json(self, status, data):
+        body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        content_type = "application/json; charset=utf-8"
+        self._replied = True
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self._cors()
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+        self._remember_flight(status, content_type, body)
+
+    def send_chat(self, data):
+        answer = str(data.get("answer") or "")
+        lines = [{"event": "start"}]
+        for index in range(0, max(len(answer), 1), 48):
+            chunk = answer[index:index + 48]
+            if chunk:
+                lines.append({"event": "delta", "text": chunk})
+        done = {"event": "done", "answer": answer}
+        for key in ("answering_mode", "sources", "model_answer", "model_note", "provider", "model"):
+            if key in data:
+                done[key] = data[key]
+        lines.append(done)
+        body = ("\n".join(json.dumps(line, ensure_ascii=False) for line in lines) + "\n").encode("utf-8")
+        content_type = "application/x-ndjson; charset=utf-8"
+        self._replied = True
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Cache-Control", "no-cache, no-transform")
+        self._cors()
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+        self._remember_flight(200, content_type, body)
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -1238,7 +1375,65 @@ class WalidAIHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            self.send_json(200, {"status": "ok"})
+            self.send_json(200, {"status": "ok", "providers": configured_provider_names()})
+            return
+        if self.path == "/api/upload-quota":
+            if not self.require_authorized():
+                return
+            if self.authenticated_user.get("role") == "admin":
+                self.send_json(200, {"unlimited": True, "remaining": 100, "limit": 100, "used": 0})
+                return
+            limit = 10
+            used = 0
+            with _GEMINI_USAGE_LOCK:
+                used = int(_GEMINI_USAGE.get("uploads", {}).get(quota_user_key(self.authenticated_user), 0))
+            self.send_json(200, {
+                "unlimited": False,
+                "limit": limit,
+                "used": used,
+                "remaining": max(0, limit - used),
+            })
+            return
+        if self.path in {"/api/admin/metrics", "/api/admin/help"}:
+            if not self.require_authorized():
+                return
+            if self.authenticated_user.get("role") != "admin":
+                self.send_json(403, {"error": "Admin access is required."})
+                return
+            if self.path == "/api/admin/help":
+                self.send_json(200, {"reports": []})
+                return
+            usage = dict(_GEMINI_USAGE)
+            questions = usage.get("questions") or {}
+            self.send_json(200, {
+                "date": usage.get("date") or "",
+                "daily_questions": sum(questions.values()) if isinstance(questions, dict) else 0,
+                "daily_users": len(usage.get("users") or {}),
+                "daily_logged_users": 0,
+                "logged_users_30d": 0,
+                "unique_users_30d": 0,
+                "total_questions_30d": sum(questions.values()) if isinstance(questions, dict) else 0,
+                "answer_errors_30d": 0,
+                "gemini_requests": usage.get("total") or 0,
+                "gemini_request_limit": GEMINI_DAILY_TOTAL_LIMIT,
+                "search_requests": usage.get("search") or 0,
+                "search_request_limit": GEMINI_DAILY_SEARCH_LIMIT,
+                "input_tokens_today": 0,
+                "output_tokens_today": 0,
+                "api_requests_30d": usage.get("total") or 0,
+                "estimated_usd_today": 0,
+                "api_estimated_usd_30d": 0,
+                "topics_30d": {},
+                "platforms_30d": {},
+                "answer_modes_30d": {},
+                "api_errors_today": {},
+                "api_errors_30d": {},
+                "api_input_tokens_30d": 0,
+                "api_output_tokens_30d": 0,
+                "api_unpriced_requests_30d": 0,
+                "cost_note": "Free-tier providers only. Historical analytics from an older private deploy are not in this build.",
+                "privacy_note": "Question text is not stored in this admin summary.",
+            })
             return
         if self.path != "/api/hello":
             self.send_json(404, {"error": "এই API ঠিকানাটি পাওয়া যায়নি।"})
@@ -1280,13 +1475,28 @@ class WalidAIHandler(BaseHTTPRequestHandler):
         })
 
     def do_POST(self):
+        self._replied = False
+        self._flight = None
+        try:
+            self._post_dispatch()
+        except Exception as error:
+            print(f"Walid AI: request failed ({type(error).__name__}).", flush=True)
+            if not self._replied:
+                try:
+                    self.send_json(500, {
+                        "error": "উত্তর তৈরি করা যায়নি। একটু পরে আবার চেষ্টা করুন।",
+                        "retryable": True,
+                    })
+                except Exception:
+                    pass
+        finally:
+            flight = getattr(self, "_flight", None)
+            if flight is not None and not flight.event.is_set():
+                flight.event.set()
+
+    def _post_dispatch(self):
         if self.path == "/api/chat":
             self.authenticated_user = self.authenticate() or {"role": "guest"}
-            if not self.allow_chat_request(self.authenticated_user):
-                self.send_json(429, {
-                    "error": "অল্প সময়ে অনেক প্রশ্ন পাঠানো হয়েছে। এক মিনিট পরে আবার চেষ্টা করো।"
-                })
-                return
         elif not self.require_authorized():
             return
         if self.path == "/api/feedback":
@@ -1345,13 +1555,45 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             self.send_json(400, {"error": "আগে একটি প্রশ্ন লিখো।"})
             return
 
+        language = "en" if data.get("language") == "en" else "bn"
         quota_user = dict(self.authenticated_user)
         quota_user["ip"] = self.client_address[0]
         quota_user["guest_id"] = str(data.get("guest_id", ""))[:128]
+        request_id = str(data.get("request_id") or "")[:80]
+        if request_id:
+            action, flight = begin_chat_flight(quota_user_key(quota_user) + ":" + request_id)
+            if action in {"done", "wait"}:
+                if action == "wait":
+                    flight.event.wait(75)
+                if flight.status and flight.body:
+                    self._replay_flight(flight)
+                    return
+                busy = (
+                    "The previous try is still running. Please wait a moment and send it again."
+                    if language == "en" else
+                    "আগের চেষ্টা এখনো চলছে। একটু পরে আবার পাঠান।"
+                )
+                self.send_json(503, {"error": busy, "retryable": True})
+                return
+            self._flight = flight
+
+        if not self.allow_chat_request(self.authenticated_user):
+            self.send_json(429, {
+                "error": (
+                    "Too many questions at once. Please wait a minute and try again."
+                    if language == "en" else
+                    "অল্প সময়ে অনেক প্রশ্ন পাঠানো হয়েছে। এক মিনিট পরে আবার চেষ্টা করুন।"
+                ),
+                "retryable": True,
+                "quota": "rate",
+            })
+            return
+
+        use_search = asks_for_current_information(question)
         allowed, quota_message = consume_gemini_quota(
             quota_user,
-            asks_for_current_information(question),
-            "en" if data.get("language") == "en" else "bn",
+            use_search,
+            language,
         )
         if not allowed:
             self.send_json(429, {
@@ -1474,24 +1716,91 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             })
             return
 
+        passages, no_text_files, read_errors = [], [], []
         try:
-            passages, _, no_text_files, read_errors = get_pdf_index()
-        except (OSError, ValueError, json.JSONDecodeError) as error:
-            self.send_json(500, {"error": f"স্থানীয় তথ্য পড়তে সমস্যা হয়েছে: {error}"})
+            passages, _, no_text_files, read_errors = get_pdf_index_for_chat()
+        except Exception as error:
+            print(f"Walid AI: PDF index failed ({type(error).__name__}).", flush=True)
+
+        try:
+            matches = search_pdf(question, passages)
+        except Exception as error:
+            print(f"Walid AI: PDF search failed ({type(error).__name__}).", flush=True)
+            matches = []
+        comparison_table = find_comparison_table(question, matches) if matches else None
+        web_sources = []
+        if use_search:
+            try:
+                web_sources = collect_web_sources(question)
+            except Exception as error:
+                print(f"Walid AI: web search failed ({type(error).__name__}).", flush=True)
+
+        history = data.get("history") if isinstance(data.get("history"), list) else []
+        files = data.get("files") if isinstance(data.get("files"), list) else []
+        try:
+            result = generate_fallback_answer(
+                question,
+                history=history,
+                passages=matches,
+                sources=web_sources,
+                language=language,
+                files=files,
+                use_search=use_search,
+            )
+        except Exception as error:
+            print(f"Walid AI: provider chain failed ({type(error).__name__}).", flush=True)
+            result = None
+
+        if result is not None and result.text:
+            response_data = {
+                "answer": result.text,
+                "answering_mode": "web" if (web_sources or result.sources) else "model",
+                "sources": result.sources,
+                "provider": result.provider,
+                "model": result.model,
+            }
+            model_status = get_own_model_status()
+            if (
+                matches
+                and not comparison_table
+                and generate_own_model_answer is not None
+                and model_status["available"]
+            ):
+                context = "\n\n".join(passage["text"][:600] for passage in matches[:3])
+                try:
+                    model_answer = generate_own_model_answer(question, context)
+                except Exception as error:
+                    print(f"Walid AI: নিজস্ব মডেলের উত্তর তৈরি হয়নি: {type(error).__name__}.", flush=True)
+                    model_answer = None
+                if model_answer:
+                    response_data["model_answer"] = model_answer
+                    response_data["model_note"] = (
+                        "নিজস্ব ছোট মডেলের পরীক্ষামূলক খসড়া; PDF-এর অংশের সঙ্গে মিলিয়ে দেখো।"
+                    )
+            self.send_chat(response_data)
             return
 
-        matches = search_pdf(question, passages)
-        comparison_table = find_comparison_table(question, matches)
-        if comparison_table:
-            answer = table_as_markdown(comparison_table)
-            answer_mode = "pdf_table"
-        elif matches:
-            answer = format_pdf_answer(matches, question)
-            answer_mode = "pdf_passages"
-        elif read_errors and not PDF_READER_AVAILABLE:
-            answer = read_errors[0]
-            answer_mode = "setup_required"
-        elif no_text_files:
+        if comparison_table and not configured_provider_names():
+            self.send_chat({
+                "answer": table_as_markdown(comparison_table),
+                "answering_mode": "pdf_table",
+                "sources": [],
+            })
+            return
+        if matches and not configured_provider_names():
+            self.send_chat({
+                "answer": format_pdf_answer(matches, question),
+                "answering_mode": "pdf_passages",
+                "sources": [
+                    {"file": item.get("file", "PDF"), "page": item.get("page")}
+                    for item in matches[:3]
+                ],
+            })
+            return
+        if not configured_provider_names() and read_errors and not PDF_READER_AVAILABLE:
+            self.send_chat({"answer": read_errors[0], "answering_mode": "setup_required", "sources": []})
+            return
+        if not configured_provider_names() and no_text_files:
             names = ", ".join(no_text_files)
             status = get_ocr_status()
             if status["available"]:
@@ -1501,60 +1810,21 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                 )
                 answer_mode = "ocr_no_text_found"
             else:
-                answer = (
-                    f"{names} সম্ভবত scanned PDF। Bengali OCR চালু নেই। "
-                    f"{status['note']}"
-                )
+                answer = f"{names} সম্ভবত scanned PDF। Bengali OCR চালু নেই। {status['note']}"
                 answer_mode = "ocr_setup_required"
-        else:
-            answer = "এই প্রশ্নটির উত্তর আমি এখনো জানি না।"
-            answer_mode = "not_found"
+            self.send_chat({"answer": answer, "answering_mode": answer_mode, "sources": []})
+            return
 
-        gemini_answer = None
-        if GEMINI_API_KEY:
-            try:
-                gemini_answer = generate_gemini_answer(
-                    question,
-                    matches,
-                    "en" if data.get("language") == "en" else "bn",
-                )
-            except Exception as error:
-                print(f"Walid AI: Gemini request failed ({type(error).__name__}).", flush=True)
-        if gemini_answer:
-            answer = gemini_answer
-            answer_mode = "gemini"
-
-        response_data = {
-            "answer": answer,
-            "answering_mode": answer_mode,
-            "sources": [
-                {"file": item.get("file", "PDF"), "page": item.get("page")}
-                for item in matches[:3]
-            ] if gemini_answer and matches else [],
-        }
-        model_status = get_own_model_status()
-        if (
-            matches
-            and not comparison_table
-            and answer_mode == "pdf_passages"
-            and generate_own_model_answer is not None
-            and model_status["available"]
-        ):
-            context = "\n\n".join(
-                passage["text"][:600] for passage in matches[:3]
-            )
-            try:
-                model_answer = generate_own_model_answer(question, context)
-            except Exception as error:
-                print(f"Walid AI: নিজস্ব মডেলের উত্তর তৈরি হয়নি: {error}", flush=True)
-                model_answer = None
-            if model_answer:
-                response_data["model_answer"] = model_answer
-                response_data["model_note"] = (
-                    "নিজস্ব ছোট মডেলের পরীক্ষামূলক খসড়া; PDF-এর অংশের সঙ্গে মিলিয়ে দেখো।"
-                )
-
-        self.send_json(200, response_data)
+        refund_question_quota(quota_user, use_search)
+        message = result.error if result is not None and result.error else (
+            "The free AI service could not answer this question. Please try again shortly."
+            if language == "en" else
+            "বিনামূল্যের AI সেবা এই মুহূর্তে উত্তর দিতে পারেনি। একটু পরে আবার চেষ্টা করুন।"
+        )
+        self.send_json(503, {
+            "error": message,
+            "retryable": True if result is None else bool(result.retryable),
+        })
 
 
 if __name__ == "__main__":
@@ -1566,6 +1836,7 @@ if __name__ == "__main__":
     print(f"Bengali OCR available: {get_ocr_status()['available']}")
     print(f"Google sign-in configured: {bool(os.environ.get('WALID_GOOGLE_CLIENT_ID', '').strip())}")
     print(f"Firebase sign-in configured: {bool(FIREBASE_PROJECT_ID)}")
+    print(f"Free providers configured: {', '.join(configured_provider_names()) or 'none'}")
     print(f"Gemini chat configured: {bool(GEMINI_API_KEY)} ({GEMINI_MODEL})")
     print(f"Gemini current-news search model: {GEMINI_NEWS_MODEL}")
     print("Press Ctrl+C to stop.")

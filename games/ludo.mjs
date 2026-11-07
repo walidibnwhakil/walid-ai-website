@@ -121,7 +121,9 @@ const lastDice=[1,1,1,1];
 let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
 const DICE_ROLL_DURATION=950;
 syncSoundControls();
-const initialColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:[0,1,2,3];
+const defaultColors=String(restoredConfig?.players)==="2"?[0,3,2,1]:[0,1,2,3];
+const storedColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:null;
+const initialColors=storedColors?(storedColors.join(",")==="0,1,2,3"?defaultColors:storedColors):defaultColors;
 let chosenColors=[...initialColors];
 const getColor=seat=>palette[chosenColors[seat]];
 function saveColorChoices(){

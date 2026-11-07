@@ -1066,7 +1066,7 @@ body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.pawn-ready-hint{animation
 /* Each player opens only their own in-yard color palette before play. */
 body.ludo-game.playing-ludo .board.ludo .home-base .yard-color-controls{position:absolute;z-index:14;top:7%;right:7%;display:block;overflow:visible}
 body.ludo-game.playing-ludo .board.ludo .yard-color-controls[hidden]{display:none!important}
-body.ludo-game.playing-ludo .yard-color-trigger{position:relative;display:grid;place-items:center;width:26px;height:26px;padding:2px;border:1.5px solid #f1d37c;border-radius:50%;background:radial-gradient(circle at 34% 25%,#fff7,#72411c 62%,#301409);box-shadow:0 1px 2px #16070088;cursor:pointer;touch-action:manipulation}
+body.ludo-game.playing-ludo .yard-color-trigger{position:relative;display:grid;place-items:center;flex:none;width:26px;height:26px;min-height:0!important;padding:2px;border:1.5px solid #f1d37c;border-radius:50%;line-height:1;background:radial-gradient(circle at 34% 25%,#fff7,#72411c 62%,#301409);box-shadow:0 1px 2px #16070088;cursor:pointer;touch-action:manipulation}
 body.ludo-game.playing-ludo .yard-color-trigger svg{display:block;width:100%;height:100%}
 body.ludo-game.playing-ludo .yard-color-swatches{position:absolute;z-index:1;top:50%;right:32px;display:grid;grid-template-columns:repeat(4,19px);gap:5px;width:max-content;padding:8px;border:1px solid #f3d47e;border-radius:12px;background:#26130eeF;box-shadow:0 3px 9px #16070055;transform:translateY(-50%)}
 body.ludo-game.playing-ludo .yard-color-swatches[hidden]{display:none!important}
@@ -1100,16 +1100,16 @@ body.ludo-game.playing-ludo .board.ludo .safe::before{display:none!important}
 body.ludo-game.playing-ludo .board.ludo .home-base{overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
 body.ludo-game.playing-ludo .board.ludo .home-base::after{display:none!important}
 body.ludo-game.playing-ludo .board.ludo .home-base::before{content:"";position:absolute;inset:12%;z-index:0;border-radius:18%;background:var(--yard-color);opacity:0;pointer-events:none}
-body.ludo-game.playing-ludo .board.ludo .home-base.custom-color::before{opacity:.36}
+body.ludo-game.playing-ludo .board.ludo .home-base.custom-color::before{opacity:.62}
 body.ludo-game.playing-ludo .board.ludo .home-diamond{border:0!important;background:transparent!important;box-shadow:none!important}
 body.ludo-game.playing-ludo .board.ludo .lane::before{content:"";position:absolute;inset:0;z-index:0;background:var(--lane-tint);opacity:0;pointer-events:none}
-body.ludo-game.playing-ludo .board.ludo .lane.custom-color::before{opacity:.30}
+body.ludo-game.playing-ludo .board.ludo .lane.custom-color::before{opacity:.52}
 body.ludo-game.playing-ludo .board.ludo .lane-0{--lane-tint:var(--seat-0)}
 body.ludo-game.playing-ludo .board.ludo .lane-1{--lane-tint:var(--seat-1)}
 body.ludo-game.playing-ludo .board.ludo .lane-2{--lane-tint:var(--seat-2)}
 body.ludo-game.playing-ludo .board.ludo .lane-3{--lane-tint:var(--seat-3)}
 body.ludo-game.playing-ludo .board.ludo .yard{z-index:1}
-body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn{inset:-35% -37.5%!important;width:175%!important;height:170%!important}
+body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn{inset:-45% -50%!important;width:200%!important;height:190%!important}
 body.ludo-game.playing-ludo .board.ludo .home-base.inactive-home{background:transparent!important;border-color:transparent!important}
 body.ludo-game.playing-ludo .board.ludo .lane.inactive-lane{background:transparent!important}
 @media(max-width:620px){body.ludo-game.playing-ludo .board.ludo{padding:4%;border:0!important;border-radius:0!important;width:min(100%,min(83vh,100vw))}}

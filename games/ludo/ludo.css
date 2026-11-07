@@ -1248,3 +1248,77 @@ body.ludo-game.playing-ludo #ludo-play #status{position:relative!important;displ
 /* Keep the finish light visible on the home art and the center finish square. */
 body.ludo-game.playing-ludo .board.ludo .home-base.has-finished-pawn:not(.custom-color)::after{display:block!important}
 body.ludo-game.playing-ludo .board.ludo .home-center.has-finished::after{display:block!important;content:""!important;position:absolute!important;inset:-12%!important;z-index:15!important;border:3px solid #fff4a6!important;border-radius:12%!important;background:radial-gradient(circle,#fff9 0 5%,#ffe88466 26%,transparent 74%)!important;box-shadow:0 0 21px 9px #ffdc77,inset 0 0 17px #fff5!important;animation:finish-home-light .95s ease-in-out infinite alternate!important;pointer-events:none!important}
+
+
+/* Stable finish: a pawn that reached the center is locked visually and in play. */
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.finished-pawn{
+  animation:none!important;translate:0 0!important;pointer-events:none!important;cursor:default!important
+}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.moving{
+  animation:ludo-pawn-travel var(--pawn-motion-duration,190ms) cubic-bezier(.2,.75,.25,1) both!important
+}
+@keyframes ludo-pawn-travel{
+  0%{translate:var(--pawn-dx,0px) var(--pawn-dy,0px);scale:.94}
+  42%{translate:calc(var(--pawn-dx,0px)*.52) calc(var(--pawn-dy,0px)*.52);scale:1.04}
+  100%{translate:0 0;scale:1}
+}
+
+/* Winner celebration fills the completed player's yard with the requested crown and lights. */
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1{
+  position:absolute!important;inset:5%!important;z-index:13!important;overflow:hidden!important;
+  display:grid!important;grid-template-rows:auto 1fr auto;place-items:center;gap:0!important;
+  padding:4% 5%!important;border:3px solid #fff4a0!important;border-radius:18%!important;
+  color:#fff2a3!important;
+  background:radial-gradient(ellipse at 50% 48%,#ffb935 0%,#d84318 48%,#820d13 100%)!important;
+  box-shadow:inset 0 0 0 3px #ffdf6888,0 0 20px 8px #ffd335,0 0 42px 16px #ff8b35aa!important;
+  animation:winner-yard-light 1.15s ease-in-out infinite alternate!important
+}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1::before{
+  content:"";position:absolute;inset:5%;z-index:0;pointer-events:none;
+  background:radial-gradient(circle at 15% 28%,#fff9 0 2px,transparent 3px),
+    radial-gradient(circle at 85% 28%,#fff9 0 2px,transparent 3px),
+    radial-gradient(circle at 15% 70%,#ffec7d 0 2px,transparent 3px),
+    radial-gradient(circle at 85% 70%,#ffec7d 0 2px,transparent 3px),
+    repeating-conic-gradient(from 0deg at 15% 29%,#ffd85c99 0 2deg,transparent 2deg 15deg),
+    repeating-conic-gradient(from 0deg at 85% 29%,#ffd85c99 0 2deg,transparent 2deg 15deg);
+  opacity:.9;animation:winner-firework-burst 1.8s ease-in-out infinite alternate
+}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1::after{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(circle,#fff9a8 0 2px,transparent 3px),radial-gradient(circle,#ffdc57 0 2px,transparent 3px),radial-gradient(circle,#ff8c30 0 2px,transparent 3px);
+  background-size:23px 21px,31px 27px,39px 33px;background-position:0 0,12px 8px,22px 3px;
+  opacity:.72;animation:firework-spark .8s steps(2,end) infinite
+}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1>*{position:relative;z-index:2}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-crown{width:clamp(32px,7vw,72px);max-height:28%;margin:0!important;filter:drop-shadow(0 3px 2px #431000)}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-place{
+  align-self:end;font-family:Georgia,serif;font-size:clamp(34px,9vw,78px);font-style:italic;line-height:.9;
+  color:#fff28e;text-shadow:0 3px #9b4216,0 5px 3px #3c1000,0 0 12px #fff8
+}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-ribbon{
+  padding:2px 20px;border:2px solid #ffdc64;border-radius:5px;
+  background:linear-gradient(#e83424,#9d0715);box-shadow:0 3px 0 #690812;
+  color:#fff8d6;font-family:Georgia,serif;font-size:clamp(11px,3vw,23px);font-weight:900;letter-spacing:.08em;
+  text-shadow:0 2px #5d0d0c;transform:rotate(-4deg)
+}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-firework{
+  position:absolute!important;top:16%;width:27%;aspect-ratio:1;z-index:1!important;border-radius:50%;
+  background:radial-gradient(circle,#fffbd4 0 3%,#ffce45 4% 7%,transparent 8% 100%);
+  box-shadow:0 0 12px 5px #ffce45aa
+}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-firework::after{
+  content:"";position:absolute;inset:-22%;border-radius:50%;
+  background:repeating-conic-gradient(#ffe779 0 3deg,transparent 3deg 16deg);
+  mask:radial-gradient(circle,transparent 0 27%,#000 31% 39%,transparent 44% 100%);
+  animation:winner-firework-burst 1.15s ease-in-out infinite alternate
+}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-firework-left{left:5%}
+body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-firework-right{right:5%}
+@keyframes winner-yard-light{to{filter:brightness(1.22);box-shadow:inset 0 0 0 3px #fff,0 0 28px 10px #ffe66a,0 0 55px 20px #ff8b35}}
+@keyframes winner-firework-burst{from{transform:scale(.78);opacity:.45}to{transform:scale(1.08);opacity:1}}
+@media(prefers-reduced-motion:reduce){
+ body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1,
+ body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1::before,
+ body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1::after,
+ body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-firework::after{animation:none!important}
+}

@@ -386,6 +386,11 @@
       border: 1px solid var(--line);
       border-radius: 17px 17px 17px 5px;
       background: var(--ai-bubble);
+      font-family: "Times New Roman", serif;
+    }
+    .msg.ai.bengali,
+    .msg.ai.bengali :not(svg):not(path) {
+      font-family: "Times New Roman", Times, SolaimanLipi, serif !important;
     }
 
     .msg.error { color: var(--red); }
@@ -966,6 +971,7 @@
   <script src="backend-config.js" defer></script>
   <script src="firebase-config.js" defer></script>
 
+<link rel="stylesheet" href="/about-contact-fonts.css">
 <link rel="stylesheet" href="/walid-branding.css">
 </head>
 
@@ -1009,7 +1015,7 @@
     <section class="main">
       <section class="welcome">
         <img class="welcome-brand" src="/walid-ai-approved-logo.png" alt="Walid AI">
-        <h1 id="welcomeTitle">Ask Walid AI...</h1>
+        <h1 id="welcomeTitle">Hi, what's on your mind today?</h1>
       </section>
 
       <section id="chat" class="chat" aria-live="polite"></section>

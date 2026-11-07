@@ -279,10 +279,10 @@
       document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", pageDescription);
       languageSelect.value = lang;
       const text = {
-        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"ওয়ালিদ AI-কে প্রশ্ন করুন...", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI", aboutUs:"আমাদের সম্পর্কে", contactUs:"যোগাযোগ", privacyPolicy:"গোপনীয়তা নীতি", termsOfService:"ব্যবহারের শর্তাবলি", thirdPartyLicenses:"তৃতীয় পক্ষের লাইসেন্স",
+        bn: { newChat:"নতুন চ্যাট", history:"চ্যাটের ইতিহাস", sidebarInfo:"আরও প্রশ্ন ও ফাইল আপলোডের জন্য লগ ইন করুন।", welcome:"হ্যালো, আজ কী ভাবছেন?", placeholder:"Walid AI-কে প্রশ্ন করুন...", login:"লগ ইন করুন", signup:"বিনামূল্যে নিবন্ধন", logout:"লগ আউট", loginDesc:"আপনার Walid AI অ্যাকাউন্টে প্রবেশ করুন।", signupTitle:"নতুন অ্যাকাউন্ট তৈরি করুন", help:"সহায়তা", settings:"সেটিংস", language:"ভাষা", tagline:"বাংলাদেশের AI", aboutUs:"আমাদের সম্পর্কে", contactUs:"যোগাযোগ", privacyPolicy:"গোপনীয়তা নীতি", termsOfService:"ব্যবহারের শর্তাবলি", thirdPartyLicenses:"তৃতীয় পক্ষের লাইসেন্স",
           helpTitle:"সহায়তা কেন্দ্র", faqTab:"সাধারণ প্রশ্ন", contactTab:"সহায়তায় যোগাযোগ", helpMailNote:"Send Email চাপলে আপনার ইমেইল অ্যাপে নিচের তথ্যসহ খসড়া খুলবে। খসড়াটি দেখে সেই অ্যাপ থেকেই Send চাপুন।", helpCategoryLabel:"সমস্যার ধরন", catGeneral:"সাধারণ প্রশ্ন", catAccount:"অ্যাকাউন্ট বা লগইন", catChat:"চ্যাট বা উত্তর", catTool:"ফাইল বা টুল", catOther:"অন্যান্য", helpSubjectLabel:"বিষয়", helpMessageLabel:"বার্তা", sendEmail:"ইমেইল পাঠান", helpAlternative:"অথবা ইমেইল করুন:", mailReady:"আপনার ইমেইল অ্যাপে খসড়াটি খোলা হয়েছে। পাঠাতে সেখানে Send চাপুন।", mailFallback:"ইমেইল অ্যাপ খুলছে না? এই ঠিকানায় লিখুন: support@walid-ai.com",
           faqChatQ:"চ্যাট কীভাবে শুরু করব?", faqChatA:"চ্যাটের ঘরে প্রশ্ন লিখে Send চাপুন।", faqLangQ:"ওয়েবসাইটের ভাষা কোথায় বদলাব?", faqLangA:"Settings খুলে English বা বাংলা বেছে নিন। পছন্দটি এই ব্রাউজারে সংরক্ষিত থাকে।", faqFilesQ:"চ্যাটে ফাইল কীভাবে যোগ করব?", faqFilesA:"চ্যাট বক্সের পাশের প্লাস বোতাম ব্যবহার করুন। চ্যাটে ফাইল যোগ করতে লগইন প্রয়োজন।", faqToolsQ:"PDF, ছবি ও ZIP টুল কোথায়?", faqToolsA:"সাইডবারের Tools বা Tools পেজ খুলে প্রয়োজনীয় টুল বেছে নিন।", faqConvertQ:"কোন ছবির ফরম্যাট বদলানো যায়?", faqConvertA:"Convert Image টুলে JPG, PNG ও WebP ব্যবহার করা যায়." },
-        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in for more questions and file uploads.", welcome:"Ask Walid AI...", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladeshi AI", aboutUs:"About Us", contactUs:"Contact Us", privacyPolicy:"Privacy Policy", termsOfService:"Terms of Service", thirdPartyLicenses:"Third-Party Licenses",
+        en: { newChat:"New chat", history:"Recent chats", sidebarInfo:"Log in for more questions and file uploads.", welcome:"Hi, what's on your mind today?", placeholder:"Ask Walid AI...", login:"Log in", signup:"Sign up for free", logout:"Log out", loginDesc:"Continue to your Walid AI account.", signupTitle:"Create your account", help:"Help", settings:"Settings", language:"Language", tagline:"Bangladeshi AI", aboutUs:"About Us", contactUs:"Contact Us", privacyPolicy:"Privacy Policy", termsOfService:"Terms of Service", thirdPartyLicenses:"Third-Party Licenses",
           helpTitle:"Help Center", faqTab:"FAQs", contactTab:"Contact Support", helpMailNote:"Send Email opens your email app with the details below. Review the draft and press Send in that app.", helpCategoryLabel:"Issue category", catGeneral:"General question", catAccount:"Account or sign-in", catChat:"Chat or answer", catTool:"File or tool", catOther:"Other", helpSubjectLabel:"Subject", helpMessageLabel:"Message", sendEmail:"Send Email", helpAlternative:"Or email:", mailReady:"Your email app should open with a draft. Press Send there to send it.", mailFallback:"If your email app did not open, email support@walid-ai.com directly.",
           faqChatQ:"How do I start a chat?", faqChatA:"Type your question in the chat box and press Send.", faqLangQ:"Where can I change the interface language?", faqLangA:"Open Settings and choose English or বাংলা. The choice is saved in this browser.", faqFilesQ:"How do I attach a file in chat?", faqFilesA:"Use the plus button beside the chat box. Sign-in is required for chat file uploads.", faqToolsQ:"Where are the PDF, image, and ZIP tools?", faqToolsA:"Open Tools from the sidebar or the Tools page to choose a tool.", faqConvertQ:"Which image formats can I convert?", faqConvertA:"The Convert Image tool supports JPG, PNG, and WebP." }
       }[lang];
@@ -811,11 +811,15 @@
       drawHistory(guestRecords());
     });
 
+    function hasBengaliScript(text) {
+      return /[\u0980-\u09FF]/.test(String(text ?? ""));
+    }
+
     // Render chat messages safely as text
     function addMessage(kind, text, source = "", meta = {}) {
       const bubble = document.createElement("div");
       bubble.className = "msg " + kind;
-      if (/[\u0980-\u09FF]/.test(String(text ?? ""))) bubble.classList.add("bengali");
+      if (hasBengaliScript(text)) bubble.classList.add("bengali");
 
       const table = kind === "ai" ? parseMarkdownTable(text) : null;
 
@@ -1277,12 +1281,15 @@
                   streamTicker = setInterval(() => {
                     if (streamVisible < streamedText.length) {
                       streamVisible = Math.min(streamedText.length, streamVisible + Math.max(1, Math.ceil((streamedText.length - streamVisible) / 90)));
-                      streamedBody.textContent = streamedText.slice(0, streamVisible);
+                      const visibleAnswer = streamedText.slice(0, streamVisible);
+                      streamedBody.textContent = visibleAnswer;
+                      if (hasBengaliScript(visibleAnswer)) streamedBubble.classList.add("bengali");
                       chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
                     }
                   }, 18);
                 }
                 streamedText += event.text || "";
+                if (hasBengaliScript(streamedText)) streamedBubble.classList.add("bengali");
               } else if (event.event === "done") {
                 Object.assign(data, event);
               }
@@ -1291,6 +1298,7 @@
           }
           while (streamVisible < streamedText.length) await new Promise((resolve) => setTimeout(resolve, 24));
           if (streamTicker) clearInterval(streamTicker);
+          if (streamedBubble && hasBengaliScript(streamedText)) streamedBubble.classList.add("bengali");
           if (streamedBody) { streamedBody.classList.remove("typing-cursor"); renderAnswerContent(streamedBody, streamedText); }
           data.answer = streamedText || data.answer || "";
         }
@@ -1315,10 +1323,11 @@
         const savedAnswer = chatMessages.at(-1); if (savedAnswer?.kind === "ai") { savedAnswer.text = data.answer; void persistConversation(); }
         const bodyNode = answer.querySelector(":scope > span:not(.source)");
         if (!streamedBubble && bodyNode && data.answer.length < 12000) {
+          answer.classList.remove("bengali");
           bodyNode.textContent = "";
           bodyNode.classList.add("typing-cursor");
           const target = String(data.answer); let offset = 0; const step = Math.max(1, Math.ceil(target.length / 160));
-          const typeNext = () => { offset = Math.min(target.length, offset + step); bodyNode.textContent = target.slice(0, offset); if (offset < target.length) { chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }); setTimeout(typeNext, 12); } else { bodyNode.classList.remove("typing-cursor"); renderAnswerContent(bodyNode, target); } };
+          const typeNext = () => { offset = Math.min(target.length, offset + step); const visibleAnswer = target.slice(0, offset); bodyNode.textContent = visibleAnswer; if (hasBengaliScript(visibleAnswer)) answer.classList.add("bengali"); if (offset < target.length) { chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }); setTimeout(typeNext, 12); } else { bodyNode.classList.remove("typing-cursor"); renderAnswerContent(bodyNode, target); } };
           typeNext();
         }
 

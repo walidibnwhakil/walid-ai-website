@@ -1204,11 +1204,11 @@ body.ludo-game.playing-ludo #board.board.ludo .track>span.ludo-pawn.sprite-pawn:
 body.ludo-game.playing-ludo #board.board.ludo .lane>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .home-center>span.ludo-pawn.sprite-pawn:not(.yard-pawn){
   inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
-  width:140%!important;height:125%!important;transform:translate(-50%,-50%)!important;z-index:9!important
+  width:155%!important;height:145%!important;transform:translate(-50%,-50%)!important;z-index:9!important
 }
 body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.yard-pawn{
   inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
-  width:140%!important;height:125%!important;transform:translate(-50%,-50%)!important;z-index:4!important
+  width:155%!important;height:145%!important;transform:translate(-50%,-50%)!important;z-index:4!important
 }
 /* Keep the base-centering transform intact during subtle pawn movement. */
 @keyframes mahir-ready-bob{0%,100%{translate:0 0}50%{translate:0 -2px}}

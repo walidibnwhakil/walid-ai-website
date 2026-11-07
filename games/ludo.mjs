@@ -303,8 +303,20 @@ async function play(index) {
     for(const step of captureReturnSteps(hit.step)) moving.push({player:hit.player,token:hit.token,step,captured:true});
   }
   for(const motion of moving) {
+    const markerSelector=`.pin-pawn[data-token="${activeTeams[motion.player]}-${motion.token}"]`;
+    const oldMarker=game.board.querySelector(markerSelector);
+    const oldRect=oldMarker?.getBoundingClientRect();
     animationToken=motion;
     render();
+    const marker=game.board.querySelector(markerSelector);
+    const newRect=marker?.getBoundingClientRect();
+    if(marker&&oldRect&&newRect){
+      marker.style.setProperty("--pawn-dx",`${oldRect.left+oldRect.width/2-newRect.left-newRect.width/2}px`);
+      marker.style.setProperty("--pawn-dy",`${oldRect.top+oldRect.height/2-newRect.top-newRect.height/2}px`);
+      marker.classList.remove("moving");
+      void marker.offsetWidth;
+      marker.classList.add("moving");
+    }
     await new Promise(resolve=>setTimeout(resolve,motion.captured?delay/4:delay));
     if(motion.step===-1)pendingCaptureSteps.delete(`${motion.player}-${motion.token}`);
   }
@@ -442,7 +454,7 @@ function render() {
     const teamId=activeTeams[player];
     const badge=document.createElement("div");
     badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;
-    badge.innerHTML=rank===1 ? `<svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><span>WINNER</span><strong>1st</strong>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
+    badge.innerHTML=rank===1 ? `<span class="winner-firework winner-firework-left" aria-hidden="true"></span><span class="winner-firework winner-firework-right" aria-hidden="true"></span><svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><strong class="winner-place">1st</strong><span class="winner-ribbon">WINNER</span>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
     game.board.querySelector(`.base-${teamId}`).append(badge);
   });
 

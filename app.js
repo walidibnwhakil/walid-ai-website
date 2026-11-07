@@ -436,7 +436,12 @@
             return;
           }
         } catch (error) {
-          addMessage("error", humanizeRequestError(error) || (languageSelect.value === "bn" ? "আপলোড সীমা যাচাই করা যায়নি।" : "Could not check upload quota."));
+          const raw = String(error && error.message || "");
+          const technical = error.name === "AbortError" || /failed to fetch|failed to patch|network|json|server|wake/i.test(raw);
+          const bn = languageSelect.value === "bn";
+          addMessage("error", technical || !raw
+            ? (bn ? "দুঃখিত, এই মুহূর্তে ফাইল যোগ করা যাচ্ছে না। একটু পরে আবার চেষ্টা করুন।" : "Sorry, I can't add that file right now. Please try again in a little while.")
+            : raw);
           fileInput.value = "";
           return;
         }
@@ -1059,24 +1064,18 @@
     let chatSending = false;
     let backendReady = false;
 
+    function politeChatFailure() {
+      return languageSelect.value === "bn"
+        ? "দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না, একটু পরে আবার চেষ্টা করুন।"
+        : "Sorry, I can't answer right now. Please try again in a little while.";
+    }
+
     function humanizeRequestError(error) {
-      const bn = languageSelect.value === "bn";
       const raw = String(error && error.message || "");
       const status = Number(error && error.status || 0);
-      if (error && error.quota === "daily_limit") return raw;
-      if (/failed to fetch|failed to patch|networkerror|load failed|network request failed/i.test(raw) || status === 502 || status === 503 || status === 504 || error && error.name === "AbortError") {
-        return bn
-          ? "সংযোগ হয়নি। বিনামূল্যের সার্ভার ঘুম থেকে উঠতে এক মিনিট লাগতে পারে। একটু পরে আবার পাঠান।"
-          : "Could not reach Walid AI. The free server can take about a minute to wake up. Please send the question again shortly.";
-      }
-      if (status === 429 || (error && error.quota === "rate")) {
-        return raw || (bn ? "একসাথে অনেক প্রশ্ন চলে গেছে। এক মিনিট পর আবার চেষ্টা করুন।" : "Too many questions at once. Please wait a minute and try again.");
-      }
-      if (/unexpected end of json|json/i.test(raw)) {
-        return bn ? "সার্ভার উত্তর দিতে পারেনি। একটু পরে আবার চেষ্টা করুন।" : "The server could not return an answer. Please try again shortly.";
-      }
-      if (raw && raw.length < 400) return raw;
-      return bn ? "উত্তর পাওয়া যায়নি। আবার চেষ্টা করুন।" : "No answer came back. Please try again.";
+      if (error && (error.quota === "daily_limit" || error.quota === "upload_daily_limit") && raw) return raw;
+      if (status === 429 && raw && !/server|wake|fetch|patch|json|error/i.test(raw)) return raw;
+      return politeChatFailure();
     }
 
     function fetchWithTimeout(url, options, timeoutMs) {
@@ -1117,13 +1116,8 @@
       return kept.reverse();
     }
 
-    function thinkingText(seconds, waking) {
-      const bn = languageSelect.value === "bn";
-      const clock = seconds.toFixed(1);
-      if (waking) {
-        return bn ? `সার্ভার ঘুম থেকে উঠছে… ${clock} সেকেন্ড` : `Server is waking up… ${clock}s`;
-      }
-      return bn ? `উত্তর তৈরি হচ্ছে… ${clock} সেকেন্ড` : `Preparing an answer… ${clock}s`;
+    function thinkingText(seconds) {
+      return "Responding… " + Math.max(0, Math.floor(seconds)) + "s";
     }
 
     // Chat submit
@@ -1164,10 +1158,9 @@
       const requestId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
       let streamedBubble = null, streamedBody = null, streamedText = "", streamVisible = 0, streamTicker = null;
       let attempt = 0;
-      const thinking = addMessage("thinking", thinkingText(0, !backendReady));
+      const thinking = addMessage("thinking", thinkingText(0));
       const timer = setInterval(() => {
-        const seconds = (performance.now() - requestStarted) / 1000;
-        thinking.textContent = thinkingText(seconds, !backendReady || seconds >= 8 || attempt > 1);
+        thinking.textContent = thinkingText((performance.now() - requestStarted) / 1000);
       }, 100);
 
       const headers = { "Content-Type": "application/json" };
@@ -1242,7 +1235,6 @@
                 chatError.retryable = Boolean(parsed.retryable);
                 const retryable = chatError.quota !== "daily_limit" && (chatError.retryable || response.status === 502 || response.status === 503 || response.status === 504 || response.status === 429);
                 if (retryable && attempt < 2) {
-                  thinking.textContent = thinkingText((performance.now() - requestStarted) / 1000, true);
                   await wakeBackend(response.status === 429 ? 5000 : 60000);
                   continue;
                 }
@@ -1256,7 +1248,6 @@
             chatError = error;
             const network = error.name === "AbortError" || /failed to fetch|networkerror|load failed/i.test(String(error.message || ""));
             if (network && attempt < 2) {
-              thinking.textContent = thinkingText((performance.now() - requestStarted) / 1000, true);
               await wakeBackend(60000);
               continue;
             }

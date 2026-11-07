@@ -702,16 +702,12 @@ def _own_model_answer(prompt, deadline):
 
 def _failure_message(language, retryable, configured):
     if not configured:
-        if language == "en":
-            return "Walid AI has no free model configured yet. Add a free Gemini key on the server and try again."
-        return "Walid AI-এর বিনামূল্যের মডেল এখনো সেটআপ হয়নি। সার্ভারে একটি ফ্রি Gemini কী দিয়ে আবার চেষ্টা করুন।"
+        print("Walid AI: no free provider is configured.", flush=True)
+    elif retryable:
+        print("Walid AI: free providers were busy or unavailable.", flush=True)
     if language == "en":
-        if retryable:
-            return "The free AI service is busy right now. Please wait a moment and send the question again."
-        return "The free AI service could not answer this question. Please try again shortly."
-    if retryable:
-        return "বিনামূল্যের AI সেবা এখন ব্যস্ত। একটু পরে প্রশ্নটি আবার পাঠান।"
-    return "বিনামূল্যের AI সেবা এই মুহূর্তে উত্তর দিতে পারেনি। একটু পরে আবার চেষ্টা করুন।"
+        return "Sorry, I can't answer right now. Please try again in a little while."
+    return "দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না, একটু পরে আবার চেষ্টা করুন।"
 
 
 def generate_fallback_answer(question, history=None, passages=None, sources=None, language="bn", files=None, use_search=False):

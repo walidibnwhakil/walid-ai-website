@@ -1484,7 +1484,7 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             if not self._replied:
                 try:
                     self.send_json(500, {
-                        "error": "উত্তর তৈরি করা যায়নি। একটু পরে আবার চেষ্টা করুন।",
+                        "error": "দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না, একটু পরে আবার চেষ্টা করুন।",
                         "retryable": True,
                     })
                 except Exception:
@@ -1569,9 +1569,9 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                     self._replay_flight(flight)
                     return
                 busy = (
-                    "The previous try is still running. Please wait a moment and send it again."
+                    "Sorry, I can't answer right now. Please try again in a little while."
                     if language == "en" else
-                    "আগের চেষ্টা এখনো চলছে। একটু পরে আবার পাঠান।"
+                    "দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না, একটু পরে আবার চেষ্টা করুন।"
                 )
                 self.send_json(503, {"error": busy, "retryable": True})
                 return
@@ -1817,9 +1817,9 @@ class WalidAIHandler(BaseHTTPRequestHandler):
 
         refund_question_quota(quota_user, use_search)
         message = result.error if result is not None and result.error else (
-            "The free AI service could not answer this question. Please try again shortly."
+            "Sorry, I can't answer right now. Please try again in a little while."
             if language == "en" else
-            "বিনামূল্যের AI সেবা এই মুহূর্তে উত্তর দিতে পারেনি। একটু পরে আবার চেষ্টা করুন।"
+            "দুঃখিত, এই মুহূর্তে উত্তর দিতে পারছি না, একটু পরে আবার চেষ্টা করুন।"
         )
         self.send_json(503, {
             "error": message,

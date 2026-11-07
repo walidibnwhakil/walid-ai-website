@@ -1199,7 +1199,7 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn{
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn::after{display:none!important}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-pawn-art{
   position:absolute;left:50%;top:50%;width:100%;height:140%;overflow:visible;
-  transform:translate(-50%,-96.25%);filter:drop-shadow(0 2px 1px #120900aa)
+  transform:translate(-50%,-96.25%);filter:none
 }
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-outline{fill:#f7fbff;stroke:#52677b;stroke-width:2.5}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-color{fill:#f5f9fc;stroke:#c8d6e4;stroke-width:1}

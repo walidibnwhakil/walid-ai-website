@@ -398,10 +398,10 @@ function render() {
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
     if(pile.length<2)continue;
     const spread=pile.length>4;
-    const positions=pile.length===2?[[-20,0],[20,0]]
-      :pile.length===3?[[-20,-12],[20,-12],[0,18]]
-      :pile.length===4?[[-20,-16],[20,-16],[-20,16],[20,16]]
-      :pile.map((_,index)=>[[-39,-13,13,39][index%4],(index<4?-14:14)]);
+    const positions=pile.length===2?[[-22,0],[22,0]]
+      :pile.length===3?[[-23,-12],[23,-12],[0,20]]
+      :pile.length===4?[[-25,-20],[25,-20],[-25,20],[25,20]]
+      :pile.map((_,index)=>[[-42,-14,14,42][index%4],(index<4?-16:16)]);
     pile.forEach((piece,index)=>{
       piece.classList.add("stacked-pawn",spread?"pile-size-dense":`pile-size-${pile.length}`);
       piece.style.setProperty("--pile-x",`${positions[index][0]}%`);

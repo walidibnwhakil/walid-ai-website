@@ -1142,7 +1142,7 @@ body.ludo-game.playing-ludo .play-toolbar .board-round-button svg{width:100%;hei
 
 /* Eight crisp sprite variants share one silhouette and keep their gold base. */
 body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn{inset:0!important;width:100%!important;height:100%!important;background-image:url("./ludo-pawns-8.webp")!important;background-size:800% 100%!important;background-repeat:no-repeat!important;filter:none!important}
-body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn.yard-pawn{inset:-25%!important;width:150%!important;height:150%!important}
+body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn.yard-pawn{inset:0!important;width:100%!important;height:100%!important}
 body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn[data-color="0"]{background-position:0% 50%!important}
 body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn[data-color="1"]{background-position:14.2857% 50%!important}
 body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn[data-color="2"]{background-position:28.5714% 50%!important}
@@ -1164,3 +1164,13 @@ body.ludo-game.playing-ludo .board.ludo .track.safe.start-square.red{background:
 body.ludo-game.playing-ludo .board.ludo .track.safe.start-square.blue{background:linear-gradient(145deg,color-mix(in srgb,var(--seat-1) 76%,white),var(--seat-1) 56%,color-mix(in srgb,var(--seat-1) 75%,#07132a))!important}
 body.ludo-game.playing-ludo .board.ludo .track.safe.start-square.green{background:linear-gradient(145deg,color-mix(in srgb,var(--seat-2) 76%,white),var(--seat-2) 56%,color-mix(in srgb,var(--seat-2) 75%,#061b0e))!important}
 body.ludo-game.playing-ludo .board.ludo .track.safe.start-square.yellow{background:linear-gradient(145deg,color-mix(in srgb,var(--seat-3) 76%,white),var(--seat-3) 56%,color-mix(in srgb,var(--seat-3) 75%,#251505))!important}
+/* Remove the empty-slot gold discs; each occupied slot shows only its pawn. */
+body.ludo-game.playing-ludo #board.board.ludo .yard::after{display:none!important}
+/* Keep moving pawns inside the exact board cells and make extra safe cells obvious. */
+body.ludo-game.playing-ludo #board.board.ludo .track,
+body.ludo-game.playing-ludo #board.board.ludo .lane,
+body.ludo-game.playing-ludo #board.board.ludo .yard,
+body.ludo-game.playing-ludo #board.board.ludo .home-center{overflow:hidden!important}
+body.ludo-game.playing-ludo #board.board.ludo .track.safe:not(.start-square){background:linear-gradient(145deg,#ffe58a,#f2bd38 58%,#c9831b)!important;border:2px solid #e2aa36!important;box-shadow:inset 0 2px #fff9,inset 0 -2px #9e6018,0 1px 2px #4b2b0f99!important}
+body.ludo-game.playing-ludo #board.board.ludo .track.safe::before{color:#fff5d5!important;-webkit-text-stroke:.5px #754408;text-shadow:0 1px 1px #4b2707,0 0 3px #61350a!important}
+@keyframes ludu-pawn-hop{0%,100%{transform:translateY(0)}42%{transform:translateY(-1px)}72%{transform:translateY(0)}}

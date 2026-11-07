@@ -1390,3 +1390,7 @@ body.ludo-game.playing-ludo #board.board.ludo .home-base.has-finished-pawn::afte
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn:not(.stacked-pawn) .pin-pawn-art{
   width:110%!important;height:108%!important
 }
+
+
+/* Hide the empty idle prompt; the die button itself is the roll control. */
+body.ludo-game.playing-ludo #ludo-play #status:empty{display:none!important}

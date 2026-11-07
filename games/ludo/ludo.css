@@ -1005,3 +1005,43 @@ body.ludo-game.playing-ludo .player-dice .die-face.rolling .die-pip{visibility:h
 @keyframes ludu-die-tumble{0%{transform:perspective(240px) rotateX(0) rotateY(0) rotateZ(0) scale(1)}16%{transform:perspective(240px) rotateX(160deg) rotateY(220deg) rotateZ(300deg) translateY(-7px) scale(1.08)}34%{transform:perspective(240px) rotateX(370deg) rotateY(510deg) rotateZ(660deg) translateY(2px)}53%{transform:perspective(240px) rotateX(590deg) rotateY(770deg) rotateZ(990deg) translateY(-5px) scale(1.04)}73%{transform:perspective(240px) rotateX(770deg) rotateY(1030deg) rotateZ(1310deg) translateY(1px)}100%{transform:perspective(240px) rotateX(1080deg) rotateY(1440deg) rotateZ(1800deg) translateY(0) scale(1)}}
 body.ludo-game.playing-ludo .board.ludo span.moving{animation:ludu-pawn-hop var(--pawn-motion-duration,320ms) cubic-bezier(.2,.72,.3,1) both}
 body.ludo-game.playing-ludo .board.ludo span.captured-return{animation-duration:calc(var(--pawn-motion-duration,160ms))}
+
+/* Reference-shaped pawn pieces: glossy colored bodies, rounded heads, and gold bases. */
+body.ludo-game .board.ludo span.ludo-pawn{position:absolute!important;inset:-3%!important;width:106%!important;height:106%!important;display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important;line-height:0!important;filter:drop-shadow(0 2px 2px #180802a8);pointer-events:auto}
+body.ludo-game .board.ludo span.ludo-pawn .pawn-body{position:absolute;z-index:2;left:14%;bottom:13%;width:72%;height:53%;display:block;clip-path:polygon(39% 0,61% 0,67% 24%,83% 57%,100% 84%,94% 100%,6% 100%,0 84%,17% 57%,33% 24%);background:linear-gradient(105deg,#fff9 0,transparent 16%,transparent 63%,#0008 100%),radial-gradient(ellipse at 34% 17%,color-mix(in srgb,var(--piece-color) 58%,white),var(--piece-color) 48%,color-mix(in srgb,var(--piece-color) 68%,#160904));box-shadow:inset 0 3px 4px #fff9,inset 0 -5px 6px #160704aa}
+body.ludo-game .board.ludo span.ludo-pawn .pawn-body::after{content:"";position:absolute;left:19%;right:19%;top:15%;height:9%;border-radius:50%;background:linear-gradient(90deg,transparent,#fff9,transparent);box-shadow:0 1px 2px #fff4}
+body.ludo-game .board.ludo span.ludo-pawn .pawn-base{position:absolute;z-index:1;left:3%;bottom:3%;width:94%;height:22%;display:block;border:2px solid #f6ce63;border-radius:50%;background:linear-gradient(180deg,#fff2ae 0,#d78d19 28%,#66350e 57%,#e5a82f 74%,#76400d 100%);box-shadow:inset 0 2px 2px #fff9,0 3px 3px #180803aa}
+body.ludo-game .board.ludo span.ludo-pawn .pawn-head{position:absolute;z-index:3;left:30%;top:0;width:40%;height:40%;display:block;border:0;border-radius:50%;background:radial-gradient(circle at 28% 21%,#fff 0 5%,#ffffffaa 12%,transparent 35%),radial-gradient(circle at 34% 28%,color-mix(in srgb,var(--piece-color) 54%,white),var(--piece-color) 55%,color-mix(in srgb,var(--piece-color) 67%,#180704));box-shadow:inset -3px -4px 5px #16070599,0 2px 3px #160803aa}
+body.ludo-game .board.ludo span.ludo-pawn.moving{animation:ludu-pawn-hop var(--pawn-motion-duration,320ms) cubic-bezier(.2,.72,.3,1) both}
+
+/* A six-sided ivory die stays in its housing while all numbered faces tumble. */
+body.ludo-game.playing-ludo .player-dice .die-face{--die-size:clamp(48px,6vw,64px);position:relative;display:grid;place-items:center;flex:none;width:var(--die-size);height:var(--die-size);margin:0;padding:4px;border:3px solid #d5ad63;border-radius:14px;background:linear-gradient(145deg,#3a1d0d,#81521e 50%,#2a1308);box-shadow:inset 0 1px #fff8,0 4px 0 #704b25,0 7px 10px #100600;perspective:420px;perspective-origin:50% 50%;transform:none!important;animation:none!important;overflow:visible}
+body.ludo-game.playing-ludo .player-dice .die-cube{--cube-size:calc(var(--die-size) - 12px);position:relative;display:block;width:var(--cube-size);height:var(--cube-size);transform-style:preserve-3d;transform:rotateX(var(--face-x,0deg)) rotateY(var(--face-y,0deg));will-change:transform}
+body.ludo-game.playing-ludo .player-dice .die-side{position:absolute;inset:0;display:grid;place-items:center;width:100%;height:100%;border:1px solid #a58b67;border-radius:6px;background:linear-gradient(145deg,#fffefa 0,#f5eee1 68%,#d7c8af 100%);box-shadow:inset 0 2px #fff,0 1px 2px #47301a88;backface-visibility:hidden}
+body.ludo-game.playing-ludo .player-dice .side-front{transform:rotateY(0deg) translateZ(calc(var(--cube-size) / 2))}
+body.ludo-game.playing-ludo .player-dice .side-right{transform:rotateY(90deg) translateZ(calc(var(--cube-size) / 2))}
+body.ludo-game.playing-ludo .player-dice .side-back{transform:rotateY(180deg) translateZ(calc(var(--cube-size) / 2))}
+body.ludo-game.playing-ludo .player-dice .side-left{transform:rotateY(-90deg) translateZ(calc(var(--cube-size) / 2))}
+body.ludo-game.playing-ludo .player-dice .side-top{transform:rotateX(90deg) translateZ(calc(var(--cube-size) / 2))}
+body.ludo-game.playing-ludo .player-dice .side-bottom{transform:rotateX(-90deg) translateZ(calc(var(--cube-size) / 2))}
+body.ludo-game.playing-ludo .player-dice .die-side-pips{display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);align-items:center;justify-items:center;width:100%;height:100%;padding:15%;box-sizing:border-box}
+body.ludo-game.playing-ludo .player-dice .die-side-pips .die-pip{position:static;display:block;width:clamp(4px,.78vw,8px);height:clamp(4px,.78vw,8px);margin:0;border-radius:50%;background:radial-gradient(circle at 27% 22%,#56483b,#19120d 72%);box-shadow:inset 0 1px 1px #000b,0 1px #fff9;visibility:visible!important;opacity:1!important}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-1{--face-x:0deg;--face-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-2{--face-x:0deg;--face-y:-90deg}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-3{--face-x:90deg;--face-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-4{--face-x:-90deg;--face-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-5{--face-x:0deg;--face-y:90deg}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-6{--face-x:0deg;--face-y:180deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-1{--roll-x:0deg;--roll-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-2{--roll-x:0deg;--roll-y:-90deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-3{--roll-x:90deg;--roll-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-4{--roll-x:-90deg;--roll-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-5{--roll-x:0deg;--roll-y:90deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-6{--roll-x:0deg;--roll-y:180deg}
+body.ludo-game.playing-ludo .player-dice .die-face.rolling{animation:none!important;backface-visibility:visible}
+body.ludo-game.playing-ludo .player-dice .die-face.rolling .die-pip{visibility:visible!important;opacity:1!important}
+body.ludo-game.playing-ludo .player-dice .die-face.rolling .die-cube{animation:ludu-stable-cube-roll .95s cubic-bezier(.18,.72,.2,1) both}
+@keyframes ludu-stable-cube-roll{0%{transform:rotateX(var(--face-x,0deg)) rotateY(var(--face-y,0deg)) rotateZ(0)}18%{transform:rotateX(calc(var(--face-x,0deg) + 180deg)) rotateY(calc(var(--face-y,0deg) + 240deg)) rotateZ(180deg)}42%{transform:rotateX(calc(var(--face-x,0deg) + 420deg)) rotateY(calc(var(--face-y,0deg) + 540deg)) rotateZ(360deg)}68%{transform:rotateX(calc(var(--face-x,0deg) + 660deg)) rotateY(calc(var(--face-y,0deg) + 840deg)) rotateZ(540deg)}100%{transform:rotateX(calc(var(--roll-x,0deg) + 720deg)) rotateY(calc(var(--roll-y,0deg) + 1080deg)) rotateZ(720deg)}}
+@media(max-width:620px){body.ludo-game.playing-ludo .player-dice .die-face{--die-size:44px;padding:4px;border-radius:11px}}
+
+body.ludo-game .board.ludo span.ludo-pawn::before,body.ludo-game .board.ludo span.ludo-pawn::after{content:none!important;display:none!important}

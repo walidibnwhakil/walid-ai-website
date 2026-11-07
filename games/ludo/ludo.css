@@ -1240,3 +1240,11 @@ body.ludo-game.playing-ludo .board.ludo .home-base.has-finished-pawn:not(.custom
 body.ludo-game.playing-ludo .board.ludo .home-base.custom-color.has-finished-pawn::after{border-color:#fff1a1;box-shadow:inset 0 2px 7px #fff7,0 0 17px 5px #ffe479aa;animation:finish-home-light 1.15s ease-in-out infinite alternate}
 body.ludo-game.playing-ludo .board.ludo .home-center.has-finished::after{inset:0!important;border:3px solid #fff4a6!important;background:radial-gradient(circle,#fff9 0 5%,#ffe88455 25%,transparent 72%)!important;box-shadow:0 0 15px 5px #ffdc77,inset 0 0 15px #fff3!important;animation:finish-home-light .95s ease-in-out infinite alternate!important}
 @keyframes finish-home-light{from{opacity:.42;filter:brightness(1);box-shadow:0 0 8px 2px #ffe47966,inset 0 0 8px #fff2}to{opacity:1;filter:brightness(1.2);box-shadow:0 0 19px 7px #ffe479ba,inset 0 0 17px #fff6}}
+
+
+/* Make turn and end-of-game feedback visible during play. */
+body.ludo-game.playing-ludo #ludo-play #status{position:relative!important;display:block!important;width:fit-content!important;max-width:calc(100% - 16px)!important;height:auto!important;min-height:0!important;padding:4px 9px!important;margin:0 auto 4px!important;overflow:visible!important;clip:auto!important;clip-path:none!important;white-space:normal!important;border:1px solid #e2b658!important;border-radius:999px!important;background:linear-gradient(145deg,#5d2b13,#2b130b)!important;color:#fff1cb!important;font-size:clamp(11px,2.8vw,14px)!important;line-height:1.2!important;text-align:center!important;z-index:12!important}
+
+/* Keep the finish light visible on the home art and the center finish square. */
+body.ludo-game.playing-ludo .board.ludo .home-base.has-finished-pawn:not(.custom-color)::after{display:block!important}
+body.ludo-game.playing-ludo .board.ludo .home-center.has-finished::after{display:block!important;content:""!important;position:absolute!important;inset:-12%!important;z-index:15!important;border:3px solid #fff4a6!important;border-radius:12%!important;background:radial-gradient(circle,#fff9 0 5%,#ffe88466 26%,transparent 74%)!important;box-shadow:0 0 21px 9px #ffdc77,inset 0 0 17px #fff5!important;animation:finish-home-light .95s ease-in-out infinite alternate!important;pointer-events:none!important}

@@ -1201,7 +1201,7 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-pawn-art{
   position:absolute;left:50%;top:50%;width:86%;height:100%;overflow:visible;
   transform:translate(-50%,-50%);filter:drop-shadow(0 2px 1px #120900aa)
 }
-body.ludo-game.playing-ludo .board.ludo span.pin-base-shadow{fill:#24170f}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-shadow{fill:#24170f}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-ring{fill:#462813;stroke:#f2d17d;stroke-width:3}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-top{fill:var(--piece-color);stroke:#fff5cf;stroke-width:1.5}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-outline{fill:#f7fbff;stroke:#344658;stroke-width:2.5}

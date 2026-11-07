@@ -415,7 +415,8 @@ function render() {
   for(const square of squares.values()){
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
     if(square.classList.contains("final-square")){
-      const used=new Set(finishSlots.values());
+      const finishSquareKey=square.style.gridArea;
+      const used=new Set(pile.map(piece=>finishSlots.get(`${finishSquareKey}:${piece.dataset.token}`)).filter(Number.isInteger));
       const count=pile.length;
       const columns=count<=4?2:count<=9?3:4;
       const rows=Math.ceil(count/columns);
@@ -423,7 +424,7 @@ function render() {
       const yStep=count<=2?0:count<=4?50:count<=9?34:24;
       const finishSize=count===2?"pile-size-finished-2":count<=4?"pile-size-finished-4":count<=9?"pile-size-finished-9":"pile-size-finished-16";
       pile.forEach(piece=>{
-        const key=piece.dataset.token;
+        const key=`${finishSquareKey}:${piece.dataset.token}`;
         if(!finishSlots.has(key)){
           let slot=0;
           while(used.has(slot))slot++;

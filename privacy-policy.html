@@ -35,7 +35,7 @@
 <p>Walid AI is operated by Whakil Ahamed Shakil, an individual developer in Bangladesh. Privacy questions can be sent to <a href="mailto:support@walid-ai.com">support@walid-ai.com</a>.</p>
 
 <h2>What this policy is based on</h2>
-<p>This policy describes what the public website code does. The chat and PDF API address configured in the site is <a href="https://walid-ai-backend.onrender.com">https://walid-ai-backend.onrender.com</a>, on Render. Sign-in and saved chats use Google Firebase. The website does not include the backend program, so this policy does not state Render log retention, backup retention, or Google’s retention for this project. Where that limit matters, the policy says so.</p>
+<p>This policy describes what the public website code does, plus three points the operator confirmed on 7 November 2026: the Gemini API project is on Google’s unpaid tier, the site has no age limit of its own, and Render log retention is not set by the operator. The chat and PDF API address configured in the site is <a href="https://walid-ai-backend.onrender.com">https://walid-ai-backend.onrender.com</a>, on Render. Sign-in and saved chats use Google Firebase.</p>
 
 <h2>Information the site handles</h2>
 <ul class="review-list">
@@ -51,8 +51,8 @@
 </ul>
 
 <h2>AI requests</h2>
-<p>The chat page does not call Google’s Gemini API itself. It sends the question, guest id, and any attachments to the Walid AI backend. The operator admin view counts those backend calls as Gemini API requests, so chat is built to be answered with Gemini. The website does not include the Gemini API key, the model name, or whether that Google project is billed.</p>
-<p>Google’s <a href="https://ai.google.dev/gemini-api/terms">Gemini API terms</a> describe different handling for unpaid and paid use, and they describe the API as a professional or business service for users who are at least 18. This website does not show which of those categories applies, and it does not ask your age. Do not send information you do not want processed by Walid AI’s backend and by Google’s Gemini API. This policy cannot state how long Google keeps that content.</p>
+<p>The chat page does not call Google’s Gemini API itself. It sends the question, guest id, and any attachments to the Walid AI backend. The operator admin view counts those backend calls as Gemini API requests, so chat is built to be answered with Gemini. The website does not include the Gemini API key or the model name.</p>
+<p><strong>Gemini API tier in use: unpaid (free).</strong> The operator states that the Gemini project is on Google’s unpaid tier. On that unpaid tier, content sent to the Gemini API — including the question and any file included in the request — may be used by Google to improve its products and may be reviewed by humans. Do not submit sensitive personal information. Google’s <a href="https://ai.google.dev/gemini-api/terms">Gemini API terms</a> describe this handling. If the project is later moved to a paid Gemini API tier, replace this paragraph with the paid-tier wording.</p>
 <p>The chat can label an answer as coming from your file or from a PDF, and it can say that setup or OCR is required or that no readable text was found. Those labels show that the backend may read an uploaded file to answer. They do not show a page limit, an OCR language, or that the backend saves the file. No chat-attachment file write appears in this website code.</p>
 
 <h2>PDF, image, and ZIP tools</h2>
@@ -74,12 +74,12 @@
 <p>This website does not show a cookie-consent banner. Google requires a Google-certified consent management platform before personalized ads are served to people in the EEA, the UK, or Switzerland. That banner is not part of the site today.</p>
 
 <h2>Retention, deletion, and security</h2>
-<p>Signed-in chats stay in Firestore until you delete that chat or the data is removed from Firebase. Guest chats stay only for the browser session, and Log out clears them. Liked answers, the guest id, and the language choice stay in local storage until you clear site data. There is no fixed retention period in this website for backend request logs, Render disks, or Google’s copies of prompts.</p>
+<p>Signed-in chats stay in Firestore until you delete that chat or the data is removed from Firebase. Guest chats stay only for the browser session, and Log out clears them. Liked answers, the guest id, and the language choice stay in local storage until you clear site data. The operator does not set a retention period for server logs. The hosting provider, Render, may keep temporary technical server logs, such as IP address and request time, for security and operations for a limited period under <a href="https://render.com/privacy">Render’s privacy policy</a>. This website does not show those logs and does not state Render’s exact number of days. How long Google keeps unpaid-tier Gemini content is covered by Google’s terms, not by a period set on this site.</p>
 <p>To ask for deletion of chat data tied to your sign-in, email <a href="mailto:support@walid-ai.com">support@walid-ai.com</a> from the address you can access, and say which Google account you used. The website cannot confirm deletion from provider backups or from Google’s systems.</p>
 <p>Chat requests send a Firebase ID token, or an operator admin token, in the Authorization header when one is available. Public PDF tool pages do not send that token. The admin token, when used, is kept in session storage. The website cannot audit Firebase, Google, or Render security controls.</p>
 
 <h2>Children</h2>
-<p>Walid AI is a general-audience site. It is not directed to children, it does not ask for a date of birth, and it does not offer a child account. Do not submit a child’s personal information in chat or in a file.</p>
+<p>Walid AI is for a general audience. People use it for games, PDF and image tools, and study questions. The site does not set its own age limit and does not ask for a date of birth. It is not directed specifically at children under 13, and it does not knowingly collect personal information from children under 13. Children should use the site with a parent or guardian. Google sign-in, the Gemini API, and Google AdSense have their own age requirements, which Google sets. Those requirements are not an age gate on this website.</p>
 
 <h2>Changes</h2>
 <p>If this policy changes, the new text will replace this page and the effective date above will change. The Bangla page will be updated to match.</p>

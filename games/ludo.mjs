@@ -398,15 +398,19 @@ function render() {
   for(const square of squares.values()){
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
     if(pile.length<2)continue;
-    const spread=pile.length>4;
-    const positions=pile.length===2?[[-22,0],[22,0]]
-      :pile.length===3?[[-23,-12],[23,-12],[0,20]]
-      :pile.length===4?[[-25,-20],[25,-20],[-25,20],[25,20]]
-      :pile.map((_,index)=>[[-42,-14,14,42][index%4],(index<4?-16:16)]);
+    const columns=pile.length<=4?2:3;
+    const rows=Math.ceil(pile.length/columns);
+    const xStep=pile.length===2?55:pile.length<=4?50:34;
+    const yStep=pile.length===2?0:pile.length<=4?44:33;
     pile.forEach((piece,index)=>{
-      piece.classList.add("stacked-pawn",spread?"pile-size-dense":`pile-size-${pile.length}`);
-      piece.style.setProperty("--pile-x",`${positions[index][0]}%`);
-      piece.style.setProperty("--pile-y",`${positions[index][1]}%`);
+      const row=Math.floor(index/columns);
+      const inRow=Math.min(columns,pile.length-row*columns);
+      const column=index%columns;
+      const x=(column-(inRow-1)/2)*xStep;
+      const y=(row-(rows-1)/2)*yStep;
+      piece.classList.add("stacked-pawn",pile.length>4?"pile-size-dense":`pile-size-${pile.length}`);
+      piece.style.setProperty("--pile-x",`${x}%`);
+      piece.style.setProperty("--pile-y",`${y}%`);
       piece.style.zIndex=String(20+index);
     });
   }

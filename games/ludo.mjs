@@ -5,6 +5,7 @@ const teams = ["Red", "Blue", "Green", "Yellow"];
 const setupScreen=document.querySelector("#ludo-setup");
 const restoredConfig=(()=>{try{return JSON.parse(sessionStorage.getItem("ludu-mahir-game")||"null")}catch{return null}})();
 const boardLaunch=new URLSearchParams(location.search).get("screen")==="board";
+const savedSoundPreference=(()=>{try{return localStorage.getItem("ludu-mahir-sound")}catch{return null}})();
 if(restoredConfig){
  if(["2","3","4"].includes(String(restoredConfig.players))){
   document.querySelector("#setup-players").value=String(restoredConfig.players);
@@ -61,6 +62,8 @@ function syncSoundControls(){
   const menu=document.querySelector("#menu-sound"),board=document.querySelector("#sound-toggle"),setting=document.querySelector("#settings-sound");
   menu.setAttribute("aria-pressed",String(soundEnabled));menu.setAttribute("aria-label",soundEnabled?"Turn sound off":"Turn sound on");menu.classList.toggle("sound-on",soundEnabled);
   board.setAttribute("aria-pressed",String(soundEnabled));board.setAttribute("aria-label",soundEnabled?"Turn sound off":"Turn sound on");setting.checked=soundEnabled;
+  try{localStorage.setItem("ludu-mahir-sound",String(soundEnabled))}catch{}
+  if(soundEnabled)resumeAudioContext();else for(const stop of activeCaptureStops)stop();
 }
 document.querySelector("#board-settings").addEventListener("click",event=>{const open=playScreen.classList.toggle("show-game-settings");event.currentTarget.setAttribute("aria-expanded",String(open));event.currentTarget.setAttribute("aria-label",open?"Close game settings":"Game settings");if(open)document.querySelector(".game-settings").scrollIntoView({behavior:"smooth",block:"center"});});
 document.querySelector("#full-screen").addEventListener("click",()=>{
@@ -121,7 +124,7 @@ function makeDieCube(){
   return cube;
 }
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), scoreLightTimers=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), scoreLightTimers=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=savedSoundPreference===null?true:savedSoundPreference==="true",audioContext=null,noiseBuffer=null,activeCaptureStops=new Set();
 const DICE_ROLL_DURATION=950;
 syncSoundControls();
 const defaultColors=String(restoredConfig?.players)==="2"?[0,3,2,1]:[0,1,2,3];
@@ -254,8 +257,86 @@ function isBot(player) {
 }
 playerSelect.addEventListener("change",game.restart);
 
+function resumeAudioContext() {
+  if(!soundEnabled)return null;
+  try {
+    const AudioEngine=window.AudioContext||window.webkitAudioContext;
+    if(!AudioEngine)return null;
+    if(!audioContext)audioContext=new AudioEngine();
+    if(audioContext.state==="suspended")audioContext.resume().catch(()=>{});
+    return audioContext;
+  } catch { return null; }
+}
+function getNoiseBuffer(ctx) {
+  if(noiseBuffer)return noiseBuffer;
+  const length=Math.max(1,ctx.sampleRate);
+  noiseBuffer=ctx.createBuffer(1,length,ctx.sampleRate);
+  const samples=noiseBuffer.getChannelData(0);
+  for(let i=0;i<length;i++)samples[i]=(Math.random()*2-1)*.72;
+  return noiseBuffer;
+}
+function playNoiseBurst(ctx,time,volume,frequency,pan,duration,type="bandpass") {
+  if(!ctx||!soundEnabled)return;
+  const source=ctx.createBufferSource();source.buffer=getNoiseBuffer(ctx);
+  const filter=ctx.createBiquadFilter();filter.type=type;filter.frequency.setValueAtTime(frequency,time);filter.Q.value=type==="bandpass"?1.1:.7;
+  const gain=ctx.createGain();gain.gain.setValueAtTime(.0001,time);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),time+.004);gain.gain.exponentialRampToValueAtTime(.0001,time+duration);
+  let output=gain;
+  if(ctx.createStereoPanner){const panner=ctx.createStereoPanner();panner.pan.setValueAtTime(Math.max(-1,Math.min(1,pan)),time);gain.connect(panner);output=panner;}
+  source.connect(filter);filter.connect(gain);output.connect(ctx.destination);source.start(time);source.stop(time+duration);
+}
+function playTone(ctx,frequency,time,volume,duration,wave="sine",endFrequency=null) {
+  if(!ctx||!soundEnabled)return;
+  const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+  oscillator.type=wave;oscillator.frequency.setValueAtTime(frequency,time);
+  if(endFrequency)oscillator.frequency.exponentialRampToValueAtTime(endFrequency,time+duration);
+  gain.gain.setValueAtTime(.0001,time);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),time+.012);gain.gain.exponentialRampToValueAtTime(.0001,time+duration);
+  oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start(time);oscillator.stop(time+duration+.02);
+}
 function playDiceSound(value) {
-  try { const AudioEngine=window.AudioContext||window.webkitAudioContext; if(!AudioEngine)return; const audio=new AudioEngine(); const oscillator=audio.createOscillator(); const gain=audio.createGain(); oscillator.type="triangle"; oscillator.frequency.value=280+value*48; gain.gain.setValueAtTime(.08,audio.currentTime); gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.17); oscillator.connect(gain);gain.connect(audio.destination);oscillator.start();oscillator.stop(audio.currentTime+.18);oscillator.onended=()=>audio.close(); } catch {}
+  const ctx=resumeAudioContext();if(!ctx)return;
+  const start=ctx.currentTime+.015;
+  const offsets=[0,.065,.132,.205,.276,.354,.435,.515,.598,.679,.758,.828];
+  offsets.forEach((offset,index)=>{
+    const strength=.105-index*.0038;
+    playNoiseBurst(ctx,start+offset,strength,850+Math.random()*1500,(Math.random()-.5)*.7,.034+Math.random()*.018);
+    if(index%2===0)playTone(ctx,130+Math.random()*90,start+offset,.035,.055,"triangle",85);
+  });
+  playNoiseBurst(ctx,start+.86,.23,560,0,.095,"lowpass");
+  playTone(ctx,178+value*7,start+.855,.17,.14,"triangle",92);
+}
+function playPawnStepSound(step) {
+  const ctx=resumeAudioContext();if(!ctx)return;
+  const now=ctx.currentTime+.006,variation=Math.abs(step)%5;
+  playNoiseBurst(ctx,now,.19,780+variation*185,(variation-2)*.12,.052,"bandpass");
+  playTone(ctx,205+variation*17,now,.13,.085,"triangle",125+variation*8);
+  playNoiseBurst(ctx,now+.012,.065,2100+variation*180,(variation-2)*.1,.026,"highpass");
+}
+function startCaptureWhoosh(durationMs) {
+  const ctx=resumeAudioContext();if(!ctx)return ()=>{};
+  const start=ctx.currentTime,duration=Math.max(.24,durationMs/1000);
+  const source=ctx.createBufferSource();source.buffer=getNoiseBuffer(ctx);source.loop=true;
+  const filter=ctx.createBiquadFilter();filter.type="lowpass";filter.frequency.setValueAtTime(1650,start);filter.frequency.exponentialRampToValueAtTime(320,start+duration);
+  const highpass=ctx.createBiquadFilter();highpass.type="highpass";highpass.frequency.setValueAtTime(180,start);
+  const gain=ctx.createGain();gain.gain.setValueAtTime(.0001,start);gain.gain.linearRampToValueAtTime(.17,start+.075);gain.gain.setValueAtTime(.12,start+Math.max(.09,duration*.4));
+  const lfo=ctx.createOscillator(),lfoGain=ctx.createGain();lfo.frequency.value=2.4;lfoGain.gain.value=170;lfo.connect(lfoGain);lfoGain.connect(filter.frequency);
+  source.connect(highpass);highpass.connect(filter);filter.connect(gain);gain.connect(ctx.destination);source.start(start);lfo.start(start);
+  let stopped=false;
+  const stop=()=>{
+    if(stopped)return;stopped=true;activeCaptureStops.delete(stop);
+    const at=ctx.currentTime;gain.gain.cancelScheduledValues(at);gain.gain.setTargetAtTime(.0001,at,.045);
+    try{source.stop(at+.22);lfo.stop(at+.22)}catch{}
+  };
+  activeCaptureStops.add(stop);return stop;
+}
+function playFinishSound() {
+  const ctx=resumeAudioContext();if(!ctx)return;
+  const start=ctx.currentTime+.02,notes=[659.25,783.99,987.77,1318.51];
+  notes.forEach((frequency,index)=>{
+    const at=start+index*.105,main=index===3?.17:.105,duration=index===3?.62:.39;
+    playTone(ctx,frequency,at,main,duration,"sine",frequency*.985);
+    playTone(ctx,frequency*2,at,main*.28,duration*.72,"sine",frequency*1.97);
+  });
+  playNoiseBurst(ctx,start+.31,.045,3600,0,.11,"highpass");
 }
 function throwDie() {
   const player=state.turn;
@@ -266,6 +347,7 @@ function throwDie() {
   rollingTeam=teamId;rollingValue=rolled;
   message=`${getColor(player)[0]} is rolling…`;
   render();
+  if(soundEnabled)playDiceSound(rolled);
   clearTimeout(diceAnimationTimer);
   diceAnimationTimer=setTimeout(()=>{
     if(rollingTeam!==teamId)return;
@@ -297,6 +379,8 @@ async function play(index) {
   const delay=Number(document.querySelector("#settings-animation-speed").value)||320;
   const moving=[];
   pendingCaptureSteps=new Map(result.lastCaptured.map(hit=>[`${hit.player}-${hit.token}`,hit.step]));
+  const capturedMotionCount=result.lastCaptured.reduce((total,hit)=>total+captureReturnSteps(hit.step).length,0);
+  let captureReturnsRemaining=result.lastCaptured.length,captureWhooshStop=null;
   if(move) {
     const steps=movementSteps(move.from,move.to);
     for(const step of steps) moving.push({player:move.player,token:move.token,step,captured:false});
@@ -305,6 +389,7 @@ async function play(index) {
     for(const step of captureReturnSteps(hit.step)) moving.push({player:hit.player,token:hit.token,step,captured:true});
   }
   for(const motion of moving) {
+    if(motion.captured){if(!captureWhooshStop)captureWhooshStop=startCaptureWhoosh(capturedMotionCount*delay/4)}else playPawnStepSound(motion.step);
     const markerSelector=`.pin-pawn[data-token="${activeTeams[motion.player]}-${motion.token}"]`;
     const oldMarker=game.board.querySelector(markerSelector);
     const oldRect=oldMarker?.getBoundingClientRect();
@@ -320,12 +405,17 @@ async function play(index) {
       marker.classList.add("moving");
     }
     await new Promise(resolve=>setTimeout(resolve,motion.captured?delay/4:delay));
-    if(motion.step===-1)pendingCaptureSteps.delete(`${motion.player}-${motion.token}`);
+    if(motion.step===-1){
+      pendingCaptureSteps.delete(`${motion.player}-${motion.token}`);
+      if(motion.captured&&--captureReturnsRemaining<=0){captureWhooshStop?.();captureWhooshStop=null;}
+    }
   }
+  captureWhooshStop?.();
   animationToken=null;
   pendingCaptureSteps.clear();
   locked=false;
   if(finishedCount){
+    if(soundEnabled)playFinishSound();
     message=`${getColor(move.player)[0]} pawn reached the final square (${finishedCount}/4). `;
     const teamId=activeTeams[move.player];
     const home=game.board.querySelector(`.base-${teamId}`);

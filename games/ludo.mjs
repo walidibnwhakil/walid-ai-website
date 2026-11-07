@@ -416,7 +416,7 @@ function render() {
       const count=pile.length;
       const columns=count<=4?2:count<=9?3:4;
       const rows=Math.ceil(count/columns);
-      const xStep=count===2?60:count<=4?52:count<=9?34:24;
+      const xStep=count===2?72:count<=4?52:count<=9?34:24;
       const yStep=count<=2?0:count<=4?50:count<=9?34:24;
       const finishSize=count===2?"pile-size-finished-2":count<=4?"pile-size-finished-4":count<=9?"pile-size-finished-9":"pile-size-finished-16";
       pile.forEach(piece=>{
@@ -446,7 +446,7 @@ function render() {
     if(pile.length<2)continue;
     const columns=pile.length<=4?2:3;
     const rows=Math.ceil(pile.length/columns);
-    const xStep=pile.length===2?55:pile.length<=4?50:34;
+    const xStep=pile.length===2?72:pile.length<=4?50:34;
     const yStep=pile.length===2?0:pile.length<=4?44:33;
     pile.forEach((piece,index)=>{
       const row=Math.floor(index/columns);

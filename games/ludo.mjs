@@ -291,7 +291,7 @@ async function play(index) {
   started=true;
   const move=result.lastMove;
   const finishedCount=move?.to===57?result.pieces[move.player].filter(position=>position===57).length:0;
-  message=finishedCount?`${getColor(move.player)[0]} pawn reached the final home (${finishedCount}/4). `:"";
+  message="";
   const delay=Number(document.querySelector("#settings-animation-speed").value)||320;
   const moving=[];
   pendingCaptureSteps=new Map(result.lastCaptured.map(hit=>[`${hit.player}-${hit.token}`,hit.step]));
@@ -311,6 +311,7 @@ async function play(index) {
   animationToken=null;
   pendingCaptureSteps.clear();
   locked=false;
+  if(finishedCount)message=`${getColor(move.player)[0]} pawn reached the final home (${finishedCount}/4). `;
   render();
 }
 function render() {
@@ -321,11 +322,11 @@ function render() {
     const base=game.board.querySelector(`.base-${seat}`);
     const player=activeTeams.indexOf(seat);
     base.classList.toggle("inactive-home",!enabled);
-    base.classList.toggle("has-finished-pawn",player>=0&&state.pieces[player].some(step=>step===57));
+    base.classList.toggle("has-finished-pawn",player>=0&&state.pieces[player].some((step,index)=>step===57&&!(animationToken?.player===player&&animationToken?.token===index&&animationToken.step!==57)));
     game.board.querySelectorAll(`.yard-seat-${seat}`).forEach(tile=>tile.classList.toggle("inactive-yard",!enabled));
     game.board.querySelectorAll(`.lane-${seat}`).forEach(tile=>tile.classList.toggle("inactive-lane",!enabled));
   }
-  game.board.querySelector(".home-center")?.classList.toggle("has-finished",state.pieces.some(team=>team.some(step=>step===57)));
+  game.board.querySelector(".home-center")?.classList.toggle("has-finished",state.pieces.some((team,player)=>team.some((step,index)=>step===57&&!(animationToken?.player===player&&animationToken?.token===index&&animationToken.step!==57))));
   updatePlayerColorPickers();
   dice.forEach((button,teamId)=>{
     const seat=activeTeams.indexOf(teamId);
@@ -411,7 +412,7 @@ function render() {
   }
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
   state.ranks.forEach((rank,player)=>{
-    if(!rank) return;
+    if(!rank||locked) return;
     const teamId=activeTeams[player];
     const badge=document.createElement("div");
     badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;

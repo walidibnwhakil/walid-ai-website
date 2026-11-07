@@ -1211,6 +1211,11 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-gloss{fill:#fff;opaci
 body.ludo-game.playing-ludo #board.board.ludo .track:has(>span.ludo-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .lane:has(>span.ludo-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .home-center:has(>span.ludo-pawn){position:relative!important;z-index:8!important;overflow:hidden!important}
+/* Yard and route pawns use the same size and square-center anchor. */
+body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.yard-pawn.pin-pawn{
+  inset:0!important;left:0!important;top:0!important;right:0!important;bottom:0!important;
+  width:100%!important;height:100%!important;transform:none!important;z-index:4!important
+}
 /* Keep the base-centering transform intact during subtle pawn movement. */
 @keyframes mahir-ready-bob{0%,100%{translate:0 0}50%{translate:0 -2px}}
 @keyframes ludu-pawn-hop{0%,100%{translate:0 0}42%{translate:0 -1px}72%{translate:0 0}}

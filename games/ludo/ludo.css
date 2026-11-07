@@ -1228,12 +1228,12 @@ body.ludo-game.playing-ludo #board.board.ludo .yard.yard-seat-1,
 body.ludo-game.playing-ludo #board.board.ludo .yard.yard-seat-3{transform:translate(50%,50%)!important}
 
 
-/* Fan same-square pawns so every player color remains visible. */
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn.stacked-pawn .pin-pawn-art{width:76%;height:96%}
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-2 .pin-pawn-art{width:88%;height:116%}
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-3 .pin-pawn-art{width:80%;height:104%}
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-4 .pin-pawn-art{width:76%;height:96%}
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-dense .pin-pawn-art{width:60%;height:78%}
+/* Miniature pile layout keeps each pawn outline and color dot visible. */
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.stacked-pawn .pin-pawn-art{width:55%;height:70%}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-2 .pin-pawn-art{width:55%;height:70%}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-3 .pin-pawn-art{width:50%;height:65%}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-4 .pin-pawn-art{width:42%;height:58%}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.pile-size-dense .pin-pawn-art{width:30%;height:41%}
 
 /* Finishing one pawn lights that player's home; the final square glows too. */
 body.ludo-game.playing-ludo .board.ludo .home-base.has-finished-pawn:not(.custom-color)::after{content:"";position:absolute;inset:12%;z-index:3;border:3px solid #fff1a1;border-radius:17%;background:radial-gradient(circle,#fff7 0 3%,transparent 68%);box-shadow:0 0 16px 4px #ffdc6688,inset 0 0 13px #fff4;animation:finish-home-light 1.15s ease-in-out infinite alternate;pointer-events:none}

@@ -416,9 +416,9 @@ function render() {
       const count=pile.length;
       const columns=count<=4?2:count<=9?3:4;
       const rows=Math.ceil(count/columns);
-      const xStep=count<=4?52:count<=9?34:24;
-      const yStep=count<=4?50:count<=9?34:24;
-      const finishSize=count<=4?"pile-size-finished-4":count<=9?"pile-size-finished-9":"pile-size-finished-16";
+      const xStep=count===2?60:count<=4?52:count<=9?34:24;
+      const yStep=count<=2?0:count<=4?50:count<=9?34:24;
+      const finishSize=count===2?"pile-size-finished-2":count<=4?"pile-size-finished-4":count<=9?"pile-size-finished-9":"pile-size-finished-16";
       pile.forEach(piece=>{
         const key=piece.dataset.token;
         if(!finishSlots.has(key)){

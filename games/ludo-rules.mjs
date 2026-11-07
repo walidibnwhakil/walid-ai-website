@@ -22,7 +22,7 @@ function nextPlayer(state, after) {
 export function legalTokens(state) {
   return state.pieces[state.turn].flatMap((step,index)=>{
     if(!state.roll || state.winner!==null || state.ranks[state.turn]) return [];
-    return (step<0 ? state.roll===6 : step+state.roll<=57) ? [index] : [];
+    return (step<0 ? state.roll===6 : step+state.roll<=56) ? [index] : [];
   });
 }
 
@@ -55,7 +55,7 @@ export function moveLudo(state,index) {
   }
   const ranks=[...state.ranks];
   let rankCount=state.rankCount;
-  const finished=pieces[turn].every(position=>position===57);
+  const finished=pieces[turn].every(position=>position===56);
   if(finished && !ranks[turn]) ranks[turn]=++rankCount;
   const remaining=pieces.length-rankCount;
   if(remaining===1) {
@@ -64,7 +64,7 @@ export function moveLudo(state,index) {
   }
   const winner=ranks.includes(1) ? ranks.indexOf(1) : null;
   const terminal=rankCount===pieces.length;
-  const bonus=roll===6 || captured.length>0 || step===57;
+  const bonus=roll===6 || captured.length>0 || step===56;
   const next=terminal ? turn : ranks[turn] ? nextPlayer(state,turn) : bonus ? turn : nextPlayer(state,turn);
   return {...state,pieces,turn:next,roll:0,sixChain:bonus ? state.sixChain : 0,ranks,rankCount,winner:terminal ? winner : null,lastCaptured:captured,lastMove:{player:turn,token:index,from:old,to:step,roll}};
 }

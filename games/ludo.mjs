@@ -289,8 +289,9 @@ async function play(index) {
   if(result===state) {locked=false;return;}
   state=result;
   started=true;
-  message="";
   const move=result.lastMove;
+  const finishedCount=move?.to===57?result.pieces[move.player].filter(position=>position===57).length:0;
+  message=finishedCount?`${getColor(move.player)[0]} pawn reached the final home (${finishedCount}/4). `:"";
   const delay=Number(document.querySelector("#settings-animation-speed").value)||320;
   const moving=[];
   pendingCaptureSteps=new Map(result.lastCaptured.map(hit=>[`${hit.player}-${hit.token}`,hit.step]));
@@ -320,6 +321,7 @@ function render() {
     const base=game.board.querySelector(`.base-${seat}`);
     const player=activeTeams.indexOf(seat);
     base.classList.toggle("inactive-home",!enabled);
+    base.classList.toggle("has-finished-pawn",player>=0&&state.pieces[player].some(step=>step===57));
     game.board.querySelectorAll(`.yard-seat-${seat}`).forEach(tile=>tile.classList.toggle("inactive-yard",!enabled));
     game.board.querySelectorAll(`.lane-${seat}`).forEach(tile=>tile.classList.toggle("inactive-lane",!enabled));
   }
@@ -392,6 +394,21 @@ function render() {
     }
     square.append(marker);
   }));
+  for(const square of squares.values()){
+    const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
+    if(pile.length<2)continue;
+    const spread=pile.length>4;
+    const positions=pile.length===2?[[-20,0],[20,0]]
+      :pile.length===3?[[-20,-12],[20,-12],[0,18]]
+      :pile.length===4?[[-20,-16],[20,-16],[-20,16],[20,16]]
+      :pile.map((_,index)=>[[-39,-13,13,39][index%4],(index<4?-14:14)]);
+    pile.forEach((piece,index)=>{
+      piece.classList.add("stacked-pawn",spread?"pile-size-dense":`pile-size-${pile.length}`);
+      piece.style.setProperty("--pile-x",`${positions[index][0]}%`);
+      piece.style.setProperty("--pile-y",`${positions[index][1]}%`);
+      piece.style.zIndex=String(20+index);
+    });
+  }
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
   state.ranks.forEach((rank,player)=>{
     if(!rank) return;
@@ -405,8 +422,10 @@ function render() {
   const currentTeam=getColor(state.turn)[0];
 
   game.status.dataset.turn=teams[activeTeams[state.turn]].toLowerCase();
-  game.status.textContent=message+(state.winner!==null?`${getColor(state.winner)[0]} wins!`
-    :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);
+  const allPawnsInYard=state.pieces[state.turn].every(step=>step===-1);
+  const turnPrompt=state.roll?"choose a token.":allPawnsInYard?"roll a 6 to release a pawn.":"roll the die.";
+  game.status.textContent=state.winner!==null?`Game over — ${getColor(state.winner)[0]} wins!`
+    :message+(botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${turnPrompt}`);
   if(!locked && rollingTeam<0 && state.winner===null && state.roll>0 && legal.length===1) {
     game.later(()=>play(legal[0]), 420);
   } else if(!locked && rollingTeam<0 && botTurn) {

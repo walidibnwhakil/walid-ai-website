@@ -1189,3 +1189,10 @@ body.ludo-game.playing-ludo #board.board.ludo .home-diamond::after{content:"";po
 body.ludo-game.playing-ludo .board.ludo .playable-token{outline:none!important;animation:mahir-ready-bob 1.1s ease-in-out infinite!important;filter:drop-shadow(0 0 3px #fff9)!important}
 @keyframes mahir-ready-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes ludu-pawn-hop{0%,100%{transform:translateY(0)}42%{transform:translateY(-1px)}72%{transform:translateY(0)}}
+
+/* Path pawns keep the same readable scale as yard pawns and sit on the tile center. */
+body.ludo-game.playing-ludo #board.board.ludo .track>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
+body.ludo-game.playing-ludo #board.board.ludo .lane>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
+body.ludo-game.playing-ludo #board.board.ludo .home-center>span.ludo-pawn.sprite-pawn:not(.yard-pawn){
+  inset:-11% -22.5%!important;width:145%!important;height:122%!important;z-index:5!important
+}

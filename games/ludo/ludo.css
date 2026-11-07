@@ -1220,3 +1220,9 @@ body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.y
 /* Keep the base-centering transform intact during subtle pawn movement. */
 @keyframes mahir-ready-bob{0%,100%{translate:0 0}50%{translate:0 -2px}}
 @keyframes ludu-pawn-hop{0%,100%{translate:0 0}42%{translate:0 -1px}72%{translate:0 0}}
+
+/* Compact, mirror-centered 2x2 home pawn slots across all four corners. */
+body.ludo-game.playing-ludo #board.board.ludo .yard.yard-seat-0,
+body.ludo-game.playing-ludo #board.board.ludo .yard.yard-seat-2{transform:translate(50%,-50%)!important}
+body.ludo-game.playing-ludo #board.board.ludo .yard.yard-seat-1,
+body.ludo-game.playing-ludo #board.board.ludo .yard.yard-seat-3{transform:translate(50%,50%)!important}

@@ -1349,3 +1349,10 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2 .pin-paw
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-2 .pin-pawn-art{
   width:60%!important;height:72%!important
 }
+
+
+/* Keep a two-pawn pair large and clearly separated. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2 .pin-pawn-art,
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-2 .pin-pawn-art{
+  width:72%!important;height:88%!important
+}

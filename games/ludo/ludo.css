@@ -1356,3 +1356,9 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2 .pin-paw
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-2 .pin-pawn-art{
   width:72%!important;height:88%!important
 }
+
+
+/* Highlight the actual finishing square at the end of each colored lane. */
+body.ludo-game.playing-ludo .board.ludo .lane.final-square.has-finished{
+  box-shadow:inset 0 0 0 2px #fff4a8,0 0 10px 3px #ffdd6b99!important
+}

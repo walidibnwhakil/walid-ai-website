@@ -1208,7 +1208,7 @@ body.ludo-game.playing-ludo #board.board.ludo .home-center>span.ludo-pawn.sprite
 }
 body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.yard-pawn{
   inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
-  width:180%!important;height:180%!important;transform:translate(-50%,-91%)!important;z-index:4!important
+  width:145%!important;height:145%!important;transform:translate(-50%,-91%)!important;z-index:4!important
 }
 /* Keep the base-centering transform intact during subtle pawn movement. */
 @keyframes mahir-ready-bob{0%,100%{translate:0 0}50%{translate:0 -2px}}

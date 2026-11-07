@@ -44,15 +44,15 @@ test("pawn animations enumerate every square forward and back to yard",()=>{
  assert.deepEqual(captureReturnSteps(0),[-1]);
 });
 
-test("last outer-track square enters its own home lane and cannot wrap into yard",()=>{
+test("the correct outer-track exit enters its own lane before the exact Home square",()=>{
  let s=newLudo(2,[0,3]);
- s.pieces[1]=[51,57,57,57];s.turn=1;s.roll=1;
+ s.pieces[1]=[50,57,57,57];s.turn=1;s.roll=1;
  s=moveLudo(s,0);
- assert.equal(s.pieces[1][0],52);
+ assert.equal(s.pieces[1][0],51);
  assert.equal(s.turn,0);
  assert.equal(trackPosition(3,0),26);
  assert.deepEqual(legalTokens({...s,turn:1,roll:5}),[0]);
- assert.deepEqual(legalTokens({...s,turn:1,roll:6}),[]);
+ assert.deepEqual(legalTokens({...s,turn:1,roll:6}),[0]);
 });
 
 test("an overshoot cannot enter or wrap past Home",()=>{
@@ -64,4 +64,11 @@ test("a six with no legal pawn move passes the turn without a bonus",()=>{
  let s=newLudo(2,[0,3]);s.pieces[0]=[52,53,54,55];
  s=rollLudo(s,6);
  assert.equal(s.turn,1);assert.equal(s.roll,0);assert.equal(s.sixChain,0);assert.deepEqual(legalTokens(s),[]);
+});
+
+test("all four outer routes leave into the matching player home lane",()=>{
+ for(let player=0;player<4;player++){
+  let s=newLudo(4,[0,1,2,3]);s.pieces[player][0]=50;s.turn=player;s.roll=1;
+  s=moveLudo(s,0);assert.equal(s.pieces[player][0],51,"player "+player+" enters lane at step 51");
+ }
 });

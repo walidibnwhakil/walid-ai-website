@@ -45,11 +45,11 @@ export function moveLudo(state,index) {
   const step=old<0 ? 0 : old+roll;
   pieces[turn][index]=step;
   const captured=[];
-  if(step<52) {
+  if(step<51) {
     const square=trackPosition(state.colors[turn],step);
     if(!safe.has(square)) pieces.forEach((team,rival)=>{
       if(rival!==turn) team.forEach((other,token)=>{
-        if(other>=0 && other<52 && trackPosition(state.colors[rival],other)===square) {
+        if(other>=0 && other<51 && trackPosition(state.colors[rival],other)===square) {
           pieces[rival][token]=-1;
           captured.push({player:rival,token,step:other});
         }

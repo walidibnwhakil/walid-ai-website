@@ -352,7 +352,7 @@ function render() {
     button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===57?"home":"step "+(step+1)}`);
     const tokenKey=`${player}-${index}`;
     const visualStep=animationToken?.player===player&&animationToken?.token===index ? animationToken.step : pendingCaptureSteps.has(tokenKey)?pendingCaptureSteps.get(tokenKey):step;
-    const tile=visualStep===-1 ? yards[teamId][index] : visualStep>=52 ? lanes[teamId][visualStep-52] : track[trackPosition(teamId,visualStep)];
+    const tile=visualStep===-1 ? yards[teamId][index] : visualStep===57 ? [7,7] : visualStep>=51 ? lanes[teamId][visualStep-51] : track[trackPosition(teamId,visualStep)];
     const square=squares.get(tile.join(","));
     const marker=document.createElement("span");
     marker.className=teams[teamId].toLowerCase();

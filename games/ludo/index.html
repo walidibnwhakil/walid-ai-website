@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ludu Mahir | Walid AI Games</title>
   <link rel="icon" href="/kathgolap-logo.png">
-  <link rel="stylesheet" href="../arcade.css?v=20261107ludu-board11">
-  <link rel="stylesheet" href="./ludo.css?v=20261107ludu-board11">
-  <script type="module" src="../ludo.mjs?v=20261107ludu-board11"></script>
+  <link rel="stylesheet" href="../arcade.css?v=20261107ludu-board12">
+  <link rel="stylesheet" href="./ludo.css?v=20261107ludu-board12">
+  <script type="module" src="../ludo.mjs?v=20261107ludu-board12"></script>
 
 </head>
 <body class="ludo-game">
@@ -104,16 +104,9 @@
       <button class="online-setting" id="online-coming" type="button">Online Multiplayer — Coming Soon</button>
       <button id="close-settings" type="button">Done</button>
     </dialog>
-    <dialog id="menu-colors-dialog" class="rules-dialog menu-colors-dialog">
-      <h2>Choose Player Colors</h2>
-      <label for="menu-color-player">Player</label><select id="menu-color-player"><option value="0">Player 1</option><option value="1">Player 2</option><option value="2">Player 3</option><option value="3">Player 4</option></select>
-      <label for="menu-color-choice">Color</label><select id="menu-color-choice"></select>
-      <p id="menu-color-confirmation" role="status"></p>
-      <div class="dialog-actions"><button id="apply-menu-color" type="button">Apply Color</button><button id="close-menu-colors" type="button">Done</button></div>
-    </dialog>
         <dialog id="rules-dialog" class="rules-dialog">
       <h2>Game Rules</h2>
-      <ul><li>Roll a six to release a pawn from your yard.</li><li>Move by the exact dice count; a pawn must reach Home exactly.</li><li>Safe star squares protect pawns from capture.</li><li>A six, capture, or finishing move grants another roll.</li><li>Three consecutive sixes pass the turn without moving.</li><li>Finish all four pawns to earn a place in the rankings.</li></ul>
+      <ul><li>Roll a six to release a pawn from your yard.</li><li>Move by the exact dice count; a pawn must reach Home exactly.</li><li>Safe star squares protect pawns from capture.</li><li>A six, capture, or finishing move grants another roll.</li><li>Every legal six grants another roll; a six with no legal move passes the turn.</li><li>Finish all four pawns to earn a place in the rankings.</li></ul>
       <button id="close-rules" type="button">Back to Menu</button>
     </dialog>
     <section id="ludo-play" hidden>
@@ -132,17 +125,7 @@
       <button id="full-screen" type="button">⛶ Full Screen</button>
     </div>
     <div id="seat-options" class="seat-options" hidden></div>
-    <div id="color-picker" class="color-picker" hidden>
-      <strong>Choose your color</strong>
-      <input id="color-seat" type="hidden" value="0">
-      <select id="color-choice" aria-label="Player color">
-        <option value="0">Red</option><option value="1">Blue</option>
-        <option value="2">Green</option><option value="3">Yellow</option>
-      </select>
-      <button type="button" id="color-apply">Apply</button>
-      <button type="button" id="color-cancel">Cancel</button>
-    </div>
-    <p class="color-hint">Before rolling, tap your player name to choose a color.</p>
+    <p class="color-hint">Before rolling, tap the small palette inside your own yard to choose a color.</p>
     <p id="status" role="status"></p>
     <div class="ludo-stage">
       <div id="dice-red" class="player-dice red"></div>

@@ -996,6 +996,7 @@ body.ludo-game .play-toolbar .board-logo img{position:absolute;inset:0;width:100
 body.ludo-game .play-toolbar .board-logo strong{position:relative;z-index:1}
 body.ludo-game #status,body.ludo-game .color-hint{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 @media(max-width:620px){body.ludo-game .ludo-stage{gap:3px;margin:2px auto 6px}body.ludo-game .board.ludo{width:min(100%,min(83vh,100vw));padding:4px;border-width:5px;border-radius:14px}body.ludo-game .play-toolbar{gap:4px;padding:2px 5px}body.ludo-game .play-toolbar .board-round-button{width:44px;height:44px;border-width:2px;padding:4px}body.ludo-game .play-toolbar .board-logo{height:64px;font-size:clamp(1.5rem,7.4vw,1.95rem)}body.ludo-game .player-dice{min-height:48px;border-radius:13px;padding:3px}body.ludo-game .player-dice .die-face{width:42px;height:42px;border-radius:11px}}
+@media(max-width:620px){body.ludo-game.playing-ludo .play-toolbar .board-round-button{position:relative;width:44px!important;height:44px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}body.ludo-game.playing-ludo .play-toolbar .board-round-button::before{content:"";position:absolute;inset:4px;border:2px solid #f5d17a;border-radius:50%;background:radial-gradient(circle at 35% 27%,#9b5a25,#431c0d 68%,#241008);box-shadow:0 0 0 1px #652d12,0 2px 4px #150700,inset 0 1px #fff8;pointer-events:none}body.ludo-game.playing-ludo .play-toolbar .board-round-button svg{position:relative;z-index:1;width:27px;height:27px}}
 body.ludo-game .board.ludo .home-base.inactive-home{background:linear-gradient(145deg,#fbf5e8,#e7dac1)!important;border-color:#aa8d62}
 body.ludo-game .board.ludo .lane.inactive-lane{background:linear-gradient(145deg,#fffef7,#e9dfcb)!important}
 
@@ -1004,7 +1005,7 @@ body.ludo-game.playing-ludo .player-dice .die-face.rolling{animation:ludu-die-tu
 body.ludo-game.playing-ludo .player-dice .die-face.rolling .die-pip{visibility:hidden;opacity:0}
 @keyframes ludu-die-tumble{0%{transform:perspective(240px) rotateX(0) rotateY(0) rotateZ(0) scale(1)}16%{transform:perspective(240px) rotateX(160deg) rotateY(220deg) rotateZ(300deg) translateY(-7px) scale(1.08)}34%{transform:perspective(240px) rotateX(370deg) rotateY(510deg) rotateZ(660deg) translateY(2px)}53%{transform:perspective(240px) rotateX(590deg) rotateY(770deg) rotateZ(990deg) translateY(-5px) scale(1.04)}73%{transform:perspective(240px) rotateX(770deg) rotateY(1030deg) rotateZ(1310deg) translateY(1px)}100%{transform:perspective(240px) rotateX(1080deg) rotateY(1440deg) rotateZ(1800deg) translateY(0) scale(1)}}
 body.ludo-game.playing-ludo .board.ludo span.moving{animation:ludu-pawn-hop var(--pawn-motion-duration,320ms) cubic-bezier(.2,.72,.3,1) both}
-body.ludo-game.playing-ludo .board.ludo span.captured-return{animation-duration:calc(var(--pawn-motion-duration,160ms))}
+body.ludo-game.playing-ludo .board.ludo span.captured-return{animation-duration:calc(var(--pawn-motion-duration,80ms))}
 
 /* Reference-shaped pawn pieces: glossy colored bodies, rounded heads, and gold bases. */
 body.ludo-game .board.ludo span.ludo-pawn{position:absolute!important;inset:-3%!important;width:106%!important;height:106%!important;display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important;line-height:0!important;filter:drop-shadow(0 2px 2px #180802a8);pointer-events:auto}
@@ -1028,14 +1029,14 @@ body.ludo-game.playing-ludo .player-dice .die-side-pips{display:grid;grid-templa
 body.ludo-game.playing-ludo .player-dice .die-side-pips .die-pip{position:static;display:block;width:clamp(4px,.78vw,8px);height:clamp(4px,.78vw,8px);margin:0;border-radius:50%;background:radial-gradient(circle at 27% 22%,#56483b,#19120d 72%);box-shadow:inset 0 1px 1px #000b,0 1px #fff9;visibility:visible!important;opacity:1!important}
 body.ludo-game.playing-ludo .player-dice .die-face.pip-1{--face-x:0deg;--face-y:0deg}
 body.ludo-game.playing-ludo .player-dice .die-face.pip-2{--face-x:0deg;--face-y:-90deg}
-body.ludo-game.playing-ludo .player-dice .die-face.pip-3{--face-x:90deg;--face-y:0deg}
-body.ludo-game.playing-ludo .player-dice .die-face.pip-4{--face-x:-90deg;--face-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-3{--face-x:-90deg;--face-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.pip-4{--face-x:90deg;--face-y:0deg}
 body.ludo-game.playing-ludo .player-dice .die-face.pip-5{--face-x:0deg;--face-y:90deg}
 body.ludo-game.playing-ludo .player-dice .die-face.pip-6{--face-x:0deg;--face-y:180deg}
 body.ludo-game.playing-ludo .player-dice .die-face.roll-to-1{--roll-x:0deg;--roll-y:0deg}
 body.ludo-game.playing-ludo .player-dice .die-face.roll-to-2{--roll-x:0deg;--roll-y:-90deg}
-body.ludo-game.playing-ludo .player-dice .die-face.roll-to-3{--roll-x:90deg;--roll-y:0deg}
-body.ludo-game.playing-ludo .player-dice .die-face.roll-to-4{--roll-x:-90deg;--roll-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-3{--roll-x:-90deg;--roll-y:0deg}
+body.ludo-game.playing-ludo .player-dice .die-face.roll-to-4{--roll-x:90deg;--roll-y:0deg}
 body.ludo-game.playing-ludo .player-dice .die-face.roll-to-5{--roll-x:0deg;--roll-y:90deg}
 body.ludo-game.playing-ludo .player-dice .die-face.roll-to-6{--roll-x:0deg;--roll-y:180deg}
 body.ludo-game.playing-ludo .player-dice .die-face.rolling{animation:none!important;backface-visibility:visible}
@@ -1052,3 +1053,35 @@ body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="0"]{background
 body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="1"]{background-position:66.6667% 50%!important}
 body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="2"]{background-position:33.3333% 50%!important}
 body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="3"]{background-position:100% 50%!important}
+body.ludo-game .board.ludo span.ludo-pawn:not(.sprite-pawn){filter:none!important}
+body.ludo-game .board.ludo span.ludo-pawn:not(.sprite-pawn) .pawn-base{border-color:color-mix(in srgb,var(--piece-color) 62%,white);background:linear-gradient(180deg,color-mix(in srgb,var(--piece-color) 78%,white),var(--piece-color) 42%,color-mix(in srgb,var(--piece-color) 56%,#100805));box-shadow:inset 0 2px 2px #fff8,0 2px 2px #18080366}
+body.ludo-game .board.ludo span.ludo-pawn:not(.sprite-pawn) .pawn-head{border:0}
+
+/* During a roll, gently lift usable pawns so players can spot their pieces.
+   Finished pawns never receive these classes and stay completely still. */
+body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.pawn-presence-hint,
+body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.pawn-ready-hint{animation:pawn-location-hint 620ms ease-in-out infinite;animation-delay:calc(var(--pawn-order,0)*85ms);transform-origin:50% 100%}
+@keyframes pawn-location-hint{0%,100%{translate:0 0}50%{translate:0 -2px}}
+
+/* Each player opens only their own in-yard color palette before play. */
+body.ludo-game.playing-ludo .board.ludo .home-base .yard-color-controls{position:absolute;z-index:14;top:7%;right:7%;display:block;overflow:visible}
+body.ludo-game.playing-ludo .board.ludo .yard-color-controls[hidden]{display:none!important}
+body.ludo-game.playing-ludo .yard-color-trigger{position:relative;display:grid;place-items:center;width:26px;height:26px;padding:2px;border:1.5px solid #f1d37c;border-radius:50%;background:radial-gradient(circle at 34% 25%,#fff7,#72411c 62%,#301409);box-shadow:0 1px 2px #16070088;cursor:pointer;touch-action:manipulation}
+body.ludo-game.playing-ludo .yard-color-trigger svg{display:block;width:100%;height:100%}
+body.ludo-game.playing-ludo .yard-color-swatches{position:absolute;z-index:1;top:50%;right:32px;display:grid;grid-template-columns:repeat(4,19px);gap:5px;width:max-content;padding:8px;border:1px solid #f3d47e;border-radius:12px;background:#26130eeF;box-shadow:0 3px 9px #16070055;transform:translateY(-50%)}
+body.ludo-game.playing-ludo .yard-color-swatches[hidden]{display:none!important}
+body.ludo-game.playing-ludo .yard-color-swatch{display:block;width:19px;height:19px;min-height:19px;padding:0;border:2px solid #fff9;border-radius:50%;background:var(--swatch);box-shadow:inset 0 1px 2px #fff7;cursor:pointer}
+body.ludo-game.playing-ludo .yard-color-swatch.selected{outline:2px solid #fff;outline-offset:1px}
+body.ludo-game.playing-ludo .yard-color-swatch:disabled{opacity:.24;cursor:default;filter:grayscale(1)}
+
+/* Rank celebrations fill the ranked player's own home and stay until reset. */
+body.ludo-game.playing-ludo .board.ludo .home-base .yard-celebration{inset:5%!important;width:auto!important;height:auto!important;display:grid;place-content:center;gap:4px;border-radius:18px;background:radial-gradient(ellipse at 50% 35%,color-mix(in srgb,var(--yard-color,#d64443) 86%,white),color-mix(in srgb,var(--yard-color,#d64443) 65%,#170805));box-shadow:inset 0 0 0 3px #fff6,0 0 18px color-mix(in srgb,var(--yard-color,#d64443) 65%,transparent);}
+body.ludo-game.playing-ludo .board.ludo .home-base .yard-celebration.rank-1{border:2px solid #fff1a1;box-shadow:inset 0 0 0 3px #fff8,0 0 18px #ffdc65;animation:yard-winner 1.6s ease-in-out infinite alternate}
+body.ludo-game.playing-ludo .board.ludo .home-base .yard-celebration.rank-1::after{inset:0!important;opacity:.58;animation:firework-spark 1.5s ease-in-out infinite}
+body.ludo-game.playing-ludo .yard-celebration .winner-crown{width:clamp(34px,7vw,76px);height:auto}
+body.ludo-game.playing-ludo .yard-celebration strong{font-size:clamp(1.45rem,6vw,3.5rem);line-height:.9;color:#fff1a1}
+body.ludo-game.playing-ludo .yard-celebration span{font-size:clamp(.82rem,3.2vw,1.5rem);letter-spacing:.08em}
+body.ludo-game.playing-ludo .yard-celebration.rank-2{animation:yard-celebrate 2s ease-in-out infinite alternate}
+body.ludo-game.playing-ludo .yard-celebration.rank-3{animation:yard-celebrate 2.7s ease-in-out infinite alternate;opacity:.95}
+body.ludo-game.playing-ludo .yard-celebration.rank-4{animation:none;opacity:.9}
+@media(max-width:620px){body.ludo-game.playing-ludo .yard-color-trigger{width:22px;height:22px}body.ludo-game.playing-ludo .yard-color-swatches{grid-template-columns:repeat(4,16px);gap:4px;padding:6px;right:27px}body.ludo-game.playing-ludo .yard-color-swatch{width:16px;height:16px;min-height:16px}}

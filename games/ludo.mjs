@@ -35,8 +35,7 @@ document.getElementById("close-rules").addEventListener("click",()=>document.get
 document.getElementById("setup-settings").addEventListener("click",()=>document.getElementById("settings-dialog").showModal());
 document.getElementById("menu-settings").addEventListener("click",()=>document.getElementById("settings-dialog").showModal());
 document.getElementById("close-settings").addEventListener("click",()=>document.getElementById("settings-dialog").close());
-document.getElementById("setup-colors").addEventListener("click",()=>{refreshMenuColors();document.getElementById("menu-colors-dialog").showModal();});
-document.getElementById("close-menu-colors").addEventListener("click",()=>document.getElementById("menu-colors-dialog").close());
+document.getElementById("setup-colors").addEventListener("click",()=>{document.getElementById("notice-title").textContent="Choose Colors";document.getElementById("notice-message").textContent="After starting, tap the small palette inside your own yard. Choose a color before the first dice roll.";document.getElementById("notice-dialog").showModal();});
 document.getElementById("online-coming").addEventListener("click",()=>document.getElementById("notice-dialog").showModal());
 document.getElementById("close-notice").addEventListener("click",()=>document.getElementById("notice-dialog").close());
 const playScreen=document.querySelector("#ludo-play");
@@ -73,21 +72,6 @@ const palette = [
   ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"],
   ["Cyan","#30c9ed"],["Lime","#9bd63d"],["Maroon","#a93455"],["Brown","#a76a3b"]
 ];
-function refreshMenuColors(){
-  const count=Number(document.querySelector('#setup-players').value);
-  const player=document.querySelector('#menu-color-player'),color=document.querySelector('#menu-color-choice');
-  [...player.options].forEach(option=>{option.disabled=Number(option.value)>=count;});
-  if(Number(player.value)>=count)player.value='0';
-  const seat=Number(player.value);color.replaceChildren();
-  palette.forEach(([name,hex],index)=>{const option=document.createElement('option');option.value=String(index);option.textContent=name;option.disabled=chosenColors.some((value,other)=>other<count&&other!==seat&&value===index);color.append(option);});
-  color.value=String(chosenColors[seat]);
-}
-document.querySelector('#menu-color-player').addEventListener('change',refreshMenuColors);
-document.querySelector('#apply-menu-color').addEventListener('click',()=>{
-  const seat=Number(document.querySelector('#menu-color-player').value),color=Number(document.querySelector('#menu-color-choice').value),count=Number(document.querySelector('#setup-players').value);
-  if(seat>=count||chosenColors.some((value,index)=>index<count&&index!==seat&&value===color))return;
-  chosenColors[seat]=color;document.querySelector('#menu-color-confirmation').textContent='Player '+(seat+1)+' color set to '+palette[color][0]+'.';refreshMenuColors();
-});
 const starts = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const lanes = [
   Array.from({length:6},(_,i)=>[7,i+1]),
@@ -108,9 +92,9 @@ const modeSelect = document.querySelector("#mode");
 const seatOptions = document.querySelector("#seat-options");
 const dice = teams.map((team,teamId)=>{
   const container=document.querySelector(`#dice-${team.toLowerCase()}`);
-  const label=document.createElement("button");
-  label.type="button";
+  const label=document.createElement("div");
   label.className="player-dice-label";
+  label.setAttribute("role","group");
   label.textContent=team;
   const button=document.createElement("button");
   button.type="button";
@@ -140,31 +124,20 @@ syncSoundControls();
 const initialColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:[0,1,2,3];
 let chosenColors=[...initialColors];
 const getColor=seat=>palette[chosenColors[seat]];
-const colorPicker=document.querySelector("#color-picker");
-const colorSeat=document.querySelector("#color-seat");
-const colorChoice=document.querySelector("#color-choice");
-document.querySelector("#color-cancel").addEventListener("click",()=>colorPicker.hidden=true);
-document.querySelector("#color-apply").addEventListener("click",()=>{
-  const seat=Number(colorSeat.value), wanted=Number(colorChoice.value);
-  if(started || seat>=activeTeams.length) return;
-  if(chosenColors.some((color,index)=>index!==seat && index<activeTeams.length && color===wanted)) return;
-  chosenColors[seat]=wanted;
-  colorPicker.hidden=true;
-  game.restart();
-});
-function showColorPicker(seat) {
-  if(started || seat<0 || seat>=activeTeams.length) return;
-  colorSeat.value=String(seat);
-  colorChoice.replaceChildren();
-  palette.forEach(([name,hex],index)=>{
-    const option=document.createElement("option");
-    option.value=String(index);
-    option.textContent=name;
-    option.disabled=chosenColors.some((color,other)=>other!==seat && other<activeTeams.length && color===index);
-    colorChoice.append(option);
-  });
-  colorChoice.value=String(chosenColors[seat]);
-  colorPicker.hidden=false;
+function saveColorChoices(){
+  sessionStorage.setItem("ludu-mahir-game",JSON.stringify({players:String(activeTeams.length),mode:modeSelect.value,colors:chosenColors,sound:soundEnabled}));
+}
+function buildYardColorControls(base,teamId){
+  const controls=document.createElement("div");controls.className="yard-color-controls";controls.dataset.seat=String(teamId);
+  const trigger=document.createElement("button");trigger.type="button";trigger.className="yard-color-trigger";trigger.setAttribute("aria-label","Choose this player's color");trigger.setAttribute("aria-expanded","false");
+  trigger.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h2a2 2 0 0 0 1.2-3.6c-.8-.6-.4-2 .8-2h1a4 4 0 0 0 4-4c0-4.6-4-8.4-9-8.4Z" fill="#ffd846" stroke="#744217" stroke-width="1.5"/><g fill="#42220e"><circle cx="7" cy="10" r="1.4"/><circle cx="11" cy="7" r="1.4"/><circle cx="16" cy="8" r="1.4"/><circle cx="8" cy="15" r="1.4"/></g></svg>';
+  const swatches=document.createElement("div");swatches.className="yard-color-swatches";swatches.hidden=true;
+  palette.forEach(([name,hex],colorId)=>{const chip=document.createElement("button");chip.type="button";chip.className="yard-color-swatch";chip.dataset.color=String(colorId);chip.title=name;chip.setAttribute("aria-label",name);chip.style.setProperty("--swatch",hex);chip.addEventListener("click",event=>{event.stopPropagation();const player=activeTeams.indexOf(teamId);if(started||player<0||chosenColors.some((value,other)=>other!==player&&other<activeTeams.length&&value===colorId))return;chosenColors[player]=colorId;swatches.hidden=true;trigger.setAttribute("aria-expanded","false");saveColorChoices();applySeatColors();render();});swatches.append(chip);});
+  trigger.addEventListener("click",event=>{event.stopPropagation();const player=activeTeams.indexOf(teamId);if(started||player<0)return;swatches.hidden=!swatches.hidden;trigger.setAttribute("aria-expanded",String(!swatches.hidden));});
+  controls.append(trigger,swatches);base.append(controls);
+}
+function updateYardColorControls(){
+  game.board.querySelectorAll(".yard-color-controls").forEach(controls=>{const teamId=Number(controls.dataset.seat),player=activeTeams.indexOf(teamId),trigger=controls.querySelector(".yard-color-trigger"),swatches=controls.querySelector(".yard-color-swatches");controls.hidden=started||player<0;controls.classList.toggle("open",!swatches.hidden);controls.querySelectorAll(".yard-color-swatch").forEach(chip=>{const color=Number(chip.dataset.color);chip.disabled=player<0||chosenColors.some((value,other)=>other!==player&&other<activeTeams.length&&value===color);chip.classList.toggle("selected",player>=0&&chosenColors[player]===color);});if(started){swatches.hidden=true;trigger.setAttribute("aria-expanded","false");}});
 }
 
 const game = gameShell({reset() {
@@ -175,7 +148,7 @@ const game = gameShell({reset() {
   started=false;
   locked=false; animationToken=null; pendingCaptureSteps.clear();
   clearTimeout(diceAnimationTimer);rollingTeam=-1;rollingValue=0;
-  colorPicker.hidden=true;
+  game.board.querySelectorAll(".yard-color-swatches").forEach(swatches=>swatches.hidden=true);
   message = "";
   lastDice.fill(1);
   dice.forEach(button=>button.classList.remove("rolling"));
@@ -190,6 +163,7 @@ for(const [seat,area] of [[0,"1 / 1 / 7 / 7"],[1,"10 / 1 / 16 / 7"],[2,"1 / 10 /
   base.dataset.seat=String(seat);
   base.style.gridArea=area;
   game.board.append(base);
+  buildYardColorControls(base,seat);
 }
 const centerBase=document.createElement("div");
 centerBase.className="home-diamond";
@@ -222,6 +196,7 @@ function applySeatColors() {
     const paletteId=player<0?teamId:chosenColors[player];
     const [name,hex]=palette[paletteId];
     board.style.setProperty(`--seat-${teamId}`,hex);
+    game.board.querySelector(`.base-${teamId}`)?.style.setProperty("--yard-color",hex);
     const dicePanel=dice[teamId].closest(".player-dice");
     dicePanel.style.setProperty("--seat-color",hex);
     dicePanel.style.setProperty("--custom-seat-color",hex);
@@ -273,7 +248,7 @@ function throwDie() {
     lastDice[teamId]=rolled;
     if(soundEnabled)playDiceSound(rolled);
     state=rollLudo(state,rolled);
-    message=state.threeSixes?`${getColor(player)[0]} rolled three sixes. Turn passed.`:`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
+    message=`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
     rollingTeam=-1;rollingValue=0;
     render();
   },DICE_ROLL_DURATION);
@@ -307,7 +282,7 @@ async function play(index) {
   for(const motion of moving) {
     animationToken=motion;
     render();
-    await new Promise(resolve=>setTimeout(resolve,motion.captured?delay/2:delay));
+    await new Promise(resolve=>setTimeout(resolve,motion.captured?delay/4:delay));
     if(motion.step===-1)pendingCaptureSteps.delete(`${motion.player}-${motion.token}`);
   }
   animationToken=null;
@@ -328,6 +303,7 @@ function render() {
     game.board.querySelectorAll(`.yard-seat-${seat}`).forEach(tile=>tile.classList.toggle("inactive-yard",!enabled));
     game.board.querySelectorAll(`.lane-${seat}`).forEach(tile=>tile.classList.toggle("inactive-lane",!enabled));
   }
+  updateYardColorControls();
   dice.forEach((button,teamId)=>{
     const seat=activeTeams.indexOf(teamId);
     const container=button.closest(".player-dice");
@@ -339,9 +315,7 @@ function render() {
     const playerName=document.createElement("span");
     playerName.textContent=seat<0?teams[teamId]:`Player ${seat+1} · ${getColor(seat)[0]}`;
     label.append(avatar,playerName);
-    label.disabled=started||seat<0;
-    label.setAttribute("aria-label",`Choose color for player ${seat+1}`);
-    label.onclick=()=>showColorPicker(seat);
+    label.setAttribute("aria-label",seat<0?`${teams[teamId]} player`:`Player ${seat+1}, ${getColor(seat)[0]}`);
     const enabled=activeTeams.includes(teamId);
     container.hidden=!enabled;
     const active=enabled && activeTeams[state.turn]===teamId && state.winner===null;
@@ -374,11 +348,13 @@ function render() {
     if(pawnColor<4) marker.classList.add("sprite-pawn");
     else marker.replaceChildren(...["pawn-body","pawn-base","pawn-head"].map(name=>{const part=document.createElement("i");part.className=name;return part;}));
     marker.dataset.token=`${teamId}-${index}`;
+    marker.style.setProperty("--pawn-order",String(index));
+    if(step!==57&&!locked&&(rollingTeam===teamId||(state.roll>0&&player===state.turn&&legal.includes(index))))marker.classList.add(rollingTeam===teamId?"pawn-presence-hint":"pawn-ready-hint");
     if(animationToken?.player===player&&animationToken?.token===index){
       marker.classList.add("moving");
       if(animationToken.captured)marker.classList.add("captured-return");
       const baseDelay=Number(document.querySelector("#settings-animation-speed").value)||320;
-      marker.style.setProperty("--pawn-motion-duration",`${animationToken.captured?baseDelay/2:baseDelay}ms`);
+      marker.style.setProperty("--pawn-motion-duration",`${animationToken.captured?baseDelay/4:baseDelay}ms`);
     }
     marker.dataset.step=String(visualStep);
     if(player===state.turn && !botTurn && rollingTeam<0 && legal.includes(index)) {
@@ -398,8 +374,8 @@ function render() {
     const teamId=activeTeams[player];
     const badge=document.createElement("div");
     badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;
-    badge.innerHTML=rank===1 ? `<svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><span>WINNER · 1st</span>` : `<span>${rank}${rank===2?"nd":rank===3?"rd":"th"} PLACE</span>`;
-    game.board.append(badge);
+    badge.innerHTML=rank===1 ? `<svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><span>WINNER</span><strong>1st</strong>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
+    game.board.querySelector(`.base-${teamId}`).append(badge);
   });
 
   const currentTeam=getColor(state.turn)[0];

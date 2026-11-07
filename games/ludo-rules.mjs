@@ -28,9 +28,6 @@ export function legalTokens(state) {
 
 export function rollLudo(state, roll) {
   if(state.roll || state.winner!==null || !Number.isInteger(roll) || roll<1 || roll>6 || state.ranks[state.turn]) return state;
-  if(roll===6 && state.sixChain>=2) {
-    return {...state,turn:nextPlayer(state,state.turn),roll:0,sixChain:0,lastCaptured:[],lastMove:null,threeSixes:true};
-  }
   const sixChain=roll===6 ? state.sixChain+1 : 0;
   const rolled={...state,roll,sixChain,threeSixes:false,lastCaptured:[],lastMove:null};
   if(legalTokens(rolled).length) return rolled;

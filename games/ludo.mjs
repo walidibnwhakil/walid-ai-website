@@ -157,7 +157,10 @@ function updatePlayerColorPickers(){
 
 const game = gameShell({reset() {
   const count=Number(playerSelect.value);
-  activeTeams=count===2?[0,3]:Array.from({length:count},(_,index)=>index);
+  const botMode=modeSelect.value==="bot";
+  activeTeams=botMode
+    ? count===2?[3,0]:[3,...Array.from({length:count-1},(_,index)=>index)]
+    : count===2?[0,3]:Array.from({length:count},(_,index)=>index);
   state=newLudo(count,activeTeams);
   applySeatColors();
   started=false;

@@ -279,10 +279,6 @@
       document.getElementById("settingsContactLink").textContent = text.contactUs;
       document.getElementById("settingsPrivacyLink").textContent = text.privacyPolicy;
       document.getElementById("settingsTermsLink").textContent = text.termsOfService;
-      document.getElementById("sidebarAboutLink").textContent = text.aboutUs;
-      document.getElementById("sidebarContactLink").textContent = text.contactUs;
-      document.getElementById("sidebarPrivacyLink").textContent = text.privacyPolicy;
-      document.getElementById("sidebarTermsLink").textContent = text.termsOfService;
       document.getElementById("welcomeTitle").textContent = text.welcome;
       input.setAttribute("aria-label", lang === "bn" ? "প্রশ্ন লিখুন" : "Ask a question");
       document.getElementById("attachBtn").setAttribute("aria-label", lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos");

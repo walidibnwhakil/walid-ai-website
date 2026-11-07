@@ -35,7 +35,7 @@ document.getElementById("close-rules").addEventListener("click",()=>document.get
 document.getElementById("setup-settings").addEventListener("click",()=>document.getElementById("settings-dialog").showModal());
 document.getElementById("menu-settings").addEventListener("click",()=>document.getElementById("settings-dialog").showModal());
 document.getElementById("close-settings").addEventListener("click",()=>document.getElementById("settings-dialog").close());
-document.getElementById("setup-colors").addEventListener("click",()=>{document.getElementById("notice-title").textContent="Choose Colors";document.getElementById("notice-message").textContent="After starting, tap the small palette inside your own yard. Choose a color before the first dice roll.";document.getElementById("notice-dialog").showModal();});
+document.getElementById("setup-colors").addEventListener("click",()=>{document.getElementById("notice-title").textContent="Choose Colors";document.getElementById("notice-message").textContent="After starting, tap your own player header to choose a color. Choose before the first dice roll.";document.getElementById("notice-dialog").showModal();});
 document.getElementById("online-coming").addEventListener("click",()=>document.getElementById("notice-dialog").showModal());
 document.getElementById("close-notice").addEventListener("click",()=>document.getElementById("notice-dialog").close());
 const playScreen=document.querySelector("#ludo-play");
@@ -69,8 +69,7 @@ document.querySelector("#full-screen").addEventListener("click",()=>{
 });
 const palette = [
   ["Red","#e83e4e"],["Blue","#2588e8"],["Green","#27bf70"],["Yellow","#f2be30"],
-  ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"],
-  ["Cyan","#30c9ed"],["Lime","#9bd63d"],["Maroon","#a93455"],["Brown","#a76a3b"]
+  ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"]
 ];
 const starts = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const lanes = [
@@ -90,12 +89,15 @@ const entrySquares=new Map([[0,0],[13,2],[26,3],[39,1]]);
 const playerSelect = document.querySelector("#player-count");
 const modeSelect = document.querySelector("#mode");
 const seatOptions = document.querySelector("#seat-options");
+const playerLabels=[];
 const dice = teams.map((team,teamId)=>{
   const container=document.querySelector(`#dice-${team.toLowerCase()}`);
-  const label=document.createElement("div");
+  const label=document.createElement("button");
+  label.type="button";
   label.className="player-dice-label";
-  label.setAttribute("role","group");
-  label.textContent=team;
+  label.setAttribute("aria-expanded","false");
+  label.setAttribute("aria-label",`Choose ${team} player color`);
+  playerLabels[teamId]=label;
   const button=document.createElement("button");
   button.type="button";
   button.className="die-face";
@@ -122,24 +124,40 @@ let activeTeams, state, message, seatBots = [], started=false, locked=false, ani
 const DICE_ROLL_DURATION=950;
 syncSoundControls();
 const defaultColors=String(restoredConfig?.players)==="2"?[0,3,2,1]:[0,1,2,3];
-const storedColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:null;
+const storedColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<palette.length)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:null;
 const initialColors=storedColors?(storedColors.join(",")==="0,1,2,3"?defaultColors:storedColors):defaultColors;
 let chosenColors=[...initialColors];
 const getColor=seat=>palette[chosenColors[seat]];
 function saveColorChoices(){
   sessionStorage.setItem("ludu-mahir-game",JSON.stringify({players:String(activeTeams.length),mode:modeSelect.value,colors:chosenColors,sound:soundEnabled}));
 }
-function buildYardColorControls(base,teamId){
-  const controls=document.createElement("div");controls.className="yard-color-controls";controls.dataset.seat=String(teamId);
-  const trigger=document.createElement("button");trigger.type="button";trigger.className="yard-color-trigger";trigger.setAttribute("aria-label","Choose this player's color");trigger.setAttribute("aria-expanded","false");
-  trigger.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h2a2 2 0 0 0 1.2-3.6c-.8-.6-.4-2 .8-2h1a4 4 0 0 0 4-4c0-4.6-4-8.4-9-8.4Z" fill="#ffd846" stroke="#744217" stroke-width="1.5"/><g fill="#42220e"><circle cx="7" cy="10" r="1.4"/><circle cx="11" cy="7" r="1.4"/><circle cx="16" cy="8" r="1.4"/><circle cx="8" cy="15" r="1.4"/></g></svg>';
-  const swatches=document.createElement("div");swatches.className="yard-color-swatches";swatches.hidden=true;
-  palette.forEach(([name,hex],colorId)=>{const chip=document.createElement("button");chip.type="button";chip.className="yard-color-swatch";chip.dataset.color=String(colorId);chip.title=name;chip.setAttribute("aria-label",name);chip.style.setProperty("--swatch",hex);chip.addEventListener("click",event=>{event.stopPropagation();const player=activeTeams.indexOf(teamId);if(started||player<0||chosenColors.some((value,other)=>other!==player&&other<activeTeams.length&&value===colorId))return;chosenColors[player]=colorId;swatches.hidden=true;trigger.setAttribute("aria-expanded","false");saveColorChoices();applySeatColors();render();});swatches.append(chip);});
-  trigger.addEventListener("click",event=>{event.stopPropagation();const player=activeTeams.indexOf(teamId);if(started||player<0)return;swatches.hidden=!swatches.hidden;trigger.setAttribute("aria-expanded",String(!swatches.hidden));});
-  controls.append(trigger,swatches);base.append(controls);
+function hueForHex(hex){
+  const [r,g,b]=hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+  if(!d)return 0;
+  let hue=max===r?((g-b)/d)%6:max===g?(b-r)/d+2:(r-g)/d+4;
+  return Math.round((hue*60+360)%360);
 }
-function updateYardColorControls(){
-  game.board.querySelectorAll(".yard-color-controls").forEach(controls=>{const teamId=Number(controls.dataset.seat),player=activeTeams.indexOf(teamId),trigger=controls.querySelector(".yard-color-trigger"),swatches=controls.querySelector(".yard-color-swatches");controls.hidden=started||player<0;controls.classList.toggle("open",!swatches.hidden);controls.querySelectorAll(".yard-color-swatch").forEach(chip=>{const color=Number(chip.dataset.color);chip.disabled=player<0||chosenColors.some((value,other)=>other!==player&&other<activeTeams.length&&value===color);chip.classList.toggle("selected",player>=0&&chosenColors[player]===color);});if(started){swatches.hidden=true;trigger.setAttribute("aria-expanded","false");}});
+const playerColorPickers=teams.map((_,teamId)=>{
+  const container=dice[teamId].closest(".player-dice"),picker=document.createElement("div");
+  picker.className="player-color-picker";picker.hidden=true;picker.dataset.seat=String(teamId);
+  palette.forEach(([name,hex],colorId)=>{
+    const chip=document.createElement("button");chip.type="button";chip.className="player-color-swatch";chip.dataset.color=String(colorId);chip.title=name;chip.setAttribute("aria-label",name);chip.style.setProperty("--swatch",hex);
+    chip.addEventListener("click",event=>{event.stopPropagation();const player=activeTeams.indexOf(teamId);if(started||player<0||chosenColors.some((value,other)=>other!==player&&other<activeTeams.length&&value===colorId))return;chosenColors[player]=colorId;picker.hidden=true;playerLabels[teamId].setAttribute("aria-expanded","false");saveColorChoices();applySeatColors();render();});
+    picker.append(chip);
+  });
+  container.append(picker);
+  playerLabels[teamId].addEventListener("click",event=>{event.stopPropagation();const player=activeTeams.indexOf(teamId);if(started||player<0)return;const opening=picker.hidden;playerColorPickers.forEach((other,index)=>{other.hidden=true;playerLabels[index].setAttribute("aria-expanded","false");});picker.hidden=!opening;playerLabels[teamId].setAttribute("aria-expanded",String(opening));});
+  return picker;
+});
+function updatePlayerColorPickers(){
+  playerColorPickers.forEach((picker,teamId)=>{
+    const player=activeTeams.indexOf(teamId),label=playerLabels[teamId];
+    label.disabled=started||player<0;
+    if(started||player<0){picker.hidden=true;label.setAttribute("aria-expanded","false");}
+    picker.querySelectorAll(".player-color-swatch").forEach(chip=>{
+      const color=Number(chip.dataset.color);chip.disabled=player<0||chosenColors.some((value,other)=>other!==player&&other<activeTeams.length&&value===color);chip.classList.toggle("selected",player>=0&&chosenColors[player]===color);
+    });
+  });
 }
 
 const game = gameShell({reset() {
@@ -150,7 +168,8 @@ const game = gameShell({reset() {
   started=false;
   locked=false; animationToken=null; pendingCaptureSteps.clear();
   clearTimeout(diceAnimationTimer);rollingTeam=-1;rollingValue=0;
-  game.board.querySelectorAll(".yard-color-swatches").forEach(swatches=>swatches.hidden=true);
+  playerColorPickers.forEach(picker=>picker.hidden=true);
+  playerLabels.forEach(label=>label.setAttribute("aria-expanded","false"));
   message = "";
   lastDice.fill(1);
   dice.forEach(button=>button.classList.remove("rolling"));
@@ -165,7 +184,6 @@ for(const [seat,area] of [[0,"1 / 1 / 7 / 7"],[1,"10 / 1 / 16 / 7"],[2,"1 / 10 /
   base.dataset.seat=String(seat);
   base.style.gridArea=area;
   game.board.append(base);
-  buildYardColorControls(base,seat);
 }
 const centerBase=document.createElement("div");
 centerBase.className="home-diamond";
@@ -302,13 +320,12 @@ function render() {
     const enabled=activeTeams.includes(seat);
     const base=game.board.querySelector(`.base-${seat}`);
     const player=activeTeams.indexOf(seat);
-    const finished=player<0?0:state.pieces[player].filter(step=>step===57).length;
-    base.classList.toggle("home-progress",finished>0);
     base.classList.toggle("inactive-home",!enabled);
     game.board.querySelectorAll(`.yard-seat-${seat}`).forEach(tile=>tile.classList.toggle("inactive-yard",!enabled));
     game.board.querySelectorAll(`.lane-${seat}`).forEach(tile=>tile.classList.toggle("inactive-lane",!enabled));
   }
-  updateYardColorControls();
+  game.board.querySelector(".home-center")?.classList.toggle("has-finished",state.pieces.some(team=>team.some(step=>step===57)));
+  updatePlayerColorPickers();
   dice.forEach((button,teamId)=>{
     const seat=activeTeams.indexOf(teamId);
     const container=button.closest(".player-dice");
@@ -350,8 +367,9 @@ function render() {
     marker.style.setProperty("--piece-color",getColor(player)[1]);
     marker.dataset.color=String(pawnColor);
     marker.setAttribute("aria-hidden","true");
-    if(pawnColor<4) marker.classList.add("sprite-pawn");
-    else marker.replaceChildren(...["pawn-body","pawn-base","pawn-head"].map(name=>{const part=document.createElement("i");part.className=name;return part;}));
+    marker.classList.add("sprite-pawn");
+    if(pawnColor<4) marker.dataset.color=String(pawnColor);
+    else {marker.dataset.color="0";marker.classList.add("custom-pawn-color");marker.style.setProperty("--pawn-hue",`${hueForHex(getColor(player)[1])-hueForHex("#e83e4e")}deg`);}
     marker.dataset.token=`${teamId}-${index}`;
     marker.style.setProperty("--pawn-order",String(index));
     if(step!==57&&!locked&&(rollingTeam===teamId||(state.roll>0&&player===state.turn&&legal.includes(index))))marker.classList.add(rollingTeam===teamId?"pawn-presence-hint":"pawn-ready-hint");

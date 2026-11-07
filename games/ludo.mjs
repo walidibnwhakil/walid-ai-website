@@ -368,7 +368,7 @@ function render() {
     marker.dataset.color=String(pawnColor);
     marker.setAttribute("aria-hidden","true");
     marker.classList.add("sprite-pawn","pin-pawn");
-    marker.innerHTML='<svg class="pin-pawn-art" viewBox="0 0 64 80" aria-hidden="true" focusable="false"><ellipse class="pin-base-shadow" cx="32" cy="74" rx="18" ry="5.5"/><ellipse class="pin-base-ring" cx="32" cy="73" rx="16" ry="4.8"/><ellipse class="pin-base-top" cx="32" cy="72" rx="10" ry="3.2"/><path class="pin-outline" d="M32 3C17 3 5 15 5 31c0 15 17 34 27 46 10-12 27-31 27-46C59 15 47 3 32 3Z"/><path class="pin-color" d="M32 9C20 9 11 18 11 31c0 11 13 27 21 38 8-11 21-27 21-38C53 18 44 9 32 9Z"/><circle class="pin-face" cx="32" cy="29" r="13"/><ellipse class="pin-gloss" cx="26" cy="22" rx="4" ry="6"/></svg>';
+    marker.innerHTML='<svg class="pin-pawn-art" viewBox="0 0 64 80" aria-hidden="true" focusable="false"><path class="pin-outline" d="M32 3C17 3 5 15 5 31c0 15 17 34 27 46 10-12 27-31 27-46C59 15 47 3 32 3Z"/><path class="pin-color" d="M32 9C20 9 11 18 11 31c0 11 13 27 21 38 8-11 21-27 21-38C53 18 44 9 32 9Z"/><circle class="pin-face" cx="32" cy="29" r="13"/><ellipse class="pin-gloss" cx="26" cy="22" rx="4" ry="6"/></svg>';
     marker.dataset.token=`${teamId}-${index}`;
     marker.style.setProperty("--pawn-order",String(index));
     // Only pieces that can legally use this exact result should lift: a six

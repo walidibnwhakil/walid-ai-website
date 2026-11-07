@@ -1199,11 +1199,8 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn{
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn::after{display:none!important}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-pawn-art{
   position:absolute;left:50%;top:50%;width:100%;height:140%;overflow:visible;
-  transform:translate(-50%,-91.25%);filter:none
+  transform:translate(-50%,-96.25%);filter:none
 }
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-shadow{fill:#12202f}
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-ring{fill:color-mix(in srgb,var(--piece-color) 82%,#12202f);stroke:color-mix(in srgb,var(--piece-color) 42%,#26384b);stroke-width:1.5}
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-top{fill:var(--piece-color);stroke:#edf5ff;stroke-width:.8}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-outline{fill:#f7fbff;stroke:#52677b;stroke-width:2.5}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-color{fill:#f5f9fc;stroke:#c8d6e4;stroke-width:1}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-face{fill:var(--piece-color);stroke:#24374c;stroke-width:2}
@@ -1217,7 +1214,7 @@ body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.y
   width:100%!important;height:100%!important;transform:none!important;z-index:4!important
 }
 body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.yard-pawn.pin-pawn .pin-pawn-art{
-  height:140%;top:50%;transform:translate(-50%,-91.25%)
+  height:140%;top:50%;transform:translate(-50%,-96.25%)
 }
 /* Keep the base-centering transform intact during subtle pawn movement. */
 @keyframes mahir-ready-bob{0%,100%{translate:0 0}50%{translate:0 -2px}}

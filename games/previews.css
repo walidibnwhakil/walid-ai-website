@@ -80,24 +80,11 @@ main { max-width: 1050px; }
 @keyframes tile-merge { 50% { transform: translate(-17px,-17px) scale(1.14); box-shadow:0 2px 5px #59483c66; } }
 .preview:not(.in-view) span { animation: none; }
 @media (prefers-reduced-motion: reduce) { .preview span, .preview .mini2048-board i:nth-child(4) { animation: none; } }
-/* Premium Ludu Mahir preview card */
+/* Ludu Mahir card uses the supplied square preview artwork. */
 .games li:nth-child(2) .tile {background:linear-gradient(145deg,#432015,#1d110e);border:2px solid #d9a63b;border-radius:20px;color:#fff0d0;box-shadow:0 5px 0 #22100a,0 12px 24px #29150d55}
 .games li:nth-child(2) .tile h2 {color:#ffe17b;font:700 1.45rem Georgia,serif;text-shadow:0 2px #49200b}
 .games li:nth-child(2) .tile p {color:#f4dfc3}
 .games li:nth-child(2) .tile>strong {display:block;width:max-content;margin:12px auto 0;padding:9px 28px;border:2px solid #fff0a3;border-radius:999px;color:#442009;background:linear-gradient(#ffe875,#f5a91c);box-shadow:0 3px 0 #8a460c;font:700 1rem Georgia,serif}
-.ludo-preview {height:280px;border:3px solid #f2c54e;border-radius:17px;background:radial-gradient(ellipse at 50% 38%,#7a2f0d,#32150d 62%,#1a0d0c);box-shadow:inset 0 0 0 4px #7c421a,inset 0 0 28px #f8b93355,0 4px 10px #130702;isolation:isolate}
-.ludo-preview::before {content:"";position:absolute;inset:7px;border:1px solid #ffe18e;border-radius:11px;pointer-events:none}
-.ludo-crown {position:absolute;top:4px;left:50%;width:112px;transform:translateX(-50%);filter:drop-shadow(0 4px 4px #140600)}
-.ludo-die {position:absolute;top:42px;width:48px;height:48px;filter:drop-shadow(0 4px 4px #150600)}
-.ludo-die.die-a {left:12%}.ludo-die.die-b {right:12%}
-.ludo-card-wordmark {z-index:2;display:grid;position:absolute;top:65px;left:50%;transform:translateX(-50%);min-width:70%;padding:6px 12px;border:2px solid #edbd42;border-radius:15px;background:linear-gradient(140deg,#59230d,#2b110a);box-shadow:0 5px 10px #160700;color:#ffdc64;font:italic 900 2rem Georgia,serif;text-shadow:0 2px #652b0a,0 5px #1b0a05}
-.ludo-card-wordmark strong {color:#fff1d3;font-size:1.7rem}
-.ludo-mini-track {position:absolute;left:50%;top:135px;display:grid;grid-template-columns:repeat(3,22px);grid-template-rows:repeat(3,17px);transform:translateX(-50%) rotate(45deg);border:2px solid #f8d461;box-shadow:0 4px 6px #120702}
-.ludo-mini-track i:nth-child(1){background:#e94447}.ludo-mini-track i:nth-child(2){background:#ffcf32}.ludo-mini-track i:nth-child(3){background:#3089ec}.ludo-mini-track i:nth-child(4){background:#1dbb68}
-.ludo-card-pawn {position:absolute;z-index:3;width:25px;height:25px;border:2px solid #ffe8b0;border-radius:50% 50% 42% 42%;box-shadow:0 4px 0 #38190a,0 6px 7px #120702,inset 0 4px 4px #fff8}
-.ludo-card-pawn.red {left:23%;top:145px;background:radial-gradient(circle at 30% 25%,#ffc4b9,#ef3448 55%,#901528)}
-.ludo-card-pawn.blue {left:37%;top:168px;background:radial-gradient(circle at 30% 25%,#c6f1ff,#3397ef 55%,#164aa1)}
-.ludo-card-pawn.green {right:36%;top:145px;background:radial-gradient(circle at 30% 25%,#caffd0,#34c778 55%,#14693a)}
-.ludo-card-pawn.yellow {right:22%;top:168px;background:radial-gradient(circle at 30% 25%,#fff8be,#ffc72c 55%,#9e600b)}
-.ludo-card-button {position:absolute;bottom:17px;left:50%;transform:translateX(-50%);width:min(75%,270px);padding:10px;border:2px solid #fff0a0;border-radius:999px;background:linear-gradient(#ffe66a,#f4a90d);color:#4d2506;font:700 1rem Georgia,serif;box-shadow:0 4px 0 #7c3a0b,0 5px 12px #150700}
-@media(max-width:600px){.ludo-preview{height:240px}.ludo-mini-track{top:122px}.ludo-card-pawn.red,.ludo-card-pawn.green{top:134px}.ludo-card-pawn.blue,.ludo-card-pawn.yellow{top:155px}}
+.ludo-preview {height:auto;aspect-ratio:1/1;padding:0;display:block;overflow:hidden;border:0;border-radius:15px;background:#2b1208;box-shadow:none;isolation:auto}
+.ludo-preview::before {display:none}
+.ludo-preview-image {display:block;width:100%;height:100%;object-fit:fill;border-radius:inherit}

@@ -103,7 +103,7 @@ const dice = teams.map((team,teamId)=>{
   button.type="button";
   button.className="die-face";
   button.textContent="⚀";
-  button.setAttribute("aria-label",`Roll ${team} die`);
+  button.setAttribute("aria-label",`Roll ${team} dice`);
   button.addEventListener("click",()=>{if(activeTeams[state.turn]===teamId && !isBot(state.turn)) throwDie();});
   container.append(label,button);
   return button;
@@ -364,7 +364,7 @@ function render() {
     if(rollingTeam===teamId){button.classList.add("rolling",`roll-to-${rollingValue}`);}
     button.disabled=!active||botTurn||locked||state.roll>0||rollingTeam>=0;
     button.replaceChildren(makeDieCube());
-    button.setAttribute("aria-label",rollingTeam===teamId?`${teams[teamId]} die rolling`:`${teams[teamId]} die: ${lastDice[teamId]}${active?", current turn":""}`);
+    button.setAttribute("aria-label",rollingTeam===teamId?`${teams[teamId]} dice rolling`:`${teams[teamId]} dice: ${lastDice[teamId]}${active?", current turn":""}`);
   });
   for(const tile of squares.values()) tile.replaceChildren();
   state.pieces.forEach((team,player)=>team.forEach((step,index)=>{
@@ -477,10 +477,9 @@ function render() {
   const currentTeam=getColor(state.turn)[0];
 
   game.status.dataset.turn=teams[activeTeams[state.turn]].toLowerCase();
-  const allPawnsInYard=state.pieces[state.turn].every(step=>step===-1);
-  const turnPrompt=state.roll?"choose a token.":allPawnsInYard?"roll a 6 to release a pawn.":"roll the die.";
-  game.status.textContent=state.winner!==null?`Game over — ${getColor(state.winner)[0]} wins!`
-    :message+(botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${turnPrompt}`);
+  const statusText=state.winner!==null?`Game over — ${getColor(state.winner)[0]} wins!`
+    :message+(botTurn?`${currentTeam} bot is playing…`:"");
+  game.status.textContent=statusText;
   if(!locked && rollingTeam<0 && state.winner===null && state.roll>0 && legal.length===1) {
     game.later(()=>play(legal[0]), 420);
   } else if(!locked && rollingTeam<0 && botTurn) {

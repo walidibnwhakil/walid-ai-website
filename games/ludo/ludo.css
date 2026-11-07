@@ -1394,3 +1394,9 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn:not(.stacked-pawn) .
 
 /* Hide the empty idle prompt; the die button itself is the roll control. */
 body.ludo-game.playing-ludo #ludo-play #status:empty{display:none!important}
+
+
+/* Center the pawn base on each route square; keep yard pieces unchanged. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn:not(.yard-pawn) .pin-pawn-art{
+  top:calc(50% + var(--pile-y,0%) - 6%)!important
+}

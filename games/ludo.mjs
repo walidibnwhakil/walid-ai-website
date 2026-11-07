@@ -413,6 +413,12 @@ function render() {
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
     if(square.classList.contains("home-center")){
       const used=new Set(finishSlots.values());
+      const count=pile.length;
+      const columns=count<=4?2:count<=9?3:4;
+      const rows=Math.ceil(count/columns);
+      const xStep=count<=4?52:count<=9?34:24;
+      const yStep=count<=4?50:count<=9?34:24;
+      const finishSize=count<=4?"pile-size-finished-4":count<=9?"pile-size-finished-9":"pile-size-finished-16";
       pile.forEach(piece=>{
         const key=piece.dataset.token;
         if(!finishSlots.has(key)){
@@ -423,11 +429,15 @@ function render() {
         const slot=finishSlots.get(key);
         const arrivingAtFinish=animationToken&&piece.dataset.token===`${activeTeams[animationToken.player]}-${animationToken.token}`&&animationToken.step===57;
         if(!arrivingAtFinish)piece.classList.add("finished-pawn");
-        if(slot>0){
-          const offsets=[[-34,-28],[34,-28],[-34,28],[34,28],[0,-46],[0,46],[-46,0],[46,0],[-22,-52],[22,-52],[-22,52],[22,52],[-52,-22],[52,-22],[-52,22],[52,22]];
-          piece.classList.add("stacked-pawn","pile-size-finished");
-          piece.style.setProperty("--pile-x",`${offsets[slot-1]?.[0]??0}%`);
-          piece.style.setProperty("--pile-y",`${offsets[slot-1]?.[1]??0}%`);
+        if(count>1){
+          const row=Math.floor(slot/columns);
+          const inRow=Math.min(columns,count-row*columns);
+          const column=slot%columns;
+          const x=(column-(inRow-1)/2)*xStep;
+          const y=(row-(rows-1)/2)*yStep;
+          piece.classList.add("stacked-pawn","pile-size-finished",finishSize);
+          piece.style.setProperty("--pile-x",`${x}%`);
+          piece.style.setProperty("--pile-y",`${y}%`);
         }
         piece.style.zIndex=piece.classList.contains("playable-token")?"80":String(20+slot);
       });

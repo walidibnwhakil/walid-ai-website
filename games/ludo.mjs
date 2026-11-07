@@ -123,7 +123,8 @@ const dice = teams.map((team,teamId)=>{
 });
 const diePips=[[],[2],[0,4],[0,2,4],[0,1,3,4],[0,1,2,3,4],[0,1,3,4,5,6]];
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), soundEnabled=Boolean(restoredConfig?.sound);
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), rollingTeam=-1, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
+const DICE_ROLL_DURATION=1400;
 syncSoundControls();
 const initialColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:[0,1,2,3];
 let chosenColors=[...initialColors];
@@ -162,6 +163,7 @@ const game = gameShell({reset() {
   applySeatColors();
   started=false;
   locked=false; animationToken=null; pendingCaptureSteps.clear();
+  clearTimeout(diceAnimationTimer);rollingTeam=-1;
   colorPicker.hidden=true;
   message = "";
   lastDice.fill(1);
@@ -247,20 +249,23 @@ function playDiceSound(value) {
 }
 function throwDie() {
   const player=state.turn;
-  if(state.roll || state.winner!==null || locked) return;
+  if(state.roll || state.winner!==null || locked || rollingTeam>=0) return;
   started=true;
   const rolled=1+Math.floor(Math.random()*6);
-  if(soundEnabled) playDiceSound(rolled);
   const teamId=activeTeams[player];
-  lastDice[teamId]=rolled;
-  const face=dice[teamId];
-  state=rollLudo(state,rolled);
-  message=state.threeSixes?`${getColor(player)[0]} rolled three sixes. Turn passed.`:`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
+  rollingTeam=teamId;
+  message=`${getColor(player)[0]} is rolling…`;
   render();
-  const rollingFace=dice[teamId];
-  rollingFace.classList.remove("rolling");
-  requestAnimationFrame(()=>rollingFace.classList.add("rolling"));
-  setTimeout(()=>rollingFace.classList.remove("rolling"),620);
+  clearTimeout(diceAnimationTimer);
+  diceAnimationTimer=setTimeout(()=>{
+    if(rollingTeam!==teamId)return;
+    lastDice[teamId]=rolled;
+    if(soundEnabled)playDiceSound(rolled);
+    state=rollLudo(state,rolled);
+    message=state.threeSixes?`${getColor(player)[0]} rolled three sixes. Turn passed.`:`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
+    rollingTeam=-1;
+    render();
+  },DICE_ROLL_DURATION);
 }
 
 const tokenControls=Array.from({length:4},(_,player)=>Array.from({length:4},(_,index)=>{
@@ -278,20 +283,20 @@ async function play(index) {
   started=true;
   message="";
   const move=result.lastMove;
-  const delay=Number(document.querySelector("#settings-animation-speed").value)||145;
+  const delay=Number(document.querySelector("#settings-animation-speed").value)||320;
   const moving=[];
   pendingCaptureSteps=new Map(result.lastCaptured.map(hit=>[`${hit.player}-${hit.token}`,hit.step]));
   if(move) {
     const steps=movementSteps(move.from,move.to);
-    for(const step of steps) moving.push({player:move.player,token:move.token,step});
+    for(const step of steps) moving.push({player:move.player,token:move.token,step,captured:false});
   }
   for(const hit of result.lastCaptured) {
-    for(const step of captureReturnSteps(hit.step)) moving.push({player:hit.player,token:hit.token,step});
+    for(const step of captureReturnSteps(hit.step)) moving.push({player:hit.player,token:hit.token,step,captured:true});
   }
   for(const motion of moving) {
     animationToken=motion;
     render();
-    await new Promise(resolve=>setTimeout(resolve,delay));
+    await new Promise(resolve=>setTimeout(resolve,motion.captured?delay/2:delay));
     if(motion.step===-1)pendingCaptureSteps.delete(`${motion.player}-${motion.token}`);
   }
   animationToken=null;
@@ -331,8 +336,9 @@ function render() {
     const active=enabled && activeTeams[state.turn]===teamId && state.winner===null;
     button.closest(".player-dice").classList.toggle("active",active);
     button.closest(".player-dice").classList.toggle("inactive-seat",!enabled);
-    button.disabled=!active||botTurn||locked||state.roll>0;
     button.className=`die-face pip-face pip-${lastDice[teamId]}`;
+    if(rollingTeam===teamId)button.classList.add("rolling");
+    button.disabled=!active||botTurn||locked||state.roll>0||rollingTeam>=0;
     button.replaceChildren(...diePips[lastDice[teamId]].map((position,index)=>{const pip=document.createElement("i");pip.className="die-pip p"+position;return pip;}));
     button.setAttribute("aria-label",`${teams[teamId]} die: ${lastDice[teamId]}${active?", current turn":""}`);
   });
@@ -342,7 +348,7 @@ function render() {
     const label=`${getColor(player)[0]} token ${index+1}`;
     const button=tokenControls[teamId][index];
     button.hidden=true;
-    button.disabled=botTurn||locked||!legal.includes(index);
+    button.disabled=botTurn||locked||rollingTeam>=0||!legal.includes(index);
     button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===57?"home":"step "+(step+1)}`);
     const tokenKey=`${player}-${index}`;
     const visualStep=animationToken?.player===player&&animationToken?.token===index ? animationToken.step : pendingCaptureSteps.has(tokenKey)?pendingCaptureSteps.get(tokenKey):step;
@@ -353,9 +359,14 @@ function render() {
     marker.style.setProperty("--piece-color",getColor(player)[1]);
     marker.textContent=String(index+1);
     marker.dataset.token=`${teamId}-${index}`;
-    if(animationToken?.player===player&&animationToken?.token===index)marker.classList.add("moving");
+    if(animationToken?.player===player&&animationToken?.token===index){
+      marker.classList.add("moving");
+      if(animationToken.captured)marker.classList.add("captured-return");
+      const baseDelay=Number(document.querySelector("#settings-animation-speed").value)||320;
+      marker.style.setProperty("--pawn-motion-duration",`${animationToken.captured?baseDelay/2:baseDelay}ms`);
+    }
     marker.dataset.step=String(visualStep);
-    if(player===state.turn && !botTurn && legal.includes(index)) {
+    if(player===state.turn && !botTurn && rollingTeam<0 && legal.includes(index)) {
       marker.setAttribute("role","button");
       marker.setAttribute("tabindex","0");
       marker.setAttribute("aria-label",`Move ${label}`);
@@ -380,9 +391,9 @@ function render() {
   game.status.dataset.turn=teams[activeTeams[state.turn]].toLowerCase();
   game.status.textContent=message+(state.winner!==null?`${getColor(state.winner)[0]} wins!`
     :botTurn?`${currentTeam} bot is playing…`:`${currentTeam}: ${state.roll?"choose a token.":"roll the die."}`);
-  if(!locked && state.winner===null && state.roll>0 && legal.length===1) {
+  if(!locked && rollingTeam<0 && state.winner===null && state.roll>0 && legal.length===1) {
     game.later(()=>play(legal[0]), 420);
-  } else if(!locked && botTurn) {
+  } else if(!locked && rollingTeam<0 && botTurn) {
     game.later(()=>state.roll?play(choose(legal)):throwDie());
   }
 }

@@ -1322,3 +1322,9 @@ body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-firewor
  body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1::after,
  body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 .winner-firework::after{animation:none!important}
 }
+
+/* A scored pawn stays still even on the exact frame it reaches the center. */
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.finished-pawn,
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn.finished-pawn.moving{
+  animation:none!important;translate:0 0!important;scale:1!important;pointer-events:none!important
+}

@@ -27,15 +27,26 @@
       welcome.classList.remove("is-exiting", "hidden");
       welcome.setAttribute("aria-hidden", "false");
     }
+    function scrollChatToLatest(force = true) {
+      const pin = () => { chat.scrollTop = chat.scrollHeight; };
+      const distance = chat.scrollHeight - chat.clientHeight - chat.scrollTop;
+      if (!force && distance > 120) return;
+      pin();
+      requestAnimationFrame(pin);
+    }
     function dismissWelcome() {
       if (welcome.classList.contains("hidden") || welcome.classList.contains("is-exiting")) return;
       welcome.setAttribute("aria-hidden", "true");
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         welcome.classList.add("hidden");
+        scrollChatToLatest();
         return;
       }
       welcome.classList.add("is-exiting");
-      welcomeHideTimer = window.setTimeout(() => welcome.classList.add("hidden"), 400);
+      welcomeHideTimer = window.setTimeout(() => {
+        welcome.classList.add("hidden");
+        scrollChatToLatest();
+      }, 400);
     }
     const languageSelect = document.getElementById("languageSelect");
     const signupBtn = document.getElementById("signupBtn");
@@ -874,7 +885,7 @@
       }
 
       chat.appendChild(bubble);
-      chat.scrollTo({ top: chat.scrollHeight, behavior: restoringChat ? "auto" : "smooth" });
+      scrollChatToLatest();
       if (["user", "ai"].includes(kind) && !restoringChat) dismissWelcome();
 
       if (!restoringChat && ["user", "ai"].includes(kind)) {
@@ -1284,7 +1295,7 @@
                       const visibleAnswer = streamedText.slice(0, streamVisible);
                       streamedBody.textContent = visibleAnswer;
                       if (hasBengaliScript(visibleAnswer)) streamedBubble.classList.add("bengali");
-                      chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+                      scrollChatToLatest(false);
                     }
                   }, 18);
                 }
@@ -1327,7 +1338,7 @@
           bodyNode.textContent = "";
           bodyNode.classList.add("typing-cursor");
           const target = String(data.answer); let offset = 0; const step = Math.max(1, Math.ceil(target.length / 160));
-          const typeNext = () => { offset = Math.min(target.length, offset + step); const visibleAnswer = target.slice(0, offset); bodyNode.textContent = visibleAnswer; if (hasBengaliScript(visibleAnswer)) answer.classList.add("bengali"); if (offset < target.length) { chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }); setTimeout(typeNext, 12); } else { bodyNode.classList.remove("typing-cursor"); renderAnswerContent(bodyNode, target); } };
+          const typeNext = () => { offset = Math.min(target.length, offset + step); const visibleAnswer = target.slice(0, offset); bodyNode.textContent = visibleAnswer; if (hasBengaliScript(visibleAnswer)) answer.classList.add("bengali"); if (offset < target.length) { scrollChatToLatest(false); setTimeout(typeNext, 12); } else { bodyNode.classList.remove("typing-cursor"); renderAnswerContent(bodyNode, target); scrollChatToLatest(false); } };
           typeNext();
         }
 

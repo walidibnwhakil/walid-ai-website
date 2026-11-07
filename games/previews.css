@@ -84,7 +84,6 @@ main { max-width: 1050px; }
 .games li:nth-child(2) .tile {background:linear-gradient(145deg,#432015,#1d110e);border:2px solid #d9a63b;border-radius:20px;color:#fff0d0;box-shadow:0 5px 0 #22100a,0 12px 24px #29150d55}
 .games li:nth-child(2) .tile h2 {color:#ffe17b;font:700 1.45rem Georgia,serif;text-shadow:0 2px #49200b}
 .games li:nth-child(2) .tile p {color:#f4dfc3}
-.games li:nth-child(2) .tile>strong {display:block;width:max-content;margin:12px auto 0;padding:9px 28px;border:2px solid #fff0a3;border-radius:999px;color:#442009;background:linear-gradient(#ffe875,#f5a91c);box-shadow:0 3px 0 #8a460c;font:700 1rem Georgia,serif}
 .ludo-preview {height:auto;aspect-ratio:1/1;padding:0;display:block;overflow:hidden;border:0;border-radius:15px;background:#2b1208;box-shadow:none;isolation:auto}
 .ludo-preview::before {display:none}
 .ludo-preview-image {display:block;width:100%;height:100%;object-fit:fill;border-radius:inherit}

@@ -421,7 +421,7 @@ function render() {
           finishSlots.set(key,slot);used.add(slot);
         }
         const slot=finishSlots.get(key);
-        const arrivingAtFinish=animationToken?.player===Number(key.split("-")[0])&&animationToken?.token===Number(key.split("-")[1])&&animationToken.step===57;
+        const arrivingAtFinish=animationToken&&piece.dataset.token===`${activeTeams[animationToken.player]}-${animationToken.token}`&&animationToken.step===57;
         if(!arrivingAtFinish)piece.classList.add("finished-pawn");
         if(slot>0){
           const offsets=[[-34,-28],[34,-28],[-34,28],[34,28],[0,-46],[0,46],[-46,0],[46,0],[-22,-52],[22,-52],[-22,52],[22,52],[-52,-22],[52,-22],[-52,22],[52,22]];

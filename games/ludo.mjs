@@ -1,5 +1,5 @@
 import {gameShell, control, choose} from "./shell.mjs";
-import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs";
+import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs?v=20261107goal56";
 
 const teams = ["Red", "Blue", "Green", "Yellow"];
 const setupScreen=document.querySelector("#ludo-setup");
@@ -194,7 +194,7 @@ track.forEach(([row,column],index) => {
   addSquare(row,column,kind);
 });
 for (let player=0;player<4;player++) {
-  lanes[player].forEach(([row,column],index)=>addSquare(row,column,`lane ${teams[player].toLowerCase()} lane-${player} lane-step-${index}`));
+  lanes[player].forEach(([row,column],index)=>addSquare(row,column,`lane ${teams[player].toLowerCase()} lane-${player} lane-step-${index}${index===5?" final-square":""}`));
   yards[player].forEach(([row,column])=>addSquare(row,column,`yard yard-seat-${player} ${teams[player].toLowerCase()}`));
 }
 addSquare(7,7,"home-center");
@@ -290,7 +290,7 @@ async function play(index) {
   state=result;
   started=true;
   const move=result.lastMove;
-  const finishedCount=move?.to===57?result.pieces[move.player].filter(position=>position===57).length:0;
+  const finishedCount=move?.to===56?result.pieces[move.player].filter(position=>position===56).length:0;
   message="";
   const delay=Number(document.querySelector("#settings-animation-speed").value)||320;
   const moving=[];
@@ -334,11 +334,14 @@ function render() {
     const base=game.board.querySelector(`.base-${seat}`);
     const player=activeTeams.indexOf(seat);
     base.classList.toggle("inactive-home",!enabled);
-    base.classList.toggle("has-finished-pawn",player>=0&&state.pieces[player].some((step,index)=>step===57&&!(animationToken?.player===player&&animationToken?.token===index&&animationToken.step!==57)));
+    base.classList.toggle("has-finished-pawn",player>=0&&state.pieces[player].some((step,index)=>step===56&&!(animationToken?.player===player&&animationToken?.token===index&&animationToken.step!==56)));
     game.board.querySelectorAll(`.yard-seat-${seat}`).forEach(tile=>tile.classList.toggle("inactive-yard",!enabled));
     game.board.querySelectorAll(`.lane-${seat}`).forEach(tile=>tile.classList.toggle("inactive-lane",!enabled));
   }
-  game.board.querySelector(".home-center")?.classList.toggle("has-finished",state.pieces.some((team,player)=>team.some((step,index)=>step===57&&!(animationToken?.player===player&&animationToken?.token===index&&animationToken.step!==57))));
+  for(let seat=0;seat<4;seat++){
+    const player=activeTeams.indexOf(seat);
+    game.board.querySelector(`.lane-${seat}.final-square`)?.classList.toggle("has-finished",player>=0&&state.pieces[player].some((step,index)=>step===56&&!(animationToken?.player===player&&animationToken?.token===index&&animationToken.step!==56)));
+  }
   updatePlayerColorPickers();
   dice.forEach((button,teamId)=>{
     const seat=activeTeams.indexOf(teamId);
@@ -370,10 +373,10 @@ function render() {
     const button=tokenControls[teamId][index];
     button.hidden=true;
     button.disabled=botTurn||locked||rollingTeam>=0||!legal.includes(index);
-    button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===57?"home":"step "+(step+1)}`);
+    button.setAttribute("aria-label",`${label}, ${step===-1?"in yard":step===56?"home":"step "+(step+1)}`);
     const tokenKey=`${player}-${index}`;
     const visualStep=animationToken?.player===player&&animationToken?.token===index ? animationToken.step : pendingCaptureSteps.has(tokenKey)?pendingCaptureSteps.get(tokenKey):step;
-    const tile=visualStep===-1 ? yards[teamId][index] : visualStep===57 ? [7,7] : visualStep>=51 ? lanes[teamId][visualStep-51] : track[trackPosition(teamId,visualStep)];
+    const tile=visualStep===-1 ? yards[teamId][index] : visualStep>=51 ? lanes[teamId][visualStep-51] : track[trackPosition(teamId,visualStep)];
     const square=squares.get(tile.join(","));
     const marker=document.createElement("span");
     marker.className="ludo-pawn "+teams[teamId].toLowerCase();
@@ -388,7 +391,7 @@ function render() {
     marker.style.setProperty("--pawn-order",String(index));
     // Only pieces that can legally use this exact result should lift: a six
     // includes yard pieces, while an overshoot at the home lane stays still.
-    if(step!==57&&!locked&&rollingTeam<0&&state.roll>0&&player===state.turn&&legal.includes(index))marker.classList.add("pawn-ready-hint");
+    if(step!==56&&!locked&&rollingTeam<0&&state.roll>0&&player===state.turn&&legal.includes(index))marker.classList.add("pawn-ready-hint");
     if(animationToken?.player===player&&animationToken?.token===index){
       marker.classList.add("moving");
       if(animationToken.captured)marker.classList.add("captured-return");
@@ -396,8 +399,8 @@ function render() {
       marker.style.setProperty("--pawn-motion-duration",`${animationToken.captured?baseDelay/4:baseDelay}ms`);
     }
     marker.dataset.step=String(visualStep);
-    const arrivingAtFinish=animationToken?.player===player&&animationToken?.token===index&&animationToken.step===57;
-    if(step===57&&visualStep===57&&!arrivingAtFinish)marker.classList.add("finished-pawn");
+    const arrivingAtFinish=animationToken?.player===player&&animationToken?.token===index&&animationToken.step===56;
+    if(step===56&&visualStep===56&&!arrivingAtFinish)marker.classList.add("finished-pawn");
     if(player===state.turn && !botTurn && rollingTeam<0 && legal.includes(index)) {
       marker.removeAttribute("aria-hidden");
       marker.setAttribute("role","button");
@@ -411,7 +414,7 @@ function render() {
   }));
   for(const square of squares.values()){
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
-    if(square.classList.contains("home-center")){
+    if(square.classList.contains("final-square")){
       const used=new Set(finishSlots.values());
       const count=pile.length;
       const columns=count<=4?2:count<=9?3:4;
@@ -427,7 +430,7 @@ function render() {
           finishSlots.set(key,slot);used.add(slot);
         }
         const slot=finishSlots.get(key);
-        const arrivingAtFinish=animationToken&&piece.dataset.token===`${activeTeams[animationToken.player]}-${animationToken.token}`&&animationToken.step===57;
+        const arrivingAtFinish=animationToken&&piece.dataset.token===`${activeTeams[animationToken.player]}-${animationToken.token}`&&animationToken.step===56;
         if(!arrivingAtFinish)piece.classList.add("finished-pawn");
         if(count>1){
           const row=Math.floor(slot/columns);

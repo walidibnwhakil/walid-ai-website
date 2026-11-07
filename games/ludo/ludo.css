@@ -1191,10 +1191,11 @@ body.ludo-game.playing-ludo .board.ludo .playable-token{outline:none!important;a
 @keyframes ludu-pawn-hop{0%,100%{transform:translateY(0)}42%{transform:translateY(-1px)}72%{transform:translateY(0)}}
 
 /* Pin pawns use the same footprint in yards and on the track, centered in each square. */
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn{
+body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn.pin-pawn{
   position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
   transform:none!important;border:0!important;border-radius:0!important;background:transparent!important;
-  background-image:none!important;box-shadow:none!important;filter:none!important;overflow:visible!important
+  background-image:none!important;background-position:0 0!important;background-size:auto!important;
+  box-shadow:none!important;filter:none!important;overflow:visible!important
 }
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn::after{display:none!important}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-pawn-art{

@@ -122,9 +122,20 @@ const dice = teams.map((team,teamId)=>{
   return button;
 });
 const diePips=[[],[2],[0,4],[0,2,4],[0,1,3,4],[0,1,2,3,4],[0,1,3,4,5,6]];
+const dieSides=[["front",1],["right",2],["top",3],["bottom",4],["left",5],["back",6]];
+function makeDieCube(){
+  const cube=document.createElement("span");cube.className="die-cube";cube.setAttribute("aria-hidden","true");
+  for(const [face,value] of dieSides){
+    const side=document.createElement("span");side.className=`die-side side-${face}`;side.dataset.value=String(value);
+    const pips=document.createElement("span");pips.className="die-side-pips";
+    for(const position of diePips[value]){const pip=document.createElement("i");pip.className=`die-pip p${position}`;pips.append(pip);}
+    side.append(pips);cube.append(side);
+  }
+  return cube;
+}
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), rollingTeam=-1, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
-const DICE_ROLL_DURATION=1400;
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
+const DICE_ROLL_DURATION=950;
 syncSoundControls();
 const initialColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<12)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:[0,1,2,3];
 let chosenColors=[...initialColors];
@@ -163,7 +174,7 @@ const game = gameShell({reset() {
   applySeatColors();
   started=false;
   locked=false; animationToken=null; pendingCaptureSteps.clear();
-  clearTimeout(diceAnimationTimer);rollingTeam=-1;
+  clearTimeout(diceAnimationTimer);rollingTeam=-1;rollingValue=0;
   colorPicker.hidden=true;
   message = "";
   lastDice.fill(1);
@@ -253,7 +264,7 @@ function throwDie() {
   started=true;
   const rolled=1+Math.floor(Math.random()*6);
   const teamId=activeTeams[player];
-  rollingTeam=teamId;
+  rollingTeam=teamId;rollingValue=rolled;
   message=`${getColor(player)[0]} is rolling…`;
   render();
   clearTimeout(diceAnimationTimer);
@@ -263,7 +274,7 @@ function throwDie() {
     if(soundEnabled)playDiceSound(rolled);
     state=rollLudo(state,rolled);
     message=state.threeSixes?`${getColor(player)[0]} rolled three sixes. Turn passed.`:`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
-    rollingTeam=-1;
+    rollingTeam=-1;rollingValue=0;
     render();
   },DICE_ROLL_DURATION);
 }
@@ -337,10 +348,10 @@ function render() {
     button.closest(".player-dice").classList.toggle("active",active);
     button.closest(".player-dice").classList.toggle("inactive-seat",!enabled);
     button.className=`die-face pip-face pip-${lastDice[teamId]}`;
-    if(rollingTeam===teamId)button.classList.add("rolling");
+    if(rollingTeam===teamId){button.classList.add("rolling",`roll-to-${rollingValue}`);}
     button.disabled=!active||botTurn||locked||state.roll>0||rollingTeam>=0;
-    button.replaceChildren(...diePips[lastDice[teamId]].map((position,index)=>{const pip=document.createElement("i");pip.className="die-pip p"+position;return pip;}));
-    button.setAttribute("aria-label",`${teams[teamId]} die: ${lastDice[teamId]}${active?", current turn":""}`);
+    button.replaceChildren(makeDieCube());
+    button.setAttribute("aria-label",rollingTeam===teamId?`${teams[teamId]} die rolling`:`${teams[teamId]} die: ${lastDice[teamId]}${active?", current turn":""}`);
   });
   for(const tile of squares.values()) tile.replaceChildren();
   state.pieces.forEach((team,player)=>team.forEach((step,index)=>{
@@ -355,9 +366,10 @@ function render() {
     const tile=visualStep===-1 ? yards[teamId][index] : visualStep===57 ? [7,7] : visualStep>=51 ? lanes[teamId][visualStep-51] : track[trackPosition(teamId,visualStep)];
     const square=squares.get(tile.join(","));
     const marker=document.createElement("span");
-    marker.className=teams[teamId].toLowerCase();
+    marker.className="ludo-pawn "+teams[teamId].toLowerCase();
     marker.style.setProperty("--piece-color",getColor(player)[1]);
-    marker.textContent=String(index+1);
+    marker.setAttribute("aria-hidden","true");
+    marker.replaceChildren(...["pawn-body","pawn-base","pawn-head"].map(name=>{const part=document.createElement("i");part.className=name;return part;}));
     marker.dataset.token=`${teamId}-${index}`;
     if(animationToken?.player===player&&animationToken?.token===index){
       marker.classList.add("moving");
@@ -367,6 +379,7 @@ function render() {
     }
     marker.dataset.step=String(visualStep);
     if(player===state.turn && !botTurn && rollingTeam<0 && legal.includes(index)) {
+      marker.removeAttribute("aria-hidden");
       marker.setAttribute("role","button");
       marker.setAttribute("tabindex","0");
       marker.setAttribute("aria-label",`Move ${label}`);

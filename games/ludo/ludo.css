@@ -1384,3 +1384,9 @@ body.ludo-game.playing-ludo #board.board.ludo .home-base.has-finished-pawn::afte
 @media(prefers-reduced-motion:reduce){
   body.ludo-game.playing-ludo #board.board.ludo .home-base.has-finished-pawn::after{animation:none!important;opacity:1!important}
 }
+
+
+/* Solo pawns keep the prominent size; only occupied stacks use miniatures. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn:not(.stacked-pawn) .pin-pawn-art{
+  width:110%!important;height:108%!important
+}

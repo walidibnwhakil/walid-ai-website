@@ -352,7 +352,7 @@ function throwDie() {
   diceAnimationTimer=setTimeout(()=>{
     if(rollingTeam!==teamId)return;
     lastDice[teamId]=rolled;
-    if(soundEnabled)playDiceSound(rolled);
+
     state=rollLudo(state,rolled);
     message=`${getColor(player)[0]} rolled ${rolled}.${state.roll?"":" No legal move."} `;
     rollingTeam=-1;rollingValue=0;

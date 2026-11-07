@@ -196,7 +196,10 @@ function applySeatColors() {
     const paletteId=player<0?teamId:chosenColors[player];
     const [name,hex]=palette[paletteId];
     board.style.setProperty(`--seat-${teamId}`,hex);
-    game.board.querySelector(`.base-${teamId}`)?.style.setProperty("--yard-color",hex);
+    const yard=game.board.querySelector(`.base-${teamId}`);
+    yard?.style.setProperty("--yard-color",hex);
+    yard?.classList.toggle("custom-color",paletteId!==teamId);
+    game.board.querySelectorAll(`.lane-${teamId}`).forEach(lane=>lane.classList.toggle("custom-color",paletteId!==teamId));
     const dicePanel=dice[teamId].closest(".player-dice");
     dicePanel.style.setProperty("--seat-color",hex);
     dicePanel.style.setProperty("--custom-seat-color",hex);

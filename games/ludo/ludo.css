@@ -1085,3 +1085,31 @@ body.ludo-game.playing-ludo .yard-celebration.rank-2{animation:yard-celebrate 2s
 body.ludo-game.playing-ludo .yard-celebration.rank-3{animation:yard-celebrate 2.7s ease-in-out infinite alternate;opacity:.95}
 body.ludo-game.playing-ludo .yard-celebration.rank-4{animation:none;opacity:.9}
 @media(max-width:620px){body.ludo-game.playing-ludo .yard-color-trigger{width:22px;height:22px}body.ludo-game.playing-ludo .yard-color-swatches{grid-template-columns:repeat(4,16px);gap:4px;padding:6px;right:27px}body.ludo-game.playing-ludo .yard-color-swatch{width:16px;height:16px;min-height:16px}}
+
+/* 3D board plate artwork from the approved reference; live grid and pawns stay interactive. */
+body.ludo-game.playing-ludo .board.ludo{
+  box-sizing:border-box;width:min(100%,min(83vh,900px));aspect-ratio:1;margin:0 auto;
+  padding:4%;gap:0;border:0;border-radius:0;overflow:visible;
+  background:#30170c url("./ludo-board-art.webp") center/100% 100% no-repeat;
+  box-shadow:none;isolation:isolate
+}
+body.ludo-game.playing-ludo .board.ludo>div:not(.home-base):not(.home-diamond):not(.yard-celebration){
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible
+}
+body.ludo-game.playing-ludo .board.ludo .safe::before{display:none!important}
+body.ludo-game.playing-ludo .board.ludo .home-base{overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+body.ludo-game.playing-ludo .board.ludo .home-base::after{display:none!important}
+body.ludo-game.playing-ludo .board.ludo .home-base::before{content:"";position:absolute;inset:12%;z-index:0;border-radius:18%;background:var(--yard-color);opacity:0;pointer-events:none}
+body.ludo-game.playing-ludo .board.ludo .home-base.custom-color::before{opacity:.36}
+body.ludo-game.playing-ludo .board.ludo .home-diamond{border:0!important;background:transparent!important;box-shadow:none!important}
+body.ludo-game.playing-ludo .board.ludo .lane::before{content:"";position:absolute;inset:0;z-index:0;background:var(--lane-tint);opacity:0;pointer-events:none}
+body.ludo-game.playing-ludo .board.ludo .lane.custom-color::before{opacity:.30}
+body.ludo-game.playing-ludo .board.ludo .lane-0{--lane-tint:var(--seat-0)}
+body.ludo-game.playing-ludo .board.ludo .lane-1{--lane-tint:var(--seat-1)}
+body.ludo-game.playing-ludo .board.ludo .lane-2{--lane-tint:var(--seat-2)}
+body.ludo-game.playing-ludo .board.ludo .lane-3{--lane-tint:var(--seat-3)}
+body.ludo-game.playing-ludo .board.ludo .yard{z-index:1}
+body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.sprite-pawn{inset:-35% -37.5%!important;width:175%!important;height:170%!important}
+body.ludo-game.playing-ludo .board.ludo .home-base.inactive-home{background:transparent!important;border-color:transparent!important}
+body.ludo-game.playing-ludo .board.ludo .lane.inactive-lane{background:transparent!important}
+@media(max-width:620px){body.ludo-game.playing-ludo .board.ludo{padding:4%;border:0!important;border-radius:0!important;width:min(100%,min(83vh,100vw))}}

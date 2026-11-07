@@ -1057,9 +1057,7 @@ body.ludo-game .board.ludo span.ludo-pawn:not(.sprite-pawn){filter:none!importan
 body.ludo-game .board.ludo span.ludo-pawn:not(.sprite-pawn) .pawn-base{border-color:color-mix(in srgb,var(--piece-color) 62%,white);background:linear-gradient(180deg,color-mix(in srgb,var(--piece-color) 78%,white),var(--piece-color) 42%,color-mix(in srgb,var(--piece-color) 56%,#100805));box-shadow:inset 0 2px 2px #fff8,0 2px 2px #18080366}
 body.ludo-game .board.ludo span.ludo-pawn:not(.sprite-pawn) .pawn-head{border:0}
 
-/* During a roll, gently lift usable pawns so players can spot their pieces.
-   Finished pawns never receive these classes and stay completely still. */
-body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.pawn-presence-hint,
+/* After the die settles, only legal pawns lift. Finished and blocked pieces stay still. */
 body.ludo-game.playing-ludo .board.ludo span.ludo-pawn.pawn-ready-hint{animation:pawn-location-hint 620ms ease-in-out infinite;animation-delay:calc(var(--pawn-order,0)*85ms);transform-origin:50% 100%}
 @keyframes pawn-location-hint{0%,100%{translate:0 0}50%{translate:0 -2px}}
 
@@ -1130,5 +1128,4 @@ body.ludo-game.playing-ludo #dice-yellow .player-color-picker{right:0;bottom:cal
 body.ludo-game.playing-ludo .player-color-swatch{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;min-height:30px;padding:3px;border:2px solid #fff9;border-radius:50%;background:var(--swatch);box-shadow:inset 0 2px 3px #fff8,0 1px 2px #080300;cursor:pointer;touch-action:manipulation}
 body.ludo-game.playing-ludo .player-color-swatch.selected{outline:2px solid #ffea88;outline-offset:1px}
 body.ludo-game.playing-ludo .player-color-swatch:disabled{opacity:.24;filter:grayscale(1);cursor:default}
-body.ludo-game.playing-ludo span.ludo-pawn.custom-pawn-color{filter:hue-rotate(var(--pawn-hue,0deg)) saturate(1.12)!important}
-@media(max-width:620px){body.ludo-game.playing-ludo .player-color-picker{gap:3px;padding:5px}body.ludo-game.playing-ludo .player-color-swatch{flex-basis:27px;width:27px;height:27px;min-height:27px;padding:2px}}
+@media(max-width:620px){body.ludo-game.playing-ludo .player-color-picker{gap:3px;padding:5px}body.ludo-game.playing-ludo .player-color-swatch{flex-basis:31px;width:31px;height:31px;min-height:31px;padding:2px}}

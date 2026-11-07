@@ -68,8 +68,7 @@ document.querySelector("#full-screen").addEventListener("click",()=>{
   else playScreen.requestFullscreen?.().catch(()=>{});
 });
 const palette = [
-  ["Red","#e83e4e"],["Blue","#2588e8"],["Green","#27bf70"],["Yellow","#f2be30"],
-  ["Purple","#9b59e8"],["Orange","#f17d2b"],["Pink","#f06eb2"],["Teal","#18b6b4"]
+  ["Red","#e83e4e"],["Blue","#2588e8"],["Green","#27bf70"],["Yellow","#f2be30"]
 ];
 const starts = [[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const lanes = [
@@ -130,12 +129,6 @@ let chosenColors=[...initialColors];
 const getColor=seat=>palette[chosenColors[seat]];
 function saveColorChoices(){
   sessionStorage.setItem("ludu-mahir-game",JSON.stringify({players:String(activeTeams.length),mode:modeSelect.value,colors:chosenColors,sound:soundEnabled}));
-}
-function hueForHex(hex){
-  const [r,g,b]=hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
-  if(!d)return 0;
-  let hue=max===r?((g-b)/d)%6:max===g?(b-r)/d+2:(r-g)/d+4;
-  return Math.round((hue*60+360)%360);
 }
 const playerColorPickers=teams.map((_,teamId)=>{
   const container=dice[teamId].closest(".player-dice"),picker=document.createElement("div");
@@ -368,11 +361,11 @@ function render() {
     marker.dataset.color=String(pawnColor);
     marker.setAttribute("aria-hidden","true");
     marker.classList.add("sprite-pawn");
-    if(pawnColor<4) marker.dataset.color=String(pawnColor);
-    else {marker.dataset.color="0";marker.classList.add("custom-pawn-color");marker.style.setProperty("--pawn-hue",`${hueForHex(getColor(player)[1])-hueForHex("#e83e4e")}deg`);}
     marker.dataset.token=`${teamId}-${index}`;
     marker.style.setProperty("--pawn-order",String(index));
-    if(step!==57&&!locked&&(rollingTeam===teamId||(state.roll>0&&player===state.turn&&legal.includes(index))))marker.classList.add(rollingTeam===teamId?"pawn-presence-hint":"pawn-ready-hint");
+    // Only pieces that can legally use this exact result should lift: a six
+    // includes yard pieces, while an overshoot at the home lane stays still.
+    if(step!==57&&!locked&&rollingTeam<0&&state.roll>0&&player===state.turn&&legal.includes(index))marker.classList.add("pawn-ready-hint");
     if(animationToken?.player===player&&animationToken?.token===index){
       marker.classList.add("moving");
       if(animationToken.captured)marker.classList.add("captured-return");

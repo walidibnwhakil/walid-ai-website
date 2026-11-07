@@ -411,7 +411,7 @@ function render() {
       piece.classList.add("stacked-pawn",pile.length>4?"pile-size-dense":`pile-size-${pile.length}`);
       piece.style.setProperty("--pile-x",`${x}%`);
       piece.style.setProperty("--pile-y",`${y}%`);
-      piece.style.zIndex=String(20+index);
+      piece.style.zIndex=piece.classList.contains("playable-token")?"80":String(20+index);
     });
   }
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());

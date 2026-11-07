@@ -1328,3 +1328,17 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn.finished-pawn,
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn.finished-pawn.moving{
   animation:none!important;translate:0 0!important;scale:1!important;pointer-events:none!important
 }
+
+
+/* Keep the whole pin inside its board square instead of hanging above it. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn .pin-pawn-art{
+  left:calc(50% + var(--pile-x,0%))!important;top:calc(50% + var(--pile-y,0%))!important;
+  width:100%!important;height:100%!important;transform:translate(-50%,-50%)!important;overflow:visible
+}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2 .pin-pawn-art{width:44%!important;height:54%!important}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-3 .pin-pawn-art,
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-4 .pin-pawn-art{width:40%!important;height:46%!important}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-dense .pin-pawn-art{width:27%!important;height:34%!important}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-4 .pin-pawn-art{width:40%!important;height:46%!important}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-9 .pin-pawn-art{width:29%!important;height:33%!important}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-16 .pin-pawn-art{width:21%!important;height:24%!important}

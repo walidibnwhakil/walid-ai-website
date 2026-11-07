@@ -1342,3 +1342,10 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-dense .pin
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-4 .pin-pawn-art{width:40%!important;height:46%!important}
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-9 .pin-pawn-art{width:29%!important;height:33%!important}
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-16 .pin-pawn-art{width:21%!important;height:24%!important}
+
+
+/* Two pawns share a square side by side at a readable size. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2 .pin-pawn-art,
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-finished-2 .pin-pawn-art{
+  width:60%!important;height:72%!important
+}

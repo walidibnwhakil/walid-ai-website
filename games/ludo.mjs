@@ -121,7 +121,7 @@ function makeDieCube(){
   return cube;
 }
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), scoreLightTimers=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
 const DICE_ROLL_DURATION=950;
 syncSoundControls();
 const defaultColors=String(restoredConfig?.players)==="2"?[0,3,2,1]:[0,1,2,3];
@@ -165,6 +165,8 @@ const game = gameShell({reset() {
   applySeatColors();
   started=false;
   locked=false; animationToken=null; pendingCaptureSteps.clear(); finishSlots.clear();
+  for(const timer of scoreLightTimers.values())clearTimeout(timer);
+  scoreLightTimers.clear();
   clearTimeout(diceAnimationTimer);rollingTeam=-1;rollingValue=0;
   playerColorPickers.forEach(picker=>picker.hidden=true);
   playerLabels.forEach(label=>label.setAttribute("aria-expanded","false"));
@@ -323,7 +325,17 @@ async function play(index) {
   animationToken=null;
   pendingCaptureSteps.clear();
   locked=false;
-  if(finishedCount)message=`${getColor(move.player)[0]} pawn reached the final home (${finishedCount}/4). `;
+  if(finishedCount){
+    message=`${getColor(move.player)[0]} pawn reached the final square (${finishedCount}/4). `;
+    const teamId=activeTeams[move.player];
+    const home=game.board.querySelector(`.base-${teamId}`);
+    if(scoreLightTimers.has(teamId))clearTimeout(scoreLightTimers.get(teamId));
+    home.classList.remove("score-flash");
+    void home.offsetWidth;
+    home.classList.add("score-flash");
+    const timer=setTimeout(()=>{home.classList.remove("score-flash");scoreLightTimers.delete(teamId);},3500);
+    scoreLightTimers.set(teamId,timer);
+  }
   render();
 }
 function render() {

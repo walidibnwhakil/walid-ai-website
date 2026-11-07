@@ -1400,3 +1400,6 @@ body.ludo-game.playing-ludo #ludo-play #status:empty{display:none!important}
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn:not(.yard-pawn) .pin-pawn-art{
   top:calc(50% + var(--pile-y,0%) - 6%)!important
 }
+
+/* Keep turn and roll feedback out of the layout so the board never shifts. */
+body.ludo-game.playing-ludo #ludo-play #status{display:none!important}

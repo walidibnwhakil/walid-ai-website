@@ -1202,7 +1202,7 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-pawn-art{
   transform:translate(-50%,-91.25%);filter:none
 }
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-shadow{fill:#12202f}
-body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-ring{fill:color-mix(in srgb,var(--piece-color) 72%,#12202f);stroke:#26384b;stroke-width:1.5}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-ring{fill:color-mix(in srgb,var(--piece-color) 82%,#12202f);stroke:color-mix(in srgb,var(--piece-color) 42%,#26384b);stroke-width:1.5}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-top{fill:var(--piece-color);stroke:#edf5ff;stroke-width:.8}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-outline{fill:#f7fbff;stroke:#52677b;stroke-width:2.5}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-color{fill:#f5f9fc;stroke:#c8d6e4;stroke-width:1}

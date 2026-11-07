@@ -1190,20 +1190,27 @@ body.ludo-game.playing-ludo .board.ludo .playable-token{outline:none!important;a
 @keyframes mahir-ready-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes ludu-pawn-hop{0%,100%{transform:translateY(0)}42%{transform:translateY(-1px)}72%{transform:translateY(0)}}
 
-/* Path pawns remain centered and contained within their current square. */
+/* Pin pawns use the same footprint in yards and on the track, centered in each square. */
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  transform:none!important;border:0!important;border-radius:0!important;background:transparent!important;
+  background-image:none!important;box-shadow:none!important;filter:none!important;overflow:visible!important
+}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn::after{display:none!important}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-pawn-art{
+  position:absolute;left:50%;top:50%;width:86%;height:100%;overflow:visible;
+  transform:translate(-50%,-50%);filter:drop-shadow(0 2px 1px #120900aa)
+}
+body.ludo-game.playing-ludo .board.ludo span.pin-base-shadow{fill:#24170f}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-ring{fill:#462813;stroke:#f2d17d;stroke-width:3}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-top{fill:var(--piece-color);stroke:#fff5cf;stroke-width:1.5}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-outline{fill:#f7fbff;stroke:#344658;stroke-width:2.5}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-color{fill:var(--piece-color);stroke:#fff;stroke-width:1}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-face{fill:var(--piece-color);stroke:#24374c;stroke-width:2}
+body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-gloss{fill:#fff;opacity:.78}
 body.ludo-game.playing-ludo #board.board.ludo .track:has(>span.ludo-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .lane:has(>span.ludo-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .home-center:has(>span.ludo-pawn){position:relative!important;z-index:8!important;overflow:hidden!important}
-body.ludo-game.playing-ludo #board.board.ludo .track>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
-body.ludo-game.playing-ludo #board.board.ludo .lane>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
-body.ludo-game.playing-ludo #board.board.ludo .home-center>span.ludo-pawn.sprite-pawn:not(.yard-pawn){
-  inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
-  width:130%!important;height:112%!important;transform:translate(-50%,-50%)!important;z-index:9!important
-}
-body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.yard-pawn{
-  inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
-  width:165%!important;height:150%!important;transform:translate(-50%,-50%)!important;z-index:4!important
-}
 /* Keep the base-centering transform intact during subtle pawn movement. */
 @keyframes mahir-ready-bob{0%,100%{translate:0 0}50%{translate:0 -2px}}
 @keyframes ludu-pawn-hop{0%,100%{translate:0 0}42%{translate:0 -1px}72%{translate:0 0}}

@@ -96,10 +96,10 @@ const lanes = [
   Array.from({length:6},(_,i)=>[7,13-i])
 ];
 const yards = [
-  Array.from({length:4},(_,i)=>[2+(i>>1),2+i%2]),
-  Array.from({length:4},(_,i)=>[11+(i>>1),2+i%2]),
-  Array.from({length:4},(_,i)=>[2+(i>>1),11+i%2]),
-  Array.from({length:4},(_,i)=>[11+(i>>1),11+i%2])
+  Array.from({length:4},(_,i)=>[2+(i>>1)*2,2+(i%2)*2]),
+  Array.from({length:4},(_,i)=>[11+(i>>1)*2,2+(i%2)*2]),
+  Array.from({length:4},(_,i)=>[2+(i>>1)*2,11+(i%2)*2]),
+  Array.from({length:4},(_,i)=>[11+(i>>1)*2,11+(i%2)*2])
 ];
 const track = starts;
 const entrySquares=new Map([[0,0],[13,2],[26,3],[39,1]]);

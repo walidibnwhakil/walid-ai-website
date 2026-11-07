@@ -1045,3 +1045,10 @@ body.ludo-game.playing-ludo .player-dice .die-face.rolling .die-cube{animation:l
 @media(max-width:620px){body.ludo-game.playing-ludo .player-dice .die-face{--die-size:44px;padding:4px;border-radius:11px}}
 
 body.ludo-game .board.ludo span.ludo-pawn::before,body.ludo-game .board.ludo span.ludo-pawn::after{content:none!important;display:none!important}
+
+/* Approved-style glossy default pawns, kept as live animated board elements. */
+body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn{inset:-11% -22.5%!important;width:145%!important;height:122%!important;background-color:transparent!important;background-image:url("./ludo-pawns.webp")!important;background-size:400% 100%!important;background-repeat:no-repeat!important;filter:none!important}
+body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="0"]{background-position:0 50%!important}
+body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="1"]{background-position:66.6667% 50%!important}
+body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="2"]{background-position:33.3333% 50%!important}
+body.ludo-game .board.ludo span.ludo-pawn.sprite-pawn[data-color="3"]{background-position:100% 50%!important}

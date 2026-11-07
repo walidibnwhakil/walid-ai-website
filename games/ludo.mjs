@@ -367,9 +367,12 @@ function render() {
     const square=squares.get(tile.join(","));
     const marker=document.createElement("span");
     marker.className="ludo-pawn "+teams[teamId].toLowerCase();
+    const pawnColor=chosenColors[player];
     marker.style.setProperty("--piece-color",getColor(player)[1]);
+    marker.dataset.color=String(pawnColor);
     marker.setAttribute("aria-hidden","true");
-    marker.replaceChildren(...["pawn-body","pawn-base","pawn-head"].map(name=>{const part=document.createElement("i");part.className=name;return part;}));
+    if(pawnColor<4) marker.classList.add("sprite-pawn");
+    else marker.replaceChildren(...["pawn-body","pawn-base","pawn-head"].map(name=>{const part=document.createElement("i");part.className=name;return part;}));
     marker.dataset.token=`${teamId}-${index}`;
     if(animationToken?.player===player&&animationToken?.token===index){
       marker.classList.add("moving");

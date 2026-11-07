@@ -121,7 +121,7 @@ function makeDieCube(){
   return cube;
 }
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=Boolean(restoredConfig?.sound);
 const DICE_ROLL_DURATION=950;
 syncSoundControls();
 const defaultColors=String(restoredConfig?.players)==="2"?[0,3,2,1]:[0,1,2,3];
@@ -164,7 +164,7 @@ const game = gameShell({reset() {
   state=newLudo(count,activeTeams);
   applySeatColors();
   started=false;
-  locked=false; animationToken=null; pendingCaptureSteps.clear();
+  locked=false; animationToken=null; pendingCaptureSteps.clear(); finishSlots.clear();
   clearTimeout(diceAnimationTimer);rollingTeam=-1;rollingValue=0;
   playerColorPickers.forEach(picker=>picker.hidden=true);
   playerLabels.forEach(label=>label.setAttribute("aria-expanded","false"));
@@ -384,6 +384,7 @@ function render() {
       marker.style.setProperty("--pawn-motion-duration",`${animationToken.captured?baseDelay/4:baseDelay}ms`);
     }
     marker.dataset.step=String(visualStep);
+    if(step===57&&visualStep===57)marker.classList.add("finished-pawn");
     if(player===state.turn && !botTurn && rollingTeam<0 && legal.includes(index)) {
       marker.removeAttribute("aria-hidden");
       marker.setAttribute("role","button");
@@ -397,6 +398,27 @@ function render() {
   }));
   for(const square of squares.values()){
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
+    if(square.classList.contains("home-center")){
+      const used=new Set(finishSlots.values());
+      pile.forEach(piece=>{
+        const key=piece.dataset.token;
+        if(!finishSlots.has(key)){
+          let slot=0;
+          while(used.has(slot))slot++;
+          finishSlots.set(key,slot);used.add(slot);
+        }
+        const slot=finishSlots.get(key);
+        piece.classList.add("finished-pawn");
+        if(slot>0){
+          const offsets=[[-34,-28],[34,-28],[-34,28],[34,28],[0,-46],[0,46],[-46,0],[46,0],[-22,-52],[22,-52],[-22,52],[22,52],[-52,-22],[52,-22],[-52,22],[52,22]];
+          piece.classList.add("stacked-pawn","pile-size-finished");
+          piece.style.setProperty("--pile-x",`${offsets[slot-1]?.[0]??0}%`);
+          piece.style.setProperty("--pile-y",`${offsets[slot-1]?.[1]??0}%`);
+        }
+        piece.style.zIndex=piece.classList.contains("playable-token")?"80":String(20+slot);
+      });
+      continue;
+    }
     if(pile.length<2)continue;
     const columns=pile.length<=4?2:3;
     const rows=Math.ceil(pile.length/columns);

@@ -85,6 +85,7 @@ const yards = [
   Array.from({length:4},(_,i)=>[11+(i>>1)*2,11+(i%2)*2])
 ];
 const track = starts;
+const safeRouteSeat = new Map([[8,0],[21,2],[34,3],[47,1]]);
 const entrySquares=new Map([[0,0],[13,2],[26,3],[39,1]]);
 const playerSelect = document.querySelector("#player-count");
 const modeSelect = document.querySelector("#mode");
@@ -185,7 +186,8 @@ centerBase.style.gridArea="7 / 7 / 10 / 10";
 game.board.append(centerBase);
 track.forEach(([row,column],index) => {
   const color=entrySquares.get(index);
-  const kind=["track",safe.has(index)?"safe":"",color!==undefined?"start-square "+teams[color].toLowerCase():""].filter(Boolean).join(" ");
+  const safeSeat=safeRouteSeat.get(index);
+  const kind=["track",safe.has(index)?"safe":"",safeSeat!==undefined?`safe-route-${teams[safeSeat].toLowerCase()}`:"",color!==undefined?"start-square "+teams[color].toLowerCase():""].filter(Boolean).join(" ");
   addSquare(row,column,kind);
 });
 for (let player=0;player<4;player++) {

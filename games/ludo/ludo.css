@@ -1190,21 +1190,15 @@ body.ludo-game.playing-ludo .board.ludo .playable-token{outline:none!important;a
 @keyframes mahir-ready-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes ludu-pawn-hop{0%,100%{transform:translateY(0)}42%{transform:translateY(-1px)}72%{transform:translateY(0)}}
 
-/* Path pawns keep the same readable scale as yard pawns and sit on the tile center. */
-body.ludo-game.playing-ludo #board.board.ludo .track>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
-body.ludo-game.playing-ludo #board.board.ludo .lane>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
-body.ludo-game.playing-ludo #board.board.ludo .home-center>span.ludo-pawn.sprite-pawn:not(.yard-pawn){
-  inset:-11% -22.5%!important;width:145%!important;height:122%!important;z-index:5!important
-}
-/* Anchor each pawn's foot/base at the center of its occupied board square. */
+/* Path pawns remain centered and contained within their current square. */
 body.ludo-game.playing-ludo #board.board.ludo .track:has(>span.ludo-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .lane:has(>span.ludo-pawn),
-body.ludo-game.playing-ludo #board.board.ludo .home-center:has(>span.ludo-pawn){position:relative!important;z-index:8!important;overflow:visible!important}
+body.ludo-game.playing-ludo #board.board.ludo .home-center:has(>span.ludo-pawn){position:relative!important;z-index:8!important;overflow:hidden!important}
 body.ludo-game.playing-ludo #board.board.ludo .track>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .lane>span.ludo-pawn.sprite-pawn:not(.yard-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .home-center>span.ludo-pawn.sprite-pawn:not(.yard-pawn){
   inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
-  width:165%!important;height:150%!important;transform:translate(-50%,-50%)!important;z-index:9!important
+  width:130%!important;height:112%!important;transform:translate(-50%,-50%)!important;z-index:9!important
 }
 body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.yard-pawn{
   inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;

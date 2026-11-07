@@ -1198,8 +1198,8 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn{
 }
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn::after{display:none!important}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-pawn-art{
-  position:absolute;left:50%;top:50%;width:100%;height:100%;overflow:visible;
-  transform:translate(-50%,-50%);filter:drop-shadow(0 2px 1px #120900aa)
+  position:absolute;left:50%;top:50%;width:100%;height:140%;overflow:visible;
+  transform:translate(-50%,-96.25%);filter:drop-shadow(0 2px 1px #120900aa)
 }
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-shadow{fill:#152233}
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-base-ring{fill:color-mix(in srgb,var(--piece-color) 46%,#162332);stroke:#26384b;stroke-width:2}
@@ -1210,7 +1210,7 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-face{fill:var(--piece
 body.ludo-game.playing-ludo .board.ludo span.pin-pawn .pin-gloss{fill:#fff;opacity:.78}
 body.ludo-game.playing-ludo #board.board.ludo .track:has(>span.ludo-pawn),
 body.ludo-game.playing-ludo #board.board.ludo .lane:has(>span.ludo-pawn),
-body.ludo-game.playing-ludo #board.board.ludo .home-center:has(>span.ludo-pawn){position:relative!important;z-index:8!important;overflow:hidden!important}
+body.ludo-game.playing-ludo #board.board.ludo .home-center:has(>span.ludo-pawn){position:relative!important;z-index:8!important;overflow:visible!important}
 /* Yard and route pawns use the same size and square-center anchor. */
 body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.sprite-pawn.yard-pawn.pin-pawn{
   inset:0!important;left:0!important;top:0!important;right:0!important;bottom:0!important;

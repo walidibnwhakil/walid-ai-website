@@ -1,0 +1,979 @@
+@import url("/walid-branding.css");
+:root {
+  color-scheme: dark;
+  --gold: #edc572;
+  --ivory: #fff0ca;
+  --green: #123e32;
+  --accent: #edc572;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #081b14;
+  color: var(--ivory);
+  font:
+    15px system-ui,
+    sans-serif;
+  min-height: 100dvh;
+}
+button,
+select {
+  font: inherit;
+}
+button,
+a,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+select {
+  min-height: 44px;
+  color: var(--ivory);
+  border: 1px solid #ad8648;
+  background: linear-gradient(#453021, #241b15);
+  border-radius: 9px;
+  padding: 10px 16px;
+}
+button {
+  cursor: pointer;
+}
+button:hover {
+  filter: brightness(1.2);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+button:focus-visible,
+a:focus-visible,
+select:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 4vw;
+  border-bottom: 1px solid #cba54b30;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+header span {
+  opacity: 0.65;
+}
+header button {
+  font-size: 12px;
+  min-height: 36px;
+  padding: 7px 12px;
+}
+main {
+  position: relative;
+  z-index: 2;
+  max-width: 1250px;
+  margin: auto;
+  padding: 30px 24px;
+}
+#world {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 70% 10%, #abc56e70, transparent 42%),
+    linear-gradient(110deg, #061b18, #174e39 50%, #061e1b);
+}
+.tree {
+  position: absolute;
+  top: -15%;
+  left: calc(50% - 300px);
+  width: 600px;
+  height: 125%;
+  border-radius: 48% 45% 5% 5%;
+  background: repeating-linear-gradient(
+    82deg,
+    #211d10 0,
+    #4e4226 10px,
+    #302c1b 17px,
+    #665733 22px,
+    #302a19 25px
+  );
+  box-shadow:
+    0 0 100px 40px #001b14 inset,
+    0 0 160px #001710;
+}
+.rays {
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(
+    from 150deg at 70% 0%,
+    transparent,
+    #ffef9a15 10deg,
+    transparent 15deg,
+    #ffef9a20 25deg,
+    transparent 30deg
+  );
+  animation: light 18s ease-in-out infinite alternate;
+}
+.mist {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 10% 80%, #bbffb21a, transparent 45%);
+  animation: mist 12s ease-in-out infinite alternate;
+}
+#jungle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+}
+.vine {
+  transform-origin: top;
+  animation: sway 8s ease-in-out infinite alternate;
+}
+.leaf {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: sway 5s ease-in-out infinite alternate;
+}
+.royal-neck {
+  animation: breathe 6s ease-in-out infinite;
+  transform-origin: 650px 230px;
+}
+.snake-head {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: head 7s ease-in-out infinite;
+}
+.eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 6s infinite;
+}
+.tongue {
+  transform-box: fill-box;
+  transform-origin: top;
+  animation: tongue 4s infinite;
+}
+.jaw {
+  transform-box: fill-box;
+  transform-origin: 20% 20%;
+  animation: jaw 8s infinite;
+}
+.small-snake {
+  animation: breathe 5s ease-in-out infinite alternate;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  font-weight: 700;
+}
+#menu {
+  text-align: center;
+  max-width: 550px;
+  margin: 35px auto 0;
+}
+h1 {
+  font:
+    700 clamp(48px, 7vw, 86px) / 0.94 Georgia,
+    serif;
+  margin: 18px 0 12px;
+  color: #ffe6a0;
+  text-shadow:
+    0 3px #6b3b10,
+    0 6px 15px #000;
+  letter-spacing: -3px;
+}
+h1 span {
+  display: block;
+}
+h1 i {
+  font-size: 0.65em;
+}
+h1:before {
+  content: "♛";
+  display: block;
+  font-size: 44px;
+  line-height: 1.2;
+  color: #f5c354;
+  letter-spacing: 0;
+}
+.subtitle {
+  font: italic 18px Georgia;
+  color: #e4dcb9;
+  margin: 22px 0;
+}
+.menu-panel {
+  background: linear-gradient(120deg, #34291cec, #171f16f5);
+  border: 1px solid #b98a47;
+  border-top: 3px solid #e0b66e;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow:
+    0 20px 70px #0009,
+    inset 0 0 30px #9f712517;
+  text-align: left;
+}
+.menu-panel label {
+  display: block;
+  color: #d6c5a1;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+select {
+  display: block;
+  width: 100%;
+  margin-top: 9px;
+  background: #18291f;
+}
+#colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 18px 0;
+}
+#colors label {
+  font-size: 11px;
+}
+#colors select {
+  border-color: var(--pawn);
+  color: var(--pawn);
+}
+.primary {
+  background: linear-gradient(#21834b, #0a482e);
+  border: 2px solid #e2bd67;
+  box-shadow:
+    0 3px 0 #6b471b,
+    inset 0 0 15px #b1f36720;
+  color: #fff3be;
+  font: 700 22px Georgia;
+  min-height: 56px;
+  width: 100%;
+}
+.menu-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 19px;
+}
+.menu-links button {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px;
+}
+.footnote {
+  font-size: 11px;
+  color: #c2cab2;
+}
+.game-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+h2 {
+  font: 700 30px Georgia;
+  margin: 8px 0;
+}
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 760px) 270px;
+  gap: 26px;
+  justify-content: center;
+}
+.board-frame {
+  background: linear-gradient(
+    135deg,
+    #f5d48b,
+    #81571c 15%,
+    #ecbd56 40%,
+    #705125 60%,
+    #f6da88
+  );
+  padding: 10px;
+  border-radius: 13px;
+  box-shadow:
+    0 15px 50px #000a,
+    0 0 30px #f36a2920;
+  border: 3px solid #5b3619;
+  aspect-ratio: 1;
+}
+#board {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  overflow: visible;
+  background: #11382b;
+}
+.square-number {
+  font: 700 2.8px Georgia;
+  paint-order: stroke;
+  stroke-width: 0.5px;
+  stroke: #143c30;
+  fill: #fff0cd;
+}
+.square-number.light {
+  stroke: #f5dfaf;
+  fill: #302b1c;
+}
+.snake-body {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.board-eye {
+  animation: blink 5s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.board-tongue {
+  animation: tongue 3.7s infinite;
+  transform-box: fill-box;
+  transform-origin: top;
+}
+.board-jaw {
+  animation: jaw 6s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.active-snake .board-jaw {
+  transform: translateY(1px) scaleY(1.5);
+}
+.pawn {
+  filter: drop-shadow(0 0.6px 0.4px #0009);
+}
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #6e583c;
+  background: #151b16d9;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 9px;
+}
+.player-row.current {
+  border-color: var(--pawn);
+  box-shadow: inset 3px 0 var(--pawn);
+}
+.player-row .dot {
+  width: 13px;
+  height: 13px;
+  background: var(--pawn);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--pawn);
+}
+.player-row strong {
+  flex: 1;
+  font-size: 13px;
+}
+.player-row small {
+  font-size: 11px;
+  opacity: 0.8;
+}
+.dice-panel {
+  padding: 17px;
+  background: #181811d9;
+  border: 1px solid #876238;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 18px;
+}
+#dice {
+  font: 70px Georgia;
+  color: #fff2d8;
+  line-height: 1.1;
+}
+.rolling {
+  animation: roll 0.13s infinite;
+}
+#status {
+  min-height: 42px;
+  font-size: 13px;
+  color: #e6d6b5;
+}
+.toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 15px;
+}
+.toolbar button {
+  font-size: 12px;
+}
+.hint {
+  text-align: center;
+  color: #c6ad85;
+  font: italic 13px Georgia;
+}
+.playing #world {
+  background:
+    radial-gradient(ellipse at 50% 90%, #92320c 0, transparent 55%),
+    repeating-conic-gradient(
+      from 20deg at 70% 40%,
+      #180f12 0 28deg,
+      #352021 30deg 48deg,
+      #100e12 50deg 70deg
+    );
+}
+.playing .tree,
+.playing #jungle,
+.playing .rays,
+.playing .mist {
+  opacity: 0;
+}
+.playing .embers {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 95%, #ffcc42 0, #d6420a 2%, transparent 7%),
+    radial-gradient(ellipse at 80% 85%, #ffcc42 0, #d6420a 1%, transparent 5%);
+  background-size: 250px 240px;
+  animation: lava 9s linear infinite alternate;
+  opacity: 0.65;
+}
+.playing #world:after {
+  content: "";
+  position: absolute;
+  inset: 75% -20% -20%;
+  background: repeating-linear-gradient(
+    155deg,
+    transparent 0 70px,
+    #f85b09 78px,
+    #ffc35b 82px,
+    #8d2308 89px,
+    transparent 100px
+  );
+  filter: blur(6px);
+  animation: lava 7s ease-in-out infinite alternate;
+}
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: transparent;
+}
+#skip {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  pointer-events: auto;
+}
+.mouth-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse, #280606, #080202 65%);
+  animation: enter-glow 3.8s forwards;
+}
+.entering #jungle {
+  animation: approach 3.8s cubic-bezier(0.6, 0, 0.8, 0.5) forwards;
+  transform-origin: 65% 22%;
+}
+.entering .royal-neck,
+.entering .snake-head {
+  animation: none;
+}
+.entering #royal-upper {
+  transform-box: fill-box;
+  transform-origin: left bottom;
+  animation: open-upper 3.8s forwards;
+}
+.entering #royal-lower {
+  transform-box: fill-box;
+  transform-origin: left top;
+  animation: open-lower 3.8s forwards;
+}
+.entering #menu {
+  transition: opacity 0.6s;
+  opacity: 0;
+}
+.entering .tree {
+  transition: transform 3.8s;
+  transform: scale(1.8);
+}
+dialog {
+  max-width: 540px;
+  width: calc(100% - 32px);
+  max-height: 85dvh;
+  overflow: auto;
+  background: #17281f;
+  color: #fff0cc;
+  border: 1px solid #d4a957;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 20px 90px #000;
+}
+dialog::backdrop {
+  background: #000b;
+  backdrop-filter: blur(5px);
+}
+.close {
+  float: right;
+  font-size: 24px;
+  padding: 0 12px;
+}
+.setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 17px 0;
+  gap: 15px;
+}
+.setting select {
+  width: 145px;
+}
+dialog p,
+dialog li {
+  line-height: 1.7;
+  color: #dfd5bd;
+}
+#celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: #080c0def;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.result-card {
+  position: relative;
+  text-align: center;
+  padding: 26px;
+  max-width: 520px;
+  width: 95%;
+}
+.result-card h2 {
+  font-size: clamp(30px, 6vw, 55px);
+  color: var(--accent);
+  text-shadow: 0 0 25px var(--accent);
+}
+.crown {
+  font-size: 80px;
+  color: var(--accent);
+  animation: breathe 3s infinite;
+}
+.result-card button {
+  margin: 8px;
+}
+.result-card .primary {
+  width: 85%;
+}
+.fireworks {
+  position: absolute;
+  inset: 0;
+}
+.spark {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: firework 2.8s ease-out infinite;
+  animation-delay: var(--delay);
+  --dx: 0px;
+  --dy: 0px;
+}
+.standing {
+  padding: 9px;
+  border-bottom: 1px solid #ffffff20;
+}
+.defeat .fireworks,
+.defeat .crown {
+  display: none;
+}
+#defeat-snake svg {
+  width: 240px;
+  overflow: visible;
+}
+.defeat #defeat-snake {
+  animation: defeat-loop 6s both;
+}
+.defeat #result-title {
+  animation: swallow-text 6s both;
+  color: #f3bb67;
+}
+.low .embers,
+.low .rays,
+.low .mist {
+  display: none;
+}
+.low .leaf,
+.low .vine,
+.low .snake-head,
+.low .royal-neck {
+  animation: none;
+}
+.reduced *,
+.reduced *:before,
+.reduced *:after {
+  animation: none !important;
+  scroll-behavior: auto !important;
+  transition: none !important;
+}
+@keyframes sway {
+  to {
+    transform: rotate(5deg);
+  }
+}
+@keyframes breathe {
+  50% {
+    transform: translateY(-3px) scaleY(1.018);
+  }
+}
+@keyframes head {
+  50% {
+    transform: rotate(3deg);
+  }
+}
+@keyframes blink {
+  0%,
+  43%,
+  47%,
+  100% {
+    transform: scaleY(1);
+  }
+  45% {
+    transform: scaleY(0.08);
+  }
+}
+@keyframes tongue {
+  0%,
+  70%,
+  85%,
+  100% {
+    transform: scaleY(0.08);
+    opacity: 0;
+  }
+  74%,
+  81% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+@keyframes jaw {
+  0%,
+  75%,
+  100% {
+    transform: rotate(0);
+  }
+  85% {
+    transform: rotate(8deg);
+  }
+}
+@keyframes mist {
+  to {
+    transform: translateX(6%);
+  }
+}
+@keyframes light {
+  to {
+    transform: rotate(4deg);
+  }
+}
+@keyframes lava {
+  to {
+    transform: translate(15px, -12px);
+    filter: brightness(1.25);
+  }
+}
+@keyframes roll {
+  to {
+    transform: rotate(25deg) scale(0.9);
+  }
+}
+@keyframes approach {
+  0%,
+  18% {
+    transform: scale(1);
+  }
+  65% {
+    transform: scale(3);
+  }
+  100% {
+    transform: scale(15);
+  }
+}
+@keyframes open-upper {
+  30% {
+    transform: rotate(0);
+  }
+  65%,
+  100% {
+    transform: rotate(-22deg);
+  }
+}
+@keyframes open-lower {
+  30% {
+    transform: rotate(0);
+  }
+  65%,
+  100% {
+    transform: rotate(34deg);
+  }
+}
+@keyframes enter-glow {
+  0%,
+  50% {
+    opacity: 0;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    background: #1b0805;
+  }
+}
+@keyframes firework {
+  0% {
+    opacity: 0;
+    transform: translate(0, 70px) scale(0.2);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+  }
+}
+@keyframes swallow-text {
+  0%,
+  22% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  38%,
+  65% {
+    transform: translate(28px, -110px) scale(0.05);
+    opacity: 0;
+  }
+  85%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes defeat-loop {
+  0% {
+    transform: translateX(-100vw);
+  }
+  25% {
+    transform: translateX(0);
+  }
+  45%,
+  65%,
+  100% {
+    transform: translateX(0);
+  }
+}
+@media (max-width: 800px) {
+  header span {
+    display: none;
+  }
+  main {
+    padding: 20px 12px;
+  }
+  .game-layout {
+    grid-template-columns: minmax(0, 620px);
+    gap: 15px;
+  }
+  aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  #players {
+    align-self: center;
+  }
+  .dice-panel {
+    margin: 0;
+    padding: 12px;
+  }
+  .toolbar {
+    grid-column: 1/-1;
+    display: flex;
+    margin: 0;
+  }
+  .toolbar button {
+    flex: 1;
+    padding: 8px;
+  }
+  .hint {
+    grid-column: 1/-1;
+    margin: 0;
+  }
+  .game-heading h2 {
+    font-size: 23px;
+  }
+  .game-heading button {
+    font-size: 12px;
+    padding: 8px;
+  }
+  .board-frame {
+    padding: 5px;
+    border-width: 2px;
+  }
+  .player-row {
+    padding: 9px;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
+  .player-row strong {
+    font-size: 11px;
+  }
+  .player-row small {
+    font-size: 10px;
+  }
+  #dice {
+    font-size: 45px;
+  }
+  #status {
+    font-size: 11px;
+    min-height: 28px;
+    margin: 6px 0;
+  }
+  .dice-panel .primary {
+    font-size: 19px;
+    min-height: 47px;
+  }
+  .embers {
+    opacity: 0.35 !important;
+  }
+  #menu {
+    margin-top: 35px;
+  }
+  .menu-panel {
+    padding: 18px;
+  }
+  .menu-links {
+    gap: 5px;
+  }
+  .menu-links button {
+    font-size: 11px;
+    padding: 7px;
+  }
+  h1 {
+    font-size: 63px;
+  }
+  .tree {
+    left: calc(50% - 230px);
+    width: 460px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* Layered environmental art remains separate from the interactive SVG rigs. */
+.entering #jungle {
+  transform-origin: 73% 26%;
+}
+.reveal {
+  animation: reveal-out 0.5s forwards;
+  background: #160604 !important;
+}
+.reveal .mouth-glow {
+  animation: none;
+  opacity: 0;
+}
+.reveal #skip {
+  display: none;
+}
+.board-frame {
+  position: relative;
+}
+.board-frame:before,
+.board-frame:after {
+  content: "◆";
+  position: absolute;
+  z-index: 2;
+  color: #ffe9a3;
+  text-shadow: 0 2px 3px #432408;
+  pointer-events: none;
+  top: -9px;
+  font-size: 25px;
+}
+.board-frame:before {
+  left: -5px;
+}
+.board-frame:after {
+  right: -5px;
+}
+.tree {
+  background-image:
+    radial-gradient(ellipse at 40% 20%, #bd93612b, transparent 30%),
+    repeating-linear-gradient(
+      82deg,
+      #211d10 0,
+      #4e4226 10px,
+      #302c1b 17px,
+      #665733 22px,
+      #302a19 25px
+    );
+}
+.menu-panel {
+  backdrop-filter: blur(9px);
+}
+.playing #world {
+  background: #170d0d url("cave.svg") center/cover no-repeat;
+}
+.playing #world:after {
+  opacity: 0.6;
+}
+.playing .game-heading {
+  border-bottom: 1px solid #a3754430;
+  padding-bottom: 12px;
+}
+.playing .board-frame {
+  box-shadow:
+    0 20px 60px #000c,
+    0 0 2px 2px #f7d88e,
+    0 0 38px #ea5d1733;
+}
+@keyframes reveal-out {
+  to {
+    opacity: 0;
+  }
+}
+.roster-summary {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #d4bc94;
+  margin: 0 0 10px;
+}
+.playing #jungle *,
+.playing .rays,
+.playing .mist {
+  animation-play-state: paused !important;
+}
+.low .board-eye,
+.low .board-jaw,
+.low .board-tongue {
+  animation-duration: 12s;
+}

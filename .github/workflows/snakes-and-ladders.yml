@@ -1,0 +1,39 @@
+name: Snakes and Ladders verification
+on:
+  push:
+    paths:
+      [
+        "games/snakes-and-ladders/**",
+        ".github/workflows/snakes-and-ladders.yml",
+      ]
+  pull_request:
+    paths:
+      [
+        "games/snakes-and-ladders/**",
+        ".github/workflows/snakes-and-ladders.yml",
+      ]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test games/snakes-and-ladders/engine.test.mjs
+      - run: npm install --prefix /tmp/serpent --no-save playwright@1.60.0
+      - name: Render gameplay and all mobile sizes
+        run: |
+          python3 -m http.server 8765 >/tmp/serpent-http.log 2>&1 &
+          export NODE_PATH=/tmp/serpent/node_modules
+          export CHROME=$(command -v google-chrome || command -v chromium)
+          node games/snakes-and-ladders/browser-check.cjs
+        env:
+          SERPENT_EVIDENCE: ${{ runner.temp }}/serpent-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: serpent-browser-evidence
+          path: ${{ runner.temp }}/serpent-evidence

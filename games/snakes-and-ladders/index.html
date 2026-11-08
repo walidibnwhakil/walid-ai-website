@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Snakes &amp; Ladders — The Serpent King's Realm | Walid AI</title>
+    <meta
+      name="description"
+      content="Enter the Serpent King's Realm. Play animated Snakes & Ladders against a fair bot or with 2–4 local players."
+    />
+    <link
+      rel="canonical"
+      href="https://walid-ai.com/games/snakes-and-ladders/"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="game.mjs"></script>
+  </head>
+  <body>
+    <div id="world">
+      <div class="rays"></div>
+      <div class="tree"></div>
+      <svg
+        id="jungle"
+        viewBox="0 0 1000 900"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      ></svg>
+      <div class="mist"></div>
+      <div class="embers"></div>
+    </div>
+    <header>
+      <a href="/games/">← Back to Games</a
+      ><span>WALID AI · THE ROYAL ARCADE</span
+      ><button id="sound" aria-label="Toggle sound effects">Sound: Off</button>
+    </header>
+    <main>
+      <section id="menu">
+        <div class="eyebrow">THE SERPENT KING'S REALM</div>
+        <h1>
+          <span>Snakes <i>&amp;</i></span
+          ><span>Ladders</span>
+        </h1>
+        <p class="subtitle">A royal ascent. A dangerous descent.</p>
+        <div class="menu-panel">
+          <label
+            >Choose your adventure<select id="mode">
+              <option value="bot">Single Player — vs Bot</option>
+              <option value="2">Local Multiplayer — 2 Players</option>
+              <option value="3">Local Multiplayer — 3 Players</option>
+              <option value="4">Local Multiplayer — 4 Players</option>
+            </select></label
+          >
+          <div id="colors"></div>
+          <button id="start" class="primary">▶ Start Game</button>
+          <div class="menu-links">
+            <button data-panel="rules">Game Rules</button
+            ><button data-panel="stats">Statistics</button
+            ><button data-panel="settings">Sound Settings</button>
+          </div>
+        </div>
+        <p class="footnote">
+          No account. Just courage, luck, and one more roll.
+        </p>
+      </section>
+      <section id="play" hidden>
+        <div class="game-heading">
+          <div>
+            <div class="eyebrow">THE SERPENT'S BELLY</div>
+            <h2>Snakes &amp; Ladders</h2>
+          </div>
+          <button id="menu-button">Back to Menu</button>
+        </div>
+        <div class="game-layout">
+          <div class="board-frame">
+            <svg
+              id="board"
+              viewBox="0 0 100 100"
+              role="img"
+              aria-label="100-square Snakes and Ladders board"
+            ></svg>
+          </div>
+          <aside>
+            <div id="players"></div>
+            <div class="dice-panel">
+              <div id="dice" aria-label="Die">⚄</div>
+              <p id="status" role="status" aria-live="polite">
+                Your adventure begins.
+              </p>
+              <button id="roll" class="primary">Roll Dice</button>
+            </div>
+            <div class="toolbar">
+              <button id="pause">Pause</button
+              ><button id="restart">Restart</button
+              ><button data-panel="rules">Rules</button
+              ><button data-panel="settings">Settings</button>
+            </div>
+            <p class="hint">Land exactly on 100 to claim the crown.</p>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <div id="intro" hidden>
+      <button id="skip">Skip Intro →</button>
+      <div class="mouth-glow"></div>
+    </div>
+    <dialog id="dialog">
+      <button id="close" class="close" aria-label="Close">×</button>
+      <div id="dialog-content"></div>
+    </dialog>
+    <div
+      id="celebration"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-label="Match result"
+    >
+      <div class="fireworks"></div>
+      <div class="result-card">
+        <div class="crown">♛</div>
+        <div id="defeat-snake"></div>
+        <h2 id="result-title"></h2>
+        <p id="result-name"></p>
+        <div id="standings"></div>
+        <button id="continue" class="primary">Continue Match</button
+        ><button id="try-again">Try Again</button
+        ><button id="result-menu">Back to Menu</button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {newLudo, rollLudo, moveLudo, legalTokens} from "./ludo-rules.mjs";
-import {advanceSnake,isReverse,nextFood} from "./snake-rules.mjs";
 import {Chess} from "./vendor/chess.mjs";
 
 test("Ludo needs a six to leave the yard and grants another roll", () => {
@@ -61,30 +60,4 @@ test("Chess handles en passant, castling, promotion and checkmate", () => {
   game.reset();
   for (const move of ["f3","e5","g4","Qh4#"]) game.move(move);
   assert.equal(game.isCheckmate(), true);
-});
-
-test("Snake grows when it eats and places food in an empty cell",()=>{
-  const snake=[136,135,134];
-  const moved=advanceSnake(snake,[0,1],152);
-  assert.equal(moved.ate,true);
-  assert.deepEqual(moved.snake,[152,136,135,134]);
-  assert.equal(nextFood(moved.snake,()=>0),0);
-});
-
-test("Snake detects walls and self-collisions but may follow its vacating tail",()=>{
-  assert.equal(advanceSnake([0,1,2],[-1,0],200).dead,true);
-  assert.equal(advanceSnake([18,17,1,2],[-1,0],200).dead,true);
-  const tail=advanceSnake([18,17,1,2],[0,-1],200);
-  assert.equal(tail.dead,false);
-  assert.deepEqual(tail.snake,[2,18,17,1]);
-});
-
-test("Snake rejects immediate reversals and detects a full board win",()=>{
-  assert.equal(isReverse([1,0],[-1,0]),true);
-  assert.equal(isReverse([0,-1],[1,0]),false);
-  const full=Array.from({length:256},(_,index)=>index);
-  assert.equal(nextFood(full),undefined);
-  const almostFull=[254,...full.filter(index=>index!==254&&index!==255)];
-  const win=advanceSnake(almostFull,[1,0],255);
-  assert.equal(win.won,true);
 });

@@ -83,6 +83,33 @@ fs.mkdirSync(out, { recursive: true });
   await shot("board-desktop");
   assert.equal(await page.locator(".square-number").count(), 100);
   await check(
+    "painted board assets load and materials remain structured",
+    async () => {
+      for (const file of [
+        "cavern.webp",
+        "cavern-mobile.webp",
+        "marble-atlas.webp",
+        "royal-logo.webp",
+        "serpent-heads.webp",
+      ]) {
+        const response = await page.request.get(
+          new URL("assets/" + file, base).href,
+        );
+        assert.equal(response.status(), 200, file);
+        assert.match(response.headers()["content-type"], /image\/webp/);
+        assert.ok((await response.body()).length > 1000);
+      }
+      assert.equal(await page.locator('[id^="material-"]').count(), 2);
+      assert.equal(await page.locator(".painted-head").count(), 6);
+      assert.equal(
+        await page
+          .locator(".painted-title img")
+          .evaluate((e) => e.complete && e.naturalWidth > 0),
+        true,
+      );
+    },
+  );
+  await check(
     "100 square centers and all rendered snake/ladder endpoints",
     async () => {
       const anchors = await page.evaluate(async () => {

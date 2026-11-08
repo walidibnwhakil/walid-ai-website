@@ -10,7 +10,7 @@ Replaces the previous Snake game. `/games/snake/` redirects through both a meta 
 - `engine.mjs`: immutable deterministic state transitions, square coordinates, mappings, cryptographic rejection-sampled die and placement labels.
 - `game.mjs`: SVG environments/rigs, movement, bot scheduling, match controls, optional locally synthesized sound and safe local statistics.
 - `style.css`: responsive presentation, separate jaw/eye/tongue animation, intro, lava, fireworks and reduced-motion alternatives.
-- `cave.svg`, `preview.svg`: original locally hosted vector artwork.
+- `assets/*.webp`: locally hosted generated painted cavern environments, marble material atlas, royal title and six-color serpent-head atlas. `preview.svg` retains the existing index preview.
 - `engine.test.mjs`, `browser-check.cjs`: deterministic rules and real Chromium verification.
 - `.github/workflows/snakes-and-ladders.yml`: engine/browser verification with screenshot artifacts.
 
@@ -47,7 +47,7 @@ CHROME=/usr/bin/chromium SERPENT_EVIDENCE=/tmp/serpent-evidence node games/snake
 ```
 
 - 175 unit tests passed across these five current suites, including 28 new engine cases.
-- 20 browser verification groups passed without page errors.
+- 21 browser verification groups passed without page errors.
 - Chromium widths: 320, 360, 390, 412, 430, 768, 1024 and 1440. Square boards, 44px-or-larger Roll Dice buttons and no horizontal overflow.
 - Sampled actual animated transforms for royal breathing, blinking, tongues, smaller snakes, leaves and vines; captured menu and intro frames.
 - Verified changing lava and board paths, mathematical endpoints, roll locking, pawn release at snake tails and ladder tops, restart cancellation, automatic bot actions and storage-unavailable play.
@@ -60,7 +60,7 @@ The old `games/arcade.test.mjs` has three existing Ludo failures, reproduced usi
 
 ## Visual and platform limits
 
-The three supplied references guide the tree/serpent composition, emerald-and-gold palette and volcanic board setting. The delivered art and logo are original stylized SVG/CSS interpretations, not the supplied raster logo or a reproduction of their painted detail. The intro uses layered 2D transforms and independent jaws; it is not a 3D camera. Swallowing, curling, lava and fireworks are simplified vector effects. They should not be described as matching the reference artwork's production quality.
+The gameplay board was redesigned after visual feedback: painted volcanic cavern artwork with serpent eyes/fangs, separate desktop and mobile compositions, polished emerald/ivory marble textures, beveled gold cells and frame, a rendered royal title, six individually colored painted heads, tapered animated scaled bodies, gold ladders, sculpted pawns, an ivory die, and controls beneath the centered board. These are local WebP assets layered with the structured SVG board; the board is never a flattened screenshot. The supplied reference guides the design; its incorrect numbering and endpoints are not copied. The menu and intro retain their earlier stylized SVG presentation. The intro uses layered 2D transforms and independent jaws, rather than a 3D camera. Body motion, swallowing, curling, lava and fireworks remain lightweight SVG/CSS effects.
 
 Mobile checks use Chromium viewport emulation, not physical Android hardware or Safari on iPhone. No measured budget-device frame-rate guarantee is made. High/Balanced/Low adjust body update frequency and effects; system reduced motion overrides animation. Sound is lightweight synthesized tones and ambience rather than a recorded environmental soundscape. Pause finishes an in-flight movement before holding further turns. Matches are not persisted across page reloads; statistics/settings are local where storage is available. No accounts, online rankings, paid APIs, external game assets or heavyweight runtime dependencies are required.
 

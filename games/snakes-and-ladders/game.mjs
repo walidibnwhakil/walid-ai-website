@@ -149,7 +149,7 @@ function serpent(parent, x, y, scale = 1, color = "#48a94c", royal = false) {
       d: "M 0 0 Q 6 10 12 0 M -6 5 Q 0 15 6 5 M 6 5 Q 12 15 18 5",
       fill: "none",
       stroke: "#102e20",
-      "stroke-width": 0.7,
+      "stroke-width": 0.95,
       opacity: 0.45,
     },
     scales,
@@ -398,28 +398,78 @@ function board() {
   b.replaceChildren();
   paths = {};
   const defs = svg("defs", {}, b);
-  const wood = svg(
-    "pattern",
-    {
-      id: "board-grain",
-      width: 10,
-      height: 10,
-      patternUnits: "userSpaceOnUse",
-    },
-    defs,
+  const gradient = (id, stops, horizontal = false) => {
+    const g = svg(
+      "linearGradient",
+      {
+        id,
+        x1: "0%",
+        y1: "0%",
+        x2: horizontal ? "100%" : "0%",
+        y2: horizontal ? "0%" : "100%",
+      },
+      defs,
+    );
+    stops.forEach(([offset, color]) =>
+      svg("stop", { offset, "stop-color": color }, g),
+    );
+  };
+  gradient(
+    "ladder-gold",
+    [
+      ["0%", "#613008"],
+      ["20%", "#fff5b3"],
+      ["40%", "#e7a72d"],
+      ["65%", "#ffe881"],
+      ["100%", "#7e3e09"],
+    ],
+    true,
   );
-  svg(
-    "path",
-    {
-      d: "M 0 2 Q 5 1 10 2 M 0 6 Q 4 5 10 6 M 0 8 Q 5 7 10 8",
-      stroke: "#49351c",
-      "stroke-width": 0.1,
-      opacity: 0.16,
-      fill: "none",
-    },
-    wood,
-  );
+  gradient("tile-bevel", [
+    ["0%", "#fff3bb"],
+    ["12%", "#d79825"],
+    ["50%", "#98601c"],
+    ["85%", "#ffd970"],
+    ["100%", "#68330b"],
+  ]);
+  const gold = defs.querySelector("#ladder-gold");
+  Object.entries({
+    gradientUnits: "userSpaceOnUse",
+    x1: 0,
+    y1: 0,
+    x2: 1.5,
+    y2: 1.5,
+    spreadMethod: "reflect",
+  }).forEach(([k, v]) => gold.setAttribute(k, v));
+  for (const [name, offset] of [
+    ["emerald", 0],
+    ["ivory", -10],
+  ]) {
+    const pat = svg(
+      "pattern",
+      {
+        id: "material-" + name,
+        width: 10,
+        height: 10,
+        patternUnits: "userSpaceOnUse",
+      },
+      defs,
+    );
+    svg(
+      "image",
+      {
+        href: "assets/marble-atlas.webp",
+        x: offset,
+        y: 0,
+        width: 20,
+        height: 10,
+        preserveAspectRatio: "none",
+      },
+      pat,
+    );
+  }
   for (const { n, x, y } of squares) {
+    const light = (Math.floor((n - 1) / 10) + (x - 5) / 10) % 2;
     svg(
       "rect",
       {
@@ -427,18 +477,54 @@ function board() {
         y: y - 5,
         width: 10,
         height: 10,
-        fill:
-          (Math.floor((n - 1) / 10) + (x - 5) / 10) % 2 ? "#ead5a6" : "#205440",
-        stroke: "#b18a45",
-        "stroke-width": 0.22,
+        rx: 0.45,
+        fill: "url(#tile-bevel)",
+        stroke: "#361806",
+        "stroke-width": 0.16,
       },
       b,
     );
     svg(
       "rect",
-      { x: x - 5, y: y - 5, width: 10, height: 10, fill: "url(#board-grain)" },
+      {
+        x: x - 4.7,
+        y: y - 4.7,
+        width: 9.4,
+        height: 9.4,
+        rx: 0.34,
+        fill: `url(#material-${light ? "ivory" : "emerald"})`,
+        stroke: light ? "#ffe9a6" : "#859947",
+        "stroke-width": 0.12,
+      },
       b,
     );
+    svg(
+      "path",
+      {
+        d: `M ${x - 4.45} ${y + 4.4} V ${y - 4.4} H ${x + 4.4}`,
+        fill: "none",
+        stroke: "#fff5b8",
+        "stroke-width": 0.12,
+        opacity: 0.6,
+      },
+      b,
+    );
+    if (n === 100 || n === 1)
+      svg(
+        "rect",
+        {
+          x: x - 4.6,
+          y: y - 4.6,
+          width: 9.2,
+          height: 9.2,
+          rx: 0.3,
+          fill: n === 100 ? "#9a090a" : "#3ab529",
+          opacity: n === 100 ? 0.88 : 0.4,
+          stroke: "#ffe792",
+          "stroke-width": 0.25,
+        },
+        b,
+      );
   }
   for (const [a, z] of Object.entries(LADDERS)) {
     const p = center(+a),
@@ -470,8 +556,8 @@ function board() {
           y1: p.y + ny * sign,
           x2: q.x + nx * sign,
           y2: q.y + ny * sign,
-          stroke: "#efc564",
-          "stroke-width": 0.7,
+          stroke: "url(#ladder-gold)",
+          "stroke-width": 0.95,
         },
         g,
       );
@@ -483,8 +569,8 @@ function board() {
           y1: p.y + dy * t - ny,
           x2: p.x + dx * t + nx,
           y2: p.y + dy * t + ny,
-          stroke: "#ffda7e",
-          "stroke-width": 0.65,
+          stroke: "url(#ladder-gold)",
+          "stroke-width": 0.85,
         },
         g,
       );
@@ -502,73 +588,190 @@ function board() {
         "#69b66a",
         "#82b646",
       ][i];
-    const path = svg(
-        "path",
-        { class: "snake-body", stroke: "#12271d", "stroke-width": 3.5 },
-        g,
-      ),
-      inner = svg(
-        "path",
-        { class: "snake-body", stroke: color, "stroke-width": 2.5 },
-        g,
-      ),
-      pattern = svg(
-        "path",
-        {
-          class: "snake-body",
-          stroke: "#fff0a3",
-          "stroke-width": 0.8,
-          "stroke-dasharray": "1 2",
-          opacity: 0.55,
-        },
-        g,
-      );
-    const head = svg("g", { transform: `translate(${p.x} ${p.y})` }, g);
-    svg(
-      "ellipse",
+    const hue = [-65, 170, 90, -110, 0, 30][i];
+    gradient(
+      `serpent-shade-${i}`,
+      [
+        ["0%", "#fff2a0"],
+        ["22%", color],
+        ["55%", color],
+        ["100%", "#153117"],
+      ],
+      true,
+    );
+    gradient(`scale-relief-${i}`, [
+      ["0%", "#fff0a4"],
+      ["18%", color],
+      ["60%", color],
+      ["100%", "#172416"],
+    ]);
+    const pat = svg(
+      "pattern",
       {
-        cx: 0,
-        cy: 0,
-        rx: 2.4,
-        ry: 1.9,
-        fill: color,
-        stroke: "#12271d",
-        "stroke-width": 0.35,
+        id: `scales-${i}`,
+        width: 1.7,
+        height: 1.3,
+        patternUnits: "userSpaceOnUse",
       },
-      head,
+      defs,
     );
-    svg(
-      "ellipse",
-      { cx: 0, cy: 1, rx: 1.4, ry: 0.5, fill: "#4d1722", class: "board-jaw" },
-      head,
-    );
-    for (const x of [-1, 1]) {
-      svg(
-        "ellipse",
-        {
-          cx: x,
-          cy: -0.7,
-          rx: 0.55,
-          ry: 0.6,
-          fill: "#ffef86",
-          class: "board-eye",
-        },
-        head,
-      );
-      svg("circle", { cx: x, cy: -0.7, r: 0.22, fill: "#151111" }, head);
-    }
     svg(
       "path",
       {
-        d: "M 0 1.4 V 3 M 0 3 L -.6 3.6 M 0 3 L .6 3.6",
-        stroke: "#ff6174",
-        "stroke-width": 0.25,
+        d: "M .85 .03 L 1.67 .65 L .85 1.27 L .03 .65 Z",
+        fill: `url(#scale-relief-${i})`,
+        stroke: "#ffe3a2",
+        "stroke-width": 0.06,
+        opacity: 0.8,
+      },
+      pat,
+    );
+    svg(
+      "path",
+      {
+        d: "M 0 0 L .85 .65 L 1.7 0 M -.85 .65 L 0 1.3 L .85 .65 L 1.7 1.3 L 2.55 .65",
+        fill: "none",
+        stroke: "#221607",
+        "stroke-width": 0.16,
+        opacity: 0.7,
+      },
+      pat,
+    );
+    svg(
+      "path",
+      {
+        d: "M .12 .04 L .85 .55 L 1.58 .04 M .12 1.25 L .85 .76 L 1.58 1.25",
+        fill: "none",
+        stroke: "#ffdf7e",
+        "stroke-width": 0.09,
+        opacity: 0.8,
+      },
+      pat,
+    );
+    const mask = svg(
+      "mask",
+      {
+        id: `taper-${i}`,
+        maskUnits: "userSpaceOnUse",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      },
+      defs,
+    );
+    const taper = svg("path", { fill: "white" }, mask);
+    const path = svg(
+      "path",
+      { class: "snake-body", stroke: "#201305", "stroke-width": 3.5 },
+      g,
+    );
+    const inner = svg(
+      "path",
+      {
+        class: "snake-body",
+        stroke: `url(#serpent-shade-${i})`,
+        "stroke-width": 2.95,
+      },
+      g,
+    );
+    const sheen = svg(
+      "path",
+      {
+        class: "snake-body",
+        stroke: "#fff5ad",
+        "stroke-width": 1.5,
+        opacity: 0.33,
+        transform: "translate(-.35 -.3)",
+      },
+      g,
+    );
+    const pattern = svg(
+      "path",
+      { class: "snake-body", stroke: `url(#scales-${i})`, "stroke-width": 2.8 },
+      g,
+    );
+    const head = svg(
+      "g",
+      { transform: `translate(${p.x} ${p.y})`, class: "painted-head" },
+      g,
+    );
+    const art = svg(
+      "g",
+      { transform: i % 2 ? "scale(-1 1)" : "scale(1 1)" },
+      head,
+    );
+    const clip = svg("clipPath", { id: `jaw-clip-${i}` }, defs);
+    svg("rect", { x: -5, y: 0.3, width: 10, height: 5 }, clip);
+    const upper = svg("clipPath", { id: `upper-clip-${i}` }, defs);
+    svg("rect", { x: -5, y: -5, width: 10, height: 5.3 }, upper);
+    function sprite(parent, clipId) {
+      const c = svg("g", { "clip-path": `url(#${clipId})` }, parent);
+      const sheet = svg(
+        "svg",
+        {
+          x: -3.6,
+          y: -2.8,
+          width: 7.2,
+          height: 7.2,
+          viewBox: `${(i % 3) * 400} ${Math.floor(i / 3) * 400} 400 400`,
+          overflow: "hidden",
+        },
+        c,
+      );
+      svg(
+        "image",
+        {
+          href: "assets/serpent-heads.webp",
+          x: 0,
+          y: 0,
+          width: 1200,
+          height: 800,
+        },
+        sheet,
+      );
+    }
+    sprite(art, `upper-clip-${i}`);
+    const jaw = svg("g", { class: "board-jaw" }, art);
+    sprite(jaw, `jaw-clip-${i}`);
+    svg(
+      "ellipse",
+      {
+        cx: -0.1,
+        cy: -1.2,
+        rx: 0.19,
+        ry: 0.09,
+        fill: "#ffce56",
+        class: "board-eye",
+      },
+      art,
+    );
+    svg(
+      "path",
+      {
+        d: "M -2 1.7 Q -3.2 2.3 -3.4 3 M -3.4 3 L -3.8 3.3 M -3.4 3 L -3.3 3.5",
+        stroke: "#c92539",
+        "stroke-width": 0.1,
         fill: "none",
         class: "board-tongue",
       },
-      head,
+      art,
     );
-    paths[a] = { kind: "snake", p, q, path, inner, pattern, head, g, i };
+    for (const layer of [path, inner, sheen, pattern])
+      layer.setAttribute("mask", `url(#taper-${i})`);
+    paths[a] = {
+      kind: "snake",
+      p,
+      q,
+      path,
+      inner,
+      sheen,
+      pattern,
+      taper,
+      head,
+      g,
+      i,
+    };
   });
   for (const { n, x, y } of squares) {
     const t = svg(
@@ -583,20 +786,58 @@ function board() {
     t.textContent = n === 100 ? "100 ♛" : n;
   }
   pawns = state.players.map((p, i) => {
-    const g = svg("g", { class: "pawn", "data-player": i }, b);
-    const color = HEX[COLORS.indexOf(p.color)];
+    const g = svg("g", { class: "pawn", "data-player": i }, b),
+      color = HEX[COLORS.indexOf(p.color)];
+    gradient(
+      `pawn-${i}`,
+      [
+        ["0%", "#421a14"],
+        ["18%", color],
+        ["38%", "#fff2bd"],
+        ["50%", color],
+        ["100%", "#1a1b20"],
+      ],
+      true,
+    );
+    const fill = `url(#pawn-${i})`;
     svg(
       "ellipse",
-      { cx: 0, cy: 0.9, rx: 1.6, ry: 0.7, fill: "#101510", opacity: 0.6 },
+      { cx: 0, cy: 1.3, rx: 1.8, ry: 0.65, fill: "#080504", opacity: 0.7 },
+      g,
+    );
+    svg(
+      "ellipse",
+      {
+        cx: 0,
+        cy: 1,
+        rx: 1.55,
+        ry: 0.55,
+        fill,
+        stroke: "#ffe6a2",
+        "stroke-width": 0.16,
+      },
       g,
     );
     svg(
       "path",
       {
-        d: "M -1.5 1 Q -1 -.6 -.6 -1.2 H .6 Q 1 -.6 1.5 1 Z",
-        fill: color,
-        stroke: "#fff3c3",
-        "stroke-width": 0.22,
+        d: "M -1.2 .8 Q -.6 .2 -.48 -1.2 H .48 Q .6 .2 1.2 .8 Z",
+        fill,
+        stroke: "#ffd6a0",
+        "stroke-width": 0.12,
+      },
+      g,
+    );
+    svg(
+      "ellipse",
+      {
+        cx: 0,
+        cy: -1.15,
+        rx: 0.85,
+        ry: 0.3,
+        fill,
+        stroke: "#ffe6a2",
+        "stroke-width": 0.12,
       },
       g,
     );
@@ -604,12 +845,17 @@ function board() {
       "circle",
       {
         cx: 0,
-        cy: -1.7,
+        cy: -2.05,
         r: 0.95,
-        fill: color,
-        stroke: "#fff3c3",
-        "stroke-width": 0.22,
+        fill,
+        stroke: "#ffdc9a",
+        "stroke-width": 0.1,
       },
+      g,
+    );
+    svg(
+      "ellipse",
+      { cx: -0.3, cy: -2.4, rx: 0.22, ry: 0.13, fill: "#fff", opacity: 0.8 },
       g,
     );
     return g;
@@ -621,8 +867,36 @@ function curve(p, q, i, t = 0) {
     dy = q.y - p.y,
     len = Math.hypot(dx, dy),
     wave = reduced() ? 0 : Math.sin(t / 800 + i) * 1.1,
-    bend = (i % 2 ? 1 : -1) * Math.min(8, len * 0.22) + wave;
-  return `M ${p.x} ${p.y} C ${p.x + dx * 0.3 + bend} ${p.y + dy * 0.28} ${q.x - dx * 0.3 - bend} ${q.y - dy * 0.28} ${q.x} ${q.y}`;
+    bend = (i % 2 ? 1 : -1) * Math.min(15, len * 0.48) + wave;
+  return `M ${p.x} ${p.y} C ${p.x + dx * 0.25 - (dy / len) * bend} ${p.y + dy * 0.25 + (dx / len) * bend} ${q.x - dx * 0.25 + (dy / len) * bend} ${q.y - dy * 0.25 - (dx / len) * bend} ${q.x} ${q.y}`;
+}
+function taperedRibbon(d) {
+  const [x0, y0, x1, y1, x2, y2, x3, y3] = d.match(/-?[\d.]+/g).map(Number),
+    left = [],
+    right = [];
+  for (let k = 0; k <= 40; k++) {
+    const t = k / 40,
+      u = 1 - t,
+      x =
+        u * u * u * x0 +
+        3 * u * u * t * x1 +
+        3 * u * t * t * x2 +
+        t * t * t * x3,
+      y =
+        u * u * u * y0 +
+        3 * u * u * t * y1 +
+        3 * u * t * t * y2 +
+        t * t * t * y3;
+    const dx =
+        3 * u * u * (x1 - x0) + 6 * u * t * (x2 - x1) + 3 * t * t * (x3 - x2),
+      dy =
+        3 * u * u * (y1 - y0) + 6 * u * t * (y2 - y1) + 3 * t * t * (y3 - y2),
+      len = Math.hypot(dx, dy) || 1,
+      w = 1.85 * Math.min(1, (1 - t) / 0.24);
+    left.push(`${x - (dy / len) * w} ${y + (dx / len) * w}`);
+    right.push(`${x + (dy / len) * w} ${y - (dx / len) * w}`);
+  }
+  return `M ${left.join(" L ")} L ${right.reverse().join(" L ")} Z`;
 }
 function animateBoard(t) {
   const interval =
@@ -635,8 +909,9 @@ function animateBoard(t) {
   for (const item of Object.values(paths)) {
     if (item.kind === "snake") {
       const d = curve(item.p, item.q, item.i, t);
-      for (const el of [item.path, item.inner, item.pattern])
+      for (const el of [item.path, item.inner, item.sheen, item.pattern])
         el.setAttribute("d", d);
+      item.taper.setAttribute("d", taperedRibbon(d));
       item.head.setAttribute(
         "transform",
         `translate(${item.p.x} ${item.p.y}) rotate(${reduced() ? 0 : Math.sin(t / 1200 + item.i) * 6})`,
@@ -685,6 +960,7 @@ async function travel(i, p, q, ms, token, path = null, climb = false) {
 function render() {
   if (!state) return;
   setGameInProgress(!$("#play").hidden && state.phase !== "over");
+  $("#players").style.setProperty("--player-count", state.players.length);
   $("#players").innerHTML =
     `<p class="roster-summary">${state.order.length} finished · ${state.players.length - state.order.length} remaining</p>` +
     state.players
@@ -699,8 +975,45 @@ function render() {
     state.phase !== "ready" ||
     (state.bot && state.current === 1);
   $("#pause").textContent = paused ? "Resume" : "Pause";
-  if (state.dice)
-    $("#dice").textContent = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][state.dice - 1];
+  if (state.dice) drawDie(state.dice);
+}
+function drawDie(value) {
+  const positions = {
+    1: [[35, 31]],
+    2: [
+      [24, 21],
+      [46, 41],
+    ],
+    3: [
+      [24, 21],
+      [35, 31],
+      [46, 41],
+    ],
+    4: [
+      [24, 21],
+      [46, 21],
+      [24, 41],
+      [46, 41],
+    ],
+    5: [
+      [24, 21],
+      [46, 21],
+      [35, 31],
+      [24, 41],
+      [46, 41],
+    ],
+    6: [
+      [24, 21],
+      [46, 21],
+      [24, 31],
+      [46, 31],
+      [24, 41],
+      [46, 41],
+    ],
+  };
+  $("#dice").setAttribute("aria-label", `Die: ${value}`);
+  $("#dice").innerHTML =
+    `<svg viewBox="0 0 80 75" aria-hidden="true"><defs><linearGradient id="die-face" x2="1" y2="1"><stop stop-color="#fffdf0"/><stop offset="1" stop-color="#d8b27a"/></linearGradient></defs><path d="M 12 11 L 57 8 L 71 20 L 68 61 L 55 70 L 13 59 Z" fill="#8c6034" stroke="#ffdb97" stroke-width="1"/><path d="M 14 11 L 57 9 L 56 53 Q 56 59 51 60 L 17 57 Q 12 57 12 51 Z" fill="url(#die-face)"/><path d="M 57 10 L 69 21 L 67 59 L 56 67 V 53 Z" fill="#ba8d56"/>${positions[value].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="3.8" fill="#1c140e"/><ellipse cx="${x - 0.6}" cy="${y - 0.8}" rx="2.2" ry="1.2" fill="#5a402b"/>`).join("")}<circle cx="63" cy="27" r="2.2" fill="#342014"/><circle cx="62" cy="44" r="2.2" fill="#342014"/><circle cx="61" cy="57" r="2.2" fill="#342014"/></svg>`;
 }
 function scheduleBot() {
   clearTimeout(botTimer);
@@ -1031,6 +1344,7 @@ function fitJungleRigs() {
 fitJungleRigs();
 window.addEventListener("resize", fitJungleRigs);
 colorOptions();
+drawDie(5);
 applySettings();
 // Explicit local-only browser harness; never enabled on the published website.
 if (

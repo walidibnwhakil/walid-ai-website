@@ -12,8 +12,8 @@
       rel="canonical"
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
-    <link rel="stylesheet" href="style.css" />
-    <script type="module" src="game.mjs"></script>
+    <link rel="stylesheet" href="style.css?v=20261108-painted" />
+    <script type="module" src="game.mjs?v=20261108-painted"></script>
   </head>
   <body>
     <div id="world">
@@ -66,12 +66,23 @@
         <div class="game-heading">
           <div>
             <div class="eyebrow">THE SERPENT'S BELLY</div>
-            <h2>Snakes &amp; Ladders</h2>
+            <h2 class="painted-title">
+              <img
+                src="assets/royal-logo.webp"
+                alt="Snakes &amp; Ladders"
+                width="900"
+                height="380"
+              />
+            </h2>
           </div>
           <button id="menu-button">Back to Menu</button>
         </div>
         <div class="game-layout">
           <div class="board-frame">
+            <span class="gold-corner top-left" aria-hidden="true">❧</span
+            ><span class="gold-corner top-right" aria-hidden="true">❧</span
+            ><span class="gold-corner bottom-left" aria-hidden="true">❧</span
+            ><span class="gold-corner bottom-right" aria-hidden="true">❧</span>
             <svg
               id="board"
               viewBox="0 0 100 100"

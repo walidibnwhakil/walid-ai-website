@@ -55,3 +55,87 @@ h1,.tile,.option,.target-control,.info-card strong{font-variant-numeric:lining-n
 .top-sound{position:absolute;right:0;top:30px;font-size:17px;min-height:44px;border-radius:30px;padding:8px 15px}
 @media(max-width:800px){.top-sound{position:static;float:right;top:auto;font-size:12px;padding:4px 8px;min-height:32px;margin-top:2px}}
 @media(max-width:520px){.top-sound{position:absolute;top:0;right:0;float:none;font-size:0;min-height:30px;width:32px;padding:0}.top-sound:before{content:'♪';font-size:20px}}
+
+/* Fit the complete scene to the available browser height, not just its width. */
+html,body{height:100%;min-height:0}
+#app{height:100vh;height:100dvh;padding:12px 20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.masthead{flex:none;width:100%;margin:0;text-align:center}
+h1.brand{position:relative;width:min(700px,65vw,calc((100dvh - 420px)*3.8));min-width:260px;aspect-ratio:950/235;line-height:0;letter-spacing:normal;margin:0 auto;font-size:0;filter:drop-shadow(0 3px 8px #0008);background:none}
+.brand img{display:block;width:100%;height:100%;object-fit:contain}
+#menu{flex:1;min-height:0;width:min(1060px,100%);margin:0;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.menu-panel{padding:20px 26px}.options-columns{gap:20px}fieldset{padding:8px 14px 14px}legend{font-size:26px;padding:5px 15px}.option{font-size:26px;min-height:44px;padding:6px 15px;margin-top:8px}.option small,.option[data-mode] small{font-size:16px}
+.target-control{margin:16px auto;padding:4px 20px}.menu-tools{padding-top:14px;gap:12px}.menu-tools button{min-height:82px;font-size:21px;padding:8px}.menu-tools i{font-size:27px;margin-bottom:5px}
+.menu-footer{flex:none;margin:0;gap:15px}.start{font-size:36px;min-width:350px;padding:8px 28px;min-height:58px}.back-link{top:5px;font-size:22px;padding:8px 20px}.local-note{display:none}
+#game{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.play-layout{--frame-side:min(650px,calc(100dvh - 190px),calc(100vw - 490px));grid-template-columns:190px var(--frame-side) 210px;gap:24px;align-items:center;width:100%}
+.board-column{width:var(--frame-side)}.board-frame{padding:16px;width:100%;border-radius:24px}
+.game-controls,.information{padding:0;gap:12px}.game-controls button{font-size:22px;min-height:44px;padding:8px}.game-controls button:first-child{margin:0}
+.info-card{padding:10px;font-size:23px}.info-card strong{font-size:36px}.info-card #status{font-size:21px;margin:6px 0}.goal-card p{font-size:21px}.info-card small{font-size:11px;margin-top:5px}
+.playing h1.brand{width:min(580px,60vw,calc((100dvh - 400px)*3.8));min-width:240px;max-height:145px}
+.top-sound{top:10px;right:0}
+@media(max-height:760px) and (min-width:801px){
+ #app{padding:10px 18px;gap:10px}h1.brand{width:460px;min-width:0}.playing h1.brand{width:460px;min-width:0;max-height:none}
+ .play-layout{--frame-side:min(590px,calc(100dvh - 148px),calc(100vw - 460px));grid-template-columns:180px var(--frame-side) 190px;gap:20px}
+ .game-controls{gap:8px}.game-controls button{min-height:40px;font-size:20px;padding:7px}.information{gap:8px}.info-card{padding:8px;font-size:21px}.info-card strong{font-size:30px}.goal-card p{font-size:18px}.info-card #status{font-size:18px}
+ #menu{gap:8px}.menu-panel{padding:14px 22px}legend{font-size:23px}.option{font-size:23px;min-height:38px;margin-top:6px;padding:4px 12px}.target-control{margin:10px auto}.menu-tools button{min-height:66px;font-size:19px}.menu-tools i{font-size:23px;margin-bottom:3px}.start{font-size:31px;min-height:50px}
+}
+@media(max-width:800px) and (orientation:portrait), (max-width:500px){
+ #app{padding:8px 12px;gap:8px}h1.brand,.playing h1.brand{width:min(100%,460px);min-width:0;max-height:none}
+ .top-sound{position:absolute;top:0;right:0;float:none;width:30px;min-height:30px;padding:0;font-size:0;margin:0}.top-sound:before{content:'♪';font-size:19px}
+ #menu{gap:10px;justify-content:center}.menu-panel{padding:14px 12px;border-width:3px;border-radius:24px}.options-columns{grid-template-columns:1fr 1fr;gap:10px}fieldset{border-radius:14px;padding:3px 7px 10px}legend{font-size:18px;padding:4px 1px}.option{font-size:21px;min-height:38px;margin-top:7px;padding:4px 8px;gap:3px}.option[data-mode]{min-height:53px}.option[data-mode] small{font-size:12px}.option[data-size] small{display:none}.option b{flex:none;width:21px;height:21px;font-size:17px;line-height:19px}
+ .target-control{width:100%;gap:9px;margin:12px auto;padding:3px 8px;font-size:20px}.target-control select{font-size:24px;min-height:36px;width:90px}.target-control button{min-height:36px}
+ .menu-tools{grid-template-columns:repeat(3,1fr);gap:8px;padding-top:10px}.menu-tools button{font-size:16px;min-height:52px;padding:6px 3px;border-radius:11px}.menu-tools i{display:none}.menu-tools small{font-size:11px;margin-top:3px}.menu-tools button:nth-child(4){grid-column:1/3;min-height:45px}.menu-tools button:nth-child(5){min-height:45px}
+ .menu-footer{flex-direction:row;gap:10px}.start{flex:1;width:auto;min-width:0;min-height:48px;font-size:27px;padding:6px 12px;border-width:3px}.back-link{position:static;min-height:44px;font-size:20px;padding:7px 13px}
+ #game{align-items:center}.play-layout{--frame-side:min(560px,calc(100vw - 24px),calc(100dvh - 300px));grid-template-columns:minmax(0,1fr);gap:8px;justify-items:center;width:min(100%,560px)}
+ .board-column{grid-row:2;width:var(--frame-side)}.board-frame{padding:10px;border-width:3px;border-radius:20px}
+ .information{grid-row:1;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}.info-card{padding:5px;font-size:17px;border-radius:12px}.info-card strong{font-size:27px;line-height:1}.status-card,.goal-card{font-size:13px;gap:3px;min-height:39px}.info-card #status{font-size:14px;margin:0;padding:2px 8px}.info-card small{font-size:10px;margin:0}.goal-card p{font-size:14px;margin:0}.goal-card small{display:none}
+ .game-controls{grid-row:3;width:100%;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;display:grid;padding:0}.game-controls button{min-height:44px;font-size:16px;padding:4px 3px;line-height:1.05;border-radius:11px}.game-controls button:last-child{grid-column:auto}.game-controls button:first-child{margin:0}
+ .tile.digits-4,.tile.digits-5{font-size:max(10px,calc(var(--cell)*.28))}
+}
+@media(max-width:800px) and (orientation:portrait) and (max-height:650px), (max-width:500px) and (max-height:650px){
+ #app{gap:6px;padding-top:6px;padding-bottom:6px}h1.brand,.playing h1.brand{width:min(100%,330px)}
+ .play-layout{--frame-side:min(calc(100vw - 24px),calc(100dvh - 270px));gap:6px}.info-card{font-size:15px}.info-card strong{font-size:23px}.status-card,.goal-card{min-height:34px;font-size:12px}.goal-card p{font-size:12px}.info-card #status{font-size:12px}.game-controls button{font-size:14px;min-height:40px}.menu-panel{padding:10px}.option[data-mode]{min-height:46px}.option{min-height:33px;margin-top:5px}.target-control{margin:8px auto}.menu-tools{gap:6px;padding-top:8px}.menu-tools button{min-height:45px}.menu-tools button:nth-child(4),.menu-tools button:nth-child(5){min-height:40px}
+}
+/* Wide, short screens (including phones in landscape) use compact side panels. */
+@media(orientation:landscape) and (max-height:600px){
+ #app{padding:6px 10px;gap:6px}h1.brand,.playing h1.brand{width:250px;min-width:0;max-height:none}.top-sound{font-size:13px;min-height:32px;padding:4px 9px}
+ .play-layout{--frame-side:min(calc(100dvh - 82px),calc(100vw - 320px),500px);grid-template-columns:130px var(--frame-side) 140px;gap:12px;align-items:center}.board-column{grid-row:auto;width:var(--frame-side)}.board-frame{padding:8px;border-width:3px;border-radius:17px}
+ .game-controls{grid-row:auto;display:flex;gap:5px;width:auto}.game-controls button{font-size:16px;min-height:30px;padding:3px;line-height:1.1}.game-controls button:first-child{margin:0}.information{grid-row:auto;display:flex;gap:5px;padding:0;width:auto}.info-card{padding:5px;font-size:16px;border-radius:12px}.info-card strong{font-size:25px}.info-card #status{font-size:14px;margin:3px 0;padding:3px}.goal-card p{font-size:15px}.info-card small{font-size:9px}.goal-card small{display:none}
+ #menu{width:min(850px,100%);gap:6px}.menu-panel{padding:8px 16px}.options-columns{grid-template-columns:1fr 1fr;gap:16px}fieldset{padding:2px 10px 6px}legend{font-size:18px;padding:2px}.option{font-size:19px;min-height:28px;padding:2px 10px;margin-top:4px}.option small,.option[data-mode] small{font-size:12px}.option[data-mode] small{display:inline;margin-left:6px}.option b{font-size:16px;width:19px;height:19px;line-height:17px}.target-control{font-size:18px;margin:6px auto;padding:0 12px;gap:10px}.target-control button,.target-control select{min-height:28px;font-size:20px}.menu-tools{grid-template-columns:repeat(5,1fr);padding-top:6px;gap:8px}.menu-tools button{font-size:15px;min-height:34px;padding:3px}.menu-tools i{display:none}.menu-tools small{font-size:10px;margin:0}.menu-tools button:nth-child(4){grid-column:auto;min-height:34px}.menu-tools button:nth-child(5){min-height:34px}.menu-footer{flex-direction:row;gap:12px}.start{font-size:23px;min-height:36px;min-width:230px;padding:2px 15px;border-width:2px}.back-link{position:static;min-height:34px;padding:3px 16px;font-size:18px}
+}
+h1.brand{width:min(620px,65vw);min-width:0;height:clamp(100px,18dvh,180px);aspect-ratio:auto}
+.playing h1.brand{width:min(580px,65vw);min-width:0;height:140px;max-height:none}
+@media(max-height:760px) and (min-width:801px){h1.brand,.playing h1.brand{height:110px;width:420px}}
+@media(max-width:800px) and (orientation:portrait), (max-width:500px){
+ h1.brand,.playing h1.brand{width:100%;height:100px;min-width:0}
+ .play-layout{--frame-side:min(560px,calc(100vw - 24px),calc(100dvh - 340px))}
+}
+@media(max-width:800px) and (orientation:portrait) and (max-height:650px), (max-width:500px) and (max-height:650px){h1.brand,.playing h1.brand{height:80px}.play-layout{--frame-side:min(calc(100vw - 24px),calc(100dvh - 290px))}}
+@media(orientation:landscape) and (max-height:600px){h1.brand,.playing h1.brand{height:50px;width:250px}.play-layout{--frame-side:min(calc(100dvh - 82px),calc(100vw - 320px),500px)}}
+@media(orientation:landscape) and (max-height:360px){
+ h1.brand,.playing h1.brand{height:42px;width:230px}.play-layout{--frame-side:min(calc(100dvh - 66px),calc(100vw - 320px),500px)}
+ .menu-panel{padding:6px 12px}legend{font-size:16px;line-height:1.1}.option{font-size:17px;line-height:1;min-height:24px;margin-top:3px;padding:2px 8px}.option small,.option[data-mode] small{font-size:11px}.target-control{margin:4px auto}.menu-tools{padding-top:4px}.menu-tools button,.menu-tools button:nth-child(4),.menu-tools button:nth-child(5){min-height:30px;font-size:14px}
+ .game-controls button{min-height:28px;font-size:15px}.info-card{font-size:14px;padding:3px}.info-card strong{font-size:21px}.info-card #status{font-size:13px}.goal-card p{font-size:13px}
+}
+/* Keep decorative corners inside the frame so ornaments cannot create scrollbars. */
+.ornate:before,.ornate:after{font-size:34px}.ornate:before{top:10px;left:8px}.ornate:after{bottom:10px;right:8px}
+@media(max-width:800px) and (orientation:portrait) and (max-height:650px), (max-width:500px) and (max-height:650px){.play-layout{--frame-side:min(calc(100vw - 24px),calc(100dvh - 310px))}}
+@media(orientation:landscape) and (max-height:600px){.top-sound{position:absolute;float:none;top:4px;right:0;margin:0}}
+@media(min-width:801px) and (min-height:761px){
+ .playing h1.brand{width:min(620px,65vw);height:clamp(100px,18dvh,180px)}
+ .play-layout{--frame-side:min(650px,calc(100dvh - 230px),calc(100vw - 490px))}
+}
+.more-controls{display:none}.quick-tools{display:grid;gap:12px}
+@media(max-width:800px) and (orientation:portrait), (max-width:500px){
+ .game-controls [data-action="rules"],.game-controls [data-action="stats"],.game-controls [data-action="settings"],.game-controls [data-action="sound"]{display:none}
+ .game-controls .more-controls{display:block}
+ .play-layout{--frame-side:min(560px,calc(100vw - 24px),calc(100dvh - 290px))}
+}
+@media(max-width:800px) and (orientation:portrait) and (max-height:650px), (max-width:500px) and (max-height:650px){.play-layout{--frame-side:min(calc(100vw - 24px),calc(100dvh - 260px))}}
+@media(max-width:500px) and (max-height:540px){
+ h1.brand,.playing h1.brand{height:60px}#menu{gap:6px}.menu-panel{padding:8px}
+ fieldset{padding:2px 6px 6px}legend{font-size:16px;line-height:1.1;padding:3px 0}.option{font-size:19px;min-height:30px;margin-top:4px;padding:3px 6px}.option[data-mode]{min-height:42px}.option[data-mode] small{font-size:11px}
+ .target-control{font-size:18px;margin:6px auto;padding:0 5px;gap:6px}.target-control button,.target-control select{min-height:30px;font-size:21px}
+ .menu-tools{padding-top:6px;gap:6px}.menu-tools button{font-size:14px;min-height:38px;padding:4px 2px}.menu-tools button:nth-child(4),.menu-tools button:nth-child(5){min-height:36px}.menu-tools small{font-size:10px}
+ .start{font-size:25px;min-height:44px;padding:4px 8px;border-width:2px}.back-link{min-height:40px;font-size:18px;padding:5px 10px}
+}

@@ -71,3 +71,23 @@ an exact reproduction of the references' detailed ornamental artwork.
 The unrelated `games/arcade.test.mjs` has three Ludo failures reproduced using
 an archive of the untouched starting commit b491543. They are outside this
 2048 change and were not altered.
+
+## One-screen layout update
+
+The menu and gameplay use the same fixed `2048-logo.webp` asset, with a responsive
+size and unchanged composition between screens. The directional buttons and
+inline input hint have been removed; instructions remain in Game Rules.
+Board dimensions now account for available dynamic viewport height as well as
+width. Compact portrait and landscape arrangements keep controls and scores in
+view without hiding page overflow. On phones, Rules, Statistics and Settings are
+available from More, preserving space for the playable board. Dialogs can scroll internally when necessary.
+
+Run the height regression suite with:
+
+```sh
+NODE_PATH="$PWD/work/node_modules" node games/2048/viewport-check.cjs
+```
+
+It covers menu and all three boards at 17 desktop, phone, tablet and landscape
+viewport sizes, including 320×480, 320×568, 1366×640, 1920×950 and 568×320. Assertions check
+both page dimensions and the actual bounds of the logo, panels, controls and board.

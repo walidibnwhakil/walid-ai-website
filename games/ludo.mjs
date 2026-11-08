@@ -62,15 +62,34 @@ document.querySelector("#back-to-setup").addEventListener("click",()=>{
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   location.assign(location.pathname);
 });
-document.querySelector("#menu-sound").addEventListener("click",()=>{soundEnabled=!soundEnabled;syncSoundControls();});
-document.querySelector("#settings-sound").addEventListener("change",event=>{soundEnabled=event.currentTarget.checked;syncSoundControls();});
-document.querySelector("#sound-toggle").addEventListener("click",()=>{soundEnabled=!soundEnabled;syncSoundControls();});
-function syncSoundControls(){
-  const menu=document.querySelector("#menu-sound"),board=document.querySelector("#sound-toggle"),setting=document.querySelector("#settings-sound");
-  menu.setAttribute("aria-pressed",String(soundEnabled));menu.setAttribute("aria-label",soundEnabled?"Turn sound off":"Turn sound on");menu.classList.toggle("sound-on",soundEnabled);
-  board.setAttribute("aria-pressed",String(soundEnabled));board.setAttribute("aria-label",soundEnabled?"Turn sound off":"Turn sound on");setting.checked=soundEnabled;
-  try{localStorage.setItem("ludu-mahir-sound",String(soundEnabled))}catch{}
-  if(soundEnabled)resumeAudioContext();else for(const stop of activeCaptureStops)stop();
+function toggleSound(){
+  soundEnabled=!soundEnabled;
+  syncSoundControls(true);
+  if(soundEnabled)playPawnStepSound(0);
+}
+document.querySelector("#menu-sound").addEventListener("click",toggleSound);
+document.querySelector("#settings-sound").addEventListener("change",event=>{
+  soundEnabled=event.currentTarget.checked;
+  syncSoundControls(true);
+  if(soundEnabled)playPawnStepSound(0);
+});
+document.querySelector("#sound-toggle").addEventListener("click",toggleSound);
+function syncSoundControls(unlock=false){
+  for(const button of [document.querySelector("#menu-sound"),document.querySelector("#sound-toggle")]){
+    button.setAttribute("aria-pressed",String(soundEnabled));
+    button.setAttribute("aria-label",soundEnabled?"Mute sound":"Unmute sound");
+    button.title=soundEnabled?"Sound on — click to mute":"Sound muted — click to unmute";
+    button.dataset.muted=String(!soundEnabled);
+    button.classList.toggle("sound-on",soundEnabled);
+  }
+  document.querySelector("#settings-sound").checked=soundEnabled;
+  try{localStorage.setItem("ludu-mahir-sound",String(soundEnabled));}catch{}
+  if(soundMaster){
+    soundMaster.gain.cancelScheduledValues(audioContext.currentTime);
+    soundMaster.gain.setValueAtTime(soundEnabled?1:0,audioContext.currentTime);
+  }
+  if(soundEnabled&&unlock)resumeAudioContext();
+  if(!soundEnabled)for(const stop of activeCaptureStops)stop();
 }
 document.querySelector("#board-settings").addEventListener("click",event=>{const open=playScreen.classList.toggle("show-game-settings");event.currentTarget.setAttribute("aria-expanded",String(open));event.currentTarget.setAttribute("aria-label",open?"Close game settings":"Game settings");if(open)document.querySelector(".game-settings").scrollIntoView({behavior:"smooth",block:"center"});});
 document.querySelector("#full-screen").addEventListener("click",()=>{
@@ -131,7 +150,7 @@ function makeDieCube(){
   return cube;
 }
 const lastDice=[1,1,1,1];
-let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), scoreLightTimers=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=savedSoundPreference===null?true:savedSoundPreference==="true",audioContext=null,noiseBuffer=null,activeCaptureStops=new Set();
+let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), scoreLightTimers=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=savedSoundPreference===null?(typeof restoredConfig?.sound==="boolean"?restoredConfig.sound:true):savedSoundPreference==="true",audioContext=null,soundMaster=null,noiseBuffer=null,activeCaptureStops=new Set();
 const DICE_ROLL_DURATION=950;
 syncSoundControls();
 const defaultColors=initialPlayers==="2"?[0,3,2,1]:[0,1,2,3];
@@ -281,8 +300,13 @@ function resumeAudioContext() {
   try {
     const AudioEngine=window.AudioContext||window.webkitAudioContext;
     if(!AudioEngine)return null;
-    if(!audioContext)audioContext=new AudioEngine();
-    if(audioContext.state==="suspended")audioContext.resume().catch(()=>{});
+    if(!audioContext){
+      audioContext=new AudioEngine();
+      soundMaster=audioContext.createGain();
+      soundMaster.gain.setValueAtTime(soundEnabled?1:0,audioContext.currentTime);
+      soundMaster.connect(audioContext.destination);
+    }
+    if(audioContext.state!=="running")audioContext.resume().catch(()=>{});
     return audioContext;
   } catch { return null; }
 }
@@ -301,7 +325,7 @@ function playNoiseBurst(ctx,time,volume,frequency,pan,duration,type="bandpass") 
   const gain=ctx.createGain();gain.gain.setValueAtTime(.0001,time);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),time+.004);gain.gain.exponentialRampToValueAtTime(.0001,time+duration);
   let output=gain;
   if(ctx.createStereoPanner){const panner=ctx.createStereoPanner();panner.pan.setValueAtTime(Math.max(-1,Math.min(1,pan)),time);gain.connect(panner);output=panner;}
-  source.connect(filter);filter.connect(gain);output.connect(ctx.destination);source.start(time);source.stop(time+duration);
+  source.connect(filter);filter.connect(gain);output.connect(soundMaster);source.start(time);source.stop(time+duration);
 }
 function playTone(ctx,frequency,time,volume,duration,wave="sine",endFrequency=null) {
   if(!ctx||!soundEnabled)return;
@@ -309,7 +333,7 @@ function playTone(ctx,frequency,time,volume,duration,wave="sine",endFrequency=nu
   oscillator.type=wave;oscillator.frequency.setValueAtTime(frequency,time);
   if(endFrequency)oscillator.frequency.exponentialRampToValueAtTime(endFrequency,time+duration);
   gain.gain.setValueAtTime(.0001,time);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),time+.012);gain.gain.exponentialRampToValueAtTime(.0001,time+duration);
-  oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start(time);oscillator.stop(time+duration+.02);
+  oscillator.connect(gain);gain.connect(soundMaster);oscillator.start(time);oscillator.stop(time+duration+.02);
 }
 function playDiceSound(value) {
   const ctx=resumeAudioContext();if(!ctx)return;
@@ -338,7 +362,7 @@ function startCaptureWhoosh(durationMs) {
   const highpass=ctx.createBiquadFilter();highpass.type="highpass";highpass.frequency.setValueAtTime(180,start);
   const gain=ctx.createGain();gain.gain.setValueAtTime(.0001,start);gain.gain.linearRampToValueAtTime(.17,start+.075);gain.gain.setValueAtTime(.12,start+Math.max(.09,duration*.4));
   const lfo=ctx.createOscillator(),lfoGain=ctx.createGain();lfo.frequency.value=2.4;lfoGain.gain.value=170;lfo.connect(lfoGain);lfoGain.connect(filter.frequency);
-  source.connect(highpass);highpass.connect(filter);filter.connect(gain);gain.connect(ctx.destination);source.start(start);lfo.start(start);
+  source.connect(highpass);highpass.connect(filter);filter.connect(gain);gain.connect(soundMaster);source.start(start);lfo.start(start);
   let stopped=false;
   const stop=()=>{
     if(stopped)return;stopped=true;activeCaptureStops.delete(stop);

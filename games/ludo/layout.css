@@ -300,3 +300,16 @@ body.ludo-game.playing-ludo
     --phone-pawn-scale: 1.1;
   }
 }
+
+/* Both speaker controls reflect the same audio setting. */
+body.ludo-game :is(#menu-sound, #sound-toggle) .sound-mute-mark {
+  display: none;
+}
+body.ludo-game
+  :is(#menu-sound, #sound-toggle)[data-muted="true"]
+  .sound-mute-mark {
+  display: block;
+}
+body.ludo-game :is(#menu-sound, #sound-toggle)[data-muted="true"] .sound-waves {
+  display: none;
+}

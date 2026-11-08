@@ -422,25 +422,75 @@ fs.mkdirSync(out, { recursive: true });
           s.players.forEach((p) => (p.position = 8));
           window.serpentTest.setState(s);
         });
-        const boxes = await page.locator(".pin-pawn-art").evaluateAll((es) =>
+        const faces = await page.locator(".pawn .pin-face").evaluateAll((es) =>
           es.map((e) => {
-            const r = e.getBoundingClientRect();
-            return { x: r.x, y: r.y, w: r.width, h: r.height };
+            const m = e.getScreenCTM(),
+              p = new DOMPoint(32, 29).matrixTransform(m);
+            return { x: p.x, y: p.y, r: 13 * Math.hypot(m.a, m.b) };
           }),
         );
-        for (let i = 0; i < 4; i++)
-          for (let j = i + 1; j < 4; j++) {
-            const a = boxes[i],
-              b = boxes[j];
+        for (let i = 0; i < faces.length; i++)
+          for (let j = i + 1; j < faces.length; j++)
             assert.ok(
-              a.x + a.w <= b.x + 0.5 ||
-                b.x + b.w <= a.x + 0.5 ||
-                a.y + a.h <= b.y + 0.5 ||
-                b.y + b.h <= a.y + 0.5,
-              "shared pawns must stay distinct",
+              Math.hypot(faces[i].x - faces[j].x, faces[i].y - faces[j].y) >
+                faces[i].r + faces[j].r,
+              "shared pawn colors remain separately visible",
             );
-          }
         await shot(`large-pawns-shared-${width}`);
+      }
+      await page.setViewportSize({ width: 1440, height: 1000 });
+    },
+  );
+  await check(
+    "every pin tip stays at the exact cell center, including shared and top-row squares",
+    async () => {
+      for (const [width, height] of [
+        [390, 844],
+        [1366, 768],
+      ]) {
+        await page.setViewportSize({ width, height });
+        for (const square of [1, 8, 54, 91, 100])
+          for (const count of [1, 2, 3, 4]) {
+            await force({ count: 4, pos: square, motion: false });
+            await page.evaluate(
+              ({ square, count }) => {
+                const s = structuredClone(window.serpentTest.state);
+                s.players.forEach(
+                  (p, i) => (p.position = i < count ? square : 0),
+                );
+                window.serpentTest.setState(s);
+              },
+              { square, count },
+            );
+            const distances = await page.evaluate(
+              async ({ square, count }) => {
+                const { center } = await import("./engine.mjs");
+                const p = center(square),
+                  m = document.querySelector("#board").getScreenCTM(),
+                  expected = new DOMPoint(p.x, p.y).matrixTransform(m);
+                return Array.from({ length: count }, (_, i) => {
+                  const art = document.querySelector(
+                      `[data-player="${i}"] .pin-pawn-art`,
+                    ),
+                    tip = new DOMPoint(32, 77).matrixTransform(
+                      art.getScreenCTM(),
+                    );
+                  return Math.hypot(tip.x - expected.x, tip.y - expected.y);
+                });
+              },
+              { square, count },
+            );
+            assert.ok(
+              distances.every((d) => d < 0.1),
+              `pin tips must mark square ${square}, count ${count}`,
+            );
+            if (square === 8 && count === 1)
+              await shot(`centered-pin-${width}`);
+            if (square === 8 && count === 4)
+              await shot(`centered-shared-pins-${width}`);
+            if (square === 100 && count === 1)
+              await shot(`centered-finish-pin-${width}`);
+          }
       }
       await page.setViewportSize({ width: 1440, height: 1000 });
     },

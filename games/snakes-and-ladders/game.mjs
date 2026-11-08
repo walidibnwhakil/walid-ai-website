@@ -938,9 +938,9 @@ function board() {
       "svg",
       {
         x: -3.5,
-        y: -4.6,
+        y: -(7 * 77) / 64,
         width: 7,
-        height: 8.42,
+        height: (7 * 77) / 64,
         viewBox: "0 0 64 77",
         class: "pin-pawn-art",
       },
@@ -1035,28 +1035,18 @@ function place(i, n, point) {
       .filter((j) => j >= 0) ?? [i],
     slot = peers.indexOf(i),
     shared = !point && n > 0 && peers.length > 1;
-  const offsets =
-    peers.length === 2
-      ? [
-          [-2.4, 0],
-          [2.4, 0],
-        ]
-      : peers.length === 3
-        ? [
-            [-2.25, -2.3],
-            [2.25, -2.3],
-            [0, 2.3],
-          ]
-        : [
-            [-2.25, -2.3],
-            [2.25, -2.3],
-            [-2.25, 2.3],
-            [2.25, 2.3],
-          ];
-  const [ox, oy] = shared ? (offsets[Math.max(0, slot)] ?? [0, 0]) : [0, 0];
+  // The pin tip is its local origin. Shared pawns fan around this same
+  // square-center anchor instead of moving their tips into the cell corners.
+  const angle = !shared
+    ? 0
+    : (peers.length === 2
+        ? [-35, 35]
+        : peers.length === 3
+          ? [-65, 0, 65]
+          : [-135, -45, 45, 135])[Math.max(0, slot)];
   pawns[i]?.setAttribute(
     "transform",
-    `translate(${p.x + ox} ${p.y + oy}) scale(${shared ? (peers.length === 2 ? 0.65 : 0.52) : 1})`,
+    `translate(${p.x} ${p.y}) rotate(${angle}) scale(${shared ? (peers.length === 2 ? 0.62 : 0.56) : 1})`,
   );
   pawns[i]?.setAttribute("data-position", n);
   pawns[i]?.setAttribute("visibility", !n && !point ? "hidden" : "visible");

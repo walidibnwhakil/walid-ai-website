@@ -24,7 +24,7 @@ Budgets are checked periodically; a slow device returns the best completed itera
 
 All five uploaded PNG references were inspected: desktop, mobile, Black Win, You Win and You Lose. The original Preview and Menu references were visible earlier in the conversation but were not present in the ZIP or workspace. Those two screens were recreated using the supplied aesthetic; exact pixel matching to their original files was unavailable.
 
-The twelve independently usable transparent WebP pieces were generated from the approved desktop artwork, then extracted into individual optimized assets. Ivory has blue jewels; black has red jewels; both have ornate gold bases. Title, avatars and small wood texture tiles were extracted from the approved desktop reference. Room, preview and result emblems were recreated from the approved artwork. The board is 64 interactive buttons; no reference screenshot is used as the playable board.
+The twelve independently usable transparent WebP pieces were generated from the approved desktop artwork, then extracted into individual optimized assets. Ivory has blue jewels; black has red jewels; both have ornate gold bases. Title, bot avatar and small wood texture tiles were extracted from the approved desktop reference. Room, preview and result emblems were recreated from the approved artwork. The board is 64 interactive buttons; no reference screenshot is used as the playable board.
 
 The recreation retains the library, gold/wood palette, crowned/laurel title, avatars, premium pieces, purple menu selection, victory emblems, particles/fireworks and fallen-king defeat. Fine carving, gold border ornaments, lighting, control proportions and banner details differ from the references. White/Black pieces are placed according to legal board orientation even where a reference depicts a different king/queen order. Defeat reads **You Lose!!**. Fireworks are omitted for draws and defeat; reduced-motion preference suppresses animated effects.
 
@@ -53,7 +53,7 @@ Added:
 - `games/chess/assets/bk.webp`, `bq.webp`, `br.webp`, `bb.webp`, `bn.webp`, `bp.webp`
 - `games/chess/assets/title.webp`
 - `games/chess/assets/bot-avatar.webp`
-- `games/chess/assets/human-avatar.webp`
+- `games/chess/assets/player-avatar.svg` (neutral profile silhouette; the former human portrait was removed at the user’s request)
 - `games/chess/assets/light-wood.webp`
 - `games/chess/assets/dark-wood.webp`
 - `games/chess/assets/room.webp`

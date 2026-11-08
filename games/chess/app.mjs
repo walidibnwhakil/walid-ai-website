@@ -314,7 +314,7 @@ function renderClocks() {
 }
 function playerHTML(color) {
   const p = identity(color, match.mode, match.side, match.difficulty);
-  return `<img class="avatar" src="${asset(p.bot ? "bot-avatar" : "human-avatar")}" alt="${p.bot ? "Bot" : "Player"} avatar"><h2>${p.label}</h2><div class="side"><img src="${asset(color + "p")}" alt="">${colorName(color)}</div><time class="clock" data-clock="${color}" aria-label="${colorName(color)} remaining time">${clockText(match.clocks[color])}</time>`;
+  return `<img class="avatar" src="${p.bot ? asset("bot-avatar") : "./assets/player-avatar.svg"}" alt="${p.bot ? "Bot" : "Player"} avatar"><h2>${p.label}</h2><div class="side"><img src="${asset(color + "p")}" alt="">${colorName(color)}</div><time class="clock" data-clock="${color}" aria-label="${colorName(color)} remaining time">${clockText(match.clocks[color])}</time>`;
 }
 function render(moved) {
   if (!match) return;

@@ -1,3 +1,4 @@
+import { createMenuScene } from "./menu-scene.mjs?v=20261108-jungle";
 import { createLava } from "./lava.mjs?v=20261108-joined";
 import {
   snakeCurve,
@@ -325,76 +326,6 @@ function serpent(parent, x, y, scale = 1, color = "#48a94c", royal = false) {
     );
   return root;
 }
-function jungle() {
-  const j = $("#jungle");
-  svg(
-    "path",
-    {
-      d: "M -30 330 Q 300 250 410 100 M 580 170 Q 800 100 1040 170",
-      fill: "none",
-      stroke: "#302b16",
-      "stroke-width": 75,
-    },
-    j,
-  );
-  for (let i = 0; i < 18; i++) {
-    const x = i * 65 - 20,
-      g = svg("g", { class: "vine", style: `animation-delay:-${i % 7}s` }, j);
-    svg(
-      "path",
-      {
-        d: `M ${x} -20 Q ${x - 45} 100 ${x + 10} ${180 + (i % 4) * 90}`,
-        stroke: "#53723a",
-        "stroke-width": 4,
-        fill: "none",
-      },
-      g,
-    );
-    for (let k = 0; k < 4; k++)
-      svg(
-        "ellipse",
-        {
-          cx: x + (k % 2 ? 16 : -10),
-          cy: 35 + k * 43,
-          rx: 13,
-          ry: 27,
-          fill: ["#234c28", "#456f35", "#6f8b40"][i % 3],
-          transform: `rotate(${k % 2 ? 40 : -40} ${x} ${35 + k * 43})`,
-          class: "leaf",
-        },
-        g,
-      );
-  }
-  const ladd = svg("g", { transform: "translate(180 330) rotate(14)" }, j);
-  for (const x of [0, 65])
-    svg(
-      "path",
-      { d: `M ${x} 0 V 520`, stroke: "#946027", "stroke-width": 14 },
-      ladd,
-    );
-  for (let y = 0; y < 520; y += 50)
-    svg(
-      "path",
-      { d: `M 0 ${y} H 65`, stroke: "#cf9747", "stroke-width": 10 },
-      ladd,
-    );
-  serpent(j, 690, 215, 1.1, "#4c9c43", true);
-  serpent(j, 170, 780, 0.65, "#c85036");
-  serpent(j, 840, 760, 0.7, "#d8b746");
-  serpent(j, 440, 880, 0.45, "#4ca786");
-  for (let i = 0; i < 22; i++)
-    svg(
-      "circle",
-      {
-        cx: (i * 139) % 1000,
-        cy: (i * 197) % 900,
-        r: 1.5,
-        fill: "#f8e59b",
-        opacity: 0.5,
-      },
-      j,
-    );
-}
 function pinMarkup(color) {
   return `<svg class="pin-avatar" viewBox="0 0 64 77" aria-hidden="true" style="--pawn:${HEX[COLORS.indexOf(color)]}"><path class="pin-outline" d="M32 3C17 3 5 15 5 31c0 15 17 34 27 46 10-12 27-31 27-46C59 15 47 3 32 3Z"/><path class="pin-color" d="M32 9C20 9 11 18 11 31c0 11 13 27 21 38 8-11 21-27 21-38C53 18 44 9 32 9Z"/><circle class="pin-face" cx="32" cy="29" r="13"/><ellipse class="pin-gloss" cx="26" cy="22" rx="4" ry="6"/></svg>`;
 }
@@ -403,7 +334,7 @@ function colorOptions() {
   $("#colors").innerHTML = Array.from(
     { length: count },
     (_, i) =>
-      `<div class="setup-color"><button type="button" data-setup-color="${i}" aria-label="${i === 1 && $("#mode").value === "bot" ? "Bot" : "Player " + (i + 1)}: choose pawn color">${pinMarkup(COLORS[i])}<span>${i === 1 && $("#mode").value === "bot" ? "Bot" : "Player " + (i + 1)}<small>${COLORS[i]}</small></span></button><select data-color="${i}" hidden aria-hidden="true">${COLORS.map((c, j) => `<option ${i === j ? "selected" : ""}>${c}</option>`).join("")}</select></div>`,
+      `<div class="setup-color"><button type="button" data-setup-color="${i}" data-short-name="${i === 1 && $("#mode").value === "bot" ? "Bot" : "P" + (i + 1)}" aria-label="${i === 1 && $("#mode").value === "bot" ? "Bot" : "Player " + (i + 1)}: choose pawn color">${pinMarkup(COLORS[i])}<span>${i === 1 && $("#mode").value === "bot" ? "Bot" : "Player " + (i + 1)}<small>${COLORS[i]}</small></span></button><select data-color="${i}" hidden aria-hidden="true">${COLORS.map((c, j) => `<option ${i === j ? "selected" : ""}>${c}</option>`).join("")}</select></div>`,
   ).join("");
 }
 function colorPicker(i, inMatch = false) {
@@ -1356,6 +1287,15 @@ function begin(skip = false) {
   if (skip || reduced()) reveal();
   else {
     $("#intro").hidden = false;
+    const hero = $(".menu-hero"),
+      box = hero.getBoundingClientRect(),
+      mouth = new DOMPoint(365, 170).matrixTransform(
+        $("#jungle").getScreenCTM(),
+      );
+    hero.style.setProperty("--camera-x", `${innerWidth / 2 - mouth.x}px`);
+    hero.style.setProperty("--camera-y", `${innerHeight / 2 - mouth.y}px`);
+    hero.style.setProperty("--mouth-x", `${mouth.x - box.x}px`);
+    hero.style.setProperty("--mouth-y", `${mouth.y - box.y}px`);
     document.body.classList.add("entering");
     introTimer = setTimeout(reveal, 3800);
     $("#skip").onclick = () => {
@@ -1490,7 +1430,39 @@ function panel(kind) {
   } else $("#dialog-content").onchange = null;
   $("#dialog").showModal();
 }
-$("#mode").onchange = colorOptions;
+function selectMode() {
+  colorOptions();
+  const bot = $("#mode").value === "bot";
+  $("#bot-mode").classList.toggle("selected", bot);
+  $("#bot-mode").setAttribute("aria-pressed", String(bot));
+  $("#local-mode").classList.toggle("selected", !bot);
+  if (!bot) $("#local-label").textContent = $("#mode").value + " Players";
+  $("#local-options").hidden = true;
+  $("#local-mode").setAttribute("aria-expanded", "false");
+}
+$("#mode").onchange = selectMode;
+$("#bot-mode").onclick = () => {
+  $("#mode").value = "bot";
+  selectMode();
+};
+$("#local-mode").onclick = () => {
+  const open = $("#local-options").hidden;
+  $("#local-options").hidden = !open;
+  $("#local-mode").setAttribute("aria-expanded", String(open));
+};
+document.querySelectorAll("[data-local-mode]").forEach(
+  (b) =>
+    (b.onclick = () => {
+      $("#mode").value = b.dataset.localMode;
+      selectMode();
+    }),
+);
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".local-picker")) {
+    $("#local-options").hidden = true;
+    $("#local-mode").setAttribute("aria-expanded", "false");
+  }
+});
 $("#start").onclick = () => {
   if (!$("#start").disabled) begin();
 };
@@ -1559,7 +1531,10 @@ matchMedia("(prefers-reduced-motion: reduce)").addEventListener(
   "change",
   applySettings,
 );
-jungle();
+const menuScene = createMenuScene($("#jungle"), $("#jungle-water"), {
+  motion: () => !reduced(),
+  quality: () => settings.quality,
+});
 function fitJungleRigs() {
   const box = $("#jungle").getBoundingClientRect();
   const ratio = (box.width * 900) / (box.height * 1000);

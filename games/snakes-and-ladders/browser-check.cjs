@@ -71,6 +71,142 @@ fs.mkdirSync(out, { recursive: true });
       assert.ok(new Set(samples).size > 1, name);
     });
   }
+  await check(
+    "reference menu fits one screen on twelve desktop and mobile sizes",
+    async () => {
+      for (const [width, height] of [
+        [320, 568],
+        [360, 640],
+        [390, 844],
+        [412, 915],
+        [430, 932],
+        [768, 1024],
+        [1024, 768],
+        [1366, 768],
+        [1440, 900],
+        [1920, 1080],
+        [640, 360],
+        [844, 390],
+      ]) {
+        await page.setViewportSize({ width, height });
+        await page.selectOption("#mode", "4");
+        const result = await page.evaluate(() => ({
+          w: document.documentElement.scrollWidth,
+          h: document.documentElement.scrollHeight,
+          buttons: [
+            ...document.querySelectorAll("#menu button,header button,header a"),
+          ]
+            .filter((e) => e.getBoundingClientRect().width)
+            .map((e) => {
+              const r = e.getBoundingClientRect();
+              return {
+                x: r.x,
+                y: r.y,
+                right: r.right,
+                bottom: r.bottom,
+                h: r.height,
+              };
+            }),
+        }));
+        assert.ok(
+          result.w <= width && result.h <= height,
+          JSON.stringify({ width, height, result }),
+        );
+        for (const r of result.buttons)
+          assert.ok(
+            r.x >= 0 &&
+              r.y >= 0 &&
+              r.right <= width + 0.5 &&
+              r.bottom <= height + 0.5,
+            JSON.stringify({ width, height, r }),
+          );
+        assert.ok((await page.locator("#start").boundingBox()).height >= 44);
+        await shot(`menu-fit-${width}-${height}`);
+      }
+      await page.setViewportSize({ width: 1440, height: 1000 });
+    },
+  );
+  await check(
+    "waterfall pixels flow while the jungle background remains stationary",
+    async () => {
+      const canvas = page.locator("#jungle-water"),
+        a = await canvas.evaluate((e) => e.toDataURL());
+      await page.waitForTimeout(350);
+      assert.notEqual(await canvas.evaluate((e) => e.toDataURL()), a);
+      assert.equal(
+        await page
+          .locator(".menu-scenery")
+          .evaluate((e) => getComputedStyle(e).transform),
+        "none",
+      );
+      await shot("living-waterfall");
+    },
+  );
+  await check(
+    "independent snake neck, head, jaw, tongue and blink change real rendered frames",
+    async () => {
+      await page
+        .locator("#jungle-water")
+        .evaluate((e) => (e.style.visibility = "hidden"));
+      await page.evaluate(() =>
+        document.getAnimations().forEach((a) => a.pause()),
+      );
+      for (const [selector, frame] of [
+        [".royal-neck", 0.5],
+        [".small-snake", 0.5],
+        [".menu-head", 0.5],
+        [".menu-jaw", 0.78],
+        [".menu-tongue", 0.7],
+        [".menu-eyelid", 0.465],
+      ]) {
+        const element = page.locator(selector).first();
+        await element.evaluate((e) => {
+          const a = e.getAnimations()[0];
+          a.currentTime = 0;
+        });
+        const before = await page.locator("#jungle").screenshot();
+        await element.evaluate((e, f) => {
+          const a = e.getAnimations()[0];
+          a.currentTime = a.effect.getTiming().duration * f;
+        }, frame);
+        const after = await page.locator("#jungle").screenshot();
+        assert.notDeepEqual(before, after, selector);
+        fs.writeFileSync(
+          path.join(out, "rig-" + selector.replaceAll(".", "") + "-before.png"),
+          before,
+        );
+        fs.writeFileSync(
+          path.join(out, "rig-" + selector.replaceAll(".", "") + "-after.png"),
+          after,
+        );
+      }
+      await page.evaluate(() =>
+        document.getAnimations().forEach((a) => a.play()),
+      );
+      await page
+        .locator("#jungle-water")
+        .evaluate((e) => (e.style.visibility = ""));
+    },
+  );
+  await check(
+    "local player chooser, bot mode and pre-game rules remain functional",
+    async () => {
+      await page.click("#local-mode");
+      await page.click('[data-local-mode="3"]');
+      assert.equal(await page.locator("#mode").inputValue(), "3");
+      assert.equal(await page.locator("[data-setup-color]").count(), 3);
+      await page.click("#bot-mode");
+      assert.equal(await page.locator("#mode").inputValue(), "bot");
+      assert.equal(await page.locator("[data-setup-color]").count(), 2);
+      await page.click("#menu-info");
+      assert.ok(
+        (await page.locator("#dialog-content").textContent()).includes(
+          "Roll a 1",
+        ),
+      );
+      await page.click("#close");
+    },
+  );
   await shot("menu-desktop");
   await page.selectOption("#mode", "4");
   await check(
@@ -1045,6 +1181,50 @@ fs.mkdirSync(out, { recursive: true });
         await page.locator('a.tile[href="/games/snake/"]').count(),
         0,
       );
+    },
+  );
+  await check(
+    "replacement preview matches the square sibling cards with emerald Play Now artwork",
+    async () => {
+      await page.goto("http://127.0.0.1:8765/games/");
+      for (const [width, height] of [
+        [390, 844],
+        [1440, 1000],
+      ]) {
+        await page.setViewportSize({ width, height });
+        const card = page.locator(".serpent-tile"),
+          preview = card.locator(".preview");
+        await card.scrollIntoViewIfNeeded();
+        await preview.locator("img").waitFor({ state: "visible" });
+        await page.waitForFunction(
+          () =>
+            document.querySelector(".serpent-tile img").naturalWidth === 900,
+        );
+        const shape = await preview.boundingBox();
+        assert.ok(Math.abs(shape.width - shape.height) < 1);
+        const css = await card.evaluate((e) => {
+          const s = getComputedStyle(e);
+          return {
+            radius: s.borderRadius,
+            padding: s.padding,
+            border: s.borderTopWidth,
+          };
+        });
+        const sibling = await page
+          .locator(".tic-tac-toe-tile")
+          .evaluate((e) => {
+            const s = getComputedStyle(e);
+            return {
+              radius: s.borderRadius,
+              padding: s.padding,
+              border: s.borderTopWidth,
+            };
+          });
+        assert.deepEqual(css, sibling);
+        await card.screenshot({
+          path: path.join(out, `square-preview-${width}.png`),
+        });
+      }
     },
   );
   assert.deepEqual(errors, []);

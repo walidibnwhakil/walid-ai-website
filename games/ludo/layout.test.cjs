@@ -194,6 +194,95 @@ fs.mkdirSync(output, { recursive: true });
         (await page.locator(".track .pin-pawn").count()) >= 1,
         `live pawn move works ${tag}`,
       );
+      async function checkPawnCenter(count) {
+        const geometry = await page
+          .locator(".track:has(.pin-pawn)")
+          .first()
+          .evaluate((tile) => {
+            const t = tile.getBoundingClientRect();
+            const boxes = [...tile.querySelectorAll(".pin-outline")].map(
+              (outline) => {
+                const b = outline.getBBox(),
+                  matrix = outline.getScreenCTM();
+                const a = new DOMPoint(b.x, b.y).matrixTransform(matrix);
+                const z = new DOMPoint(
+                  b.x + b.width,
+                  b.y + b.height,
+                ).matrixTransform(matrix);
+                return { left: a.x, right: z.x, top: a.y, bottom: z.y };
+              },
+            );
+            const left = Math.min(...boxes.map((b) => b.left)),
+              right = Math.max(...boxes.map((b) => b.right));
+            const top = Math.min(...boxes.map((b) => b.top)),
+              bottom = Math.max(...boxes.map((b) => b.bottom));
+            return {
+              count: boxes.length,
+              dx: Math.abs((left + right) / 2 - (t.left + t.right) / 2),
+              dy: Math.abs((top + bottom) / 2 - (t.top + t.bottom) / 2),
+              inside: boxes.every(
+                (b) =>
+                  b.left >= t.left - 0.5 &&
+                  b.right <= t.right + 0.5 &&
+                  b.top >= t.top - 0.5 &&
+                  b.bottom <= t.bottom + 0.5,
+              ),
+            };
+          });
+        check(
+          geometry.count === count &&
+            geometry.dx < 0.75 &&
+            geometry.dy < 0.75 &&
+            geometry.inside,
+          `${count} pawn silhouettes centered inside tile ${tag}`,
+        );
+      }
+      await checkPawnCenter(1);
+      for (const count of [2, 3, 4]) {
+        await page.locator(".player-dice.active .die-face").click();
+        await page.locator(".yard .playable-token").first().waitFor();
+        const pawn = await page
+          .locator(".yard .playable-token")
+          .first()
+          .boundingBox();
+        await page.mouse.click(
+          pawn.x + pawn.width / 2,
+          pawn.y + pawn.height / 2,
+        );
+        await page.waitForFunction(
+          (n) =>
+            document.querySelectorAll(".track .pin-pawn:not(.moving)")
+              .length === n,
+          count,
+        );
+        await checkPawnCenter(count);
+        await screenshot(page, `centered-${count}-pawns-${tag}`);
+      }
+      await page.locator(".player-dice.active .die-face").click();
+      await page.locator(".track .playable-token").first().waitFor();
+      const movingPawn = await page
+        .locator(".track .playable-token")
+        .first()
+        .boundingBox();
+      await page.mouse.click(
+        movingPawn.x + movingPawn.width / 2,
+        movingPawn.y + movingPawn.height / 2,
+      );
+      await page
+        .locator('.track .pin-pawn[data-step="6"]:not(.moving)')
+        .waitFor();
+      const soloCentered = await page
+        .locator('.track .pin-pawn[data-step="6"] .pin-pawn-art')
+        .evaluate((svg) => {
+          const a = svg.getBoundingClientRect(),
+            b = svg.closest(".track").getBoundingClientRect();
+          return (
+            Math.abs(a.x + a.width / 2 - b.x - b.width / 2) < 0.75 &&
+            Math.abs(a.y + a.height / 2 - b.y - b.height / 2) < 0.75
+          );
+        });
+      check(soloCentered, `moving pawn settles in tile center ${tag}`);
+      await screenshot(page, `centered-route-pawns-${tag}`);
     }
     await page.close();
   }
@@ -210,8 +299,11 @@ fs.mkdirSync(output, { recursive: true });
       (await page.locator(".player-dice:visible").count()) === count,
       `${count}-player panels`,
     );
-    await page.locator('#board .pin-pawn').first().waitFor();
-    check(await page.locator('#board .pin-pawn:visible').count() === count * 4, `${count}-player pawns visible`);
+    await page.locator("#board .pin-pawn").first().waitFor();
+    check(
+      (await page.locator("#board .pin-pawn:visible").count()) === count * 4,
+      `${count}-player pawns visible`,
+    );
     check(
       await page.evaluate(
         () => document.documentElement.scrollHeight <= innerHeight + 1,

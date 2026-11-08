@@ -271,3 +271,16 @@ body.ludo-game.playing-ludo
     width: 100%;
   }
 }
+
+/* Center the full pin silhouette, rather than shifting its tip above the tile.
+   Pile slots share this anchor and scale to fit wholly inside the same tile. */
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  span.ludo-pawn.pin-pawn
+  .pin-pawn-art {
+  left: calc(50% + var(--pile-x, 0%)) !important;
+  top: calc(50% + var(--pile-y, 0%)) !important;
+  width: var(--pawn-width, 100%) !important;
+  height: var(--pawn-height, 100%) !important;
+  transform: translate(-50%, -50%) !important;
+}

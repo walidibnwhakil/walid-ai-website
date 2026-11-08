@@ -1,3 +1,4 @@
+import {pawnSlots} from "./ludo/pawn-layout.mjs";
 import {gameShell, control, choose} from "./shell.mjs";
 import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs?v=20261107goal56";
 
@@ -516,14 +517,12 @@ function render() {
   }));
   for(const square of squares.values()){
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
+    if(!pile.length)continue;
     if(square.classList.contains("final-square")){
       const finishSquareKey=square.style.gridArea;
       const used=new Set(pile.map(piece=>finishSlots.get(`${finishSquareKey}:${piece.dataset.token}`)).filter(Number.isInteger));
       const count=pile.length;
-      const columns=count<=4?2:count<=9?3:4;
-      const rows=Math.ceil(count/columns);
-      const xStep=count===2?72:count<=4?52:count<=9?34:24;
-      const yStep=count<=2?0:count<=4?50:count<=9?34:24;
+      const slots=pawnSlots(count);
       const finishSize=count===2?"pile-size-finished-2":count<=4?"pile-size-finished-4":count<=9?"pile-size-finished-9":"pile-size-finished-16";
       pile.forEach(piece=>{
         const key=`${finishSquareKey}:${piece.dataset.token}`;
@@ -536,11 +535,9 @@ function render() {
         const arrivingAtFinish=animationToken&&piece.dataset.token===`${activeTeams[animationToken.player]}-${animationToken.token}`&&animationToken.step===56;
         if(!arrivingAtFinish)piece.classList.add("finished-pawn");
         if(count>1){
-          const row=Math.floor(slot/columns);
-          const inRow=Math.min(columns,count-row*columns);
-          const column=slot%columns;
-          const x=(column-(inRow-1)/2)*xStep;
-          const y=(row-(rows-1)/2)*yStep;
+          const {x,y,width,height}=slots[slot];
+          piece.style.setProperty("--pawn-width",`${width}%`);
+          piece.style.setProperty("--pawn-height",`${height}%`);
           piece.classList.add("stacked-pawn","pile-size-finished",finishSize);
           piece.style.setProperty("--pile-x",`${x}%`);
           piece.style.setProperty("--pile-y",`${y}%`);
@@ -550,16 +547,11 @@ function render() {
       continue;
     }
     if(pile.length<2)continue;
-    const columns=pile.length<=4?2:3;
-    const rows=Math.ceil(pile.length/columns);
-    const xStep=pile.length===2?72:pile.length<=4?50:34;
-    const yStep=pile.length===2?0:pile.length<=4?44:33;
+    const slots=pawnSlots(pile.length);
     pile.forEach((piece,index)=>{
-      const row=Math.floor(index/columns);
-      const inRow=Math.min(columns,pile.length-row*columns);
-      const column=index%columns;
-      const x=(column-(inRow-1)/2)*xStep;
-      const y=(row-(rows-1)/2)*yStep;
+      const {x,y,width,height}=slots[index];
+      piece.style.setProperty("--pawn-width",`${width}%`);
+      piece.style.setProperty("--pawn-height",`${height}%`);
       piece.classList.add("stacked-pawn",pile.length>4?"pile-size-dense":`pile-size-${pile.length}`);
       piece.style.setProperty("--pile-x",`${x}%`);
       piece.style.setProperty("--pile-y",`${y}%`);

@@ -78,8 +78,8 @@
     </script>
     <title>Tic Tac Toe | Walid AI Games</title>
     <link rel="icon" href="/kathgolap-logo.png" />
-    <link rel="stylesheet" href="./royal.css" />
-    <script type="module" src="../tic-tac-toe.mjs?v=royal-1"></script>
+    <link rel="stylesheet" href="./royal.css?v=royal-2" />
+    <script type="module" src="../tic-tac-toe.mjs?v=royal-2"></script>
   </head>
   <body>
     <main id="royal-game">
@@ -157,27 +157,29 @@
           ><strong id="status" role="status" aria-live="polite"></strong
           ><span id="player-o"></span>
         </div>
-        <div id="arena" class="ornate easy">
-          <div id="board-wrap">
-            <div id="board" role="group" aria-label="Tic Tac Toe board"></div>
-            <svg id="fire" aria-hidden="true">
-              <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="3" /></filter>
-              </defs>
-              <g id="fire-lines"></g>
-            </svg>
-          </div>
-          <canvas id="sparks" aria-hidden="true"></canvas>
-          <div id="result" hidden aria-live="polite">
-            <h2 id="result-title"></h2>
-            <p id="result-detail"></p>
-            <div class="controls">
-              <button id="again" class="start">Play Again</button
-              ><button data-action="menu">Back to Menu</button>
+        <div id="arena-slot">
+          <div id="arena" class="ornate easy">
+            <div id="board-wrap">
+              <div id="board" role="group" aria-label="Tic Tac Toe board"></div>
+              <svg id="fire" aria-hidden="true">
+                <defs>
+                  <filter id="glow"><feGaussianBlur stdDeviation="3" /></filter>
+                </defs>
+                <g id="fire-lines"></g>
+              </svg>
+            </div>
+            <canvas id="sparks" aria-hidden="true"></canvas>
+            <div id="result" hidden aria-live="polite">
+              <h2 id="result-title"></h2>
+              <p id="result-detail"></p>
+              <div class="controls">
+                <button id="again" class="start">Play Again</button
+                ><button data-action="menu">Back to Menu</button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="controls">
+        <div class="controls play-controls">
           <button id="restart">↻ Restart</button
           ><button data-action="menu">← Back to Menu</button>
         </div>

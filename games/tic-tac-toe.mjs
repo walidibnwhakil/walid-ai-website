@@ -7,6 +7,7 @@ import {
   lineGeometry,
   LEVELS,
 } from "./tic-tac-toe/engine.mjs";
+import { fireCelebration } from "./tic-tac-toe/effects.mjs";
 import { chooseMove } from "./tic-tac-toe/bot.mjs";
 const $ = (s) => document.querySelector(s),
   $$ = (s) => [...document.querySelectorAll(s)];
@@ -15,7 +16,7 @@ let selection = { level: "easy", mode: "bot", symbol: "X" },
   worker = null,
   epoch = 0,
   timer = null,
-  raf = 0,
+  stopEffects = () => {},
   resultTimer = null,
   audio = null,
   stats = {},
@@ -104,7 +105,7 @@ function cleanup() {
   timer = null;
   clearTimeout(resultTimer);
   resultTimer = null;
-  cancelAnimationFrame(raf);
+  stopEffects();
   worker?.terminate();
   worker = null;
   $("#fire-lines").replaceChildren();
@@ -122,6 +123,7 @@ function start() {
   $("#menu").hidden = true;
   $("#play").hidden = false;
   $("#arena").className = `ornate ${g.level}`;
+  $("#arena").style.setProperty("--size", g.size);
   $("#level-title").textContent =
     `${g.level[0].toUpperCase() + g.level.slice(1)} · Royal Challenge`;
   $("#condition").textContent =
@@ -138,6 +140,8 @@ function start() {
     }),
   );
   render();
+  fitBoard();
+  window.scrollTo(0, 0);
   scheduleBot();
 }
 function render() {
@@ -172,7 +176,7 @@ function render() {
     );
   }
   $("#status").textContent = g.ended
-    ? resultTitle(g)
+    ? "Match complete"
     : bot
       ? `${g.turn} · Bot is thinking…`
       : `${g.turn} · ${g.mode === "bot" ? "Your turn" : g.turn === g.symbol ? "Player 1’s turn" : "Player 2’s turn"}`;
@@ -232,6 +236,8 @@ function finish() {
   }
   save();
   $("#result-title").textContent = resultTitle(g);
+  $("#result-title").dataset.text = resultTitle(g);
+  $("#result").classList.toggle("draw", g.winner === "draw");
   $("#result-detail").textContent =
     g.winner === "draw"
       ? "A balanced contest. The crown awaits a rematch."
@@ -262,7 +268,7 @@ function finish() {
   resultTimer = setTimeout(() => {
     $("#arena").classList.add("frame-burst");
     show();
-  }, 1500);
+  }, 1800);
 }
 function points() {
   const origin = $("#board-wrap").getBoundingClientRect();
@@ -292,96 +298,27 @@ function drawLines(animate = false) {
   svg.classList.toggle("ignite", animate && !reduced());
 }
 function particles() {
-  cancelAnimationFrame(raf);
-  const canvas = $("#sparks"),
-    ctx = canvas.getContext("2d");
-  let start = performance.now(),
-    last = 0,
-    embers = [],
-    burst = false;
   const id = epoch;
-  function frame(now) {
-    if (id !== epoch || !g?.ended || reduced()) return;
-    const w = $("#arena").clientWidth,
-      h = $("#arena").clientHeight,
-      dpr = Math.min(devicePixelRatio, 2);
-    if (
-      canvas.width !== Math.round(w * dpr) ||
-      canvas.height !== Math.round(h * dpr)
-    ) {
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    const t = (now - start) / 1000,
-      dt = Math.min(0.04, (now - last) / 1000 || 0.016);
-    last = now;
-    const br = $("#board").getBoundingClientRect(),
-      ar = $("#arena").getBoundingClientRect(),
-      ps = points().map((p) => ({
-        x: p.x + br.x - ar.x - $("#arena").clientLeft,
-        y: p.y + br.y - ar.y - $("#arena").clientTop,
-      })),
-      a = ps[0],
-      b = ps.at(-1),
-      progress = Math.min(1, t / 1.1);
-    if (t < 1.4)
-      for (let j = 0; j < 5; j++)
-        embers.push({
-          x: a.x + (b.x - a.x) * progress,
-          y: a.y + (b.y - a.y) * progress,
-          vx: (Math.random() - 0.5) * 170,
-          vy: (Math.random() - 0.5) * 170,
-          life: 0.35 + Math.random() * 0.5,
-        });
-    if (t >= 1.1 && !burst) {
-      burst = true;
-      for (let j = 0; j < 45; j++) {
-        const angle = Math.random() * Math.PI * 2,
-          speed = 35 + Math.random() * 120;
-        embers.push({
-          x: b.x,
-          y: b.y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          life: 0.4 + Math.random() * 0.5,
-        });
-      }
-    }
-    if (t > 1.5 && t < 2.3)
-      for (let j = 0; j < 3; j++) {
-        const f = Math.random(),
-          x = a.x + (b.x - a.x) * f,
-          y = a.y + (b.y - a.y) * f;
-        embers.push({
-          x,
-          y,
-          vx: (w / 2 - x) * 1.1 + (Math.random() - 0.5) * 20,
-          vy: ($("#result-title").getBoundingClientRect().y - ar.y - y) * 1.3,
-          life: 0.8,
-        });
-      }
-    embers = embers.filter((p) => p.life > 0);
-    for (const p of embers) {
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.vy += 40 * dt;
-      p.life -= dt;
-      ctx.globalAlpha = Math.min(1, p.life * 2);
-      ctx.fillStyle = p.life > 0.4 ? "#fff7b0" : "#ff8b23";
-      ctx.shadowBlur = 7;
-      ctx.shadowColor = "#ff8000";
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, Math.max(0.7, p.life * 2.5), 0, 7);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-    if (t < 3) raf = requestAnimationFrame(frame);
-    else ctx.clearRect(0, 0, w, h);
-  }
-  raf = requestAnimationFrame(frame);
+  stopEffects = fireCelebration({
+    canvas: $("#sparks"),
+    arena: $("#arena"),
+    board: $("#board"),
+    title: $("#result-title"),
+    points,
+    active: () => id === epoch && g?.ended && !reduced(),
+  });
 }
+function fitBoard() {
+  const slot = $("#arena-slot");
+  if ($("#play").hidden) return;
+  const side = Math.max(
+    0,
+    Math.floor(Math.min(slot.clientWidth, slot.clientHeight, 720)),
+  );
+  $("#arena").style.setProperty("--arena-side", `${side}px`);
+}
+new ResizeObserver(fitBoard).observe($("#arena-slot"));
+window.visualViewport?.addEventListener("resize", fitBoard);
 new ResizeObserver(() => {
   if (g?.ended && g.lines.length) drawLines(false);
 }).observe($("#board"));
@@ -391,6 +328,7 @@ function menu() {
   $("#play").hidden = true;
   $("#menu").hidden = false;
   select();
+  window.scrollTo(0, 0);
 }
 $("#start").onclick = start;
 $("#restart").onclick = start;
@@ -439,7 +377,7 @@ $$("[data-action]").forEach(
         settings.effects = e.target.checked;
         syncSettings();
         if (reduced()) {
-          cancelAnimationFrame(raf);
+          stopEffects();
           const c = $("#sparks");
           c.getContext("2d").clearRect(0, 0, c.width, c.height);
         }

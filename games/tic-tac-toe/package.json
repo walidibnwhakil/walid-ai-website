@@ -5,7 +5,7 @@
   "scripts": {
     "test": "node --test engine.test.mjs",
     "test:browser": "node browser-check.cjs",
-    "check": "node --check ../tic-tac-toe.mjs && node --check engine.mjs && node --check bot.mjs && node --check bot-worker.mjs"
+    "check": "node --check ../tic-tac-toe.mjs && node --check engine.mjs && node --check bot.mjs && node --check bot-worker.mjs && node --check effects.mjs"
   },
   "devDependencies": {
     "playwright": "1.60.0"

@@ -45,6 +45,44 @@ const base = process.env.TTT_URL || "http://localhost:8000";
   async function click(i) {
     await p.locator(".cell").nth(i).click();
   }
+  async function viewportFits(label) {
+    const result = await p.evaluate(() => {
+      const root = document.documentElement;
+      const targets = [
+        document.querySelector(".topbar"),
+        document.querySelector(".title"),
+        document.querySelector(".game-tools"),
+      ];
+      if (!document.querySelector("#play").hidden)
+        targets.push(
+          document.querySelector("#arena"),
+          document.querySelector(".play-controls"),
+        );
+      else
+        targets.push(
+          document.querySelector("#menu"),
+          document.querySelector("#start"),
+        );
+      return {
+        scroll:
+          root.scrollHeight <= innerHeight + 1 &&
+          root.scrollWidth <= innerWidth + 1,
+        visible: targets.every((e) => {
+          const r = e.getBoundingClientRect();
+          return (
+            r.top >= -1 &&
+            r.left >= -1 &&
+            r.bottom <= innerHeight + 1 &&
+            r.right <= innerWidth + 1
+          );
+        }),
+      };
+    });
+    check(
+      result.scroll && result.visible,
+      "Entire screen fits without scroll: " + label,
+    );
+  }
   async function outcome(expected) {
     await p.locator("#result:not([hidden])").waitFor();
     check(
@@ -52,6 +90,23 @@ const base = process.env.TTT_URL || "http://localhost:8000";
       expected,
     );
     check((await p.locator("#result").count()) === 1, "Single result");
+    check(
+      await p.evaluate(() => {
+        const a = document.querySelector("#arena").getBoundingClientRect(),
+          r = document.querySelector("#result").getBoundingClientRect(),
+          t = document.querySelector("#result-title").getBoundingClientRect();
+        return (
+          r.top >= a.top &&
+          r.bottom <= a.bottom &&
+          t.left >= a.left &&
+          t.right <= a.right &&
+          t.top >= a.top &&
+          t.bottom <= a.bottom
+        );
+      }),
+      "Result title is on the board",
+    );
+    await viewportFits("result " + expected);
     check((await p.locator(".cell:enabled").count()) === 0, "Game ended lock");
   }
   await menu();
@@ -108,6 +163,39 @@ const base = process.env.TTT_URL || "http://localhost:8000";
       );
       if ([320, 390, 768, 1440].includes(width))
         await snap(level + "-" + width);
+    }
+  }
+  for (const [width, height] of [
+    [320, 568],
+    [360, 640],
+    [390, 700],
+    [412, 740],
+    [430, 800],
+    [768, 1024],
+    [1024, 600],
+    [1440, 900],
+    [1920, 953],
+    [844, 390],
+    [667, 375],
+  ]) {
+    await p.setViewportSize({ width, height });
+    await menu();
+    await viewportFits("menu " + width + "x" + height);
+    await snap("fitted-menu-" + width + "x" + height);
+    for (const level of ["easy", "medium", "hard"]) {
+      await start(level);
+      await p.waitForTimeout(80);
+      await viewportFits(level + " " + width + "x" + height);
+      check(
+        await p.locator(".cell").evaluateAll((es) =>
+          es.every((e) => {
+            const r = e.getBoundingClientRect();
+            return Math.abs(r.width - r.height) < 1;
+          }),
+        ),
+        "Fitted square cells " + level + width,
+      );
+      await snap("fitted-" + level + "-" + width + "x" + height);
     }
   }
   await p.setViewportSize({ width: 1024, height: 1100 });
@@ -207,7 +295,7 @@ const base = process.env.TTT_URL || "http://localhost:8000";
   await start();
   for (const i of [0, 3, 1, 4, 2]) await click(i);
   await p.locator("#restart").click();
-  await p.waitForTimeout(1700);
+  await p.waitForTimeout(2000);
   check(await p.locator("#result").isHidden(), "Restart cancels result timer");
   check(
     (await p.locator("#fire line").count()) === 0,
@@ -276,6 +364,10 @@ const base = process.env.TTT_URL || "http://localhost:8000";
   }
   await outcome("You Lose");
   await snap("you-lose");
+  const flame1 = await p.locator("#sparks").evaluate((c) => c.toDataURL());
+  await p.waitForTimeout(350);
+  const flame2 = await p.locator("#sparks").evaluate((c) => c.toDataURL());
+  check(flame1 !== flame2, "Result has living flames, not a static image");
   // Deterministic worker fixture verifies human-win presentation without weakening production AI.
   await p.route("**/bot-worker.mjs", (route) =>
     route.fulfill({
@@ -290,6 +382,13 @@ const base = process.env.TTT_URL || "http://localhost:8000";
   }
   await outcome("You Win");
   await snap("you-win-fixture");
+  const beforeOverlay = await p.locator("#arena").boundingBox();
+  await p.waitForTimeout(500);
+  const afterOverlay = await p.locator("#arena").boundingBox();
+  check(
+    JSON.stringify(beforeOverlay) === JSON.stringify(afterOverlay),
+    "Result causes no board layout shift",
+  );
   await p.unroute("**/bot-worker.mjs");
   await p.emulateMedia({ reducedMotion: "reduce" });
   await start();

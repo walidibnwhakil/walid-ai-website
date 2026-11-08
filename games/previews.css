@@ -49,9 +49,10 @@ main { max-width: 1050px; }
 .pawn.blue { left:23%; bottom:37%; background:radial-gradient(circle at 32% 25%,#fff,#48a6f0 48%,#1b59b5); animation-delay:.14s; }
 .pawn.green { left:42%; bottom:20%; background:radial-gradient(circle at 32% 25%,#fff,#43d178 48%,#168045); animation-delay:.28s; }
 .pawn.yellow { left:50%; bottom:38%; background:radial-gradient(circle at 32% 25%,#fff,#ffd341 48%,#b9780d); animation-delay:.42s; }
-.chess-preview { background:repeating-conic-gradient(#6b4428 0 25%,#ddb77c 0 50%) 50% / 44px 44px; box-shadow:inset 0 0 0 6px #9c6a38,inset 0 0 0 8px #684322; }
-.knight { filter:drop-shadow(0 3px 3px #241a10aa); animation: knight 1.6s 2; }
-.knight svg { width:54px; height:64px; fill:#e9c98a; stroke:#70451f; stroke-width:3; stroke-linejoin:round; }
+.chess-tile {background:linear-gradient(145deg,#432015,#1d110e);border:2px solid #d9a63b;color:#fff0d0;box-shadow:0 8px 22px #29150d55}
+.chess-tile h2 {color:#ffe17b;font-family:Georgia,serif}
+.chess-preview {display:block;height:auto;aspect-ratio:1;padding:0;background:#2b1208;box-shadow:none}
+.chess-preview img {display:block;width:100%;height:auto;object-fit:contain}
 .penalty-preview { background: #326545; }
 .mini-goal { width: 100px; height: 47px; position: absolute; top: 13px; border: 3px solid #f6f1e1; border-bottom: none; }
 .mini-ball { position: absolute; bottom: 4px; font-size: 1.55rem; animation: kick 1.25s 3; }
@@ -73,7 +74,6 @@ main { max-width: 1050px; }
 @keyframes note { from { opacity: 0; transform: translateY(20px) rotate(-12deg); } 55%, to { opacity: 1; transform: rotate(-8deg); } }
 @keyframes die { 50% { transform: rotate(90deg) translateX(-5px); } }
 @keyframes pawn { 55% { transform: translateX(34px); } }
-@keyframes knight { 40% { transform: translate(-36px, -21px); } 75% { transform: translate(-36px, 13px); } }
 @keyframes kick { 75% { transform: translate(31px, -48px) rotate(120deg) scale(.65); } }
 @keyframes mark { from { opacity: .1; transform: scale(.75); } 75%, to { opacity: 1; transform: scale(1); } }
 @keyframes snake { 75% { transform: translateX(48px); } }

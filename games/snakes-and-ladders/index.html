@@ -12,8 +12,8 @@
       rel="canonical"
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
-    <link rel="stylesheet" href="style.css?v=20261108-living" />
-    <script type="module" src="game.mjs?v=20261108-living"></script>
+    <link rel="stylesheet" href="style.css?v=20261108-compact-maps" />
+    <script type="module" src="game.mjs?v=20261108-compact-maps"></script>
   </head>
   <body>
     <div id="world">
@@ -29,9 +29,49 @@
       <div class="embers"></div>
     </div>
     <header>
-      <a href="/games/">← Back to Games</a
-      ><span>WALID AI · THE ROYAL ARCADE</span
-      ><button id="sound" aria-label="Toggle sound effects">Sound: Off</button>
+      <a
+        id="games-link"
+        class="icon-control"
+        href="/games/"
+        aria-label="Back to Games"
+        title="Games"
+        ><svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 5l-7 7 7 7M8 12h12" /></svg
+      ></a>
+      <button
+        id="menu-button"
+        class="icon-control"
+        aria-label="Menu"
+        title="Menu"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 6h14M5 12h14M5 18h14" />
+        </svg>
+      </button>
+      <div class="header-actions">
+        <button
+          id="sound"
+          class="icon-control"
+          aria-label="Unmute sound"
+          aria-pressed="false"
+          title="Unmute sound"
+        ></button
+        ><button
+          id="settings-button"
+          class="icon-control"
+          data-panel="settings"
+          aria-label="Settings"
+          title="Settings"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l.6 3 2 .9 2.8-.9 2 4-2.3 2v2l2.3 2-2 4-2.8-.9-2 .9-.6 3H9l-.6-3-2-.9-2.8.9-2-4L4 14v-2l-2.4-2 2-4 2.8.9 2-.9Z"
+              transform="translate(0 -1) scale(1 .96)"
+            />
+            <circle cx="12" cy="12" r="3.2" />
+          </svg>
+        </button>
+      </div>
     </header>
     <main>
       <section id="menu">
@@ -75,7 +115,6 @@
               />
             </h2>
           </div>
-          <button id="menu-button">Back to Menu</button>
         </div>
         <div class="game-layout">
           <div class="board-frame">
@@ -95,12 +134,6 @@
             <p id="status" role="status" aria-live="polite">
               Roll a 1 to enter the realm.
             </p>
-            <div class="toolbar">
-              <button id="restart">Restart</button
-              ><button data-panel="rules">Rules</button
-              ><button data-panel="settings">Settings</button>
-            </div>
-            <p class="hint">Land exactly on 100 to claim the crown.</p>
           </aside>
         </div>
       </section>

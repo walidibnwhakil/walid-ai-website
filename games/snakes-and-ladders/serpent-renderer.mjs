@@ -1,3 +1,6 @@
+// Photo-style natural skin is deformed along the authoritative animated curve.
+const skinAtlas = new Image();
+skinAtlas.src = new URL("assets/natural-skin.webp", import.meta.url).href;
 // Cylindrical bodies and tangent-aligned scale plates share the SVG movement path.
 const rgb = (hex) => hex.match(/[\da-f]{2}/gi).map((n) => parseInt(n, 16));
 const tint = (c, k, white = 0) =>
@@ -128,60 +131,51 @@ export function paintBodies(canvas, items, time, quality = "Balanced") {
       c.fillStyle = g;
       c.fill();
     }
-    const cols = quality === "Low" ? 3 : 5;
-    for (let j = 1; j < points.length - 2; j++)
-      for (let col = 0; col < cols; col++) {
+    if (skinAtlas.complete && skinAtlas.naturalWidth) {
+      const cell = skinAtlas.naturalWidth / 2,
+        type = item.i % 4,
+        sx = (type % 2) * cell,
+        baseY = Math.floor(type / 2) * cell;
+      let arc = 0;
+      for (let j = 0; j < points.length - 1; j++) {
         const p = points[j],
-          f = (col - (cols - 1) / 2) / (cols / 2),
-          width = p.w * (quality === "Low" ? 0.42 : 0.28);
-        if (width < 0.1) continue;
-        const shift = col % 2 ? -0.19 : 0.19,
-          x = p.x + p.nx * p.w * f + p.tx * shift,
-          y = p.y + p.ny * p.w * f + p.ty * shift,
-          along = 0.47;
-        c.beginPath();
-        c.moveTo(x + p.tx * along, y + p.ty * along);
-        c.quadraticCurveTo(
-          x + p.nx * width + p.tx * 0.15,
-          y + p.ny * width + p.ty * 0.15,
-          x + p.nx * width,
-          y + p.ny * width,
-        );
-        c.quadraticCurveTo(
-          x - p.tx * along,
-          y - p.ty * along,
-          x - p.nx * width,
-          y - p.ny * width,
-        );
-        c.quadraticCurveTo(
-          x - p.nx * width + p.tx * 0.15,
-          y - p.ny * width + p.ty * 0.15,
-          x + p.tx * along,
-          y + p.ty * along,
-        );
-        c.fillStyle = tint(
-          color,
-          0.38 + 0.66 * Math.sqrt(Math.max(0, 1 - f * f)),
-          f < 0 ? 12 : 0,
-        );
-        c.fill();
-        c.strokeStyle = "rgba(19,16,7,.65)";
-        c.lineWidth = 0.045;
-        c.stroke();
-        c.beginPath();
-        c.moveTo(x - p.nx * width, y - p.ny * width);
-        c.quadraticCurveTo(
-          x - p.nx * width + p.tx * 0.2,
-          y - p.ny * width + p.ty * 0.2,
-          x + p.tx * along,
-          y + p.ty * along,
-        );
-        c.strokeStyle = "rgba(255,224,136,.48)";
-        c.lineWidth = 0.05;
-        c.stroke();
+          q = points[j + 1],
+          length = Math.hypot(q.x - p.x, q.y - p.y),
+          sourceHeight = (length * cell) / 3,
+          sourceY = ((arc * cell) / 3) % cell;
+        c.save();
+        c.transform(p.nx, p.ny, p.tx, p.ty, p.x, p.y);
+        let consumed = 0;
+        while (consumed < sourceHeight) {
+          const sy = (sourceY + consumed) % cell,
+            part = Math.min(sourceHeight - consumed, cell - sy);
+          c.drawImage(
+            skinAtlas,
+            sx,
+            baseY + sy,
+            cell,
+            Math.max(0.01, part),
+            -p.w,
+            (consumed / sourceHeight) * length - 0.04,
+            2 * p.w,
+            (part / sourceHeight) * length + 0.1,
+          );
+          consumed += part;
+        }
+        const shade = c.createLinearGradient(-p.w, 0, p.w, 0);
+        shade.addColorStop(0, "#000a");
+        shade.addColorStop(0.24, "#0002");
+        shade.addColorStop(0.43, "#ffffff10");
+        shade.addColorStop(0.68, "#0001");
+        shade.addColorStop(1, "#000a");
+        c.fillStyle = shade;
+        c.fillRect(-p.w, -0.04, p.w * 2, length + 0.1);
+        c.restore();
+        arc += length;
       }
+    }
     // A travelling specular highlight adds a subtle breathing sheen, without moving endpoints.
-    c.globalAlpha = 0.19;
+    c.globalAlpha = item.i % 4 === 3 ? 0.15 : 0.08;
     c.beginPath();
     points.forEach((p, j) => {
       const x = p.x - p.nx * p.w * 0.28,

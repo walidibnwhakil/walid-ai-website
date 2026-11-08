@@ -1,12 +1,21 @@
 export const SNAKES = Object.freeze({
-  17: 7,
-  39: 18,
-  54: 34,
-  62: 36,
-  87: 24,
-  99: 78,
+  27: 5,
+  40: 3,
+  43: 18,
+  54: 31,
+  66: 45,
+  89: 53,
+  95: 77,
+  99: 41,
 });
-export const LADDERS = Object.freeze({ 3: 22, 6: 15, 28: 52, 47: 68, 72: 91 });
+export const LADDERS = Object.freeze({
+  4: 25,
+  13: 46,
+  42: 63,
+  50: 69,
+  62: 81,
+  74: 92,
+});
 export const COLORS = [
   "Red",
   "Blue",

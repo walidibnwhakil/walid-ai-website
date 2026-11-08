@@ -102,6 +102,35 @@ fs.mkdirSync(out, { recursive: true });
   await shot("board-desktop");
   assert.equal(await page.locator(".square-number").count(), 100);
   await check(
+    "compact gold header replaces redundant in-game navigation and controls",
+    async () => {
+      assert.equal(
+        await page
+          .locator('#play #restart,#play .toolbar,#play [data-panel="rules"]')
+          .count(),
+        0,
+      );
+      assert.equal(await page.locator("#games-link").isVisible(), false);
+      assert.equal(await page.locator("#menu-button").isVisible(), true);
+      assert.equal(await page.locator("#sound svg").count(), 1);
+      assert.equal(await page.locator("#sound").textContent(), "");
+      const before = await page.locator("#sound").getAttribute("aria-pressed");
+      await page.click("#sound");
+      assert.notEqual(
+        await page.locator("#sound").getAttribute("aria-pressed"),
+        before,
+      );
+      await page.click("#sound");
+      assert.equal(
+        await page.locator("#sound").getAttribute("aria-pressed"),
+        before,
+      );
+      await page.click("#settings-button");
+      await page.waitForSelector("#sfx-setting");
+      await page.click("#close");
+    },
+  );
+  await check(
     "painted board assets load and materials remain structured",
     async () => {
       for (const file of [
@@ -109,7 +138,8 @@ fs.mkdirSync(out, { recursive: true });
         "cavern-mobile.webp",
         "marble-atlas.webp",
         "royal-logo.webp",
-        "serpent-heads.webp",
+        "natural-heads.webp",
+        "natural-skin.webp",
       ]) {
         const response = await page.request.get(
           new URL("assets/" + file, base).href,
@@ -119,7 +149,7 @@ fs.mkdirSync(out, { recursive: true });
         assert.ok((await response.body()).length > 1000);
       }
       assert.equal(await page.locator('[id^="material-"]').count(), 2);
-      assert.equal(await page.locator(".painted-head").count(), 6);
+      assert.equal(await page.locator(".painted-head").count(), 8);
       assert.equal(
         await page
           .locator(".painted-title img")
@@ -162,12 +192,12 @@ fs.mkdirSync(out, { recursive: true });
     "living path changes intermediate body but keeps anchors",
     async () => {
       const a = await page
-        .locator('[data-snake="87"] path')
+        .locator('[data-snake="89"] path')
         .first()
         .getAttribute("d");
       await page.waitForTimeout(350);
       const z = await page
-        .locator('[data-snake="87"] path')
+        .locator('[data-snake="89"] path')
         .first()
         .getAttribute("d");
       assert.notEqual(a, z);
@@ -409,9 +439,9 @@ fs.mkdirSync(out, { recursive: true });
   await check(
     "swallow follows the animated real body and releases at exact tail",
     async () => {
-      await force({ pos: 16, die: 1 });
+      await force({ pos: 26, die: 1 });
       await clickDie();
-      await page.waitForSelector('[data-snake="17"].active-snake');
+      await page.waitForSelector('[data-snake="27"].active-snake');
       assert.equal(
         await page.locator(".player-die:not([disabled])").count(),
         0,
@@ -422,11 +452,11 @@ fs.mkdirSync(out, { recursive: true });
       await settled();
       assert.equal(
         await page.evaluate(() => window.serpentTest.state.players[0].position),
-        7,
+        5,
       );
       assert.equal(
         await page.locator('[data-player="0"]').getAttribute("data-position"),
-        "7",
+        "5",
       );
       await shot("snake-tail-release");
     },
@@ -434,8 +464,8 @@ fs.mkdirSync(out, { recursive: true });
   await check(
     "extruded ladders climb their real geometry and land exactly",
     async () => {
-      assert.equal(await page.locator(".sculpted-ladder").count(), 5);
-      await force({ pos: 2, die: 1 });
+      assert.equal(await page.locator(".sculpted-ladder").count(), 6);
+      await force({ pos: 3, die: 1 });
       await clickDie();
       await page.waitForFunction(() =>
         document.querySelector("#status").textContent.includes("Climbing"),
@@ -456,21 +486,24 @@ fs.mkdirSync(out, { recursive: true });
       await settled();
       assert.equal(
         await page.evaluate(() => window.serpentTest.state.players[0].position),
-        22,
+        25,
       );
       assert.equal(
         await page.locator('[data-player="0"]').getAttribute("data-position"),
-        "22",
+        "25",
       );
     },
   );
   await check(
-    "double rolls rejected and restart cancels an in-flight die",
+    "double rolls rejected; Menu cancels an in-flight die and resets a new match",
     async () => {
       await force({ die: 6 });
       await clickDie();
       await page.evaluate(() => window.serpentTest.turn());
-      await page.click("#restart");
+      await page.click("#menu-button");
+      await page.click("#start");
+      if (await page.locator("#skip").isVisible()) await page.click("#skip");
+      await page.waitForSelector("#play:visible");
       await page.waitForTimeout(1250);
       assert.equal(
         await page.evaluate(() => window.serpentTest.state.rolls),
@@ -581,8 +614,8 @@ fs.mkdirSync(out, { recursive: true });
       await page.emulateMedia({ reducedMotion: "reduce" });
       for (const [pos, destination] of [
         [0, 1],
-        [16, 7],
-        [2, 22],
+        [26, 5],
+        [3, 25],
       ]) {
         await force({ pos, die: 1, motion: false });
         await clickDie();
@@ -623,6 +656,50 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
+    "all four personal dice are distinct and only the current player can roll",
+    async () => {
+      for (let i = 0; i < 4; i++) {
+        await force({ count: 4, current: i, die: 1, motion: false });
+        assert.equal(await page.locator(".player-die").count(), 4);
+        assert.equal(
+          await page
+            .locator(".player-die:not([disabled])")
+            .getAttribute("data-roll"),
+          String(i),
+        );
+        for (let j = 0; j < 4; j++) {
+          assert.equal(
+            await page.locator(`[data-roll="${j}"] .die-face`).count(),
+            6,
+          );
+          assert.equal(
+            await page.locator(`[data-roll="${j}"] .pip`).count(),
+            21,
+          );
+        }
+        await clickDie(i);
+        await settled();
+        assert.equal(
+          await page.evaluate(
+            (i) => window.serpentTest.state.players[i].lastDice,
+            i,
+          ),
+          1,
+        );
+        assert.equal(
+          await page.evaluate(
+            (i) =>
+              window.serpentTest.state.players
+                .filter((_, j) => j !== i)
+                .every((p) => p.lastDice === null),
+            i,
+          ),
+          true,
+        );
+      }
+    },
+  );
+  await check(
     "complete PC/phone matches fit one screen including all controls",
     async () => {
       for (const [width, height] of [
@@ -659,7 +736,11 @@ fs.mkdirSync(out, { recursive: true });
               bottom: b.bottom,
             },
             panel: { x: a.x, y: a.y, right: a.right, bottom: a.bottom },
-            buttons: [...document.querySelectorAll("#play button")].map((e) => {
+            buttons: [
+              ...document.querySelectorAll(
+                "#play button, body.playing header button",
+              ),
+            ].map((e) => {
               const r = e.getBoundingClientRect();
               return { x: r.x, y: r.y, right: r.right, bottom: r.bottom };
             }),
@@ -689,6 +770,19 @@ fs.mkdirSync(out, { recursive: true });
         assert.ok(
           (await page.locator('[data-roll="0"]').boundingBox()).height >= 44,
         );
+        assert.equal(await page.locator(".player-die").count(), 4);
+        for (let j = 0; j < 4; j++) {
+          const r = await page
+            .locator(`[data-roll="${j}"] .cube-stage`)
+            .boundingBox();
+          assert.ok(
+            r.x >= 0 &&
+              r.y >= 0 &&
+              r.x + r.width <= width + 0.5 &&
+              r.y + r.height <= height + 0.5,
+            JSON.stringify({ j, width, height, r }),
+          );
+        }
         await shot(`fit-${width}-${height}`);
       }
     },

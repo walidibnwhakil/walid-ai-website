@@ -9,9 +9,9 @@ Replaces the previous Snake game. `/games/snake/` redirects through both a meta 
 - `index.html`: English menu, board, settings, rules, statistics and result controls.
 - `engine.mjs`: immutable deterministic state transitions, square coordinates, mappings, cryptographic rejection-sampled die and placement labels.
 - `game.mjs`: SVG environments/rigs, stepped movement, individual CSS 3D dice, player-head color selection, viewport fitting, bot scheduling, optional locally synthesized sound and safe local statistics.
-- `serpent-renderer.mjs`: cylindrical Canvas body shading and tangent-aligned scales, sharing exact geometry with the SVG heads and swallow paths.
+- `serpent-renderer.mjs`: cylindrical Canvas body shading and tangent-aligned photo-style skin strips, sharing exact geometry with the SVG heads and swallow paths.
 - `style.css`: responsive presentation, separate jaw/eye/tongue animation, intro, lava, fireworks and reduced-motion alternatives.
-- `assets/*.webp`: locally hosted generated painted cavern environments, marble material atlas, royal title and six-color serpent-head atlas. `preview.svg` retains the existing index preview.
+- `assets/*.webp`: locally hosted generated painted cavern environments, marble material atlas, royal title and natural venomous-snake head and skin atlases. `preview.svg` retains the existing index preview.
 - `engine.test.mjs`, `browser-check.cjs`: deterministic rules and real Chromium verification.
 - `.github/workflows/snakes-and-ladders.yml`: engine/browser verification with screenshot artifacts.
 
@@ -27,12 +27,14 @@ The board has 100 data-generated numbered squares. Row 1 begins at bottom-left, 
 
 | Ladders | Snakes  |
 | ------- | ------- |
-| 3 → 22  | 17 → 7  |
-| 6 → 15  | 39 → 18 |
-| 28 → 52 | 54 → 34 |
-| 47 → 68 | 62 → 36 |
-| 72 → 91 | 87 → 24 |
-|         | 99 → 78 |
+| 4 → 25  | 27 → 5  |
+| 13 → 46 | 40 → 3  |
+| 42 → 63 | 43 → 18 |
+| 50 → 69 | 54 → 31 |
+| 62 → 81 | 66 → 45 |
+| 74 → 92 | 89 → 53 |
+|         | 95 → 77 |
+|         | 99 → 41 |
 
 All visual endpoints use square-center coordinates from `engine.mjs`. Body control points move while the head/tail coordinates remain fixed. Swallowed pawns follow the current animated snake path, accompanied by a traveling color glow; ladder climbs follow their rendered straight geometry. Rolling stays locked until movement settles. Cancellation tokens prevent old turns from writing into restarted matches.
 
@@ -47,8 +49,8 @@ python3 -m http.server 8765
 CHROME=/usr/bin/chromium SERPENT_EVIDENCE=/tmp/serpent-evidence node games/snakes-and-ladders/browser-check.cjs
 ```
 
-- 183 unit tests passed across these five current suites, including 36 new engine cases.
-- 27 browser verification groups passed without page errors, including viewport fitting, color locks, real die rotations, pawn steps, anchors, and the full match/result flows.
+- 186 unit tests passed across these five current suites, including 39 new engine cases.
+- 29 browser verification groups passed without page errors, including viewport fitting, color locks, real die rotations, pawn steps, anchors, and the full match/result flows.
 - Chromium viewports include 320×568, 360×640, 390×844, 412×915, 430×932, 768×1024, 1024×768, 1366×768, 1440×900, 1920×1080, 640×360 and 844×390. The full board and all controls fit without horizontal or vertical page scrolling. Each player has their own die; only the current human player can tap theirs.
 - Sampled actual animated transforms for royal breathing, blinking, tongues, smaller snakes, leaves and vines; captured menu and intro frames.
 - Verified changing lava and board paths, mathematical endpoints, roll locking, pawn release at snake tails and ladder tops, restart cancellation, automatic bot actions and storage-unavailable play.
@@ -61,8 +63,8 @@ The old `games/arcade.test.mjs` has three existing Ludo failures, reproduced usi
 
 ## Visual and platform limits
 
-The gameplay board was redesigned after visual feedback: painted volcanic cavern artwork with serpent eyes/fangs, separate desktop and mobile compositions, polished emerald/ivory marble textures, beveled gold cells and frame, a rendered royal title, six individually colored painted heads, tapered animated scaled bodies, gold ladders, sculpted pawns, an ivory die, and viewport-fitted controls alongside the board on PC and below it on portrait phones. These are local WebP assets layered with the structured SVG board; the board is never a flattened screenshot. The supplied reference guides the design; its incorrect numbering and endpoints are not copied. The menu and intro retain their earlier stylized SVG presentation. The intro uses layered 2D transforms and independent jaws, rather than a 3D camera. Cylindrical Canvas shading and tangent-aligned scales animate the bodies; articulated SVG-image heads and tail endpoints stay in their designated squares. Ladders use extruded SVG side faces and beveled rungs. Each player’s die has six actual CSS 3D faces and a multi-revolution spin. Pin pawns use the same vector shape as Ludu Mahir.
+The gameplay board was redesigned after visual feedback: painted volcanic cavern artwork with serpent eyes/fangs, separate desktop and mobile compositions, polished emerald/ivory marble textures, beveled gold cells and frame, a rendered royal title, eight anchored natural-color venomous-snake heads, tapered animated scaled bodies, gold ladders, sculpted pawns, an ivory die, and viewport-fitted controls alongside the board on PC and below it on portrait phones. These are local WebP assets layered with the structured SVG board; the board is never a flattened screenshot. Numbering remains programmatically generated. The eight snake and six ladder endpoints match the latest approved numbered reference diagram. The menu and intro retain their earlier stylized SVG presentation. The intro uses layered 2D transforms and independent jaws, rather than a 3D camera. Natural brown viper, olive cobra, green pit-viper and black/white krait-style generated artwork replaces the fantasy heads. Cylindrical Canvas shading and tangent-aligned photo-style skin strips animate the bodies; articulated SVG-image heads and tail endpoints stay in their designated squares. Ladders use extruded SVG side faces and beveled rungs. Each player’s die has six actual CSS 3D faces and a multi-revolution spin. Pin pawns use the same vector shape as Ludu Mahir.
 
-Mobile checks use Chromium viewport emulation, not physical Android hardware or Safari on iPhone. No measured budget-device frame-rate guarantee is made. High/Balanced/Low adjust body update frequency and effects; system reduced motion overrides animation. Sound is lightweight synthesized tones and ambience rather than a recorded environmental soundscape. There is no match timer, Start/Stop control, or Pause button in gameplay. Desktop controls sit beside the board; portrait-phone controls fit below it. Matches are not persisted across page reloads; statistics/settings are local where storage is available. No accounts, online rankings, paid APIs, external game assets or heavyweight runtime dependencies are required.
+Mobile checks use Chromium viewport emulation, not physical Android hardware or Safari on iPhone. No measured budget-device frame-rate guarantee is made. High/Balanced/Low adjust body update frequency and effects; system reduced motion overrides animation. Sound is lightweight synthesized tones and ambience rather than a recorded environmental soundscape. There is no match timer, Start/Stop, Pause, Restart or Rules control in gameplay. Rules remain in setup. One gold Menu icon, a global mute/unmute icon and a Settings icon sit in the header; redundant navigation labels are removed. The compact personal-dice dock leaves the board dominant, including with four players. Desktop controls sit beside the board; portrait-phone controls fit below it. Matches are not persisted across page reloads; statistics/settings are local where storage is available. No accounts, online rankings, paid APIs, external game assets or heavyweight runtime dependencies are required.
 
 Deployment and live verification are reported separately with the final commit and GitHub Pages run, rather than inferred from local tests.

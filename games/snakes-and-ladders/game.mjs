@@ -1,7 +1,7 @@
 import {
   createBodyCanvas,
   paintBodies,
-} from "./serpent-renderer.mjs?v=20261108-living";
+} from "./serpent-renderer.mjs?v=20261108-compact-maps";
 import { setGameInProgress } from "../refresh-guard.mjs";
 import {
   SNAKES,
@@ -16,7 +16,7 @@ import {
   settle,
   placement,
   chooseColor,
-} from "./engine.mjs?v=20261108-living";
+} from "./engine.mjs?v=20261108-compact-maps";
 const $ = (s) => document.querySelector(s),
   NS = "http://www.w3.org/2000/svg";
 const svg = (tag, attrs = {}, parent) => {
@@ -44,6 +44,7 @@ let settings = read("serpent-settings", {
   motion: true,
   botDelay: 900,
 });
+let audioMuted = read("serpent-muted", !(settings.sfx || settings.ambience));
 let stats = read("serpent-stats", {
   gamesPlayed: 0,
   humanWins: 0,
@@ -72,7 +73,13 @@ const reduced = () =>
 function applySettings() {
   document.body.classList.toggle("reduced", reduced());
   document.body.classList.toggle("low", settings.quality === "Low");
-  $("#sound").textContent = `Sound: ${settings.sfx ? "On" : "Off"}`;
+  const sound = $("#sound"),
+    label = audioMuted ? "Unmute sound" : "Mute sound";
+  sound.setAttribute("aria-label", label);
+  sound.setAttribute("title", label);
+  sound.setAttribute("aria-pressed", String(!audioMuted));
+  sound.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4Z"/>${audioMuted ? '<path d="m17 9 5 6m0-6-5 6"/>' : '<path d="M16 8q5 4 0 8M19 5q8 7 0 14"/>'}</svg>`;
+  save("serpent-muted", audioMuted);
   save("serpent-settings", settings);
   updateAmbience();
 }
@@ -86,7 +93,7 @@ function audio() {
   }
 }
 function tone(f = 400, d = 0.12) {
-  if (!settings.sfx) return;
+  if (!settings.sfx || audioMuted) return;
   const a = audio();
   if (!a) return;
   const o = a.createOscillator(),
@@ -107,7 +114,7 @@ function updateAmbience() {
     } catch {}
     ambienceNode = null;
   }
-  if (!settings.ambience || !context || document.hidden) return;
+  if (!settings.ambience || audioMuted || !context || document.hidden) return;
   const a = context,
     o = a.createOscillator(),
     g = a.createGain();
@@ -727,14 +734,15 @@ function board() {
       q = center(z),
       g = svg("g", { "data-snake": a }, b),
       color = [
-        "#e9aa36",
-        "#bd5fdb",
-        "#48b6d1",
-        "#ed6953",
-        "#69b66a",
-        "#82b646",
+        "#8d7452",
+        "#5d573f",
+        "#68883d",
+        "#262b29",
+        "#8d7452",
+        "#5d573f",
+        "#68883d",
+        "#262b29",
       ][i];
-    const hue = [-65, 170, 90, -110, 0, 30][i];
     gradient(
       `serpent-shade-${i}`,
       [
@@ -860,7 +868,7 @@ function board() {
           y: -2.8,
           width: 7.2,
           height: 7.2,
-          viewBox: `${(i % 3) * 400} ${Math.floor(i / 3) * 400} 400 400`,
+          viewBox: `${(i % 2) * 500} ${Math.floor((i % 4) / 2) * 500} 500 500`,
           overflow: "hidden",
         },
         c,
@@ -868,11 +876,11 @@ function board() {
       svg(
         "image",
         {
-          href: "assets/serpent-heads.webp",
+          href: "assets/natural-heads.webp",
           x: 0,
           y: 0,
-          width: 1200,
-          height: 800,
+          width: 1000,
+          height: 1000,
         },
         sheet,
       );
@@ -883,12 +891,12 @@ function board() {
     svg(
       "ellipse",
       {
-        cx: -0.1,
-        cy: -1.2,
-        rx: 0.19,
-        ry: 0.09,
-        fill: "#ffce56",
-        class: "board-eye",
+        cx: [-0.42, -1.5, -0.33, -1.47][i % 4],
+        cy: [-0.55, -0.32, -0.73, -0.73][i % 4],
+        rx: 0.31,
+        ry: 0.3,
+        fill: color,
+        class: "board-eye natural-eyelid",
       },
       art,
     );
@@ -1162,6 +1170,7 @@ function render() {
   if (!state) return;
   setGameInProgress(!$("#play").hidden && state.phase !== "over");
   $("#players").style.setProperty("--player-count", state.players.length);
+  $("#players").dataset.count = state.players.length;
   $("#players").innerHTML = state.players
     .map((p, i) => {
       const rank = state.order.indexOf(i),
@@ -1189,7 +1198,7 @@ function fitGame() {
     parseFloat(getComputedStyle(main).paddingRight);
   const size = portrait
     ? Math.min(width, height - top - aside.offsetHeight - 18)
-    : Math.min(height - top - 23, width - 270, 880);
+    : Math.min(height - top - 23, width - 214, 920);
   document.body.style.setProperty(
     "--board-size",
     Math.max(120, Math.floor(size)) + "px",
@@ -1493,7 +1502,7 @@ function panel(kind) {
   if (kind === "settings") {
     $("#dialog-content").innerHTML =
       `<h2>Sound & Animation</h2><label class="setting">Sound Effects<input id="sfx-setting" type="checkbox" ${settings.sfx ? "checked" : ""}></label><label class="setting">Background Ambience<input id="ambience-setting" type="checkbox" ${settings.ambience ? "checked" : ""}></label><label class="setting">Animations<input id="motion-setting" type="checkbox" ${settings.motion ? "checked" : ""}></label><label class="setting">Animation Quality<select id="quality-setting">${["High", "Balanced", "Low"].map((q) => `<option ${settings.quality === q ? "selected" : ""}>${q}</option>`).join("")}</select></label><label class="setting">Bot delay<select id="bot-setting">${[400, 900, 1600].map((n) => `<option value="${n}" ${+settings.botDelay === n ? "selected" : ""}>${n / 1000} seconds</option>`).join("")}</select></label><p>System reduced-motion preferences take priority. Sound is synthesized locally; no audio downloads or paid services.</p>`;
-    $("#dialog-content").onchange = () => {
+    $("#dialog-content").onchange = (event) => {
       settings = {
         sfx: $("#sfx-setting").checked,
         ambience: $("#ambience-setting").checked,
@@ -1501,6 +1510,11 @@ function panel(kind) {
         quality: $("#quality-setting").value,
         botDelay: +$("#bot-setting").value,
       };
+      if (
+        event.target.id === "sfx-setting" ||
+        event.target.id === "ambience-setting"
+      )
+        audioMuted = !(settings.sfx || settings.ambience);
       audio();
       applySettings();
     };
@@ -1520,10 +1534,10 @@ $("#players").onclick = (e) => {
   const b = e.target.closest("[data-roll]");
   if (b && !b.disabled && +b.dataset.roll === state?.current) takeTurn();
 };
-$("#restart").onclick = () => begin(true);
 $("#menu-button").onclick = menu;
 $("#sound").onclick = () => {
-  settings.sfx = !settings.sfx;
+  audioMuted = !audioMuted;
+  if (!audioMuted && !settings.sfx && !settings.ambience) settings.sfx = true;
   audio();
   applySettings();
   tone();

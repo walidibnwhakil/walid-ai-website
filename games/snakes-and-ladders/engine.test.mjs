@@ -33,8 +33,17 @@ test("100 unique numbered squares, traditional zigzag from bottom left", () => {
   assert.throws(() => center(101));
 });
 test("exact Classic mappings", () => {
-  assert.deepEqual(SNAKES, { 17: 7, 39: 18, 54: 34, 62: 36, 87: 24, 99: 78 });
-  assert.deepEqual(LADDERS, { 3: 22, 6: 15, 28: 52, 47: 68, 72: 91 });
+  assert.deepEqual(SNAKES, {
+    27: 5,
+    40: 3,
+    43: 18,
+    54: 31,
+    66: 45,
+    89: 53,
+    95: 77,
+    99: 41,
+  });
+  assert.deepEqual(LADDERS, { 4: 25, 13: 46, 42: 63, 50: 69, 62: 81, 74: 92 });
 });
 for (const [kind, map] of [
   ["snake", SNAKES],
@@ -167,12 +176,12 @@ test("turn wrap, unique colors and restart", () => {
 });
 test("logical state never mutates caller; animation resolution is separate", () => {
   const s = createGame();
-  s.players[0].position = 2;
+  s.players[0].position = 3;
   const original = structuredClone(s);
   const r = roll(s, 1);
   assert.deepEqual(s, original);
   assert.equal(r.state.phase, "moving");
-  assert.equal(r.target, 22);
+  assert.equal(r.target, 25);
   assert.equal(settle(r).state.phase, "ready");
 });
 for (const count of [2, 3, 4])
@@ -211,7 +220,9 @@ test("a one activates at square 1 and later values advance normally", () => {
   assert.equal(r.target, 1);
   s = settle(r).state;
   s.current = 0;
-  assert.equal(roll(s, 3).target, 4);
+  const next = roll(s, 3);
+  assert.equal(next.landing, 4);
+  assert.equal(next.target, 25);
 });
 test("consecutive six rule applies before and after activation", () => {
   for (const position of [0, 40]) {

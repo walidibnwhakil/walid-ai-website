@@ -334,6 +334,12 @@ function menu() {
   select();
   window.scrollTo(0, 0);
 }
+$("#top-back").addEventListener("click", (event) => {
+  if (!$("#play").hidden) {
+    event.preventDefault();
+    menu();
+  }
+});
 $("#start").onclick = start;
 $("#restart").onclick = start;
 $("#again").onclick = start;

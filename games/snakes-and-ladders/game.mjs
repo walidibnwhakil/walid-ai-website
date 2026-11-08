@@ -1,3 +1,7 @@
+import {
+  createBodyCanvas,
+  paintBodies,
+} from "./serpent-renderer.mjs?v=20261108-living";
 import { setGameInProgress } from "../refresh-guard.mjs";
 import {
   SNAKES,
@@ -11,7 +15,8 @@ import {
   roll,
   settle,
   placement,
-} from "./engine.mjs";
+  chooseColor,
+} from "./engine.mjs?v=20261108-living";
 const $ = (s) => document.querySelector(s),
   NS = "http://www.w3.org/2000/svg";
 const svg = (tag, attrs = {}, parent) => {
@@ -51,7 +56,6 @@ let stats = read("serpent-stats", {
 });
 let state = null,
   busy = false,
-  paused = false,
   epoch = 0,
   raf = 0,
   lastBoardFrame = -Infinity,
@@ -59,6 +63,8 @@ let state = null,
   introTimer = 0,
   paths = {},
   pawns = [],
+  bodyCanvas = null,
+  activeRollAnimation = null,
   context,
   ambienceNode;
 const reduced = () =>
@@ -372,27 +378,84 @@ function jungle() {
       j,
     );
 }
+function pinMarkup(color) {
+  return `<svg class="pin-avatar" viewBox="0 0 64 77" aria-hidden="true" style="--pawn:${HEX[COLORS.indexOf(color)]}"><path class="pin-outline" d="M32 3C17 3 5 15 5 31c0 15 17 34 27 46 10-12 27-31 27-46C59 15 47 3 32 3Z"/><path class="pin-color" d="M32 9C20 9 11 18 11 31c0 11 13 27 21 38 8-11 21-27 21-38C53 18 44 9 32 9Z"/><circle class="pin-face" cx="32" cy="29" r="13"/><ellipse class="pin-gloss" cx="26" cy="22" rx="4" ry="6"/></svg>`;
+}
 function colorOptions() {
   const count = $("#mode").value === "bot" ? 2 : +$("#mode").value;
   $("#colors").innerHTML = Array.from(
     { length: count },
     (_, i) =>
-      `<label style="--pawn:${HEX[i]}">${i === 1 && $("#mode").value === "bot" ? "Bot" : `Player ${i + 1}`} color<select data-color="${i}">${COLORS.map((c, j) => `<option ${j === i ? "selected" : ""}>${c}</option>`).join("")}</select></label>`,
+      `<div class="setup-color"><button type="button" data-setup-color="${i}" aria-label="${i === 1 && $("#mode").value === "bot" ? "Bot" : "Player " + (i + 1)}: choose pawn color">${pinMarkup(COLORS[i])}<span>${i === 1 && $("#mode").value === "bot" ? "Bot" : "Player " + (i + 1)}<small>${COLORS[i]}</small></span></button><select data-color="${i}" hidden aria-hidden="true">${COLORS.map((c, j) => `<option ${i === j ? "selected" : ""}>${c}</option>`).join("")}</select></div>`,
   ).join("");
-  $("#colors").onchange = (e) => {
-    const sels = [...document.querySelectorAll("[data-color]")];
-    const other = sels.find(
-      (s) => s !== e.target && s.value === e.target.value,
-    );
-    if (other) {
-      const used = sels.filter((s) => s !== other).map((s) => s.value);
-      other.value = COLORS.find((c) => !used.includes(c));
-    }
-    sels.forEach((s) =>
-      s.parentElement.style.setProperty("--pawn", HEX[COLORS.indexOf(s.value)]),
-    );
-  };
 }
+function colorPicker(i, inMatch = false) {
+  if (
+    busy ||
+    (inMatch && (state?.colorsLocked || state?.rolls > 0)) ||
+    (!inMatch && !$("#play").hidden)
+  )
+    return;
+  clearTimeout(botTimer);
+  const selects = [...document.querySelectorAll("[data-color]")],
+    current = inMatch ? state.players[i].color : selects[i].value;
+  $("#dialog-content").innerHTML =
+    `<h2 class="sr-only">Choose pawn color</h2><p class="sr-only">Player ${i + 1} · Colors lock on the first die roll. Choosing an occupied color swaps the two players.</p><div class="color-palette">${["Red", "Blue", "Green", "Brown", "Purple", "Orange", "Pink", "Yellow", "Teal"].map((c) => `<button type="button" data-pick-color="${c}" aria-label="${c}" aria-pressed="${c === current}"><span class="color-swatch" style="--swatch:${HEX[COLORS.indexOf(c)]}"></span><span>${c}</span></button>`).join("")}</div>`;
+  $("#dialog-content").onclick = (e) => {
+    const button = e.target.closest("[data-pick-color]");
+    if (!button || busy || (inMatch && (state.colorsLocked || state.rolls > 0)))
+      return;
+    const color = button.dataset.pickColor;
+    if (inMatch) {
+      state = chooseColor(state, i, color);
+      state.players.forEach((p, j) => {
+        selects[j].value = p.color;
+        pawns[j].style.setProperty("--pawn", HEX[COLORS.indexOf(p.color)]);
+      });
+      render();
+    } else {
+      const other = selects.find((s, j) => j !== i && s.value === color);
+      if (other) other.value = current;
+      selects[i].value = color;
+    }
+    selects.forEach((s, j) => {
+      const head = document.querySelector(`[data-setup-color="${j}"]`);
+      head.innerHTML =
+        pinMarkup(s.value) +
+        `<span>${j === 1 && $("#mode").value === "bot" ? "Bot" : "Player " + (j + 1)}<small>${s.value}</small></span>`;
+    });
+    $("#dialog").close();
+    document
+      .querySelector(
+        inMatch ? `[data-game-color="${i}"]` : `[data-setup-color="${i}"]`,
+      )
+      ?.focus();
+  };
+  const dialog = $("#dialog");
+  dialog.classList.add("color-dialog");
+  dialog.showModal();
+  const anchor = document
+      .querySelector(
+        inMatch ? `[data-game-color="${i}"]` : `[data-setup-color="${i}"]`,
+      )
+      .getBoundingClientRect(),
+    rect = dialog.getBoundingClientRect();
+  dialog.style.left =
+    Math.max(
+      8,
+      Math.min(
+        innerWidth - rect.width - 8,
+        anchor.left + anchor.width / 2 - rect.width / 2,
+      ),
+    ) + "px";
+  dialog.style.top =
+    Math.max(8, Math.min(innerHeight - rect.height - 8, anchor.bottom + 7)) +
+    "px";
+}
+$("#colors").onclick = (e) => {
+  const b = e.target.closest("[data-setup-color]");
+  if (b) colorPicker(+b.dataset.setupColor);
+};
 function board() {
   const b = $("#board");
   b.replaceChildren();
@@ -526,56 +589,139 @@ function board() {
         b,
       );
   }
+  gradient(
+    "ladder-rail",
+    [
+      ["0%", "#5b2908"],
+      ["16%", "#ffeb9e"],
+      ["34%", "#be6e16"],
+      ["58%", "#f7d06d"],
+      ["82%", "#9b4c0e"],
+      ["100%", "#ffe3a0"],
+    ],
+    true,
+  );
+  gradient("ladder-rung", [
+    ["0%", "#fff2a6"],
+    ["28%", "#df9f31"],
+    ["65%", "#ae5b0d"],
+    ["100%", "#582b0a"],
+  ]);
   for (const [a, z] of Object.entries(LADDERS)) {
     const p = center(+a),
       q = center(z),
       dx = q.x - p.x,
       dy = q.y - p.y,
       len = Math.hypot(dx, dy),
-      nx = (-dy / len) * 1.25,
-      ny = (dx / len) * 1.25;
-    const g = svg("g", { "data-ladder": a }, b);
-    for (const sign of [-1, 1])
+      ux = dx / len,
+      uy = dy / len,
+      nx = -uy,
+      ny = ux;
+    const g = svg(
+      "g",
+      {
+        "data-ladder": a,
+        transform: `matrix(${nx} ${ny} ${ux} ${uy} ${p.x} ${p.y})`,
+        class: "sculpted-ladder",
+      },
+      b,
+    );
+    for (const x of [-1.5, 1.5]) {
       svg(
-        "line",
+        "rect",
         {
-          x1: p.x + nx * sign,
-          y1: p.y + ny * sign,
-          x2: q.x + nx * sign,
-          y2: q.y + ny * sign,
-          stroke: "#51331a",
-          "stroke-width": 1.4,
+          x: x - 0.38 + 0.25,
+          y: 0.25,
+          width: 0.76,
+          height: len,
+          rx: 0.14,
+          fill: "#2a1409",
+          opacity: 0.8,
         },
         g,
       );
-    for (const sign of [-1, 1])
       svg(
-        "line",
+        "path",
         {
-          x1: p.x + nx * sign,
-          y1: p.y + ny * sign,
-          x2: q.x + nx * sign,
-          y2: q.y + ny * sign,
-          stroke: "url(#ladder-gold)",
-          "stroke-width": 0.95,
+          d: `M ${x + 0.32} 0 l .26 .28 V ${len + 0.28} l -.26 -.28 Z`,
+          fill: "#73400e",
         },
         g,
       );
-    for (let t = 0; t <= 1; t += 1 / Math.ceil(len / 2.3))
       svg(
-        "line",
+        "rect",
         {
-          x1: p.x + dx * t - nx,
-          y1: p.y + dy * t - ny,
-          x2: p.x + dx * t + nx,
-          y2: p.y + dy * t + ny,
-          stroke: "url(#ladder-gold)",
-          "stroke-width": 0.85,
+          x: x - 0.36,
+          y: 0,
+          width: 0.72,
+          height: len,
+          rx: 0.12,
+          fill: "url(#ladder-rail)",
+          stroke: "#ffdfa1",
+          "stroke-width": 0.08,
         },
         g,
       );
+      svg(
+        "path",
+        {
+          d: `M ${x - 0.23} .1 V ${len - 0.1}`,
+          stroke: "#fff0aa",
+          "stroke-width": 0.09,
+          fill: "none",
+          opacity: 0.8,
+        },
+        g,
+      );
+    }
+    const rungs = Math.max(2, Math.ceil(len / 2.2));
+    for (let j = 0; j <= rungs; j++) {
+      const y = 0.38 + ((len - 0.76) * j) / rungs;
+      svg(
+        "path",
+        { d: `M -1.55 ${y + 0.3} H 1.55 l .2 .3 H -1.35 Z`, fill: "#673608" },
+        g,
+      );
+      svg(
+        "rect",
+        {
+          x: -1.55,
+          y: y - 0.25,
+          width: 3.1,
+          height: 0.55,
+          rx: 0.08,
+          fill: "url(#ladder-rung)",
+          stroke: "#eebd5a",
+          "stroke-width": 0.07,
+        },
+        g,
+      );
+      svg(
+        "path",
+        {
+          d: `M -1.42 ${y - 0.16} H 1.42`,
+          stroke: "#fff3bf",
+          "stroke-width": 0.1,
+        },
+        g,
+      );
+      for (const x of [-1.49, 1.49])
+        svg(
+          "circle",
+          {
+            cx: x,
+            cy: y,
+            r: 0.11,
+            fill: "#633810",
+            stroke: "#f2d181",
+            "stroke-width": 0.05,
+          },
+          g,
+        );
+    }
     paths[a] = { kind: "ladder", p, q };
   }
+  bodyCanvas = createBodyCanvas(b);
   Object.entries(SNAKES).forEach(([a, z], i) => {
     const p = center(+a),
       q = center(z),
@@ -757,8 +903,10 @@ function board() {
       },
       art,
     );
-    for (const layer of [path, inner, sheen, pattern])
+    for (const layer of [path, inner, sheen, pattern]) {
       layer.setAttribute("mask", `url(#taper-${i})`);
+      layer.setAttribute("opacity", 0);
+    }
     paths[a] = {
       kind: "snake",
       p,
@@ -771,6 +919,7 @@ function board() {
       head,
       g,
       i,
+      color,
     };
   });
   for (const { n, x, y } of squares) {
@@ -786,78 +935,45 @@ function board() {
     t.textContent = n === 100 ? "100 ♛" : n;
   }
   pawns = state.players.map((p, i) => {
-    const g = svg("g", { class: "pawn", "data-player": i }, b),
-      color = HEX[COLORS.indexOf(p.color)];
-    gradient(
-      `pawn-${i}`,
-      [
-        ["0%", "#421a14"],
-        ["18%", color],
-        ["38%", "#fff2bd"],
-        ["50%", color],
-        ["100%", "#1a1b20"],
-      ],
-      true,
-    );
-    const fill = `url(#pawn-${i})`;
-    svg(
-      "ellipse",
-      { cx: 0, cy: 1.3, rx: 1.8, ry: 0.65, fill: "#080504", opacity: 0.7 },
-      g,
-    );
-    svg(
-      "ellipse",
+    const g = svg(
+      "g",
       {
-        cx: 0,
-        cy: 1,
-        rx: 1.55,
-        ry: 0.55,
-        fill,
-        stroke: "#ffe6a2",
-        "stroke-width": 0.16,
+        class: "pawn pin-pawn",
+        "data-player": i,
+        style: `--pawn:${HEX[COLORS.indexOf(p.color)]}`,
+      },
+      b,
+    );
+    const pin = svg(
+      "svg",
+      {
+        x: -2.1,
+        y: -2.9,
+        width: 4.2,
+        height: 5.05,
+        viewBox: "0 0 64 77",
+        class: "pin-pawn-art",
       },
       g,
     );
     svg(
       "path",
       {
-        d: "M -1.2 .8 Q -.6 .2 -.48 -1.2 H .48 Q .6 .2 1.2 .8 Z",
-        fill,
-        stroke: "#ffd6a0",
-        "stroke-width": 0.12,
+        d: "M32 3C17 3 5 15 5 31c0 15 17 34 27 46 10-12 27-31 27-46C59 15 47 3 32 3Z",
+        class: "pin-outline",
       },
-      g,
+      pin,
     );
     svg(
-      "ellipse",
+      "path",
       {
-        cx: 0,
-        cy: -1.15,
-        rx: 0.85,
-        ry: 0.3,
-        fill,
-        stroke: "#ffe6a2",
-        "stroke-width": 0.12,
+        d: "M32 9C20 9 11 18 11 31c0 11 13 27 21 38 8-11 21-27 21-38C53 18 44 9 32 9Z",
+        class: "pin-color",
       },
-      g,
+      pin,
     );
-    svg(
-      "circle",
-      {
-        cx: 0,
-        cy: -2.05,
-        r: 0.95,
-        fill,
-        stroke: "#ffdc9a",
-        "stroke-width": 0.1,
-      },
-      g,
-    );
-    svg(
-      "ellipse",
-      { cx: -0.3, cy: -2.4, rx: 0.22, ry: 0.13, fill: "#fff", opacity: 0.8 },
-      g,
-    );
+    svg("circle", { cx: 32, cy: 29, r: 13, class: "pin-face" }, pin);
+    svg("ellipse", { cx: 26, cy: 22, rx: 4, ry: 6, class: "pin-gloss" }, pin);
     return g;
   });
   state.players.forEach((p, i) => place(i, p.position));
@@ -866,9 +982,10 @@ function curve(p, q, i, t = 0) {
   const dx = q.x - p.x,
     dy = q.y - p.y,
     len = Math.hypot(dx, dy),
-    wave = reduced() ? 0 : Math.sin(t / 800 + i) * 1.1,
+    wave = reduced() ? 0 : Math.sin(t / 900 + i) * 1.8,
+    tailWave = reduced() ? 0 : Math.sin(t / 900 + i - 2.4) * 1.8,
     bend = (i % 2 ? 1 : -1) * Math.min(15, len * 0.48) + wave;
-  return `M ${p.x} ${p.y} C ${p.x + dx * 0.25 - (dy / len) * bend} ${p.y + dy * 0.25 + (dx / len) * bend} ${q.x - dx * 0.25 + (dy / len) * bend} ${q.y - dy * 0.25 - (dx / len) * bend} ${q.x} ${q.y}`;
+  return `M ${p.x} ${p.y} C ${p.x + dx * 0.25 - (dy / len) * bend} ${p.y + dy * 0.25 + (dx / len) * bend} ${q.x - dx * 0.25 + (dy / len) * (bend - wave + tailWave)} ${q.y - dy * 0.25 - (dx / len) * (bend - wave + tailWave)} ${q.x} ${q.y}`;
 }
 function taperedRibbon(d) {
   const [x0, y0, x1, y1, x2, y2, x3, y3] = d.match(/-?[\d.]+/g).map(Number),
@@ -918,20 +1035,60 @@ function animateBoard(t) {
       );
     }
   }
+  if (bodyCanvas)
+    paintBodies(
+      bodyCanvas,
+      Object.values(paths).filter((p) => p.kind === "snake"),
+      reduced() ? 0 : t,
+      settings.quality,
+    );
   if (state && !$("#play").hidden) raf = requestAnimationFrame(animateBoard);
 }
 function place(i, n, point) {
   const p = point ?? (n ? center(n) : { x: 3 + i * 3, y: 103 });
-  const offset = point ? 0 : (i % 2 ? 1 : -1) * 0.8;
+  const peers = state?.players
+      .map((v, j) => (v.position === n ? j : -1))
+      .filter((j) => j >= 0) ?? [i],
+    slot = peers.indexOf(i),
+    shared = !point && n > 0 && peers.length > 1;
+  const offsets =
+    peers.length === 2
+      ? [
+          [-1.7, 0],
+          [1.7, 0],
+        ]
+      : peers.length === 3
+        ? [
+            [-1.7, -1.2],
+            [1.7, -1.2],
+            [0, 1.7],
+          ]
+        : [
+            [-1.7, -1.5],
+            [1.7, -1.5],
+            [-1.7, 1.5],
+            [1.7, 1.5],
+          ];
+  const [ox, oy] = shared ? (offsets[Math.max(0, slot)] ?? [0, 0]) : [0, 0];
   pawns[i]?.setAttribute(
     "transform",
-    `translate(${p.x + offset} ${p.y + Math.floor(i / 2) * 1.1})`,
+    `translate(${p.x + ox} ${p.y + oy}) scale(${shared ? 0.76 : 1})`,
   );
   pawns[i]?.setAttribute("data-position", n);
+  pawns[i]?.setAttribute("visibility", !n && !point ? "hidden" : "visible");
 }
 const delay = (ms) =>
   new Promise((resolve) => setTimeout(resolve, reduced() ? 0 : ms));
-async function travel(i, p, q, ms, token, path = null, climb = false) {
+async function travel(
+  i,
+  p,
+  q,
+  ms,
+  token,
+  path = null,
+  climb = false,
+  hop = false,
+) {
   if (reduced()) {
     place(i, 0, q);
     return;
@@ -949,7 +1106,7 @@ async function travel(i, p, q, ms, token, path = null, climb = false) {
           : { x: p.x + (q.x - p.x) * f, y: p.y + (q.y - p.y) * f };
       place(i, 0, {
         x: pt.x + (climb ? Math.sin(f * Math.PI * 16) * 0.45 : 0),
-        y: pt.y,
+        y: pt.y - (hop ? Math.sin(f * Math.PI) * 1.1 : 0),
       });
       if (f < 1) requestAnimationFrame(frame);
       else resolve();
@@ -957,63 +1114,121 @@ async function travel(i, p, q, ms, token, path = null, climb = false) {
     requestAnimationFrame(frame);
   });
 }
+const DIE_FACES = {
+  1: [[1, 1]],
+  2: [
+    [0, 0],
+    [2, 2],
+  ],
+  3: [
+    [0, 0],
+    [1, 1],
+    [2, 2],
+  ],
+  4: [
+    [0, 0],
+    [2, 0],
+    [0, 2],
+    [2, 2],
+  ],
+  5: [
+    [0, 0],
+    [2, 0],
+    [1, 1],
+    [0, 2],
+    [2, 2],
+  ],
+  6: [
+    [0, 0],
+    [2, 0],
+    [0, 1],
+    [2, 1],
+    [0, 2],
+    [2, 2],
+  ],
+};
+const DIE_ROTATION = {
+  1: [0, 0],
+  2: [0, -90],
+  3: [-90, 0],
+  4: [90, 0],
+  5: [0, 90],
+  6: [0, 180],
+};
+function dieCube(value = 1) {
+  return `<span class="cube-stage" aria-hidden="true"><span class="die-cube" style="--rx:${DIE_ROTATION[value][0]}deg;--ry:${DIE_ROTATION[value][1]}deg">${[1, 2, 3, 4, 5, 6].map((n) => `<span class="die-face face-${n}" data-face="${n}">${DIE_FACES[n].map(([x, y]) => `<i class="pip" style="--px:${x};--py:${y}"></i>`).join("")}</span>`).join("")}</span></span>`;
+}
 function render() {
   if (!state) return;
   setGameInProgress(!$("#play").hidden && state.phase !== "over");
   $("#players").style.setProperty("--player-count", state.players.length);
-  $("#players").innerHTML =
-    `<p class="roster-summary">${state.order.length} finished · ${state.players.length - state.order.length} remaining</p>` +
-    state.players
-      .map(
-        (p, i) =>
-          `<div class="player-row ${i === state.current ? "current" : ""}" style="--pawn:${HEX[COLORS.indexOf(p.color)]}"><span class="dot"></span><strong>${p.name}<br><small>${p.color}${state.order.includes(i) ? " · " + placement(state.order.indexOf(i), state.players.length) : ""}</small></strong><span>${p.position || "Start"}</span></div>`,
-      )
-      .join("");
-  $("#roll").disabled =
-    busy ||
-    paused ||
-    state.phase !== "ready" ||
-    (state.bot && state.current === 1);
-  $("#pause").textContent = paused ? "Resume" : "Pause";
-  if (state.dice) drawDie(state.dice);
+  $("#players").innerHTML = state.players
+    .map((p, i) => {
+      const rank = state.order.indexOf(i),
+        bot = state.bot && i === 1,
+        active =
+          i === state.current && state.phase === "ready" && !busy && rank < 0;
+      return `<div class="player-row ${i === state.current ? "current" : ""} ${rank >= 0 ? "finished" : ""}" style="--pawn:${HEX[COLORS.indexOf(p.color)]}" data-player-card="${i}"><button type="button" class="player-head" data-game-color="${i}" aria-label="${p.name}: ${state.colorsLocked ? "colors locked" : "choose pawn color"}" ${state.colorsLocked || busy || state.rolls > 0 ? "disabled" : ""}>${pinMarkup(p.color)}<strong>${p.name}</strong></button><button type="button" class="player-die" data-roll="${i}" aria-label="${p.name}: ${p.lastDice ? "last roll " + p.lastDice + ". " : ""}${bot ? "Bot rolls automatically" : p.position === 0 ? "Roll a 1 to enter" : "Roll dice"}" ${!active || bot ? "disabled" : ""}>${dieCube(p.lastDice ?? 1)}</button><span class="player-position">${rank >= 0 ? placement(rank, state.players.length) : p.position === 0 ? "Roll 1 to enter" : `Square ${p.position}`}</span></div>`;
+    })
+    .join("");
+  fitGame();
 }
-function drawDie(value) {
-  const positions = {
-    1: [[35, 31]],
-    2: [
-      [24, 21],
-      [46, 41],
-    ],
-    3: [
-      [24, 21],
-      [35, 31],
-      [46, 41],
-    ],
-    4: [
-      [24, 21],
-      [46, 21],
-      [24, 41],
-      [46, 41],
-    ],
-    5: [
-      [24, 21],
-      [46, 21],
-      [35, 31],
-      [24, 41],
-      [46, 41],
-    ],
-    6: [
-      [24, 21],
-      [46, 21],
-      [24, 31],
-      [46, 31],
-      [24, 41],
-      [46, 41],
-    ],
-  };
-  $("#dice").setAttribute("aria-label", `Die: ${value}`);
-  $("#dice").innerHTML =
-    `<svg viewBox="0 0 80 75" aria-hidden="true"><defs><linearGradient id="die-face" x2="1" y2="1"><stop stop-color="#fffdf0"/><stop offset="1" stop-color="#d8b27a"/></linearGradient></defs><path d="M 12 11 L 57 8 L 71 20 L 68 61 L 55 70 L 13 59 Z" fill="#8c6034" stroke="#ffdb97" stroke-width="1"/><path d="M 14 11 L 57 9 L 56 53 Q 56 59 51 60 L 17 57 Q 12 57 12 51 Z" fill="url(#die-face)"/><path d="M 57 10 L 69 21 L 67 59 L 56 67 V 53 Z" fill="#ba8d56"/>${positions[value].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="3.8" fill="#1c140e"/><ellipse cx="${x - 0.6}" cy="${y - 0.8}" rx="2.2" ry="1.2" fill="#5a402b"/>`).join("")}<circle cx="63" cy="27" r="2.2" fill="#342014"/><circle cx="62" cy="44" r="2.2" fill="#342014"/><circle cx="61" cy="57" r="2.2" fill="#342014"/></svg>`;
+function fitGame() {
+  if (!state || $("#play").hidden) return;
+  const height = window.visualViewport?.height ?? innerHeight,
+    portrait = innerWidth < 820 && height > innerWidth;
+  document.body.classList.toggle("portrait-game", portrait);
+  window.scrollTo(0, 0);
+  const layout = $(".game-layout"),
+    main = $("main"),
+    aside = $("#play aside"),
+    top = layout.getBoundingClientRect().top;
+  const width =
+    main.clientWidth -
+    parseFloat(getComputedStyle(main).paddingLeft) -
+    parseFloat(getComputedStyle(main).paddingRight);
+  const size = portrait
+    ? Math.min(width, height - top - aside.offsetHeight - 18)
+    : Math.min(height - top - 23, width - 270, 880);
+  document.body.style.setProperty(
+    "--board-size",
+    Math.max(120, Math.floor(size)) + "px",
+  );
+}
+async function spinDie(i, value, token) {
+  const cube = document.querySelector(`[data-roll="${i}"] .die-cube`);
+  const button = cube?.closest("button");
+  if (!cube) return;
+  button.classList.add("rolling");
+  const [rx, ry] = DIE_ROTATION[value];
+  const startX = parseFloat(cube.style.getPropertyValue("--rx")) || 0,
+    startY = parseFloat(cube.style.getPropertyValue("--ry")) || 0;
+  if (!reduced()) {
+    const animation = cube.animate(
+      [
+        {
+          transform: `rotateX(${startX}deg) rotateY(${startY}deg) rotateZ(0deg)`,
+        },
+        {
+          transform: `rotateX(${1080 + rx}deg) rotateY(${1440 + ry}deg) rotateZ(360deg)`,
+        },
+      ],
+      {
+        duration: 1100,
+        easing: "cubic-bezier(.16,.55,.32,1)",
+        fill: "forwards",
+      },
+    );
+    activeRollAnimation = animation;
+    await animation.finished.catch(() => {});
+    animation.cancel();
+    if (activeRollAnimation === animation) activeRollAnimation = null;
+  }
+  if (token !== epoch) return;
+  cube.style.setProperty("--rx", rx + "deg");
+  cube.style.setProperty("--ry", ry + "deg");
+  button.classList.remove("rolling");
+  button.dataset.result = value;
 }
 function scheduleBot() {
   clearTimeout(botTimer);
@@ -1022,7 +1237,6 @@ function scheduleBot() {
     state.bot &&
     state.current === 1 &&
     !busy &&
-    !paused &&
     !document.hidden &&
     $("#celebration").hidden &&
     !$("#dialog").open
@@ -1030,26 +1244,30 @@ function scheduleBot() {
     botTimer = setTimeout(() => takeTurn(), Number(settings.botDelay));
 }
 async function takeTurn() {
-  if (!state || busy || paused || state.phase !== "ready") return;
+  if (!state || busy || state.phase !== "ready") return;
   busy = true;
+  state = { ...state, colorsLocked: true };
   const token = epoch,
     i = state.current;
   render();
-  $("#dice").classList.add("rolling");
+  const value = die();
   tone(250, 0.25);
-  await delay(500);
+  await spinDie(i, value, token);
   if (token !== epoch) return;
-  $("#dice").classList.remove("rolling");
-  const result = roll(state, die());
+  const result = roll(state, value);
   state = result.state;
   stats.totalDiceRolls++;
   render();
   $("#status").textContent =
-    `${state.players[i].name} rolled ${state.dice}${result.penalty ? " — third six: turn ends." : ""}`;
+    `${state.players[i].name} rolled ${state.dice}${result.waitingForOne ? " — a 1 is needed to enter." : result.activated ? " — pawn activated!" : result.penalty ? " — third six: turn ends." : ""}`;
   for (let n = result.from + 1; n <= result.landing; n++) {
     const p = n === 1 ? center(1) : center(n - 1),
       q = center(n);
-    await travel(i, p, q, 125, token);
+    await travel(i, p, q, 245, token, null, false, true);
+    if (token !== epoch) return;
+    place(i, n);
+    pawns[i].dataset.step = String(n);
+    await delay(170);
     if (token !== epoch) return;
     tone(300 + n * 3, 0.045);
   }
@@ -1077,10 +1295,7 @@ async function takeTurn() {
         },
         $("#board"),
       );
-      const movingPath = item.path.cloneNode();
-      movingPath.removeAttribute("class");
-      movingPath.style.display = "none";
-      $("#board").append(movingPath);
+      const movingPath = item.path;
       const timer = setInterval(() => {
         const tr = pawns[i]?.getAttribute("transform");
         if (tr) glow.setAttribute("transform", tr);
@@ -1088,7 +1303,6 @@ async function takeTurn() {
       await travel(i, item.p, item.q, 1500, token, movingPath);
       clearInterval(timer);
       glow.remove();
-      movingPath.remove();
       pawns[i].style.opacity = "1";
       item.g.classList.remove("active-snake");
       tone(95, 0.3);
@@ -1106,24 +1320,24 @@ async function takeTurn() {
   state = done.state;
   busy = false;
   save("serpent-stats", stats);
+  state.players.forEach((p, j) => place(j, p.position));
   render();
   if (done.finisher !== null) celebrate(done.finisher);
   else {
-    $("#status").textContent = paused
-      ? "Paused"
-      : `${state.players[state.current].name}'s turn${state.sixes ? " — extra roll" : ""}.`;
+    $("#status").textContent =
+      `${state.players[state.current].name}'s turn${state.sixes ? " — extra roll" : ""}${state.players[state.current].position === 0 ? " · Roll a 1 to enter" : ""}.`;
     scheduleBot();
   }
 }
 function cancel() {
   setGameInProgress(false);
   epoch++;
+  activeRollAnimation?.cancel();
+  activeRollAnimation = null;
   clearTimeout(botTimer);
   clearTimeout(introTimer);
   cancelAnimationFrame(raf);
   busy = false;
-  paused = false;
-  $("#dice").classList.remove("rolling");
   $("#celebration").hidden = true;
   $("main").inert = false;
   $("header").inert = false;
@@ -1155,7 +1369,9 @@ function begin(skip = false) {
     $("#start").disabled = false;
     updateAmbience();
     render();
-    $("#status").textContent = `${state.players[0].name}'s turn.`;
+    $("#status").textContent = `${state.players[0].name}: roll a 1 to enter.`;
+    fitGame();
+    requestAnimationFrame(fitGame);
     raf = requestAnimationFrame(animateBoard);
   };
   $("#start").disabled = true;
@@ -1173,7 +1389,8 @@ function begin(skip = false) {
 function menu() {
   cancel();
   state = null;
-  document.body.classList.remove("playing");
+  document.body.classList.remove("playing", "portrait-game");
+  document.body.style.removeProperty("--board-size");
   $("#play").hidden = true;
   $("#menu").hidden = false;
   $("#start").disabled = false;
@@ -1254,9 +1471,10 @@ function celebrate(i) {
 }
 function panel(kind) {
   clearTimeout(botTimer);
+  $("#dialog-content").onclick = null;
   if (kind === "rules")
     $("#dialog-content").innerHTML =
-      `<h2>Game Rules</h2><p>Classic · The Serpent King's Realm</p><ul><li>Start outside the board at 0. No six is required to enter.</li><li>Roll one fair six-sided die and advance by its value.</li><li>A six grants an extra roll. The third consecutive six ends your turn without moving on that roll.</li><li>Land on a snake head to slide down; land at a ladder base to climb.</li><li>Reach 100 exactly. An overshoot leaves your pawn in place.</li><li>Finished players are skipped. The last remaining player receives the final place automatically.</li><li>The bot follows the same rules and uses the same fair die.</li></ul><p>Ladders: ${Object.entries(
+      `<h2>Game Rules</h2><p>Classic · The Serpent King's Realm</p><ul><li>Colors can be chosen by tapping a player head until the first die roll. Start outside the board at 0. Roll a 1 to activate your pawn and enter square 1. Other rolls leave an inactive pawn outside. A six still grants an extra roll; the third consecutive six is discarded.</li><li>Tap your own active die. After entering, move one square at a time by the rolled value. Other players’ dice stay locked.</li><li>A six grants an extra roll. The third consecutive six ends your turn without moving on that roll.</li><li>Land on a snake head to slide down; land at a ladder base to climb.</li><li>Reach 100 exactly. An overshoot leaves your pawn in place.</li><li>Finished players are skipped. The last remaining player receives the final place automatically.</li><li>The bot follows the same rules and uses the same fair die.</li></ul><p>Ladders: ${Object.entries(
         LADDERS,
       )
         .map(([a, b]) => `${a} → ${b}`)
@@ -1293,17 +1511,17 @@ $("#mode").onchange = colorOptions;
 $("#start").onclick = () => {
   if (!$("#start").disabled) begin();
 };
-$("#roll").onclick = () => takeTurn();
+$("#players").onclick = (e) => {
+  const head = e.target.closest("[data-game-color]");
+  if (head && !head.disabled) {
+    colorPicker(+head.dataset.gameColor, true);
+    return;
+  }
+  const b = e.target.closest("[data-roll]");
+  if (b && !b.disabled && +b.dataset.roll === state?.current) takeTurn();
+};
 $("#restart").onclick = () => begin(true);
 $("#menu-button").onclick = menu;
-$("#pause").onclick = () => {
-  paused = !paused;
-  render();
-  $("#status").textContent = paused
-    ? "Paused — finish the current movement, then resume."
-    : `${state.players[state.current].name}'s turn.`;
-  scheduleBot();
-};
 $("#sound").onclick = () => {
   settings.sfx = !settings.sfx;
   audio();
@@ -1314,12 +1532,32 @@ document
   .querySelectorAll("[data-panel]")
   .forEach((b) => (b.onclick = () => panel(b.dataset.panel)));
 $("#close").onclick = () => $("#dialog").close();
-$("#dialog").onclose = scheduleBot;
+$("#dialog").onclose = () => {
+  $("#dialog").classList.remove("color-dialog");
+  $("#dialog").style.removeProperty("left");
+  $("#dialog").style.removeProperty("top");
+  scheduleBot();
+};
+$("#dialog").addEventListener("click", (e) => {
+  if (
+    e.target !== $("#dialog") ||
+    !$("#dialog").classList.contains("color-dialog")
+  )
+    return;
+  const r = e.target.getBoundingClientRect();
+  if (
+    e.clientX < r.left ||
+    e.clientX > r.right ||
+    e.clientY < r.top ||
+    e.clientY > r.bottom
+  )
+    e.target.close();
+});
 $("#continue").onclick = () => {
   $("#celebration").hidden = true;
   $("main").inert = false;
   $("header").inert = false;
-  $("#roll").focus();
+  document.querySelector(`[data-roll="${state.current}"]`)?.focus();
   scheduleBot();
 };
 $("#try-again").onclick = () => begin(true);
@@ -1342,9 +1580,12 @@ function fitJungleRigs() {
     .forEach((g) => g.setAttribute("transform", `scale(1 ${ratio})`));
 }
 fitJungleRigs();
-window.addEventListener("resize", fitJungleRigs);
+window.addEventListener("resize", () => {
+  fitJungleRigs();
+  fitGame();
+});
+window.visualViewport?.addEventListener("resize", fitGame);
 colorOptions();
-drawDie(5);
 applySettings();
 // Explicit local-only browser harness; never enabled on the published website.
 if (
@@ -1358,6 +1599,7 @@ if (
     setState(s) {
       cancel();
       state = s;
+      applySettings();
       document.body.classList.add("playing");
       $("#menu").hidden = true;
       $("#play").hidden = false;

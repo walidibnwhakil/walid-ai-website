@@ -16,9 +16,10 @@ fs.mkdirSync(out, { recursive: true });
     process.env.SERPENT_URL ||
     "http://127.0.0.1:8765/games/snakes-and-ladders/";
   let checks = [];
-  const check = (name, fn) => {
+  const check = async (name, fn) => {
     checks.push(name);
-    return fn();
+    await fn();
+    console.log("PASS", name);
   };
   const shot = (name) =>
     page.screenshot({ path: path.join(out, name + ".png"), fullPage: true });
@@ -71,6 +72,24 @@ fs.mkdirSync(out, { recursive: true });
     });
   }
   await shot("menu-desktop");
+  await page.selectOption("#mode", "4");
+  await check(
+    "setup head opens gold palette of round color swatches",
+    async () => {
+      await page.click('[data-setup-color="0"]');
+      assert.equal(await page.locator(".color-swatch").count(), 9);
+      assert.equal(
+        await page
+          .locator(".color-swatch")
+          .first()
+          .evaluate((e) => getComputedStyle(e).borderRadius),
+        "50%",
+      );
+      await shot("setup-color-palette");
+      await page.click('[data-pick-color="Teal"]');
+      assert.equal(await page.locator('[data-color="0"]').inputValue(), "Teal");
+    },
+  );
   await page.click("#start");
   await page.waitForTimeout(900);
   await shot("intro-focus");
@@ -166,6 +185,10 @@ fs.mkdirSync(out, { recursive: true });
         .evaluate((e) => getComputedStyle(e).transform),
     );
   });
+  const clickDie = async (i) => {
+    i ??= await page.evaluate(() => window.serpentTest.state.current);
+    await page.locator(`[data-roll="${i}"]`).click();
+  };
   const force = async ({
     count = 2,
     bot = false,
@@ -181,6 +204,7 @@ fs.mkdirSync(out, { recursive: true });
         const s = createGame(v.count, v.bot);
         s.current = v.current;
         s.order = v.order;
+        for (const j of v.order) s.players[j].position = 100;
         s.players[v.current].position = v.pos;
         window.serpentTest.settings.motion = v.motion;
         window.serpentTest.setState(s);
@@ -191,19 +215,211 @@ fs.mkdirSync(out, { recursive: true });
       },
       { count, bot, current, pos, order, die, motion },
     );
+  const settled = async (n = 1) =>
+    page.waitForFunction(
+      (n) =>
+        window.serpentTest.state.rolls >= n &&
+        ["ready", "over"].includes(window.serpentTest.state.phase),
+      n,
+    );
   await check(
-    "snake swallow travels actual path, lock, exact destination",
+    "color remains editable after Start; first dice click immediately locks every head",
     async () => {
-      await force({ pos: 16 });
-      await page.click("#roll");
-      await page.waitForTimeout(1100);
-      assert.equal(await page.locator("#roll").isDisabled(), true);
-      await shot("snake-swallow");
-      await page.waitForTimeout(450);
-      await shot("snake-travel");
-      await page.waitForFunction(
-        () => window.serpentTest.state.phase === "ready",
+      await page.click('[data-game-color="1"]');
+      await shot("game-color-palette");
+      await page.click('[data-pick-color="Orange"]');
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.players[1].color),
+        "Orange",
       );
+      await page.evaluate(
+        () =>
+          (crypto.getRandomValues = (a) => {
+            a[0] = 1;
+            return a;
+          }),
+      );
+      await page.locator('[data-roll="2"]').dispatchEvent("click");
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.rolls),
+        0,
+      );
+      await clickDie(0);
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.colorsLocked),
+        true,
+      );
+      assert.equal(await page.locator("[data-game-color]:disabled").count(), 4);
+      await page.locator('[data-game-color="1"]').dispatchEvent("click");
+      assert.equal(await page.locator("#dialog").isVisible(), false);
+      await settled();
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.players[0].position),
+        0,
+      );
+      assert.equal(
+        await page.locator(".player-die:not([disabled])").count(),
+        1,
+      );
+      assert.equal(await page.locator('[data-roll="1"]').isEnabled(), true);
+    },
+  );
+  await check(
+    "Ludu Mahir pin shape is reused on the board and player heads",
+    async () => {
+      assert.equal(await page.locator(".pawn .pin-outline").count(), 4);
+      const shape = await page
+        .locator(".pawn .pin-outline")
+        .first()
+        .getAttribute("d");
+      assert.ok(shape.includes("M32 3C17 3 5 15 5 31"));
+      assert.equal(await page.locator(".player-head .pin-face").count(), 4);
+    },
+  );
+  await check(
+    "six physical die faces rotate in 3D and settle on every injected result",
+    async () => {
+      for (let value = 1; value <= 6; value++) {
+        await force({ pos: 40, die: value });
+        await clickDie();
+        assert.equal(
+          await page.locator('[data-roll="0"] .die-face').count(),
+          6,
+        );
+        assert.equal(await page.locator('[data-roll="0"] .pip').count(), 21);
+        if (value === 1) {
+          const cube = page.locator('[data-roll="0"] .die-cube');
+          await page.waitForFunction(() =>
+            [
+              ...document
+                .querySelector('[data-roll="0"] .die-cube')
+                .getAnimations(),
+            ].some((a) => a.currentTime > 60),
+          );
+          const a = await cube.evaluate((e) => getComputedStyle(e).transform);
+          await shot("dice-turn-1");
+          await page.waitForTimeout(250);
+          const b = await cube.evaluate((e) => getComputedStyle(e).transform);
+          assert.notEqual(a, b);
+          await shot("dice-turn-2");
+        }
+        await settled();
+        assert.equal(
+          await page.evaluate(
+            () => window.serpentTest.state.players[0].lastDice,
+          ),
+          value,
+        );
+        const normal = await page
+          .locator(`[data-roll="0"] .face-${value}`)
+          .evaluate((e) => {
+            const cube = e.closest(".die-cube");
+            return new DOMMatrix(getComputedStyle(cube).transform).multiply(
+              new DOMMatrix(getComputedStyle(e).transform),
+            ).m33;
+          });
+        assert.ok(normal > 0.99, `face ${value} faces the viewer`);
+      }
+    },
+  );
+  await check(
+    "one activates the pawn; other opening rolls leave it outside",
+    async () => {
+      await force({ die: 5 });
+      await clickDie();
+      await settled();
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.players[0].position),
+        0,
+      );
+      await force({ die: 1 });
+      await clickDie();
+      await settled();
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.players[0].position),
+        1,
+      );
+      assert.equal(
+        await page.locator('[data-player="0"]').getAttribute("visibility"),
+        "visible",
+      );
+    },
+  );
+  await check(
+    "a six visits six separate square centers with a pause at each square",
+    async () => {
+      await force({ pos: 1, die: 6 });
+      await page.evaluate(() => {
+        window.stepFrames = [];
+        const pawn = document.querySelector('[data-player="0"]');
+        new MutationObserver((ms) => {
+          for (const m of ms)
+            if (m.attributeName === "data-step")
+              window.stepFrames.push({
+                n: +pawn.dataset.step,
+                time: performance.now(),
+                transform: pawn.getAttribute("transform"),
+              });
+        }).observe(pawn, { attributes: true });
+      });
+      await clickDie();
+      await page.waitForFunction(() => window.stepFrames.length >= 2);
+      await shot("pin-step-by-step");
+      assert.equal(
+        await page.locator(".player-die:not([disabled])").count(),
+        0,
+      );
+      await settled();
+      const steps = await page.evaluate(() => window.stepFrames);
+      assert.deepEqual(
+        steps.map((s) => s.n),
+        [2, 3, 4, 5, 6, 7],
+      );
+      for (let j = 1; j < steps.length; j++)
+        assert.ok(
+          steps[j].time - steps[j - 1].time >= 320,
+          "individual stops are visible",
+        );
+    },
+  );
+  await check(
+    "rendered cylindrical scale bodies change real pixels while endpoints remain fixed",
+    async () => {
+      const canvas = page.locator(".living-serpents");
+      const a = await canvas.evaluate((e) => e.toDataURL());
+      const d = await page
+        .locator('[data-snake="99"] path')
+        .first()
+        .getAttribute("d");
+      await page.waitForTimeout(350);
+      assert.notEqual(await canvas.evaluate((e) => e.toDataURL()), a);
+      const after = await page
+        .locator('[data-snake="99"] path')
+        .first()
+        .getAttribute("d");
+      assert.notEqual(d, after);
+      assert.equal(after.split(" C ")[0], d.split(" C ")[0]);
+      assert.equal(
+        after.split(" ").slice(-2).join(" "),
+        d.split(" ").slice(-2).join(" "),
+      );
+      await shot("living-cylindrical-snakes");
+    },
+  );
+  await check(
+    "swallow follows the animated real body and releases at exact tail",
+    async () => {
+      await force({ pos: 16, die: 1 });
+      await clickDie();
+      await page.waitForSelector('[data-snake="17"].active-snake');
+      assert.equal(
+        await page.locator(".player-die:not([disabled])").count(),
+        0,
+      );
+      await shot("snake-swallow");
+      await page.waitForTimeout(550);
+      await shot("snake-travel");
+      await settled();
       assert.equal(
         await page.evaluate(() => window.serpentTest.state.players[0].position),
         7,
@@ -216,15 +432,28 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
-    "ladder climb follows geometry and reaches exact top",
+    "extruded ladders climb their real geometry and land exactly",
     async () => {
-      await force({ pos: 2 });
-      await page.click("#roll");
-      await page.waitForTimeout(1200);
-      await shot("ladder-climbing");
-      await page.waitForFunction(
-        () => window.serpentTest.state.phase === "ready",
+      assert.equal(await page.locator(".sculpted-ladder").count(), 5);
+      await force({ pos: 2, die: 1 });
+      await clickDie();
+      await page.waitForFunction(() =>
+        document.querySelector("#status").textContent.includes("Climbing"),
       );
+      assert.equal(
+        await page.locator(".player-die:not([disabled])").count(),
+        0,
+      );
+      const before = await page
+        .locator('[data-player="0"]')
+        .getAttribute("transform");
+      await page.waitForTimeout(200);
+      const climbing = await page
+        .locator('[data-player="0"]')
+        .getAttribute("transform");
+      assert.notEqual(climbing, before);
+      await shot("ladder-climbing");
+      await settled();
       assert.equal(
         await page.evaluate(() => window.serpentTest.state.players[0].position),
         22,
@@ -236,79 +465,75 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
-    "no double roll and restart during movement safely cancels",
+    "double rolls rejected and restart cancels an in-flight die",
     async () => {
-      await force();
-      await page.click("#roll");
+      await force({ die: 6 });
+      await clickDie();
       await page.evaluate(() => window.serpentTest.turn());
-      assert.equal(await page.locator("#roll").isDisabled(), true);
       await page.click("#restart");
-      await page.waitForTimeout(700);
+      await page.waitForTimeout(1250);
       assert.equal(
         await page.evaluate(() => window.serpentTest.state.rolls),
         0,
       );
       assert.equal(
-        await page.evaluate(() => window.serpentTest.state.players[0].position),
-        0,
+        await page.evaluate(() => window.serpentTest.state.colorsLocked),
+        false,
       );
+      assert.equal(await page.locator("#pause").count(), 0);
     },
   );
   await check(
-    "four-player winner, runners-up, final standings and color fireworks",
+    "each finisher receives their own color celebration and final ranking",
     async () => {
       for (let i = 0; i < 3; i++) {
         await force({
           count: 4,
           current: i,
           pos: 98,
-          order: Array.from({ length: i }, (_, k) => k),
+          order: Array.from({ length: i }, (_, j) => j),
           die: 2,
         });
-        await page.click("#roll");
+        await clickDie(i);
         await page.waitForSelector("#celebration:visible");
-        const expected = ["WINNER", "1ST RUNNER-UP", "2ND RUNNER-UP"][i];
         assert.equal(
           await page.locator("#result-title").textContent(),
-          expected,
+          ["WINNER", "1ST RUNNER-UP", "2ND RUNNER-UP"][i],
         );
-        const color = await page
-          .locator(".spark")
-          .first()
-          .evaluate((e) => getComputedStyle(e).backgroundColor);
         assert.equal(
-          color,
+          await page
+            .locator(".spark")
+            .first()
+            .evaluate((e) => getComputedStyle(e).backgroundColor),
           ["rgb(241, 75, 88)", "rgb(67, 174, 255)", "rgb(255, 208, 75)"][i],
         );
-        await shot("finish-" + (i + 1));
+        await shot("finish-" + i);
         if (i === 2) {
-          assert.equal(await page.locator(".standing").count(), 4);
           assert.deepEqual(
             await page.evaluate(() => window.serpentTest.state.order),
             [0, 1, 2, 3],
           );
+          assert.equal(await page.locator(".standing").count(), 4);
         } else await page.click("#continue");
       }
+      await force({ count: 3, pos: 98, die: 2 });
+      await page.evaluate(
+        () => (window.serpentTest.state.players[0].color = "Green"),
+      );
+      await clickDie();
+      await page.waitForSelector("#celebration:visible");
+      assert.equal(
+        await page
+          .locator(".spark")
+          .first()
+          .evaluate((e) => getComputedStyle(e).backgroundColor),
+        "rgb(79, 218, 145)",
+      );
+      await shot("finish-green");
     },
   );
-  await check("green celebration and 3-player results", async () => {
-    await force({ count: 3, current: 0, pos: 98, die: 2 });
-    await page.evaluate(() => {
-      window.serpentTest.state.players[0].color = "Green";
-    });
-    await page.click("#roll");
-    await page.waitForSelector("#celebration:visible");
-    assert.equal(
-      await page
-        .locator(".spark")
-        .first()
-        .evaluate((e) => getComputedStyle(e).backgroundColor),
-      "rgb(79, 218, 145)",
-    );
-    await shot("finish-green");
-  });
   await check(
-    "bot defeat swallowed and revealed with no fireworks",
+    "bot defeat text is swallowed and revealed without fireworks",
     async () => {
       await force({ bot: true, current: 1, pos: 98, die: 2 });
       await page.evaluate(() => window.serpentTest.turn());
@@ -317,83 +542,58 @@ fs.mkdirSync(out, { recursive: true });
         await page.locator("#result-title").textContent(),
         "YOU LOSE",
       );
-      await page.waitForTimeout(600);
-      await shot("defeat-approach");
-      await page.waitForTimeout(2300);
+      await page.waitForTimeout(2600);
       assert.ok(
         +(await page
           .locator("#result-title")
           .evaluate((e) => getComputedStyle(e).opacity)) < 0.1,
       );
       await shot("defeat-swallowed");
-      await page.waitForTimeout(3300);
+      await page.waitForTimeout(3600);
       assert.equal(
         await page
           .locator("#result-title")
           .evaluate((e) => getComputedStyle(e).opacity),
         "1",
       );
-      await shot("defeat-revealed");
       assert.equal(await page.locator(".spark").count(), 0);
+      await shot("defeat-revealed");
     },
   );
-  await check(
-    "automatic bot turn uses same dice and returns control",
-    async () => {
-      await force({ bot: true, die: 2, motion: false });
-      await page.click("#roll");
-      await page.waitForFunction(
-        () =>
-          window.serpentTest.state.rolls === 2 &&
-          window.serpentTest.state.phase === "ready",
-      );
-      assert.equal(
-        await page.evaluate(() => window.serpentTest.state.current),
-        0,
-      );
-      assert.equal(
-        await page.evaluate(() => window.serpentTest.state.players[1].position),
-        2,
-      );
-    },
-  );
-  await check("blocked localStorage remains playable", async () => {
-    const isolated = await b.newContext();
-    const p = await isolated.newPage();
-    await p.addInitScript(() => {
-      Object.defineProperty(window, "localStorage", {
-        get() {
-          throw new Error("Storage unavailable");
-        },
-      });
-    });
-    await p.goto(base);
-    await p.emulateMedia({ reducedMotion: "reduce" });
-    await p.click("#start");
-    await p.waitForSelector("#play:visible");
-    await p.click("#roll");
-    await p.waitForFunction(
-      () =>
-        document.querySelector("#dice").classList.contains("rolling") ||
-        document.querySelector("#dice").textContent !== "⚄",
+  await check("automatic fair bot also needs a one to activate", async () => {
+    await force({ bot: true, die: 1, motion: false });
+    await clickDie();
+    await settled(2);
+    assert.equal(
+      await page.evaluate(() => window.serpentTest.state.current),
+      0,
     );
-    await isolated.close();
+    assert.deepEqual(
+      await page.evaluate(() =>
+        window.serpentTest.state.players.map((p) => p.position),
+      ),
+      [1, 1],
+    );
   });
   await check(
-    "reduced motion keeps snake destination, intro skip and final result",
+    "reduced motion preserves activation, snake, ladder and results",
     async () => {
       await page.emulateMedia({ reducedMotion: "reduce" });
-      await force({ pos: 16, motion: false });
-      await page.click("#roll");
-      await page.waitForFunction(
-        () =>
-          window.serpentTest.state.rolls === 1 &&
-          window.serpentTest.state.phase === "ready",
-      );
-      assert.equal(
-        await page.evaluate(() => window.serpentTest.state.players[0].position),
-        7,
-      );
+      for (const [pos, destination] of [
+        [0, 1],
+        [16, 7],
+        [2, 22],
+      ]) {
+        await force({ pos, die: 1, motion: false });
+        await clickDie();
+        await settled();
+        assert.equal(
+          await page.evaluate(
+            () => window.serpentTest.state.players[0].position,
+          ),
+          destination,
+        );
+      }
       await page.click("#menu-button");
       await page.click("#start");
       await page.waitForSelector("#play:visible");
@@ -401,36 +601,105 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
-    "mobile and desktop square board, touch targets and no horizontal overflow",
+    "storage blocked still allows an active die and a real match",
     async () => {
-      for (const width of [320, 360, 390, 412, 430, 768, 1024, 1440]) {
-        await page.setViewportSize({ width, height: width < 768 ? 900 : 1100 });
-        const box = await page.locator("#board").boundingBox();
-        assert.ok(Math.abs(box.width - box.height) < 1);
+      const context = await b.newContext({ reducedMotion: "reduce" }),
+        p = await context.newPage();
+      await p.addInitScript(() => {
+        Object.defineProperty(window, "localStorage", {
+          get() {
+            throw Error("blocked");
+          },
+        });
+      });
+      await p.goto(base);
+      await p.click("#start");
+      await p.waitForSelector("#play:visible");
+      await p.click('[data-roll="0"]');
+      await p.waitForFunction(
+        () => document.querySelector('[data-game-color="0"]').disabled,
+      );
+      await context.close();
+    },
+  );
+  await check(
+    "complete PC/phone matches fit one screen including all controls",
+    async () => {
+      for (const [width, height] of [
+        [320, 568],
+        [360, 640],
+        [390, 844],
+        [412, 915],
+        [430, 932],
+        [768, 1024],
+        [1024, 768],
+        [1366, 768],
+        [1440, 900],
+        [1920, 1080],
+        [640, 360],
+        [844, 390],
+      ]) {
+        await page.setViewportSize({ width, height });
+        await force({ count: 4, motion: false });
+        await page.waitForTimeout(80);
+        const measured = await page.evaluate(() => {
+          const b = document
+              .querySelector(".board-frame")
+              .getBoundingClientRect(),
+            a = document.querySelector("aside").getBoundingClientRect();
+          return {
+            w: document.documentElement.scrollWidth,
+            h: document.documentElement.scrollHeight,
+            board: {
+              x: b.x,
+              y: b.y,
+              w: b.width,
+              h: b.height,
+              right: b.right,
+              bottom: b.bottom,
+            },
+            panel: { x: a.x, y: a.y, right: a.right, bottom: a.bottom },
+            buttons: [...document.querySelectorAll("#play button")].map((e) => {
+              const r = e.getBoundingClientRect();
+              return { x: r.x, y: r.y, right: r.right, bottom: r.bottom };
+            }),
+          };
+        });
         assert.ok(
-          await page.evaluate(
-            () => document.documentElement.scrollWidth <= innerWidth,
-          ),
+          measured.w <= width,
+          JSON.stringify({ width, height, measured }),
         );
-        assert.ok((await page.locator("#roll").boundingBox()).height >= 44);
-        await shot("board-" + width);
-        await page.click("#menu-button");
-        await shot("menu-" + width);
         assert.ok(
-          await page.evaluate(
-            () => document.documentElement.scrollWidth <= innerWidth,
-          ),
+          measured.h <= height,
+          JSON.stringify({ width, height, measured }),
         );
-        await page.click("#start");
+        assert.ok(Math.abs(measured.board.w - measured.board.h) < 1);
+        for (const r of measured.buttons) {
+          assert.ok(
+            r.x >= 0 &&
+              r.y >= 0 &&
+              r.right <= width + 0.5 &&
+              r.bottom <= height + 0.5,
+            JSON.stringify(r),
+          );
+        }
+        if (width >= 820 || width > height)
+          assert.ok(measured.panel.x >= measured.board.right);
+        else assert.ok(measured.panel.y >= measured.board.bottom);
+        assert.ok(
+          (await page.locator('[data-roll="0"]').boundingBox()).height >= 44,
+        );
+        await shot(`fit-${width}-${height}`);
       }
     },
   );
   await check(
-    "old URL redirects and exactly one new Games index card",
+    "one replacement card and the legacy redirect remain intact",
     async () => {
-      await page.goto("http://127.0.0.1:8765/games/snake/");
+      await page.click("#menu-button");
+      await page.goto(new URL("../snake/", base).href);
       await page.waitForURL("**/games/snakes-and-ladders/");
-      await page.goto("http://127.0.0.1:8765/games/");
+      await page.goto(new URL("../", base).href);
       assert.equal(
         await page.locator('a.tile[href="/games/snakes-and-ladders/"]').count(),
         1,

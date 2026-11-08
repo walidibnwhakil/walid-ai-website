@@ -7,8 +7,28 @@ export const SNAKES = Object.freeze({
   99: 78,
 });
 export const LADDERS = Object.freeze({ 3: 22, 6: 15, 28: 52, 47: 68, 72: 91 });
-export const COLORS = ["Red", "Blue", "Yellow", "Green"];
-export const HEX = ["#f14b58", "#43aeff", "#ffd04b", "#4fda91"];
+export const COLORS = [
+  "Red",
+  "Blue",
+  "Yellow",
+  "Green",
+  "Brown",
+  "Purple",
+  "Orange",
+  "Pink",
+  "Teal",
+];
+export const HEX = [
+  "#f14b58",
+  "#43aeff",
+  "#ffd04b",
+  "#4fda91",
+  "#685348",
+  "#a35de8",
+  "#fa8237",
+  "#ed6aaf",
+  "#20b5b4",
+];
 export function center(n) {
   if (n < 1 || n > 100) throw Error("Invalid square");
   const r = Math.floor((n - 1) / 10),
@@ -50,6 +70,7 @@ export function createGame(
       color,
       name: bot && i === 1 ? "Serpent Bot" : `Player ${i + 1}`,
       position: 0,
+      lastDice: null,
     })),
     current: 0,
     sixes: 0,
@@ -57,6 +78,7 @@ export function createGame(
     phase: "ready",
     dice: null,
     rolls: 0,
+    colorsLocked: false,
   };
 }
 export function roll(state, value) {
@@ -66,13 +88,17 @@ export function roll(state, value) {
   const s = structuredClone(state),
     p = s.players[s.current];
   s.phase = "moving";
+  s.colorsLocked = true;
   s.dice = value;
   s.rolls++;
+  p.lastDice = value;
   s.sixes = value === 6 ? s.sixes + 1 : 0;
   const from = p.position;
   let landing = from;
   const penalty = s.sixes === 3;
-  if (!penalty && from + value <= 100) landing = from + value;
+  const waitingForOne = from === 0 && value !== 1;
+  const activated = from === 0 && value === 1;
+  if (!penalty && !waitingForOne && from + value <= 100) landing = from + value;
   const target = SNAKES[landing] ?? LADDERS[landing] ?? landing;
   p.position = target;
   return {
@@ -81,6 +107,8 @@ export function roll(state, value) {
     landing,
     target,
     penalty,
+    waitingForOne,
+    activated,
     kind: SNAKES[landing] ? "snake" : LADDERS[landing] ? "ladder" : "move",
   };
 }
@@ -118,4 +146,21 @@ export function placement(rank, count) {
         : rank === 2
           ? "2ND RUNNER-UP"
           : "4TH PLACE";
+}
+// Colors may be swapped until the first die is clicked; the UI locks before animation.
+export function chooseColor(state, index, color) {
+  if (state.colorsLocked || state.rolls > 0 || state.phase !== "ready")
+    throw Error("Colors locked");
+  if (
+    !Number.isInteger(index) ||
+    !state.players[index] ||
+    !COLORS.includes(color)
+  )
+    throw Error("Invalid color choice");
+  const s = structuredClone(state),
+    old = s.players[index].color,
+    other = s.players.findIndex((p, j) => j !== index && p.color === color);
+  if (other >= 0) s.players[other].color = old;
+  s.players[index].color = color;
+  return s;
 }

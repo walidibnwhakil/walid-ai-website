@@ -12,8 +12,8 @@
       rel="canonical"
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
-    <link rel="stylesheet" href="style.css?v=20261108-painted" />
-    <script type="module" src="game.mjs?v=20261108-painted"></script>
+    <link rel="stylesheet" href="style.css?v=20261108-living" />
+    <script type="module" src="game.mjs?v=20261108-living"></script>
   </head>
   <body>
     <div id="world">
@@ -92,16 +92,11 @@
           </div>
           <aside>
             <div id="players"></div>
-            <div class="dice-panel">
-              <div id="dice" aria-label="Die">⚄</div>
-              <p id="status" role="status" aria-live="polite">
-                Your adventure begins.
-              </p>
-              <button id="roll" class="primary">Roll Dice</button>
-            </div>
+            <p id="status" role="status" aria-live="polite">
+              Roll a 1 to enter the realm.
+            </p>
             <div class="toolbar">
-              <button id="pause">Pause</button
-              ><button id="restart">Restart</button
+              <button id="restart">Restart</button
               ><button data-panel="rules">Rules</button
               ><button data-panel="settings">Settings</button>
             </div>

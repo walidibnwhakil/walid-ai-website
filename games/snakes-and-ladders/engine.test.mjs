@@ -11,6 +11,7 @@ import {
   roll,
   settle,
   placement,
+  chooseColor,
 } from "./engine.mjs";
 const move = (s, v) => settle(roll(s, v)).state;
 test("100 unique numbered squares, traditional zigzag from bottom left", () => {
@@ -53,11 +54,11 @@ for (const [kind, map] of [
       assert.equal(settle(r).state.players[0].position, b);
       for (const n of [+a, b]) assert.ok(center(n).x >= 5 && center(n).x <= 95);
     });
-test("all players start at 0 and enter without a six", () => {
+test("all players start outside and only a one activates the pawn", () => {
   for (let v = 1; v <= 6; v++) {
     const s = createGame();
     assert.ok(s.players.every((p) => p.position === 0));
-    assert.equal(roll(s, v).landing, v);
+    assert.equal(roll(s, v).landing, v === 1 ? 1 : 0);
   }
 });
 test("extra turn on six, third consecutive six ignored, counter resets", () => {
@@ -122,7 +123,7 @@ test("bot and human use identical transitions for all dice values", () => {
       roll(bot, v).state.players.map((p) => p.position),
     );
     bot.current = 1;
-    assert.equal(roll(bot, v).landing, v);
+    assert.equal(roll(bot, v).landing, v === 1 ? 1 : 0);
   }
 });
 for (const count of [2, 3, 4])
@@ -159,15 +160,16 @@ test("turn wrap, unique colors and restart", () => {
   assert.equal(s.current, 0);
   assert.deepEqual(
     createGame(4).players.map((p) => p.color),
-    COLORS,
+    COLORS.slice(0, 4),
   );
   assert.throws(() => createGame(3, false, ["Red", "Red", "Blue"]));
   assert.deepEqual(createGame(), createGame());
 });
 test("logical state never mutates caller; animation resolution is separate", () => {
   const s = createGame();
+  s.players[0].position = 2;
   const original = structuredClone(s);
-  const r = roll(s, 3);
+  const r = roll(s, 1);
   assert.deepEqual(s, original);
   assert.equal(r.state.phase, "moving");
   assert.equal(r.target, 22);
@@ -193,6 +195,83 @@ for (const count of [2, 3, 4])
 test("rejects invalid player configurations", () => {
   assert.throws(() => createGame(2.5));
   assert.throws(() => createGame(3, true));
-  assert.throws(() => createGame(2, false, ["Pink", "Red"]));
+  assert.throws(() => createGame(2, false, ["Invalid", "Red"]));
   assert.throws(() => createGame(2, false, ["Red"]));
+});
+test("a one activates at square 1 and later values advance normally", () => {
+  let s = createGame();
+  for (const v of [2, 3, 4, 5, 6]) {
+    const r = roll(s, v);
+    assert.equal(r.waitingForOne, true);
+    assert.equal(r.target, 0);
+    assert.equal(r.activated, false);
+  }
+  const r = roll(s, 1);
+  assert.equal(r.activated, true);
+  assert.equal(r.target, 1);
+  s = settle(r).state;
+  s.current = 0;
+  assert.equal(roll(s, 3).target, 4);
+});
+test("consecutive six rule applies before and after activation", () => {
+  for (const position of [0, 40]) {
+    let s = createGame();
+    s.players[0].position = position;
+    s = move(s, 6);
+    s = move(s, 6);
+    const before = s.players[0].position,
+      r = roll(s, 6);
+    assert.equal(r.penalty, true);
+    assert.equal(r.target, before);
+    assert.equal(settle(r).state.current, 1);
+  }
+});
+test("each player retains their own last die result", () => {
+  let s = createGame();
+  s = move(s, 1);
+  assert.equal(s.players[0].lastDice, 1);
+  assert.equal(s.players[1].lastDice, null);
+  s = move(s, 4);
+  assert.equal(s.players[1].lastDice, 4);
+  assert.equal(s.players[0].lastDice, 1);
+});
+test("color choice before first roll swaps occupied colors without duplicates", () => {
+  const s = createGame(4),
+    next = chooseColor(s, 0, "Blue");
+  assert.deepEqual(
+    next.players.map((p) => p.color),
+    ["Blue", "Red", "Yellow", "Green"],
+  );
+  assert.deepEqual(
+    s.players.map((p) => p.color),
+    COLORS.slice(0, 4),
+  );
+  assert.equal(new Set(next.players.map((p) => p.color)).size, 4);
+});
+test("first roll locks all players colors, including a failed entry roll", () => {
+  for (const value of [1, 2, 6]) {
+    const r = roll(createGame(4), value);
+    assert.equal(r.state.colorsLocked, true);
+    for (let i = 0; i < 4; i++)
+      assert.throws(() => chooseColor(r.state, i, "Green"), /locked/);
+    assert.throws(() => chooseColor(settle(r).state, 0, "Blue"), /locked/);
+  }
+});
+test("color lock takes effect immediately when UI begins rolling; restart unlocks", () => {
+  const s = { ...createGame(), colorsLocked: true };
+  assert.throws(() => chooseColor(s, 1, "Green"), /locked/);
+  assert.equal(createGame().colorsLocked, false);
+  assert.equal(chooseColor(createGame(), 1, "Green").players[1].color, "Green");
+});
+test("invalid color and player choices are rejected", () => {
+  assert.throws(() => chooseColor(createGame(), 4, "Red"));
+  assert.throws(() => chooseColor(createGame(), 0, "Invalid"));
+});
+test("all nine palette colors preserve uniqueness for every match size", () => {
+  for (const count of [2, 3, 4])
+    for (const color of COLORS) {
+      const s = chooseColor(createGame(count), 0, color);
+      assert.equal(s.players[0].color, color);
+      assert.equal(new Set(s.players.map((p) => p.color)).size, count);
+    }
 });

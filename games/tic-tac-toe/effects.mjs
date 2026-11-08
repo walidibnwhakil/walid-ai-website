@@ -46,6 +46,80 @@ export function fireCelebration({
     ctx.quadraticCurveTo(x, y + height * 0.16, x - width, y);
     ctx.fill();
   }
+  const glyph = document.createElement("canvas"),
+    ink = document.createElement("canvas");
+  const glyphCtx = glyph.getContext("2d"),
+    inkCtx = ink.getContext("2d");
+  let glyphKey = "";
+  function burnLetters(tr, ar, t) {
+    const style = getComputedStyle(title),
+      scale = Math.min(devicePixelRatio, 2);
+    const width = Math.ceil(tr.width * scale),
+      height = Math.ceil(tr.height * scale);
+    const key = `${width}/${height}/${style.fontSize}/${title.textContent}`;
+    if (key !== glyphKey) {
+      glyphKey = key;
+      glyph.width = ink.width = width;
+      glyph.height = ink.height = height;
+      glyphCtx.setTransform(scale, 0, 0, scale, 0, 0);
+      glyphCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      glyphCtx.letterSpacing = style.letterSpacing;
+      glyphCtx.textAlign = "center";
+      glyphCtx.textBaseline = "alphabetic";
+      const m = glyphCtx.measureText(title.textContent);
+      const ascent =
+        m.fontBoundingBoxAscent ?? parseFloat(style.fontSize) * 0.9;
+      const descent =
+        m.fontBoundingBoxDescent ?? parseFloat(style.fontSize) * 0.2;
+      glyphCtx.fillStyle = "white";
+      glyphCtx.fillText(
+        title.textContent,
+        tr.width / 2,
+        (tr.height - ascent - descent) / 2 + ascent,
+      );
+    }
+    inkCtx.setTransform(1, 0, 0, 1, 0, 0);
+    inkCtx.globalCompositeOperation = "source-over";
+    const base = inkCtx.createLinearGradient(0, height, 0, 0);
+    base.addColorStop(0, "#6d1405");
+    base.addColorStop(0.27, "#ee3a04");
+    base.addColorStop(0.62, "#ffbd2a");
+    base.addColorStop(1, "#ffed91");
+    inkCtx.fillStyle = base;
+    inkCtx.fillRect(0, 0, width, height);
+    for (let j = 0; j < 32; j++) {
+      const x =
+        (width * (j + 0.5)) / 32 + Math.sin(t * 3 + j * 2.3) * width * 0.012;
+      const y = height * (0.85 - ((t * 0.7 + j * 0.367) % 1) * 1.1);
+      const radius = height * (0.22 + 0.1 * Math.sin(t * 8 + j));
+      const heat = inkCtx.createRadialGradient(
+        x,
+        y,
+        0,
+        x,
+        y,
+        Math.max(1, radius),
+      );
+      heat.addColorStop(0, "#fff7c9");
+      heat.addColorStop(0.28, "#ffe56d");
+      heat.addColorStop(0.6, "#ff6909bb");
+      heat.addColorStop(1, "#ff330000");
+      inkCtx.fillStyle = heat;
+      inkCtx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    }
+    inkCtx.globalCompositeOperation = "destination-in";
+    inkCtx.drawImage(glyph, 0, 0);
+    ctx.globalAlpha = Math.min(1, (t - 1.8) / 0.55);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.drawImage(
+      ink,
+      tr.x - ar.x - arena.clientLeft,
+      tr.y - ar.y - arena.clientTop,
+      tr.width,
+      tr.height,
+    );
+    ctx.globalCompositeOperation = "screen";
+  }
   function frame(now) {
     if (stopped || !active()) {
       stop();
@@ -140,32 +214,8 @@ export function fireCelebration({
             Math.sin(phase * Math.PI) * w * 0.13;
         flame(x, y, 10 + w * 0.025, t * 23 + j, Math.sin(phase * Math.PI));
       }
-    // Low-cost living flames continue around the revealed fiery lettering.
-    if (tr.width && t > 1.8) {
-      const left = tr.x - ar.x - arena.clientLeft,
-        top = tr.y - ar.y - arena.clientTop;
-      const sweep = Math.min(1, (t - 1.8) / 0.8);
-      for (let j = 0; j < 25 * sweep; j++) {
-        const x = left + (tr.width * (j + 0.5)) / 25;
-        const y =
-          top + tr.height * 0.25 + Math.sin(j * 3.1 + t * 2) * tr.height * 0.06;
-        flame(
-          x,
-          y,
-          8 + tr.height * (0.24 + 0.15 * Math.sin(j * 2 + t * 13)),
-          t * 19 + j,
-          0.42,
-        );
-      }
-      if (embers.length < 100 && Math.random() > 0.35)
-        embers.push({
-          x: left + Math.random() * tr.width,
-          y: top + tr.height * 0.5,
-          vx: (Math.random() - 0.5) * 20,
-          vy: -20 - Math.random() * 35,
-          life: 0.6,
-        });
-    }
+    // Fire is painted through an exact text alpha mask: no separate flame row.
+    if (tr.width && t > 1.8) burnLetters(tr, ar, t);
     while (embers.length > 150) embers.shift();
     for (let i = embers.length - 1; i >= 0; i--) {
       const p = embers[i];

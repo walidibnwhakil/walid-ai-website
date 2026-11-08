@@ -1116,3 +1116,177 @@ body.low-effects * {
     line-height: 0;
   }
 }
+/* A continuous library scene, including the middle of the screen. */
+body {
+  background:
+    linear-gradient(#28100618, #28100628),
+    url("./library-room.webp") center/cover fixed,
+    #522b16;
+}
+body.playing #royal-game {
+  grid-template-rows: 34px auto minmax(0, 1fr);
+}
+.playing .game-tools {
+  display: none;
+}
+.topbar,
+.game-heading,
+.players {
+  position: relative;
+}
+.game-heading {
+  width: fit-content;
+  max-width: 100%;
+  margin: auto;
+  padding: 5px 24px;
+  border: 1px solid #dcb35988;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #2d1007b8, #351706e0, #2d1007b8);
+  box-shadow: 0 2px 12px #1a080744;
+}
+.players > span,
+.players strong {
+  background: #261206de;
+  text-shadow: 0 1px 3px #000;
+}
+.players strong {
+  padding: 5px 12px;
+  border-radius: 12px;
+}
+.brand {
+  color: #fff0b8;
+  text-shadow:
+    0 1px 3px #000,
+    0 0 5px #000;
+}
+#arena {
+  border: 6px solid transparent;
+  background:
+    radial-gradient(ellipse at 45% 20%, #246440, #092d1b 65%, #082216)
+      padding-box,
+    linear-gradient(
+        135deg,
+        #fff0a4,
+        #b87518 15%,
+        #ffe997 25%,
+        #87400a 48%,
+        #fbc65f 65%,
+        #fff1a5 78%,
+        #ae6413
+      )
+      border-box;
+  box-shadow:
+    inset 0 0 0 2px #744414,
+    inset 0 0 0 4px #ffe4a0,
+    inset 0 0 0 7px #173219,
+    0 3px 0 2px #6a350f,
+    0 7px 0 3px #2d1308,
+    0 10px 24px #180a06a0;
+}
+#arena.medium {
+  background:
+    radial-gradient(ellipse at 45% 20%, #1b5184, #0b2142 65%, #071d32)
+      padding-box,
+    linear-gradient(
+        135deg,
+        #fff0a4,
+        #b87518 15%,
+        #ffe997 25%,
+        #87400a 48%,
+        #fbc65f 65%,
+        #fff1a5 78%,
+        #ae6413
+      )
+      border-box;
+}
+#arena.hard {
+  background:
+    radial-gradient(ellipse at 45% 20%, #681c7d, #301044 65%, #200c32)
+      padding-box,
+    linear-gradient(
+        135deg,
+        #fff0a4,
+        #b87518 15%,
+        #ffe997 25%,
+        #87400a 48%,
+        #fbc65f 65%,
+        #fff1a5 78%,
+        #ae6413
+      )
+      border-box;
+}
+#board-wrap {
+  border: 5px ridge #ffcf70;
+  box-shadow:
+    0 0 0 2px #5b2d0b,
+    0 0 0 4px #f7ce7655,
+    0 3px 8px #0008,
+    inset 0 0 12px #0008;
+}
+#board-wrap:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("./frame-detail.svg") center/100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 2;
+}
+#board {
+  background: url("./walnut.svg") center/cover;
+}
+.cell {
+  border: 1px solid #e8b64e;
+  box-shadow:
+    inset 0 0 18px #17090070,
+    inset 2px 2px 2px #ffe7a589,
+    inset -2px -2px 2px #4f230d;
+  background: linear-gradient(120deg, #f4c9790d, #14060020);
+}
+.cell .mark {
+  width: 69%;
+  height: 69%;
+  filter: drop-shadow(0 4px 2px #100702a0);
+}
+#result-title:before {
+  display: none !important;
+}
+#result-title {
+  background: linear-gradient(0deg, #a02c07, #ff8520 35%, #ffeb9c 74%, #fff5be);
+  background-clip: text;
+  animation: none;
+  filter: drop-shadow(0 0 3px #ffcd67) drop-shadow(0 0 9px #f55e07);
+}
+#result.reveal #result-title {
+  animation: flame-reveal 0.8s ease-out;
+}
+@media (max-width: 760px) {
+  body.playing #royal-game {
+    grid-template-rows: 32px auto minmax(0, 1fr);
+  }
+  .game-heading {
+    padding: 4px 14px;
+  }
+  #arena {
+    padding: 11px;
+    border-radius: 24px;
+  }
+  #board-wrap {
+    border-width: 4px;
+  }
+  .players strong {
+    padding: 5px 6px;
+  }
+}
+@media (max-width: 360px) {
+  body.playing #royal-game {
+    grid-template-rows: 31px auto minmax(0, 1fr);
+  }
+}
+@media (max-height: 500px) and (min-width: 600px) {
+  body.playing #royal-game {
+    grid-template-rows: 28px 54px minmax(0, 1fr);
+  }
+  .game-heading {
+    padding: 5px 10px;
+  }
+}

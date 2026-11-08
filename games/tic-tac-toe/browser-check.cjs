@@ -38,6 +38,10 @@ const base = process.env.TTT_URL || "http://localhost:8000";
     await p.locator(`[data-level="${level}"]`).click();
     await p.locator(`[data-symbol="${symbol}"]`).click();
     await p.locator("#start").click();
+    check(
+      await p.locator(".game-tools").isHidden(),
+      "Auxiliary controls are menu-only",
+    );
   }
   async function snap(name) {
     await p.screenshot({ path: path.join(out, name + ".png"), fullPage: true });
@@ -67,15 +71,17 @@ const base = process.env.TTT_URL || "http://localhost:8000";
         scroll:
           root.scrollHeight <= innerHeight + 1 &&
           root.scrollWidth <= innerWidth + 1,
-        visible: targets.every((e) => {
-          const r = e.getBoundingClientRect();
-          return (
-            r.top >= -1 &&
-            r.left >= -1 &&
-            r.bottom <= innerHeight + 1 &&
-            r.right <= innerWidth + 1
-          );
-        }),
+        visible: targets
+          .filter((e) => !e.hidden)
+          .every((e) => {
+            const r = e.getBoundingClientRect();
+            return (
+              r.top >= -1 &&
+              r.left >= -1 &&
+              r.bottom <= innerHeight + 1 &&
+              r.right <= innerWidth + 1
+            );
+          }),
       };
     });
     check(
@@ -400,6 +406,7 @@ const base = process.env.TTT_URL || "http://localhost:8000";
   );
   await snap("reduced-motion");
   await p.emulateMedia({ reducedMotion: "no-preference" });
+  await menu();
   for (const action of ["rules", "stats", "settings"]) {
     await p.locator(`.game-tools [data-action="${action}"]`).click();
     check(await p.locator("#dialog").isVisible(), action + " dialog");

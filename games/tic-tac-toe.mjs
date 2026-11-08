@@ -7,7 +7,7 @@ import {
   lineGeometry,
   LEVELS,
 } from "./tic-tac-toe/engine.mjs";
-import { fireCelebration } from "./tic-tac-toe/effects.mjs";
+import { fireCelebration } from "./tic-tac-toe/effects.mjs?v=ember-4";
 import { chooseMove } from "./tic-tac-toe/bot.mjs";
 const $ = (s) => document.querySelector(s),
   $$ = (s) => [...document.querySelectorAll(s)];
@@ -122,6 +122,8 @@ function start() {
   g = createGame(selection.level, selection.mode, selection.symbol);
   $("#menu").hidden = true;
   $("#play").hidden = false;
+  $(".game-tools").hidden = true;
+  document.body.classList.add("playing");
   $("#arena").className = `ornate ${g.level}`;
   $("#arena").style.setProperty("--size", g.size);
   $("#level-title").textContent =
@@ -326,6 +328,8 @@ function menu() {
   cleanup();
   g = null;
   $("#play").hidden = true;
+  $(".game-tools").hidden = false;
+  document.body.classList.remove("playing");
   $("#menu").hidden = false;
   select();
   window.scrollTo(0, 0);

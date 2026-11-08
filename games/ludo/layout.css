@@ -139,14 +139,14 @@
   }
   body.ludo-game.playing-ludo .play-toolbar {
     max-width: 1120px;
-    height: 66px;
+    height: 88px;
     margin-bottom: 6px;
   }
   body.ludo-game.playing-ludo .play-toolbar .board-logo {
-    height: 62px;
+    height: 84px;
   }
   body.ludo-game.playing-ludo .ludo-stage {
-    --board-size: min(800px, calc(100dvh - 100px), calc(100vw - 410px));
+    --board-size: min(800px, calc(100dvh - 120px), calc(100vw - 410px));
     width: max-content;
     max-width: 100%;
     grid-template-columns: 170px var(--board-size) 170px;

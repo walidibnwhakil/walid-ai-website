@@ -50,6 +50,21 @@ fs.mkdirSync(output, { recursive: true });
     );
     await page.screenshot({ path: `${output}/${name}.png`, fullPage: true });
   }
+  async function logoMetrics(locator) {
+    return locator.evaluate((el) => {
+      const r = el.getBoundingClientRect(),
+        words = el.querySelector(".mahir-brand-words");
+      return {
+        src: el.querySelector("img").src,
+        aspect: r.width / r.height,
+        font: parseFloat(getComputedStyle(words).fontSize) / r.width,
+        top: (words.getBoundingClientRect().top - r.top) / r.height,
+        text: words.textContent,
+        gold: getComputedStyle(words).color,
+        ivory: getComputedStyle(words.querySelector("strong")).color,
+      };
+    });
+  }
   for (const [width, height] of [
     [1366, 768],
     [1280, 720],
@@ -81,6 +96,9 @@ fs.mkdirSync(output, { recursive: true });
       ),
       `menu width ${tag}`,
     );
+    const menuBrand = await logoMetrics(
+      page.locator("#ludo-setup .mahir-brand"),
+    );
     await screenshot(page, `menu-${tag}`);
     await page.click('#mode-buttons [data-value="friend"]');
     await page.click('#player-buttons [data-value="4"]');
@@ -88,6 +106,25 @@ fs.mkdirSync(output, { recursive: true });
     await page.waitForURL("**/?screen=board");
     await page.locator("#board .pin-pawn").first().waitFor();
     const board = await page.locator("#board").boundingBox();
+    const boardBrand = await logoMetrics(
+      page.locator(".board-logo .mahir-brand"),
+    );
+    check(
+      boardBrand.text === "LuduMahir" &&
+        (await page.locator(".board-logo .mahir-brand-words > *").count()) ===
+          2,
+      `board uses two-line menu logo ${tag}`,
+    );
+    check(
+      boardBrand.src === menuBrand.src &&
+        Math.abs(boardBrand.aspect - menuBrand.aspect) < 0.01 &&
+        Math.abs(boardBrand.font - menuBrand.font) < 0.001 &&
+        Math.abs(boardBrand.top - menuBrand.top) < 0.01 &&
+        boardBrand.gold === menuBrand.gold &&
+        boardBrand.ivory === menuBrand.ivory,
+      `menu and board logo design matches ${tag}`,
+    );
+
     check(Math.abs(board.width - board.height) < 1, `square board ${tag}`);
     if (width >= 900) {
       check(

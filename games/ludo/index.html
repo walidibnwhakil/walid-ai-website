@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="./ludo.css?v=20261108pawn-center">
   <link rel="stylesheet" href="./layout.css?v=20261108phone-pawns">
   <link rel="stylesheet" href="./brand.css?v=20261108shared-logo">
-  <script type="module" src="../ludo.mjs?v=20261108pawn-foot"></script>
+  <script type="module" src="../ludo.mjs?v=20261108player-roster"></script>
 
 </head>
 <body class="ludo-game">
@@ -69,11 +69,11 @@
         <div class="player-count-panel">
           <h2>Number of Players</h2>
           <div class="player-count-options" id="player-buttons" role="group" aria-label="Number of players">
-            <button type="button" data-value="2" aria-pressed="false"><svg viewBox="0 0 46 50" aria-hidden="true"><circle cx="23" cy="12" r="9" fill="#fff2dc"/><path d="M5 46V37c0-12 8-18 18-18s18 6 18 18v9z" fill="#fff2dc"/></svg><span>2 Players</span></button>
+            <button type="button" data-value="2" class="selected" aria-pressed="true"><svg viewBox="0 0 46 50" aria-hidden="true"><circle cx="23" cy="12" r="9" fill="#fff2dc"/><path d="M5 46V37c0-12 8-18 18-18s18 6 18 18v9z" fill="#fff2dc"/></svg><span>2 Players</span></button>
             <button type="button" data-value="3" aria-pressed="false"><svg viewBox="0 0 66 50" aria-hidden="true"><circle cx="18" cy="13" r="8" fill="#fff2dc"/><circle cx="47" cy="13" r="8" fill="#fff2dc"/><path d="M2 45V37q0-13 16-13t16 13v8zm28 0V37q0-13 17-13t17 13v8z" fill="#fff2dc"/></svg><span>3 Players</span></button>
-            <button type="button" data-value="4" class="selected" aria-pressed="true"><svg viewBox="0 0 46 50" aria-hidden="true"><circle cx="23" cy="12" r="9" fill="#fff2dc"/><path d="M5 46V37c0-12 8-18 18-18s18 6 18 18v9z" fill="#fff2dc"/></svg><span>4 Players</span></button>
+            <button type="button" data-value="4" aria-pressed="false"><svg viewBox="0 0 46 50" aria-hidden="true"><circle cx="23" cy="12" r="9" fill="#fff2dc"/><path d="M5 46V37c0-12 8-18 18-18s18 6 18 18v9z" fill="#fff2dc"/></svg><span>4 Players</span></button>
           </div>
-          <select id="setup-players" aria-label="Players" hidden><option value="2">2 Players</option><option value="3">3 Players</option><option value="4" selected>4 Players</option></select>
+          <select id="setup-players" aria-label="Players" hidden><option value="2" selected>2 Players</option><option value="3">3 Players</option><option value="4">4 Players</option></select>
           <select id="setup-mode" aria-label="Game Mode" hidden><option value="bot">Play vs Bot</option><option value="friend">Local Multiplayer</option><option value="mixed">Human & Bot</option></select>
         </div>
 

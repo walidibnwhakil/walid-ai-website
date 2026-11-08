@@ -107,7 +107,7 @@ fs.mkdirSync(output, { recursive: true });
     await page.click('#mode-buttons [data-value="friend"]');
     await page.click('#player-buttons [data-value="4"]');
     await page.click("#start-game");
-    await page.waitForURL("**/?screen=board");
+    await page.waitForURL((url) => url.searchParams.get("screen") === "board");
     await page.locator("#board .pin-pawn").first().waitFor();
     const board = await page.locator("#board").boundingBox();
     const boardBrand = await logoMetrics(
@@ -344,33 +344,137 @@ fs.mkdirSync(output, { recursive: true });
     }
     await page.close();
   }
-  for (const count of [2, 3]) {
+  for (const width of [1366, 390])
+    for (const mode of ["friend", "bot"])
+      for (const count of [2, 3]) {
+        const page = await browser.newPage({
+          viewport: { width, height: width === 390 ? 844 : 768 },
+          isMobile: width === 390,
+          hasTouch: width === 390,
+        });
+        page.on("pageerror", (error) => errors.push(error.message));
+        await page.goto(`${base}/games/ludo/`);
+        await page.click(`#mode-buttons [data-value="${mode}"]`);
+        await page.click(`#player-buttons [data-value="${count}"]`);
+        await page.click("#start-game");
+        await page.waitForURL(
+          (url) => url.searchParams.get("screen") === "board",
+        );
+        await page.locator("#board .pin-pawn").first().waitFor();
+        const tag = `${count}-player ${mode} ${width}`;
+        check(
+          (await page.locator(".player-dice:visible").count()) === count,
+          `${tag} panels`,
+        );
+        check(
+          (await page.locator("#board .pin-pawn").count()) === count * 4,
+          `${tag} only participating pawns exist`,
+        );
+        check(
+          (await page.locator("#board .inactive-yard .pin-pawn").count()) === 0,
+          `${tag} unused yards are empty`,
+        );
+        await page.reload();
+        await page.locator("#board .pin-pawn").first().waitFor();
+        check(
+          (await page.locator("#board .pin-pawn").count()) === count * 4,
+          `${tag} roster survives refresh`,
+        );
+        if (width >= 900)
+          check(
+            await page.evaluate(
+              () => document.documentElement.scrollHeight <= innerHeight + 1,
+            ),
+            `${tag} fits desktop`,
+          );
+        await screenshot(page, `board-${count}-${mode}-${width}`);
+        await page.click("#back-to-setup");
+        await page.waitForURL((url) => !url.searchParams.has("screen"));
+        check(
+          (await page
+            .locator('#player-buttons [aria-pressed="true"]')
+            .getAttribute("data-value")) === String(count),
+          `${tag} menu keeps selected count`,
+        );
+        await page.close();
+      }
+  // A board-side player-count change must survive refresh (including a prior 4-player setup).
+  for (const width of [390, 1366]) {
     const page = await browser.newPage({
-      viewport: { width: 1366, height: 768 },
+      viewport: { width, height: width === 390 ? 844 : 768 },
+      isMobile: width === 390,
+      hasTouch: width === 390,
     });
     await page.goto(`${base}/games/ludo/`);
+    await page.click('#player-buttons [data-value="4"]');
     await page.click('#mode-buttons [data-value="friend"]');
-    await page.click(`#player-buttons [data-value="${count}"]`);
     await page.click("#start-game");
-    await page.waitForURL("**/?screen=board");
+    await page.waitForURL((url) => url.searchParams.get("screen") === "board");
+    await page.click("#board-settings");
+    await page.selectOption("#player-count", "2");
     check(
-      (await page.locator(".player-dice:visible").count()) === count,
-      `${count}-player panels`,
+      (await page.locator("#board .pin-pawn:visible").count()) === 8,
+      `settings switch to 2 players ${width}`,
     );
+    await page.reload();
+    check(
+      (await page.locator("#board .pin-pawn:visible").count()) === 8,
+      `2-player roster survives refresh ${width}`,
+    );
+    await page.click("#board-settings");
+    await page.selectOption("#player-count", "3");
+    await page.reload();
     await page.locator("#board .pin-pawn").first().waitFor();
     check(
-      (await page.locator("#board .pin-pawn:visible").count()) === count * 4,
-      `${count}-player pawns visible`,
+      (await page.locator("#board .pin-pawn").count()) === 12,
+      `3-player settings survive refresh ${width}`,
     );
-    check(
-      await page.evaluate(
-        () => document.documentElement.scrollHeight <= innerHeight + 1,
-      ),
-      `${count}-player game fits`,
-    );
-    await screenshot(page, `board-${count}-players`);
     await page.close();
   }
+  const stale = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+  });
+  stale.on("pageerror", (error) => errors.push(error.message));
+  await stale.addInitScript(() =>
+    sessionStorage.setItem(
+      "ludu-mahir-game",
+      JSON.stringify({ players: "4", mode: "bot", colors: [0, 1, 2, 3] }),
+    ),
+  );
+  await stale.goto(`${base}/games/ludo/?screen=board&players=2&mode=friend`);
+  await stale.locator("#board .pin-pawn").first().waitFor();
+  check(
+    (await stale.locator("#board .pin-pawn").count()) === 8,
+    "explicit 2-player phone launch overrides stale 4-player settings",
+  );
+  check(
+    (await stale.locator("#mode").inputValue()) === "friend",
+    "explicit local mode overrides stale bot mode",
+  );
+  await stale.close();
+  const blocked = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+  });
+  blocked.on("pageerror", (error) => errors.push(error.message));
+  await blocked.addInitScript(() => {
+    Storage.prototype.setItem = function () {
+      throw new DOMException("Blocked", "SecurityError");
+    };
+  });
+  await blocked.goto(`${base}/games/ludo/`);
+  await blocked.click('#player-buttons [data-value="2"]');
+  await blocked.click("#start-game");
+  await blocked.waitForURL((url) => url.searchParams.get("screen") === "board");
+  await blocked.locator("#board .pin-pawn").first().waitFor();
+  check(
+    (await blocked.locator("#board .pin-pawn").count()) === 8,
+    "phone starts with exactly two players when browser storage is blocked",
+  );
+  await blocked.close();
   check(errors.length === 0, `no page errors ${errors.join("; ")}`);
   console.log(JSON.stringify({ passed, failed: 0, screenshots: output }));
   await browser.close();

@@ -5,18 +5,17 @@ import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementS
 const teams = ["Red", "Blue", "Green", "Yellow"];
 const setupScreen=document.querySelector("#ludo-setup");
 const restoredConfig=(()=>{try{return JSON.parse(sessionStorage.getItem("ludu-mahir-game")||"null")}catch{return null}})();
-const boardLaunch=new URLSearchParams(location.search).get("screen")==="board";
+const launchParameters=new URLSearchParams(location.search);
+const boardLaunch=launchParameters.get("screen")==="board";
 const savedSoundPreference=(()=>{try{return localStorage.getItem("ludu-mahir-sound")}catch{return null}})();
-if(restoredConfig){
- if(["2","3","4"].includes(String(restoredConfig.players))){
-  document.querySelector("#setup-players").value=String(restoredConfig.players);
-  document.querySelector("#player-count").value=String(restoredConfig.players);
- }
- if(["bot","friend","mixed"].includes(restoredConfig.mode)){
-  document.querySelector("#setup-mode").value=restoredConfig.mode;
-  document.querySelector("#mode").value=restoredConfig.mode;
- }
-}
+// Explicit launch settings take priority over an older saved game.
+const validPlayers=value=>["2","3","4"].includes(String(value));
+const validMode=value=>["bot","friend","mixed"].includes(value);
+const initialPlayers=boardLaunch&&validPlayers(launchParameters.get("players"))?launchParameters.get("players"):validPlayers(restoredConfig?.players)?String(restoredConfig.players):"2";
+const initialMode=boardLaunch&&validMode(launchParameters.get("mode"))?launchParameters.get("mode"):validMode(restoredConfig?.mode)?restoredConfig.mode:"bot";
+for(const id of ["setup-players","player-count"])document.getElementById(id).value=initialPlayers;
+for(const id of ["setup-mode","mode"])document.getElementById(id).value=initialMode;
+
 for(const [groupId,selectId] of [["mode-buttons","setup-mode"],["player-buttons","setup-players"]]){
  const group=document.getElementById(groupId),select=document.getElementById(selectId);
  group.addEventListener("click",event=>{
@@ -49,8 +48,13 @@ if(boardLaunch){
 document.querySelector("#start-game").addEventListener("click",()=>{
   document.querySelector("#player-count").value=document.querySelector("#setup-players").value;
   document.querySelector("#mode").value=document.querySelector("#setup-mode").value;
-  sessionStorage.setItem("ludu-mahir-game",JSON.stringify({players:document.querySelector("#setup-players").value,mode:document.querySelector("#setup-mode").value,colors:chosenColors,sound:soundEnabled}));
-  location.assign(location.pathname+"?screen=board");
+  if(["0,1,2,3","0,3,2,1"].includes(chosenColors.join(",")))chosenColors=playerSelect.value==="2"?[0,3,2,1]:[0,1,2,3];
+  persistGameSettings();
+  const destination=new URL(location.href);
+  destination.searchParams.set("screen","board");
+  destination.searchParams.set("players",playerSelect.value);
+  destination.searchParams.set("mode",modeSelect.value);
+  location.assign(destination.pathname+destination.search);
 });
 document.querySelector("#back-to-setup").addEventListener("click",()=>{
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
@@ -128,14 +132,25 @@ const lastDice=[1,1,1,1];
 let activeTeams, state, message, seatBots = [], started=false, locked=false, animationToken=null, pendingCaptureSteps=new Map(), finishSlots=new Map(), scoreLightTimers=new Map(), rollingTeam=-1, rollingValue=0, diceAnimationTimer=0, soundEnabled=savedSoundPreference===null?true:savedSoundPreference==="true",audioContext=null,noiseBuffer=null,activeCaptureStops=new Set();
 const DICE_ROLL_DURATION=950;
 syncSoundControls();
-const defaultColors=String(restoredConfig?.players)==="2"?[0,3,2,1]:[0,1,2,3];
+const defaultColors=initialPlayers==="2"?[0,3,2,1]:[0,1,2,3];
 const storedColors=Array.isArray(restoredConfig?.colors)&&restoredConfig.colors.length===4&&restoredConfig.colors.every(c=>Number.isInteger(c)&&c>=0&&c<palette.length)&&new Set(restoredConfig.colors).size===4?restoredConfig.colors:null;
 const initialColors=storedColors?(storedColors.join(",")==="0,1,2,3"?defaultColors:storedColors):defaultColors;
 let chosenColors=[...initialColors];
 const getColor=seat=>palette[chosenColors[seat]];
-function saveColorChoices(){
-  sessionStorage.setItem("ludu-mahir-game",JSON.stringify({players:String(activeTeams.length),mode:modeSelect.value,colors:chosenColors,sound:soundEnabled}));
+function persistGameSettings(){
+  const config={players:playerSelect.value,mode:modeSelect.value,colors:[...chosenColors],sound:soundEnabled};
+  document.querySelector("#setup-players").value=config.players;
+  document.querySelector("#setup-mode").value=config.mode;
+  try{sessionStorage.setItem("ludu-mahir-game",JSON.stringify(config));}catch{}
+  if(boardLaunch){
+    const url=new URL(location.href);
+    url.searchParams.set("players",config.players);
+    url.searchParams.set("mode",config.mode);
+    history.replaceState(null,"",url.pathname+url.search);
+  }
 }
+function saveColorChoices(){persistGameSettings();}
+
 const playerColorPickers=teams.map((_,teamId)=>{
   const container=dice[teamId].closest(".player-dice"),picker=document.createElement("div");
   picker.className="player-color-picker";picker.hidden=true;picker.dataset.seat=String(teamId);
@@ -256,7 +271,8 @@ function isBot(player) {
   if (modeSelect.value==="mixed") return Boolean(seatBots[player]);
   return false;
 }
-playerSelect.addEventListener("change",game.restart);
+playerSelect.addEventListener("change",()=>{game.restart();persistGameSettings();});
+modeSelect.addEventListener("change",persistGameSettings);
 
 function resumeAudioContext() {
   if(!soundEnabled)return null;
@@ -581,4 +597,4 @@ function render() {
   }
 }
 game.restart();
-
+if(boardLaunch)persistGameSettings();

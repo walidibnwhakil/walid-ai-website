@@ -1,7 +1,109 @@
+import {
+  HEAD_FRAME,
+  headPoseFromPath,
+  headUvAtLocal,
+} from "./snake-geometry.mjs?v=20261108-joined";
 // Photo-style natural skin is deformed along the authoritative animated curve.
 const skinAtlas = new Image();
 skinAtlas.src = new URL("assets/natural-skin.webp", import.meta.url).href;
-// Cylindrical bodies and tangent-aligned scale plates share the SVG movement path.
+
+const joinedAtlas = new Image(),
+  openAtlas = new Image(),
+  closedSprites = [],
+  openSprites = [];
+function prepareHeads(atlas, output) {
+  const cell = atlas.naturalWidth / 2,
+    size = 256,
+    height = Math.round(size * HEAD_FRAME.crop);
+  for (let type = 0; type < 4; type++) {
+    const c = document.createElement("canvas");
+    c.width = size;
+    c.height = height;
+    const g = c.getContext("2d");
+    g.imageSmoothingQuality = "high";
+    g.drawImage(
+      atlas,
+      (type % 2) * cell,
+      Math.floor(type / 2) * cell,
+      cell,
+      cell * HEAD_FRAME.crop,
+      0,
+      0,
+      size,
+      height,
+    );
+    g.clearRect(0, 0, size, size * 0.08);
+    g.globalCompositeOperation = "destination-in";
+    const fade = g.createLinearGradient(0, size * 0.53, 0, height);
+    fade.addColorStop(0, "#fff");
+    fade.addColorStop(1, "#fff0");
+    g.fillStyle = fade;
+    g.fillRect(0, 0, size, height);
+    output[type] = c;
+  }
+}
+joinedAtlas.onload = () => prepareHeads(joinedAtlas, closedSprites);
+openAtlas.onload = () => prepareHeads(openAtlas, openSprites);
+joinedAtlas.src = new URL("assets/joined-heads.webp", import.meta.url).href;
+openAtlas.src = new URL("assets/joined-heads-open.webp", import.meta.url).href;
+function paintHead(c, item, time) {
+  const type = item.i % 4,
+    sprite = closedSprites[type];
+  if (!sprite) return;
+  const pose = headPoseFromPath(item.path.getAttribute("d")),
+    f = HEAD_FRAME,
+    cell = joinedAtlas.naturalWidth / 2,
+    sx = (type % 2) * cell,
+    sy = Math.floor(type / 2) * cell;
+  c.save();
+  c.translate(pose.x, pose.y);
+  c.rotate(pose.angle);
+  c.shadowColor = "#0009";
+  c.shadowBlur = 4;
+  c.shadowOffsetX = 1;
+  c.shadowOffsetY = 2;
+  c.drawImage(sprite, f.x, f.y, f.width, f.height * f.crop);
+  c.shadowColor = "transparent";
+  const active = item.g.classList.contains("active-snake");
+  if (active && openSprites[type]) {
+    c.globalAlpha = 0.94;
+    c.drawImage(openSprites[type], f.x, f.y, f.width, f.height * f.crop);
+    c.globalAlpha = 1;
+  }
+  const flick = Math.max(0, Math.sin(time / 220 + item.i * 1.7)) ** 8;
+  if (flick > 0.02) {
+    c.globalAlpha = flick;
+    c.drawImage(
+      joinedAtlas,
+      sx,
+      sy,
+      cell,
+      cell * 0.08,
+      f.x,
+      f.y + 0.8 * (1 - flick),
+      f.width,
+      0.8 * flick,
+    );
+    c.globalAlpha = 1;
+  }
+  const blink = (time + item.i * 733) % 6300;
+  if (blink > 2800 && blink < 2940) {
+    const opacity = Math.sin(((blink - 2800) / 140) * Math.PI);
+    c.globalAlpha = opacity;
+    c.fillStyle = item.color;
+    for (const x of [-1.38, 1.38]) {
+      c.beginPath();
+      c.ellipse(x, -1, 0.24, 0.4, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+  }
+  c.restore();
+  item.head.setAttribute("data-heading", String(pose.angle));
+  item.head.setAttribute("data-renderer", "joined-canvas");
+}
+
+// Head and body use one overhead camera, one spine and the same proximal neck material.
 const rgb = (hex) => hex.match(/[\da-f]{2}/gi).map((n) => parseInt(n, 16));
 const tint = (c, k, white = 0) =>
   `rgb(${c.map((v) => Math.max(0, Math.min(255, Math.round(v * k + white)))).join(",")})`;
@@ -40,7 +142,7 @@ function samples(d, time, index, quality) {
       tx: dx / len,
       ty: dy / len,
       w:
-        1.48 *
+        1.36 *
         Math.min(1, (1 - t) / 0.22) *
         (1 + 0.025 * Math.sin(time / 850 + index + t * 6)),
       t,
@@ -141,8 +243,10 @@ export function paintBodies(canvas, items, time, quality = "Balanced") {
         const p = points[j],
           q = points[j + 1],
           length = Math.hypot(q.x - p.x, q.y - p.y),
-          sourceHeight = (length * cell) / 3,
-          sourceY = ((arc * cell) / 3) % cell;
+          sourceHeight = (length * cell) / HEAD_FRAME.height,
+          sourceY = ((arc * cell) / HEAD_FRAME.height) % cell,
+          sourceWidth = ((2 * p.w) / HEAD_FRAME.width) * cell,
+          sourceX = sx + (cell - sourceWidth) / 2;
         c.save();
         c.transform(p.nx, p.ny, p.tx, p.ty, p.x, p.y);
         let consumed = 0;
@@ -151,9 +255,9 @@ export function paintBodies(canvas, items, time, quality = "Balanced") {
             part = Math.min(sourceHeight - consumed, cell - sy);
           c.drawImage(
             skinAtlas,
-            sx,
+            sourceX,
             baseY + sy,
-            cell,
+            sourceWidth,
             Math.max(0.01, part),
             -p.w,
             (consumed / sourceHeight) * length - 0.04,
@@ -162,6 +266,27 @@ export function paintBodies(canvas, items, time, quality = "Balanced") {
           );
           consumed += part;
         }
+        if (joinedAtlas.complete && joinedAtlas.naturalWidth && arc < 9) {
+          const hc = joinedAtlas.naturalWidth / 2,
+            uv = headUvAtLocal(-p.w, Math.min(4.8, arc)),
+            neckX = (type % 2) * hc + uv.u * hc,
+            neckY = Math.floor(type / 2) * hc + uv.v * hc,
+            neckWidth = ((2 * p.w) / HEAD_FRAME.width) * hc,
+            neckH = (length / HEAD_FRAME.height) * hc;
+          c.globalAlpha = Math.max(0, Math.min(1, (9 - arc) / 5.5));
+          c.drawImage(
+            joinedAtlas,
+            neckX,
+            neckY,
+            neckWidth,
+            Math.max(0.01, neckH),
+            -p.w,
+            -0.04,
+            p.w * 2,
+            length + 0.1,
+          );
+          c.globalAlpha = 1;
+        }
         const shade = c.createLinearGradient(-p.w, 0, p.w, 0);
         shade.addColorStop(0, "#000a");
         shade.addColorStop(0.24, "#0002");
@@ -169,7 +294,9 @@ export function paintBodies(canvas, items, time, quality = "Balanced") {
         shade.addColorStop(0.68, "#0001");
         shade.addColorStop(1, "#000a");
         c.fillStyle = shade;
+        c.globalAlpha = Math.max(0, Math.min(1, (arc - 2.8) / 5));
         c.fillRect(-p.w, -0.04, p.w * 2, length + 0.1);
+        c.globalAlpha = 1;
         c.restore();
         arc += length;
       }
@@ -188,4 +315,5 @@ export function paintBodies(canvas, items, time, quality = "Balanced") {
     c.globalAlpha = 1;
     c.restore();
   }
+  for (const item of items) paintHead(c, item, time);
 }

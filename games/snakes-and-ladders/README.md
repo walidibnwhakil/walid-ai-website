@@ -9,9 +9,11 @@ Replaces the previous Snake game. `/games/snake/` redirects through both a meta 
 - `index.html`: English menu, board, settings, rules, statistics and result controls.
 - `engine.mjs`: immutable deterministic state transitions, square coordinates, mappings, cryptographic rejection-sampled die and placement labels.
 - `game.mjs`: SVG environments/rigs, stepped movement, individual CSS 3D dice, player-head color selection, viewport fitting, bot scheduling, optional locally synthesized sound and safe local statistics.
-- `serpent-renderer.mjs`: cylindrical Canvas body shading and tangent-aligned photo-style skin strips, sharing exact geometry with the SVG heads and swallow paths.
+- `serpent-renderer.mjs`: cylindrical Canvas body shading and tangent-aligned photo-style skin strips, integrated top-down head/neck art and shared exact geometry with swallow paths.
 - `style.css`: responsive presentation, separate jaw/eye/tongue animation, intro, lava, fireworks and reduced-motion alternatives.
 - `assets/*.webp`: locally hosted generated painted cavern environments, marble material atlas, royal title and natural venomous-snake head and skin atlases. `preview.svg` retains the existing index preview.
+- `snake-geometry.mjs`, `snake-geometry.test.mjs`: shared endpoint/tangent and head-to-neck texture coordinates, verified without a DOM.
+- `lava.mjs`: lightweight flowing bottom-lava highlights and bubbles.
 - `engine.test.mjs`, `browser-check.cjs`: deterministic rules and real Chromium verification.
 - `.github/workflows/snakes-and-ladders.yml`: engine/browser verification with screenshot artifacts.
 
@@ -21,9 +23,9 @@ Removed obsolete files: `games/snake.mjs`, `games/snake-rules.mjs`, `games/snake
 
 ## Rules
 
-Players start inactive at 0 and must roll a 1 to enter square 1. Other opening rolls leave them outside. A six still grants an extra roll, even before activation. After activation, rolls advance one square at a time with visible pauses. The third consecutive six is discarded and ends the turn. Overshooting 100 leaves the pawn in place; exactly 100 finishes. Finished players are skipped and the final remaining player gets the last place automatically. A single human and bot share identical rules and randomness. Local matches support 2, 3 or 4 players with distinct pawn colors selected from nine choices. Tap a player head for the round-swatch gold palette, including after Start Game; the first click on any die immediately locks every player’s color for that match. Selecting an occupied color before the lock swaps the two players. Pin pawn paths are reused from Ludu Mahir.
+Players start inactive at 0 and must roll a 1 to enter square 1. Other opening rolls leave them outside. Before activation, even a six ends the turn. Only an already active pawn receives an extra roll on six. After activation, rolls advance one square at a time with visible pauses. The third consecutive six is discarded and ends the turn. Overshooting 100 leaves the pawn in place; exactly 100 finishes. Finished players are skipped and the final remaining player gets the last place automatically. A single human and bot share identical rules and randomness. Local matches support 2, 3 or 4 players with distinct pawn colors selected from nine choices. Tap a player head for the round-swatch gold palette, including after Start Game; the first click on any die immediately locks every player’s color for that match. Selecting an occupied color before the lock swaps the two players. Pin pawn paths are reused from Ludu Mahir. Solo pins fill 70% of a square’s width; two-to-four shared pins use a spaced arrangement that stays inside the cell.
 
-The board has 100 data-generated numbered squares. Row 1 begins at bottom-left, alternates direction each row, and ends with square 100 at top-left, marked with a crown.
+The board has 100 data-generated squares (99 numbers and a gold logo crown filling the finish cell). Row 1 begins at bottom-left, alternates direction each row, and ends with square 100 at top-left, marked with a crown.
 
 | Ladders | Snakes  |
 | ------- | ------- |
@@ -43,14 +45,14 @@ All visual endpoints use square-center coordinates from `engine.mjs`. Body contr
 Run from the repository root:
 
 ```sh
-node --test games/snakes-and-ladders/engine.test.mjs games/2048.test.mjs games/ludo-rules.test.mjs games/chess/chess.test.mjs games/tic-tac-toe/engine.test.mjs
+node --test games/snakes-and-ladders/engine.test.mjs games/snakes-and-ladders/snake-geometry.test.mjs games/2048.test.mjs games/ludo-rules.test.mjs games/chess/chess.test.mjs games/tic-tac-toe/engine.test.mjs
 python3 -m http.server 8765
 # In another terminal with Playwright available:
 CHROME=/usr/bin/chromium SERPENT_EVIDENCE=/tmp/serpent-evidence node games/snakes-and-ladders/browser-check.cjs
 ```
 
-- 186 unit tests passed across these five current suites, including 39 new engine cases.
-- 29 browser verification groups passed without page errors, including viewport fitting, color locks, real die rotations, pawn steps, anchors, and the full match/result flows.
+- 198 unit tests passed across the current suites, including 40 engine cases and 11 shared-geometry cases.
+- 35 browser verification groups passed without page errors, including viewport fitting, color locks, real die rotations, pawn steps, anchors, and the full match/result flows.
 - Chromium viewports include 320×568, 360×640, 390×844, 412×915, 430×932, 768×1024, 1024×768, 1366×768, 1440×900, 1920×1080, 640×360 and 844×390. The full board and all controls fit without horizontal or vertical page scrolling. Each player has their own die; only the current human player can tap theirs.
 - Sampled actual animated transforms for royal breathing, blinking, tongues, smaller snakes, leaves and vines; captured menu and intro frames.
 - Verified changing lava and board paths, mathematical endpoints, roll locking, pawn release at snake tails and ladder tops, restart cancellation, automatic bot actions and storage-unavailable play.
@@ -63,7 +65,7 @@ The old `games/arcade.test.mjs` has three existing Ludo failures, reproduced usi
 
 ## Visual and platform limits
 
-The gameplay board was redesigned after visual feedback: painted volcanic cavern artwork with serpent eyes/fangs, separate desktop and mobile compositions, polished emerald/ivory marble textures, beveled gold cells and frame, a rendered royal title, eight anchored natural-color venomous-snake heads, tapered animated scaled bodies, gold ladders, sculpted pawns, an ivory die, and viewport-fitted controls alongside the board on PC and below it on portrait phones. These are local WebP assets layered with the structured SVG board; the board is never a flattened screenshot. Numbering remains programmatically generated. The eight snake and six ladder endpoints match the latest approved numbered reference diagram. The menu and intro retain their earlier stylized SVG presentation. The intro uses layered 2D transforms and independent jaws, rather than a 3D camera. Natural brown viper, olive cobra, green pit-viper and black/white krait-style generated artwork replaces the fantasy heads. Cylindrical Canvas shading and tangent-aligned photo-style skin strips animate the bodies; articulated SVG-image heads and tail endpoints stay in their designated squares. Ladders use extruded SVG side faces and beveled rungs. Each player’s die has six actual CSS 3D faces and a multi-revolution spin. Pin pawns use the same vector shape as Ludu Mahir.
+The gameplay board was redesigned after visual feedback: painted volcanic cavern artwork with serpent eyes/fangs, separate desktop and mobile compositions, polished emerald/ivory marble textures, beveled gold cells and frame, a rendered royal title, eight anchored natural-color venomous-snake heads, tapered animated scaled bodies, gold ladders, sculpted pawns, an ivory die, and viewport-fitted controls alongside the board on PC and below it on portrait phones. These are local WebP assets layered with the structured SVG board; the board is never a flattened screenshot. Numbering remains programmatically generated. The eight snake and six ladder endpoints match the latest approved numbered reference diagram. The menu and intro retain their earlier stylized SVG presentation. The intro uses layered 2D transforms and independent jaws, rather than a 3D camera. Natural brown viper, olive cobra, green pit-viper and black/white krait-style generated artwork replaces the fantasy heads. Cylindrical Canvas shading and tangent-aligned photo-style skin strips animate the bodies; top-down heads and necks are painted into the same Canvas with registered neck texture, while head and tail endpoints stay in their designated squares. Ladders use extruded SVG side faces and beveled rungs. Each player’s die has six actual CSS 3D faces and a fast 480 ms multi-revolution spin. In bot matches, the human die is on the right. A small dedicated Canvas animates lava highlights and bubbles beneath the board, respecting quality, visibility and reduced motion. Pin pawns use the same vector shape as Ludu Mahir.
 
 Mobile checks use Chromium viewport emulation, not physical Android hardware or Safari on iPhone. No measured budget-device frame-rate guarantee is made. High/Balanced/Low adjust body update frequency and effects; system reduced motion overrides animation. Sound is lightweight synthesized tones and ambience rather than a recorded environmental soundscape. There is no match timer, Start/Stop, Pause, Restart or Rules control in gameplay. Rules remain in setup. One gold Menu icon, a global mute/unmute icon and a Settings icon sit in the header; redundant navigation labels are removed. The compact personal-dice dock leaves the board dominant, including with four players. Desktop controls sit beside the board; portrait-phone controls fit below it. Matches are not persisted across page reloads; statistics/settings are local where storage is available. No accounts, online rankings, paid APIs, external game assets or heavyweight runtime dependencies are required.
 

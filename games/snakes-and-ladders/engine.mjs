@@ -101,7 +101,7 @@ export function roll(state, value) {
   s.dice = value;
   s.rolls++;
   p.lastDice = value;
-  s.sixes = value === 6 ? s.sixes + 1 : 0;
+  s.sixes = value === 6 && p.position > 0 ? s.sixes + 1 : 0;
   const from = p.position;
   let landing = from;
   const penalty = s.sixes === 3;
@@ -135,7 +135,12 @@ export function settle(result) {
     );
     s.phase = "over";
   } else {
-    if (finisher !== null || s.dice !== 6 || result.penalty) {
+    if (
+      finisher !== null ||
+      s.dice !== 6 ||
+      result.penalty ||
+      result.from === 0
+    ) {
       do {
         s.current = (s.current + 1) % s.players.length;
       } while (s.order.includes(s.current));

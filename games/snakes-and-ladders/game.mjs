@@ -1,7 +1,12 @@
+import { createLava } from "./lava.mjs?v=20261108-joined";
+import {
+  snakeCurve,
+  headPoseFromPath,
+} from "./snake-geometry.mjs?v=20261108-joined";
 import {
   createBodyCanvas,
   paintBodies,
-} from "./serpent-renderer.mjs?v=20261108-compact-maps";
+} from "./serpent-renderer.mjs?v=20261108-joined";
 import { setGameInProgress } from "../refresh-guard.mjs";
 import {
   SNAKES,
@@ -16,7 +21,7 @@ import {
   settle,
   placement,
   chooseColor,
-} from "./engine.mjs?v=20261108-compact-maps";
+} from "./engine.mjs?v=20261108-joined";
 const $ = (s) => document.querySelector(s),
   NS = "http://www.w3.org/2000/svg";
 const svg = (tag, attrs = {}, parent) => {
@@ -70,6 +75,10 @@ let state = null,
   ambienceNode;
 const reduced = () =>
   matchMedia("(prefers-reduced-motion: reduce)").matches || !settings.motion;
+const liveLava = createLava($("#live-lava"), {
+  motion: () => !reduced(),
+  quality: () => settings.quality,
+});
 function applySettings() {
   document.body.classList.toggle("reduced", reduced());
   document.body.classList.toggle("low", settings.quality === "Low");
@@ -82,6 +91,7 @@ function applySettings() {
   save("serpent-muted", audioMuted);
   save("serpent-settings", settings);
   updateAmbience();
+  if (state && !$("#play").hidden) liveLava.start();
 }
 function audio() {
   try {
@@ -847,70 +857,15 @@ function board() {
     );
     const head = svg(
       "g",
-      { transform: `translate(${p.x} ${p.y})`, class: "painted-head" },
+      {
+        transform: `translate(${p.x} ${p.y})`,
+        class: "painted-head integrated-head",
+        "data-head-square": a,
+      },
       g,
     );
-    const art = svg(
-      "g",
-      { transform: i % 2 ? "scale(-1 1)" : "scale(1 1)" },
-      head,
-    );
-    const clip = svg("clipPath", { id: `jaw-clip-${i}` }, defs);
-    svg("rect", { x: -5, y: 0.3, width: 10, height: 5 }, clip);
-    const upper = svg("clipPath", { id: `upper-clip-${i}` }, defs);
-    svg("rect", { x: -5, y: -5, width: 10, height: 5.3 }, upper);
-    function sprite(parent, clipId) {
-      const c = svg("g", { "clip-path": `url(#${clipId})` }, parent);
-      const sheet = svg(
-        "svg",
-        {
-          x: -3.6,
-          y: -2.8,
-          width: 7.2,
-          height: 7.2,
-          viewBox: `${(i % 2) * 500} ${Math.floor((i % 4) / 2) * 500} 500 500`,
-          overflow: "hidden",
-        },
-        c,
-      );
-      svg(
-        "image",
-        {
-          href: "assets/natural-heads.webp",
-          x: 0,
-          y: 0,
-          width: 1000,
-          height: 1000,
-        },
-        sheet,
-      );
-    }
-    sprite(art, `upper-clip-${i}`);
-    const jaw = svg("g", { class: "board-jaw" }, art);
-    sprite(jaw, `jaw-clip-${i}`);
-    svg(
-      "ellipse",
-      {
-        cx: [-0.42, -1.5, -0.33, -1.47][i % 4],
-        cy: [-0.55, -0.32, -0.73, -0.73][i % 4],
-        rx: 0.31,
-        ry: 0.3,
-        fill: color,
-        class: "board-eye natural-eyelid",
-      },
-      art,
-    );
-    svg(
-      "path",
-      {
-        d: "M -2 1.7 Q -3.2 2.3 -3.4 3 M -3.4 3 L -3.8 3.3 M -3.4 3 L -3.3 3.5",
-        stroke: "#c92539",
-        "stroke-width": 0.1,
-        fill: "none",
-        class: "board-tongue",
-      },
-      art,
-    );
+    const title = svg("title", {}, head);
+    title.textContent = `Snake ${a} to ${z}`;
     for (const layer of [path, inner, sheen, pattern]) {
       layer.setAttribute("mask", `url(#taper-${i})`);
       layer.setAttribute("opacity", 0);
@@ -931,7 +886,34 @@ function board() {
     };
   });
   for (const { n, x, y } of squares) {
-    const t = svg(
+    if (n === 100) {
+      const clip = svg("clipPath", { id: "finish-crown-clip" }, defs);
+      svg("rect", { x: x - 4.75, y: y - 3.13, width: 9.5, height: 6.26 }, clip);
+      const crown = svg(
+        "g",
+        {
+          class: "finish-crown",
+          role: "img",
+          "aria-label": "Finish — square 100",
+          "clip-path": "url(#finish-crown-clip)",
+        },
+        b,
+      );
+      const factor = 9.5 / 220;
+      svg(
+        "image",
+        {
+          href: "assets/royal-logo.webp",
+          x: x - 4.75 - 340 * factor,
+          y: y - 3.13,
+          width: 900 * factor,
+          height: 375 * factor,
+        },
+        crown,
+      );
+      continue;
+    }
+    const text = svg(
       "text",
       {
         x: x - 3.8,
@@ -940,7 +922,7 @@ function board() {
       },
       b,
     );
-    t.textContent = n === 100 ? "100 ♛" : n;
+    text.textContent = n;
   }
   pawns = state.players.map((p, i) => {
     const g = svg(
@@ -955,10 +937,10 @@ function board() {
     const pin = svg(
       "svg",
       {
-        x: -2.1,
-        y: -2.9,
-        width: 4.2,
-        height: 5.05,
+        x: -3.5,
+        y: -4.6,
+        width: 7,
+        height: 8.42,
         viewBox: "0 0 64 77",
         class: "pin-pawn-art",
       },
@@ -986,14 +968,8 @@ function board() {
   });
   state.players.forEach((p, i) => place(i, p.position));
 }
-function curve(p, q, i, t = 0) {
-  const dx = q.x - p.x,
-    dy = q.y - p.y,
-    len = Math.hypot(dx, dy),
-    wave = reduced() ? 0 : Math.sin(t / 900 + i) * 1.8,
-    tailWave = reduced() ? 0 : Math.sin(t / 900 + i - 2.4) * 1.8,
-    bend = (i % 2 ? 1 : -1) * Math.min(15, len * 0.48) + wave;
-  return `M ${p.x} ${p.y} C ${p.x + dx * 0.25 - (dy / len) * bend} ${p.y + dy * 0.25 + (dx / len) * bend} ${q.x - dx * 0.25 + (dy / len) * (bend - wave + tailWave)} ${q.y - dy * 0.25 - (dx / len) * (bend - wave + tailWave)} ${q.x} ${q.y}`;
+function curve(p, q, i, time = 0) {
+  return snakeCurve(p, q, i, time, !reduced());
 }
 function taperedRibbon(d) {
   const [x0, y0, x1, y1, x2, y2, x3, y3] = d.match(/-?[\d.]+/g).map(Number),
@@ -1039,7 +1015,7 @@ function animateBoard(t) {
       item.taper.setAttribute("d", taperedRibbon(d));
       item.head.setAttribute(
         "transform",
-        `translate(${item.p.x} ${item.p.y}) rotate(${reduced() ? 0 : Math.sin(t / 1200 + item.i) * 6})`,
+        `translate(${item.p.x} ${item.p.y}) rotate(${(headPoseFromPath(d).angle * 180) / Math.PI})`,
       );
     }
   }
@@ -1062,25 +1038,25 @@ function place(i, n, point) {
   const offsets =
     peers.length === 2
       ? [
-          [-1.7, 0],
-          [1.7, 0],
+          [-2.4, 0],
+          [2.4, 0],
         ]
       : peers.length === 3
         ? [
-            [-1.7, -1.2],
-            [1.7, -1.2],
-            [0, 1.7],
+            [-2.25, -2.3],
+            [2.25, -2.3],
+            [0, 2.3],
           ]
         : [
-            [-1.7, -1.5],
-            [1.7, -1.5],
-            [-1.7, 1.5],
-            [1.7, 1.5],
+            [-2.25, -2.3],
+            [2.25, -2.3],
+            [-2.25, 2.3],
+            [2.25, 2.3],
           ];
   const [ox, oy] = shared ? (offsets[Math.max(0, slot)] ?? [0, 0]) : [0, 0];
   pawns[i]?.setAttribute(
     "transform",
-    `translate(${p.x + ox} ${p.y + oy}) scale(${shared ? 0.76 : 1})`,
+    `translate(${p.x + ox} ${p.y + oy}) scale(${shared ? (peers.length === 2 ? 0.65 : 0.52) : 1})`,
   );
   pawns[i]?.setAttribute("data-position", n);
   pawns[i]?.setAttribute("visibility", !n && !point ? "hidden" : "visible");
@@ -1171,6 +1147,7 @@ function render() {
   setGameInProgress(!$("#play").hidden && state.phase !== "over");
   $("#players").style.setProperty("--player-count", state.players.length);
   $("#players").dataset.count = state.players.length;
+  $("#players").dataset.mode = state.bot ? "bot" : "local";
   $("#players").innerHTML = state.players
     .map((p, i) => {
       const rank = state.order.indexOf(i),
@@ -1181,6 +1158,7 @@ function render() {
     })
     .join("");
   fitGame();
+  liveLava.start();
 }
 function fitGame() {
   if (!state || $("#play").hidden) return;
@@ -1219,11 +1197,11 @@ async function spinDie(i, value, token) {
           transform: `rotateX(${startX}deg) rotateY(${startY}deg) rotateZ(0deg)`,
         },
         {
-          transform: `rotateX(${1080 + rx}deg) rotateY(${1440 + ry}deg) rotateZ(360deg)`,
+          transform: `rotateX(${720 + rx}deg) rotateY(${1080 + ry}deg) rotateZ(360deg)`,
         },
       ],
       {
-        duration: 1100,
+        duration: 480,
         easing: "cubic-bezier(.16,.55,.32,1)",
         fill: "forwards",
       },
@@ -1339,6 +1317,7 @@ async function takeTurn() {
   }
 }
 function cancel() {
+  liveLava.stop();
   setGameInProgress(false);
   epoch++;
   activeRollAnimation?.cancel();
@@ -1483,7 +1462,7 @@ function panel(kind) {
   $("#dialog-content").onclick = null;
   if (kind === "rules")
     $("#dialog-content").innerHTML =
-      `<h2>Game Rules</h2><p>Classic · The Serpent King's Realm</p><ul><li>Colors can be chosen by tapping a player head until the first die roll. Start outside the board at 0. Roll a 1 to activate your pawn and enter square 1. Other rolls leave an inactive pawn outside. A six still grants an extra roll; the third consecutive six is discarded.</li><li>Tap your own active die. After entering, move one square at a time by the rolled value. Other players’ dice stay locked.</li><li>A six grants an extra roll. The third consecutive six ends your turn without moving on that roll.</li><li>Land on a snake head to slide down; land at a ladder base to climb.</li><li>Reach 100 exactly. An overshoot leaves your pawn in place.</li><li>Finished players are skipped. The last remaining player receives the final place automatically.</li><li>The bot follows the same rules and uses the same fair die.</li></ul><p>Ladders: ${Object.entries(
+      `<h2>Game Rules</h2><p>Classic · The Serpent King's Realm</p><ul><li>Colors can be chosen by tapping a player head until the first die roll. Start outside the board at 0. Roll a 1 to activate your pawn and enter square 1. Other rolls leave an inactive pawn outside. An inactive pawn gets no extra turn on a six.</li><li>Tap your own active die. After entering, move one square at a time by the rolled value. Other players’ dice stay locked.</li><li>Only an activated pawn gets an extra roll on a six. The third consecutive six ends your turn without moving on that roll.</li><li>Land on a snake head to slide down; land at a ladder base to climb.</li><li>Reach 100 exactly. An overshoot leaves your pawn in place.</li><li>Finished players are skipped. The last remaining player receives the final place automatically.</li><li>The bot follows the same rules and uses the same fair die.</li></ul><p>Ladders: ${Object.entries(
         LADDERS,
       )
         .map(([a, b]) => `${a} → ${b}`)
@@ -1577,8 +1556,13 @@ $("#continue").onclick = () => {
 $("#try-again").onclick = () => begin(true);
 $("#result-menu").onclick = menu;
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) clearTimeout(botTimer);
-  else scheduleBot();
+  if (document.hidden) {
+    clearTimeout(botTimer);
+    liveLava.stop();
+  } else {
+    scheduleBot();
+    if (state && !$("#play").hidden) liveLava.start();
+  }
   updateAmbience();
 });
 matchMedia("(prefers-reduced-motion: reduce)").addEventListener(

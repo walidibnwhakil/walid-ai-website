@@ -100,7 +100,7 @@ fs.mkdirSync(out, { recursive: true });
   await page.waitForTimeout(1500);
   await page.waitForSelector("#play:visible");
   await shot("board-desktop");
-  assert.equal(await page.locator(".square-number").count(), 100);
+  assert.equal(await page.locator(".square-number").count(), 99);
   await check(
     "compact gold header replaces redundant in-game navigation and controls",
     async () => {
@@ -138,7 +138,8 @@ fs.mkdirSync(out, { recursive: true });
         "cavern-mobile.webp",
         "marble-atlas.webp",
         "royal-logo.webp",
-        "natural-heads.webp",
+        "joined-heads.webp",
+        "joined-heads-open.webp",
         "natural-skin.webp",
       ]) {
         const response = await page.request.get(
@@ -215,6 +216,98 @@ fs.mkdirSync(out, { recursive: true });
         .evaluate((e) => getComputedStyle(e).transform),
     );
   });
+  await check(
+    "finish square shows only the large exact logo crown",
+    async () => {
+      assert.equal(await page.locator(".finish-crown").count(), 1);
+      assert.equal(
+        await page.locator("#board text").filter({ hasText: /^100/ }).count(),
+        0,
+      );
+      assert.equal(
+        await page.locator(".finish-crown image").getAttribute("href"),
+        "assets/royal-logo.webp",
+      );
+      const clip = await page
+        .locator("#finish-crown-clip rect")
+        .evaluate((e) => ({
+          x: e.x.baseVal.value,
+          y: e.y.baseVal.value,
+          w: e.width.baseVal.value,
+          h: e.height.baseVal.value,
+        }));
+      assert.ok(
+        clip.w >= 9 &&
+          clip.x >= 0 &&
+          clip.x + clip.w <= 10 &&
+          clip.y >= 0 &&
+          clip.y + clip.h <= 10,
+      );
+      const box = await page.locator("#board").boundingBox();
+      await page.screenshot({
+        path: path.join(out, "finish-crown-close.png"),
+        clip: {
+          x: box.x,
+          y: box.y,
+          width: box.width * 0.105,
+          height: box.height * 0.105,
+        },
+      });
+    },
+  );
+  await check(
+    "head 54 and every neck share the spine direction and one material surface",
+    async () => {
+      assert.equal(await page.locator(".integrated-head image").count(), 0);
+      await page.waitForFunction(
+        () =>
+          document.querySelector('[data-snake="54"] .integrated-head')?.dataset
+            .renderer === "joined-canvas",
+      );
+      const result = await page.evaluate(async () => {
+        const { headPoseFromPath, headLocalToWorld } = await import(
+          "./snake-geometry.mjs?v=20261108-joined"
+        );
+        return Object.values(window.serpentTest.paths())
+          .filter((p) => p.kind === "snake")
+          .map((p) => {
+            const pose = headPoseFromPath(p.path.getAttribute("d")),
+              neck = headLocalToWorld(pose, 0, 1);
+            return { a: p.p, pose, neck, rendered: +p.head.dataset.heading };
+          });
+      });
+      for (const r of result) {
+        assert.equal(r.a.x, r.pose.x);
+        assert.equal(r.a.y, r.pose.y);
+        assert.ok(Math.abs(r.rendered - r.pose.angle) < 0.00001);
+        assert.ok(Math.abs(r.neck.x - r.pose.x - r.pose.tx) < 0.00001);
+        assert.ok(Math.abs(r.neck.y - r.pose.y - r.pose.ty) < 0.00001);
+      }
+      const b = await page.locator("#board").boundingBox();
+      await page.screenshot({
+        path: path.join(out, "head-54-joined.png"),
+        clip: {
+          x: b.x + b.width * 0.59,
+          y: b.y + b.height * 0.39,
+          width: b.width * 0.14,
+          height: b.height * 0.18,
+        },
+      });
+    },
+  );
+  await check(
+    "the molten lava foreground changes rendered pixels",
+    async () => {
+      const lava = page.locator("#live-lava");
+      await page.waitForFunction(
+        () => document.querySelector("#live-lava").dataset.active === "true",
+      );
+      const a = await lava.evaluate((e) => e.toDataURL());
+      await page.waitForTimeout(220);
+      assert.notEqual(await lava.evaluate((e) => e.toDataURL()), a);
+      await shot("living-lava-foreground");
+    },
+  );
   const clickDie = async (i) => {
     i ??= await page.evaluate(() => window.serpentTest.state.current);
     await page.locator(`[data-roll="${i}"]`).click();
@@ -307,6 +400,52 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
+    "larger pins remain readable alone and all four fit a shared square",
+    async () => {
+      for (const [width, height] of [
+        [390, 844],
+        [1366, 768],
+      ]) {
+        await page.setViewportSize({ width, height });
+        await force({ count: 4, pos: 8, motion: false });
+        const single = await page
+          .locator('[data-player="0"] .pin-pawn-art')
+          .boundingBox();
+        const board = await page.locator("#board").boundingBox();
+        assert.ok(
+          single.width >= board.width * 0.068,
+          "solo pawn must span about 70% of a square",
+        );
+        await shot(`large-pawn-${width}`);
+        await page.evaluate(() => {
+          const s = structuredClone(window.serpentTest.state);
+          s.players.forEach((p) => (p.position = 8));
+          window.serpentTest.setState(s);
+        });
+        const boxes = await page.locator(".pin-pawn-art").evaluateAll((es) =>
+          es.map((e) => {
+            const r = e.getBoundingClientRect();
+            return { x: r.x, y: r.y, w: r.width, h: r.height };
+          }),
+        );
+        for (let i = 0; i < 4; i++)
+          for (let j = i + 1; j < 4; j++) {
+            const a = boxes[i],
+              b = boxes[j];
+            assert.ok(
+              a.x + a.w <= b.x + 0.5 ||
+                b.x + b.w <= a.x + 0.5 ||
+                a.y + a.h <= b.y + 0.5 ||
+                b.y + b.h <= a.y + 0.5,
+              "shared pawns must stay distinct",
+            );
+          }
+        await shot(`large-pawns-shared-${width}`);
+      }
+      await page.setViewportSize({ width: 1440, height: 1000 });
+    },
+  );
+  await check(
     "six physical die faces rotate in 3D and settle on every injected result",
     async () => {
       for (let value = 1; value <= 6; value++) {
@@ -317,6 +456,15 @@ fs.mkdirSync(out, { recursive: true });
           6,
         );
         assert.equal(await page.locator('[data-roll="0"] .pip').count(), 21);
+        assert.ok(
+          await page
+            .locator('[data-roll="0"] .die-cube')
+            .evaluate((e) =>
+              e
+                .getAnimations()
+                .every((a) => a.effect.getTiming().duration <= 500),
+            ),
+        );
         if (value === 1) {
           const cube = page.locator('[data-roll="0"] .die-cube');
           await page.waitForFunction(() =>
@@ -375,6 +523,51 @@ fs.mkdirSync(out, { recursive: true });
       );
     },
   );
+  await check(
+    "inactive six has no extra turn, while an active six does",
+    async () => {
+      await force({ count: 4, die: 6, motion: false });
+      await clickDie(0);
+      await settled();
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.current),
+        1,
+      );
+      assert.equal(
+        await page
+          .locator(".player-die:not([disabled])")
+          .getAttribute("data-roll"),
+        "1",
+      );
+      await force({ count: 4, pos: 1, die: 6, motion: false });
+      await clickDie(0);
+      await settled();
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.current),
+        0,
+      );
+      assert.equal(
+        await page
+          .locator(".player-die:not([disabled])")
+          .getAttribute("data-roll"),
+        "0",
+      );
+    },
+  );
+  await check("in bot matches the human die is on the right", async () => {
+    for (const [width, height] of [
+      [390, 700],
+      [1366, 768],
+    ]) {
+      await page.setViewportSize({ width, height });
+      await force({ bot: true, motion: false });
+      const human = await page.locator('[data-roll="0"]').boundingBox(),
+        bot = await page.locator('[data-roll="1"]').boundingBox();
+      assert.ok(human.x > bot.x);
+      await shot("bot-human-right-" + width);
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+  });
   await check(
     "a six visits six separate square centers with a pause at each square",
     async () => {

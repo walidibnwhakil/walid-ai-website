@@ -72,6 +72,7 @@ test("all players start outside and only a one activates the pawn", () => {
 });
 test("extra turn on six, third consecutive six ignored, counter resets", () => {
   let s = createGame();
+  s.players[0].position = 10;
   s = move(s, 6);
   assert.equal(s.current, 0);
   assert.equal(s.sixes, 1);
@@ -224,8 +225,8 @@ test("a one activates at square 1 and later values advance normally", () => {
   assert.equal(next.landing, 4);
   assert.equal(next.target, 25);
 });
-test("consecutive six rule applies before and after activation", () => {
-  for (const position of [0, 40]) {
+test("third-six penalty applies only after activation", () => {
+  for (const position of [10, 40]) {
     let s = createGame();
     s.players[0].position = position;
     s = move(s, 6);
@@ -285,4 +286,15 @@ test("all nine palette colors preserve uniqueness for every match size", () => {
       assert.equal(s.players[0].color, color);
       assert.equal(new Set(s.players.map((p) => p.color)).size, count);
     }
+});
+test("an inactive six ends the turn with no extra roll or six streak", () => {
+  for (const count of [2, 3, 4]) {
+    const s = createGame(count),
+      r = roll(s, 6);
+    assert.equal(r.target, 0);
+    assert.equal(r.state.sixes, 0);
+    const next = settle(r).state;
+    assert.equal(next.current, 1);
+    assert.equal(next.sixes, 0);
+  }
 });

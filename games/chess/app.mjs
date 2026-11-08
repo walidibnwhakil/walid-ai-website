@@ -1,3 +1,4 @@
+import { setGameInProgress } from "../refresh-guard.mjs";
 import {
   Match,
   identity,
@@ -159,6 +160,7 @@ function start() {
 $("#start").onclick = start;
 $("#again").onclick = start;
 function menu() {
+  setGameInProgress(false);
   cancel();
   match = null;
   close();
@@ -318,6 +320,7 @@ function playerHTML(color) {
 }
 function render(moved) {
   if (!match) return;
+  setGameInProgress(!match.result);
   const c = match.chess;
   $("#desktop-clocks").innerHTML = [opposite(orientation), orientation]
     .map(

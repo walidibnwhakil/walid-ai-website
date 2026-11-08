@@ -1,3 +1,4 @@
+import {setGameInProgress} from "./refresh-guard.mjs";
 import {gameShell, control, choose} from "./shell.mjs";
 
 const zones = ["Left", "Center", "Right"];
@@ -53,6 +54,7 @@ function resolve(player, save) {
 }
 
 function render() {
+  setGameInProgress(phase!=="end"&&(shot!==null||shots[0]+shots[1]>0));
   game.board.dataset.phase = phase;
   choices.forEach(button => {button.disabled = phase === "replay" || phase === "end";});
   const shooter = (shots[0] + shots[1]) % 2;

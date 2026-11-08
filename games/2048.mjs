@@ -1,3 +1,4 @@
+import {setGameInProgress} from "./refresh-guard.mjs";
 import {addTile, canMove, moveBoard, tileMotions} from "./2048-core.mjs";
 
 const boardElement = document.querySelector("#board");
@@ -19,6 +20,7 @@ let pointerStart;
 try { best = Number(localStorage.getItem("walid-ai-2048-best")) || 0; } catch {}
 
 function start() {
+  setGameInProgress(false);
   board = Array(16).fill(0);
   score = 0;
   won = ended = false;
@@ -68,6 +70,7 @@ function move(direction) {
     ended = true;
     statusElement.textContent = `No moves remain. Final score ${score}. Start a new game to play again.`;
   } else statusElement.textContent = result.score ? `Merged tiles. Gained ${result.score} points.` : "Tiles moved.";
+  setGameInProgress(!ended);
   paint(newIndex);
   for (const motion of motions) {
     const cell = cells[motion.consumed ? motion.source : motion.destination];

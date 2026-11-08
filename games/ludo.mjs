@@ -1,3 +1,4 @@
+import {setGameInProgress} from "./refresh-guard.mjs";
 import {pawnSlots} from "./ludo/pawn-layout.mjs";
 import {gameShell, control, choose} from "./shell.mjs";
 import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs?v=20261107goal56";
@@ -57,6 +58,7 @@ document.querySelector("#start-game").addEventListener("click",()=>{
   location.assign(destination.pathname+destination.search);
 });
 document.querySelector("#back-to-setup").addEventListener("click",()=>{
+  setGameInProgress(false);
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   location.assign(location.pathname);
 });
@@ -446,6 +448,7 @@ async function play(index) {
   render();
 }
 function render() {
+  setGameInProgress(boardLaunch&&state.winner===null);
   const botTurn=isBot(state.turn)&&state.winner===null;
   const legal=legalTokens(state);
   for(let seat=0;seat<4;seat++){

@@ -1,3 +1,4 @@
+import {setGameInProgress} from "../refresh-guard.mjs";
 import {animateWelcome,animateProps} from "./scene-props.js?v=release";
 import {animateOffice} from "./scene-motion.js?v=desk-reveal";
 import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
@@ -76,6 +77,7 @@ function showUnresolved(){
 }
 function reset(){loadToken++;category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
 function render(){
+ setGameInProgress(!["splash","start","done"].includes(mode));
  progress();
  const splash=mode==="splash";
  visible($("splash-art"),splash);

@@ -22,6 +22,7 @@ fs.mkdirSync(out, { recursive: true });
       viewport: { width, height },
       reducedMotion: "reduce",
     });
+    p.on("dialog", (dialog) => dialog.accept());
     p.on("pageerror", (e) => errors.push(e.message));
     p.on("response", (r) => {
       if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);

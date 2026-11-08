@@ -1,13 +1,15 @@
+import {setGameInProgress} from "./refresh-guard.mjs";
 import {gameShell,control} from "./shell.mjs";
 import {gridSize,directions,isReverse,advanceSnake,nextFood} from "./snake-rules.mjs";
 
 const keyDirections=new Map(Object.entries(directions));
 let snake,food,direction,next,running,ended,score=0,best=Number(localStorage.getItem("walid-snake-best")||0);
 let swipeStart=null;
+let hasStarted=false;
 const game=gameShell({modes:false,reset(){
   snake=[8+8*gridSize,7+8*gridSize,6+8*gridSize];
   direction=next=directions.ArrowRight;
-  running=ended=false;score=0;food=nextFood(snake);
+  running=ended=hasStarted=false;score=0;food=nextFood(snake);
   draw("Ready. Swipe, use arrow keys or WASD, or press Start.");
 }});
 game.board.classList.add("snake");
@@ -18,8 +20,9 @@ const cells=Array.from({length:gridSize*gridSize},(_,index)=>{
 });
 const pause=document.querySelector("#pause");
 pause.addEventListener("click",()=>{
-  if(ended){game.restart();running=true;queue();draw("Playing.");return;}
+  if(ended){game.restart();hasStarted=true;running=true;queue();draw("Playing.");return;}
   running=!running;
+  hasStarted=true;
   if(running)queue();
   draw(running?"Playing.":"Paused.");
 });
@@ -59,7 +62,7 @@ function steer(vector){
   if(ended)return;
   if(isReverse(next,vector))return;
   next=vector;
-  if(!running){running=true;queue();draw("Playing.");}
+  if(!running){hasStarted=true;running=true;queue();draw("Playing.");}
 }
 function queue(){
   game.later(()=>{
@@ -87,6 +90,7 @@ function paint(){
   });
 }
 function draw(message){
+  setGameInProgress(hasStarted&&!ended);
   paint();
   pause.textContent=ended?"Play again":running?"Pause":"Start";
   pause.setAttribute("aria-label",pause.textContent);

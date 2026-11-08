@@ -37,6 +37,11 @@ fs.mkdirSync(output, { recursive: true });
     executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
     args: ["--no-sandbox"],
   });
+  async function newPage(options) {
+    const page = await browser.newPage(options);
+    page.on("dialog", (dialog) => dialog.accept());
+    return page;
+  }
   let passed = 0;
   const errors = [];
   function check(value, label) {
@@ -77,7 +82,7 @@ fs.mkdirSync(output, { recursive: true });
     [390, 844],
     [320, 740],
   ]) {
-    const page = await browser.newPage({
+    const page = await newPage({
       viewport: { width, height },
       reducedMotion: "reduce",
     });
@@ -347,7 +352,7 @@ fs.mkdirSync(output, { recursive: true });
   for (const width of [1366, 390])
     for (const mode of ["friend", "bot"])
       for (const count of [2, 3]) {
-        const page = await browser.newPage({
+        const page = await newPage({
           viewport: { width, height: width === 390 ? 844 : 768 },
           isMobile: width === 390,
           hasTouch: width === 390,
@@ -400,7 +405,7 @@ fs.mkdirSync(output, { recursive: true });
       }
   // A board-side player-count change must survive refresh (including a prior 4-player setup).
   for (const width of [390, 1366]) {
-    const page = await browser.newPage({
+    const page = await newPage({
       viewport: { width, height: width === 390 ? 844 : 768 },
       isMobile: width === 390,
       hasTouch: width === 390,
@@ -431,7 +436,7 @@ fs.mkdirSync(output, { recursive: true });
     );
     await page.close();
   }
-  const stale = await browser.newPage({
+  const stale = await newPage({
     viewport: { width: 390, height: 844 },
     isMobile: true,
     hasTouch: true,
@@ -454,7 +459,7 @@ fs.mkdirSync(output, { recursive: true });
     "explicit local mode overrides stale bot mode",
   );
   await stale.close();
-  const blocked = await browser.newPage({
+  const blocked = await newPage({
     viewport: { width: 390, height: 844 },
     isMobile: true,
     hasTouch: true,

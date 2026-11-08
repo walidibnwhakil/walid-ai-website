@@ -87,3 +87,7 @@ main { max-width: 1050px; }
 .ludo-preview {height:auto;aspect-ratio:1/1;padding:0;display:block;overflow:hidden;border:0;border-radius:15px;background:#2b1208;box-shadow:none;isolation:auto}
 .ludo-preview::before {display:none}
 .ludo-preview-image {display:block;width:100%;height:100%;object-fit:fill;border-radius:inherit}
+
+/* Artwork already contains the title, description and Play Now control. */
+.artwork-tile {height:auto;padding:6px;overflow:hidden}
+.artwork-tile .preview {margin:0;border-radius:12px}

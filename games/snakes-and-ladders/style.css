@@ -3310,3 +3310,262 @@ body:not(.playing) .icon-control {
     border-radius: 12px !important;
   }
 }
+
+/* One photographic cobra is used for entering and leaving the volcanic realm. */
+.entering .menu-hero {
+  animation: none !important;
+  will-change: transform, opacity;
+}
+#entrance-scene,
+.cinematic-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1100px;
+}
+.cinematic-jungle,
+.cinematic-aura,
+.cinematic-dark {
+  position: absolute;
+  inset: 0;
+}
+.cinematic-jungle {
+  background: #07160d url("assets/jungle-menu.webp") 60% center/cover no-repeat;
+}
+.cinematic-aura {
+  background: radial-gradient(
+    ellipse at 50% 47%,
+    #ff531524,
+    transparent 36%,
+    #0005 85%
+  );
+}
+.cinematic-face {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(112vw, 110vh);
+  aspect-ratio: 3/4;
+  transform-origin: 50% 47%;
+  transform-style: preserve-3d;
+  will-change: transform;
+  filter: drop-shadow(0 15px 24px #0008);
+}
+.cinematic-face svg {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+.cinematic-closed,
+.cinematic-open {
+  will-change: opacity;
+}
+.cinematic-upper {
+  transform: translateY(calc(var(--gape, 1) * -4px));
+}
+.cinematic-lower {
+  transform: translateY(calc(var(--gape, 1) * 8px));
+}
+.cinematic-dark {
+  background: radial-gradient(ellipse, #210301, #030000 70%);
+  opacity: 0;
+}
+#defeat-snake {
+  position: fixed;
+  inset: 0;
+  animation: none !important;
+  z-index: 0;
+  pointer-events: none;
+  display: none;
+}
+.defeat #defeat-snake {
+  display: block;
+}
+.defeat #defeat-snake .cinematic-face {
+  top: 40%;
+}
+#celebration .result-card {
+  z-index: 2;
+  perspective: 850px;
+  transform-style: preserve-3d;
+}
+#result-title {
+  position: relative;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  animation: result-3d 4s ease-in-out infinite !important;
+  transform-origin: center;
+  color: var(--accent);
+  -webkit-text-stroke: 0.6px #fff0b7;
+  font-family: Georgia, serif;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 1px #8b591c,
+    0 2px #765019,
+    0 3px #684215,
+    0 4px #573611,
+    0 5px #482b0e,
+    0 6px #3c200b,
+    0 7px #301809,
+    0 9px 3px #000b,
+    0 0 28px var(--accent);
+}
+#result-title:before {
+  content: attr(data-title);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: #8d581c;
+  -webkit-text-stroke: 1px #d9a53c;
+  transform: translate3d(0, 5px, -8px);
+  text-shadow: 0 5px 12px #000;
+}
+.bot-victory #result-title {
+  font-size: clamp(40px, 9vw, 88px);
+}
+.bot-victory .crown {
+  font-size: clamp(65px, 15vw, 125px);
+}
+.bot-victory .result-card {
+  max-width: 700px;
+  background: radial-gradient(ellipse, #1d251eaa, transparent 70%);
+}
+.bot-victory .spark {
+  width: 6px;
+  height: 6px;
+  box-shadow:
+    0 0 8px var(--accent),
+    0 0 18px var(--accent);
+}
+.defeat #result-title {
+  animation: result-3d 4s ease-in-out infinite !important;
+  font-size: clamp(40px, 9vw, 84px);
+  color: #ffc473;
+}
+.defeat .result-card {
+  align-self: end;
+  margin-bottom: max(14px, 3vh);
+  background: linear-gradient(transparent, #080402c9 28%);
+  max-width: 650px;
+}
+.defeat .standing {
+  background: #09060366;
+}
+.defeat #result-name {
+  text-shadow: 0 1px 3px #000;
+}
+@keyframes result-3d {
+  0%,
+  100% {
+    transform: scale(var(--result-scale, 1)) rotateX(8deg) rotateY(-7deg)
+      translateZ(14px);
+  }
+  50% {
+    transform: scale(var(--result-scale, 1)) rotateX(-3deg) rotateY(7deg)
+      translateZ(26px);
+  }
+}
+.playing .game-heading {
+  height: 84px;
+  min-height: 84px;
+}
+.playing .game-heading .eyebrow {
+  display: none;
+}
+.playing .painted-title img {
+  width: 180px;
+  height: 80px;
+  object-fit: contain;
+}
+.portrait-game .game-heading {
+  height: 72px;
+  min-height: 72px;
+}
+.portrait-game .painted-title img {
+  width: 170px;
+  height: 68px;
+}
+@media (max-height: 480px) {
+  .playing .game-heading {
+    height: 44px;
+    min-height: 44px;
+  }
+  .playing .painted-title img {
+    height: 42px;
+    width: 105px;
+  }
+  .defeat .result-card {
+    padding: 10px;
+    margin-bottom: 2px;
+  }
+  .defeat #result-title {
+    font-size: 38px;
+    margin: 6px 0;
+  }
+  .defeat #result-name {
+    font-size: 11px;
+    margin: 5px 0;
+  }
+  .defeat .standing {
+    padding: 3px;
+    font-size: 11px;
+  }
+}
+.reduced #result-title {
+  animation: none !important;
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #result-title {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+#result-title:before {
+  content: none;
+}
+#result-fireworks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+.defeat #result-fireworks {
+  display: none;
+}
+#celebration .crown {
+  width: clamp(90px, 19vw, 150px);
+  height: auto;
+  margin: 0 auto;
+  line-height: 0;
+  filter: drop-shadow(0 0 14px var(--accent));
+}
+#celebration .crown svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+/* Colors are chosen on player heads after Play Now, before the first die click. */
+#menu #colors {
+  display: none !important;
+}
+#cavern-eyes {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.playing #cavern-eyes {
+  display: block;
+}
+#live-lava {
+  opacity: 1;
+}

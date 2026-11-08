@@ -12,8 +12,9 @@
       rel="canonical"
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
-    <link rel="stylesheet" href="style.css?v=20261108-jungle" />
-    <script type="module" src="game.mjs?v=20261108-jungle"></script>
+    <link rel="preload" as="image" href="assets/cobra-cinema.webp" />
+    <link rel="stylesheet" href="style.css?v=20261108-cinema" />
+    <script type="module" src="game.mjs?v=20261108-cinema"></script>
   </head>
   <body>
     <div id="world">
@@ -21,6 +22,7 @@
       <div class="tree"></div>
       <div class="mist"></div>
       <div class="embers"></div>
+      <canvas id="cavern-eyes" aria-hidden="true"></canvas>
       <canvas id="live-lava" aria-hidden="true"></canvas>
     </div>
     <header>
@@ -161,10 +163,10 @@
             <div class="eyebrow">THE SERPENT'S BELLY</div>
             <h2 class="painted-title">
               <img
-                src="assets/royal-logo.webp"
+                src="assets/jungle-emblem.webp"
                 alt="Snakes &amp; Ladders"
-                width="900"
-                height="380"
+                width="1536"
+                height="1024"
               />
             </h2>
           </div>
@@ -193,7 +195,7 @@
     </main>
     <div id="intro" hidden>
       <button id="skip">Skip Intro →</button>
-      <div class="mouth-glow"></div>
+      <div id="entrance-scene"></div>
     </div>
     <dialog id="dialog">
       <button id="close" class="close" aria-label="Close">×</button>
@@ -206,10 +208,19 @@
       aria-modal="true"
       aria-label="Match result"
     >
+      <div id="defeat-snake"></div>
+      <canvas id="result-fireworks" aria-hidden="true"></canvas>
       <div class="fireworks"></div>
       <div class="result-card">
-        <div class="crown">♛</div>
-        <div id="defeat-snake"></div>
+        <div class="crown" aria-hidden="true">
+          <svg viewBox="490 0 560 370">
+            <image
+              href="assets/jungle-emblem.webp"
+              width="1536"
+              height="1024"
+            />
+          </svg>
+        </div>
         <h2 id="result-title"></h2>
         <p id="result-name"></p>
         <div id="standings"></div>

@@ -108,7 +108,11 @@ export function roll(state, value) {
   const waitingForOne = from === 0 && value !== 1;
   const activated = from === 0 && value === 1;
   if (!penalty && !waitingForOne && from + value <= 100) landing = from + value;
-  const target = SNAKES[landing] ?? LADDERS[landing] ?? landing;
+  const overshoot = !penalty && !waitingForOne && from + value > 100;
+  const advanced = landing !== from;
+  const target = advanced
+    ? (SNAKES[landing] ?? LADDERS[landing] ?? landing)
+    : landing;
   p.position = target;
   return {
     state: s,
@@ -118,7 +122,13 @@ export function roll(state, value) {
     penalty,
     waitingForOne,
     activated,
-    kind: SNAKES[landing] ? "snake" : LADDERS[landing] ? "ladder" : "move",
+    overshoot,
+    kind:
+      advanced && SNAKES[landing]
+        ? "snake"
+        : advanced && LADDERS[landing]
+          ? "ladder"
+          : "move",
   };
 }
 export function settle(result) {
@@ -139,6 +149,7 @@ export function settle(result) {
       finisher !== null ||
       s.dice !== 6 ||
       result.penalty ||
+      result.overshoot ||
       result.from === 0
     ) {
       do {

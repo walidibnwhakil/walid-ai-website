@@ -1,6 +1,38 @@
 // A small transparent foreground layer animates the existing molten-rock artwork.
 export function createLava(canvas, { motion, quality }) {
   const c = canvas.getContext("2d");
+  const plates = {};
+  for (const name of ["cavern.webp", "cavern-mobile.webp"]) {
+    const image = new Image();
+    image.onload = () => {
+      const layer = document.createElement("canvas");
+      layer.width = image.naturalWidth;
+      layer.height = Math.round(image.naturalHeight * 0.28);
+      const lc = layer.getContext("2d");
+      lc.drawImage(
+        image,
+        0,
+        image.naturalHeight - layer.height,
+        layer.width,
+        layer.height,
+        0,
+        0,
+        layer.width,
+        layer.height,
+      );
+      const pixels = lc.getImageData(0, 0, layer.width, layer.height),
+        a = pixels.data;
+      for (let i = 0; i < a.length; i += 4) {
+        a[i + 3] =
+          a[i] > 190 && a[i + 1] > 55 && a[i + 1] > a[i + 2] * 1.1
+            ? Math.min(255, (a[i] - 160) * 2)
+            : 0;
+      }
+      lc.putImageData(pixels, 0, 0);
+      plates[name] = layer;
+    };
+    image.src = "assets/" + name;
+  }
   let raf = 0,
     last = 0,
     running = false;
@@ -14,6 +46,29 @@ export function createLava(canvas, { motion, quality }) {
     c.clearRect(0, 0, w, h);
     c.globalCompositeOperation = "screen";
     const t = ms / 1000;
+    const plate =
+      plates[innerWidth <= 800 ? "cavern-mobile.webp" : "cavern.webp"];
+    if (plate) {
+      c.globalAlpha = 0.78;
+      const step = quality() === "Low" ? 16 : 9;
+      for (let y = 0; y < h; y += step) {
+        const sh = Math.min(step, h - y),
+          dx = Math.sin(t * 1.8 + y * 0.13) * 6 + Math.sin(t * 0.7) * 3;
+        c.drawImage(
+          plate,
+          0,
+          (y / h) * plate.height,
+          plate.width,
+          (sh / h) * plate.height,
+          dx,
+          y,
+          w,
+          sh + 1,
+        );
+      }
+      c.globalAlpha = 1;
+    }
+
     const glow = c.createRadialGradient(
       w * 0.55,
       h * 0.9,
@@ -24,41 +79,17 @@ export function createLava(canvas, { motion, quality }) {
     );
     glow.addColorStop(
       0,
-      `rgba(255,112,12,${0.07 + Math.sin(t * 0.55) * 0.018})`,
+      `rgba(255,112,12,${0.16 + Math.sin(t * 0.55) * 0.035})`,
     );
     glow.addColorStop(1, "rgba(255,70,0,0)");
     c.fillStyle = glow;
     c.fillRect(0, 0, w, h);
-    for (let river = 0; river < 4; river++) {
-      const path = new Path2D();
-      for (let x = -30; x <= w + 30; x += 12) {
-        const y =
-          64 +
-          river * 31 +
-          Math.sin(x * 0.012 + t * 0.26 + river * 1.7) * 9 +
-          Math.sin(x * 0.024 - t * 0.33) * 4;
-        x === -30 ? path.moveTo(x, y) : path.lineTo(x, y);
-      }
-      c.setLineDash([]);
-      c.strokeStyle = "rgba(255,90,12,.10)";
-      c.lineWidth = 23;
-      c.shadowColor = "#ff7200";
-      c.shadowBlur = 15;
-      c.stroke(path);
-      c.shadowBlur = 0;
-      c.setLineDash([19, 53, 5, 91]);
-      c.lineDashOffset = -t * (19 + river * 8);
-      c.strokeStyle = "rgba(255,225,131,.42)";
-      c.lineWidth = 1.2;
-      c.stroke(path);
-    }
-    c.setLineDash([]);
     const count = quality() === "Low" ? 6 : 14;
     for (let i = 0; i < count; i++) {
       const p = (t * (0.085 + (i % 4) * 0.012) + i * 0.173) % 1,
         x = ((i * 167.3) % w) + Math.sin(t * 0.6 + i) * 7,
         y = 179 - p * (68 + (i % 4) * 16),
-        r = (1.1 + (i % 3) * 0.7) * Math.sin(Math.PI * p);
+        r = (2 + (i % 3) * 1.1) * Math.sin(Math.PI * p);
       c.globalAlpha = Math.sin(Math.PI * p) * 0.55;
       c.strokeStyle = "#ffe89c";
       c.lineWidth = 0.7;

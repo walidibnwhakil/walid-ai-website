@@ -1,5 +1,8 @@
+import { createCavernEyes } from "./cavern-eyes.mjs?v=20261108-cinema";
+import { createFireworks } from "./fireworks.mjs?v=20261108-cinema";
+import { createCinematic } from "./cinematic.mjs?v=20261108-cinema";
 import { createMenuScene } from "./menu-scene.mjs?v=20261108-jungle";
-import { createLava } from "./lava.mjs?v=20261108-joined";
+import { createLava } from "./lava.mjs?v=20261108-cinema";
 import {
   snakeCurve,
   headPoseFromPath,
@@ -22,7 +25,7 @@ import {
   settle,
   placement,
   chooseColor,
-} from "./engine.mjs?v=20261108-joined";
+} from "./engine.mjs?v=20261108-cinema";
 const $ = (s) => document.querySelector(s),
   NS = "http://www.w3.org/2000/svg";
 const svg = (tag, attrs = {}, parent) => {
@@ -135,196 +138,6 @@ function updateAmbience() {
   o.connect(g).connect(a.destination);
   o.start();
   ambienceNode = o;
-}
-function serpent(parent, x, y, scale = 1, color = "#48a94c", royal = false) {
-  const uid =
-    "skin-" +
-    Math.round(x) +
-    "-" +
-    Math.round(y) +
-    "-" +
-    Math.round(scale * 100);
-  const defs = svg("defs", {}, parent);
-  const grad = svg(
-    "linearGradient",
-    { id: uid, x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
-    defs,
-  );
-  for (const [offset, c] of [
-    ["0%", "#c8e581"],
-    ["25%", color],
-    ["70%", color],
-    ["100%", "#153d27"],
-  ])
-    svg("stop", { offset, "stop-color": c }, grad);
-  const scales = svg(
-    "pattern",
-    {
-      id: uid + "-scales",
-      width: 12,
-      height: 9,
-      patternUnits: "userSpaceOnUse",
-    },
-    defs,
-  );
-  svg(
-    "path",
-    {
-      d: "M 0 0 Q 6 10 12 0 M -6 5 Q 0 15 6 5 M 6 5 Q 12 15 18 5",
-      fill: "none",
-      stroke: "#102e20",
-      "stroke-width": 0.95,
-      opacity: 0.45,
-    },
-    scales,
-  );
-  const anchor = svg(
-    "g",
-    { transform: `translate(${x} ${y}) scale(${scale})` },
-    parent,
-  );
-  const anatomy =
-    parent.id === "jungle"
-      ? svg("g", { class: "jungle-anatomy" }, anchor)
-      : anchor;
-  const root = svg(
-    "g",
-    { class: royal ? "royal-neck" : "small-snake" },
-    anatomy,
-  );
-  svg(
-    "path",
-    {
-      d: "M -70 100 C -150 70 -130 0 -65 -20 C -20 -35 20 -20 20 0",
-      fill: "none",
-      stroke: "#073d29",
-      "stroke-width": 45,
-      "stroke-linecap": "round",
-    },
-    root,
-  );
-  svg(
-    "path",
-    {
-      d: "M -70 100 C -150 70 -130 0 -65 -20 C -20 -35 20 -20 20 0",
-      fill: "none",
-      stroke: `url(#${uid})`,
-      "stroke-width": 33,
-      "stroke-linecap": "round",
-      "stroke-dasharray": "3 2",
-    },
-    root,
-  );
-  svg(
-    "path",
-    {
-      d: "M -70 100 C -150 70 -130 0 -65 -20 C -20 -35 20 -20 20 0",
-      fill: "none",
-      stroke: `url(#${uid}-scales)`,
-      "stroke-width": 33,
-      "stroke-linecap": "round",
-    },
-    root,
-  );
-  const head = svg("g", { class: "snake-head" }, root);
-  svg(
-    "ellipse",
-    {
-      cx: 33,
-      cy: 12,
-      rx: 47,
-      ry: 24,
-      fill: "#250d0e",
-      stroke: "#d1b44d",
-      "stroke-width": 3,
-    },
-    head,
-  );
-  const upper = svg("g", royal ? { id: "royal-upper" } : {}, head);
-  svg(
-    "path",
-    {
-      d: "M -15 5 Q -10 -37 37 -28 Q 82 -22 82 2 Q 40 15 -15 5",
-      fill: `url(#${uid})`,
-      stroke: "#123d22",
-      "stroke-width": 3,
-    },
-    upper,
-  );
-  svg(
-    "ellipse",
-    { cx: 33, cy: -16, rx: 12, ry: 10, fill: "#f4cc4d", class: "eye" },
-    upper,
-  );
-  svg(
-    "ellipse",
-    { cx: 35, cy: -16, rx: 2.8, ry: 9, fill: "#15200e", class: "eye" },
-    upper,
-  );
-  svg(
-    "path",
-    { d: "M 59 5 L 55 26 L 48 8 M 3 8 L 7 24 L 15 9", fill: "#fff3c8" },
-    upper,
-  );
-  svg(
-    "path",
-    {
-      d: "M -10 -3 Q 30 -35 75 -10",
-      fill: "none",
-      stroke: `url(#${uid}-scales)`,
-      "stroke-width": 22,
-    },
-    upper,
-  );
-  svg("ellipse", { cx: 68, cy: -7, rx: 3, ry: 2, fill: "#123322" }, upper);
-  svg(
-    "path",
-    {
-      d: "M 18 -26 Q 34 -35 46 -26",
-      fill: "none",
-      stroke: "#173a20",
-      "stroke-width": 5,
-    },
-    upper,
-  );
-  const lower = svg(
-    "g",
-    { class: "jaw", ...(royal ? { id: "royal-lower" } : {}) },
-    head,
-  );
-  svg(
-    "path",
-    {
-      d: "M -12 16 Q 26 51 71 18 Q 35 65 -12 16",
-      fill: "#b0c94f",
-      stroke: "#e7ce79",
-      "stroke-width": 3,
-    },
-    lower,
-  );
-  svg(
-    "path",
-    {
-      d: "M 32 26 Q 58 39 57 57 M 57 57 L 48 64 M 57 57 L 66 64",
-      fill: "none",
-      stroke: "#f15165",
-      "stroke-width": 3,
-      class: "tongue",
-    },
-    head,
-  );
-  if (royal)
-    svg(
-      "path",
-      {
-        d: "M 0 -33 L -7 -58 L 16 -48 L 28 -70 L 43 -46 L 66 -58 L 59 -31 Z",
-        fill: "#e7b544",
-        stroke: "#ffe49b",
-        "stroke-width": 2,
-      },
-      head,
-    );
-  return root;
 }
 function pinMarkup(color) {
   return `<svg class="pin-avatar" viewBox="0 0 64 77" aria-hidden="true" style="--pawn:${HEX[COLORS.indexOf(color)]}"><path class="pin-outline" d="M32 3C17 3 5 15 5 31c0 15 17 34 27 46 10-12 27-31 27-46C59 15 47 3 32 3Z"/><path class="pin-color" d="M32 9C20 9 11 18 11 31c0 11 13 27 21 38 8-11 21-27 21-38C53 18 44 9 32 9Z"/><circle class="pin-face" cx="32" cy="29" r="13"/><ellipse class="pin-gloss" cx="26" cy="22" rx="4" ry="6"/></svg>`;
@@ -529,8 +342,9 @@ function board() {
           width: 9.2,
           height: 9.2,
           rx: 0.3,
-          fill: n === 100 ? "#9a090a" : "#3ab529",
-          opacity: n === 100 ? 0.88 : 0.4,
+          class: n === 100 ? "finish-cell" : "start-cell",
+          fill: n === 100 ? "#ffffff" : "#3ab529",
+          opacity: n === 100 ? 1 : 0.4,
           stroke: "#ffe792",
           "stroke-width": 0.25,
         },
@@ -1116,14 +930,20 @@ async function spinDie(i, value, token) {
       [
         {
           transform: `rotateX(${startX}deg) rotateY(${startY}deg) rotateZ(0deg)`,
+          offset: 0,
         },
+        ...[6, 5, 4, 3, 2, 1].map((face, j) => ({
+          transform: `rotateX(${DIE_ROTATION[face][0] + 360 * Math.ceil((j + 1) / 2)}deg) rotateY(${DIE_ROTATION[face][1] + 360 * Math.ceil((j + 1) / 3)}deg) rotateZ(0deg)`,
+          offset: 0.12 + j * 0.13,
+        })),
         {
-          transform: `rotateX(${720 + rx}deg) rotateY(${1080 + ry}deg) rotateZ(360deg)`,
+          transform: `rotateX(${rx + 1440}deg) rotateY(${ry + 1440}deg) rotateZ(0deg)`,
+          offset: 1,
         },
       ],
       {
-        duration: 480,
-        easing: "cubic-bezier(.16,.55,.32,1)",
+        duration: 620,
+        easing: "linear",
         fill: "forwards",
       },
     );
@@ -1239,6 +1059,11 @@ async function takeTurn() {
 }
 function cancel() {
   liveLava.stop();
+  resultFireworks.stop();
+  entranceCinema.cancel();
+  defeatCinema.cancel();
+  $(".menu-hero").style.removeProperty("transform");
+  $(".menu-hero").style.removeProperty("opacity");
   setGameInProgress(false);
   epoch++;
   activeRollAnimation?.cancel();
@@ -1292,15 +1117,16 @@ function begin(skip = false) {
       mouth = new DOMPoint(365, 170).matrixTransform(
         $("#jungle").getScreenCTM(),
       );
+    hero.dataset.dx = String(innerWidth / 2 - mouth.x);
+    hero.dataset.dy = String(innerHeight / 2 - mouth.y);
     hero.style.setProperty("--camera-x", `${innerWidth / 2 - mouth.x}px`);
     hero.style.setProperty("--camera-y", `${innerHeight / 2 - mouth.y}px`);
     hero.style.setProperty("--mouth-x", `${mouth.x - box.x}px`);
     hero.style.setProperty("--mouth-y", `${mouth.y - box.y}px`);
     document.body.classList.add("entering");
-    introTimer = setTimeout(reveal, 3800);
+    entranceCinema.enter({ motion: true, profile: hero, onReveal: reveal });
     $("#skip").onclick = () => {
-      clearTimeout(introTimer);
-      reveal();
+      entranceCinema.finish();
     };
   }
 }
@@ -1322,35 +1148,24 @@ function celebrate(i) {
   $("main").inert = true;
   $("header").inert = true;
   $("#celebration").classList.toggle("defeat", defeat);
+  $("#celebration").classList.toggle("bot-victory", state.bot && !defeat);
+  defeatCinema.cancel();
+  resultFireworks.stop();
+  $("#result-title").style.opacity = "1";
+  $("#result-title").style.setProperty("--result-scale", "1");
   $("#celebration").style.setProperty("--accent", HEX[COLORS.indexOf(p.color)]);
   $("#result-title").textContent = defeat
     ? "YOU LOSE"
-    : placement(rank, state.players.length);
+    : state.bot
+      ? "YOU WIN"
+      : placement(rank, state.players.length);
+  $("#result-title").dataset.title = $("#result-title").textContent;
+  $("#result-title").setAttribute("aria-label", $("#result-title").textContent);
   $("#result-name").textContent = defeat
     ? "The Serpent Bot claimed the crown. Your next adventure awaits."
     : `${p.name} · ${p.color}`;
-  $("#defeat-snake").replaceChildren();
-  if (defeat) {
-    const s = svg("svg", { viewBox: "-160 -80 300 230" }, $("#defeat-snake"));
-    serpent(s, 0, 0, 1, "#53aa62");
-    if (!reduced()) {
-      for (const path of s.querySelectorAll(".small-snake > path")) {
-        const base = path.getAttribute("d"),
-          curl = "M -70 100 C -185 75 -120 -125 -10 -90 C 100 -55 110 90 20 0";
-        svg(
-          "animate",
-          {
-            attributeName: "d",
-            dur: "6s",
-            values: `${base};${base};${curl};${curl};${base}`,
-            keyTimes: "0;.3;.55;.7;1",
-            fill: "freeze",
-          },
-          path,
-        );
-      }
-    }
-  }
+  if (defeat)
+    defeatCinema.defeat({ motion: !reduced(), title: $("#result-title") });
   const over = state.phase === "over";
   $("#continue").hidden = over;
   $("#try-again").hidden = !over;
@@ -1365,6 +1180,10 @@ function celebrate(i) {
   const f = $(".fireworks");
   f.replaceChildren();
   if (!defeat) {
+    resultFireworks.start(HEX[COLORS.indexOf(p.color)], {
+      motion: !reduced(),
+      quality: settings.quality,
+    });
     for (let k = 0; k < (settings.quality === "Low" ? 12 : 48); k++) {
       const el = document.createElement("i");
       el.className = "spark";
@@ -1392,7 +1211,7 @@ function panel(kind) {
   $("#dialog-content").onclick = null;
   if (kind === "rules")
     $("#dialog-content").innerHTML =
-      `<h2>Game Rules</h2><p>Classic · The Serpent King's Realm</p><ul><li>Colors can be chosen by tapping a player head until the first die roll. Start outside the board at 0. Roll a 1 to activate your pawn and enter square 1. Other rolls leave an inactive pawn outside. An inactive pawn gets no extra turn on a six.</li><li>Tap your own active die. After entering, move one square at a time by the rolled value. Other players’ dice stay locked.</li><li>Only an activated pawn gets an extra roll on a six. The third consecutive six ends your turn without moving on that roll.</li><li>Land on a snake head to slide down; land at a ladder base to climb.</li><li>Reach 100 exactly. An overshoot leaves your pawn in place.</li><li>Finished players are skipped. The last remaining player receives the final place automatically.</li><li>The bot follows the same rules and uses the same fair die.</li></ul><p>Ladders: ${Object.entries(
+      `<h2>Game Rules</h2><p>Classic · The Serpent King's Realm</p><ul><li>Colors can be chosen by tapping a player head until the first die roll. Start outside the board at 0. Roll a 1 to activate your pawn and enter square 1. Other rolls leave an inactive pawn outside. An inactive pawn gets no extra turn on a six.</li><li>Tap your own active die. After entering, move one square at a time by the rolled value. Other players’ dice stay locked.</li><li>Only an activated pawn gets an extra roll on a six. The third consecutive six ends your turn without moving on that roll.</li><li>Land on a snake head to slide down; land at a ladder base to climb.</li><li>Reach 100 exactly. An overshoot leaves your pawn in place and ends your turn, even on a six.</li><li>Finished players are skipped. The last remaining player receives the final place automatically.</li><li>The bot follows the same rules and uses the same fair die.</li></ul><p>Ladders: ${Object.entries(
         LADDERS,
       )
         .map(([a, b]) => `${a} → ${b}`)
@@ -1509,6 +1328,7 @@ $("#dialog").addEventListener("click", (e) => {
     e.target.close();
 });
 $("#continue").onclick = () => {
+  resultFireworks.stop();
   $("#celebration").hidden = true;
   $("main").inert = false;
   $("header").inert = false;
@@ -1531,6 +1351,12 @@ matchMedia("(prefers-reduced-motion: reduce)").addEventListener(
   "change",
   applySettings,
 );
+const cavernEyes = createCavernEyes($("#cavern-eyes"), {
+  motion: () => !reduced(),
+});
+const resultFireworks = createFireworks($("#result-fireworks"));
+const entranceCinema = createCinematic($("#entrance-scene"), "entrance");
+const defeatCinema = createCinematic($("#defeat-snake"), "defeat");
 const menuScene = createMenuScene($("#jungle"), $("#jungle-water"), {
   motion: () => !reduced(),
   quality: () => settings.quality,
@@ -1575,4 +1401,7 @@ if (
     settings,
     paths: () => paths,
     begin,
+    entranceCinema,
+    defeatCinema,
+    cavernEyes,
   };

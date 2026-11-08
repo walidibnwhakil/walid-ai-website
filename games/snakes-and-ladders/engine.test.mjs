@@ -298,3 +298,58 @@ test("an inactive six ends the turn with no extra roll or six streak", () => {
     assert.equal(next.sixes, 0);
   }
 });
+
+test("97 plus six cannot move and passes the turn for humans and the bot", () => {
+  for (const bot of [false, true])
+    for (const current of [0, 1]) {
+      const s = createGame(2, bot);
+      s.current = current;
+      s.players[current].position = 97;
+      const r = roll(s, 6);
+      assert.equal(r.overshoot, true);
+      assert.equal(r.target, 97);
+      assert.equal(r.kind, "move");
+      const next = settle(r).state;
+      assert.equal(next.current, 1 - current);
+      assert.equal(next.sixes, 0);
+    }
+});
+test("every overshoot keeps its square and ends the turn including a six", () => {
+  for (let pos = 95; pos < 100; pos++)
+    for (let value = 1; value <= 6; value++) {
+      if (pos + value <= 100) continue;
+      const s = createGame();
+      s.players[0].position = pos;
+      s.sixes = 1;
+      const r = roll(s, value);
+      assert.equal(r.overshoot, true);
+      assert.equal(r.target, pos);
+      assert.equal(r.kind, "move");
+      assert.equal(settle(r).state.current, 1);
+      assert.equal(settle(r).state.sixes, 0);
+    }
+});
+test("an impossible six skips finished players when handing over", () => {
+  const s = createGame(4);
+  s.players[0].position = 97;
+  s.players[1].position = 100;
+  s.order = [1];
+  const next = move(s, 6);
+  assert.equal(next.current, 2);
+  assert.deepEqual(next.order, [1]);
+  assert.equal(next.players[0].position, 97);
+});
+test("a possible six still grants an extra turn and an exact six can win", () => {
+  let s = createGame();
+  s.players[0].position = 90;
+  let r = roll(s, 6);
+  assert.equal(r.overshoot, false);
+  assert.equal(r.target, 96);
+  assert.equal(settle(r).state.current, 0);
+  s = createGame();
+  s.players[0].position = 94;
+  r = roll(s, 6);
+  assert.equal(r.overshoot, false);
+  assert.equal(r.target, 100);
+  assert.equal(settle(r).finisher, 0);
+});

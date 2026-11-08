@@ -210,32 +210,62 @@ fs.mkdirSync(out, { recursive: true });
   await shot("menu-desktop");
   await page.selectOption("#mode", "4");
   await check(
-    "setup head opens gold palette of round color swatches",
+    "menu hides the unwanted player row; unique colors remain selectable before the first in-game roll",
     async () => {
-      await page.click('[data-setup-color="0"]');
-      assert.equal(await page.locator(".color-swatch").count(), 9);
+      assert.equal(await page.locator("#colors").isVisible(), false);
+      assert.equal(await page.locator("[data-color]").count(), 4);
       assert.equal(
-        await page
-          .locator(".color-swatch")
-          .first()
-          .evaluate((e) => getComputedStyle(e).borderRadius),
-        "50%",
+        new Set(
+          await page
+            .locator("[data-color]")
+            .evaluateAll((es) => es.map((e) => e.value)),
+        ).size,
+        4,
       );
-      await shot("setup-color-palette");
-      await page.click('[data-pick-color="Teal"]');
-      assert.equal(await page.locator('[data-color="0"]').inputValue(), "Teal");
+      await shot("clean-menu-without-player-row");
     },
   );
   await page.click("#start");
   await page.waitForTimeout(900);
   await shot("intro-focus");
   await page.waitForTimeout(1100);
+  assert.ok(
+    +(await page.locator("#entrance-scene").getAttribute("data-gape")) > 0.7,
+  );
   await shot("intro-open-jaw");
   await page.waitForTimeout(1000);
+  assert.ok(
+    +(await page.locator("#entrance-scene").getAttribute("data-scale")) > 3,
+  );
   await shot("intro-enter");
   await page.waitForTimeout(1500);
   await page.waitForSelector("#play:visible");
   await shot("board-desktop");
+  await check(
+    "menu and gameplay share the exact logo asset and cinematic cobra is photographic",
+    async () => {
+      assert.equal(
+        await page.locator(".painted-title img").getAttribute("src"),
+        await page.locator("#jungle image").first().getAttribute("href"),
+      );
+      assert.equal(
+        await page
+          .locator("#entrance-scene image")
+          .first()
+          .getAttribute("href"),
+        "assets/cobra-cinema.webp",
+      );
+      assert.equal(
+        await page.locator("#entrance-scene path,#defeat-snake path").count(),
+        0,
+      );
+      assert.equal(
+        await page.locator("#entrance-scene").getAttribute("data-phase"),
+        "complete",
+      );
+    },
+  );
+
   assert.equal(await page.locator(".square-number").count(), 99);
   await check(
     "compact gold header replaces redundant in-game navigation and controls",
@@ -274,6 +304,8 @@ fs.mkdirSync(out, { recursive: true });
         "cavern-mobile.webp",
         "marble-atlas.webp",
         "royal-logo.webp",
+        "jungle-emblem.webp",
+        "cobra-cinema.webp",
         "joined-heads.webp",
         "joined-heads-open.webp",
         "natural-skin.webp",
@@ -428,6 +460,28 @@ fs.mkdirSync(out, { recursive: true });
           width: b.width * 0.14,
           height: b.height * 0.18,
         },
+      });
+    },
+  );
+  await check(
+    "the finish crown has a white cell and the cavern snake blinks with photo-textured eyelids",
+    async () => {
+      assert.equal(
+        await page.locator(".finish-cell").getAttribute("fill"),
+        "#ffffff",
+      );
+      const eye = page.locator("#cavern-eyes");
+      await page.evaluate(() => {
+        window.serpentTest.cavernEyes.stop();
+        window.serpentTest.cavernEyes.paint(0);
+      });
+      const open = await eye.evaluate((e) => e.toDataURL());
+      await page.evaluate(() => window.serpentTest.cavernEyes.paint(6912));
+      assert.notEqual(await eye.evaluate((e) => e.toDataURL()), open);
+      await shot("cavern-eyes-closed");
+      await page.evaluate(() => {
+        window.serpentTest.cavernEyes.paint(0);
+        window.serpentTest.cavernEyes.start();
       });
     },
   );
@@ -648,11 +702,33 @@ fs.mkdirSync(out, { recursive: true });
             .evaluate((e) =>
               e
                 .getAnimations()
-                .every((a) => a.effect.getTiming().duration <= 500),
+                .every((a) => a.effect.getTiming().duration <= 650),
             ),
         );
         if (value === 1) {
           const cube = page.locator('[data-roll="0"] .die-cube');
+          const seen = await cube.evaluate((e) => {
+            const a = e.getAnimations()[0];
+            a.pause();
+            const result = [];
+            for (const [j, face] of [6, 5, 4, 3, 2, 1].entries()) {
+              a.currentTime = a.effect.getTiming().duration * (0.12 + j * 0.13);
+              const n = new DOMMatrix(getComputedStyle(e).transform).multiply(
+                new DOMMatrix(
+                  getComputedStyle(e.querySelector(`.face-${face}`)).transform,
+                ),
+              ).m33;
+              result.push({ face, n });
+            }
+            a.currentTime = 0;
+            a.play();
+            return result;
+          });
+          assert.ok(
+            seen.every((s) => s.n > 0.99),
+            "all six numbered faces must actually turn toward the viewer before the final result",
+          );
+
           await page.waitForFunction(() =>
             [
               ...document
@@ -737,6 +813,28 @@ fs.mkdirSync(out, { recursive: true });
           .locator(".player-die:not([disabled])")
           .getAttribute("data-roll"),
         "0",
+      );
+    },
+  );
+  await check(
+    "an impossible six at 97 activates the next player die",
+    async () => {
+      await force({ count: 4, pos: 97, die: 6, motion: false });
+      await clickDie(0);
+      await settled();
+      assert.equal(
+        await page.locator('[data-player="0"]').getAttribute("data-position"),
+        "97",
+      );
+      assert.equal(
+        await page
+          .locator(".player-die:not([disabled])")
+          .getAttribute("data-roll"),
+        "1",
+      );
+      assert.equal(
+        await page.evaluate(() => window.serpentTest.state.sixes),
+        0,
       );
     },
   );
@@ -896,6 +994,61 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
+    "human bot victory shows animated 3D YOU WIN with continuously moving color fireworks",
+    async () => {
+      await force({ bot: true, pos: 98, die: 2 });
+      await clickDie();
+      await page.waitForSelector("#celebration:visible");
+      assert.equal(
+        await page.locator("#result-title").textContent(),
+        "YOU WIN",
+      );
+      assert.equal(
+        await page
+          .locator("#celebration")
+          .evaluate((e) => e.classList.contains("bot-victory")),
+        true,
+      );
+      const title = await page
+          .locator("#result-title")
+          .evaluate((e) => getComputedStyle(e).transform),
+        spark = await page
+          .locator(".spark")
+          .first()
+          .evaluate((e) => getComputedStyle(e).transform);
+      await page.waitForTimeout(400);
+      assert.notEqual(
+        await page
+          .locator("#result-title")
+          .evaluate((e) => getComputedStyle(e).transform),
+        title,
+      );
+      assert.notEqual(
+        await page
+          .locator(".spark")
+          .first()
+          .evaluate((e) => getComputedStyle(e).transform),
+        spark,
+      );
+      assert.equal(
+        await page
+          .locator(".spark")
+          .first()
+          .evaluate((e) => getComputedStyle(e).backgroundColor),
+        "rgb(241, 75, 88)",
+      );
+      const pixels = await page
+        .locator("#result-fireworks")
+        .evaluate((e) => e.toDataURL());
+      await page.waitForTimeout(150);
+      assert.notEqual(
+        await page.locator("#result-fireworks").evaluate((e) => e.toDataURL()),
+        pixels,
+      );
+      await shot("bot-3d-you-win");
+    },
+  );
+  await check(
     "each finisher receives their own color celebration and final ranking",
     async () => {
       for (let i = 0; i < 3; i++) {
@@ -945,7 +1098,7 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
-    "bot defeat text is swallowed and revealed without fireworks",
+    "real cobra closes its mouth and camera exits before 3D YOU LOSE returns",
     async () => {
       await force({ bot: true, current: 1, pos: 98, die: 2 });
       await page.evaluate(() => window.serpentTest.turn());
@@ -954,7 +1107,29 @@ fs.mkdirSync(out, { recursive: true });
         await page.locator("#result-title").textContent(),
         "YOU LOSE",
       );
+      const initialScale = +(await page
+        .locator("#defeat-snake")
+        .getAttribute("data-scale"));
       await page.waitForTimeout(2600);
+      await page.waitForFunction(
+        () =>
+          getComputedStyle(
+            document.querySelector("#defeat-snake .cinematic-closed"),
+          ).opacity === "1",
+      );
+      assert.ok(
+        +(await page.locator("#defeat-snake").getAttribute("data-scale")) <
+          initialScale,
+      );
+      assert.equal(
+        +(await page.locator("#defeat-snake").getAttribute("data-gape")),
+        0,
+      );
+      assert.equal(await page.locator("#defeat-snake .small-snake").count(), 0);
+      assert.equal(
+        await page.locator("#defeat-snake image").first().getAttribute("href"),
+        "assets/cobra-cinema.webp",
+      );
       assert.ok(
         +(await page
           .locator("#result-title")
@@ -969,7 +1144,45 @@ fs.mkdirSync(out, { recursive: true });
         "1",
       );
       assert.equal(await page.locator(".spark").count(), 0);
+      assert.equal(
+        await page.locator("#defeat-snake").getAttribute("data-phase"),
+        "complete",
+      );
+      assert.equal(
+        await page
+          .locator("#defeat-snake .cinematic-closed")
+          .evaluate((e) => getComputedStyle(e).opacity),
+        "1",
+      );
       await shot("defeat-revealed");
+    },
+  );
+  await check(
+    "camera cancellation and reduced motion preserve the real defeat result",
+    async () => {
+      await force({ bot: true, current: 1, pos: 98, die: 2, motion: false });
+      await page.evaluate(() => window.serpentTest.turn());
+      assert.equal(
+        await page.locator("#result-title").textContent(),
+        "YOU LOSE",
+      );
+      assert.equal(
+        await page.locator("#defeat-snake").getAttribute("data-phase"),
+        "complete",
+      );
+      assert.equal(
+        await page
+          .locator("#result-title")
+          .evaluate((e) => getComputedStyle(e).opacity),
+        "1",
+      );
+      await page.click("#result-menu");
+      assert.equal(
+        await page.locator("#defeat-snake").getAttribute("data-phase"),
+        "idle",
+      );
+      await page.waitForTimeout(100);
+      assert.equal(await page.locator("#menu").isVisible(), true);
     },
   );
   await check("automatic fair bot also needs a one to activate", async () => {
@@ -1202,6 +1415,21 @@ fs.mkdirSync(out, { recursive: true });
         );
         const shape = await preview.boundingBox();
         assert.ok(Math.abs(shape.width - shape.height) < 1);
+        const playRegion = await card
+          .locator(".preview-play-region")
+          .evaluate((e) => {
+            const v = e.viewBox.baseVal,
+              m = e.getScreenCTM(),
+              a = new DOMPoint(v.x, v.y).matrixTransform(m),
+              b = new DOMPoint(v.x + v.width, v.y + v.height).matrixTransform(
+                m,
+              );
+            return { width: b.x - a.x, height: b.y - a.y };
+          });
+        assert.ok(Math.abs(playRegion.width / shape.width - 2 / 3) < 0.005);
+        assert.ok(
+          Math.abs(playRegion.height / shape.height - 140 / 900) < 0.005,
+        );
         const css = await card.evaluate((e) => {
           const s = getComputedStyle(e);
           return {

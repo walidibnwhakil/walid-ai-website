@@ -1,23 +1,46 @@
-import assert from "node:assert/strict";
-import {addTile, canMove, mergeLine, moveBoard, tileMotions} from "./2048-core.mjs";
-
-assert.deepEqual(mergeLine([2, 0, 2, 2]), {line:[4, 2, 0, 0], score:4});
-assert.deepEqual(mergeLine([2, 2, 2, 2]), {line:[4, 4, 0, 0], score:8});
-assert.deepEqual(mergeLine([4, 4, 8, 0]), {line:[8, 8, 0, 0], score:8});
-const board = [2,0,2,2, 0,0,0,0, 0,0,0,0, 0,0,0,0];
-assert.deepEqual(moveBoard(board, "left"), {board:[4,2,0,0, ...Array(12).fill(0)], score:4, changed:true});
-assert.deepEqual(moveBoard([2,0,0,0, 2,0,0,0, 0,0,0,0, 0,0,0,0], "up").board.slice(0,4), [4,0,0,0]);
-assert.equal(moveBoard(board, "right").board[3], 4);
-assert.equal(moveBoard(Array(16).fill(0), "left").changed, false);
-assert.equal(canMove([2,4,2,4, 4,2,4,2, 2,4,2,4, 4,2,4,2]), false);
-assert.equal(canMove([2,4,2,4, 4,2,4,2, 2,4,2,4, 4,2,4,0]), true);
-const spawned = addTile(Array(16).fill(0), () => 0);
-assert.equal(spawned[0], 2);
-assert.equal(spawned.reduce((sum, value) => sum + Number(!!value), 0), 1);
-assert.equal(addTile(Array(16).fill(2)).every(value => value === 2), true);
-assert.deepEqual(tileMotions(board, "left"), [
-  {source:2,destination:0,merged:true,consumed:true},
-  {source:3,destination:1,merged:false}
-]);
-assert.deepEqual(tileMotions([2,0,0,0,...Array(12).fill(0)], "right"), [{source:0,destination:3,merged:false}]);
-console.log("2048 rules and tile motion: 14 assertions passed");
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mergeLine,moveBoard,tileMotions,addTile,canMove,newGame,play,continueGame,undoGame,resultTitle,keyDirection,swipeDirection,readStore,writeStore} from './2048-core.mjs';
+const zero=()=>0, board=row=>[...row,...Array(16-row.length).fill(0)];
+const fixture=(values,extra={})=>({...newGame({},zero),board:values,...extra});
+for(const size of [4,5,6]){
+ test(`${size}×${size}: starts with exactly two valid tiles in distinct cells`,()=>{const s=newGame({size},zero);assert.equal(s.board.length,size*size);assert.equal(s.board.filter(Boolean).length,2);assert.deepEqual(s.board.filter(Boolean),[2,2]);});
+ test(`${size}×${size}: all four directions preserve mass before spawn`,()=>{const b=Array(size*size).fill(0);b[0]=2;b[1]=2;b[size]=4;for(const d of ['left','right','up','down'])assert.equal(moveBoard(b,d).board.reduce((a,b)=>a+b),8);});
+}
+for(const [input,expected,score] of [
+ [[2,2,0,0],[4,0,0,0],4],[[2,2,2,0],[4,2,0,0],4],[[2,2,2,2],[4,4,0,0],8],[[4,4,8,8],[8,16,0,0],24],[[2,2,4,0],[4,4,0,0],4],[[4,4,4,4],[8,8,0,0],16],[[0,2,0,4],[2,4,0,0],0],[[4,0,4,8],[8,8,0,0],8],[[2,2,4,4,8,8],[4,8,16,0,0,0],28]])test(`merge ${JSON.stringify(input)}`,()=>assert.deepEqual(mergeLine(input),{line:expected,score}));
+test('left compression',()=>assert.deepEqual(moveBoard(board([0,2,0,4]),'left').board.slice(0,4),[2,4,0,0]));
+test('right merging',()=>assert.deepEqual(moveBoard(board([2,2,4,0]),'right').board.slice(0,4),[0,0,4,4]));
+test('up movement',()=>assert.equal(moveBoard([2,0,0,0,2,0,0,0,...Array(8).fill(0)],'up').board[0],4));
+test('down movement',()=>assert.equal(moveBoard([2,0,0,0,2,0,0,0,...Array(8).fill(0)],'down').board[12],4));
+test('motion destinations accurately describe consumed and surviving tiles',()=>assert.deepEqual(tileMotions(board([2,0,2,2]),'left'),[{source:2,destination:0,merged:true,consumed:true},{source:3,destination:1,merged:false}]));
+test('invalid move preserves exact state and never calls RNG',()=>{const s=fixture(board([2]));const r=play(s,'left',()=>{throw Error('must not spawn')});assert.equal(r.state,s);assert.equal(r.changed,false);assert.equal(r.state.undoUsed,false);});
+test('valid move spawns exactly one tile',()=>{const r=play(fixture(board([0,2])),'left',zero);assert.equal(r.state.board.filter(Boolean).length,2);assert.equal(r.spawn,1);});
+test('spawn cannot overwrite occupied tiles',()=>{const b=Array(16).fill(4);b[7]=0;const next=addTile(b,zero);assert.equal(next[7],2);assert.equal(next.filter(v=>v===4).length,15);assert.equal(b[7],0);});
+test('spawn 4 at upper probability range',()=>assert.equal(addTile(Array(16).fill(0),()=>.95).filter(Boolean)[0],4));
+test('spawn probability boundary',()=>{for(const v of [0,.5,.8999,.9,.99]){let i=0;const next=addTile(Array(16).fill(0),()=>i++===0?0:v);assert.equal(next[0],v<.9?2:4);}});
+test('full board spawn is immutable no-op',()=>{const b=Array(16).fill(2);assert.deepEqual(addTile(b),b);});
+const lost=[2,4,2,4,4,2,4,2,2,4,2,4,4,2,4,2];
+test('full board without equal neighbors has no moves',()=>assert.equal(canMove(lost),false));
+test('full board with horizontal merge is playable',()=>assert.equal(canMove([2,2,...lost.slice(2)]),true));
+test('full board with vertical merge is playable',()=>{const b=lost.slice();b[4]=2;assert.equal(canMove(b),true);});
+test('empty cell means moves remain',()=>assert.equal(canMove([...lost.slice(0,15),0]),true));
+test('Classic actual target merge wins',()=>{const r=play(fixture(board([256,256]),{target:512}),'left',zero);assert.equal(r.state.status,'won');assert.equal(r.state.achieved,true);assert.equal(r.milestone,true);assert.equal(r.state.score,512);});
+test('score alone never wins',()=>{const r=play(fixture(board([2,2]),{score:2048}),'left',zero);assert.equal(r.state.status,'playing');assert.equal(r.state.achieved,false);});
+test('Challenge records milestone and continues',()=>{const r=play(fixture(board([256,256]),{mode:'challenge',target:512}),'left',zero);assert.equal(r.state.status,'playing');assert.equal(r.state.achieved,true);});
+test('Continue preserves board and score',()=>{const s=play(fixture(board([256,256]),{target:512}),'left',zero).state;const next=continueGame(s);assert.deepEqual(next.board,s.board);assert.equal(next.score,s.score);assert.equal(next.status,'playing');});
+test('same target celebration only once after continuing',()=>{let s=continueGame(play(fixture(board([256,256]),{target:512}),'left',zero).state);const r=play(s,'right',zero);assert.equal(r.milestone,false);assert.equal(r.state.status,'playing');});
+test('completed victory never becomes You Lose',()=>assert.equal(resultTitle(fixture(lost,{status:'over',achieved:true,continued:true})),'Game Over'));
+test('Challenge result never claims a competitive loss',()=>assert.equal(resultTitle(fixture(lost,{status:'over',mode:'challenge'})),'Game Over'));
+test('unachieved Classic target results in You Lose',()=>assert.equal(resultTitle(fixture(lost,{status:'over'})),'You Lose'));
+test('loss only after actual last legal move and spawn',()=>{const s=fixture([0,2,8,16,4,16,32,64,8,32,64,128,16,64,128,256]);const r=play(s,'left',zero);assert.equal(canMove(r.state.board),false);assert.equal(r.state.status,'over');assert.equal(resultTitle(r.state),'You Lose');});
+test('Undo restores exact board score status target state without extra tiles',()=>{const before=fixture(board([256,256]),{target:512,score:24});const after=play(before,'left',zero).state;const restored=undoGame(after,before);assert.deepEqual(restored,{...before,undoUsed:true});assert.notEqual(restored.board,before.board);assert.equal(restored.board.filter(Boolean).length,2);});
+test('only one Undo per game',()=>{const before=fixture(board([2,2])),after=undoGame(play(before,'left',zero).state,before);assert.equal(undoGame(after,before),after);});
+test('restart clears score, milestone, moves and Undo',()=>{const s=newGame({},zero);assert.equal(s.score,0);assert.equal(s.achieved,false);assert.equal(s.undoUsed,false);assert.equal(s.moves,0);assert.equal(s.board.filter(Boolean).length,2);});
+test('Best persists through storage adapter',()=>{const storage={value:null,getItem(){return this.value},setItem(k,v){this.value=v}};writeStore(storage,'best',{'classic-4':4096});assert.equal(readStore(storage,'best',{})['classic-4'],4096);});
+test('blocked and corrupt storage do not crash',()=>{const storage={getItem(){throw Error()},setItem(){throw Error()}};assert.deepEqual(readStore(storage,'x',{}),{});assert.doesNotThrow(()=>writeStore(storage,'x',1));assert.equal(readStore({getItem:()=>'{broken'},'x',0),0);});
+test('score and total merge count use resulting values',()=>{const r=play(fixture(board([4,4,8,8])),'left',zero);assert.equal(r.gained,24);assert.equal(r.merges,2);assert.equal(r.state.merges,2);});
+test('invalid options rejected',()=>{assert.throws(()=>newGame({target:1000}));assert.throws(()=>newGame({size:7}));assert.throws(()=>newGame({mode:'online'}));});
+test('keyboard arrow and WASD mappings',()=>{for(const [k,d] of [['ArrowUp','up'],['ArrowDown','down'],['ArrowLeft','left'],['ArrowRight','right'],['w','up'],['a','left'],['s','down'],['d','right']])assert.equal(keyDirection(k),d);assert.equal(keyDirection('Enter'),undefined);});
+test('swipe directions, sensitivity, taps',()=>{assert.equal(swipeDirection(40,2),'right');assert.equal(swipeDirection(-40,2),'left');assert.equal(swipeDirection(2,40),'down');assert.equal(swipeDirection(2,-40),'up');assert.equal(swipeDirection(10,10),null);assert.equal(swipeDirection(30,0,40),null);});
+test('won and ended states reject moves and RNG',()=>{for(const status of ['won','over']){const s=fixture(lost,{status});assert.equal(play(s,'left',()=>{throw Error()}).state,s);}});

@@ -1178,10 +1178,6 @@ body.ludo-game.playing-ludo #board.board.ludo .yard{overflow:visible!important;z
 body.ludo-game.playing-ludo #board.board.ludo .yard>span.ludo-pawn.yard-pawn.sprite-pawn{top:-40%!important;left:-40%!important;width:180%!important;height:180%!important;z-index:3!important}
 /* Safe markers are stars on the original ivory tile, never raised gold plaques. */
 body.ludo-game.playing-ludo #board.board.ludo .track.safe:not(.start-square){background:transparent!important;border:0!important;box-shadow:none!important}
-body.ludo-game.playing-ludo #board.board.ludo .track.safe.safe-route-red:not(.start-square){--safe-color:var(--seat-0);background:linear-gradient(145deg,color-mix(in srgb,var(--safe-color) 82%,white),color-mix(in srgb,var(--safe-color) 82%,#d8cdbb))!important}
-body.ludo-game.playing-ludo #board.board.ludo .track.safe.safe-route-green:not(.start-square){--safe-color:var(--seat-2);background:linear-gradient(145deg,color-mix(in srgb,var(--safe-color) 82%,white),color-mix(in srgb,var(--safe-color) 82%,#d8cdbb))!important}
-body.ludo-game.playing-ludo #board.board.ludo .track.safe.safe-route-yellow:not(.start-square){--safe-color:var(--seat-3);background:linear-gradient(145deg,color-mix(in srgb,var(--safe-color) 82%,white),color-mix(in srgb,var(--safe-color) 82%,#d8cdbb))!important}
-body.ludo-game.playing-ludo #board.board.ludo .track.safe.safe-route-blue:not(.start-square){--safe-color:var(--seat-1);background:linear-gradient(145deg,color-mix(in srgb,var(--safe-color) 82%,white),color-mix(in srgb,var(--safe-color) 82%,#d8cdbb))!important}
 body.ludo-game.playing-ludo #board.board.ludo .track.safe:not(.start-square)::before{color:#fff!important;-webkit-text-stroke:.4px #56300b;text-shadow:0 1px 2px #271405,0 0 4px #271405!important}
 body.ludo-game.playing-ludo #board.board.ludo .track.safe.start-square::before{color:#fff!important;-webkit-text-stroke:.4px #56300b;text-shadow:0 1px 2px #271405!important}
 body.ludo-game.playing-ludo #board.board.ludo .home-diamond{position:relative!important;z-index:1!important}

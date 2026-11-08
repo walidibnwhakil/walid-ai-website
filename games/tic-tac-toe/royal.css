@@ -262,12 +262,6 @@ button.selected:after {
     ),
     linear-gradient(110deg, #512b14, #3b1c0c 25%, #643716 55%, #40200c 90%);
 }
-.mini-board span {
-  border: 1px solid #e8ae47;
-  width: auto;
-  height: auto;
-  background-size: 75%;
-}
 .menu-art p {
   font-size: 12px;
   letter-spacing: 0.15em;
@@ -1289,4 +1283,88 @@ body.playing #royal-game {
   .game-heading {
     padding: 5px 10px;
   }
+}
+
+/* Every decorative square owns a full-size piece; no font-sized corner icons. */
+.mini-board {
+  position: relative;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: url("./walnut.svg") center/cover;
+  pointer-events: none;
+}
+.mini-board > .demo-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #f4c564;
+  box-shadow:
+    inset 1px 1px 2px #ffe7b5aa,
+    inset 0 0 12px #1c080755;
+}
+.mini-board .demo-piece {
+  display: block;
+  width: 78%;
+  height: 78%;
+  background-size: contain;
+  filter: drop-shadow(0 4px 1px #1c090abb);
+  animation: demo-place 0.4s cubic-bezier(0.2, 0.8, 0.3, 1.25) both;
+}
+.demo-winning {
+  background: radial-gradient(#ffd36344, transparent 75%);
+}
+.demo-winning .demo-piece {
+  filter: drop-shadow(0 0 6px #ffcf6d);
+}
+.demo-fire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.demo-fire line {
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: demo-line 0.85s ease-out forwards;
+}
+.demo-flame {
+  stroke: #ff9d19;
+  stroke-width: 8;
+  filter: drop-shadow(0 0 5px #ff6500);
+}
+.demo-core {
+  stroke: #fff4b9;
+  stroke-width: 2.5;
+}
+@keyframes demo-place {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes demo-line {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mini-board .demo-piece,
+  .demo-fire line {
+    animation: none !important;
+  }
+  .demo-fire line {
+    stroke-dashoffset: 0;
+  }
+}
+.low-effects .demo-fire line {
+  stroke-dashoffset: 0;
 }

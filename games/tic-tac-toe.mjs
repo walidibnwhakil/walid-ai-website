@@ -1,3 +1,4 @@
+import "./tic-tac-toe/menu-demo.mjs";
 import { setGameInProgress } from "./refresh-guard.mjs";
 import {
   createGame,

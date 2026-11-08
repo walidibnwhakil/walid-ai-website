@@ -209,6 +209,19 @@ fs.mkdirSync(output, { recursive: true });
         }),
       );
     check(yardFeet, `yard pawn feet centered ${tag}`);
+    const pawnScale = await page
+      .locator("#board .yard .pin-pawn-art")
+      .first()
+      .evaluate(
+        (svg) =>
+          svg.getBoundingClientRect().height /
+          svg.closest(".yard").getBoundingClientRect().height,
+      );
+    check(
+      Math.abs(pawnScale - (width <= 620 ? 1.2 : 1)) < 0.02,
+      `phone pawn enlargement and unchanged desktop size ${tag}`,
+    );
+
     await screenshot(page, `board-${tag}`);
     if (width === 1366 || width === 390) {
       await page.click("#dice-red .player-dice-label");

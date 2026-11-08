@@ -284,3 +284,19 @@ body.ludo-game.playing-ludo
   height: var(--pawn-height, 100%) !important;
   transform: translate(-50%, -100%) !important;
 }
+
+/* Enlarge phone pawns around their foot, so the centered anchor never moves. */
+@media (max-width: 620px) {
+  body.ludo-game.playing-ludo
+    #board.board.ludo
+    span.ludo-pawn.pin-pawn
+    .pin-pawn-art {
+    transform-origin: 50% 100%;
+    transform: translate(-50%, -100%) scale(var(--phone-pawn-scale, 1.2)) !important;
+  }
+  body.ludo-game.playing-ludo
+    #board.board.ludo
+    span.ludo-pawn.pin-pawn.stacked-pawn {
+    --phone-pawn-scale: 1.1;
+  }
+}

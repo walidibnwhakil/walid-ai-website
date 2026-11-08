@@ -272,8 +272,8 @@ body.ludo-game.playing-ludo
   }
 }
 
-/* Center the full pin silhouette, rather than shifting its tip above the tile.
-   Pile slots share this anchor and scale to fit wholly inside the same tile. */
+/* The SVG pin ends at (32, 77). Bottom-align that point to the tile center.
+   Every pile slot uses the same foot anchor, independent of SVG letterboxing. */
 body.ludo-game.playing-ludo
   #board.board.ludo
   span.ludo-pawn.pin-pawn
@@ -282,5 +282,5 @@ body.ludo-game.playing-ludo
   top: calc(50% + var(--pile-y, 0%)) !important;
   width: var(--pawn-width, 100%) !important;
   height: var(--pawn-height, 100%) !important;
-  transform: translate(-50%, -50%) !important;
+  transform: translate(-50%, -100%) !important;
 }

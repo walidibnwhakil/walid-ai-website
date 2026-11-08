@@ -46,7 +46,11 @@ fs.mkdirSync(output, { recursive: true });
   }
   async function screenshot(page, name) {
     await page.evaluate(() =>
-      Promise.all([...document.images].map((i) => i.decode().catch(() => {}))),
+      Promise.all(
+        [...document.images]
+          .filter((i) => i.getClientRects().length > 0)
+          .map((i) => i.decode().catch(() => {})),
+      ),
     );
     await page.screenshot({ path: `${output}/${name}.png`, fullPage: true });
   }
@@ -192,6 +196,19 @@ fs.mkdirSync(output, { recursive: true });
       }),
     );
     check(colors, `lane and safe tile colors match ${tag}`);
+    const yardFeet = await page
+      .locator("#board .yard .pin-pawn-art")
+      .evaluateAll((svgs) =>
+        svgs.every((svg) => {
+          const f = new DOMPoint(32, 77).matrixTransform(svg.getScreenCTM()),
+            r = svg.closest(".yard").getBoundingClientRect();
+          return (
+            Math.abs(f.x - r.x - r.width / 2) < 0.75 &&
+            Math.abs(f.y - r.y - r.height / 2) < 0.75
+          );
+        }),
+      );
+    check(yardFeet, `yard pawn feet centered ${tag}`);
     await screenshot(page, `board-${tag}`);
     if (width === 1366 || width === 390) {
       await page.click("#dice-red .player-dice-label");
@@ -237,32 +254,23 @@ fs.mkdirSync(output, { recursive: true });
           .first()
           .evaluate((tile) => {
             const t = tile.getBoundingClientRect();
-            const boxes = [...tile.querySelectorAll(".pin-outline")].map(
-              (outline) => {
-                const b = outline.getBBox(),
-                  matrix = outline.getScreenCTM();
-                const a = new DOMPoint(b.x, b.y).matrixTransform(matrix);
-                const z = new DOMPoint(
-                  b.x + b.width,
-                  b.y + b.height,
-                ).matrixTransform(matrix);
-                return { left: a.x, right: z.x, top: a.y, bottom: z.y };
-              },
+            const feet = [...tile.querySelectorAll(".pin-pawn-art")].map(
+              (svg) => new DOMPoint(32, 77).matrixTransform(svg.getScreenCTM()),
             );
-            const left = Math.min(...boxes.map((b) => b.left)),
-              right = Math.max(...boxes.map((b) => b.right));
-            const top = Math.min(...boxes.map((b) => b.top)),
-              bottom = Math.max(...boxes.map((b) => b.bottom));
+            const left = Math.min(...feet.map((p) => p.x)),
+              right = Math.max(...feet.map((p) => p.x));
+            const top = Math.min(...feet.map((p) => p.y)),
+              bottom = Math.max(...feet.map((p) => p.y));
             return {
-              count: boxes.length,
+              count: feet.length,
               dx: Math.abs((left + right) / 2 - (t.left + t.right) / 2),
               dy: Math.abs((top + bottom) / 2 - (t.top + t.bottom) / 2),
-              inside: boxes.every(
-                (b) =>
-                  b.left >= t.left - 0.5 &&
-                  b.right <= t.right + 0.5 &&
-                  b.top >= t.top - 0.5 &&
-                  b.bottom <= t.bottom + 0.5,
+              inside: feet.every(
+                (p) =>
+                  p.x >= t.left &&
+                  p.x <= t.right &&
+                  p.y >= t.top &&
+                  p.y <= t.bottom,
               ),
             };
           });
@@ -271,7 +279,7 @@ fs.mkdirSync(output, { recursive: true });
             geometry.dx < 0.75 &&
             geometry.dy < 0.75 &&
             geometry.inside,
-          `${count} pawn silhouettes centered inside tile ${tag}`,
+          `${count} pawn feet centered inside tile ${tag}`,
         );
       }
       await checkPawnCenter(1);
@@ -311,14 +319,14 @@ fs.mkdirSync(output, { recursive: true });
       const soloCentered = await page
         .locator('.track .pin-pawn[data-step="6"] .pin-pawn-art')
         .evaluate((svg) => {
-          const a = svg.getBoundingClientRect(),
+          const foot = new DOMPoint(32, 77).matrixTransform(svg.getScreenCTM()),
             b = svg.closest(".track").getBoundingClientRect();
           return (
-            Math.abs(a.x + a.width / 2 - b.x - b.width / 2) < 0.75 &&
-            Math.abs(a.y + a.height / 2 - b.y - b.height / 2) < 0.75
+            Math.abs(foot.x - b.x - b.width / 2) < 0.75 &&
+            Math.abs(foot.y - b.y - b.height / 2) < 0.75
           );
         });
-      check(soloCentered, `moving pawn settles in tile center ${tag}`);
+      check(soloCentered, `moving pawn foot settles in tile center ${tag}`);
       await screenshot(page, `centered-route-pawns-${tag}`);
     }
     await page.close();

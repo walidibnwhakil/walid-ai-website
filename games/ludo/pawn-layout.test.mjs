@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { pawnSlots } from "./pawn-layout.mjs";
 for (let count = 1; count <= 16; count++) {
-  test(`${count} pawns stay centered, inside one tile, without overlapping`, () => {
+  test(`${count} pawn anchor slots stay centered, inside one tile, without overlapping`, () => {
     const slots = pawnSlots(count);
     assert.equal(slots.length, count);
     const boxes = slots.map((p) => ({

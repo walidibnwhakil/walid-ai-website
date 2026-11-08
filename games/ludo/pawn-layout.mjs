@@ -1,4 +1,4 @@
-// Symmetric positions within one tile. Keep a small margin around every pile.
+// Symmetric foot-anchor slots within one tile, with a margin around the pile.
 export function pawnSlots(count) {
   if (!Number.isInteger(count) || count < 1 || count > 16) {
     throw new RangeError("A Ludo tile supports 1 to 16 pawns");

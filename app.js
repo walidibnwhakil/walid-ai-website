@@ -22,8 +22,6 @@
     const googleButton = document.getElementById("googleButton");
     const emailInput = document.getElementById("emailInput");
     const emailButton = document.getElementById("emailButton");
-    const chatToolsBtn = document.getElementById("chatToolsBtn");
-    const chatToolsModal = document.getElementById("chatToolsModal");
     const form = document.getElementById("form");
     const input = document.getElementById("question");
     const chat = document.getElementById("chat");
@@ -131,7 +129,6 @@
         : (languageSelect.value === "bn" ? "এই ব্রাউজারে সংরক্ষিত" : "Saved on this browser");
       profileCopy.appendChild(note);
       const signedIn = Boolean(ACCESS_TOKEN);
-      chatToolsBtn.classList.toggle("hidden", !signedIn);
       signedInProfile.classList.toggle("hidden", !signedIn);
       sidebarLogin.classList.toggle("hidden", signedIn);
       accountMenuWrap.classList.toggle("hidden", !signedIn);
@@ -323,8 +320,8 @@
       input.setAttribute("aria-label", lang === "bn" ? "প্রশ্ন লিখুন" : "Ask a question");
       document.getElementById("attachBtn").setAttribute("aria-label", lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos");
       document.getElementById("attachBtn").title = lang === "bn" ? "ফাইল বা ছবি যোগ করুন" : "Add files or photos";
-      document.querySelector('#attachMenu [data-upload-kind="file"]').textContent = lang === "bn" ? "ফাইল আপলোড" : "Upload files";
-      document.querySelector('#attachMenu [data-upload-kind="photo"]').textContent = lang === "bn" ? "ছবি আপলোড" : "Upload photos";
+      document.querySelector('#attachMenu [data-upload-kind="file"] .upload-label').textContent = lang === "bn" ? "ফাইল" : "Files";
+      document.querySelector('#attachMenu [data-upload-kind="photo"] .upload-label').textContent = lang === "bn" ? "ছবি" : "Photos";
       document.getElementById("helpTitle").textContent = text.helpTitle;
       document.getElementById("helpFaqTab").textContent = text.faqTab;
       document.getElementById("helpContactTab").textContent = text.contactTab;
@@ -404,39 +401,54 @@
     const attachBtn = document.getElementById("attachBtn");
     const attachmentList = document.getElementById("attachmentList");
     const attachMenu = document.getElementById("attachMenu");
+    function closeAttachMenu(returnFocus = false) {
+      attachMenu.classList.add("hidden"); attachBtn.setAttribute("aria-expanded", "false");
+      if (returnFocus) attachBtn.focus();
+    }
+    function openAttachMenu(last = false, moveFocus = true) {
+      attachMenu.classList.remove("hidden"); attachBtn.setAttribute("aria-expanded", "true");
+      const items = attachMenu.querySelectorAll("[role=menuitem]"); if (moveFocus) items[last ? items.length - 1 : 0].focus();
+    }
     attachBtn.addEventListener("click", () => {
-      if (!IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
-        loginModal.classList.remove("hidden");
-        loginStatus.textContent = languageSelect.value === "bn" ? "ফাইল বা ছবি দিতে আগে লগ ইন করুন।" : "Log in to upload files or photos.";
-        return;
-      }
-      const open = attachMenu.classList.contains("hidden");
-      attachMenu.classList.toggle("hidden", !open);
-      attachBtn.setAttribute("aria-expanded", String(open));
+      if (attachMenu.classList.contains("hidden")) openAttachMenu(false, false); else closeAttachMenu(true);
+    });
+    attachBtn.addEventListener("keydown", event => {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); openAttachMenu(event.key === "ArrowUp"); }
     });
     function openUploadPicker(kind) {
-      attachMenu.classList.add("hidden");
-      attachBtn.setAttribute("aria-expanded", "false");
+      closeAttachMenu(true);
+      if (!IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
+        openLogin("login");
+        loginStatus.textContent = languageSelect.value === "bn" ? "ফাইল বা ছবি দিতে আগে লগ ইন করুন।" : "Log in to add files or photos.";
+        return;
+      }
       fileInput.accept = kind === "photo"
         ? "image/png,image/jpeg,image/webp,image/gif"
         : ".pdf,.docx,.txt,.md,.csv,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,text/csv";
       fileInput.click();
     }
-    attachMenu.addEventListener("click", (event) => {
+    attachMenu.addEventListener("click", event => {
       const choice = event.target.closest("[data-upload-kind]");
-      if (choice) void openUploadPicker(choice.dataset.uploadKind);
+      if (choice) openUploadPicker(choice.dataset.uploadKind);
     });
-    document.addEventListener("click", (event) => {
-      if (!attachMenu.contains(event.target) && event.target !== attachBtn && !attachBtn.contains(event.target)) {
-        attachMenu.classList.add("hidden");
-        attachBtn.setAttribute("aria-expanded", "false");
-      }
+    attachMenu.addEventListener("keydown", event => {
+      const keys = ["ArrowDown", "ArrowUp", "Home", "End"];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault(); const items = [...attachMenu.querySelectorAll("[role=menuitem]")];
+      let index = items.indexOf(document.activeElement);
+      if (event.key === "Home") index = 0;
+      else if (event.key === "End") index = items.length - 1;
+      else index = (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+      items[index].focus();
     });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        attachMenu.classList.add("hidden");
-        attachBtn.setAttribute("aria-expanded", "false");
-      }
+    attachMenu.addEventListener("focusout", () => setTimeout(() => {
+      if (!attachMenu.contains(document.activeElement) && document.activeElement !== attachBtn) closeAttachMenu();
+    }, 0));
+    document.addEventListener("click", event => {
+      if (!attachMenu.contains(event.target) && !attachBtn.contains(event.target)) closeAttachMenu();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !attachMenu.classList.contains("hidden")) { event.preventDefault(); closeAttachMenu(true); }
     });
     fileInput.addEventListener("change", async () => {
       const files = Array.from(fileInput.files || []);
@@ -659,28 +671,6 @@
 
     loginBtn.addEventListener("click", () => openLogin("login"));
     signupBtn.addEventListener("click", () => openLogin("signup"));
-    chatToolsBtn.addEventListener("click", () => {
-      if (!IS_ADMIN && (!firebaseAuth?.currentUser || firebaseAuth.currentUser.isAnonymous)) {
-        openLogin("login");
-        return;
-      }
-      chatToolsModal.classList.remove("hidden");
-    });
-    window.addEventListener("message", async (event) => {
-      if (event.origin !== window.location.origin || event.source !== chatToolsModal.querySelector("iframe")?.contentWindow) return;
-      if (event.data?.type !== "walid-tools-token-request" || typeof event.data.id !== "string") return;
-      try {
-        const token = await getAuthorizationToken();
-        event.source.postMessage({ type: "walid-tools-token", id: event.data.id, token: token || "" }, event.origin);
-      } catch {
-        event.source.postMessage({ type: "walid-tools-token", id: event.data.id, token: "" }, event.origin);
-      }
-    });
-    document.getElementById("closeChatTools").addEventListener("click", () => chatToolsModal.classList.add("hidden"));
-    chatToolsModal.addEventListener("click", (event) => {
-      if (event.target === chatToolsModal) chatToolsModal.classList.add("hidden");
-    });
-
     document.getElementById("closeLogin").addEventListener("click", () => {
       loginModal.classList.add("hidden");
     });

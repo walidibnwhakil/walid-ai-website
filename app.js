@@ -342,7 +342,7 @@
       setLanguage(languageSelect.value);
       loginStatus.textContent = firebaseReady
         ? ""
-        : (languageSelect.value === "bn" ? "Google দিয়ে প্রবেশ করা যাবে; ইমেইল প্রবেশের Firebase সেটআপ বাকি।" : "Google sign-in is available. Email sign-in still needs Firebase setup.");
+        : (languageSelect.value === "bn" ? "সাইন-ইন এখন উপলব্ধ নয়। Firebase configuration যাচাই প্রয়োজন।" : "Sign-in is currently unavailable. Firebase configuration needs to be checked.");
       loginModal.classList.remove("hidden");
     }
 

@@ -1,6 +1,14 @@
 
     "use strict";
 
+    const chatIcons = {
+      copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/>',
+      edit: '<path d="M12 20h9"/><path d="m16 3 5 5L8 21H3v-5Z"/>',
+      regenerate: '<path d="M20 7v5h-5M4 17v-5h5"/><path d="M20 12a8 8 0 0 0-14-5M4 12a8 8 0 0 0 14 5"/>',
+      love: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
+      check: '<path d="m5 12 4 4L19 6"/>'
+    };
+
     const API = String(window.WALID_AI_API || "").trim().replace(/\/$/, "");
 
     const loginModal = document.getElementById("loginModal");
@@ -69,6 +77,8 @@
     let historyOwner = "";
     let currentConversationId = newConversationId();
     let chatMessages = [];
+    let pendingTurn = null;
+    const ChatUI = window.WalidChatUI;
     let restoringChat = false;
     let persistQueue = Promise.resolve();
 
@@ -213,7 +223,9 @@
         messages: chatMessages.slice(-40).map((item) => ({
           kind: item.kind,
           text: String(item.text || "").slice(0, 8000),
-          source: item.source || ""
+          source: item.source || "",
+          sources: ChatUI.normalizeSources(item.sources),
+          seconds: Number.isFinite(item.seconds) ? item.seconds : null
         })),
         updatedAt: Date.now()
       };
@@ -258,7 +270,7 @@
       currentConversationId = record.id;
       chatMessages = Array.isArray(record.messages) ? record.messages : [];
       chat.replaceChildren();
-      chatMessages.forEach((item) => addMessage(item.kind, item.text, item.source || ""));
+      chatMessages.forEach((item, index) => addMessage(item.kind, item.text, item.source || "", { ...item, messageIndex: index }));
       if (chatMessages.length > 0) dismissWelcome(); else restoreWelcome();
       restoringChat = false;
       rememberActiveConversation();
@@ -826,112 +838,113 @@
       return /[\u0980-\u09FF]/.test(String(text ?? ""));
     }
 
-    // Render chat messages safely as text
+    function actionButton(icon, title, callback) {
+      const button = document.createElement("button");
+      button.type = "button"; button.title = title; button.setAttribute("aria-label", title);
+      button.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">' + chatIcons[icon] + '</svg>';
+      button.addEventListener("click", (event) => { event.stopPropagation(); callback(button); });
+      return button;
+    }
+    function redrawMessages() {
+      chat.replaceChildren(); restoringChat = true;
+      chatMessages.forEach((item, index) => addMessage(item.kind, item.text, item.source || "", { ...item, messageIndex: index }));
+      restoringChat = false;
+    }
+    document.addEventListener("pointerdown", event => {
+      if (!event.target.closest(".msg.user")) chat.querySelectorAll(".question-menu-open").forEach(item => item.classList.remove("question-menu-open"));
+    });
+    function showQuestionEditor(bubble, index) {
+      if (chatSending || bubble.querySelector(".question-editor")) return;
+      const editor = document.createElement("form"); editor.className = "question-editor";
+      const field = document.createElement("textarea"); field.value = chatMessages[index].text; field.maxLength = 2000;
+      field.setAttribute("aria-label", languageSelect.value === "bn" ? "প্রশ্ন সম্পাদনা" : "Edit question");
+      const controls = document.createElement("div"); controls.className = "edit-controls";
+      const cancel = document.createElement("button"); cancel.type = "button"; cancel.textContent = languageSelect.value === "bn" ? "বাতিল" : "Cancel";
+      const save = document.createElement("button"); save.type = "submit"; save.textContent = languageSelect.value === "bn" ? "পাঠান" : "Send";
+      const close = () => { editor.remove(); bubble.classList.remove("editing", "question-menu-open"); bubble.focus(); };
+      cancel.addEventListener("click", close);
+      field.addEventListener("keydown", event => { if (event.key === "Escape") { event.preventDefault(); close(); } });
+      editor.addEventListener("submit", event => {
+        event.preventDefault(); event.stopPropagation(); if (!field.value.trim() || chatSending) return;
+        pendingTurn = { kind: "edit", index }; input.value = field.value.trim(); close(); resizeComposer(); form.requestSubmit();
+      });
+      controls.append(cancel, save); editor.append(field, controls); bubble.classList.add("editing"); bubble.append(editor); field.focus();
+      field.style.height = Math.max(72, field.scrollHeight) + "px";
+    }
+    function addSources(bubble, text, sources) {
+      bubble.querySelector(".answer-sources")?.remove();
+      const entries = ChatUI.splitAnswer(text, sources).sources;
+      if (!entries.length) return;
+      const panel = document.createElement("div"); panel.className = "answer-sources";
+      const primary = document.createElement("a"); primary.className = "citation-chip";
+      primary.href = entries[0].url; primary.target = "_blank"; primary.rel = "noopener noreferrer";
+      primary.textContent = ChatUI.publisher(entries[0]); primary.title = entries[0].title;
+      panel.append(primary);
+      const details = document.createElement("details"); const summary = document.createElement("summary");
+      summary.textContent = languageSelect.value === "bn" ? `সূত্র (${entries.length})` : `Sources (${entries.length})`;
+      details.append(summary);
+      const list = document.createElement("div"); list.className = "source-cards";
+      for (const source of entries) {
+        const link = document.createElement("a"); link.href = source.url; link.target = "_blank"; link.rel = "noopener noreferrer";
+        const site = document.createElement("small"); site.textContent = ChatUI.publisher(source) + (source.date ? " · " + source.date : "");
+        const title = document.createElement("span"); title.textContent = source.title;
+        link.append(site, title); list.append(link);
+      }
+      details.append(list); panel.append(details);
+      bubble.insertBefore(panel, bubble.querySelector(".answer-actions"));
+    }
+    // Every persisted message owns one position. Regeneration replaces that position.
     function addMessage(kind, text, source = "", meta = {}) {
-      const bubble = document.createElement("div");
-      bubble.className = "msg " + kind;
+      const isTurn = ["user", "ai"].includes(kind);
+      const index = Number.isInteger(meta.messageIndex) ? meta.messageIndex : chatMessages.length;
+      const bubble = document.createElement("div"); bubble.className = "msg " + kind;
       if (hasBengaliScript(text)) bubble.classList.add("bengali");
-
-      const table = kind === "ai" ? parseMarkdownTable(text) : null;
-
-      if (table) {
-        const wrapper = document.createElement("div");
-        wrapper.className = "answer-table-wrap";
-
-        const element = document.createElement("table");
-        element.className = "answer-table";
-
-        const head = document.createElement("thead");
-        const row = document.createElement("tr");
-
-        table.headers.forEach((value) => {
-          const cell = document.createElement("th");
-          cell.textContent = value;
-          row.appendChild(cell);
-        });
-
-        head.appendChild(row);
-        element.appendChild(head);
-
-        const body = document.createElement("tbody");
-
-        table.rows.forEach((values) => {
-          const tr = document.createElement("tr");
-
-          values.forEach((value) => {
-            const td = document.createElement("td");
-            td.textContent = value;
-            tr.appendChild(td);
+      if (isTurn) bubble.dataset.messageIndex = String(index);
+      const body = document.createElement("span"); body.className = "message-body";
+      if (kind === "ai") renderAnswerContent(body, String(text || "")); else body.textContent = String(text || "");
+      bubble.append(body);
+      const old = isTurn ? chat.querySelector(`[data-message-index="${index}"]`) : null;
+      if (old && !restoringChat) old.replaceWith(bubble); else chat.append(bubble);
+      if (isTurn && !restoringChat) {
+        chatMessages[index] = { kind, text: String(text || ""), source, sources: ChatUI.normalizeSources(meta.sources), seconds: meta.seconds ?? null };
+        dismissWelcome(); void persistConversation();
+      }
+      const currentText = () => String(chatMessages[index]?.text || "");
+      if (source && kind !== "ai") { const label = document.createElement("span"); label.className = "source"; label.textContent = source; bubble.append(label); }
+      if (kind === "user" || kind === "ai") {
+        const actions = document.createElement("div"); actions.className = kind === "user" ? "question-actions" : "answer-actions";
+        actions.setAttribute("role", "group"); actions.setAttribute("aria-label", kind === "user" ? "Question actions" : "Answer actions");
+        const copyTitle = languageSelect.value === "bn" ? (kind === "user" ? "প্রশ্ন কপি করুন" : "উত্তর কপি করুন") : (kind === "user" ? "Copy question" : "Copy answer");
+        actions.append(actionButton("copy", copyTitle, async button => {
+          try {
+            await navigator.clipboard.writeText(kind === "ai" ? ChatUI.plainAnswer(currentText()) : currentText());
+            button.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">' + chatIcons.check + '</svg>';
+            button.setAttribute("aria-label", languageSelect.value === "bn" ? "কপি হয়েছে" : "Copied");
+            setTimeout(() => { button.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">' + chatIcons.copy + '</svg>'; button.setAttribute("aria-label", copyTitle); }, 1800);
+          } catch { button.title = languageSelect.value === "bn" ? "লেখা নির্বাচন করে কপি করুন" : "Select text to copy"; }
+        }));
+        if (kind === "user") {
+          actions.append(actionButton("edit", languageSelect.value === "bn" ? "প্রশ্ন সম্পাদনা" : "Edit question", () => showQuestionEditor(bubble, index)));
+          bubble.tabIndex = 0;
+          bubble.addEventListener("click", event => { if (!event.target.closest("button, textarea, .question-editor") && window.matchMedia("(hover: none)").matches) bubble.classList.toggle("question-menu-open"); });
+        } else {
+          actions.append(actionButton("regenerate", languageSelect.value === "bn" ? "আবার উত্তর তৈরি করুন" : "Regenerate answer", () => {
+            if (chatSending) return;
+            const turn = ChatUI.prepareTurn(chatMessages, { kind: "regenerate", index }, "");
+            pendingTurn = { kind: "regenerate", index }; input.value = turn.question; resizeComposer(); form.requestSubmit();
+          }));
+          const readLikes = () => { try { return new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]")); } catch { return new Set(); } };
+          const like = actionButton("love", languageSelect.value === "bn" ? "ভালো লেগেছে" : "Like answer", button => {
+            const likes = readLikes(); const key = currentText(); if (likes.has(key)) likes.delete(key); else likes.add(key);
+            localStorage.setItem("walidLikedAnswers", JSON.stringify([...likes].slice(-100)));
+            button.classList.toggle("active", likes.has(key)); button.setAttribute("aria-pressed", String(likes.has(key)));
           });
-
-          body.appendChild(tr);
-        });
-
-        element.appendChild(body);
-        wrapper.appendChild(element);
-        bubble.appendChild(wrapper);
-      } else {
-        const body = document.createElement("span");
-        body.textContent = String(text ?? "");
-        if (kind === "ai" && !table) renderAnswerContent(body, String(text ?? ""));
-        bubble.appendChild(body);
+          const active = readLikes().has(currentText()); like.classList.toggle("active", active); like.setAttribute("aria-pressed", String(active)); actions.append(like);
+        }
+        bubble.append(actions);
       }
-
-      if (source) {
-        const label = document.createElement("span");
-        label.className = "source";
-        label.textContent = source;
-        bubble.appendChild(label);
-      }
-
-      chat.appendChild(bubble);
-      scrollChatToLatest();
-      if (["user", "ai"].includes(kind) && !restoringChat) dismissWelcome();
-
-      if (!restoringChat && ["user", "ai"].includes(kind)) {
-        chatMessages.push({ kind, text: String(text ?? ""), source });
-        void persistConversation();
-      }
-      if (["user", "ai"].includes(kind)) bubble.dataset.messageIndex = String(chat.querySelectorAll(".msg.user, .msg.ai").length - 1);
-
-      if (kind === "user") {
-        const actions = document.createElement("div"); actions.className = "question-actions";
-        const edit = document.createElement("button"); edit.type = "button"; edit.title = languageSelect.value === "bn" ? "প্রশ্ন সম্পাদনা করুন" : "Edit question"; edit.setAttribute("aria-label", edit.title); edit.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
-        edit.addEventListener("click", () => {
-          const index = Number(bubble.dataset.messageIndex);
-          input.value = String(text ?? ""); resizeComposer(); input.focus();
-          chatMessages = chatMessages.slice(0, index);
-          const previous = chatMessages.slice(); chat.replaceChildren();
-          restoringChat = true; previous.forEach((item) => addMessage(item.kind, item.text, item.source || "")); restoringChat = false;
-          void persistConversation();
-        });
-        const copy = document.createElement("button"); copy.type = "button"; copy.title = languageSelect.value === "bn" ? "প্রশ্ন কপি করুন" : "Copy question"; copy.setAttribute("aria-label", copy.title); copy.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>';
-        copy.addEventListener("click", async (event) => { event.stopPropagation(); try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", languageSelect.value === "bn" ? "প্রশ্নটি কপি করা যায়নি।" : "The question could not be copied."); } bubble.classList.remove("question-menu-open"); });
-        actions.append(edit, copy); bubble.appendChild(actions);
-        let holdTimer = null;
-        const reveal = () => { chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); bubble.classList.add("question-menu-open"); };
-        bubble.addEventListener("contextmenu", (event) => { event.preventDefault(); reveal(); });
-        bubble.addEventListener("pointerdown", (event) => { if (event.button !== 0) return; holdTimer = setTimeout(reveal, 500); });
-        ["pointerup", "pointerleave", "pointercancel"].forEach((name) => bubble.addEventListener(name, () => { clearTimeout(holdTimer); }));
-        bubble.addEventListener("click", (event) => { if (!event.target.closest(".question-actions")) chat.querySelectorAll(".question-menu-open").forEach((item) => item.classList.remove("question-menu-open")); });
-      }
-      if (kind === "ai") {
-        const answerIndex = Number(bubble.dataset.messageIndex);
-        const previousQuestion = meta.question || [...chatMessages.slice(0, answerIndex)].reverse().find((item) => item.kind === "user")?.text || "";
-        const actions = document.createElement("div"); actions.className = "answer-actions";
-        const iconButton = (svg, title, callback) => { const element = document.createElement("button"); element.type = "button"; element.innerHTML = svg; element.title = title; element.setAttribute("aria-label", title); element.addEventListener("click", callback); actions.appendChild(element); };
-        iconButton('<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg>', languageSelect.value === "bn" ? "উত্তর কপি করুন" : "Copy answer", async () => { try { await navigator.clipboard.writeText(String(text ?? "")); } catch { addMessage("error", languageSelect.value === "bn" ? "কপি করা যায়নি—উত্তরটি চেপে ধরে কপি করুন।" : "Copy failed. Press and hold the answer to copy it."); } });
-        iconButton('<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"/></svg>', languageSelect.value === "bn" ? "উত্তর শেয়ার করুন" : "Share answer", async () => { try { if (navigator.share) await navigator.share({ title:"Walid AI", text:String(text ?? "") }); else { await navigator.clipboard.writeText(String(text ?? "")); } } catch {} });
-        iconButton('<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 0 2 5"/></svg>', languageSelect.value === "bn" ? "আবার উত্তর তৈরি করুন" : "Regenerate answer", () => { input.value = String(previousQuestion); resizeComposer(); form.requestSubmit(); });
-        const liked = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]"));
-        const like = document.createElement("button"); like.type = "button"; like.title = languageSelect.value === "bn" ? "ভালো লেগেছে" : "Like answer"; like.setAttribute("aria-label", like.title); like.innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>'; like.classList.toggle("active", liked.has(String(text ?? "")));
-        like.addEventListener("click", () => { const next = new Set(JSON.parse(localStorage.getItem("walidLikedAnswers") || "[]")); if (next.has(String(text ?? ""))) next.delete(String(text ?? "")); else next.add(String(text ?? "")); localStorage.setItem("walidLikedAnswers", JSON.stringify([...next].slice(-100))); like.classList.toggle("active", next.has(String(text ?? ""))); });
-        actions.appendChild(like);
-        if (Number.isFinite(meta.seconds)) { const duration = document.createElement("span"); duration.className = "source"; duration.textContent = languageSelect.value === "bn" ? `⏱ ${meta.seconds.toFixed(1)} সেকেন্ড` : `⏱ ${meta.seconds.toFixed(1)} sec`; actions.appendChild(duration); }
-        bubble.appendChild(actions);
-      }
-
-      return bubble;
+      if (kind === "ai") addSources(bubble, text, meta.sources);
+      scrollChatToLatest(); return bubble;
     }
 
     function parseMarkdownTable(text) {
@@ -959,16 +972,28 @@
     }
 
     function renderAnswerContent(node, text) {
-      const pattern = /\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g;
-      const fragment = document.createDocumentFragment();
-      let last = 0, match;
-      while ((match = pattern.exec(text))) {
-        fragment.appendChild(document.createTextNode(text.slice(last, match.index)));
-        const link = document.createElement("a"); link.textContent = match[1]; link.href = match[2]; link.target = "_blank"; link.rel = "noopener noreferrer";
-        fragment.appendChild(link); last = pattern.lastIndex;
+      const { body } = ChatUI.splitAnswer(text);
+      const table = parseMarkdownTable(body);
+      if (table) {
+        const wrapper = document.createElement("div"); wrapper.className = "answer-table-wrap";
+        const element = document.createElement("table"); element.className = "answer-table";
+        const head = document.createElement("thead"); const row = document.createElement("tr");
+        table.headers.forEach(value => { const cell = document.createElement("th"); cell.textContent = value; row.append(cell); });
+        head.append(row); element.append(head); const tbody = document.createElement("tbody");
+        table.rows.forEach(values => { const tr = document.createElement("tr"); values.forEach(value => { const td = document.createElement("td"); td.textContent = value; tr.append(td); }); tbody.append(tr); });
+        element.append(tbody); wrapper.append(element); node.replaceChildren(wrapper); return;
       }
-      fragment.appendChild(document.createTextNode(text.slice(last)));
-      node.replaceChildren(fragment);
+      const fragment = document.createDocumentFragment(); let last = 0;
+      for (const link of ChatUI.markdownLinks(body)) {
+        // Reference-only parentheticals become compact source chips below.
+        const reference = /wikipedia\.org/.test(new URL(link.url).hostname) && /minister|president|bangladesh|wikipedia/i.test(link.title);
+        const before = body.slice(last, link.start);
+        fragment.append(document.createTextNode(reference ? before.replace(/\s*\(\s*$/, "") : before));
+        if (!reference) { const anchor = document.createElement("a"); anchor.textContent = link.title; anchor.href = link.url; anchor.target = "_blank"; anchor.rel = "noopener noreferrer"; fragment.append(anchor); }
+        last = link.end;
+        if (reference && body[last] === ")") last++;
+      }
+      fragment.append(document.createTextNode(body.slice(last))); node.replaceChildren(fragment);
     }
 
     // Admin feedback
@@ -1163,8 +1188,15 @@
       if (pendingUploads.length && uploadQuota && !uploadQuota.unlimited && pendingUploads.length > uploadQuota.remaining) { addMessage("error", languageSelect.value === "bn" ? `আজ আর মাত্র ${uploadQuota.remaining}টি ফাইল/ছবি পাঠানো যাবে।` : `You can send ${uploadQuota.remaining} more file(s) today.`); return; }
       chatSending = true;
       send.disabled = true;
-      const priorHistory = trimChatHistory(chatMessages);
-      addMessage("user", question);
+      const requestConversationId = currentConversationId;
+      const operation = pendingTurn; pendingTurn = null;
+      const originalMessages = chatMessages.map(item => ({ ...item }));
+      const turn = ChatUI.prepareTurn(chatMessages, operation, question);
+      const priorHistory = trimChatHistory(turn.history);
+      const answerIndex = turn.answerIndex;
+      if (operation) { chatMessages = turn.messages; redrawMessages(); }
+      else addMessage("user", question);
+      chat.classList.add("chat-busy");
       const filesToSend = pendingUploads.slice();
       input.value = "";
       pendingUploads = []; attachmentList.replaceChildren(); attachmentList.classList.add("hidden");
@@ -1199,6 +1231,7 @@
             body: JSON.stringify(toolBody)
           });
           const toolResult = await toolResponse.json();
+          if (currentConversationId !== requestConversationId) return;
           if (!toolResponse.ok) {
             const error = new Error(toolResult.error || "The PDF could not be processed.");
             error.quota = toolResult.quota || "";
@@ -1206,7 +1239,7 @@
           }
           const fileBytes = Uint8Array.from(atob(toolResult.file), (character) => character.charCodeAt(0));
           const downloadUrl = URL.createObjectURL(new Blob([fileBytes], { type: toolResult.type }));
-          const toolAnswer = addMessage("ai", "Your file is ready.", "File tool", { question });
+          const toolAnswer = addMessage("ai", "Your file is ready.", "File tool", { question, messageIndex: answerIndex });
           const download = document.createElement("a");
           download.className = "tool-result-link";
           download.href = downloadUrl;
@@ -1282,17 +1315,19 @@
             for (const line of lines) {
               if (!line.trim()) continue;
               const event = JSON.parse(line);
+              if (currentConversationId !== requestConversationId) continue;
               if (event.event === "delta") {
                 if (!streamedBubble) {
                   const elapsed = (performance.now() - requestStarted) / 1000;
                   clearInterval(timer); thinking.remove();
-                  streamedBubble = addMessage("ai", "", "", { question, seconds: elapsed });
-                  streamedBody = streamedBubble.querySelector(":scope > span:not(.source)");
+                  streamedBubble = addMessage("ai", "", "", { question, seconds: elapsed, messageIndex: answerIndex });
+                  streamedBody = streamedBubble.querySelector(".message-body");
                   streamedBody.classList.add("typing-cursor");
                   streamTicker = setInterval(() => {
-                    if (streamVisible < streamedText.length) {
-                      streamVisible = Math.min(streamedText.length, streamVisible + Math.max(1, Math.ceil((streamedText.length - streamVisible) / 90)));
-                      const visibleAnswer = streamedText.slice(0, streamVisible);
+                    const preview = ChatUI.plainAnswer(streamedText);
+                    if (streamVisible < preview.length) {
+                      streamVisible = Math.min(preview.length, streamVisible + Math.max(1, Math.ceil((preview.length - streamVisible) / 90)));
+                      const visibleAnswer = preview.slice(0, streamVisible);
                       streamedBody.textContent = visibleAnswer;
                       if (hasBengaliScript(visibleAnswer)) streamedBubble.classList.add("bengali");
                       scrollChatToLatest(false);
@@ -1307,13 +1342,13 @@
             }
             if (done) break;
           }
-          while (streamVisible < streamedText.length) await new Promise((resolve) => setTimeout(resolve, 24));
           if (streamTicker) clearInterval(streamTicker);
           if (streamedBubble && hasBengaliScript(streamedText)) streamedBubble.classList.add("bengali");
           if (streamedBody) { streamedBody.classList.remove("typing-cursor"); renderAnswerContent(streamedBody, streamedText); }
-          data.answer = streamedText || data.answer || "";
+          data.answer = data.answer || streamedText || "";
         }
 
+        if (currentConversationId !== requestConversationId) return;
         if (!data || !data.answer) {
           const empty = new Error("");
           empty.status = response ? response.status : 502;
@@ -1326,21 +1361,10 @@
           document.getElementById("uploadQuotaHint").textContent = "আজকের আপলোড: " + uploadQuota.remaining + "/" + uploadQuota.limit + " বাকি";
         }
         clearInterval(timer); thinking.remove();
-        const answer = streamedBubble || addMessage("ai", data.answer, sourceLabel(data.answering_mode), { question, seconds });
-        if (streamedBubble) {
-          const label = sourceLabel(data.answering_mode);
-          if (label) { const source = document.createElement("span"); source.className = "source"; source.textContent = label; answer.insertBefore(source, answer.querySelector(".answer-actions")); }
-        }
-        const savedAnswer = chatMessages.at(-1); if (savedAnswer?.kind === "ai") { savedAnswer.text = data.answer; void persistConversation(); }
-        const bodyNode = answer.querySelector(":scope > span:not(.source)");
-        if (!streamedBubble && bodyNode && data.answer.length < 12000) {
-          answer.classList.remove("bengali");
-          bodyNode.textContent = "";
-          bodyNode.classList.add("typing-cursor");
-          const target = String(data.answer); let offset = 0; const step = Math.max(1, Math.ceil(target.length / 160));
-          const typeNext = () => { offset = Math.min(target.length, offset + step); const visibleAnswer = target.slice(0, offset); bodyNode.textContent = visibleAnswer; if (hasBengaliScript(visibleAnswer)) answer.classList.add("bengali"); if (offset < target.length) { scrollChatToLatest(false); setTimeout(typeNext, 12); } else { bodyNode.classList.remove("typing-cursor"); renderAnswerContent(bodyNode, target); scrollChatToLatest(false); } };
-          typeNext();
-        }
+        const answer = addMessage("ai", data.answer, sourceLabel(data.answering_mode), {
+          question, seconds, sources: data.sources, messageIndex: answerIndex
+        });
+        void persistConversation();
 
         addFeedback(answer, question, data.answer);
 
@@ -1357,8 +1381,11 @@
       } catch (error) {
         clearInterval(timer); if (thinking) thinking.remove();
         if (streamTicker) clearInterval(streamTicker);
+        if (currentConversationId !== requestConversationId) return;
+        if (operation) { chatMessages = originalMessages; redrawMessages(); void persistConversation(); }
         addMessage("error", humanizeRequestError(error));
       } finally {
+        chat.classList.remove("chat-busy");
         chatSending = false;
         send.disabled = false;
         input.focus();

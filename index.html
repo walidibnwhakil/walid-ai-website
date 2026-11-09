@@ -478,17 +478,34 @@
       font-size: .77rem;
     }
 
-    .answer-actions, .question-actions { display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; }
-    .question-actions { display:none; position:absolute; z-index:5; left:0; bottom:-43px; padding:4px 7px; border:1px solid var(--line); border-radius:12px; background:var(--field); box-shadow:0 5px 18px #0002; }
-    .msg.user.question-menu-open .question-actions { display:flex; }
-    .msg.user { position:relative; }
-    .msg.ai > span a { color:var(--green); text-decoration:underline; text-underline-offset:2px; overflow-wrap:anywhere; }
-    .typing-cursor::after { content:"▋"; display:inline-block; margin-left:2px; color:var(--green); animation:walid-caret .8s steps(2,start) infinite; }
-    @keyframes walid-caret { to { visibility:hidden; } }
-    .answer-actions button, .question-actions button { display:inline-grid; place-items:center; width:34px; height:34px; border:0; background:transparent; color:var(--muted); padding:6px; border-radius:10px; cursor:pointer; }
+    .answer-actions, .question-actions { display:flex; align-items:center; gap:2px; margin-top:10px; }
+    .msg.user { position:relative; margin-bottom:36px; }
+    .question-actions { position:absolute; right:6px; bottom:-36px; padding-top:4px; margin:0; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .15s; }
+    .msg.user:hover .question-actions, .msg.user:focus-within .question-actions, .msg.user.question-menu-open .question-actions { opacity:1; visibility:visible; pointer-events:auto; }
+    .answer-actions button, .question-actions button { display:inline-grid; place-items:center; width:32px; height:32px; border:0; background:transparent; color:var(--muted); padding:7px; border-radius:50%; cursor:pointer; transition:background .15s,color .15s; }
     .answer-actions button:hover, .question-actions button:hover, .answer-actions button.active { background:var(--mint); color:var(--green); }
     .answer-actions button.active svg { fill:currentColor; }
-    .action-icon { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .chat-busy .answer-actions button:not(:first-child), .chat-busy .question-actions button { pointer-events:none; opacity:.4; }
+    .action-icon { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+    .message-body { white-space:pre-wrap; }
+    .message-body a { color:var(--green); text-underline-offset:3px; overflow-wrap:anywhere; }
+    .answer-sources { display:flex; align-items:flex-start; gap:7px; flex-wrap:wrap; margin-top:10px; white-space:normal; font-size:12px; }
+    .chat .msg .citation-chip, .answer-sources summary { display:inline-block; max-width:180px; padding:2px 9px; border-radius:12px; background:var(--user-bubble); color:var(--muted); text-decoration:none; cursor:pointer; font-size:12px; line-height:1.6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .answer-sources details { max-width:100%; }
+    .answer-sources summary { list-style:none; }
+    .answer-sources summary::-webkit-details-marker { display:none; }
+    .source-cards { display:grid; gap:8px; margin:10px 0; max-height:280px; overflow:auto; }
+    .source-cards a { display:grid; gap:3px; padding:10px 12px; border:1px solid var(--line); border-radius:12px; text-decoration:none; color:var(--ink); font-size:14px; overflow-wrap:anywhere; }
+    .source-cards small { color:var(--muted); font-size:12px; }
+    .msg.user.editing > .message-body, .msg.user.editing > .question-actions { display:none; }
+    .question-editor { display:grid; gap:8px; margin:0; }
+    .question-editor textarea { width:100%; min-height:72px; resize:vertical; padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--field); color:var(--ink); font:inherit; }
+    .edit-controls { display:flex; justify-content:flex-end; gap:8px; }
+    .edit-controls button { padding:6px 14px; border:1px solid var(--line); border-radius:18px; background:var(--field); color:var(--ink); }
+    .edit-controls button[type=submit] { background:var(--ink); color:var(--field); }
+    .typing-cursor::after { content:"▋"; display:inline-block; margin-left:2px; color:var(--green); animation:walid-caret .8s steps(2,start) infinite; }
+    @keyframes walid-caret { to { visibility:hidden; } }
+    @media (hover:none) { .answer-actions button, .question-actions button { width:40px; height:40px; } .question-actions { bottom:-44px; } .msg.user { margin-bottom:44px; } }
     .thinking-status { color:var(--muted); font-size:.82rem; }
     .attachment-list { display:flex; gap:7px; flex-wrap:wrap; width:100%; }
     .composer { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; }
@@ -1157,7 +1174,7 @@
 
   <script>
     (()=>{if(!matchMedia('(max-width: 650px)').matches)return;let startX=0,startY=0,reloaded=false;document.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;startX=event.touches[0].clientX;startY=event.touches[0].clientY;reloaded=false},{passive:true});document.addEventListener('touchmove',event=>{if(reloaded||event.touches.length!==1)return;const chat=document.getElementById('chat');if(chat&&(chat.contains(event.target)||chat.scrollTop>0))return;if(event.target.closest&&event.target.closest('#form,.composer'))return;const dx=event.touches[0].clientX-startX,dy=event.touches[0].clientY-startY;if(startY<100&&dy>120&&Math.abs(dx)<70){reloaded=true;location.reload()}},{passive:true})})();
-  </script>  <script src="/app.js" defer></script>
+  </script>  <script src="/chat-ui.js" defer></script><script src="/app.js" defer></script>
 </body>
 </html>
 

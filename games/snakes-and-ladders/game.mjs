@@ -6,7 +6,7 @@ import {
 } from "./results.mjs";
 import { createCavernEyes } from "./cavern-eyes.mjs?v=20261108-cinema";
 import { createFireworks } from "./fireworks.mjs?v=20261109-medals";
-import { createCinematic } from "./cinematic.mjs?v=20261109-medals";
+import { createCinematic } from "./cinematic.mjs?v=20261109-medals-2";
 import { createMenuScene } from "./menu-scene.mjs?v=20261108-jungle";
 import { createLava } from "./lava.mjs?v=20261108-cinema";
 import {

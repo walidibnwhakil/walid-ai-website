@@ -285,10 +285,11 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await page.click("#start");
-  await page.waitForTimeout(900);
+  await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.12));
   await shot("intro-focus");
-  await page.waitForFunction(
-    () => +document.querySelector("#entrance-scene").dataset.gape > 0.7,
+  await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.3));
+  assert(
+    +(await page.locator("#entrance-scene").getAttribute("data-gape")) > 0.7,
   );
   await shot("intro-open-jaw");
   assert.equal(
@@ -301,26 +302,21 @@ fs.mkdirSync(out, { recursive: true });
       .evaluate((e) => getComputedStyle(e).display),
     "none",
   );
-  await page.waitForFunction(
-    () =>
-      document.querySelector("#entrance-scene").dataset.phase === "enter-mouth",
-  );
+  await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.45));
   await shot("intro-enter");
-  await page.waitForFunction(
-    () =>
-      document.querySelector("#entrance-scene").dataset.phase === "board-focus",
-  );
+  await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.7));
   const blurBefore = await page
     .locator("#play")
     .evaluate((e) => parseFloat(getComputedStyle(e).filter.slice(5)));
   assert(blurBefore > 0);
   await shot("board-emerging-blurred");
-  await page.waitForTimeout(300);
+  await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.85));
   const blurAfter = await page
     .locator("#play")
     .evaluate((e) => parseFloat(getComputedStyle(e).filter.slice(5)));
   assert(blurAfter < blurBefore);
   await shot("board-becoming-clear");
+  await page.evaluate(() => window.serpentTest.entranceCinema.sample(1));
   await page.waitForSelector("#intro", { state: "hidden" });
   await shot("board-desktop");
   await check(

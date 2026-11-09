@@ -19,7 +19,8 @@ export function createCinematic(host, prefix) {
     rig = null,
     cameraBoard = null,
     boardReady = null,
-    prepared = false;
+    prepared = false,
+    sampleFrame = null;
   function resetCamera() {
     if (rig) {
       rig.profile.style.removeProperty("transform");
@@ -54,6 +55,7 @@ export function createCinematic(host, prefix) {
     raf = 0;
     done = null;
     resetCamera();
+    sampleFrame = null;
     host.dataset.phase = "idle";
   }
   function pose(scale, gape, angle = 0) {
@@ -206,6 +208,15 @@ export function createCinematic(host, prefix) {
       }
       raf = requestAnimationFrame(frame);
     }
+    // Frame sampling reuses the production renderer for the local browser harness.
+    // It freezes only this camera, so screenshot latency cannot skip a brief phase.
+    sampleFrame = (progress) => {
+      if (!active) return;
+      cancelAnimationFrame(raf);
+      frame(begin + clamp(progress) * duration);
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
     frame(begin);
     return { skip: finish };
   }
@@ -214,6 +225,7 @@ export function createCinematic(host, prefix) {
     defeat: (options) => start("defeat", options),
     cancel,
     finish,
+    sample: (progress) => sampleFrame?.(progress),
     get progress() {
       return last;
     },

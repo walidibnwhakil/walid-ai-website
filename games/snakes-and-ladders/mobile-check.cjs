@@ -78,6 +78,40 @@ const path = require("node:path");
           r.h >= 43,
         JSON.stringify({ width, height, r }),
       );
+    // Button bounds alone missed wrapped/overflowing labels on Android.
+    const labels = await p.locator(".match-mode").evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const label = button.querySelector(".mode-label"),
+          range = document.createRange();
+        range.selectNodeContents(label);
+        const text = range.getBoundingClientRect(),
+          box = button.getBoundingClientRect(),
+          icon = button.querySelector(".menu-symbol").getBoundingClientRect();
+        return {
+          lines: range.getClientRects().length,
+          text: {
+            x: text.x,
+            y: text.y,
+            right: text.right,
+            bottom: text.bottom,
+          },
+          box: { x: box.x, y: box.y, right: box.right, bottom: box.bottom },
+          iconRight: icon.right,
+          font: getComputedStyle(label).fontSize,
+        };
+      }),
+    );
+    assert.equal(labels[0].font, labels[1].font);
+    for (const { lines, text, box, iconRight } of labels) {
+      assert.equal(lines, 1);
+      assert(
+        text.x >= iconRight &&
+          text.right <= box.right - 3 &&
+          text.y >= box.y + 3 &&
+          text.bottom <= box.bottom - 3,
+        JSON.stringify({ width, height, text, box }),
+      );
+    }
     assert(
       await p.evaluate(
         () =>
@@ -139,14 +173,12 @@ const path = require("node:path");
       `input/render heartbeat stalled: ${frames} frames in two seconds`,
     );
     assert(ratio < 0.8, `slow-CPU main thread overloaded: ${ratio}`);
-    const raster = await p
-      .locator(".living-serpents")
-      .evaluate((e) => ({
-        w: e.width,
-        h: e.height,
-        stats: e.renderStats,
-        tag: e.parentElement.tagName,
-      }));
+    const raster = await p.locator(".living-serpents").evaluate((e) => ({
+      w: e.width,
+      h: e.height,
+      stats: e.renderStats,
+      tag: e.parentElement.tagName,
+    }));
     assert(raster.w <= 600 && raster.h <= 600);
     assert(raster.stats.repainted <= 2);
     assert.equal(raster.tag, "DIV");

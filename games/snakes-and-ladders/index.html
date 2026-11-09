@@ -12,7 +12,7 @@
       rel="canonical"
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
-    <link rel="stylesheet" href="style.css?v=20261109-fast" />
+    <link rel="stylesheet" href="style.css?v=20261109-mode-labels" />
     <script type="module" src="game.mjs?v=20261109-fast"></script>
   </head>
   <body>
@@ -109,7 +109,11 @@
               4 <small>Players</small>
             </button>
           </div>
-          <button id="friends-mode" class="menu-pill" aria-pressed="false">
+          <button
+            id="friends-mode"
+            class="menu-pill match-mode"
+            aria-pressed="false"
+          >
             <span class="menu-symbol" aria-hidden="true"
               ><svg viewBox="0 0 32 32">
                 <circle cx="10" cy="8" r="6" />
@@ -117,15 +121,19 @@
                 <path
                   d="M1 30v-8q0-8 9-8t9 8v8ZM21 17q10-1 10 8v5h-9Z"
                 /></svg></span
-            ><span>Play with Friends</span>
+            ><span class="mode-label">Play with Friends</span>
           </button>
-          <button id="bot-mode" class="menu-pill selected" aria-pressed="true">
+          <button
+            id="bot-mode"
+            class="menu-pill match-mode selected"
+            aria-pressed="true"
+          >
             <span class="menu-symbol" aria-hidden="true"
               ><svg viewBox="0 0 32 32">
                 <path
                   d="M8 3h16v9q0 9-8 10-8-1-8-10ZM13 21h6v6h6v4H7v-4h6ZM7 5H1v6q0 8 9 8v-4q-5 0-5-5V9h2ZM25 5h6v6q0 8-9 8v-4q5 0 5-5V9h-2Z"
                 /></svg></span
-            ><span>Play with <small>Computer / Bot</small></span>
+            ><span class="mode-label">Play with Bot</span>
           </button>
           <select id="mode" class="sr-only" aria-label="Game mode">
             <option value="bot">Single Player — vs Bot</option>

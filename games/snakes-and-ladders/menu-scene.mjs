@@ -1,6 +1,7 @@
+import { compactDevice, menuArtwork } from "./performance.mjs?v=20261109-fast";
 // The title, water, necks, heads, lower jaws, tongues and eyelids are separate layers.
 export function createMenuScene(root, canvas, { motion, quality }) {
-  const asset = "assets/jungle-emblem.webp",
+  const asset = menuArtwork(),
     image = `<image href="${asset}" width="1536" height="1024"/>`;
   const left = "0,0 480,0 480,275 310,275 265,390 0,440",
     right = "1070,0 1536,0 1536,510 1260,510 1240,330 1070,280";
@@ -10,7 +11,9 @@ export function createMenuScene(root, canvas, { motion, quality }) {
     rj = "1127,173 1230,180 1315,171 1305,207 1160,218";
   const lt = "370,176 405,176 470,280 370,280",
     rt = "1070,200 1150,175 1165,190 1120,270 1050,270";
-  root.innerHTML = `<defs><clipPath id="menu-mouth-texture"><path d="M300 141 373 154 397 176 360 187 325 166Z"/></clipPath><filter id="menu-feather"><feGaussianBlur stdDeviation="2"/></filter><mask id="menu-soft-lj"><rect width="1536" height="1024" fill="black"/><polygon points="${lj}" fill="white" filter="url(#menu-feather)"/></mask><mask id="menu-soft-rj"><rect width="1536" height="1024" fill="black"/><polygon points="${rj}" fill="white" filter="url(#menu-feather)"/></mask>
+  root.innerHTML = compactDevice()
+    ? `<g class="mobile-menu-art">${image}</g><g class="mobile-eye-rig"><ellipse class="menu-eyelid" cx="348" cy="94" rx="16" ry="12" fill="#3d2e1e"/><ellipse class="menu-eyelid" cx="1243" cy="129" rx="14" ry="13" fill="#42622d" style="animation-delay:-3s"/></g>`
+    : `<defs><clipPath id="menu-mouth-texture"><path d="M300 141 373 154 397 176 360 187 325 166Z"/></clipPath><filter id="menu-feather"><feGaussianBlur stdDeviation="2"/></filter><mask id="menu-soft-lj"><rect width="1536" height="1024" fill="black"/><polygon points="${lj}" fill="white" filter="url(#menu-feather)"/></mask><mask id="menu-soft-rj"><rect width="1536" height="1024" fill="black"/><polygon points="${rj}" fill="white" filter="url(#menu-feather)"/></mask>
   ${[
     ["left", 360, 440],
     ["right", 430, 510],
@@ -66,7 +69,7 @@ ${Object.entries({ left, right, lh, rh, lj, rj, lt, rt })
     stopped = true;
   function paint(ms) {
     const box = canvas.getBoundingClientRect(),
-      w = Math.min(1200, Math.round(box.width)),
+      w = Math.min(quality() === "Low" ? 240 : 960, Math.round(box.width)),
       h = Math.max(1, Math.round((box.height * w) / box.width));
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
@@ -135,7 +138,7 @@ ${Object.entries({ left, right, lh, rh, lj, rj, lt, rt })
     if (stopped || document.hidden) return;
     if (
       t - last >=
-      (quality() === "Low" ? 100 : quality() === "High" ? 33 : 50)
+      (quality() === "Low" ? 150 : quality() === "High" ? 50 : 83)
     ) {
       paint(motion() ? t : 0);
       last = t;
@@ -150,7 +153,12 @@ ${Object.entries({ left, right, lh, rh, lj, rj, lt, rt })
   }
   function start() {
     stop();
-    if (document.body.classList.contains("playing") || document.hidden) return;
+    if (
+      document.body.classList.contains("playing") ||
+      document.body.classList.contains("entering") ||
+      document.hidden
+    )
+      return;
     canvas.dataset.active = motion() ? "true" : "static";
     if (!motion()) {
       paint(0);

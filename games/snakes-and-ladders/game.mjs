@@ -1,15 +1,22 @@
 import {
+  renderQuality,
+  menuArtwork,
+  caveArtwork,
+  preloadImage,
+  compactDevice,
+} from "./performance.mjs?v=20261109-fast";
+import {
   MEDALS,
   finishPresentation,
   finishMedal,
   finalStandings,
 } from "./results.mjs";
-import { createJungleLife } from "./jungle-life.mjs?v=20261109-living";
-import { createCavernEyes } from "./cavern-eyes.mjs?v=20261109-living";
-import { createFireworks } from "./fireworks.mjs?v=20261109-living";
-import { createCinematic } from "./cinematic.mjs?v=20261109-portal";
-import { createMenuScene } from "./menu-scene.mjs?v=20261109-living";
-import { createLava } from "./lava.mjs?v=20261108-cinema";
+import { createJungleLife } from "./jungle-life.mjs?v=20261109-fast";
+import { createCavernEyes } from "./cavern-eyes.mjs?v=20261109-fast";
+import { createFireworks } from "./fireworks.mjs?v=20261109-fast";
+import { createCinematic } from "./cinematic.mjs?v=20261109-fast";
+import { createMenuScene } from "./menu-scene.mjs?v=20261109-fast";
+import { createLava } from "./lava.mjs?v=20261109-fast";
 import {
   snakeCurve,
   headPoseFromPath,
@@ -17,7 +24,8 @@ import {
 import {
   createBodyCanvas,
   paintBodies,
-} from "./serpent-renderer.mjs?v=20261108-joined";
+  preloadBodyAssets,
+} from "./serpent-renderer.mjs?v=20261109-fast";
 import { setGameInProgress } from "../refresh-guard.mjs";
 import {
   SNAKES,
@@ -85,15 +93,18 @@ let state = null,
   activeRollAnimation = null,
   context,
   ambienceNode;
-const reduced = () =>
-  matchMedia("(prefers-reduced-motion: reduce)").matches || !settings.motion;
+const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+const reduced = () => motionQuery.matches || !settings.motion;
 const liveLava = createLava($("#live-lava"), {
   motion: () => !reduced(),
-  quality: () => settings.quality,
+  quality: () => renderQuality(settings.quality),
 });
 function applySettings() {
   document.body.classList.toggle("reduced", reduced());
-  document.body.classList.toggle("low", settings.quality === "Low");
+  document.body.classList.toggle(
+    "low",
+    renderQuality(settings.quality) === "Low",
+  );
   const sound = $("#sound"),
     label = audioMuted ? "Unmute sound" : "Mute sound";
   sound.setAttribute("aria-label", label);
@@ -103,6 +114,15 @@ function applySettings() {
   save("serpent-muted", audioMuted);
   save("serpent-settings", settings);
   updateAmbience();
+  if (boardAnimationActive()) {
+    cancelAnimationFrame(raf);
+    lastBoardFrame = -Infinity;
+    raf = requestAnimationFrame(animateBoard);
+  } else if (state && !$("#play").hidden && reduced()) {
+    cancelAnimationFrame(raf);
+    lastBoardFrame = -Infinity;
+    animateBoard(0);
+  }
   if (state && !$("#play").hidden && $("#celebration").hidden) liveLava.start();
 }
 function audio() {
@@ -226,7 +246,11 @@ $("#colors").onclick = (e) => {
   if (b) colorPicker(+b.dataset.setupColor);
 };
 function board() {
+  preloadBodyAssets().catch(() => {});
   const b = $("#board");
+  document
+    .querySelectorAll(".board-base,.living-serpents")
+    .forEach((e) => e.remove());
   b.replaceChildren();
   paths = {};
   const defs = svg("defs", {}, b);
@@ -753,20 +777,32 @@ function taperedRibbon(d) {
   }
   return `M ${left.join(" L ")} L ${right.reverse().join(" L ")} Z`;
 }
+function boardAnimationActive() {
+  return (
+    state &&
+    !$("#play").hidden &&
+    !document.hidden &&
+    $("#celebration").hidden &&
+    !document.body.classList.contains("mouth-crossing") &&
+    !reduced()
+  );
+}
 function animateBoard(t) {
   const interval =
-    settings.quality === "High" ? 16 : settings.quality === "Low" ? 100 : 33;
+    renderQuality(settings.quality) === "High"
+      ? 33
+      : renderQuality(settings.quality) === "Low"
+        ? 125
+        : 67;
   if (t - lastBoardFrame < interval) {
-    if (state && !$("#play").hidden) raf = requestAnimationFrame(animateBoard);
+    if (boardAnimationActive()) raf = requestAnimationFrame(animateBoard);
     return;
   }
   lastBoardFrame = t;
   for (const item of Object.values(paths)) {
     if (item.kind === "snake") {
       const d = curve(item.p, item.q, item.i, t);
-      for (const el of [item.path, item.inner, item.sheen, item.pattern])
-        el.setAttribute("d", d);
-      item.taper.setAttribute("d", taperedRibbon(d));
+      item.path.setAttribute("d", d);
       item.head.setAttribute(
         "transform",
         `translate(${item.p.x} ${item.p.y}) rotate(${(headPoseFromPath(d).angle * 180) / Math.PI})`,
@@ -778,9 +814,9 @@ function animateBoard(t) {
       bodyCanvas,
       Object.values(paths).filter((p) => p.kind === "snake"),
       reduced() ? 0 : t,
-      settings.quality,
+      renderQuality(settings.quality),
     );
-  if (state && !$("#play").hidden) raf = requestAnimationFrame(animateBoard);
+  if (boardAnimationActive()) raf = requestAnimationFrame(animateBoard);
 }
 function place(i, n, point) {
   const p = point ?? (n ? center(n) : { x: 3 + i * 3, y: 103 });
@@ -912,12 +948,17 @@ function render() {
     })
     .join("");
   fitGame();
-  liveLava.start();
-  cavernEyes.start();
+  if ($("#celebration").hidden && $("#intro").hidden) {
+    liveLava.start();
+    cavernEyes.start();
+  }
 }
 function fitGame() {
   if (!state || $("#play").hidden) return;
-  const height = window.visualViewport?.height ?? innerHeight,
+  const height = Math.min(
+      innerHeight,
+      window.visualViewport?.height ?? innerHeight,
+    ),
     portrait = innerWidth < 820 && height > innerWidth,
     desktop = innerWidth >= 1000 && height >= 600;
   document.body.classList.toggle("desktop-game", desktop);
@@ -936,6 +977,12 @@ function fitGame() {
     : portrait
       ? Math.min(width, height - top - aside.offsetHeight - 18)
       : Math.min(height - top - 23, width - 214, 920);
+  $(".board-frame").style.setProperty(
+    "--board-pad",
+    getComputedStyle($(".board-frame")).paddingLeft,
+  );
+  if (bodyCanvas)
+    bodyCanvas.dataset.renderSize = String(Math.max(120, Math.floor(size)));
   document.body.style.setProperty(
     "--board-size",
     Math.max(120, Math.floor(size)) + "px",
@@ -1010,6 +1057,11 @@ async function takeTurn() {
   const token = epoch,
     i = state.current;
   render();
+  if (state.rolls === 0 && state.bot)
+    setTimeout(() => {
+      preloadImage("assets/victory-emblem.webp").catch(() => {});
+      preloadImage("assets/defeat-title.webp").catch(() => {});
+    }, 1000);
   const value = die();
   tone(250, 0.25);
   await spinDie(i, value, token);
@@ -1090,6 +1142,8 @@ async function takeTurn() {
   }
 }
 function cancel() {
+  $("#start").removeAttribute("aria-busy");
+  $("#start").querySelector("span:last-child").textContent = "Play Now";
   liveLava.stop();
   resultFireworks.stop();
   entranceCinema.cancel();
@@ -1119,8 +1173,40 @@ function cancel() {
   $("#intro").classList.remove("reveal");
   document.body.classList.remove("entering", "arriving");
 }
-function begin(skip = false) {
+async function begin(skip = false) {
   cancel();
+  const loadingToken = epoch,
+    start = $("#start");
+  start.disabled = true;
+  start.setAttribute("aria-busy", "true");
+  start.querySelector("span:last-child").textContent = "Loading…";
+  $("main").inert = true;
+  audio();
+  try {
+    await Promise.all([
+      preloadBodyAssets(),
+      ...[
+        caveArtwork(),
+        menuArtwork(),
+        "assets/marble-atlas.webp",
+        "assets/royal-logo.webp",
+      ].map(preloadImage),
+    ]);
+  } catch {
+    if (epoch !== loadingToken) return;
+    start.disabled = false;
+    start.removeAttribute("aria-busy");
+    start.querySelector("span:last-child").textContent = "Play Now";
+    $("main").inert = false;
+    $("#dialog-content").innerHTML =
+      "<h2>The realm could not load</h2><p>Please check your connection and try Play Now again.</p>";
+    $("#dialog").showModal();
+    return;
+  }
+  if (epoch !== loadingToken) return;
+  start.removeAttribute("aria-busy");
+  start.querySelector("span:last-child").textContent = "Play Now";
+
   const mode = $("#mode").value,
     colors = [...document.querySelectorAll("[data-color]")].map((s) => s.value);
   state = createGame(colors.length, mode === "bot", colors);
@@ -1156,6 +1242,11 @@ function begin(skip = false) {
     $("main").inert = false;
     $("header").inert = false;
     fitGame();
+    cancelAnimationFrame(raf);
+    lastBoardFrame = -Infinity;
+    raf = requestAnimationFrame(animateBoard);
+    liveLava.start();
+    cavernEyes.start();
     scheduleBot();
   };
   $("#start").disabled = true;
@@ -1172,7 +1263,7 @@ function begin(skip = false) {
       profile: hero,
       board: $("#play"),
       onBoardReady: prepare,
-      quality: settings.quality,
+      quality: renderQuality(settings.quality),
       onReveal: reveal,
     });
     $("#skip").onclick = () => entranceCinema.finish();
@@ -1243,7 +1334,7 @@ function menu(immediate = false) {
     profile,
     board: $("#play"),
     motion: true,
-    quality: settings.quality,
+    quality: renderQuality(settings.quality),
     fromDefeat,
     resultRect,
     onReveal: reveal,
@@ -1386,12 +1477,12 @@ function celebrate(i) {
       title: $("#result-title"),
       profile: cameraProfile(),
       board: $("#play"),
-      quality: settings.quality,
+      quality: renderQuality(settings.quality),
     });
   else {
     resultFireworks.start(HEX[COLORS.indexOf(p.color)], {
       motion: !reduced(),
-      quality: settings.quality,
+      quality: renderQuality(settings.quality),
     });
     tone(880, 0.5);
   }
@@ -1548,11 +1639,20 @@ $("#continue").onclick = resumeMatch;
 $("#try-again").onclick = () => begin(true);
 $("#result-menu").onclick = menu;
 document.addEventListener("visibilitychange", () => {
+  document.body.classList.toggle("page-hidden", document.hidden);
   if (document.hidden) {
+    cancelAnimationFrame(raf);
+    cavernEyes.stop();
     clearTimeout(botTimer);
     liveLava.stop();
   } else {
     scheduleBot();
+    if (boardAnimationActive()) {
+      lastBoardFrame = -Infinity;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(animateBoard);
+      cavernEyes.start();
+    }
     if (state && !$("#play").hidden && $("#celebration").hidden)
       liveLava.start();
   }
@@ -1570,11 +1670,11 @@ const entranceCinema = createCinematic($("#entrance-scene"), "entrance");
 const defeatCinema = createCinematic($("#defeat-snake"), "defeat");
 const jungleLife = createJungleLife($("#jungle-life"), {
   motion: () => !reduced(),
-  quality: () => settings.quality,
+  quality: () => renderQuality(settings.quality),
 });
 const menuScene = createMenuScene($("#jungle"), $("#jungle-water"), {
   motion: () => !reduced(),
-  quality: () => settings.quality,
+  quality: () => renderQuality(settings.quality),
 });
 function fitJungleRigs() {
   const box = $("#jungle").getBoundingClientRect();
@@ -1589,6 +1689,18 @@ window.addEventListener("resize", () => {
   fitGame();
 });
 window.visualViewport?.addEventListener("resize", fitGame);
+$(".painted-title img").src = menuArtwork();
+$("#celebration .crown image").setAttribute("href", menuArtwork());
+function fitViewport() {
+  document.body.style.setProperty(
+    "--app-height",
+    Math.round(Math.min(innerHeight, visualViewport?.height ?? innerHeight)) +
+      "px",
+  );
+}
+fitViewport();
+window.addEventListener("resize", fitViewport);
+visualViewport?.addEventListener("resize", fitViewport);
 selectMode();
 applySettings();
 // Explicit local-only browser harness; never enabled on the published website.

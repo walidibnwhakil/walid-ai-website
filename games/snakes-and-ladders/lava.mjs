@@ -2,36 +2,19 @@
 export function createLava(canvas, { motion, quality }) {
   const c = canvas.getContext("2d");
   const plates = {};
-  for (const name of ["cavern.webp", "cavern-mobile.webp"]) {
-    const image = new Image();
-    image.onload = () => {
-      const layer = document.createElement("canvas");
-      layer.width = image.naturalWidth;
-      layer.height = Math.round(image.naturalHeight * 0.28);
-      const lc = layer.getContext("2d");
-      lc.drawImage(
-        image,
-        0,
-        image.naturalHeight - layer.height,
-        layer.width,
-        layer.height,
-        0,
-        0,
-        layer.width,
-        layer.height,
-      );
-      const pixels = lc.getImageData(0, 0, layer.width, layer.height),
-        a = pixels.data;
-      for (let i = 0; i < a.length; i += 4) {
-        a[i + 3] =
-          a[i] > 190 && a[i + 1] > 55 && a[i + 1] > a[i + 2] * 1.1
-            ? Math.min(255, (a[i] - 160) * 2)
-            : 0;
-      }
-      lc.putImageData(pixels, 0, 0);
-      plates[name] = layer;
-    };
-    image.src = "assets/" + name;
+  function loadPlate() {
+    const name = innerWidth <= 800 ? "cavern-mobile.webp" : "cavern.webp";
+    if (!plates[name]) {
+      const im = new Image();
+      im.decoding = "async";
+      im.onload = () => {
+        if (running || !motion()) paint(0);
+      };
+      im.src =
+        "assets/" +
+        (innerWidth <= 800 ? "lava-mobile-ready.webp" : "lava-ready.webp");
+      plates[name] = im;
+    }
   }
   let raf = 0,
     last = 0,
@@ -48,7 +31,7 @@ export function createLava(canvas, { motion, quality }) {
     const t = ms / 1000;
     const plate =
       plates[innerWidth <= 800 ? "cavern-mobile.webp" : "cavern.webp"];
-    if (plate) {
+    if (plate?.complete && plate.naturalWidth) {
       c.globalAlpha = 0.78;
       const step = quality() === "Low" ? 16 : 9;
       for (let y = 0; y < h; y += step) {
@@ -121,7 +104,7 @@ export function createLava(canvas, { motion, quality }) {
     }
     if (
       t - last >=
-      (quality() === "Low" ? 100 : quality() === "High" ? 33 : 50)
+      (quality() === "Low" ? 125 : quality() === "High" ? 50 : 83)
     ) {
       paint(motion() ? t : 0);
       last = t;
@@ -133,6 +116,16 @@ export function createLava(canvas, { motion, quality }) {
     }
   }
   function start() {
+    if (
+      document.hidden ||
+      !document.body.classList.contains("playing") ||
+      !document.querySelector("#celebration").hidden ||
+      !document.querySelector("#intro").hidden
+    ) {
+      stop();
+      return;
+    }
+    loadPlate();
     canvas.dataset.active = "true";
     if (!motion()) {
       stop();

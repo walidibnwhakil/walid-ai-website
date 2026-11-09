@@ -307,6 +307,7 @@ fs.mkdirSync(out, { recursive: true });
     () => (window.originalMenuHead = document.querySelector("#royal-upper")),
   );
   await page.click("#start");
+  await page.waitForSelector("#intro:visible");
   await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.12));
   await shot("intro-focus");
   await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.3));
@@ -496,15 +497,11 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check("living lava moves", async () => {
-    const a = await page
-      .locator(".embers")
-      .evaluate((e) => getComputedStyle(e).transform);
-    await page.waitForTimeout(250);
+    const a = await page.locator("#live-lava").evaluate((e) => e.toDataURL());
+    await page.waitForTimeout(300);
     assert.notEqual(
+      await page.locator("#live-lava").evaluate((e) => e.toDataURL()),
       a,
-      await page
-        .locator(".embers")
-        .evaluate((e) => getComputedStyle(e).transform),
     );
   });
   await check(
@@ -1425,6 +1422,7 @@ fs.mkdirSync(out, { recursive: true });
         )),
       );
       await page.click("#start");
+      await page.waitForSelector("#intro:visible");
       await page.evaluate(() => serpentTest.entranceCinema.sample(0.36));
       assert(
         (

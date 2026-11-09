@@ -5,7 +5,6 @@ import {
 } from "./snake-geometry.mjs?v=20261108-joined";
 // Photo-style natural skin is deformed along the authoritative animated curve.
 const skinAtlas = new Image();
-skinAtlas.src = new URL("assets/natural-skin.webp", import.meta.url).href;
 
 const joinedAtlas = new Image(),
   openAtlas = new Image(),
@@ -44,8 +43,51 @@ function prepareHeads(atlas, output) {
 }
 joinedAtlas.onload = () => prepareHeads(joinedAtlas, closedSprites);
 openAtlas.onload = () => prepareHeads(openAtlas, openSprites);
-joinedAtlas.src = new URL("assets/joined-heads.webp", import.meta.url).href;
-openAtlas.src = new URL("assets/joined-heads-open.webp", import.meta.url).href;
+let assetsReady;
+export function preloadBodyAssets() {
+  return (assetsReady ??= Promise.all(
+    [
+      [skinAtlas, "natural-skin.webp"],
+      [joinedAtlas, "joined-heads.webp"],
+      [openAtlas, "joined-heads-open.webp"],
+    ].map(
+      ([image, name]) =>
+        new Promise((resolve, reject) => {
+          const prepared = image.onload;
+          image.onload = () => {
+            prepared?.();
+            resolve();
+          };
+          image.onerror = () => {
+            assetsReady = null;
+            reject(new Error("Could not load snake textures"));
+          };
+          image.decoding = "async";
+          image.src = new URL("assets/" + name, import.meta.url).href;
+        }),
+    ),
+  ));
+}
+let shadeStrip;
+function shadeTexture() {
+  if (shadeStrip) return shadeStrip;
+  shadeStrip = document.createElement("canvas");
+  shadeStrip.width = 64;
+  shadeStrip.height = 1;
+  const g = shadeStrip.getContext("2d"),
+    shade = g.createLinearGradient(0, 0, 64, 0);
+  for (const [p, color] of [
+    [0, "#000a"],
+    [0.24, "#0002"],
+    [0.43, "#ffffff10"],
+    [0.68, "#0001"],
+    [1, "#000a"],
+  ])
+    shade.addColorStop(p, color);
+  g.fillStyle = shade;
+  g.fillRect(0, 0, 64, 1);
+  return shadeStrip;
+}
 function paintHead(c, item, time) {
   const type = item.i % 4,
     sprite = closedSprites[type];
@@ -59,7 +101,7 @@ function paintHead(c, item, time) {
   c.translate(pose.x, pose.y);
   c.rotate(pose.angle);
   c.shadowColor = "#0009";
-  c.shadowBlur = 4;
+  c.shadowBlur = 0;
   c.shadowOffsetX = 1;
   c.shadowOffsetY = 2;
   c.drawImage(sprite, f.x, f.y, f.width, f.height * f.crop);
@@ -112,7 +154,8 @@ function samples(d, time, index, quality) {
   const count = Math.max(
       18,
       Math.ceil(
-        Math.hypot(x3 - x0, y3 - y0) / (quality === "Low" ? 1.25 : 0.75),
+        Math.hypot(x3 - x0, y3 - y0) /
+          (quality === "Low" ? 3 : quality === "High" ? 0.9 : 1.6),
       ),
     ),
     out = [];
@@ -151,169 +194,219 @@ function samples(d, time, index, quality) {
   return out;
 }
 export function createBodyCanvas(board) {
-  const fo = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "foreignObject",
-  );
-  fo.setAttribute("x", 0);
-  fo.setAttribute("y", 0);
-  fo.setAttribute("width", 100);
-  fo.setAttribute("height", 100);
-  fo.setAttribute("pointer-events", "none");
+  const base = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  base.setAttribute("viewBox", "0 0 100 100");
+  base.setAttribute("aria-hidden", "true");
+  base.classList.add("board-base");
+  for (const node of [...board.children])
+    if (node.tagName.toLowerCase() !== "defs") base.append(node);
   const canvas = document.createElement("canvas");
   canvas.className = "living-serpents";
   canvas.setAttribute("aria-hidden", "true");
-  canvas.style.cssText = "width:100%;height:100%;display:block";
-  fo.append(canvas);
-  board.append(fo);
+  board.before(base, canvas);
   return canvas;
 }
-export function paintBodies(canvas, items, time, quality = "Balanced") {
-  const resolution = quality === "High" ? 1400 : quality === "Low" ? 700 : 1100;
-  if (canvas.width !== resolution) {
-    canvas.width = resolution;
-    canvas.height = resolution;
-  }
-  const c = canvas.getContext("2d");
-  c.setTransform(resolution / 100, 0, 0, resolution / 100, 0, 0);
-  c.clearRect(0, 0, 100, 100);
-  for (const item of items) {
-    const points = samples(item.path.getAttribute("d"), time, item.i, quality),
-      color = rgb(item.color);
-    c.save();
-    c.beginPath();
-    points.forEach((p, j) => {
-      const x = p.x + p.nx * p.w,
-        y = p.y + p.ny * p.w;
-      j ? c.lineTo(x, y) : c.moveTo(x, y);
-    });
-    [...points]
-      .reverse()
-      .forEach((p) => c.lineTo(p.x - p.nx * p.w, p.y - p.ny * p.w));
-    c.closePath();
-    c.fillStyle = "#0c0806";
-    c.shadowColor = "#000b";
-    c.shadowBlur = 5;
-    c.shadowOffsetX = 2;
-    c.shadowOffsetY = 4;
-    c.fill();
-    c.restore();
-    c.save();
-    c.beginPath();
-    points.forEach((p, j) => {
-      const x = p.x + p.nx * p.w,
-        y = p.y + p.ny * p.w;
-      j ? c.lineTo(x, y) : c.moveTo(x, y);
-    });
-    [...points]
-      .reverse()
-      .forEach((p) => c.lineTo(p.x - p.nx * p.w, p.y - p.ny * p.w));
-    c.closePath();
-    c.clip();
+function paintBody(c, item, time, quality) {
+  const points = samples(item.path.getAttribute("d"), time, item.i, quality),
+    color = rgb(item.color);
+  c.save();
+  c.beginPath();
+  points.forEach((p, j) => {
+    const x = p.x + p.nx * p.w,
+      y = p.y + p.ny * p.w;
+    j ? c.lineTo(x, y) : c.moveTo(x, y);
+  });
+  [...points]
+    .reverse()
+    .forEach((p) => c.lineTo(p.x - p.nx * p.w, p.y - p.ny * p.w));
+  c.closePath();
+  c.fillStyle = "#0c0806";
+  c.shadowColor = "#000b";
+  c.shadowBlur = 0;
+  c.shadowOffsetX = 2;
+  c.shadowOffsetY = 4;
+  c.fill();
+  c.restore();
+  c.save();
+  c.beginPath();
+  points.forEach((p, j) => {
+    const x = p.x + p.nx * p.w,
+      y = p.y + p.ny * p.w;
+    j ? c.lineTo(x, y) : c.moveTo(x, y);
+  });
+  [...points]
+    .reverse()
+    .forEach((p) => c.lineTo(p.x - p.nx * p.w, p.y - p.ny * p.w));
+  c.closePath();
+  c.clip();
+  c.fillStyle = item.color;
+  c.fill();
+  if (skinAtlas.complete && skinAtlas.naturalWidth) {
+    const cell = skinAtlas.naturalWidth / 2,
+      type = item.i % 4,
+      sx = (type % 2) * cell,
+      baseY = Math.floor(type / 2) * cell;
+    let arc = 0;
     for (let j = 0; j < points.length - 1; j++) {
       const p = points[j],
         q = points[j + 1],
-        g = c.createLinearGradient(
-          p.x + p.nx * p.w,
-          p.y + p.ny * p.w,
-          p.x - p.nx * p.w,
-          p.y - p.ny * p.w,
+        length = Math.hypot(q.x - p.x, q.y - p.y),
+        sourceHeight = (length * cell) / HEAD_FRAME.height,
+        sourceY = ((arc * cell) / HEAD_FRAME.height) % cell,
+        sourceWidth = ((2 * p.w) / HEAD_FRAME.width) * cell,
+        sourceX = sx + (cell - sourceWidth) / 2;
+      c.save();
+      c.transform(p.nx, p.ny, p.tx, p.ty, p.x, p.y);
+      let consumed = 0;
+      while (consumed < sourceHeight) {
+        const sy = (sourceY + consumed) % cell,
+          part = Math.min(sourceHeight - consumed, cell - sy);
+        c.drawImage(
+          skinAtlas,
+          sourceX,
+          baseY + sy,
+          sourceWidth,
+          Math.max(0.01, part),
+          -p.w,
+          (consumed / sourceHeight) * length - 0.04,
+          2 * p.w,
+          (part / sourceHeight) * length + 0.1,
         );
-      g.addColorStop(0, tint(color, 0.22));
-      g.addColorStop(0.18, tint(color, 0.75));
-      g.addColorStop(0.38, tint(color, 1.15, 42));
-      g.addColorStop(0.62, tint(color, 0.95));
-      g.addColorStop(1, tint(color, 0.18));
-      c.beginPath();
-      c.moveTo(p.x + p.nx * p.w - p.tx * 0.06, p.y + p.ny * p.w - p.ty * 0.06);
-      c.lineTo(q.x + q.nx * q.w + q.tx * 0.06, q.y + q.ny * q.w + q.ty * 0.06);
-      c.lineTo(q.x - q.nx * q.w + q.tx * 0.06, q.y - q.ny * q.w + q.ty * 0.06);
-      c.lineTo(p.x - p.nx * p.w - p.tx * 0.06, p.y - p.ny * p.w - p.ty * 0.06);
-      c.closePath();
-      c.fillStyle = g;
-      c.fill();
-    }
-    if (skinAtlas.complete && skinAtlas.naturalWidth) {
-      const cell = skinAtlas.naturalWidth / 2,
-        type = item.i % 4,
-        sx = (type % 2) * cell,
-        baseY = Math.floor(type / 2) * cell;
-      let arc = 0;
-      for (let j = 0; j < points.length - 1; j++) {
-        const p = points[j],
-          q = points[j + 1],
-          length = Math.hypot(q.x - p.x, q.y - p.y),
-          sourceHeight = (length * cell) / HEAD_FRAME.height,
-          sourceY = ((arc * cell) / HEAD_FRAME.height) % cell,
-          sourceWidth = ((2 * p.w) / HEAD_FRAME.width) * cell,
-          sourceX = sx + (cell - sourceWidth) / 2;
-        c.save();
-        c.transform(p.nx, p.ny, p.tx, p.ty, p.x, p.y);
-        let consumed = 0;
-        while (consumed < sourceHeight) {
-          const sy = (sourceY + consumed) % cell,
-            part = Math.min(sourceHeight - consumed, cell - sy);
-          c.drawImage(
-            skinAtlas,
-            sourceX,
-            baseY + sy,
-            sourceWidth,
-            Math.max(0.01, part),
-            -p.w,
-            (consumed / sourceHeight) * length - 0.04,
-            2 * p.w,
-            (part / sourceHeight) * length + 0.1,
-          );
-          consumed += part;
-        }
-        if (joinedAtlas.complete && joinedAtlas.naturalWidth && arc < 9) {
-          const hc = joinedAtlas.naturalWidth / 2,
-            uv = headUvAtLocal(-p.w, Math.min(4.8, arc)),
-            neckX = (type % 2) * hc + uv.u * hc,
-            neckY = Math.floor(type / 2) * hc + uv.v * hc,
-            neckWidth = ((2 * p.w) / HEAD_FRAME.width) * hc,
-            neckH = (length / HEAD_FRAME.height) * hc;
-          c.globalAlpha = Math.max(0, Math.min(1, (9 - arc) / 5.5));
-          c.drawImage(
-            joinedAtlas,
-            neckX,
-            neckY,
-            neckWidth,
-            Math.max(0.01, neckH),
-            -p.w,
-            -0.04,
-            p.w * 2,
-            length + 0.1,
-          );
-          c.globalAlpha = 1;
-        }
-        const shade = c.createLinearGradient(-p.w, 0, p.w, 0);
-        shade.addColorStop(0, "#000a");
-        shade.addColorStop(0.24, "#0002");
-        shade.addColorStop(0.43, "#ffffff10");
-        shade.addColorStop(0.68, "#0001");
-        shade.addColorStop(1, "#000a");
-        c.fillStyle = shade;
-        c.globalAlpha = Math.max(0, Math.min(1, (arc - 2.8) / 5));
-        c.fillRect(-p.w, -0.04, p.w * 2, length + 0.1);
-        c.globalAlpha = 1;
-        c.restore();
-        arc += length;
+        consumed += part;
       }
+      if (joinedAtlas.complete && joinedAtlas.naturalWidth && arc < 9) {
+        const hc = joinedAtlas.naturalWidth / 2,
+          uv = headUvAtLocal(-p.w, Math.min(4.8, arc)),
+          neckX = (type % 2) * hc + uv.u * hc,
+          neckY = Math.floor(type / 2) * hc + uv.v * hc,
+          neckWidth = ((2 * p.w) / HEAD_FRAME.width) * hc,
+          neckH = (length / HEAD_FRAME.height) * hc;
+        c.globalAlpha = Math.max(0, Math.min(1, (9 - arc) / 5.5));
+        c.drawImage(
+          joinedAtlas,
+          neckX,
+          neckY,
+          neckWidth,
+          Math.max(0.01, neckH),
+          -p.w,
+          -0.04,
+          p.w * 2,
+          length + 0.1,
+        );
+        c.globalAlpha = 1;
+      }
+      c.globalAlpha = Math.max(0, Math.min(1, (arc - 2.8) / 5));
+      c.drawImage(
+        shadeTexture(),
+        0,
+        0,
+        64,
+        1,
+        -p.w,
+        -0.04,
+        p.w * 2,
+        length + 0.1,
+      );
+      c.globalAlpha = 1;
+      c.restore();
+      arc += length;
     }
-    // A travelling specular highlight adds a subtle breathing sheen, without moving endpoints.
-    c.globalAlpha = item.i % 4 === 3 ? 0.15 : 0.08;
-    c.beginPath();
-    points.forEach((p, j) => {
-      const x = p.x - p.nx * p.w * 0.28,
-        y = p.y - p.ny * p.w * 0.28;
-      j ? c.lineTo(x, y) : c.moveTo(x, y);
-    });
-    c.strokeStyle = "#fff2b3";
-    c.lineWidth = 0.14;
-    c.stroke();
-    c.globalAlpha = 1;
-    c.restore();
   }
+  // A travelling specular highlight adds a subtle breathing sheen, without moving endpoints.
+  c.globalAlpha = item.i % 4 === 3 ? 0.15 : 0.08;
+  c.beginPath();
+  points.forEach((p, j) => {
+    const x = p.x - p.nx * p.w * 0.28,
+      y = p.y - p.ny * p.w * 0.28;
+    j ? c.lineTo(x, y) : c.moveTo(x, y);
+  });
+  c.strokeStyle = "#fff2b3";
+  c.lineWidth = 0.14;
+  c.stroke();
+  c.globalAlpha = 1;
+  c.restore();
+}
+// Cache each photographed body in its tight bounding box. Refresh one body per tick;
+// composite cached bodies and animate all heads without repainting eight textured meshes.
+export function paintBodies(canvas, items, time, quality = "Balanced") {
+  const size = +canvas.dataset.renderSize || 500;
+  const resolution = Math.round(
+    Math.min(
+      quality === "High" ? 1200 : quality === "Low" ? 600 : 900,
+      Math.max(240, size * (quality === "High" ? 1.5 : 1.25)),
+    ),
+  );
+  let cache = canvas.bodyCache;
+  if (
+    !cache ||
+    cache.resolution !== resolution ||
+    cache.quality !== quality ||
+    cache.items[0] !== items[0]
+  ) {
+    cache = canvas.bodyCache = {
+      resolution,
+      quality,
+      items,
+      index: 0,
+      layers: items.map((item) => {
+        const n = item.path
+            .getAttribute("d")
+            .match(/-?[\d.]+/g)
+            .map(Number),
+          xs = [n[0], n[2], n[4], n[6]],
+          ys = [n[1], n[3], n[5], n[7]],
+          x = Math.min(...xs) - 4,
+          y = Math.min(...ys) - 4,
+          w = Math.max(...xs) - x + 4,
+          h = Math.max(...ys) - y + 4;
+        const image = document.createElement("canvas");
+        image.width = Math.ceil((w * resolution) / 100);
+        image.height = Math.ceil((h * resolution) / 100);
+        return { image, c: image.getContext("2d"), x, y, w, h, ready: false };
+      }),
+    };
+  }
+  const refresh = (index) => {
+    const layer = cache.layers[index],
+      scale = resolution / 100;
+    layer.c.setTransform(1, 0, 0, 1, 0, 0);
+    layer.c.clearRect(0, 0, layer.image.width, layer.image.height);
+    layer.c.setTransform(
+      scale,
+      0,
+      0,
+      scale,
+      -layer.x * scale,
+      -layer.y * scale,
+    );
+    paintBody(layer.c, items[index], time, quality);
+    layer.ready = true;
+  };
+  let repainted = 0;
+  for (let i = 0; i < items.length; i++)
+    if (!cache.layers[i].ready) {
+      refresh(i);
+      repainted++;
+    }
+  if (!repainted && items.length) {
+    refresh(cache.index);
+    repainted++;
+    for (let i = 0; i < items.length; i++)
+      if (i !== cache.index && items[i].g.classList.contains("active-snake")) {
+        refresh(i);
+        repainted++;
+      }
+    cache.index = (cache.index + 1) % items.length;
+  }
+  if (canvas.width !== resolution) {
+    canvas.width = canvas.height = resolution;
+  }
+  const c = canvas.getContext("2d");
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.clearRect(0, 0, resolution, resolution);
+  c.setTransform(resolution / 100, 0, 0, resolution / 100, 0, 0);
+  for (const layer of cache.layers)
+    c.drawImage(layer.image, layer.x, layer.y, layer.w, layer.h);
   for (const item of items) paintHead(c, item, time);
+  canvas.renderStats = { repainted, cached: items.length, resolution };
 }

@@ -93,3 +93,25 @@ The entrance opens and advances the original menu cobra before camera entry. Its
 The die stage has no idle tilt. Twelve physical face-facing samples occur within 620 ms; the settled result faces the camera. Result containers clip transformed paint rather than adding internal scrollbars. All five result types (bot win, bot loss, two-player winner, three-/four-player final standings) are checked for visible buttons on twelve viewport sizes, including 640×360 and 844×390. Progressive multiplayer medals remain board-anchored and auto-resume after 3.5 seconds; final standings stay over the board. The loss title is local transparent WebP artwork, with no runtime asset API.
 
 These animals are photographic 2D texture rigs and aperture compositing, not a volumetric 3D animal model. Physical iPhone/Android devices and Safari have not been tested.
+
+## Mobile/desktop loading and thermal-work revision
+
+Menu startup no longer downloads both cavern plates, snake textures or result artwork. Compact screens/pointers use a 768px emblem and 960px jungle background. Photo foliage and river/lava transparency masks are preprocessed local WebP assets, avoiding large getImageData loops during startup. Start shows Loading and locks duplicate clicks until required scene images/textures are ready; image decoding finishes before the cinematic starts. Failed downloads show a retry message.
+
+Compact menus use one photographed emblem layer and small eyelids instead of many full-image SVG mask rigs. Water/sprites have bounded raster sizes and update rates. The portrait menu uses a safe grid even at 320×480; visible viewport resizing cannot leave a taller stale menu after rotation.
+
+The static board, animated body Canvas and vector number/pawn overlay are independent layers. This also removes the SVG foreignObject Canvas composition path on mobile browsers. Each photographic snake body has a tight cached bitmap; only one body (plus an active swallowing snake) refreshes per tick, while heads remain animated. Canvas resolution follows displayed board size rather than a fixed 1100×1100 surface. Redundant hidden SVG body/shading updates, per-segment gradient creation, viewport CSS glow/blur layers and the unrelated global branding flower animation are removed. Menu/effects stop during camera travel, hidden tabs, and results. System reduced motion paints one static board instead of maintaining an idle loop.
+
+Controlled Chromium comparison, same machine and throttling/network settings:
+
+| Metric                                               |       Before |         After |
+| ---------------------------------------------------- | -----------: | ------------: |
+| Phone menu ready, 4× CPU / 400 KB/s / 100 ms latency |        9.0 s |         2.2 s |
+| Phone UI animation heartbeat during gameplay         | 3.7 frames/s | 56.6 frames/s |
+| Phone main-thread busy share during gameplay         |        99.6% |         35.0% |
+| Desktop menu ready, 1.5 MB/s / 30 ms latency         |        2.4 s |         0.7 s |
+| Desktop main-thread busy share during gameplay       |        63.9% |         14.3% |
+
+The heartbeat measures UI responsiveness, not the deliberately lower update rate of decorative snake bodies. These are emulated measurements, not a frame-rate or temperature guarantee for physical phones. Hardware temperature was not measured.
+
+Validation: 212 dedicated game unit tests, 51 rendered browser groups and four new real-mobile-emulation groups pass. The latter use touch input, DPR 2, 4× CPU slowdown, 320×480/360×640/390×844/844×390 viewports, startup request exclusions, Loading/double-start guards, bounded cached rendering, layer alignment, fair dice input, hidden-tab pause/resume and return to menu. CI runs mobile-check.cjs after the main browser suite.

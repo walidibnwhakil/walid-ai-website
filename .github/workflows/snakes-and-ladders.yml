@@ -30,6 +30,7 @@ jobs:
           export NODE_PATH=/tmp/serpent/node_modules
           export CHROME=$(command -v google-chrome || command -v chromium)
           node games/snakes-and-ladders/browser-check.cjs
+          node games/snakes-and-ladders/mobile-check.cjs
         env:
           SERPENT_EVIDENCE: ${{ runner.temp }}/serpent-evidence
       - uses: actions/upload-artifact@v4

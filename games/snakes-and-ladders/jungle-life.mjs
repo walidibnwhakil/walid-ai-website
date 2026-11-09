@@ -12,66 +12,32 @@ export function createJungleLife(canvas, { motion, quality }) {
     startTime = 0,
     last = 0;
   atlas.onload = () => {
+    const cell = atlas.naturalWidth / 3;
     for (let k = 0; k < 6; k++) {
       const s = document.createElement("canvas");
-      s.width = s.height = 512;
-      const sc = s.getContext("2d");
-      sc.drawImage(
+      s.width = s.height = cell;
+      s.getContext("2d").drawImage(
         atlas,
-        (k % 3) * 512,
-        Math.floor(k / 3) * 512,
-        512,
-        512,
+        (k % 3) * cell,
+        Math.floor(k / 3) * cell,
+        cell,
+        cell,
         0,
         0,
-        512,
-        512,
+        cell,
+        cell,
       );
-      // Perched sprites arrive on a branch; remove that prop while keeping blue tail/feet.
-      if (k === 0 || k === 3) {
-        const px = sc.getImageData(0, 0, 512, 512),
-          a = px.data;
-        for (let y = 330; y < 512; y++)
-          for (let x = 0; x < 512; x++) {
-            const i = (y * 512 + x) * 4;
-            if (
-              !(a[i + 2] > a[i] * 1.1 && a[i + 2] > a[i + 1] * 0.6) &&
-              !(a[i] > 150 && a[i] > a[i + 1] * 1.5)
-            )
-              a[i + 3] = 0;
-          }
-        sc.putImageData(px, 0, 0);
-      }
       sprites.push(s);
     }
-    if (!motion()) paint(3000);
+    paint(3000);
   };
   plate.onload = () => {
-    water = document.createElement("canvas");
-    water.width = 1536;
-    water.height = 1024;
-    const wc = water.getContext("2d");
-    wc.drawImage(plate, 0, 0, 1536, 1024);
-    const px = wc.getImageData(0, 0, 1536, 1024),
-      a = px.data;
-    for (let y = 0; y < 1024; y++)
-      for (let x = 0; x < 1536; x++) {
-        const i = (y * 1536 + x) * 4;
-        if (
-          x < 640 ||
-          x > 1195 ||
-          y < 500 ||
-          a[i + 1] < a[i] * 1.05 ||
-          a[i + 2] < a[i] * 1.02 ||
-          a[i + 1] < 75
-        )
-          a[i + 3] = 0;
-      }
-    wc.putImageData(px, 0, 0);
-    if (!motion()) paint(3000);
+    water = plate;
+    paint(3000);
   };
-  atlas.src = "assets/jungle-life.webp";
-  plate.src = "assets/jungle-menu.webp";
+  atlas.decoding = plate.decoding = "async";
+  atlas.src = "assets/jungle-life-ready.webp";
+  plate.src = "assets/river-ready.webp";
   function plant(cell, x, y, w, h, angle, root = 0.5) {
     if (!sprites[cell]) return;
     c.save();
@@ -203,7 +169,7 @@ export function createJungleLife(canvas, { motion, quality }) {
   function paint(ms) {
     const r = canvas.getBoundingClientRect();
     if (!r.width || !r.height) return;
-    const w = Math.min(1200, Math.round(r.width)),
+    const w = Math.min(quality() === "Low" ? 240 : 960, Math.round(r.width)),
       h = Math.round((r.height * w) / r.width);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
@@ -223,7 +189,17 @@ export function createJungleLife(canvas, { motion, quality }) {
         const sh = Math.min(step, 1024 - y),
           dx = Math.sin(t * 1.3 + y * 0.03) * 3,
           dy = Math.sin(t * 1.7 + y * 0.02) * 2;
-        c.drawImage(water, 640, y, 560, sh, 640 + dx, y + dy, 560, sh + 1);
+        c.drawImage(
+          water,
+          320,
+          y / 2,
+          280,
+          sh / 2,
+          640 + dx,
+          y + dy,
+          560,
+          sh + 1,
+        );
       }
       c.globalAlpha = 1;
     }
@@ -242,7 +218,7 @@ export function createJungleLife(canvas, { motion, quality }) {
     if (!running || document.hidden) return;
     if (
       t - last >=
-      (quality() === "Low" ? 100 : quality() === "High" ? 33 : 50)
+      (quality() === "Low" ? 150 : quality() === "High" ? 50 : 83)
     ) {
       paint(motion() ? t - startTime : 3000);
       last = t;
@@ -256,7 +232,12 @@ export function createJungleLife(canvas, { motion, quality }) {
   }
   function start() {
     stop();
-    if (document.body.classList.contains("playing") || document.hidden) return;
+    if (
+      document.body.classList.contains("playing") ||
+      document.body.classList.contains("entering") ||
+      document.hidden
+    )
+      return;
     startTime = performance.now();
     canvas.dataset.active = motion() ? "true" : "static";
     if (!motion()) {

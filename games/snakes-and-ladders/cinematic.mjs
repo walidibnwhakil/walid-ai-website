@@ -1,4 +1,4 @@
-import { createEntryMesh } from "./snake-entry-mesh.mjs?v=20261109-portal";
+import { createEntryMesh } from "./snake-entry-mesh.mjs?v=20261109-fast";
 const clamp = (n) => Math.max(0, Math.min(1, n));
 const ease = (a, b, t) => {
   const n = clamp((t - a) / (b - a));
@@ -162,7 +162,7 @@ export function createCinematic(host, prefix) {
         ty = (innerHeight / 2 - top - mouth.y) * approach;
       rig.style.transformOrigin = `${mouth.x}px ${mouth.y}px`;
       rig.style.transform = `translate(${tx}px,${ty}px) scale(${zoom}) rotate(${-9 * ease(0.1, 0.5, q)}deg)`;
-      if (now - lastMesh > (quality === "Low" ? 70 : 33)) {
+      if (now - lastMesh > (quality === "Low" ? 100 : 50)) {
         mesh.paint(
           kind === "defeat"
             ? gape - 0.42 * ease(0.6, 0.88, p)

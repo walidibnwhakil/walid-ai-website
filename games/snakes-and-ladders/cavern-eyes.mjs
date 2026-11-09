@@ -2,10 +2,18 @@
 export function createCavernEyes(canvas, { motion }) {
   const c = canvas.getContext("2d"),
     images = {};
-  for (const name of ["cavern.webp", "cavern-mobile.webp"]) {
-    const image = new Image();
-    image.src = "assets/" + name;
-    images[name] = image;
+  function plate(name) {
+    if (!images[name]) {
+      const image = new Image();
+      image.decoding = "async";
+      image.onload = () => {
+        dirty = true;
+        if (running || !motion()) paint(0);
+      };
+      image.src = "assets/" + name;
+      images[name] = image;
+    }
+    return images[name];
   }
   let raf = 0,
     running = false,
@@ -20,7 +28,7 @@ export function createCavernEyes(canvas, { motion }) {
       dirty = true;
     }
     const mobile = innerWidth <= 800,
-      im = images[mobile ? "cavern-mobile.webp" : "cavern.webp"];
+      im = plate(mobile ? "cavern-mobile.webp" : "cavern.webp");
     if (!im.complete || !im.naturalWidth) return;
     const phase = (ms % 7200) / 7200,
       p = phase > 0.92 ? Math.sin(((phase - 0.92) / 0.08) * Math.PI) ** 2 : 0;
@@ -93,7 +101,7 @@ export function createCavernEyes(canvas, { motion }) {
   }
   function frame(t) {
     if (!running || document.hidden) return;
-    if (t - last >= 40) {
+    if (t - last >= 100) {
       paint(motion() ? t : 0);
       last = t;
     }
@@ -109,6 +117,7 @@ export function createCavernEyes(canvas, { motion }) {
     if (
       !document.body.classList.contains("playing") ||
       document.hidden ||
+      document.body.classList.contains("mouth-crossing") ||
       !document.querySelector("#celebration").hidden
     )
       return;

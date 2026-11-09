@@ -1,4 +1,3 @@
-@import url("/walid-branding.css");
 :root {
   color-scheme: dark;
   --gold: #edc572;
@@ -4772,4 +4771,127 @@ body {
 }
 #celebration.defeat .result-card {
   overflow: hidden;
+}
+
+/* Bound mobile work and fit the actually visible browser viewport. */
+body,
+body:not(.playing),
+body:not(.playing) main,
+#menu {
+  height: var(--app-height, 100dvh);
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+#world .tree,
+#world .rays,
+#world .mist {
+  display: none !important;
+}
+.low #world .embers {
+  display: none !important;
+}
+.mobile-menu-art {
+  animation: none !important;
+}
+#start[aria-busy="true"] {
+  cursor: progress;
+}
+@media (max-width: 800px), (pointer: coarse) {
+  .menu-scenery,
+  .cinematic-jungle {
+    background-image: url("assets/jungle-menu-small.webp");
+  }
+  .menu-hero {
+    filter: none;
+  }
+  .low #menu .menu-neck,
+  .low #menu .menu-head,
+  .low #menu .menu-jaw {
+    animation: none !important;
+  }
+  .mouth-crossing #play {
+    filter: brightness(var(--arrival-brightness, 1));
+  }
+}
+@media (max-aspect-ratio: 4/5) {
+  #menu {
+    display: grid;
+    grid-template-rows: 48px minmax(70px, 1fr) minmax(284px, 48%);
+    padding: 8px 0 max(14px, env(safe-area-inset-bottom));
+  }
+  #menu .menu-hero {
+    position: relative;
+    grid-row: 2;
+    top: auto;
+    left: auto;
+    width: 94%;
+    height: 100%;
+    margin: auto;
+  }
+  #menu .menu-panel {
+    position: relative;
+    grid-row: 3;
+    inset: auto;
+    transform: none;
+    width: 80%;
+    height: 100%;
+    max-height: 430px;
+    margin: auto;
+    gap: clamp(4px, 1vh, 8px);
+  }
+}
+/* Keep the static board out of the animated Canvas repaint boundary (also avoids
+   mobile WebKit/Chromium foreignObject compositing failures). Numbers and pawns
+   remain vector elements above the living snakes. */
+.board-base,
+.board-frame > .living-serpents {
+  position: absolute;
+  left: var(--board-pad, 9px);
+  top: var(--board-pad, 9px);
+  width: calc(100% - 2 * var(--board-pad, 9px));
+  height: calc(100% - 2 * var(--board-pad, 9px));
+  pointer-events: none;
+  border-radius: 4px;
+}
+.board-base {
+  z-index: 0;
+  background: #11382b;
+  contain: layout paint;
+}
+.board-frame > .living-serpents {
+  z-index: 1;
+  contain: strict;
+  transform: translateZ(0);
+}
+#board {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+/* The small lava Canvas already supplies the glow and embers. Do not also blur
+   and blend an animated viewport-sized CSS layer behind the whole board. */
+#world::after,
+#world .embers {
+  display: none !important;
+}
+.menu-hero {
+  filter: none;
+}
+
+.page-hidden * {
+  animation-play-state: paused !important;
+}
+body,
+body:not(.playing),
+body:not(.playing) main,
+#menu {
+  height: min(var(--app-height, 100dvh), 100dvh);
+}
+.playing [data-snake] {
+  filter: none;
+}
+#board {
+  pointer-events: none;
 }

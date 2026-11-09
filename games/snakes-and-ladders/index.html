@@ -12,10 +12,8 @@
       rel="canonical"
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
-    <link rel="preload" as="image" href="assets/victory-emblem.webp" />
-    <link rel="preload" as="image" href="assets/defeat-title.webp" />
-    <link rel="stylesheet" href="style.css?v=20261109-portal" />
-    <script type="module" src="game.mjs?v=20261109-portal"></script>
+    <link rel="stylesheet" href="style.css?v=20261109-fast" />
+    <script type="module" src="game.mjs?v=20261109-fast"></script>
   </head>
   <body>
     <div id="world">
@@ -161,7 +159,7 @@
             <div class="eyebrow">THE SERPENT'S BELLY</div>
             <h2 class="painted-title">
               <img
-                src="assets/jungle-emblem.webp"
+                data-logo-art="true"
                 alt="Snakes &amp; Ladders"
                 width="1536"
                 height="1024"
@@ -212,11 +210,7 @@
       <div class="result-card">
         <div class="crown" aria-hidden="true">
           <svg viewBox="490 0 560 370">
-            <image
-              href="assets/jungle-emblem.webp"
-              width="1536"
-              height="1024"
-            />
+            <image data-logo-art="true" width="1536" height="1024" />
           </svg>
         </div>
         <h2 id="result-title"></h2>

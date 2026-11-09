@@ -6,8 +6,9 @@ const smooth = (a, b, x) => {
 export function createEntryMesh(profile, quality = "Balanced") {
   const canvas = document.createElement("canvas");
   canvas.className = "same-snake-mesh";
-  canvas.width = 1536;
-  canvas.height = 1024;
+  const rasterScale = quality === "Low" ? 0.5 : 0.75;
+  canvas.width = 1536 * rasterScale;
+  canvas.height = 1024 * rasterScale;
   canvas.dataset.asset = "assets/jungle-emblem.webp";
   canvas.setAttribute("aria-hidden", "true");
   const unit = +profile.dataset.sourceScale,
@@ -17,7 +18,11 @@ export function createEntryMesh(profile, quality = "Balanced") {
   profile.append(canvas);
   const c = canvas.getContext("2d"),
     image = new Image();
-  image.src = "assets/jungle-emblem.webp";
+  image.decoding = "async";
+  image.src = profile.querySelector("#jungle image").getAttribute("href");
+  canvas.dataset.asset = profile
+    .querySelector("#jungle image")
+    .getAttribute("href");
   const original = profile.querySelector("#jungle"),
     steps = quality === "Low" ? 8 : 12;
   const point = (x, y, gape) => {
@@ -53,12 +58,13 @@ export function createEntryMesh(profile, quality = "Balanced") {
     c.transform(a, b, k, d, tx, ty);
     const x = Math.min(s0.x, s1.x, s2.x),
       y = Math.min(s0.y, s1.y, s2.y);
+    const sourceScale = image.naturalWidth / 1536;
     c.drawImage(
       image,
-      x - 0.5,
-      y - 0.5,
-      Math.abs(u) + 1,
-      Math.abs(v) + 1,
+      (x - 0.5) * sourceScale,
+      (y - 0.5) * sourceScale,
+      (Math.abs(u) + 1) * sourceScale,
+      (Math.abs(v) + 1) * sourceScale,
       x - 0.5,
       y - 0.5,
       Math.abs(u) + 1,
@@ -68,6 +74,7 @@ export function createEntryMesh(profile, quality = "Balanced") {
   }
   function paint(gape, angry = 0) {
     if (!image.complete || !image.naturalWidth) return;
+    c.setTransform(rasterScale, 0, 0, rasterScale, 0, 0);
     original.style.opacity = "0";
     c.clearRect(0, 0, 1536, 1024);
     c.drawImage(image, 0, 0, 1536, 1024);

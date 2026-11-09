@@ -97,6 +97,9 @@
     let firebaseAuth = null;
     let authorizedUid = "";
     let authorizingUid = "";
+    let authPersistenceReady = Promise.resolve();
+    let authRetryTimer = null, authRetryAttempt = 0, authGeneration = 0;
+    let authSigningOut = false, authStateReady = false, lastFirebaseUid = "", lastVerifiedToken = "";
 
     function newConversationId() {
       return window.crypto?.randomUUID?.() ||
@@ -128,12 +131,13 @@
         ? (languageSelect.value === "bn" ? "ব্যক্তিগত অ্যাকাউন্ট" : "Personal account")
         : (languageSelect.value === "bn" ? "এই ব্রাউজারে সংরক্ষিত" : "Saved on this browser");
       profileCopy.appendChild(note);
-      const signedIn = Boolean(ACCESS_TOKEN);
+      const signedIn = !authSigningOut && Boolean(ACCESS_TOKEN || (firebaseAuth?.currentUser && !firebaseAuth.currentUser.isAnonymous));
+      const restoringSession = firebaseReady && Boolean(window.firebase) && !authStateReady && !authSigningOut;
       signedInProfile.classList.toggle("hidden", !signedIn);
-      sidebarLogin.classList.toggle("hidden", signedIn);
+      sidebarLogin.classList.toggle("hidden", signedIn || restoringSession);
       accountMenuWrap.classList.toggle("hidden", !signedIn);
-      loginBtn.classList.toggle("hidden", signedIn);
-      signupBtn.classList.toggle("hidden", signedIn);
+      loginBtn.classList.toggle("hidden", signedIn || restoringSession);
+      signupBtn.classList.toggle("hidden", signedIn || restoringSession);
       accountAvatar.textContent = admin ? "♛" : cleanName.charAt(0).toLocaleUpperCase();
       accountAvatar.setAttribute("aria-label", admin ? "Boss account menu" : cleanName + " account menu");
       accountPopoverName.textContent = admin ? "Boss · Whakil Ahamed Shakil" : cleanName;
@@ -249,7 +253,8 @@
             console.warn("Guest chat history was shortened to fit this browser.", error);
           }
         }
-        drawHistory(ownerAtSave ? await loadAccountRecords(false) : guestRecords());
+        const records = ownerAtSave ? await loadAccountRecords(false) : guestRecords();
+        if (ownerAtSave === historyOwner) drawHistory(records);
       }).catch((error) => console.warn("Chat history could not be saved.", error));
       return persistQueue;
     }
@@ -537,84 +542,105 @@
     }
 
     async function authorize(token, options = {}) {
-      if (!API) {
-        throw new Error("Walid AI এখন চালু নেই। পরে আবার চেষ্টা করুন।");
+      if (!API) throw new Error("Walid AI এখন চালু নেই। পরে আবার চেষ্টা করুন।");
+      const current = options.isCurrent || (() => true);
+      const request = value => fetchWithTimeout(API + "/api/hello", { headers: { Authorization: "Bearer " + value } }, 20000);
+      let response = await request(token);
+      const user = firebaseAuth?.currentUser;
+      if (response.status === 401 && user && !user.isAnonymous && current()) {
+        token = await user.getIdToken(true);
+        if (!current()) return false;
+        response = await request(token);
       }
-
-      const response = await fetch(API + "/api/hello", {
-        headers: { Authorization: "Bearer " + token }
-      });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "প্রবেশ করা যায়নি।");
-      }
-
-      ACCESS_TOKEN = token;
+      if (!current()) return false;
+      if (!response.ok) { const error = new Error(data.error || "প্রবেশ করা যায়নি।"); error.status = response.status; throw error; }
+      ACCESS_TOKEN = token; lastVerifiedToken = token;
       IS_ADMIN = data.auth_role === "admin";
       if (IS_ADMIN && token.split(".").length !== 3) sessionStorage.setItem("walidAdminAccess", token);
       else sessionStorage.removeItem("walidAdminAccess");
       sessionStorage.removeItem("walidToken");
-
       updateAccountUI(data.email || "");
-
       if (IS_ADMIN && options.celebrate) showAdminCelebration();
+      return true;
     }
 
     async function getAuthorizationToken() {
+      if (authSigningOut) return "";
       if (IS_ADMIN && ACCESS_TOKEN && ACCESS_TOKEN.split(".").length !== 3) return ACCESS_TOKEN;
       const user = firebaseAuth?.currentUser;
       if (user && !user.isAnonymous) {
-        ACCESS_TOKEN = await user.getIdToken();
+        const generation = authGeneration;
+        const token = await user.getIdToken();
+        if (generation !== authGeneration || authSigningOut || firebaseAuth.currentUser?.uid !== user.uid) return "";
+        ACCESS_TOKEN = token;
+        return token;
       }
       return ACCESS_TOKEN;
+    }
+
+    function retryFirebaseSession(user) {
+      clearTimeout(authRetryTimer);
+      const delay = Math.min(30000, 1500 * 2 ** Math.min(authRetryAttempt++, 5));
+      authRetryTimer = setTimeout(() => {
+        if (!authSigningOut && firebaseAuth?.currentUser?.uid === user.uid) void useFirebaseUser(firebaseAuth.currentUser);
+      }, delay);
     }
 
     async function useFirebaseUser(user, options = {}) {
       const adminSessionToken = sessionStorage.getItem("walidAdminAccess") || "";
       if (adminSessionToken && adminSessionToken.split(".").length !== 3) return;
-      if (
-        !user ||
-        user.isAnonymous ||
-        !user.email ||
-        authorizedUid === user.uid ||
-        authorizingUid === user.uid
-      ) {
-        return;
-      }
-
-      authorizingUid = user.uid;
+      if (!user || user.isAnonymous || !user.email || authSigningOut || authorizingUid === user.uid) return;
+      clearTimeout(authRetryTimer);
+      const generation = authGeneration;
+      const current = () => generation === authGeneration && !authSigningOut && firebaseAuth?.currentUser?.uid === user.uid;
+      const needsHistory = authorizedUid !== user.uid;
+      if (historyOwner && historyOwner !== user.uid) { chat.replaceChildren(); chatMessages = []; restoreWelcome(); }
       historyOwner = user.uid;
-      chat.replaceChildren();
-      chatMessages = [];
-      restoreWelcome();
-
+      // Firebase identity survives a sleeping/offline backend; server authorization
+      // is retried separately, without discarding the user's local session/chat.
+      setProfile(user.displayName || user.email, IS_ADMIN);
+      authorizingUid = user.uid;
+      const conversationAtStart = currentConversationId, messageCountAtStart = chatMessages.length;
       try {
-        await authorize(await user.getIdToken(), options);
-        setProfile(user.displayName || user.email, IS_ADMIN);
-        const records = (await loadAccountRecords(false))
-          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-        drawHistory(records);
-        const savedId = localStorage.getItem(accountChatKey(user.uid));
-        const active = records.find((record) => record.id === savedId) || (!savedId ? records[0] : null);
-        if (active) {
-          openConversation(active);
-        } else {
-          currentConversationId = savedId || newConversationId();
-          localStorage.setItem(accountChatKey(user.uid), currentConversationId);
-          chat.replaceChildren();
-          chatMessages = [];
-          restoreWelcome();
+        await authPersistenceReady;
+        if (!current()) return;
+        const token = await user.getIdToken();
+        if (!current()) return;
+        ACCESS_TOKEN = token;
+        if (lastVerifiedToken !== token || needsHistory) {
+          if (!await authorize(token, { ...options, isCurrent: current })) return;
         }
-        authorizedUid = user.uid;
+        if (!current()) return;
+        setProfile(user.displayName || user.email, IS_ADMIN);
+        if (needsHistory) {
+          const records = (await loadAccountRecords(false)).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+          if (!current()) return;
+          drawHistory(records);
+          if (currentConversationId === conversationAtStart && chatMessages.length === messageCountAtStart) {
+            const savedId = localStorage.getItem(accountChatKey(user.uid));
+            const active = records.find(record => record.id === savedId) || (!savedId ? records[0] : null);
+            if (active) openConversation(active);
+            else if (!chatMessages.length) { currentConversationId = savedId || newConversationId(); rememberActiveConversation(); }
+          }
+          authorizedUid = user.uid;
+        }
+        authRetryAttempt = 0;
       } catch (error) {
-        historyOwner = "";
-        loginStatus.textContent = error.message || "প্রবেশ করা যায়নি।";
+        if (current()) {
+          loginStatus.textContent = error.message || "সংযোগ ফিরলে অ্যাকাউন্ট আবার প্রস্তুত হবে।";
+          retryFirebaseSession(user);
+        }
       } finally {
-        authorizingUid = "";
+        if (generation === authGeneration && authorizingUid === user.uid) authorizingUid = "";
       }
     }
+    function resumeFirebaseSession() {
+      const user = firebaseAuth?.currentUser;
+      if (user && !user.isAnonymous && !authSigningOut) { authRetryAttempt = 0; void useFirebaseUser(user); }
+    }
+    window.addEventListener("online", resumeFirebaseSession);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") resumeFirebaseSession(); });
 
     // Firebase initialization
     if (firebaseReady && window.firebase) {
@@ -622,23 +648,33 @@
         firebase.initializeApp(firebaseConfig);
         firebaseAuth = firebase.auth();
         firestoreDB = firebase.firestore();
-        // Firebase Auth's default browser persistence is LOCAL unless changed in Firebase setup.
-        emailButton.disabled = false;
+        authPersistenceReady = firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        authPersistenceReady.then(() => { emailButton.disabled = false; }).catch(() => {
+          loginStatus.textContent = "এই ব্রাউজারে স্থায়ী sign-in রাখা যাচ্ছে না। Site storage চালু করে আবার চেষ্টা করুন।";
+        });
 
         let initialAuthStateHandled = false;
-        firebaseAuth.onAuthStateChanged((user) => {
+        firebaseAuth.onIdTokenChanged((user) => {
+          authStateReady = true;
           const isFreshLogin = initialAuthStateHandled;
           initialAuthStateHandled = true;
+          const ownerCode = sessionStorage.getItem("walidAdminAccess") || "";
+          if (ownerCode && ownerCode.split(".").length !== 3) return;
           if (user && !user.isAnonymous) {
-            useFirebaseUser(user, { celebrate: isFreshLogin });
-          }
+            if (lastFirebaseUid !== user.uid) { authGeneration++; authorizedUid = ""; lastVerifiedToken = ""; ACCESS_TOKEN = ""; IS_ADMIN = false; }
+            lastFirebaseUid = user.uid;
+            void useFirebaseUser(user, { celebrate: isFreshLogin });
+          } else if (lastFirebaseUid) {
+            authGeneration++; lastFirebaseUid = ""; clearTimeout(authRetryTimer);
+            resetAccountSession();
+          } else { setProfile("Guest"); }
         });
 
         if (firebaseAuth.isSignInWithEmailLink(window.location.href)) {
           const email = localStorage.getItem("walidEmailForSignIn");
 
           if (email) {
-            firebaseAuth.signInWithEmailLink(email, window.location.href)
+            authPersistenceReady.then(() => { authSigningOut = false; return firebaseAuth.signInWithEmailLink(email, window.location.href); })
               .then(async (result) => {
                 localStorage.removeItem("walidEmailForSignIn");
                 history.replaceState(
@@ -660,6 +696,7 @@
           }
         }
       } catch (error) {
+        authStateReady = true; setProfile("Guest");
         emailButton.disabled = true;
         loginStatus.textContent = "ইমেইল প্রবেশ সেটআপ করা যায়নি।";
       }
@@ -708,6 +745,7 @@
       emailButton.textContent = "Sending link…";
 
       try {
+        await authPersistenceReady;
         await firebaseAuth.sendSignInLinkToEmail(email, {
           url: window.location.origin + window.location.pathname,
           handleCodeInApp: true
@@ -724,79 +762,26 @@
       }
     });
 
-    // Google login
-    const googleClientId =
-      String(window.WALID_AI_GOOGLE_CLIENT_ID || "").trim();
-
+    // Google sign-in uses Firebase so its refreshable session can persist locally.
+    const googleClientId = String(window.WALID_AI_GOOGLE_CLIENT_ID || "").trim();
     if (firebaseAuth && googleClientId) {
-      const googleCta = document.createElement("button");
-      googleCta.type = "button";
-      googleCta.className = "google-custom";
+      const googleCta = document.createElement("button"); googleCta.type = "button"; googleCta.className = "google-custom";
       googleCta.textContent = "Continue with Google";
-
+      googleCta.disabled = true;
+      authPersistenceReady.then(() => { googleCta.disabled = false; }).catch(() => {});
       googleCta.addEventListener("click", async () => {
         loginStatus.textContent = "";
-
         try {
+          await authPersistenceReady; authSigningOut = false;
           const provider = new firebase.auth.GoogleAuthProvider();
           await firebaseAuth.signInWithPopup(provider);
-        } catch (error) {
-          loginStatus.textContent =
-            error.message || "Google দিয়ে প্রবেশ করা যায়নি।";
-        }
+        } catch (error) { loginStatus.textContent = error.message || "Google দিয়ে প্রবেশ করা যায়নি।"; }
       });
+      googleButton.append(googleCta);
+    } else { googleButton.textContent = "Google sign-in could not load. Reload the page and try again."; }
 
-      googleButton.appendChild(googleCta);
-    } else if (
-      googleClientId &&
-      window.google &&
-      window.google.accounts &&
-      window.google.accounts.id
-    ) {
-      google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: async (response) => {
-          loginStatus.textContent = "";
-
-          try {
-            if (firebaseAuth) {
-              const credential =
-                firebase.auth.GoogleAuthProvider.credential(
-                  response.credential
-                );
-              const result =
-                await firebaseAuth.signInWithCredential(credential);
-              await useFirebaseUser(result.user);
-            } else {
-              await authorize(response.credential);
-            }
-          } catch (error) {
-            loginStatus.textContent =
-              error.message || "Google দিয়ে প্রবেশ করা যায়নি।";
-          }
-        },
-        auto_select: false
-      });
-
-      google.accounts.id.renderButton(googleButton, {
-        type: "standard",
-        theme: "outline",
-        size: "large",
-        text: "continue_with",
-        shape: "pill",
-        width: 320,
-        locale: "en"
-      });
-    } else {
-      googleButton.textContent = "Google sign-in setup required";
-    }
-
-    // Logout
-    logoutBtn.addEventListener("click", async () => {
-      if (firebaseAuth && firebaseAuth.currentUser) {
-        await firebaseAuth.signOut().catch(() => {});
-      }
-
+    function resetAccountSession() {
+      clearTimeout(authRetryTimer); authRetryAttempt = 0; lastVerifiedToken = "";
       ACCESS_TOKEN = "";
       IS_ADMIN = false;
       authorizedUid = "";
@@ -822,6 +807,18 @@
       rememberActiveConversation();
       setProfile("Guest");
       drawHistory(guestRecords());
+    }
+    // Only explicit sign-out or a real Firebase session end clears account state.
+    logoutBtn.addEventListener("click", async () => {
+      authSigningOut = true; authGeneration++; clearTimeout(authRetryTimer);
+      try {
+        if (firebaseAuth?.currentUser) await firebaseAuth.signOut();
+        resetAccountSession();
+      } catch (error) {
+        authSigningOut = false;
+        resumeFirebaseSession();
+        addMessage("error", languageSelect.value === "bn" ? "Log out সম্পন্ন হয়নি। আবার চেষ্টা করুন।" : "Sign-out did not finish. Please try again.");
+      }
     });
 
     function hasBengaliScript(text) {
@@ -1409,25 +1406,18 @@
 
     if (API) void wakeBackend(70000);
 
-    // Restore admin access-code session. Firebase users are restored through
-    // onAuthStateChanged and receive a fresh ID token there.
-    if (ACCESS_TOKEN) {
-      authorize(ACCESS_TOKEN).then(() => {
-        restoreGuestConversation();
-      }).catch(() => {
-        ACCESS_TOKEN = "";
-        IS_ADMIN = false;
-        authorizedUid = "";
-        historyOwner = "";
-
-        sessionStorage.removeItem("walidToken");
-        
-        sessionStorage.removeItem("walidAdminAccess");
-        loginBtn.classList.remove("hidden");
-        signupBtn.classList.remove("hidden");
-        accountMenuWrap.classList.add("hidden");
-        setProfile("Guest");
-      });
+    // Owner codes remain tab-scoped; normal Google/email sessions are managed
+    // by Firebase LOCAL persistence and onIdTokenChanged above.
+    async function restoreOwnerSession() {
+      const token = sessionStorage.getItem("walidAdminAccess");
+      if (!token || authSigningOut) return;
+      const generation = authGeneration;
+      const current = () => generation === authGeneration && !authSigningOut && sessionStorage.getItem("walidAdminAccess") === token;
+      try { if (await authorize(token, { isCurrent: current })) restoreGuestConversation(); }
+      catch (error) {
+        if (!current()) return;
+        if (error.status === 401 || error.status === 403) resetAccountSession();
+        else authRetryTimer = setTimeout(restoreOwnerSession, 5000);
+      }
     }
-  
-
+    if (ACCESS_TOKEN) void restoreOwnerSession();

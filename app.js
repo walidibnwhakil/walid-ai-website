@@ -1055,6 +1055,7 @@
       if (mode === "uploaded_file") return bn ? "আপনার ফাইল থেকে" : "From your file";
       if (mode === "pdf_passages") return bn ? "PDF থেকে" : "From PDF";
       if (mode === "pdf_table") return bn ? "PDF-এর টেবিল থেকে" : "From a PDF table";
+      if (mode === "search_unavailable") return "";
       if (mode === "web") return bn ? "ওয়েব উৎস থেকে" : "From web sources";
       if (mode === "not_found") return bn ? "তথ্যভাণ্ডারে মেলেনি" : "Not found in the knowledge base";
 
@@ -1248,7 +1249,7 @@
                 chatError.status = response.status;
                 chatError.quota = parsed.quota || "";
                 chatError.retryable = Boolean(parsed.retryable);
-                const retryable = chatError.quota !== "daily_limit" && (chatError.retryable || response.status === 502 || response.status === 503 || response.status === 504 || response.status === 429);
+                const retryable = !chatError.quota && (parsed.retryable ?? [502, 503, 504].includes(response.status));
                 if (retryable && attempt < 2) {
                   await wakeBackend(response.status === 429 ? 5000 : 60000);
                   continue;

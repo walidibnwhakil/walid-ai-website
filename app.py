@@ -14,9 +14,9 @@ import urllib.request
 import threading
 
 from walid_providers import (
-    collect_web_sources,
     configured_provider_names,
     generate_fallback_answer,
+    mentions_creator,
 )
 from datetime import datetime, timedelta, timezone
 
@@ -224,8 +224,14 @@ def small_talk_answer(question):
         "hello", "hi", "hey", "assalamu alaikum", "assalamualaikum",
         "assalamu-alaikum", "salam", "সালাম", "আসসালামুআলাইকুম",
     }
+    if normalized in {"iloveyou", "loveyou"}:
+        return "That's kind of you to say! I'm here if you'd like to chat."
+    if normalized in {"আমিতোমাকেভালোবাসি", "আমিতোমাকেভালবাসি", "amitomakebhalobashi", "amitomakevalobashi"}:
+        return "এত সুন্দর কথা বলার জন্য ধন্যবাদ! তোমার সঙ্গে কথা বলতে ভালো লাগছে।"
     normalized_greetings = {normalize_text(item) for item in greetings}
     if normalized in normalized_greetings:
+        if normalized in {"hi", "hey", "hello", "howareyou"}:
+            return "Hi! What would you like to talk about with Walid AI?"
         return "আমি ভালো আছি, ধন্যবাদ! তুমি কেমন আছো? Walid AI-কে কী জানতে চাও?"
     return None
 
@@ -238,7 +244,8 @@ def asks_for_current_information(question):
         "weather", "temperature", "teperature", "temparature", "temp",
         "bristi", "brishti", "gorom", "tapmatra", "abohawa",
         "আবহাওয়া", "আবহাওয়া", "তাপমাত্রা", "ডিগ্রি", "বৃষ্টি",
-        "dhaka", "dhakay", "ঢাকা", "latest news",
+        "live", "price", "exchange rate", "stock price", "score", "forecast",
+        "দাম", "মূল্য", "স্কোর", "লাইভ", "আজ", "এখন", "dam", "daam", "koto dam",
         # Office holders and cabinet membership change over time. Route
         # these questions to Google Search grounding in Bangla and Banglish.
         "minister", "ministers", "cabinet", "prime minister", "president",
@@ -249,7 +256,7 @@ def asks_for_current_information(question):
         "প্রধানমন্ত্রী", "রাষ্ট্রপতি",
     )
     normalized = unicodedata.normalize("NFC", question).lower()
-    return any(term in normalized for term in terms)
+    return any(re.search(r"(?<!\w)" + re.escape(term) + r"(?!\w)", normalized) for term in terms)
 
 
 def known_geography_answer(question):
@@ -335,7 +342,7 @@ def consume_gemini_quota(user, is_search, language="bn"):
                 if language != "en" else
                 "Walid AI has reached today's free AI limit. Please try again tomorrow."
             )
-        if GEMINI_API_KEY and is_search and _GEMINI_USAGE.get("search", 0) >= GEMINI_DAILY_SEARCH_LIMIT:
+        if is_search and _GEMINI_USAGE.get("search", 0) >= GEMINI_DAILY_SEARCH_LIMIT:
             return False, (
                 "আজকের বিনামূল্যের খবর-খোঁজার সীমা শেষ। আগামীকাল আবার চেষ্টা করুন।"
                 if language != "en" else
@@ -353,7 +360,7 @@ def consume_gemini_quota(user, is_search, language="bn"):
         if GEMINI_API_KEY:
             users[user_key] = users.get(user_key, 0) + 1
             _GEMINI_USAGE["total"] = _GEMINI_USAGE.get("total", 0) + 1
-        if GEMINI_API_KEY and is_search:
+        if is_search:
             _GEMINI_USAGE["search"] = _GEMINI_USAGE.get("search", 0) + 1
         try:
             temporary_path = GEMINI_USAGE_PATH.with_suffix(".tmp")
@@ -1669,56 +1676,32 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                 })
                 return
 
-        try:
-            answers = load_dataset()
-        except (OSError, ValueError, json.JSONDecodeError) as error:
-            self.send_json(500, {"error": f"প্রশ্ন–উত্তরের ফাইল পড়তে সমস্যা হয়েছে: {error}"})
-            return
-
-        geography_answer = known_geography_answer(question)
-        if geography_answer is not None:
-            self.send_json(200, {
-                "answer": geography_answer,
-                "answering_mode": "known_geography",
-                "sources": [],
-            })
-            return
-
-        # Saved Q&A should answer immediately without waiting for a large PDF
-        # library to finish indexing.
-        try:
-            answer = find_dataset_answer(question, answers)
-        except (OSError, ValueError, json.JSONDecodeError) as error:
-            self.send_json(500, {"error": f"প্রশ্ন–উত্তরের ফাইল পড়তে সমস্যা হয়েছে: {error}"})
-            return
-        if answer is not None:
-            self.send_json(200, {
-                "answer": answer,
-                "answering_mode": "dataset_lookup",
-                "sources": [],
-            })
-            return
-
         greeting = small_talk_answer(question)
         if greeting is not None:
-            self.send_json(200, {
-                "answer": greeting,
-                "answering_mode": "small_talk",
-                "sources": [],
-            })
+            self.send_json(200, {"answer": greeting, "answering_mode": "small_talk", "sources": []})
             return
 
-        if len(set(tokenize(question))) < 2:
-            self.send_json(200, {
-                "answer": "কোন তথ্যটি জানতে চাও, প্রশ্নটি একটু বিস্তারিত করে লিখো। যেমন: “বাংলাদেশের সরকারি নাম কী?”",
-                "answering_mode": "need_more_detail",
-                "sources": [],
-            })
-            return
+        history = data.get("history") if isinstance(data.get("history"), list) else []
+        files = data.get("files") if isinstance(data.get("files"), list) else []
+        if not use_search and not (history or files):
+            geography_answer = known_geography_answer(question) if language == "bn" else None
+            try:
+                answer = geography_answer or find_dataset_answer(question, load_dataset())
+            except (OSError, ValueError, json.JSONDecodeError) as error:
+                print(f"Walid AI: dataset lookup failed ({type(error).__name__}).", flush=True)
+                answer = None
+            if answer is not None and not mentions_creator(answer):
+                self.send_json(200, {
+                    "answer": answer,
+                    "answering_mode": "known_geography" if geography_answer else "dataset_lookup",
+                    "sources": [],
+                })
+                return
 
         passages, no_text_files, read_errors = [], [], []
         try:
-            passages, _, no_text_files, read_errors = get_pdf_index_for_chat()
+            if not use_search:
+                passages, _, no_text_files, read_errors = get_pdf_index_for_chat()
         except Exception as error:
             print(f"Walid AI: PDF index failed ({type(error).__name__}).", flush=True)
 
@@ -1728,21 +1711,11 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             print(f"Walid AI: PDF search failed ({type(error).__name__}).", flush=True)
             matches = []
         comparison_table = find_comparison_table(question, matches) if matches else None
-        web_sources = []
-        if use_search:
-            try:
-                web_sources = collect_web_sources(question)
-            except Exception as error:
-                print(f"Walid AI: web search failed ({type(error).__name__}).", flush=True)
-
-        history = data.get("history") if isinstance(data.get("history"), list) else []
-        files = data.get("files") if isinstance(data.get("files"), list) else []
         try:
             result = generate_fallback_answer(
                 question,
                 history=history,
                 passages=matches,
-                sources=web_sources,
                 language=language,
                 files=files,
                 use_search=use_search,
@@ -1754,7 +1727,7 @@ class WalidAIHandler(BaseHTTPRequestHandler):
         if result is not None and result.text:
             response_data = {
                 "answer": result.text,
-                "answering_mode": "web" if (web_sources or result.sources) else "model",
+                "answering_mode": "web" if result.sources else ("search_unavailable" if use_search else "model"),
                 "sources": result.sources,
                 "provider": result.provider,
                 "model": result.model,
@@ -1815,7 +1788,7 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             self.send_chat({"answer": answer, "answering_mode": answer_mode, "sources": []})
             return
 
-        refund_question_quota(quota_user, use_search)
+        refund_question_quota(quota_user)
         message = result.error if result is not None and result.error else (
             "Sorry, I can't answer right now. Please try again in a little while."
             if language == "en" else

@@ -4,10 +4,12 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import urllib.error
 import urllib.request
+from unittest.mock import patch
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,6 +19,7 @@ from walid_providers import (  # noqa: E402
     append_citations,
     collect_web_sources,
     configured_provider_names,
+    generate_fallback_answer,
     is_billing_block,
     trim_history,
 )
@@ -116,11 +119,41 @@ def test_units():
     print("unit checks passed")
 
 
+def test_search_grounding():
+    question = "Dhaka weather today"
+    grounded = {
+        "candidates": [{
+            "content": {"parts": [{"text": "Verified weather."}]},
+            "groundingMetadata": {
+                "groundingChunks": [{"web": {"uri": "https://example.com/weather"}}],
+            },
+        }],
+    }
+    ungrounded = {"candidates": [{"content": {"parts": [{"text": "Invented weather."}]}}]}
+    with patch.dict(os.environ, {"GEMINI_API_KEY": "fake", "WALID_SEARCH": "1", "WALID_PROVIDER_ORDER": "gemini"}):
+        with patch("walid_providers._post_json", return_value=(200, grounded)) as post:
+            result = generate_fallback_answer(question, language="en", use_search=True)
+            assert "Verified weather." in result.text and result.sources
+            assert post.call_count == 1 and post.call_args.args[1]["tools"] == [{"google_search": {}}]
+        with patch("walid_providers._post_json", return_value=(200, ungrounded)) as post:
+            with patch("walid_providers.collect_web_sources", return_value=[]):
+                result = generate_fallback_answer(question, language="en", use_search=True)
+            assert "couldn't verify" in result.text and not result.sources
+            assert post.call_count == 1
+        with patch("walid_providers._post_json") as post, patch.dict(os.environ, {"WALID_SEARCH": "0"}):
+            result = generate_fallback_answer(question, language="en", use_search=True)
+            assert "couldn't verify" in result.text and not post.called
+    print("search grounding checks passed")
+
+
 def test_server():
     groq = start_mock("unused", failures=100)
     own = start_mock("Blue is a primary color.")
-    data_dir = os.path.join("/tmp", "walid-chat-test-" + str(os.getpid()))
-    os.makedirs(data_dir, exist_ok=True)
+    temp_dir = tempfile.TemporaryDirectory()
+    data_dir = temp_dir.name
+    with open(os.path.join(data_dir, "walid_knowledge.jsonl"), "w", encoding="utf-8") as dataset:
+        for question in ("I love you", "Dhaka weather today"):
+            dataset.write(json.dumps({"question": question, "answer": "Whakil Ahamed Shakil created me."}) + "\n")
     port = str(18080 + (os.getpid() % 1000))
     env = os.environ.copy()
     for name in list(env):
@@ -158,6 +191,18 @@ def test_server():
         }))
         assert status == 200, (status, answer)
         assert "Walid AI" in answer
+        assert own.bodies == [] and groq.bodies == []
+
+        for question, expected in (
+            ("I love you", "kind of you"),
+            ("Who created you?", "Whakil Ahamed Shakil"),
+            ("tomake ke banaise?", "Whakil Ahamed Shakil"),
+            ("Dhaka weather today", "couldn't verify"),
+        ):
+            status, answer, _ = read_answer(*post_json(base + "/api/chat", {
+                "question": question, "guest_id": "identity-search", "language": "en",
+            }))
+            assert status == 200 and expected in answer, (question, status, answer)
         assert own.bodies == [] and groq.bodies == []
 
         status, answer, meta = read_answer(*post_json(base + "/api/chat", {
@@ -203,6 +248,7 @@ def test_server():
             process.wait(timeout=5)
         except subprocess.TimeoutExpired:
             process.kill()
+        temp_dir.cleanup()
         groq.shutdown()
         own.shutdown()
         if process.stdout:
@@ -213,5 +259,6 @@ def test_server():
 
 if __name__ == "__main__":
     test_units()
+    test_search_grounding()
     test_server()
     print("all chat reliability checks passed")

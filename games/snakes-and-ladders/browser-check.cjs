@@ -365,7 +365,11 @@ fs.mkdirSync(out, { recursive: true });
         "assets/jungle-emblem.webp",
       );
       assert.equal(
-        await page.locator("#entrance-scene path,#defeat-snake path").count(),
+        await page
+          .locator("#entrance-scene path,#defeat-snake path")
+          .evaluateAll(
+            (es) => es.filter((e) => !e.closest(".return-play")).length,
+          ),
         0,
       );
       assert.equal(
@@ -815,6 +819,12 @@ fs.mkdirSync(out, { recursive: true });
           6,
         );
         assert.equal(await page.locator('[data-roll="0"] .pip').count(), 21);
+        assert.equal(
+          await page
+            .locator('[data-roll="0"] .cube-stage')
+            .evaluate((e) => getComputedStyle(e).transform),
+          "none",
+        );
         assert.ok(
           await page
             .locator('[data-roll="0"] .die-cube')
@@ -830,8 +840,11 @@ fs.mkdirSync(out, { recursive: true });
             const a = e.getAnimations()[0];
             a.pause();
             const result = [];
-            for (const [j, face] of [6, 5, 4, 3, 2, 1].entries()) {
-              a.currentTime = a.effect.getTiming().duration * (0.12 + j * 0.13);
+            for (const [j, face] of [
+              1, 3, 6, 4, 2, 5, 6, 2, 4, 1, 5, 3,
+            ].entries()) {
+              a.currentTime =
+                a.effect.getTiming().duration * (0.055 + j * 0.075);
               const n = new DOMMatrix(getComputedStyle(e).transform).multiply(
                 new DOMMatrix(
                   getComputedStyle(e.querySelector(`.face-${face}`)).transform,
@@ -1327,10 +1340,7 @@ fs.mkdirSync(out, { recursive: true });
         .getAttribute("data-scale"));
       await page.waitForTimeout(2600);
       await page.waitForFunction(
-        () =>
-          getComputedStyle(
-            document.querySelector("#defeat-snake .cinematic-closed"),
-          ).opacity === "1",
+        () => document.querySelector("#defeat-snake").dataset.gape === "0.000",
       );
       assert.ok(
         +(await page.locator("#defeat-snake").getAttribute("data-scale")) <
@@ -1342,8 +1352,8 @@ fs.mkdirSync(out, { recursive: true });
       );
       assert.equal(await page.locator("#defeat-snake .small-snake").count(), 0);
       assert.equal(
-        await page.locator("#defeat-snake image").first().getAttribute("href"),
-        "assets/cobra-cinema.webp",
+        await page.locator("#defeat-snake").getAttribute("data-serpent-source"),
+        "assets/jungle-emblem.webp",
       );
       assert.ok(
         +(await page
@@ -1365,12 +1375,103 @@ fs.mkdirSync(out, { recursive: true });
       );
       assert.equal(
         await page
-          .locator("#defeat-snake .cinematic-closed")
-          .evaluate((e) => getComputedStyle(e).opacity),
-        "1",
+          .locator(".same-snake-mesh")
+          .evaluate((e) => +e.dataset.gape < -0.3),
+        true,
       );
       assert.equal(await page.locator(".standing").count(), 0);
       await shot("defeat-revealed");
+    },
+  );
+  await check(
+    "bot defeat returns through the same mouth, swallows the loss and releases Play Now",
+    async () => {
+      await page.click("#result-menu");
+      await page.evaluate(() => serpentTest.entranceCinema.sample(0));
+      assert.equal(
+        await page.locator("#entrance-scene").getAttribute("data-mode"),
+        "exit",
+      );
+      assert.equal(
+        await page
+          .locator("#entrance-scene .return-lose")
+          .evaluate((e) => +getComputedStyle(e).opacity),
+        1,
+      );
+      await page.evaluate(() => serpentTest.entranceCinema.sample(0.15));
+      assert(
+        +(await page.locator("#entrance-scene").getAttribute("data-gape")) >
+          0.5,
+      );
+      await shot("loss-swallowed-on-return");
+      await page.evaluate(() => serpentTest.entranceCinema.sample(0.7));
+      assert(
+        +(await page
+          .locator("#entrance-scene .return-lose")
+          .evaluate((e) => getComputedStyle(e).opacity)) < 0.01,
+      );
+      assert(
+        +(await page
+          .locator("#entrance-scene .return-play")
+          .evaluate((e) => getComputedStyle(e).opacity)) > 0.8,
+      );
+      await shot("mouth-releases-play-now");
+      await page.evaluate(() => serpentTest.entranceCinema.sample(1));
+      assert(await page.locator("#start").isEnabled());
+      assert(await page.locator("#intro").isHidden());
+      assert(
+        !(await page.evaluate(() =>
+          document.body.classList.contains("mouth-crossing"),
+        )),
+      );
+      await page.click("#start");
+      await page.evaluate(() => serpentTest.entranceCinema.sample(0.36));
+      assert(
+        (
+          await page
+            .locator("#menu")
+            .evaluate((e) => getComputedStyle(e).maskImage)
+        ).includes("radial-gradient"),
+      );
+      const far = await page.locator(".board-frame").boundingBox();
+      const blur = await page
+        .locator("#play")
+        .evaluate((e) => parseFloat(getComputedStyle(e).filter.slice(5)));
+      await shot("actual-board-through-open-mouth");
+      await page.evaluate(() => serpentTest.entranceCinema.sample(0.8));
+      assert(
+        (await page.locator(".board-frame").boundingBox()).width > far.width,
+      );
+      assert(
+        (await page
+          .locator("#play")
+          .evaluate((e) => parseFloat(getComputedStyle(e).filter.slice(5)))) <
+          blur,
+      );
+      await page.evaluate(() => serpentTest.entranceCinema.sample(1));
+      await page.click("#menu-button");
+      await page.evaluate(() => serpentTest.entranceCinema.sample(0.7));
+      assert(
+        +(await page
+          .locator("#entrance-scene .return-play")
+          .evaluate((e) => getComputedStyle(e).opacity)) > 0.8,
+      );
+      await shot("normal-match-return-to-mouth");
+      await page.click("#skip");
+      assert.equal(
+        await page
+          .locator("#entrance-scene .return-play")
+          .evaluate((e) => getComputedStyle(e).opacity),
+        "0",
+      );
+      assert.equal(
+        await page
+          .locator("#entrance-scene .return-lose")
+          .evaluate((e) => getComputedStyle(e).opacity),
+        "0",
+      );
+      await page.click("#start");
+      await page.click("#skip");
     },
   );
   await check(
@@ -1604,6 +1705,88 @@ fs.mkdirSync(out, { recursive: true });
         }
         await shot(`fit-${width}-${height}`);
       }
+    },
+  );
+  await check(
+    "all result stages and board standings fit twelve viewports without internal scrollbars",
+    async () => {
+      for (const [width, height] of [
+        [320, 568],
+        [360, 640],
+        [390, 844],
+        [412, 915],
+        [430, 932],
+        [768, 1024],
+        [1024, 768],
+        [1366, 768],
+        [1440, 900],
+        [1920, 1080],
+        [640, 360],
+        [844, 390],
+      ]) {
+        await page.setViewportSize({ width, height });
+        for (const kind of [
+          "bot-win",
+          "bot-lose",
+          "local-two",
+          "summary-three",
+          "summary-four",
+        ]) {
+          const count =
+            kind === "summary-three" ? 3 : kind === "summary-four" ? 4 : 2;
+          await force({ count, bot: kind.startsWith("bot"), motion: false });
+          await page.evaluate(
+            ({ kind, count }) => {
+              const s = serpentTest.state;
+              s.order = Array.from({ length: count }, (_, i) => i);
+              if (kind === "bot-lose") s.order.reverse();
+              s.phase = "over";
+              s.players[s.order[0]].position = 100;
+              serpentTest.celebrate(
+                kind.startsWith("summary") ? count - 2 : s.order[0],
+              );
+              if (kind.startsWith("summary")) serpentTest.summary();
+            },
+            { kind, count },
+          );
+          const bounds = await page.locator("#celebration").evaluate((e) => {
+            const c = e.querySelector(".result-card"),
+              r = c.getBoundingClientRect();
+            return {
+              overflow: getComputedStyle(c).overflowX,
+              w: document.documentElement.scrollWidth,
+              h: document.documentElement.scrollHeight,
+              card: { x: r.x, y: r.y, right: r.right, bottom: r.bottom },
+              buttons: [...c.querySelectorAll("button:not([hidden])")].map(
+                (b) => {
+                  const q = b.getBoundingClientRect();
+                  return { x: q.x, y: q.y, right: q.right, bottom: q.bottom };
+                },
+              ),
+            };
+          });
+          assert.equal(bounds.overflow, "hidden");
+          assert(
+            bounds.w <= width && bounds.h <= height,
+            `${width} ${kind} page overflow`,
+          );
+          for (const r of bounds.buttons)
+            assert(
+              r.x >= 0 &&
+                r.y >= 0 &&
+                r.right <= width + 0.5 &&
+                r.bottom <= height + 0.5 &&
+                r.y >= bounds.card.y - 0.5 &&
+                r.bottom <= bounds.card.bottom + 0.5,
+              `${width}x${height} ${kind}: ${JSON.stringify(bounds)}`,
+            );
+          if (width === 1366 || width === 390 || width === 640)
+            await shot(`fitted-${kind}-${width}`);
+        }
+      }
+      await page.click("#result-menu");
+      await page.click("#start");
+      await page.waitForSelector("#play:visible");
     },
   );
   await check(

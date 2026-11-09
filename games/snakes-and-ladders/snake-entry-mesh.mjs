@@ -11,22 +11,24 @@ export function createEntryMesh(profile, quality = "Balanced") {
   canvas.dataset.asset = "assets/jungle-emblem.webp";
   canvas.setAttribute("aria-hidden", "true");
   const unit = +profile.dataset.sourceScale,
-    ox = +profile.dataset.originX - 365 * unit,
-    oy = +profile.dataset.originY - 170 * unit;
+    ox = +profile.dataset.sourceLeft,
+    oy = +profile.dataset.sourceTop;
   canvas.style.cssText = `position:absolute;left:${ox}px;top:${oy}px;width:${1536 * unit}px;height:${1024 * unit}px;pointer-events:none;`;
   profile.append(canvas);
   const c = canvas.getContext("2d"),
     image = new Image();
   image.src = "assets/jungle-emblem.webp";
   const original = profile.querySelector("#jungle"),
-    steps = quality === "Low" ? 6 : quality === "High" ? 12 : 8;
+    steps = quality === "Low" ? 8 : 12;
   const point = (x, y, gape) => {
-    const weight =
-      smooth(270, 345, x) *
-      (1 - smooth(435, 490, x)) *
-      smooth(140, 188, y) *
-      (1 - smooth(215, 310, y));
-    return { x: x - 12 * weight * gape, y: y + 45 * weight * gape };
+    const width = smooth(265, 330, x) * (1 - smooth(440, 500, x));
+    const lower = smooth(138, 185, y) * (1 - smooth(225, 390, y));
+    const upper = smooth(60, 95, y) * (1 - smooth(135, 155, y));
+    const head = smooth(45, 100, y) * (1 - smooth(225, 350, y));
+    return {
+      x: x + width * gape * (22 * head + (x - 280) * 0.12 * head),
+      y: y + width * gape * (90 * lower - 24 * upper),
+    };
   };
   function triangle(s0, s1, s2, p0, p1, p2) {
     const u = s1.x - s0.x,
@@ -64,18 +66,18 @@ export function createEntryMesh(profile, quality = "Balanced") {
     );
     c.restore();
   }
-  function paint(gape) {
+  function paint(gape, angry = 0) {
     if (!image.complete || !image.naturalWidth) return;
     original.style.opacity = "0";
     c.clearRect(0, 0, 1536, 1024);
     c.drawImage(image, 0, 0, 1536, 1024);
-    c.clearRect(250, 130, 240, 180);
+    c.clearRect(250, 45, 260, 355);
     for (let row = 0; row < steps; row++)
       for (let col = 0; col < steps; col++) {
-        const x = 250 + (col * 240) / steps,
-          y = 130 + (row * 180) / steps,
-          w = 240 / steps,
-          h = 180 / steps,
+        const x = 250 + (col * 260) / steps,
+          y = 45 + (row * 355) / steps,
+          w = 260 / steps,
+          h = 355 / steps,
           a = { x, y },
           b = { x: x + w, y },
           d = { x, y: y + h },
@@ -87,10 +89,33 @@ export function createEntryMesh(profile, quality = "Balanced") {
         triangle(a, b, d, pa, pb, pd);
         triangle(e, d, b, pe, pd, pb);
       }
+    if (angry > 0) {
+      c.save();
+      c.beginPath();
+      const eye = point(348, 94, gape);
+      c.ellipse(eye.x, eye.y, 16, 12, 0, 0, Math.PI * 2);
+      c.clip();
+      c.globalAlpha = angry;
+      const shadow = c.createLinearGradient(0, eye.y - 12, 0, eye.y + 3);
+      shadow.addColorStop(0, "#100c08f5");
+      shadow.addColorStop(0.65, "#21160ac4");
+      shadow.addColorStop(1, "#21160a00");
+      c.fillStyle = shadow;
+      c.fillRect(eye.x - 18, eye.y - 12, 36, 15);
+      c.restore();
+    }
     canvas.dataset.gape = String(gape);
   }
   return {
     paint,
+    mouth(gape) {
+      return {
+        x: ox + (360 + 32 * gape) * unit,
+        y: oy + (174 + 55 * gape) * unit,
+        rx: (30 + 7 * gape) * unit,
+        ry: (5 + 41 * gape) * unit,
+      };
+    },
     destroy() {
       original.style.removeProperty("opacity");
       canvas.remove();

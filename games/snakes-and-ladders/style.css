@@ -4494,3 +4494,282 @@ body:not(.playing) .icon-control {
     margin-bottom: 0;
   }
 }
+/* One photographic menu animal frames a real, interactive board through its mouth. */
+html,
+body {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.cube-stage {
+  transform: none;
+}
+.mouth-crossing #menu {
+  z-index: 20;
+  pointer-events: none;
+}
+.mouth-crossing header {
+  visibility: hidden;
+}
+.mouth-crossing #menu .menu-panel {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+.mouth-crossing #menu .menu-hero {
+  animation: none !important;
+  filter: none;
+  will-change: transform;
+}
+.mouth-crossing #menu #jungle {
+  width: 100%;
+  height: 100%;
+  position: static;
+}
+.mouth-crossing #menu .menu-neck,
+.mouth-crossing #menu .menu-head {
+  animation: none !important;
+}
+#intro {
+  z-index: 50;
+  overflow: hidden;
+}
+.mouth-journey {
+  perspective: none;
+}
+.throat-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.arriving #play {
+  filter: blur(var(--arrival-blur, 0px))
+    brightness(var(--arrival-brightness, 1));
+  opacity: var(--arrival-opacity, 1);
+}
+.arriving #play .board-frame {
+  transform: translate(var(--arrival-x, 0px), var(--arrival-y, 0px))
+    scale(var(--arrival-scale, 1));
+}
+.return-play,
+.return-lose {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: center;
+}
+.return-play {
+  border: 3px double #ffe099;
+  border-radius: 50px;
+  padding: 12px 22px;
+  color: #fff0b2;
+  background: linear-gradient(#08713d, #012d19);
+  box-shadow:
+    0 0 15px #e9b94c,
+    inset 0 0 0 2px #744e15;
+  font:
+    italic 700 clamp(22px, 3vw, 36px) Georgia,
+    serif;
+  text-align: center;
+  white-space: nowrap;
+}
+.return-lose {
+  font:
+    900 clamp(38px, 8vw, 100px) Georgia,
+    serif;
+  color: #ffc66c;
+  text-shadow:
+    0 1px #9f5219,
+    0 3px #75340d,
+    0 5px #432306,
+    0 8px 3px #000;
+}
+.returning #menu .menu-panel {
+  opacity: var(--return-options, 0);
+}
+.defeat-camera #menu .menu-panel {
+  opacity: 0;
+}
+#celebration.defeat {
+  background: transparent;
+  backdrop-filter: none;
+  z-index: 40;
+}
+#celebration.defeat #defeat-snake {
+  display: block;
+}
+#celebration.defeat #result-title {
+  animation: result-3d 3s ease-in-out infinite !important;
+  font-weight: 900;
+  text-shadow:
+    0 1px #b7742a,
+    0 3px #88531b,
+    0 5px #6b3610,
+    0 7px #4d2207,
+    0 10px 3px #000;
+}
+#celebration,
+#celebration .result-card {
+  overflow: hidden;
+}
+#celebration .result-card {
+  min-width: 0;
+  flex-shrink: 1;
+  padding: 12px;
+}
+#celebration #result-title {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+#celebration.bot-victory #result-title {
+  width: min(100%, 720px);
+  height: min(45dvh, 390px);
+  aspect-ratio: auto;
+  margin: 0 auto;
+}
+#celebration.bot-victory .result-card {
+  width: min(800px, 94vw);
+  max-width: 94vw;
+  max-height: 96dvh;
+}
+#celebration.bot-victory #result-name {
+  display: none;
+}
+#celebration:not(.defeat) {
+  overflow: hidden;
+  contain: paint;
+}
+#celebration .result-card button {
+  max-width: 48%;
+}
+#celebration.defeat .result-card {
+  position: relative;
+  top: 16dvh;
+}
+#celebration.defeat #result-name {
+  display: none;
+}
+@media (max-height: 480px) {
+  #celebration .result-card {
+    padding: 6px;
+  }
+  #celebration.bot-victory #result-title {
+    height: 42dvh;
+  }
+  #celebration .result-card button {
+    min-height: 40px;
+    margin: 3px;
+    padding: 6px 14px;
+  }
+  #celebration.defeat .result-card {
+    top: 12dvh;
+  }
+  #celebration.defeat #result-title {
+    font-size: clamp(30px, 8vh, 52px);
+    margin: 6px 0;
+  }
+}
+.mouth-crossing #play aside,
+.mouth-crossing .game-heading {
+  visibility: hidden;
+}
+/* Narrowing a photographed eyelid supplies the final hostile gaze, without a second head. */
+.defeat-camera #menu .menu-scenery {
+  filter: brightness(0.64);
+}
+.return-play {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+.return-play svg {
+  width: 36px;
+  height: 36px;
+  fill: #ffd85a;
+  flex: none;
+}
+#celebration.defeat .result-card {
+  position: absolute;
+  top: auto;
+  bottom: max(16px, 6dvh);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(760px, 94vw);
+  max-width: 94vw;
+}
+#celebration.defeat #result-title,
+.return-lose {
+  font-size: 0;
+  line-height: 0;
+  text-shadow: none;
+  -webkit-text-stroke: 0;
+  background: url("assets/defeat-title.webp") center/contain no-repeat;
+  height: clamp(70px, 18dvh, 150px);
+  width: 100%;
+  margin: 4px auto 10px;
+  filter: drop-shadow(0 6px 10px #000b);
+}
+.return-lose {
+  width: min(720px, 90vw);
+}
+#celebration.defeat #result-title:before {
+  display: none;
+}
+@media (max-height: 480px) {
+  #celebration.defeat .result-card {
+    bottom: 10px;
+  }
+  #celebration.defeat #result-title {
+    height: 20dvh;
+    margin: 0 auto 6px;
+  }
+  #celebration.final-summary #result-title {
+    font-size: 22px;
+  }
+  #celebration.final-summary .standing {
+    font-size: 10px;
+    margin: 2px 0;
+    padding: 2px 6px;
+  }
+  #celebration.final-summary .medal-icon {
+    height: 20px;
+    width: 28px;
+  }
+  #celebration.final-summary .standing strong {
+    font-size: 13px;
+  }
+}
+@media (max-height: 480px) {
+  #celebration.two-player-result .crown,
+  #celebration.placement-celebration .crown {
+    width: 84px;
+  }
+  #celebration.two-player-result #result-title {
+    font-size: 28px;
+    margin: 5px 0;
+  }
+  #celebration:not(.bot-victory):not(.defeat) .result-card button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(50% - 8px);
+    max-width: none;
+    margin: 3px;
+    min-height: 40px;
+    font-size: 12px;
+    padding: 6px;
+    white-space: nowrap;
+  }
+}
+#celebration.defeat .result-card {
+  background: none;
+  box-shadow: none;
+}
+#celebration.defeat .result-card {
+  overflow: hidden;
+}

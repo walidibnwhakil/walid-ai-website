@@ -7,7 +7,7 @@ import {
 import { createJungleLife } from "./jungle-life.mjs?v=20261109-living";
 import { createCavernEyes } from "./cavern-eyes.mjs?v=20261109-living";
 import { createFireworks } from "./fireworks.mjs?v=20261109-living";
-import { createCinematic } from "./cinematic.mjs?v=20261109-living";
+import { createCinematic } from "./cinematic.mjs?v=20261109-portal";
 import { createMenuScene } from "./menu-scene.mjs?v=20261109-living";
 import { createLava } from "./lava.mjs?v=20261108-cinema";
 import {
@@ -956,12 +956,12 @@ async function spinDie(i, value, token) {
           transform: `rotateX(${startX}deg) rotateY(${startY}deg) rotateZ(0deg)`,
           offset: 0,
         },
-        ...[6, 5, 4, 3, 2, 1].map((face, j) => ({
-          transform: `rotateX(${DIE_ROTATION[face][0] + 360 * Math.ceil((j + 1) / 2)}deg) rotateY(${DIE_ROTATION[face][1] + 360 * Math.ceil((j + 1) / 3)}deg) rotateZ(0deg)`,
-          offset: 0.12 + j * 0.13,
+        ...[1, 3, 6, 4, 2, 5, 6, 2, 4, 1, 5, 3].map((face, j) => ({
+          transform: `rotateX(${DIE_ROTATION[face][0] + 360 * (j + 1)}deg) rotateY(${DIE_ROTATION[face][1] + 360 * (j + 1)}deg) rotateZ(0deg)`,
+          offset: 0.055 + j * 0.075,
         })),
         {
-          transform: `rotateX(${rx + 1440}deg) rotateY(${ry + 1440}deg) rotateZ(0deg)`,
+          transform: `rotateX(${rx + 4680}deg) rotateY(${ry + 4680}deg) rotateZ(0deg)`,
           offset: 1,
         },
       ],
@@ -991,7 +991,8 @@ function scheduleBot() {
     !busy &&
     !document.hidden &&
     $("#celebration").hidden &&
-    !$("#dialog").open
+    !$("#dialog").open &&
+    $("#intro").hidden
   )
     botTimer = setTimeout(() => takeTurn(), Number(settings.botDelay));
 }
@@ -1133,7 +1134,7 @@ function begin(skip = false) {
     if (token !== epoch || prepared) return;
     prepared = true;
     document.body.classList.add("playing");
-    $("#menu").hidden = true;
+    if (!document.body.classList.contains("entering")) $("#menu").hidden = true;
     $("#play").hidden = false;
     updateAmbience();
     render();
@@ -1144,6 +1145,7 @@ function begin(skip = false) {
   const reveal = () => {
     if (token !== epoch) return;
     prepare();
+    $("#menu").hidden = true;
     document.body.classList.remove("entering", "arriving");
     $("#intro").hidden = true;
     $("#intro").classList.remove("reveal");
@@ -1160,22 +1162,10 @@ function begin(skip = false) {
   if (skip || reduced()) reveal();
   else {
     $("#intro").hidden = false;
+    $("#skip").textContent = "Skip Intro →";
     $("main").inert = true;
     $("header").inert = true;
-    const hero = $(".menu-hero"),
-      box = hero.getBoundingClientRect(),
-      mouth = new DOMPoint(365, 178).matrixTransform(
-        $("#jungle").getScreenCTM(),
-      );
-    hero.dataset.left = String(box.x);
-    hero.dataset.top = String(box.y);
-    hero.dataset.originX = String(mouth.x - box.x);
-    hero.dataset.originY = String(mouth.y - box.y);
-    hero.dataset.sourceScale = String($("#jungle").getScreenCTM().a);
-    hero.dataset.dx = String(innerWidth / 2 - mouth.x);
-    hero.dataset.dy = String(innerHeight / 2 - mouth.y);
-    hero.style.setProperty("--mouth-x", `${mouth.x - box.x}px`);
-    hero.style.setProperty("--mouth-y", `${mouth.y - box.y}px`);
+    const hero = cameraProfile();
     document.body.classList.add("entering");
     entranceCinema.enter({
       motion: true,
@@ -1188,15 +1178,77 @@ function begin(skip = false) {
     $("#skip").onclick = () => entranceCinema.finish();
   }
 }
-function menu() {
+function cameraProfile() {
+  const menu = $("#menu"),
+    hidden = menu.hidden;
+  menu.hidden = false;
+  const hero = $(".menu-hero"),
+    box = hero.getBoundingClientRect(),
+    matrix = $("#jungle").getScreenCTM();
+  const mouth = new DOMPoint(365, 178).matrixTransform(matrix);
+  Object.assign(hero.dataset, {
+    left: String(box.x),
+    top: String(box.y),
+    originX: String(mouth.x - box.x),
+    originY: String(mouth.y - box.y),
+    sourceScale: String(matrix.a),
+    sourceLeft: String(matrix.e - box.x),
+    sourceTop: String(matrix.f - box.y),
+  });
+  menu.hidden = hidden;
+  return hero;
+}
+function menu(immediate = false) {
+  if (document.body.classList.contains("returning")) return;
+  const animate =
+    state && !$("#play").hidden && !reduced() && immediate !== true;
+  const fromDefeat =
+    !$("#celebration").hidden && $("#celebration").classList.contains("defeat");
+  const resultRect = fromDefeat
+    ? $("#result-title").getBoundingClientRect().toJSON()
+    : null;
   cancel();
-  state = null;
-  document.body.classList.remove("playing", "portrait-game", "desktop-game");
-  document.body.style.removeProperty("--board-size");
-  $("#play").hidden = true;
-  $("#menu").hidden = false;
-  $("#start").disabled = false;
-  updateAmbience();
+  const reveal = () => {
+    state = null;
+    document.body.classList.remove(
+      "playing",
+      "portrait-game",
+      "desktop-game",
+      "entering",
+      "arriving",
+      "mouth-crossing",
+      "returning",
+      "defeat-camera",
+    );
+    document.body.style.removeProperty("--board-size");
+    $("#play").hidden = true;
+    $("#menu").hidden = false;
+    $("#intro").hidden = true;
+    $("main").inert = false;
+    $("header").inert = false;
+    $("#start").disabled = false;
+    $("#start").focus({ preventScroll: true });
+    updateAmbience();
+  };
+  if (!animate) {
+    reveal();
+    return;
+  }
+  const profile = cameraProfile();
+  $("main").inert = true;
+  $("header").inert = true;
+  $("#intro").hidden = false;
+  $("#skip").textContent = "Skip →";
+  entranceCinema.exit({
+    profile,
+    board: $("#play"),
+    motion: true,
+    quality: settings.quality,
+    fromDefeat,
+    resultRect,
+    onReveal: reveal,
+  });
+  $("#skip").onclick = () => entranceCinema.finish();
 }
 function medalMarkup(medal) {
   return medal
@@ -1304,10 +1356,7 @@ function celebrate(i) {
     height: boardRect.height,
   }))
     layer.style.setProperty(`--result-${key}`, `${value}px`);
-  layer.style.setProperty(
-    "--accent",
-    state.bot && !defeat ? "#ffdb70" : HEX[COLORS.indexOf(p.color)],
-  );
+  layer.style.setProperty("--accent", HEX[COLORS.indexOf(p.color)]);
   layer.style.setProperty("--medal-color", MEDALS[Math.min(rank, 2)].color);
   const crown = layer.querySelector(".crown");
   crown.dataset.medal = presentation.medal || "gold";
@@ -1332,12 +1381,18 @@ function celebrate(i) {
   $("#result-menu").hidden = presentation.automatic;
   $(".fireworks").replaceChildren();
   if (defeat)
-    defeatCinema.defeat({ motion: !reduced(), title: $("#result-title") });
+    defeatCinema.defeat({
+      motion: !reduced(),
+      title: $("#result-title"),
+      profile: cameraProfile(),
+      board: $("#play"),
+      quality: settings.quality,
+    });
   else {
-    resultFireworks.start(
-      state.bot ? "#ffd96b" : HEX[COLORS.indexOf(p.color)],
-      { motion: !reduced(), quality: settings.quality },
-    );
+    resultFireworks.start(HEX[COLORS.indexOf(p.color)], {
+      motion: !reduced(),
+      quality: settings.quality,
+    });
     tone(880, 0.5);
   }
   render();
@@ -1559,6 +1614,7 @@ if (
     },
     turn: takeTurn,
     celebrate,
+    summary: showSummary,
     settings,
     paths: () => paths,
     begin,

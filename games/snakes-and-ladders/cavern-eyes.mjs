@@ -106,7 +106,12 @@ export function createCavernEyes(canvas, { motion }) {
   }
   function start() {
     stop();
-    if (!document.body.classList.contains("playing") || document.hidden) return;
+    if (
+      !document.body.classList.contains("playing") ||
+      document.hidden ||
+      !document.querySelector("#celebration").hidden
+    )
+      return;
     canvas.dataset.active = motion() ? "true" : "static";
     if (!motion()) {
       paint(0);

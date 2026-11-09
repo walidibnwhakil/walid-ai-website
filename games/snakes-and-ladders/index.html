@@ -13,8 +13,9 @@
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
     <link rel="preload" as="image" href="assets/cobra-cinema.webp" />
-    <link rel="stylesheet" href="style.css?v=20261109-medals" />
-    <script type="module" src="game.mjs?v=20261109-medals-2"></script>
+    <link rel="preload" as="image" href="assets/victory-emblem.webp" />
+    <link rel="stylesheet" href="style.css?v=20261109-living" />
+    <script type="module" src="game.mjs?v=20261109-living"></script>
   </head>
   <body>
     <div id="world">
@@ -30,8 +31,8 @@
         id="games-link"
         class="icon-control"
         href="/games/"
-        aria-label="Back to Games"
-        title="Games"
+        aria-label="All Games"
+        title="All Games"
         ><svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M2 11 12 2l10 9M5 10v12h5v-7h4v7h5V10" /></svg
       ></a>
@@ -89,10 +90,7 @@
           <h1 class="sr-only">Snakes &amp; Ladders</h1>
           <svg id="jungle" viewBox="0 0 1536 1024" aria-hidden="true"></svg>
         </div>
-        <div class="menu-foliage" aria-hidden="true">
-          <span class="vine"><i class="leaf">❧</i></span
-          ><span class="vine"><i class="leaf">❧</i></span>
-        </div>
+        <canvas id="jungle-life" aria-hidden="true"></canvas>
         <div class="menu-panel">
           <button id="start" class="primary menu-pill">
             <span class="menu-symbol" aria-hidden="true"
@@ -100,65 +98,36 @@
                 <path d="M6 3L29 16 6 29Z" /></svg></span
             ><span>Play Now</span>
           </button>
-          <div class="local-picker">
-            <button
-              id="local-mode"
-              class="menu-pill"
-              aria-expanded="false"
-              aria-controls="local-options"
-            >
-              <span class="menu-symbol" aria-hidden="true"
-                ><svg viewBox="0 0 32 32">
-                  <circle cx="16" cy="8" r="6" />
-                  <circle cx="5" cy="10" r="4" />
-                  <circle cx="27" cy="10" r="4" />
-                  <path
-                    d="M7 29v-7q0-8 9-8t9 8v7ZM0 27v-7q0-5 6-5v12ZM26 15q6 0 6 5v7h-6Z"
-                  /></svg></span
-              ><span id="local-label">2 Players</span><small>⌄</small>
+          <div
+            id="player-count-choice"
+            role="group"
+            aria-label="Local player count"
+          >
+            <button data-player-count="2" aria-pressed="true">
+              2 <small>Players</small></button
+            ><button data-player-count="3" aria-pressed="false">
+              3 <small>Players</small></button
+            ><button data-player-count="4" aria-pressed="false">
+              4 <small>Players</small>
             </button>
-            <dialog id="local-options" hidden aria-labelledby="local-title">
-              <button
-                type="button"
-                id="close-local"
-                aria-label="Close player selection"
-              >
-                ×
-              </button>
-              <div class="chooser-crown" aria-hidden="true">
-                <svg viewBox="490 0 560 370">
-                  <image
-                    href="assets/jungle-emblem.webp"
-                    width="1536"
-                    height="1024"
-                  />
-                </svg>
-              </div>
-              <h2 id="local-title">Choose Your Players</h2>
-              <p>Gather around. Share the adventure.</p>
-              <div class="player-count-grid">
-                <button type="button" data-local-mode="2" aria-pressed="false">
-                  <span class="seat-preview" aria-hidden="true"></span
-                  ><strong>2 Players</strong><small>A royal duel</small>
-                </button>
-                <button type="button" data-local-mode="3" aria-pressed="false">
-                  <span class="seat-preview" aria-hidden="true"></span
-                  ><strong>3 Players</strong><small>A race for the crown</small>
-                </button>
-                <button type="button" data-local-mode="4" aria-pressed="false">
-                  <span class="seat-preview" aria-hidden="true"></span
-                  ><strong>4 Players</strong><small>The grand table</small>
-                </button>
-              </div>
-            </dialog>
           </div>
+          <button id="friends-mode" class="menu-pill" aria-pressed="false">
+            <span class="menu-symbol" aria-hidden="true"
+              ><svg viewBox="0 0 32 32">
+                <circle cx="10" cy="8" r="6" />
+                <circle cx="23" cy="10" r="5" />
+                <path
+                  d="M1 30v-8q0-8 9-8t9 8v8ZM21 17q10-1 10 8v5h-9Z"
+                /></svg></span
+            ><span>Play with Friends</span>
+          </button>
           <button id="bot-mode" class="menu-pill selected" aria-pressed="true">
             <span class="menu-symbol" aria-hidden="true"
               ><svg viewBox="0 0 32 32">
                 <path
                   d="M8 3h16v9q0 9-8 10-8-1-8-10ZM13 21h6v6h6v4H7v-4h6ZM7 5H1v6q0 8 9 8v-4q-5 0-5-5V9h2ZM25 5h6v6q0 8-9 8v-4q5 0 5-5V9h-2Z"
                 /></svg></span
-            ><span>Challenge <small>(Bot)</small></span>
+            ><span>Play with <small>Computer / Bot</small></span>
           </button>
           <select id="mode" class="sr-only" aria-label="Game mode">
             <option value="bot">Single Player — vs Bot</option>
@@ -251,6 +220,7 @@
           </svg>
         </div>
         <h2 id="result-title"></h2>
+        <p class="victory-caption">The crown is yours</p>
         <p id="result-name"></p>
         <div id="standings"></div>
         <button id="continue" class="primary">Continue Match</button

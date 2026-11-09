@@ -18,10 +18,14 @@ export function createFireworks(canvas) {
     }
     c.clearRect(0, 0, w, h);
     c.globalCompositeOperation = "lighter";
-    for (let b = 0; b < 3; b++) {
-      const phase = (t - b * 0.82 + 9) % 2.7,
-        x = w * [0.22, 0.78, 0.5][b],
-        y = h * [0.24, 0.28, 0.47][b];
+    for (
+      let b = 0;
+      b < (quality === "Low" ? 2 : quality === "High" ? 5 : 4);
+      b++
+    ) {
+      const phase = (t - b * 0.55 + 12) % 2.4,
+        x = w * [0.15, 0.85, 0.28, 0.72, 0.5][b],
+        y = h * [0.2, 0.24, 0.49, 0.55, 0.68][b];
       if (phase < 0.35) {
         const py = h * 0.93 - ((h * 0.93 - y) * phase) / 0.35;
         c.strokeStyle = color;
@@ -37,11 +41,11 @@ export function createFireworks(canvas) {
       if (phase > 1.8) continue;
       const p = (phase - 0.35) / 1.45,
         spread = Math.min(w, h) * (0.27 + b * 0.015) * (1 - (1 - p) ** 2),
-        fade = (1 - p) ** 1.25,
-        rays = quality === "Low" ? 12 : 24;
+        fade = (1 - p) ** 0.6,
+        rays = quality === "Low" ? 14 : quality === "High" ? 32 : 24;
       c.globalAlpha = fade;
       const glow = c.createRadialGradient(x, y, 0, x, y, spread + 10);
-      glow.addColorStop(0, color + "33");
+      glow.addColorStop(0, color + "66");
       glow.addColorStop(1, color + "00");
       c.fillStyle = glow;
       c.fillRect(
@@ -56,7 +60,7 @@ export function createFireworks(canvas) {
           dy = Math.sin(a) * spread + p * p * 32,
           tail = 0.56 + (k % 3) * 0.07;
         c.strokeStyle = color;
-        c.lineWidth = 1.7;
+        c.lineWidth = 2.4;
         c.shadowColor = color;
         c.shadowBlur = 7;
         c.beginPath();
@@ -66,7 +70,7 @@ export function createFireworks(canvas) {
         c.shadowBlur = 0;
         c.fillStyle = "#fff3cb";
         c.beginPath();
-        c.arc(x + dx, y + dy, 1.2, 0, 7);
+        c.arc(x + dx, y + dy, 1.7, 0, 7);
         c.fill();
       }
       c.globalAlpha = 1;

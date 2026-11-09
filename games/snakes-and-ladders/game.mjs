@@ -4,10 +4,11 @@ import {
   finishMedal,
   finalStandings,
 } from "./results.mjs";
-import { createCavernEyes } from "./cavern-eyes.mjs?v=20261108-cinema";
-import { createFireworks } from "./fireworks.mjs?v=20261109-medals";
-import { createCinematic } from "./cinematic.mjs?v=20261109-medals-2";
-import { createMenuScene } from "./menu-scene.mjs?v=20261108-jungle";
+import { createJungleLife } from "./jungle-life.mjs?v=20261109-living";
+import { createCavernEyes } from "./cavern-eyes.mjs?v=20261109-living";
+import { createFireworks } from "./fireworks.mjs?v=20261109-living";
+import { createCinematic } from "./cinematic.mjs?v=20261109-living";
+import { createMenuScene } from "./menu-scene.mjs?v=20261109-living";
 import { createLava } from "./lava.mjs?v=20261108-cinema";
 import {
   snakeCurve,
@@ -102,7 +103,7 @@ function applySettings() {
   save("serpent-muted", audioMuted);
   save("serpent-settings", settings);
   updateAmbience();
-  if (state && !$("#play").hidden) liveLava.start();
+  if (state && !$("#play").hidden && $("#celebration").hidden) liveLava.start();
 }
 function audio() {
   try {
@@ -912,11 +913,14 @@ function render() {
     .join("");
   fitGame();
   liveLava.start();
+  cavernEyes.start();
 }
 function fitGame() {
   if (!state || $("#play").hidden) return;
   const height = window.visualViewport?.height ?? innerHeight,
-    portrait = innerWidth < 820 && height > innerWidth;
+    portrait = innerWidth < 820 && height > innerWidth,
+    desktop = innerWidth >= 1000 && height >= 600;
+  document.body.classList.toggle("desktop-game", desktop);
   document.body.classList.toggle("portrait-game", portrait);
   window.scrollTo(0, 0);
   const layout = $(".game-layout"),
@@ -927,9 +931,11 @@ function fitGame() {
     main.clientWidth -
     parseFloat(getComputedStyle(main).paddingLeft) -
     parseFloat(getComputedStyle(main).paddingRight);
-  const size = portrait
-    ? Math.min(width, height - top - aside.offsetHeight - 18)
-    : Math.min(height - top - 23, width - 214, 920);
+  const size = desktop
+    ? Math.min(height - top - 30, width - 360, 920)
+    : portrait
+      ? Math.min(width, height - top - aside.offsetHeight - 18)
+      : Math.min(height - top - 23, width - 214, 920);
   document.body.style.setProperty(
     "--board-size",
     Math.max(120, Math.floor(size)) + "px",
@@ -1089,6 +1095,13 @@ function cancel() {
   defeatCinema.cancel();
   $(".menu-hero").style.removeProperty("transform");
   $(".menu-hero").style.removeProperty("opacity");
+  $(".menu-hero").style.removeProperty("transform-origin");
+  document
+    .querySelectorAll("#royal-upper,#royal-lower,.menu-mouth-cavity")
+    .forEach((e) => {
+      e.style.removeProperty("transform");
+      e.style.removeProperty("opacity");
+    });
   setGameInProgress(false);
   epoch++;
   activeRollAnimation?.cancel();
@@ -1154,6 +1167,11 @@ function begin(skip = false) {
       mouth = new DOMPoint(365, 178).matrixTransform(
         $("#jungle").getScreenCTM(),
       );
+    hero.dataset.left = String(box.x);
+    hero.dataset.top = String(box.y);
+    hero.dataset.originX = String(mouth.x - box.x);
+    hero.dataset.originY = String(mouth.y - box.y);
+    hero.dataset.sourceScale = String($("#jungle").getScreenCTM().a);
     hero.dataset.dx = String(innerWidth / 2 - mouth.x);
     hero.dataset.dy = String(innerHeight / 2 - mouth.y);
     hero.style.setProperty("--mouth-x", `${mouth.x - box.x}px`);
@@ -1164,6 +1182,7 @@ function begin(skip = false) {
       profile: hero,
       board: $("#play"),
       onBoardReady: prepare,
+      quality: settings.quality,
       onReveal: reveal,
     });
     $("#skip").onclick = () => entranceCinema.finish();
@@ -1172,7 +1191,7 @@ function begin(skip = false) {
 function menu() {
   cancel();
   state = null;
-  document.body.classList.remove("playing", "portrait-game");
+  document.body.classList.remove("playing", "portrait-game", "desktop-game");
   document.body.style.removeProperty("--board-size");
   $("#play").hidden = true;
   $("#menu").hidden = false;
@@ -1225,6 +1244,10 @@ function resumeMatch() {
   $("main").inert = false;
   $("header").inert = false;
   updateCrown();
+  liveLava.start();
+  cavernEyes.start();
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(animateBoard);
   render();
   $("#status").textContent = `${state.players[state.current].color}'s turn.`;
   document.querySelector(`[data-roll="${state.current}"]`)?.focus();
@@ -1266,6 +1289,9 @@ function celebrate(i) {
         ? "two-player-result"
         : "placement-celebration";
   layer.hidden = false;
+  cancelAnimationFrame(raf);
+  liveLava.stop();
+  cavernEyes.stop();
   $("main").inert = true;
   $("header").inert = true;
   defeatCinema.cancel();
@@ -1380,72 +1406,44 @@ function panel(kind) {
   } else $("#dialog-content").onchange = null;
   $("#dialog").showModal();
 }
-function closeLocalChooser() {
-  const dialog = $("#local-options");
-  if (dialog.open) dialog.close();
-  dialog.hidden = true;
-  $("#local-mode").setAttribute("aria-expanded", "false");
-}
+let localCount = 2;
 function selectMode() {
-  colorOptions();
   const bot = $("#mode").value === "bot";
+  if (!bot) localCount = +$("#mode").value;
+  colorOptions();
   $("#bot-mode").classList.toggle("selected", bot);
   $("#bot-mode").setAttribute("aria-pressed", String(bot));
-  $("#local-mode").classList.toggle("selected", !bot);
-  if (!bot) $("#local-label").textContent = $("#mode").value + " Players";
-  document
-    .querySelectorAll("[data-local-mode]")
-    .forEach((b) =>
-      b.setAttribute(
-        "aria-pressed",
-        String(!bot && b.dataset.localMode === $("#mode").value),
-      ),
-    );
-  closeLocalChooser();
+  $("#friends-mode").classList.toggle("selected", !bot);
+  $("#friends-mode").setAttribute("aria-pressed", String(!bot));
+  document.querySelectorAll("[data-player-count]").forEach((b) => {
+    const selected = +b.dataset.playerCount === (bot ? 2 : localCount);
+    b.classList.toggle("selected", selected);
+    b.setAttribute("aria-pressed", String(selected));
+  });
 }
+$("#games-link").addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  cancel();
+  location.assign(new URL("/games/", location.origin).href);
+});
 $("#mode").onchange = selectMode;
 $("#bot-mode").onclick = () => {
   $("#mode").value = "bot";
   selectMode();
 };
-$("#local-mode").onclick = () => {
-  const dialog = $("#local-options");
-  if (dialog.open) {
-    closeLocalChooser();
-    return;
-  }
-  dialog.hidden = false;
-  dialog.showModal();
-  $("#local-mode").setAttribute("aria-expanded", "true");
+$("#friends-mode").onclick = () => {
+  $("#mode").value = String(localCount);
+  selectMode();
 };
-$("#close-local").onclick = closeLocalChooser;
-$("#local-options").addEventListener("close", () => {
-  $("#local-options").hidden = true;
-  $("#local-mode").setAttribute("aria-expanded", "false");
-});
-$("#local-options").addEventListener("click", (e) => {
-  if (e.target === $("#local-options")) {
-    const r = e.target.getBoundingClientRect();
-    if (
-      e.clientX < r.left ||
-      e.clientX > r.right ||
-      e.clientY < r.top ||
-      e.clientY > r.bottom
-    )
-      closeLocalChooser();
-  }
-});
-for (const b of document.querySelectorAll("[data-local-mode]")) {
-  b.querySelector(".seat-preview").innerHTML = Array.from(
-    { length: +b.dataset.localMode },
-    (_, i) => pinMarkup(COLORS[i]),
-  ).join("");
-  b.onclick = () => {
-    $("#mode").value = b.dataset.localMode;
-    selectMode();
-    $("#local-mode").focus();
-  };
-}
+document.querySelectorAll("[data-player-count]").forEach(
+  (b) =>
+    (b.onclick = () => {
+      localCount = +b.dataset.playerCount;
+      $("#mode").value = String(localCount);
+      selectMode();
+    }),
+);
 $("#start").onclick = () => {
   if (!$("#start").disabled) begin();
 };
@@ -1500,7 +1498,8 @@ document.addEventListener("visibilitychange", () => {
     liveLava.stop();
   } else {
     scheduleBot();
-    if (state && !$("#play").hidden) liveLava.start();
+    if (state && !$("#play").hidden && $("#celebration").hidden)
+      liveLava.start();
   }
   updateAmbience();
 });
@@ -1514,6 +1513,10 @@ const cavernEyes = createCavernEyes($("#cavern-eyes"), {
 const resultFireworks = createFireworks($("#result-fireworks"));
 const entranceCinema = createCinematic($("#entrance-scene"), "entrance");
 const defeatCinema = createCinematic($("#defeat-snake"), "defeat");
+const jungleLife = createJungleLife($("#jungle-life"), {
+  motion: () => !reduced(),
+  quality: () => settings.quality,
+});
 const menuScene = createMenuScene($("#jungle"), $("#jungle-water"), {
   motion: () => !reduced(),
   quality: () => settings.quality,
@@ -1531,7 +1534,7 @@ window.addEventListener("resize", () => {
   fitGame();
 });
 window.visualViewport?.addEventListener("resize", fitGame);
-colorOptions();
+selectMode();
 applySettings();
 // Explicit local-only browser harness; never enabled on the published website.
 if (
@@ -1562,4 +1565,5 @@ if (
     entranceCinema,
     defeatCinema,
     cavernEyes,
+    jungleLife,
   };

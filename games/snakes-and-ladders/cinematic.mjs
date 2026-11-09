@@ -1,3 +1,4 @@
+import { createEntryMesh } from "./snake-entry-mesh.mjs?v=20261109-living";
 const clamp = (x) => Math.max(0, Math.min(1, x));
 const ease = (a, b, t) => {
   const n = clamp((t - a) / (b - a));
@@ -5,6 +6,9 @@ const ease = (a, b, t) => {
 };
 export function createCinematic(host, prefix) {
   host.innerHTML = `<div class="cinematic-scene" aria-hidden="true"><div class="cinematic-jungle"></div><div class="cinematic-aura"></div><div class="cinematic-face"><svg viewBox="0 0 768 1024"><defs><filter id="${prefix}-soft"><feGaussianBlur stdDeviation="6"/></filter><mask id="${prefix}-lip"><rect width="768" height="1024" fill="black"/><ellipse cx="384" cy="645" rx="150" ry="40" fill="white" filter="url(#${prefix}-soft)"/></mask><mask id="${prefix}-snout"><rect width="768" height="1024" fill="black"/><ellipse cx="384" cy="332" rx="153" ry="25" fill="white" filter="url(#${prefix}-soft)"/></mask></defs><g class="cinematic-open"><image href="assets/cobra-cinema.webp" width="1536" height="1024"/><g class="cinematic-upper" mask="url(#${prefix}-snout)"><image href="assets/cobra-cinema.webp" width="1536" height="1024"/></g><g class="cinematic-lower" mask="url(#${prefix}-lip)"><image href="assets/cobra-cinema.webp" width="1536" height="1024"/></g></g><g class="cinematic-closed"><image href="assets/cobra-cinema.webp" x="-768" width="1536" height="1024"/></g></svg></div><div class="cinematic-dark"></div></div>`;
+  if (prefix === "entrance")
+    host.innerHTML =
+      '<div class="cinematic-scene original-snake-entry" aria-hidden="true"><div class="cinematic-dark"></div></div>';
   const scene = host.firstElementChild,
     face = scene.querySelector(".cinematic-face"),
     open = scene.querySelector(".cinematic-open"),
@@ -22,6 +26,8 @@ export function createCinematic(host, prefix) {
     prepared = false,
     sampleFrame = null;
   function resetCamera() {
+    mesh?.destroy();
+    mesh = null;
     if (rig) {
       rig.profile.style.removeProperty("transform");
       rig.profile.style.removeProperty("opacity");
@@ -49,8 +55,12 @@ export function createCinematic(host, prefix) {
       boardReady?.();
     }
   }
+  let mesh = null,
+    lastMesh = -Infinity;
   function cancel() {
     active = false;
+    mesh?.destroy();
+    mesh = null;
     cancelAnimationFrame(raf);
     raf = 0;
     done = null;
@@ -59,10 +69,11 @@ export function createCinematic(host, prefix) {
     host.dataset.phase = "idle";
   }
   function pose(scale, gape, angle = 0) {
-    face.style.transform = `translate(-50%,-47%) scale(${scale}) rotateY(${angle}deg)`;
-    face.style.setProperty("--gape", gape);
-    open.style.opacity = gape;
-    closed.style.opacity = 1 - gape;
+    if (face)
+      face.style.transform = `translate(-50%,-47%) scale(${scale}) rotateY(${angle}deg)`;
+    face?.style.setProperty("--gape", gape);
+    if (open) open.style.opacity = gape;
+    if (closed) closed.style.opacity = 1 - gape;
     host.dataset.scale = scale.toFixed(3);
     host.dataset.gape = gape.toFixed(3);
   }
@@ -79,7 +90,15 @@ export function createCinematic(host, prefix) {
   }
   function start(
     kind,
-    { motion = true, onReveal, onBoardReady, profile, board, title } = {},
+    {
+      motion = true,
+      onReveal,
+      onBoardReady,
+      profile,
+      board,
+      title,
+      quality = "Balanced",
+    } = {},
   ) {
     cancel();
     active = true;
@@ -103,7 +122,7 @@ export function createCinematic(host, prefix) {
     if (!motion) {
       pose(1.06, kind === "enter" ? 1 : 0);
       dark.style.opacity = 0;
-      jungle.style.opacity = 1;
+      if (jungle) jungle.style.opacity = 1;
       if (title) {
         title.style.opacity = "1";
         title.style.setProperty("--result-scale", "1");
@@ -111,52 +130,56 @@ export function createCinematic(host, prefix) {
       finish();
       return;
     }
+    if (kind === "enter" && profile) mesh = createEntryMesh(profile, quality);
     const begin = performance.now(),
-      duration = kind === "enter" ? 6500 : 6200;
+      duration = kind === "enter" ? 4800 : 6200;
     function frame(now) {
       if (!active) return;
       const p = clamp((now - begin) / duration);
       last = p;
       if (kind === "enter") {
         const approach = ease(0, 0.26, p),
-          gape = ease(0.15, 0.38, p),
-          zoom = Math.exp(ease(0.04, 0.56, p) * 3.7);
-        scene.style.opacity = 1;
-        jungle.style.opacity = 0;
-        if (rig) {
-          rig.profile.style.transform = `translate(${profile.dataset.dx * approach}px,${profile.dataset.dy * approach}px) scale(${zoom})`;
-          rig.profile.style.opacity = "1";
-          if (rig.upper)
-            rig.upper.style.transform = `rotate(${-0.8 * gape}deg)`;
-          if (rig.lower)
-            rig.lower.style.transform = `translate(0,${2.5 * gape}px) rotate(${1.5 * gape}deg)`;
-          if (rig.cavity) {
-            rig.cavity.style.opacity = "0";
-            rig.cavity.style.transform = `translate(0,${1.5 * gape}px) scale(${1 + 0.3 * gape},${1 + 0.7 * gape})`;
+          gape = ease(0.12, 0.34, p),
+          swallow = ease(0.32, 0.58, p);
+        const zoom = (1 + 4 * ease(0, 0.32, p)) * Math.exp(swallow * 2.7);
+        if (profile) {
+          const unit = +profile.dataset.sourceScale || 0.5,
+            ox = +profile.dataset.originX - 12 * gape * unit,
+            oy = +profile.dataset.originY + 18 * gape * unit;
+          const dx = innerWidth / 2 - (+profile.dataset.left + ox),
+            dy = innerHeight / 2 - (+profile.dataset.top + oy);
+          profile.style.transformOrigin = `${ox}px ${oy}px`;
+          profile.style.transform = `translate(${dx * approach}px,${dy * approach}px) scale(${zoom})`;
+          profile.style.opacity = "1";
+          if (
+            now - lastMesh >
+            (quality === "Low" ? 80 : quality === "High" ? 33 : 42)
+          ) {
+            mesh?.paint(gape);
+            lastMesh = now;
           }
         }
+        scene.style.opacity = 1;
         pose(zoom, gape);
         dark.style.opacity = String(
-          p < 0.58 ? ease(0.22, 0.39, p) : 1 - ease(0.6, 0.98, p),
+          p < 0.6 ? ease(0.5, 0.6, p) : 1 - ease(0.62, 1, p),
         );
-        if (p >= 0.56) {
+        if (p >= 0.6) {
           prepareBoard();
           document.body.classList.add("arriving");
           const focus = ease(0.6, 1, p);
-          if (cameraBoard) {
-            cameraBoard.style.setProperty(
-              "--arrival-blur",
-              `${24 * (1 - focus)}px`,
-            );
-            cameraBoard.style.setProperty(
-              "--arrival-scale",
-              String(0.72 + 0.28 * focus),
-            );
-            cameraBoard.style.setProperty(
-              "--arrival-opacity",
-              String(0.12 + 0.88 * focus),
-            );
-          }
+          cameraBoard?.style.setProperty(
+            "--arrival-blur",
+            `${24 * (1 - focus)}px`,
+          );
+          cameraBoard?.style.setProperty(
+            "--arrival-scale",
+            String(0.72 + 0.28 * focus),
+          );
+          cameraBoard?.style.setProperty(
+            "--arrival-opacity",
+            String(0.12 + 0.88 * focus),
+          );
         }
         host.dataset.phase =
           p < 0.15

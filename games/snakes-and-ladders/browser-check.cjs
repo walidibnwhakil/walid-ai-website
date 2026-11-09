@@ -47,8 +47,6 @@ fs.mkdirSync(out, { recursive: true });
     [".eye", "blink"],
     [".tongue", "tongue"],
     [".small-snake", "small-snake"],
-    [".leaf", "leaf"],
-    [".vine", "vine"],
   ]) {
     await check(name + " actual sampled animation frames", async () => {
       const samples = await page
@@ -71,6 +69,75 @@ fs.mkdirSync(out, { recursive: true });
       assert.ok(new Set(samples).size > 1, name);
     });
   }
+  await check(
+    "river water and real leaf/vine sprites change rendered pixels independently",
+    async () => {
+      await page.waitForFunction(
+        () => document.querySelector("#jungle-life").dataset.ready === "true",
+      );
+      const sample = async (ms) =>
+        page.evaluate((ms) => {
+          window.serpentTest.jungleLife.stop();
+          window.serpentTest.jungleLife.paint(ms);
+          const e = document.querySelector("#jungle-life"),
+            c = e.getContext("2d"),
+            w = e.width,
+            h = e.height,
+            scale = Math.max(w / 1536, h / 1024),
+            ox = (w - 1536 * scale) * 0.6,
+            oy = (h - 1024 * scale) * 0.5;
+          function hash(x, y, sw, sh) {
+            const d = c.getImageData(
+              Math.round(x * scale + ox),
+              Math.max(0, Math.round(y * scale + oy)),
+              Math.round(sw * scale),
+              Math.round(sh * scale),
+            ).data;
+            let n = 0;
+            for (let i = 0; i < d.length; i++) n = (n * 31 + d[i]) >>> 0;
+            return n;
+          }
+          return {
+            river: hash(1000, 800, 110, 70),
+            canopy: hash(1200, 20, 250, 200),
+          };
+        }, ms);
+      const a = await sample(15000),
+        b = await sample(16000);
+      assert.notEqual(a.river, b.river);
+      assert.notEqual(a.canopy, b.canopy);
+      await shot("living-river-canopy");
+      await page.evaluate(() => window.serpentTest.jungleLife.start());
+    },
+  );
+  await check(
+    "kingfisher lands on the dice and returns from the water carrying a fish",
+    async () => {
+      await page.evaluate(() => window.serpentTest.jungleLife.stop());
+      const frames = [];
+      for (const [ms, phase] of [
+        [1000, "arriving"],
+        [3000, "perched-on-die"],
+        [6700, "catching-fish"],
+        [10500, "perched-with-fish"],
+      ]) {
+        await page.evaluate(
+          (ms) => window.serpentTest.jungleLife.paint(ms),
+          ms,
+        );
+        assert.equal(
+          await page.locator("#jungle-life").getAttribute("data-bird"),
+          phase,
+        );
+        frames.push(
+          await page.locator("#jungle-life").evaluate((e) => e.toDataURL()),
+        );
+        await shot("bird-" + phase);
+      }
+      assert.equal(new Set(frames).size, 4);
+      await page.evaluate(() => window.serpentTest.jungleLife.start());
+    },
+  );
   await check(
     "reference menu fits one screen on twelve desktop and mobile sizes",
     async () => {
@@ -191,8 +258,8 @@ fs.mkdirSync(out, { recursive: true });
   await check(
     "local player chooser, bot mode and pre-game rules remain functional",
     async () => {
-      await page.click("#local-mode");
-      await page.click('[data-local-mode="3"]');
+      await page.click('[data-player-count="3"]');
+      await page.click("#friends-mode");
       assert.equal(await page.locator("#mode").inputValue(), "3");
       assert.equal(await page.locator("[data-setup-color]").count(), 3);
       await page.click("#bot-mode");
@@ -205,6 +272,17 @@ fs.mkdirSync(out, { recursive: true });
         ),
       );
       await page.click("#close");
+    },
+  );
+  await check(
+    "Home opens the full Games index instead of the website front page",
+    async () => {
+      await page.click("#games-link");
+      await page.waitForURL("**/games/");
+      assert.equal(new URL(page.url()).pathname, "/games/");
+      assert.ok((await page.locator(".games a.tile").count()) >= 6);
+      await page.goto(base + "?test");
+      await page.waitForSelector(".snake-head");
     },
   );
   await shot("menu-desktop");
@@ -225,64 +303,8 @@ fs.mkdirSync(out, { recursive: true });
       await shot("clean-menu-without-player-row");
     },
   );
-  await check(
-    "premium local chooser uses matching real pawns and closes after choosing",
-    async () => {
-      for (const count of [2, 3, 4]) {
-        await page.click("#local-mode");
-        assert(await page.locator("#local-options").isVisible());
-        assert.equal(
-          await page
-            .locator(`[data-local-mode="${count}"] .pin-avatar`)
-            .count(),
-          count,
-        );
-        assert(
-          (await page.locator(`[data-local-mode="${count}"]`).boundingBox())
-            .height >= 140,
-        );
-        await shot("choose-" + count + "-players");
-        await page.click(`[data-local-mode="${count}"]`);
-        assert.equal(await page.locator("#mode").inputValue(), String(count));
-        assert(await page.locator("#local-options").isHidden());
-      }
-    },
-  );
-  await check(
-    "player chooser fits narrow phones and landscape without native dropdown styling",
-    async () => {
-      for (const [width, height] of [
-        [320, 568],
-        [390, 844],
-        [844, 390],
-        [1440, 1000],
-      ]) {
-        await page.setViewportSize({ width, height });
-        await page.click("#local-mode");
-        const r = await page.locator("#local-options").boundingBox();
-        assert(
-          r.x >= 0 &&
-            r.y >= 0 &&
-            r.x + r.width <= width + 1 &&
-            r.y + r.height <= height + 1,
-        );
-        for (const count of [2, 3, 4]) {
-          const b = await page
-            .locator(`[data-local-mode="${count}"]`)
-            .boundingBox();
-          assert(
-            b.x >= 0 &&
-              b.y >= 0 &&
-              b.x + b.width <= width + 1 &&
-              b.y + b.height <= height + 1,
-          );
-          assert(b.height >= 100);
-        }
-        await shot("player-chooser-" + width);
-        await page.click("#close-local");
-      }
-      await page.setViewportSize({ width: 1440, height: 1000 });
-    },
+  await page.evaluate(
+    () => (window.originalMenuHead = document.querySelector("#royal-upper")),
   );
   await page.click("#start");
   await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.12));
@@ -291,16 +313,25 @@ fs.mkdirSync(out, { recursive: true });
   assert(
     +(await page.locator("#entrance-scene").getAttribute("data-gape")) > 0.7,
   );
+  assert.equal(
+    await page.evaluate(
+      () => document.querySelector("#royal-upper") === window.originalMenuHead,
+    ),
+    true,
+  );
+  assert.equal(
+    await page.locator(".same-snake-mesh").getAttribute("data-asset"),
+    "assets/jungle-emblem.webp",
+  );
+  assert.equal(await page.locator("#entrance-scene image").count(), 0);
   await shot("intro-open-jaw");
   assert.equal(
     await page.locator("#entrance-scene").getAttribute("data-serpent-source"),
     "assets/jungle-emblem.webp",
   );
   assert.equal(
-    await page
-      .locator("#entrance-scene .cinematic-face")
-      .evaluate((e) => getComputedStyle(e).display),
-    "none",
+    await page.locator("#entrance-scene .cinematic-face").count(),
+    0,
   );
   await page.evaluate(() => window.serpentTest.entranceCinema.sample(0.45));
   await shot("intro-enter");
@@ -320,11 +351,22 @@ fs.mkdirSync(out, { recursive: true });
   await page.waitForSelector("#intro", { state: "hidden" });
   await shot("board-desktop");
   await check(
-    "same menu snake enters the mouth and the blurred board becomes fully clear",
+    "menu and gameplay share the logo and entry never swaps the menu snake",
     async () => {
       assert.equal(
         await page.locator(".painted-title img").getAttribute("src"),
         await page.locator("#jungle image").first().getAttribute("href"),
+      );
+      assert.equal(await page.locator("#entrance-scene image").count(), 0);
+      assert.equal(
+        await page
+          .locator("#entrance-scene")
+          .getAttribute("data-serpent-source"),
+        "assets/jungle-emblem.webp",
+      );
+      assert.equal(
+        await page.locator("#entrance-scene path,#defeat-snake path").count(),
+        0,
       );
       assert.equal(
         await page.locator("#entrance-scene").getAttribute("data-phase"),
@@ -381,6 +423,8 @@ fs.mkdirSync(out, { recursive: true });
         "royal-logo.webp",
         "jungle-emblem.webp",
         "cobra-cinema.webp",
+        "victory-emblem.webp",
+        "jungle-life.webp",
         "joined-heads.webp",
         "joined-heads-open.webp",
         "natural-skin.webp",
@@ -508,8 +552,9 @@ fs.mkdirSync(out, { recursive: true });
             .renderer === "joined-canvas",
       );
       const result = await page.evaluate(async () => {
-        const { headPoseFromPath, headLocalToWorld } =
-          await import("./snake-geometry.mjs?v=20261108-joined");
+        const { headPoseFromPath, headLocalToWorld } = await import(
+          "./snake-geometry.mjs?v=20261108-joined"
+        );
         return Object.values(window.serpentTest.paths())
           .filter((p) => p.kind === "snake")
           .map((p) => {
@@ -927,6 +972,37 @@ fs.mkdirSync(out, { recursive: true });
     await page.setViewportSize({ width: 1440, height: 1000 });
   });
   await check(
+    "desktop opponents sit on opposite sides and three/four players occupy board corners",
+    async () => {
+      for (const count of [2, 3, 4]) {
+        await page.setViewportSize({ width: 1366, height: 768 });
+        await force({ count, motion: false });
+        const board = await page.locator(".board-frame").boundingBox(),
+          cards = await page.locator(".player-row").evaluateAll((es) =>
+            es.map((e) => {
+              const r = e.getBoundingClientRect();
+              return { x: r.x, y: r.y, w: r.width, h: r.height };
+            }),
+          );
+        assert.ok(cards[0].x >= board.x + board.width);
+        assert.ok(cards[1].x + cards[1].w <= board.x);
+        assert.ok(
+          (await page.locator(".painted-title img").boundingBox()).height >=
+            130,
+        );
+        if (count >= 3) {
+          assert.ok(cards[0].y + cards[0].h >= board.y + board.height - 1);
+          assert.ok(Math.abs(cards[1].y - board.y) < 2);
+          assert.ok(Math.abs(cards[2].y - board.y) < 2);
+        }
+        if (count === 4)
+          assert.ok(cards[3].y + cards[3].h >= board.y + board.height - 1);
+        await shot("desktop-corner-seats-" + count);
+      }
+      await page.setViewportSize({ width: 1440, height: 1000 });
+    },
+  );
+  await check(
     "a six visits six separate square centers with a pause at each square",
     async () => {
       await force({ pos: 1, die: 6 });
@@ -1077,11 +1153,21 @@ fs.mkdirSync(out, { recursive: true });
         await page.locator("#result-title").textContent(),
         "You Win",
       );
-      assert.equal(
+      const title = await page
+        .locator("#result-title")
+        .evaluate((e) => getComputedStyle(e).transform);
+      await page.waitForFunction(
+        (previous) =>
+          getComputedStyle(document.querySelector("#result-title"))
+            .transform !== previous,
+        title,
+        { timeout: 5000 },
+      );
+      assert.notEqual(
         await page
           .locator("#result-title")
-          .evaluate((e) => getComputedStyle(e).color),
-        "rgb(255, 223, 122)",
+          .evaluate((e) => getComputedStyle(e).transform),
+        title,
       );
       assert.equal(await page.locator(".standing").count(), 0);
       assert(
@@ -1095,7 +1181,23 @@ fs.mkdirSync(out, { recursive: true });
         await page.locator("#result-fireworks").evaluate((e) => e.toDataURL()),
         pixels,
       );
-      await shot("bot-golden-you-win");
+      assert.equal(await page.locator(".standing").count(), 0);
+      assert.equal(
+        await page
+          .locator(".player-position")
+          .evaluateAll((es) =>
+            es.some((e) => e.textContent.includes("RUNNER")),
+          ),
+        false,
+      );
+      assert.ok(
+        (
+          await page
+            .locator("#result-title")
+            .evaluate((e) => getComputedStyle(e).backgroundImage)
+        ).includes("victory-emblem.webp"),
+      );
+      await shot("bot-3d-you-win");
     },
   );
   await check(
@@ -1267,6 +1369,7 @@ fs.mkdirSync(out, { recursive: true });
           .evaluate((e) => getComputedStyle(e).opacity),
         "1",
       );
+      assert.equal(await page.locator(".standing").count(), 0);
       await shot("defeat-revealed");
     },
   );
@@ -1469,7 +1572,18 @@ fs.mkdirSync(out, { recursive: true });
             JSON.stringify(r),
           );
         }
-        if (width >= 820 || width > height)
+        if (width >= 1000 && height >= 600) {
+          const cards = await page.locator(".player-row").evaluateAll((es) =>
+            es.map((e) => {
+              const r = e.getBoundingClientRect();
+              return { x: r.x, right: r.right };
+            }),
+          );
+          assert.ok(
+            cards[0].x >= measured.board.right &&
+              cards[1].right <= measured.board.x,
+          );
+        } else if (width >= 820 || width > height)
           assert.ok(measured.panel.x >= measured.board.right);
         else assert.ok(measured.panel.y >= measured.board.bottom);
         assert.ok(

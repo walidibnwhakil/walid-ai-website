@@ -10,7 +10,7 @@ export function createMenuScene(root, canvas, { motion, quality }) {
     rj = "1127,173 1230,180 1315,171 1305,207 1160,218";
   const lt = "370,176 405,176 470,280 370,280",
     rt = "1070,200 1150,175 1165,190 1120,270 1050,270";
-  root.innerHTML = `<defs><filter id="menu-feather"><feGaussianBlur stdDeviation="2"/></filter><mask id="menu-soft-lj"><rect width="1536" height="1024" fill="black"/><polygon points="${lj}" fill="white" filter="url(#menu-feather)"/></mask><mask id="menu-soft-rj"><rect width="1536" height="1024" fill="black"/><polygon points="${rj}" fill="white" filter="url(#menu-feather)"/></mask>
+  root.innerHTML = `<defs><clipPath id="menu-mouth-texture"><path d="M300 141 373 154 397 176 360 187 325 166Z"/></clipPath><filter id="menu-feather"><feGaussianBlur stdDeviation="2"/></filter><mask id="menu-soft-lj"><rect width="1536" height="1024" fill="black"/><polygon points="${lj}" fill="white" filter="url(#menu-feather)"/></mask><mask id="menu-soft-rj"><rect width="1536" height="1024" fill="black"/><polygon points="${rj}" fill="white" filter="url(#menu-feather)"/></mask>
   ${[
     ["left", 360, 440],
     ["right", 430, 510],
@@ -45,7 +45,7 @@ ${Object.entries({ left, right, lh, rh, lj, rj, lt, rt })
   <g mask="url(#left-rig-alpha)"><g class="royal-neck menu-neck" style="transform-origin:170px 400px">
     <g clip-path="url(#menu-left)" mask="url(#menu-ln)">${image}</g>
     <g class="snake-head menu-head" style="transform-origin:230px 185px">
-      <ellipse class="menu-mouth-cavity" cx="365" cy="170" rx="48" ry="19" fill="#190207"/><g id="royal-upper" clip-path="url(#menu-lh)" mask="url(#menu-lhead)">${image}</g>
+      <g class="menu-mouth-cavity"><path d="M283 145 Q345 130 405 160 Q400 215 348 209 Q303 189 283 145Z" fill="#21060a"/><g clip-path="url(#menu-mouth-texture)">${image}</g></g><g id="royal-upper" clip-path="url(#menu-lh)" mask="url(#menu-lhead)">${image}</g>
       <g id="royal-lower" class="jaw menu-jaw" style="transform-origin:278px 153px" mask="url(#menu-soft-lj)">${image}</g>
       <g class="tongue menu-tongue" style="transform-origin:375px 180px" clip-path="url(#menu-lt)">${image}</g>
       <ellipse class="eye menu-eyelid" cx="348" cy="94" rx="16" ry="12" fill="#3d2e1e"/>

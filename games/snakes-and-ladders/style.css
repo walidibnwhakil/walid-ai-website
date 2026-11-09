@@ -3516,7 +3516,6 @@ body:not(.playing) .icon-control {
 }
 .reduced #result-title {
   animation: none !important;
-  transform: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
   #result-title {
@@ -3748,7 +3747,6 @@ body:not(.playing) .icon-control {
     0 0 16px color-mix(in srgb, var(--accent) 60%, transparent);
   -webkit-text-stroke: 0.35px #ffe7a3;
   animation: royal-title-glow 2.2s ease-in-out infinite alternate !important;
-  transform: none !important;
 }
 #celebration.bot-victory #result-title {
   color: #ffdf7a;
@@ -4048,5 +4046,451 @@ body:not(.playing) .icon-control {
   }
   #local-options strong {
     font-size: 22px;
+  }
+}
+/* Entry keeps the existing menu snake node and artwork for the entire camera move. */
+.entering #menu #royal-upper,
+.entering #menu #royal-lower,
+.entering #menu .menu-mouth-cavity {
+  animation: none !important;
+}
+.entering #menu .menu-tongue {
+  animation: none !important;
+  opacity: 0;
+}
+.original-snake-entry {
+  background: none;
+}
+.original-snake-entry .cinematic-dark {
+  background: radial-gradient(ellipse, #260507, #040001 75%);
+}
+.bot-victory #standings,
+.defeat #standings {
+  display: none;
+}
+/* Always-visible player count and explicit match type replace the dropdown. */
+#player-count-choice {
+  display: flex;
+  gap: 9px;
+  min-height: 44px;
+}
+#player-count-choice button {
+  flex: 1;
+  border: 2px solid #dcaf4b;
+  border-radius: 18px;
+  padding: 7px 4px;
+  background: linear-gradient(#17251b, #050c08);
+  color: #ffe7a0;
+  font: 700 clamp(20px, 2.4vw, 30px) / 1 Georgia;
+  box-shadow:
+    inset 0 1px 3px #fff7,
+    0 3px 7px #0009;
+}
+#player-count-choice small {
+  display: inline;
+  font-size: 0.53em;
+}
+#player-count-choice button.selected {
+  background: linear-gradient(#16783a, #053b20);
+  border-color: #ffe99a;
+  box-shadow:
+    inset 0 0 0 2px #bf913b,
+    0 0 12px #d7b45466;
+}
+#menu #friends-mode {
+  font-size: clamp(19px, 2.3vw, 34px);
+}
+#menu .menu-panel {
+  gap: clamp(7px, 1.25vh, 14px);
+}
+#menu #bot-mode > span:last-child {
+  font-size: 0.85em;
+}
+#jungle-life {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+@media (max-aspect-ratio: 4/5) {
+  #menu .menu-panel {
+    gap: clamp(5px, 0.9vh, 9px);
+  }
+  #menu #friends-mode {
+    font-size: clamp(20px, 3.8vh, 28px);
+  }
+  #player-count-choice {
+    flex: 0 0 44px;
+    gap: 7px;
+  }
+  #player-count-choice button {
+    font-size: 23px;
+    padding: 6px;
+    border-radius: 14px;
+  }
+  #menu #bot-mode small {
+    display: inline;
+  }
+}
+@media (max-height: 480px) and (min-aspect-ratio: 1/1) {
+  #player-count-choice {
+    min-height: 34px;
+  }
+  #player-count-choice button {
+    font-size: 17px;
+    padding: 4px;
+  }
+  #menu .menu-panel {
+    gap: 4px;
+  }
+  #menu #friends-mode {
+    font-size: 17px;
+  }
+  #menu #bot-mode {
+    font-size: 17px;
+  }
+  #menu #bot-mode small {
+    display: inline;
+  }
+}
+/* Desktop seats surround the board; compact phone seats remain below/beside it. */
+.desktop-game header {
+  height: 148px;
+  min-height: 148px;
+  align-items: flex-start;
+  padding: 8px 20px;
+}
+.desktop-game main {
+  height: calc(100dvh - 148px);
+  padding: 0 18px 28px;
+}
+.desktop-game .game-heading {
+  position: fixed;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 144px;
+  min-height: 0;
+  width: 290px;
+  z-index: 4;
+  pointer-events: none;
+}
+.desktop-game .painted-title img {
+  width: 290px;
+  height: 144px;
+  max-width: none;
+}
+.desktop-game .game-layout {
+  position: relative;
+  display: block;
+  margin-top: 8px;
+}
+.desktop-game .board-frame {
+  margin: 0 auto;
+}
+.desktop-game #play aside {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  display: block;
+  pointer-events: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.desktop-game #players {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.desktop-game #play #players .player-row {
+  position: absolute;
+  width: 154px;
+  height: 136px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 30px 70px 18px;
+  grid-template-areas: "head" "die" "position";
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  padding: 7px;
+  margin: 0;
+  border-radius: 18px;
+  pointer-events: auto;
+  background: linear-gradient(135deg, #25140eef, #080f0bef);
+  box-shadow:
+    0 5px 18px #0008,
+    inset 0 0 14px #b8802222;
+}
+.desktop-game #play #players .player-head {
+  justify-content: center;
+  min-height: 30px;
+}
+.desktop-game #play #players .player-head strong {
+  font-size: 12px;
+}
+.desktop-game #play #players .pin-avatar {
+  width: 23px;
+  height: 28px;
+}
+.desktop-game #play #players .player-die {
+  --die-size: 52px;
+  width: 80px;
+  height: 70px;
+  min-height: 70px;
+  padding: 8px;
+}
+.desktop-game #play #players .player-position {
+  font-size: 11px;
+  text-align: center;
+  padding: 0;
+}
+.desktop-game #players [data-player-card="0"],
+.desktop-game #players [data-player-card="2"] {
+  left: calc(50% + var(--board-size) / 2 + 20px);
+  right: auto;
+}
+.desktop-game #players [data-player-card="1"],
+.desktop-game #players [data-player-card="3"] {
+  right: calc(50% + var(--board-size) / 2 + 20px);
+  left: auto;
+}
+.desktop-game #players [data-player-card="0"],
+.desktop-game #players [data-player-card="1"] {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+.desktop-game #players[data-count="3"] [data-player-card="0"],
+.desktop-game #players[data-count="4"] [data-player-card="0"],
+.desktop-game #players [data-player-card="3"] {
+  top: auto;
+  bottom: 0;
+  transform: none;
+}
+.desktop-game #players[data-count="3"] [data-player-card="1"],
+.desktop-game #players[data-count="4"] [data-player-card="1"],
+.desktop-game #players [data-player-card="2"] {
+  top: 0;
+  bottom: auto;
+  transform: none;
+}
+.desktop-game #status {
+  position: absolute;
+  left: 50%;
+  bottom: -25px;
+  transform: translateX(-50%);
+  width: var(--board-size);
+  max-width: none;
+  min-height: 18px;
+  text-align: center;
+  font-size: 12px;
+  pointer-events: none;
+}
+/* Bevelled victory artwork, animated reflected light and pawn-color celebrations. */
+#celebration.bot-victory {
+  background: radial-gradient(ellipse at 50% 42%, #173c27ed, #010704f5 76%);
+}
+#celebration.bot-victory:before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg 10deg,
+    #e0ba6e15 10deg 13deg,
+    transparent 13deg 30deg
+  );
+  mask-image: radial-gradient(ellipse, #000, transparent 65%);
+  animation: royal-rays 45s linear infinite;
+}
+#celebration.bot-victory .result-card {
+  max-width: 800px;
+  width: 96%;
+  padding: 16px;
+  background: none;
+}
+#celebration.bot-victory .crown {
+  display: none;
+}
+#celebration.bot-victory #result-title {
+  height: clamp(190px, 45vh, 390px);
+  width: 100%;
+  margin: 0;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  background: url("assets/victory-emblem.webp") center/contain no-repeat;
+  filter: drop-shadow(0 0 16px var(--accent));
+}
+#celebration.bot-victory #result-title:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    #fff6 48%,
+    transparent 60%
+  );
+  mask: url("assets/victory-emblem.webp") center/contain no-repeat;
+  mix-blend-mode: screen;
+  animation: victory-gleam 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.victory-caption {
+  display: none;
+}
+.bot-victory .victory-caption {
+  display: block;
+  margin: 2px 0 14px;
+  font: 700 12px/1.2 Georgia;
+  color: #e5c982;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.bot-victory #result-name {
+  font-size: 14px;
+  color: #ffe8af;
+}
+.result-card #try-again,
+.result-card #result-menu,
+.result-card #continue {
+  min-height: 48px;
+  border: 2px solid #e2b65a;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 0 2px #624016,
+    inset 0 2px 4px #fff3,
+    0 4px 10px #0008;
+  padding: 10px 20px;
+  font: 700 15px Georgia;
+}
+.bot-victory #try-again {
+  background: linear-gradient(#146a36, #03341b);
+  color: #fff2b7;
+}
+@keyframes royal-rays {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes victory-gleam {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translateX(-15%);
+  }
+  40% {
+    opacity: 0.8;
+  }
+  65%,
+  100% {
+    opacity: 0;
+    transform: translateX(20%);
+  }
+}
+@media (max-height: 480px) {
+  #celebration.bot-victory #result-title {
+    height: 165px;
+  }
+  .bot-victory .victory-caption {
+    margin: 0 0 5px;
+    font-size: 10px;
+  }
+  .bot-victory #result-name {
+    margin: 4px 0;
+  }
+  .result-card #try-again,
+  .result-card #result-menu {
+    min-height: 42px;
+    padding: 8px 15px;
+  }
+}
+.low #celebration.bot-victory:before {
+  display: none;
+}
+.reduced #celebration:before,
+.reduced #result-title:after {
+  animation: none !important;
+}
+#menu #bot-mode small {
+  display: block !important;
+  font-size: max(11px, 0.6em);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+@media (max-height: 650px) and (max-aspect-ratio: 4/5) {
+  #menu #bot-mode {
+    font-size: 21px;
+    padding: 4px 10px;
+  }
+}
+.desktop-game #status {
+  background: #130c08e8;
+  border: 1px solid #ad833f;
+  border-radius: 20px;
+  padding: 3px 8px;
+}
+#celebration.bot-victory #result-title {
+  height: auto;
+  aspect-ratio: 1.7;
+  min-height: 0;
+  max-height: 45vh;
+}
+@media (max-height: 480px) and (min-aspect-ratio: 1/1) {
+  #player-count-choice {
+    min-height: 44px;
+  }
+  #player-count-choice button {
+    min-height: 44px;
+  }
+}
+
+#celebration.bot-victory #result-title {
+  animation: result-3d 4s ease-in-out infinite !important;
+  transform: rotateY(0deg);
+}
+#celebration.bot-victory .result-card {
+  perspective: 850px;
+}
+.reduced #celebration.bot-victory #result-title {
+  animation: none !important;
+}
+/* The bot victory has its own full-viewport stage, including short landscape screens. */
+#celebration.bot-victory {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+@media (max-height: 480px) and (min-aspect-ratio: 1/1) {
+  #celebration.bot-victory .result-card {
+    padding: 6px;
+  }
+  #celebration.bot-victory #result-title {
+    max-height: 42vh;
+    width: min(100%, 400px);
+    margin: 0 auto;
+  }
+  #celebration.bot-victory .victory-caption {
+    margin: 3px 0;
+  }
+  #celebration.bot-victory #result-name {
+    margin: 4px 0;
+  }
+  #celebration.bot-victory button {
+    margin-top: 5px;
+    margin-bottom: 0;
   }
 }

@@ -1176,7 +1176,7 @@
   <script>
     (()=>{if(!matchMedia('(max-width: 650px)').matches)return;let startX=0,startY=0,reloaded=false;document.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;startX=event.touches[0].clientX;startY=event.touches[0].clientY;reloaded=false},{passive:true});document.addEventListener('touchmove',event=>{if(reloaded||event.touches.length!==1)return;const chat=document.getElementById('chat');if(chat&&(chat.contains(event.target)||chat.scrollTop>0))return;if(event.target.closest&&event.target.closest('#form,.composer'))return;const dx=event.touches[0].clientX-startX,dy=event.touches[0].clientY-startY;if(startY<100&&dy>120&&Math.abs(dx)<70){reloaded=true;location.reload()}},{passive:true})})();
   </script>  <script src="/chat-ui.js" defer></script><script src="/app.js" defer></script>
-<script src="/usage.js?v=20261109-1"></script></body>
+<script src="/usage.js?v=20261109-2"></script></body>
 </html>
 
 

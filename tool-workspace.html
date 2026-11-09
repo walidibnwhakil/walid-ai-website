@@ -68,5 +68,5 @@ function bindFileDrop(zone,input,multiple){if(!zone||!input)return;zone.addEvent
 /* Standalone route recovery: keep deep links opening the selected tool even if
    another optional initializer fails earlier in the page. */
 (()=>{const params=new URLSearchParams(location.search),tool=params.get('tool');if(!tool)return;const activate=()=>{const card=document.querySelector('.tool-card[data-tool="'+CSS.escape(tool)+'"]');if(!card)return;document.body.classList.add('tool-mode');try{if(typeof openTool==='function'){openTool(card,false);return}}catch(error){console.error('Tool workspace initialization failed',error)}const workspace=document.getElementById('workspace'),pdf=document.getElementById('pdfPanel'),image=document.getElementById('imagePanel');if(!workspace)return;workspace.hidden=false;if(pdf)pdf.hidden=card.dataset.kind!=='pdf';if(image)image.hidden=card.dataset.kind!=='image';document.getElementById('toolGrid')?.setAttribute('hidden','');document.getElementById('toolGrid')?.setAttribute('aria-hidden','true')};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(activate,0),{once:true});else setTimeout(activate,0)})();
-</script><script src="/usage.js?v=20261109-1"></script></body></html>
+</script><script src="/usage.js?v=20261109-2"></script></body></html>
 

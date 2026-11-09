@@ -87,6 +87,9 @@
     }
     let IS_ADMIN = false;
     let firebaseAuth = null;
+    const googleClientId =
+      String(window.WALID_AI_GOOGLE_CLIENT_ID || "").trim();
+    const googleIdentity = googleClientId ? window.google?.accounts?.id : null;
     let authorizedUid = "";
     let authorizingUid = "";
 
@@ -340,17 +343,10 @@
     function openLogin(mode = "login") {
       loginMode = mode;
       setLanguage(languageSelect.value);
-      loginStatus.textContent = firebaseReady
+      loginStatus.textContent = (firebaseAuth && !emailButton.disabled) || (googleClientId && firebaseAuth) || googleIdentity
         ? ""
         : (languageSelect.value === "bn" ? "সাইন-ইন এখন উপলব্ধ নয়। Firebase configuration যাচাই প্রয়োজন।" : "Sign-in is currently unavailable. Firebase configuration needs to be checked.");
       loginModal.classList.remove("hidden");
-    }
-
-    // Tool pages link back to the existing sign-in dialog through this query parameter.
-    const authAction = new URLSearchParams(window.location.search).get("auth");
-    if (authAction === "login" || authAction === "signup") {
-      openLogin(authAction);
-      window.history.replaceState(null, "", window.location.pathname + window.location.hash);
     }
 
     document.getElementById("helpBtn").addEventListener("click", () => helpModal.classList.remove("hidden"));
@@ -723,9 +719,6 @@
     });
 
     // Google login
-    const googleClientId =
-      String(window.WALID_AI_GOOGLE_CLIENT_ID || "").trim();
-
     if (firebaseAuth && googleClientId) {
       const googleCta = document.createElement("button");
       googleCta.type = "button";
@@ -745,13 +738,8 @@
       });
 
       googleButton.appendChild(googleCta);
-    } else if (
-      googleClientId &&
-      window.google &&
-      window.google.accounts &&
-      window.google.accounts.id
-    ) {
-      google.accounts.id.initialize({
+    } else if (googleIdentity) {
+      googleIdentity.initialize({
         client_id: googleClientId,
         callback: async (response) => {
           loginStatus.textContent = "";
@@ -776,7 +764,7 @@
         auto_select: false
       });
 
-      google.accounts.id.renderButton(googleButton, {
+      googleIdentity.renderButton(googleButton, {
         type: "standard",
         theme: "outline",
         size: "large",
@@ -787,6 +775,13 @@
       });
     } else {
       googleButton.textContent = "Google sign-in setup required";
+    }
+
+    // Tool pages link back to the existing sign-in dialog through this query parameter.
+    const authAction = new URLSearchParams(window.location.search).get("auth");
+    if (authAction === "login" || authAction === "signup") {
+      openLogin(authAction);
+      window.history.replaceState(null, "", window.location.pathname + window.location.hash);
     }
 
     // Logout

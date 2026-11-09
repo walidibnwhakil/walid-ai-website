@@ -83,7 +83,7 @@
       overflow: hidden;
       background: var(--bg);
       color: var(--ink);
-      font: 15px/1.65 "Times New Roman", Times, serif;
+      font: 17px/1.65 "Times New Roman", Times, serif;
     }
 
     :root[data-theme="dark"] body { background: var(--bg); }
@@ -269,7 +269,7 @@
     html[lang="bn"] .brand-tagline { font-family:"SolaimanLipi","Noto Sans Bengali",serif; }
     html[data-ui-language="en"] body,
     html[data-ui-language="en"] body :not(svg):not(path) { font-family:"Times New Roman",Times,serif !important; }
-    .msg.bengali { font-family:"SolaimanLipi","Noto Sans Bengali",serif !important; }
+    .msg.bengali { font-size: 22px; font-family:"SolaimanLipi","Noto Sans Bengali",serif !important; }
     @media (prefers-reduced-motion: reduce) {
       /* Keep the brand flag gently waving even when system motion is reduced. */
       .page-brand-logo, .side-brand img, .flower-flight { animation:none !important; }
@@ -372,15 +372,18 @@
     .main:has(.chat .msg) { justify-content: flex-start; }
     .main:has(.chat .msg) .chat { flex: 1 1 auto; min-height: 0; max-height: none; }
     .composer { flex: 0 0 auto; }
+    .composer textarea { font-size: 18px; line-height: 1.6; }
 
     .msg {
+      font-size: 20px;
+      line-height: 1.75;
       max-width: 84%;
       margin: 13px 0;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
       font-family: "Times New Roman", Times, serif;
     }
-    .msg.bengali { font-family: "SolaimanLipi", "Siyam Rupali", serif; }
+    .msg.bengali { font-size: 22px; font-family: "SolaimanLipi", "Siyam Rupali", serif; }
 
     .msg.user {
       margin-left: auto;

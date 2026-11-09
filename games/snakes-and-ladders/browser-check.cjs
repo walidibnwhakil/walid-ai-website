@@ -225,43 +225,122 @@ fs.mkdirSync(out, { recursive: true });
       await shot("clean-menu-without-player-row");
     },
   );
+  await check(
+    "premium local chooser uses matching real pawns and closes after choosing",
+    async () => {
+      for (const count of [2, 3, 4]) {
+        await page.click("#local-mode");
+        assert(await page.locator("#local-options").isVisible());
+        assert.equal(
+          await page
+            .locator(`[data-local-mode="${count}"] .pin-avatar`)
+            .count(),
+          count,
+        );
+        assert(
+          (await page.locator(`[data-local-mode="${count}"]`).boundingBox())
+            .height >= 140,
+        );
+        await shot("choose-" + count + "-players");
+        await page.click(`[data-local-mode="${count}"]`);
+        assert.equal(await page.locator("#mode").inputValue(), String(count));
+        assert(await page.locator("#local-options").isHidden());
+      }
+    },
+  );
+  await check(
+    "player chooser fits narrow phones and landscape without native dropdown styling",
+    async () => {
+      for (const [width, height] of [
+        [320, 568],
+        [390, 844],
+        [844, 390],
+        [1440, 1000],
+      ]) {
+        await page.setViewportSize({ width, height });
+        await page.click("#local-mode");
+        const r = await page.locator("#local-options").boundingBox();
+        assert(
+          r.x >= 0 &&
+            r.y >= 0 &&
+            r.x + r.width <= width + 1 &&
+            r.y + r.height <= height + 1,
+        );
+        for (const count of [2, 3, 4]) {
+          const b = await page
+            .locator(`[data-local-mode="${count}"]`)
+            .boundingBox();
+          assert(
+            b.x >= 0 &&
+              b.y >= 0 &&
+              b.x + b.width <= width + 1 &&
+              b.y + b.height <= height + 1,
+          );
+          assert(b.height >= 100);
+        }
+        await shot("player-chooser-" + width);
+        await page.click("#close-local");
+      }
+      await page.setViewportSize({ width: 1440, height: 1000 });
+    },
+  );
   await page.click("#start");
   await page.waitForTimeout(900);
   await shot("intro-focus");
-  await page.waitForTimeout(1100);
-  assert.ok(
-    +(await page.locator("#entrance-scene").getAttribute("data-gape")) > 0.7,
+  await page.waitForFunction(
+    () => +document.querySelector("#entrance-scene").dataset.gape > 0.7,
   );
   await shot("intro-open-jaw");
-  await page.waitForTimeout(1000);
-  assert.ok(
-    +(await page.locator("#entrance-scene").getAttribute("data-scale")) > 3,
+  assert.equal(
+    await page.locator("#entrance-scene").getAttribute("data-serpent-source"),
+    "assets/jungle-emblem.webp",
+  );
+  assert.equal(
+    await page
+      .locator("#entrance-scene .cinematic-face")
+      .evaluate((e) => getComputedStyle(e).display),
+    "none",
+  );
+  await page.waitForFunction(
+    () =>
+      document.querySelector("#entrance-scene").dataset.phase === "enter-mouth",
   );
   await shot("intro-enter");
-  await page.waitForTimeout(1500);
-  await page.waitForSelector("#play:visible");
+  await page.waitForFunction(
+    () =>
+      document.querySelector("#entrance-scene").dataset.phase === "board-focus",
+  );
+  const blurBefore = await page
+    .locator("#play")
+    .evaluate((e) => parseFloat(getComputedStyle(e).filter.slice(5)));
+  assert(blurBefore > 0);
+  await shot("board-emerging-blurred");
+  await page.waitForTimeout(300);
+  const blurAfter = await page
+    .locator("#play")
+    .evaluate((e) => parseFloat(getComputedStyle(e).filter.slice(5)));
+  assert(blurAfter < blurBefore);
+  await shot("board-becoming-clear");
+  await page.waitForSelector("#intro", { state: "hidden" });
   await shot("board-desktop");
   await check(
-    "menu and gameplay share the exact logo asset and cinematic cobra is photographic",
+    "same menu snake enters the mouth and the blurred board becomes fully clear",
     async () => {
       assert.equal(
         await page.locator(".painted-title img").getAttribute("src"),
         await page.locator("#jungle image").first().getAttribute("href"),
       );
       assert.equal(
-        await page
-          .locator("#entrance-scene image")
-          .first()
-          .getAttribute("href"),
-        "assets/cobra-cinema.webp",
-      );
-      assert.equal(
-        await page.locator("#entrance-scene path,#defeat-snake path").count(),
-        0,
-      );
-      assert.equal(
         await page.locator("#entrance-scene").getAttribute("data-phase"),
         "complete",
+      );
+      assert.equal(
+        await page.locator("#play").evaluate((e) => getComputedStyle(e).filter),
+        "none",
+      );
+      assert.equal(
+        await page.locator("#royal-upper image").getAttribute("href"),
+        "assets/jungle-emblem.webp",
       );
     },
   );
@@ -433,9 +512,8 @@ fs.mkdirSync(out, { recursive: true });
             .renderer === "joined-canvas",
       );
       const result = await page.evaluate(async () => {
-        const { headPoseFromPath, headLocalToWorld } = await import(
-          "./snake-geometry.mjs?v=20261108-joined"
-        );
+        const { headPoseFromPath, headLocalToWorld } =
+          await import("./snake-geometry.mjs?v=20261108-joined");
         return Object.values(window.serpentTest.paths())
           .filter((p) => p.kind === "snake")
           .map((p) => {
@@ -994,62 +1072,38 @@ fs.mkdirSync(out, { recursive: true });
     },
   );
   await check(
-    "human bot victory shows animated 3D YOU WIN with continuously moving color fireworks",
+    "human bot victory is golden You Win without any runners-up",
     async () => {
       await force({ bot: true, pos: 98, die: 2 });
       await clickDie();
       await page.waitForSelector("#celebration:visible");
       assert.equal(
         await page.locator("#result-title").textContent(),
-        "YOU WIN",
+        "You Win",
       );
       assert.equal(
         await page
-          .locator("#celebration")
-          .evaluate((e) => e.classList.contains("bot-victory")),
-        true,
-      );
-      const title = await page
           .locator("#result-title")
-          .evaluate((e) => getComputedStyle(e).transform),
-        spark = await page
-          .locator(".spark")
-          .first()
-          .evaluate((e) => getComputedStyle(e).transform);
-      await page.waitForTimeout(400);
-      assert.notEqual(
-        await page
-          .locator("#result-title")
-          .evaluate((e) => getComputedStyle(e).transform),
-        title,
+          .evaluate((e) => getComputedStyle(e).color),
+        "rgb(255, 223, 122)",
       );
-      assert.notEqual(
-        await page
-          .locator(".spark")
-          .first()
-          .evaluate((e) => getComputedStyle(e).transform),
-        spark,
-      );
-      assert.equal(
-        await page
-          .locator(".spark")
-          .first()
-          .evaluate((e) => getComputedStyle(e).backgroundColor),
-        "rgb(241, 75, 88)",
+      assert.equal(await page.locator(".standing").count(), 0);
+      assert(
+        !/runner-up/i.test(await page.locator("#celebration").innerText()),
       );
       const pixels = await page
         .locator("#result-fireworks")
         .evaluate((e) => e.toDataURL());
-      await page.waitForTimeout(150);
+      await page.waitForTimeout(200);
       assert.notEqual(
         await page.locator("#result-fireworks").evaluate((e) => e.toDataURL()),
         pixels,
       );
-      await shot("bot-3d-you-win");
+      await shot("bot-golden-you-win");
     },
   );
   await check(
-    "each finisher receives their own color celebration and final ranking",
+    "four-player celebrations auto-resume with gold silver bronze and final color standings",
     async () => {
       for (let i = 0; i < 3; i++) {
         await force({
@@ -1063,38 +1117,101 @@ fs.mkdirSync(out, { recursive: true });
         await page.waitForSelector("#celebration:visible");
         assert.equal(
           await page.locator("#result-title").textContent(),
-          ["WINNER", "1ST RUNNER-UP", "2ND RUNNER-UP"][i],
+          ["Red Wins", "Blue · 1st Runner-up", "Yellow · 2nd Runner-up"][i],
         );
         assert.equal(
-          await page
-            .locator(".spark")
-            .first()
-            .evaluate((e) => getComputedStyle(e).backgroundColor),
-          ["rgb(241, 75, 88)", "rgb(67, 174, 255)", "rgb(255, 208, 75)"][i],
+          await page.locator("#celebration .crown").getAttribute("data-medal"),
+          ["gold", "silver", "bronze"][i],
+        );
+        assert.equal(await page.locator(".player-die:enabled").count(), 0);
+        const rolls = await page.evaluate(() => window.serpentTest.state.rolls);
+        await page.evaluate(() => window.serpentTest.turn());
+        assert.equal(
+          await page.evaluate(() => window.serpentTest.state.rolls),
+          rolls,
         );
         await shot("finish-" + i);
-        if (i === 2) {
+        if (i < 2) {
+          await page.waitForSelector("#celebration", { state: "hidden" });
+          assert.equal(
+            await page.locator(".finish-crown").getAttribute("data-medal"),
+            ["silver", "bronze"][i],
+          );
+          assert(await page.locator(`[data-roll="${i + 1}"]`).isEnabled());
+        } else {
+          await page.waitForFunction(() =>
+            document
+              .querySelector("#celebration")
+              .classList.contains("final-summary"),
+          );
           assert.deepEqual(
             await page.evaluate(() => window.serpentTest.state.order),
             [0, 1, 2, 3],
           );
           assert.equal(await page.locator(".standing").count(), 4);
-        } else await page.click("#continue");
+          assert.deepEqual(
+            await page.locator(".standing strong").allTextContents(),
+            ["Red", "Blue", "Yellow", "Green"],
+          );
+          assert.equal(
+            await page
+              .locator(".standing")
+              .last()
+              .innerText()
+              .then((x) => x.includes("Loser")),
+            true,
+          );
+          assert.equal(
+            await page.locator("#result-fireworks").getAttribute("data-active"),
+            "false",
+          );
+          await shot("final-medal-standings");
+        }
       }
-      await force({ count: 3, pos: 98, die: 2 });
+    },
+  );
+  await check(
+    "two-player result is color-only and never triggers defeat; three players finish at silver",
+    async () => {
+      await force({ count: 2, pos: 98, die: 2 });
       await page.evaluate(
         () => (window.serpentTest.state.players[0].color = "Green"),
       );
       await clickDie();
       await page.waitForSelector("#celebration:visible");
       assert.equal(
-        await page
-          .locator(".spark")
-          .first()
-          .evaluate((e) => getComputedStyle(e).backgroundColor),
-        "rgb(79, 218, 145)",
+        await page.locator("#result-title").textContent(),
+        "Green Wins",
       );
-      await shot("finish-green");
+      assert.equal(await page.locator(".standing").count(), 0);
+      assert(
+        !(await page
+          .locator("#celebration")
+          .evaluate((e) => e.classList.contains("defeat"))),
+      );
+      await shot("two-player-green-wins");
+      await force({ count: 3, current: 1, pos: 98, order: [0], die: 2 });
+      await clickDie(1);
+      await page.waitForSelector("#celebration:visible");
+      assert.equal(
+        await page.locator(".crown").getAttribute("data-medal"),
+        "silver",
+      );
+      await page.waitForFunction(() =>
+        document
+          .querySelector("#celebration")
+          .classList.contains("final-summary"),
+      );
+      assert.equal(await page.locator(".standing").count(), 3);
+      assert.equal(
+        await page.locator(".medal-icon[data-medal=bronze]").count(),
+        0,
+      );
+      assert.equal(
+        await page.locator(".finish-crown").getAttribute("data-medal"),
+        "silver",
+      );
+      await shot("three-player-final");
     },
   );
   await check(
@@ -1105,7 +1222,7 @@ fs.mkdirSync(out, { recursive: true });
       await page.waitForSelector("#celebration:visible");
       assert.equal(
         await page.locator("#result-title").textContent(),
-        "YOU LOSE",
+        "You Lose",
       );
       const initialScale = +(await page
         .locator("#defeat-snake")
@@ -1164,7 +1281,7 @@ fs.mkdirSync(out, { recursive: true });
       await page.evaluate(() => window.serpentTest.turn());
       assert.equal(
         await page.locator("#result-title").textContent(),
-        "YOU LOSE",
+        "You Lose",
       );
       assert.equal(
         await page.locator("#defeat-snake").getAttribute("data-phase"),
@@ -1399,7 +1516,7 @@ fs.mkdirSync(out, { recursive: true });
   await check(
     "replacement preview matches the square sibling cards with emerald Play Now artwork",
     async () => {
-      await page.goto("http://127.0.0.1:8765/games/");
+      await page.goto(new URL("../", base).href);
       for (const [width, height] of [
         [390, 844],
         [1440, 1000],

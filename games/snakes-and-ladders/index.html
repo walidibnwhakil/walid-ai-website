@@ -13,8 +13,8 @@
       href="https://walid-ai.com/games/snakes-and-ladders/"
     />
     <link rel="preload" as="image" href="assets/cobra-cinema.webp" />
-    <link rel="stylesheet" href="style.css?v=20261108-cinema" />
-    <script type="module" src="game.mjs?v=20261108-cinema"></script>
+    <link rel="stylesheet" href="style.css?v=20261109-medals" />
+    <script type="module" src="game.mjs?v=20261109-medals"></script>
   </head>
   <body>
     <div id="world">
@@ -117,11 +117,40 @@
                   /></svg></span
               ><span id="local-label">2 Players</span><small>⌄</small>
             </button>
-            <div id="local-options" hidden>
-              ${''}<button data-local-mode="2">2 Players</button
-              ><button data-local-mode="3">3 Players</button
-              ><button data-local-mode="4">4 Players</button>
-            </div>
+            <dialog id="local-options" hidden aria-labelledby="local-title">
+              <button
+                type="button"
+                id="close-local"
+                aria-label="Close player selection"
+              >
+                ×
+              </button>
+              <div class="chooser-crown" aria-hidden="true">
+                <svg viewBox="490 0 560 370">
+                  <image
+                    href="assets/jungle-emblem.webp"
+                    width="1536"
+                    height="1024"
+                  />
+                </svg>
+              </div>
+              <h2 id="local-title">Choose Your Players</h2>
+              <p>Gather around. Share the adventure.</p>
+              <div class="player-count-grid">
+                <button type="button" data-local-mode="2" aria-pressed="false">
+                  <span class="seat-preview" aria-hidden="true"></span
+                  ><strong>2 Players</strong><small>A royal duel</small>
+                </button>
+                <button type="button" data-local-mode="3" aria-pressed="false">
+                  <span class="seat-preview" aria-hidden="true"></span
+                  ><strong>3 Players</strong><small>A race for the crown</small>
+                </button>
+                <button type="button" data-local-mode="4" aria-pressed="false">
+                  <span class="seat-preview" aria-hidden="true"></span
+                  ><strong>4 Players</strong><small>The grand table</small>
+                </button>
+              </div>
+            </dialog>
           </div>
           <button id="bot-mode" class="menu-pill selected" aria-pressed="true">
             <span class="menu-symbol" aria-hidden="true"

@@ -155,11 +155,12 @@ for (const count of [2, 3, 4])
     }
     assert.deepEqual(s.order, desired);
     assert.equal(placement(0, count), "WINNER");
-    assert.equal(
-      placement(1, count),
-      count === 2 ? "RUNNER-UP" : "1ST RUNNER-UP",
-    );
-    if (count > 2) assert.equal(placement(2, count), "2ND RUNNER-UP");
+    assert.equal(placement(1, count), count === 2 ? "LOSER" : "1ST RUNNER-UP");
+    if (count > 2)
+      assert.equal(
+        placement(2, count),
+        count === 3 ? "LOSER" : "2ND RUNNER-UP",
+      );
   });
 test("turn wrap, unique colors and restart", () => {
   let s = createGame(4);

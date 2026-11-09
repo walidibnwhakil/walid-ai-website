@@ -3569,3 +3569,484 @@ body:not(.playing) .icon-control {
 #live-lava {
   opacity: 1;
 }
+/* Premium player-count chooser: real colored pins, no plain browser-style list. */
+@font-face {
+  font-family: SerpentRoyal;
+  src: url("../2048/cormorant-700.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+#local-options {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  display: block;
+  width: min(620px, 94vw);
+  max-height: 88dvh;
+  padding: 22px;
+  border: 4px double #f9d77e;
+  border-radius: 28px;
+  background: radial-gradient(at 50% 0, #345c36, #102e21 48%, #08190f);
+  box-shadow:
+    inset 0 0 0 3px #3d2910,
+    inset 0 0 35px #0009,
+    0 15px 70px #000b;
+  text-align: center;
+  color: #fff0be;
+}
+#local-options::backdrop {
+  background: #021008b8;
+  backdrop-filter: blur(7px);
+}
+#local-options #close-local {
+  position: absolute;
+  right: 12px;
+  top: 9px;
+  min-height: 35px;
+  width: 35px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 25px;
+  background: #102719;
+  border: 1px solid #b58d42;
+}
+.chooser-crown {
+  font:
+    56px SerpentRoyal,
+    Georgia,
+    serif;
+  color: #ffda73;
+  text-shadow:
+    0 3px #81500d,
+    0 0 15px #d9a43477;
+  line-height: 1;
+}
+#local-title {
+  font:
+    700 clamp(27px, 4vw, 40px) SerpentRoyal,
+    Georgia,
+    serif;
+  color: #ffe69b;
+  margin: 7px 0;
+}
+#local-options > p {
+  color: #c8d5b7;
+  font:
+    14px Georgia,
+    serif;
+  margin: 0 0 20px;
+}
+.player-count-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+#local-options [data-local-mode] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 160px;
+  padding: 16px 7px;
+  background: radial-gradient(at 50% 25%, #2b6541, #102e22 70%);
+  border: 2px solid #dbb768;
+  border-radius: 20px;
+  box-shadow:
+    inset 0 0 0 2px #684b1f,
+    inset 0 2px 6px #fff0a155,
+    0 5px 12px #0005;
+}
+#local-options [data-local-mode][aria-pressed="true"] {
+  background: radial-gradient(at top, #517b40, #173a25);
+  border-color: #ffefb3;
+  box-shadow:
+    0 0 15px #ffc95766,
+    inset 0 0 0 2px #bb8736;
+}
+.seat-preview {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  width: 100%;
+  height: 56px;
+  gap: 0;
+}
+.seat-preview .pin-avatar {
+  width: 32px;
+  height: 46px;
+  filter: drop-shadow(0 3px 2px #0009);
+  margin: 0 -3px;
+}
+#local-options strong {
+  font:
+    700 clamp(18px, 3vw, 27px) SerpentRoyal,
+    Georgia,
+    serif;
+  color: #ffe494;
+  white-space: nowrap;
+  text-shadow: 0 2px #4b310c;
+}
+#local-options small {
+  font:
+    11px Georgia,
+    serif;
+  color: #cfdfc2;
+}
+@media (max-width: 430px) {
+  #local-options {
+    padding: 18px 12px;
+  }
+  .player-count-grid {
+    gap: 7px;
+  }
+  #local-options [data-local-mode] {
+    min-height: 145px;
+    padding: 12px 3px;
+    border-radius: 16px;
+  }
+  .seat-preview .pin-avatar {
+    width: 25px;
+    height: 38px;
+    margin: 0 -4px;
+  }
+  #local-options small {
+    font-size: 10px;
+  }
+}
+/* Celebration stays on the actual board; completed players never block the next turn. */
+#celebration:not(.defeat) {
+  inset: auto;
+  left: var(--result-left);
+  top: var(--result-top);
+  width: var(--result-width);
+  height: var(--result-height);
+  border-radius: 22px;
+  background: radial-gradient(ellipse, #06120bdd, #06120b88 55%, #06120b28);
+  backdrop-filter: blur(1px);
+}
+#celebration .result-card {
+  max-width: 96%;
+  max-height: 100%;
+  overflow: auto;
+  padding: 18px 12px;
+  perspective: none;
+}
+#celebration #result-title {
+  font:
+    700 clamp(30px, 8vw, 68px) SerpentRoyal,
+    Georgia,
+    serif;
+  line-height: 1.05;
+  margin: 12px 0;
+  color: var(--accent);
+  letter-spacing: 0;
+  text-shadow:
+    0 2px #66401b,
+    0 4px 6px #000b,
+    0 0 16px color-mix(in srgb, var(--accent) 60%, transparent);
+  -webkit-text-stroke: 0.35px #ffe7a3;
+  animation: royal-title-glow 2.2s ease-in-out infinite alternate !important;
+  transform: none !important;
+}
+#celebration.bot-victory #result-title {
+  color: #ffdf7a;
+  background: linear-gradient(#fff8cd, #ffdc6c 40%, #b97c1d 66%, #fff0a6);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.3px #fff1bb;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 1px #70410a) drop-shadow(0 0 12px #ffba3355);
+  font-size: clamp(40px, 10vw, 84px);
+}
+#celebration .crown {
+  width: clamp(78px, 18vw, 135px);
+  margin: auto;
+  animation: crown-arrival 0.9s ease-out both;
+  filter: drop-shadow(0 0 12px var(--medal-color, #ffd66b));
+}
+#celebration .crown[data-medal="silver"] svg,
+.medal-icon[data-medal="silver"] svg {
+  filter: grayscale(1) brightness(1.55) contrast(0.8);
+}
+#celebration .crown[data-medal="bronze"] svg,
+.medal-icon[data-medal="bronze"] svg {
+  filter: sepia(1) saturate(1.6) hue-rotate(-18deg) brightness(0.8);
+}
+.finish-crown[data-medal="silver"] image {
+  filter: grayscale(1) brightness(1.55) contrast(0.8);
+}
+.finish-crown[data-medal="bronze"] image {
+  filter: sepia(1) saturate(1.6) hue-rotate(-18deg) brightness(0.8);
+}
+#celebration #result-name {
+  font:
+    15px Georgia,
+    serif;
+  color: #f4dfad;
+  line-height: 1.5;
+  margin: 8px auto 14px;
+}
+#celebration.placement-celebration #result-title {
+  font-size: clamp(26px, 6vw, 48px);
+  max-width: 100%;
+  text-wrap: balance;
+}
+#celebration .result-card button {
+  font:
+    700 clamp(16px, 3vw, 22px) SerpentRoyal,
+    Georgia,
+    serif;
+  border: 2px solid #e6c57b;
+  border-radius: 24px;
+  background: linear-gradient(#365d31, #123c27 50%, #0c2316);
+  color: #ffedb4;
+  box-shadow: inset 0 1px 3px #fff5ab44;
+  padding: 10px 20px;
+  margin: 7px;
+  min-height: 44px;
+}
+#celebration #try-again {
+  width: auto;
+}
+#celebration.final-summary .crown {
+  display: none;
+}
+#celebration.final-summary #result-title {
+  color: #ffe49c;
+  font-size: clamp(28px, 6vw, 45px);
+}
+#celebration.final-summary #result-name {
+  font-size: 12px;
+  margin: 4px 0 12px;
+}
+#standings .standing {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 9px;
+  align-items: center;
+  padding: 7px 9px;
+  background: linear-gradient(90deg, #163324bb, #0c211988);
+  border: 1px solid #dfb65c55;
+  border-radius: 12px;
+  margin: 5px 0;
+  text-align: left;
+  font:
+    12px Georgia,
+    serif;
+  color: #ebdfc4;
+}
+.standing strong {
+  color: var(--pawn);
+  font-size: 16px;
+  text-shadow: 0 1px 2px #000;
+}
+.medal-icon {
+  display: block;
+  width: 42px;
+  height: 28px;
+}
+.medal-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.last-place-mark {
+  font-size: 24px;
+  color: #ab9872;
+  text-align: center;
+}
+#celebration.defeat .result-card {
+  overflow: visible;
+  max-width: 650px;
+}
+#celebration.defeat #result-title {
+  color: #ffd397;
+  font-size: clamp(40px, 9vw, 80px);
+}
+#celebration .fireworks {
+  display: none;
+}
+@keyframes royal-title-glow {
+  to {
+    filter: brightness(1.12);
+  }
+}
+@keyframes crown-arrival {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (max-width: 430px) {
+  #celebration .result-card {
+    padding: 12px 8px;
+  }
+  #celebration .result-card button {
+    padding: 8px 13px;
+    margin: 5px;
+    font-size: 16px;
+  }
+  #standings .standing {
+    grid-template-columns: 34px 1fr auto;
+    gap: 5px;
+    padding: 5px 7px;
+    font-size: 10px;
+  }
+  .medal-icon {
+    width: 32px;
+    height: 24px;
+  }
+  .standing strong {
+    font-size: 14px;
+  }
+  #celebration.final-summary #result-name {
+    margin: 3px 0 8px;
+  }
+  #celebration.final-summary #result-title {
+    margin: 5px 0;
+  }
+}
+/* Entrance retains the exact menu snake and its original photo-textured jaw. */
+#entrance-scene[data-mode="enter"] .cinematic-face,
+#entrance-scene[data-mode="enter"] .cinematic-jungle,
+#entrance-scene[data-mode="enter"] .cinematic-aura {
+  display: none;
+}
+.entering #jungle,
+.entering #royal-upper,
+.entering #royal-lower,
+.entering .menu-mouth-cavity {
+  animation: none !important;
+}
+.entering #menu {
+  opacity: 1 !important;
+  transition: none !important;
+}
+.entering .menu-hero {
+  opacity: 1 !important;
+  transform-origin: var(--mouth-x) var(--mouth-y);
+}
+.entering #royal-upper {
+  transform-origin: 260px 152px;
+  transform-box: view-box;
+}
+.entering #royal-lower {
+  transform-origin: 278px 153px;
+  transform-box: view-box;
+}
+.entering .menu-mouth-cavity {
+  transform-origin: 365px 178px;
+  transform-box: view-box;
+}
+.arriving #play {
+  filter: blur(var(--arrival-blur, 24px));
+  opacity: var(--arrival-opacity, 0.12);
+  will-change: filter, opacity;
+}
+.arriving #play .board-frame {
+  transform: scale(var(--arrival-scale, 0.72));
+  transform-origin: center;
+  will-change: transform;
+}
+.cinematic-dark {
+  background: radial-gradient(ellipse at 50% 50%, #140402, #020000 75%);
+}
+#intro {
+  pointer-events: auto;
+}
+#intro[hidden] {
+  pointer-events: none;
+}
+.reduced #celebration #result-title {
+  animation: none !important;
+  filter: none;
+}
+#local-options .chooser-crown {
+  width: 85px;
+  height: 62px;
+  margin: auto;
+  line-height: 0;
+}
+#local-options .chooser-crown svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#local-options .seat-preview .pin-avatar {
+  width: 36px;
+  height: 52px;
+  margin: 0 -3px;
+  flex-shrink: 0;
+}
+#local-options strong {
+  font-size: 26px;
+}
+@media (max-width: 430px) {
+  #local-options .seat-preview .pin-avatar {
+    width: 28px;
+    height: 43px;
+    margin: 0 -4px;
+  }
+  #local-options strong {
+    font-size: 21px;
+  }
+}
+#celebration.final-summary #result-name {
+  display: none;
+}
+#celebration.final-summary .result-card {
+  padding: 10px;
+}
+#celebration.final-summary #result-title {
+  font-size: clamp(25px, 5.5vw, 40px);
+  margin: 3px 0 7px;
+}
+#celebration.final-summary .standing {
+  padding: 4px 7px;
+  margin: 4px 0;
+}
+
+#celebration button:focus-visible {
+  outline: 2px solid #ffe39b;
+  outline-offset: 3px;
+}
+.standing > span:last-child {
+  justify-self: end;
+  color: #d9c99f;
+}
+@media (max-height: 500px) {
+  #local-options {
+    padding: 12px 20px;
+  }
+  #local-options .chooser-crown {
+    width: 60px;
+    height: 40px;
+  }
+  #local-options h2 {
+    font-size: 27px;
+    margin: 3px 0;
+  }
+  #local-options > p {
+    font-size: 12px;
+    margin: 0 0 10px;
+  }
+  #local-options [data-local-mode] {
+    min-height: 112px;
+    padding: 7px;
+  }
+  #local-options .seat-preview {
+    height: 42px;
+  }
+  #local-options .seat-preview .pin-avatar {
+    width: 28px;
+    height: 40px;
+  }
+  #local-options strong {
+    font-size: 22px;
+  }
+}

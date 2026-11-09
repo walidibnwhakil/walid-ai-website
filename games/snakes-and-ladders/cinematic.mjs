@@ -15,12 +15,45 @@ export function createCinematic(host, prefix) {
     active = false,
     done = null,
     mode = "",
-    last = 0;
+    last = 0,
+    rig = null,
+    cameraBoard = null,
+    boardReady = null,
+    prepared = false;
+  function resetCamera() {
+    if (rig) {
+      rig.profile.style.removeProperty("transform");
+      rig.profile.style.removeProperty("opacity");
+      rig.profile.style.removeProperty("transform-origin");
+      for (const node of [rig.upper, rig.lower, rig.cavity]) {
+        node?.style.removeProperty("transform");
+        node?.style.removeProperty("opacity");
+      }
+    }
+    if (cameraBoard) {
+      for (const key of [
+        "--arrival-blur",
+        "--arrival-scale",
+        "--arrival-opacity",
+      ])
+        cameraBoard.style.removeProperty(key);
+    }
+    rig = null;
+    cameraBoard = null;
+    boardReady = null;
+  }
+  function prepareBoard() {
+    if (!prepared) {
+      prepared = true;
+      boardReady?.();
+    }
+  }
   function cancel() {
     active = false;
     cancelAnimationFrame(raf);
     raf = 0;
     done = null;
+    resetCamera();
     host.dataset.phase = "idle";
   }
   function pose(scale, gape, angle = 0) {
@@ -36,15 +69,33 @@ export function createCinematic(host, prefix) {
     active = false;
     cancelAnimationFrame(raf);
     host.dataset.phase = "complete";
+    if (mode === "enter") prepareBoard();
+    resetCamera();
     const cb = done;
     done = null;
     cb?.();
   }
-  function start(kind, { motion = true, onReveal, profile, title } = {}) {
+  function start(
+    kind,
+    { motion = true, onReveal, onBoardReady, profile, board, title } = {},
+  ) {
     cancel();
     active = true;
     mode = kind;
     done = onReveal;
+    boardReady = onBoardReady;
+    cameraBoard = board;
+    prepared = false;
+    if (kind === "enter" && profile) {
+      rig = {
+        profile,
+        upper: profile.querySelector("#royal-upper"),
+        lower: profile.querySelector("#royal-lower"),
+        cavity: profile.querySelector(".menu-mouth-cavity"),
+      };
+      profile.style.transformOrigin = "var(--mouth-x) var(--mouth-y)";
+      host.dataset.serpentSource = "assets/jungle-emblem.webp";
+    }
     scene.style.opacity = 1;
     host.dataset.mode = kind;
     if (!motion) {
@@ -59,36 +110,64 @@ export function createCinematic(host, prefix) {
       return;
     }
     const begin = performance.now(),
-      duration = kind === "enter" ? 3800 : 6200;
+      duration = kind === "enter" ? 6500 : 6200;
     function frame(now) {
       if (!active) return;
       const p = clamp((now - begin) / duration);
       last = p;
       if (kind === "enter") {
-        const approach = ease(0, 0.45, p),
-          front = ease(0.16, 0.42, p),
-          gape = ease(0.23, 0.58, p),
-          swallow = ease(0.58, 0.96, p);
-        if (profile) {
-          profile.style.transform = `translate(${profile.dataset.dx * approach}px,${profile.dataset.dy * approach}px) scale(${1 + 2.5 * approach}) rotateY(${approach * -8}deg)`;
-          profile.style.opacity = String(1 - ease(0.28, 0.45, p));
+        const approach = ease(0, 0.26, p),
+          gape = ease(0.15, 0.38, p),
+          zoom = Math.exp(ease(0.04, 0.56, p) * 3.7);
+        scene.style.opacity = 1;
+        jungle.style.opacity = 0;
+        if (rig) {
+          rig.profile.style.transform = `translate(${profile.dataset.dx * approach}px,${profile.dataset.dy * approach}px) scale(${zoom})`;
+          rig.profile.style.opacity = "1";
+          if (rig.upper)
+            rig.upper.style.transform = `rotate(${-0.8 * gape}deg)`;
+          if (rig.lower)
+            rig.lower.style.transform = `translate(0,${2.5 * gape}px) rotate(${1.5 * gape}deg)`;
+          if (rig.cavity) {
+            rig.cavity.style.opacity = "0";
+            rig.cavity.style.transform = `translate(0,${1.5 * gape}px) scale(${1 + 0.3 * gape},${1 + 0.7 * gape})`;
+          }
         }
-        scene.style.opacity = front;
-        jungle.style.opacity = front;
-        pose(
-          (0.48 + 0.7 * ease(0.18, 0.58, p)) * Math.exp(swallow * 2.5),
-          gape,
-          (1 - front) * -15,
+        pose(zoom, gape);
+        dark.style.opacity = String(
+          p < 0.58 ? ease(0.22, 0.39, p) : 1 - ease(0.6, 0.98, p),
         );
-        dark.style.opacity = ease(0.87, 0.98, p);
+        if (p >= 0.56) {
+          prepareBoard();
+          document.body.classList.add("arriving");
+          const focus = ease(0.6, 1, p);
+          if (cameraBoard) {
+            cameraBoard.style.setProperty(
+              "--arrival-blur",
+              `${24 * (1 - focus)}px`,
+            );
+            cameraBoard.style.setProperty(
+              "--arrival-scale",
+              String(0.72 + 0.28 * focus),
+            );
+            cameraBoard.style.setProperty(
+              "--arrival-opacity",
+              String(0.12 + 0.88 * focus),
+            );
+          }
+        }
         host.dataset.phase =
-          p < 0.23
+          p < 0.15
             ? "approach"
-            : p < 0.58
+            : p < 0.38
               ? "open-mouth"
-              : p < 0.9
+              : p < 0.56
                 ? "enter-mouth"
-                : "reveal";
+                : p < 0.64
+                  ? "darkness"
+                  : p < 0.96
+                    ? "board-focus"
+                    : "reveal";
       } else {
         const pull = ease(0.13, 0.89, p),
           gape = 1 - ease(0.1, 0.42, p);

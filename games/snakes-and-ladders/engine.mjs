@@ -164,13 +164,11 @@ export function settle(result) {
 export function placement(rank, count) {
   return rank === 0
     ? "WINNER"
-    : count === 2
-      ? "RUNNER-UP"
+    : rank === count - 1
+      ? "LOSER"
       : rank === 1
         ? "1ST RUNNER-UP"
-        : rank === 2
-          ? "2ND RUNNER-UP"
-          : "4TH PLACE";
+        : "2ND RUNNER-UP";
 }
 // Colors may be swapped until the first die is clicked; the UI locks before animation.
 export function chooseColor(state, index, color) {

@@ -86,6 +86,7 @@ export function createFireworks(canvas) {
     active = false;
     cancelAnimationFrame(raf);
     canvas.dataset.active = "false";
+    c.clearRect(0, 0, canvas.width, canvas.height);
   }
   function start(nextColor, options = {}) {
     stop();

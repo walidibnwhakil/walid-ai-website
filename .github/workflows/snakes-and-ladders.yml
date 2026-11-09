@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: node --test games/snakes-and-ladders/engine.test.mjs games/snakes-and-ladders/snake-geometry.test.mjs
+      - run: node --test games/snakes-and-ladders/engine.test.mjs games/snakes-and-ladders/snake-geometry.test.mjs games/snakes-and-ladders/results.test.mjs
       - run: npm install --prefix /tmp/serpent --no-save playwright@1.60.0
       - name: Render gameplay and all mobile sizes
         run: |

@@ -1,6 +1,12 @@
+import {
+  MEDALS,
+  finishPresentation,
+  finishMedal,
+  finalStandings,
+} from "./results.mjs";
 import { createCavernEyes } from "./cavern-eyes.mjs?v=20261108-cinema";
-import { createFireworks } from "./fireworks.mjs?v=20261108-cinema";
-import { createCinematic } from "./cinematic.mjs?v=20261108-cinema";
+import { createFireworks } from "./fireworks.mjs?v=20261109-medals";
+import { createCinematic } from "./cinematic.mjs?v=20261109-medals";
 import { createMenuScene } from "./menu-scene.mjs?v=20261108-jungle";
 import { createLava } from "./lava.mjs?v=20261108-cinema";
 import {
@@ -25,7 +31,7 @@ import {
   settle,
   placement,
   chooseColor,
-} from "./engine.mjs?v=20261108-cinema";
+} from "./engine.mjs?v=20261109-medals";
 const $ = (s) => document.querySelector(s),
   NS = "http://www.w3.org/2000/svg";
 const svg = (tag, attrs = {}, parent) => {
@@ -71,6 +77,7 @@ let state = null,
   lastBoardFrame = -Infinity,
   botTimer = 0,
   introTimer = 0,
+  finishTimer = 0,
   paths = {},
   pawns = [],
   bodyCanvas = null,
@@ -638,6 +645,7 @@ function board() {
         "g",
         {
           class: "finish-crown",
+          "data-medal": "gold",
           role: "img",
           "aria-label": "Finish — square 100",
           "clip-path": "url(#finish-crown-clip)",
@@ -794,7 +802,13 @@ function place(i, n, point) {
     `translate(${p.x} ${p.y}) rotate(${angle}) scale(${shared ? (peers.length === 2 ? 0.62 : 0.56) : 1})`,
   );
   pawns[i]?.setAttribute("data-position", n);
-  pawns[i]?.setAttribute("visibility", !n && !point ? "hidden" : "visible");
+  pawns[i]?.setAttribute(
+    "visibility",
+    (!n && !point) ||
+      (state.order.includes(i) && state.players[i].position === 100)
+      ? "hidden"
+      : "visible",
+  );
 }
 const delay = (ms) =>
   new Promise((resolve) => setTimeout(resolve, reduced() ? 0 : ms));
@@ -888,8 +902,12 @@ function render() {
       const rank = state.order.indexOf(i),
         bot = state.bot && i === 1,
         active =
-          i === state.current && state.phase === "ready" && !busy && rank < 0;
-      return `<div class="player-row ${i === state.current ? "current" : ""} ${rank >= 0 ? "finished" : ""}" style="--pawn:${HEX[COLORS.indexOf(p.color)]}" data-player-card="${i}"><button type="button" class="player-head" data-game-color="${i}" aria-label="${p.name}: ${state.colorsLocked ? "colors locked" : "choose pawn color"}" ${state.colorsLocked || busy || state.rolls > 0 ? "disabled" : ""}>${pinMarkup(p.color)}<strong>${p.name}</strong></button><button type="button" class="player-die" data-roll="${i}" aria-label="${p.name}: ${p.lastDice ? "last roll " + p.lastDice + ". " : ""}${bot ? "Bot rolls automatically" : p.position === 0 ? "Roll a 1 to enter" : "Roll dice"}" ${!active || bot ? "disabled" : ""}>${dieCube(p.lastDice ?? 1)}</button><span class="player-position">${rank >= 0 ? placement(rank, state.players.length) : p.position === 0 ? "Roll 1 to enter" : `Square ${p.position}`}</span></div>`;
+          i === state.current &&
+          state.phase === "ready" &&
+          !busy &&
+          rank < 0 &&
+          $("#celebration").hidden;
+      return `<div class="player-row ${i === state.current ? "current" : ""} ${rank >= 0 ? "finished" : ""}" style="--pawn:${HEX[COLORS.indexOf(p.color)]}" data-player-card="${i}"><button type="button" class="player-head" data-game-color="${i}" aria-label="${p.name}: ${state.colorsLocked ? "colors locked" : "choose pawn color"}" ${state.colorsLocked || busy || state.rolls > 0 ? "disabled" : ""}>${pinMarkup(p.color)}<strong>${p.name}</strong></button><button type="button" class="player-die" data-roll="${i}" aria-label="${p.name}: ${p.lastDice ? "last roll " + p.lastDice + ". " : ""}${bot ? "Bot rolls automatically" : p.position === 0 ? "Roll a 1 to enter" : "Roll dice"}" ${!active || bot ? "disabled" : ""}>${dieCube(p.lastDice ?? 1)}</button><span class="player-position">${rank >= 0 ? (state.players.length === 2 ? (state.bot ? "" : rank === 0 ? "Winner" : "") : placement(rank, state.players.length)) : p.position === 0 ? "Roll 1 to enter" : `Square ${p.position}`}</span></div>`;
     })
     .join("");
   fitGame();
@@ -972,7 +990,14 @@ function scheduleBot() {
     botTimer = setTimeout(() => takeTurn(), Number(settings.botDelay));
 }
 async function takeTurn() {
-  if (!state || busy || state.phase !== "ready") return;
+  if (
+    !state ||
+    busy ||
+    state.phase !== "ready" ||
+    !$("#celebration").hidden ||
+    !$("#intro").hidden
+  )
+    return;
   busy = true;
   state = { ...state, colorsLocked: true };
   const token = epoch,
@@ -1070,6 +1095,7 @@ function cancel() {
   activeRollAnimation = null;
   clearTimeout(botTimer);
   clearTimeout(introTimer);
+  clearTimeout(finishTimer);
   cancelAnimationFrame(raf);
   busy = false;
   $("#celebration").hidden = true;
@@ -1077,7 +1103,7 @@ function cancel() {
   $("header").inert = false;
   $("#intro").hidden = true;
   $("#intro").classList.remove("reveal");
-  document.body.classList.remove("entering");
+  document.body.classList.remove("entering", "arriving");
 }
 function begin(skip = false) {
   cancel();
@@ -1089,45 +1115,58 @@ function begin(skip = false) {
   audio();
   board();
   const token = epoch;
-  const reveal = () => {
-    if (token !== epoch) return;
-    document.body.classList.remove("entering");
+  let prepared = false;
+  const prepare = () => {
+    if (token !== epoch || prepared) return;
+    prepared = true;
     document.body.classList.add("playing");
-    $("#intro").classList.add("reveal");
-    introTimer = setTimeout(() => {
-      $("#intro").hidden = true;
-      $("#intro").classList.remove("reveal");
-    }, 500);
     $("#menu").hidden = true;
     $("#play").hidden = false;
-    $("#start").disabled = false;
     updateAmbience();
     render();
     $("#status").textContent = `${state.players[0].name}: roll a 1 to enter.`;
     fitGame();
-    requestAnimationFrame(fitGame);
     raf = requestAnimationFrame(animateBoard);
+  };
+  const reveal = () => {
+    if (token !== epoch) return;
+    prepare();
+    document.body.classList.remove("entering", "arriving");
+    $("#intro").hidden = true;
+    $("#intro").classList.remove("reveal");
+    $("#play").style.removeProperty("--arrival-blur");
+    $("#play").style.removeProperty("--arrival-scale");
+    $("#play").style.removeProperty("--arrival-opacity");
+    $("#start").disabled = false;
+    $("main").inert = false;
+    $("header").inert = false;
+    fitGame();
+    scheduleBot();
   };
   $("#start").disabled = true;
   if (skip || reduced()) reveal();
   else {
     $("#intro").hidden = false;
+    $("main").inert = true;
+    $("header").inert = true;
     const hero = $(".menu-hero"),
       box = hero.getBoundingClientRect(),
-      mouth = new DOMPoint(365, 170).matrixTransform(
+      mouth = new DOMPoint(365, 178).matrixTransform(
         $("#jungle").getScreenCTM(),
       );
     hero.dataset.dx = String(innerWidth / 2 - mouth.x);
     hero.dataset.dy = String(innerHeight / 2 - mouth.y);
-    hero.style.setProperty("--camera-x", `${innerWidth / 2 - mouth.x}px`);
-    hero.style.setProperty("--camera-y", `${innerHeight / 2 - mouth.y}px`);
     hero.style.setProperty("--mouth-x", `${mouth.x - box.x}px`);
     hero.style.setProperty("--mouth-y", `${mouth.y - box.y}px`);
     document.body.classList.add("entering");
-    entranceCinema.enter({ motion: true, profile: hero, onReveal: reveal });
-    $("#skip").onclick = () => {
-      entranceCinema.finish();
-    };
+    entranceCinema.enter({
+      motion: true,
+      profile: hero,
+      board: $("#play"),
+      onBoardReady: prepare,
+      onReveal: reveal,
+    });
+    $("#skip").onclick = () => entranceCinema.finish();
   }
 }
 function menu() {
@@ -1140,58 +1179,151 @@ function menu() {
   $("#start").disabled = false;
   updateAmbience();
 }
+function medalMarkup(medal) {
+  return medal
+    ? `<span class="medal-icon" data-medal="${medal}" aria-label="${medal} crown"><svg viewBox="490 0 560 370" aria-hidden="true"><image href="assets/jungle-emblem.webp" width="1536" height="1024"/></svg></span>`
+    : '<span class="last-place-mark" aria-hidden="true">—</span>';
+}
+function positionCelebration() {
+  if (
+    $("#celebration").hidden ||
+    $("#celebration").classList.contains("defeat")
+  )
+    return;
+  const r = $(".board-frame").getBoundingClientRect();
+  for (const [key, value] of Object.entries({
+    left: r.left,
+    top: r.top,
+    width: r.width,
+    height: r.height,
+  }))
+    $("#celebration").style.setProperty(`--result-${key}`, `${value}px`);
+}
+window.addEventListener("resize", () =>
+  requestAnimationFrame(positionCelebration),
+);
+window.visualViewport?.addEventListener("resize", () =>
+  requestAnimationFrame(positionCelebration),
+);
+function updateCrown() {
+  const crown = $(".finish-crown");
+  if (crown) {
+    crown.dataset.medal = finishMedal(
+      state.phase === "over" ? state.players.length - 2 : state.order.length,
+    );
+    crown.setAttribute(
+      "aria-label",
+      `${crown.dataset.medal} crown — square 100`,
+    );
+  }
+}
+function resumeMatch() {
+  clearTimeout(finishTimer);
+  resultFireworks.stop();
+  $(".fireworks").replaceChildren();
+  $("#celebration").hidden = true;
+  $("main").inert = false;
+  $("header").inert = false;
+  updateCrown();
+  render();
+  $("#status").textContent = `${state.players[state.current].color}'s turn.`;
+  document.querySelector(`[data-roll="${state.current}"]`)?.focus();
+  scheduleBot();
+}
+function showSummary() {
+  resultFireworks.stop();
+  $(".fireworks").replaceChildren();
+  $("#celebration").className = "final-summary";
+  $("#result-title").textContent = "Royal Standings";
+  $("#result-title").setAttribute("aria-label", "Royal Standings");
+  $("#result-name").textContent = "Every crown has found its champion.";
+  $("#standings").innerHTML = finalStandings(state)
+    .map(
+      (row) =>
+        `<div class="standing" style="--pawn:${HEX[COLORS.indexOf(row.color)]}">${medalMarkup(row.medal)}<strong>${row.color}</strong><span>${row.label}</span></div>`,
+    )
+    .join("");
+  $("#standings").hidden = false;
+  $("#continue").hidden = true;
+  $("#try-again").hidden = false;
+  $("#result-menu").hidden = false;
+  updateCrown();
+  $("#try-again").focus();
+}
 function celebrate(i) {
   const p = state.players[i],
     rank = state.order.indexOf(i),
-    defeat = state.bot && i === 1;
-  $("#celebration").hidden = false;
+    presentation = finishPresentation(state, i),
+    defeat = presentation.defeat;
+  clearTimeout(finishTimer);
+  clearTimeout(botTimer);
+  const layer = $("#celebration");
+  layer.className = defeat
+    ? "defeat"
+    : state.bot
+      ? "bot-victory"
+      : state.players.length === 2
+        ? "two-player-result"
+        : "placement-celebration";
+  layer.hidden = false;
   $("main").inert = true;
   $("header").inert = true;
-  $("#celebration").classList.toggle("defeat", defeat);
-  $("#celebration").classList.toggle("bot-victory", state.bot && !defeat);
   defeatCinema.cancel();
   resultFireworks.stop();
+  const boardRect = $(".board-frame").getBoundingClientRect();
+  for (const [key, value] of Object.entries({
+    left: boardRect.left,
+    top: boardRect.top,
+    width: boardRect.width,
+    height: boardRect.height,
+  }))
+    layer.style.setProperty(`--result-${key}`, `${value}px`);
+  layer.style.setProperty(
+    "--accent",
+    state.bot && !defeat ? "#ffdb70" : HEX[COLORS.indexOf(p.color)],
+  );
+  layer.style.setProperty("--medal-color", MEDALS[Math.min(rank, 2)].color);
+  const crown = layer.querySelector(".crown");
+  crown.dataset.medal = presentation.medal || "gold";
+  const boardCrown = $(".finish-crown");
+  if (boardCrown) boardCrown.dataset.medal = presentation.medal || "gold";
   $("#result-title").style.opacity = "1";
   $("#result-title").style.setProperty("--result-scale", "1");
-  $("#celebration").style.setProperty("--accent", HEX[COLORS.indexOf(p.color)]);
-  $("#result-title").textContent = defeat
-    ? "YOU LOSE"
-    : state.bot
-      ? "YOU WIN"
-      : placement(rank, state.players.length);
-  $("#result-title").dataset.title = $("#result-title").textContent;
-  $("#result-title").setAttribute("aria-label", $("#result-title").textContent);
-  $("#result-name").textContent = defeat
-    ? "The Serpent Bot claimed the crown. Your next adventure awaits."
-    : `${p.name} · ${p.color}`;
+  $("#result-title").textContent = presentation.title;
+  $("#result-title").dataset.title = presentation.title;
+  $("#result-title").setAttribute("aria-label", presentation.title);
+  $("#result-name").textContent = state.bot
+    ? defeat
+      ? "The Serpent Bot claimed this round."
+      : "The golden crown is yours."
+    : state.players.length > 2
+      ? MEDALS[rank].label + " · " + presentation.medal.toUpperCase() + " CROWN"
+      : "";
+  $("#standings").replaceChildren();
+  $("#standings").hidden = true;
+  $("#continue").hidden = true;
+  $("#try-again").hidden = presentation.automatic;
+  $("#result-menu").hidden = presentation.automatic;
+  $(".fireworks").replaceChildren();
   if (defeat)
     defeatCinema.defeat({ motion: !reduced(), title: $("#result-title") });
-  const over = state.phase === "over";
-  $("#continue").hidden = over;
-  $("#try-again").hidden = !over;
-  $("#standings").innerHTML = over
-    ? state.order
-        .map(
-          (j, k) =>
-            `<div class="standing" style="color:${HEX[COLORS.indexOf(state.players[j].color)]}">${placement(k, state.players.length)} — ${state.players[j].name}</div>`,
-        )
-        .join("")
-    : "";
-  const f = $(".fireworks");
-  f.replaceChildren();
-  if (!defeat) {
-    resultFireworks.start(HEX[COLORS.indexOf(p.color)], {
-      motion: !reduced(),
-      quality: settings.quality,
-    });
-    for (let k = 0; k < (settings.quality === "Low" ? 12 : 48); k++) {
-      const el = document.createElement("i");
-      el.className = "spark";
-      el.style.cssText = `--x:${25 + (k % 3) * 25}%;--y:${25 + (k % 2) * 30}%;--dx:${Math.cos(k * 2.4) * 150}px;--dy:${Math.sin(k * 2.4) * 150}px;--delay:-${(k % 3) * 0.6}s`;
-      f.append(el);
-    }
+  else {
+    resultFireworks.start(
+      state.bot ? "#ffd96b" : HEX[COLORS.indexOf(p.color)],
+      { motion: !reduced(), quality: settings.quality },
+    );
     tone(880, 0.5);
   }
+  render();
+  positionCelebration();
+  if (presentation.automatic) {
+    const token = epoch;
+    finishTimer = setTimeout(() => {
+      if (token !== epoch) return;
+      if (state.phase === "over") showSummary();
+      else resumeMatch();
+    }, 3500);
+  } else $("#try-again").focus();
   if (!state.bot || state.phase === "over") {
     const localRank = state.bot ? state.order.indexOf(0) + 1 : rank + 1;
     stats.highestFinishingPosition = Math.min(
@@ -1204,7 +1336,6 @@ function celebrate(i) {
     else stats.multiplayerWins++;
   }
   save("serpent-stats", stats);
-  (over ? $("#try-again") : $("#continue")).focus();
 }
 function panel(kind) {
   clearTimeout(botTimer);
@@ -1249,6 +1380,12 @@ function panel(kind) {
   } else $("#dialog-content").onchange = null;
   $("#dialog").showModal();
 }
+function closeLocalChooser() {
+  const dialog = $("#local-options");
+  if (dialog.open) dialog.close();
+  dialog.hidden = true;
+  $("#local-mode").setAttribute("aria-expanded", "false");
+}
 function selectMode() {
   colorOptions();
   const bot = $("#mode").value === "bot";
@@ -1256,8 +1393,15 @@ function selectMode() {
   $("#bot-mode").setAttribute("aria-pressed", String(bot));
   $("#local-mode").classList.toggle("selected", !bot);
   if (!bot) $("#local-label").textContent = $("#mode").value + " Players";
-  $("#local-options").hidden = true;
-  $("#local-mode").setAttribute("aria-expanded", "false");
+  document
+    .querySelectorAll("[data-local-mode]")
+    .forEach((b) =>
+      b.setAttribute(
+        "aria-pressed",
+        String(!bot && b.dataset.localMode === $("#mode").value),
+      ),
+    );
+  closeLocalChooser();
 }
 $("#mode").onchange = selectMode;
 $("#bot-mode").onclick = () => {
@@ -1265,23 +1409,43 @@ $("#bot-mode").onclick = () => {
   selectMode();
 };
 $("#local-mode").onclick = () => {
-  const open = $("#local-options").hidden;
-  $("#local-options").hidden = !open;
-  $("#local-mode").setAttribute("aria-expanded", String(open));
+  const dialog = $("#local-options");
+  if (dialog.open) {
+    closeLocalChooser();
+    return;
+  }
+  dialog.hidden = false;
+  dialog.showModal();
+  $("#local-mode").setAttribute("aria-expanded", "true");
 };
-document.querySelectorAll("[data-local-mode]").forEach(
-  (b) =>
-    (b.onclick = () => {
-      $("#mode").value = b.dataset.localMode;
-      selectMode();
-    }),
-);
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".local-picker")) {
-    $("#local-options").hidden = true;
-    $("#local-mode").setAttribute("aria-expanded", "false");
+$("#close-local").onclick = closeLocalChooser;
+$("#local-options").addEventListener("close", () => {
+  $("#local-options").hidden = true;
+  $("#local-mode").setAttribute("aria-expanded", "false");
+});
+$("#local-options").addEventListener("click", (e) => {
+  if (e.target === $("#local-options")) {
+    const r = e.target.getBoundingClientRect();
+    if (
+      e.clientX < r.left ||
+      e.clientX > r.right ||
+      e.clientY < r.top ||
+      e.clientY > r.bottom
+    )
+      closeLocalChooser();
   }
 });
+for (const b of document.querySelectorAll("[data-local-mode]")) {
+  b.querySelector(".seat-preview").innerHTML = Array.from(
+    { length: +b.dataset.localMode },
+    (_, i) => pinMarkup(COLORS[i]),
+  ).join("");
+  b.onclick = () => {
+    $("#mode").value = b.dataset.localMode;
+    selectMode();
+    $("#local-mode").focus();
+  };
+}
 $("#start").onclick = () => {
   if (!$("#start").disabled) begin();
 };
@@ -1327,14 +1491,7 @@ $("#dialog").addEventListener("click", (e) => {
   )
     e.target.close();
 });
-$("#continue").onclick = () => {
-  resultFireworks.stop();
-  $("#celebration").hidden = true;
-  $("main").inert = false;
-  $("header").inert = false;
-  document.querySelector(`[data-roll="${state.current}"]`)?.focus();
-  scheduleBot();
-};
+$("#continue").onclick = resumeMatch;
 $("#try-again").onclick = () => begin(true);
 $("#result-menu").onclick = menu;
 document.addEventListener("visibilitychange", () => {
@@ -1394,6 +1551,7 @@ if (
       $("#play").hidden = false;
       board();
       render();
+      updateCrown();
       raf = requestAnimationFrame(animateBoard);
     },
     turn: takeTurn,

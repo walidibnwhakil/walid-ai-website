@@ -1708,14 +1708,6 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             })
             return
 
-        if len(set(tokenize(question))) < 2:
-            self.send_json(200, {
-                "answer": "কোন তথ্যটি জানতে চাও, প্রশ্নটি একটু বিস্তারিত করে লিখো। যেমন: “বাংলাদেশের সরকারি নাম কী?”",
-                "answering_mode": "need_more_detail",
-                "sources": [],
-            })
-            return
-
         passages, no_text_files, read_errors = [], [], []
         try:
             passages, _, no_text_files, read_errors = get_pdf_index_for_chat()

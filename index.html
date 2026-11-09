@@ -580,13 +580,21 @@
     }
     .attach-button:hover { background:#e5eee7; transform:scale(1.04); }
     .attach-button svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; }
-    .attach-menu { position:absolute; z-index:18; left:10px; bottom:calc(100% + 10px); min-width:210px; padding:7px; display:grid; gap:3px; border:1px solid var(--line); border-radius:14px; background:var(--paper); box-shadow:0 12px 35px #0002; }
+    .attach-menu { position:absolute; z-index:18; left:10px; bottom:calc(100% + 10px); width:212px; max-width:calc(100vw - 40px); padding:6px; display:grid; gap:3px; border:1px solid var(--line); border-radius:14px; background:var(--paper); box-shadow:0 12px 35px #0002; }
     .attach-menu.hidden { display:none; }
-    .attach-menu button { display:flex; align-items:center; width:100%; padding:10px 12px; border:0; border-radius:9px; background:transparent; color:var(--ink); text-align:left; font:inherit; }
+    .upload-icon { display:grid; place-items:center; flex:0 0 32px; width:32px; height:32px; border-radius:9px; background:var(--soft); color:var(--green); }
+    .upload-icon svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+    .upload-label { font-size:15px; font-weight:400; }
+    .attach-button[aria-expanded=true] { background:#e5eee7; }
+    .attach-button svg { transition:transform .16s ease; }
+    .attach-button[aria-expanded=true] svg { transform:rotate(45deg); }
+    @media(prefers-reduced-motion:reduce) { .attach-button svg { transition:none; } }
+    .attach-menu button { display:flex; align-items:center; width:100%; gap:11px; min-height:48px; padding:7px 10px; border:0; border-radius:10px; background:transparent; color:var(--ink); text-align:left; font:inherit; }
     .attach-menu button:hover, .attach-menu button:focus-visible { background:var(--soft); }
+    .attach-menu button:focus-visible { outline:2px solid #87a392; outline-offset:-2px; }
     .composer { flex-wrap:wrap; align-items:center; }
     .composer .attachment-list { order:-1; flex:0 0 100%; align-self:stretch; min-width:0; }
-    .composer #attachBtn, .composer #chatToolsBtn { order:0; }
+    .composer #attachBtn { order:0; }
     .composer textarea { order:1; flex:1 1 130px; width:auto; min-width:120px; }
     .composer-bottom { order:2; flex:0 0 auto; }
     .attachment-chip { display:flex; align-items:center; gap:5px; max-width:min(100%,320px); min-width:0; }
@@ -988,16 +996,7 @@
     }
   </style>
   <style>
-    .chat-tools-modal{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;padding:16px;background:#1119}
-    .chat-tools-modal.hidden{display:none}
-    .chat-tools-dialog{width:min(1120px,100%);height:min(92vh,900px);display:flex;flex-direction:column;overflow:hidden;border-radius:16px;background:#f7f7f8;box-shadow:0 20px 70px #0004}
-    .chat-tools-head{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#fff;border-bottom:1px solid #e4e6ea;font-weight:650}
-    .chat-tools-head button{border:0;background:none;font-size:1.5rem;cursor:pointer;color:#51565d}
-    .chat-tools-dialog iframe{width:100%;flex:1;border:0;background:#f7f7f8}
-    .tools-chat-button{font-size:.75rem;font-weight:650;flex-basis:42px;width:auto;padding:0 10px;border-radius:18px}
-    .tools-chat-button.hidden{display:none}
     .tool-result-link{display:inline-block;margin:10px 0;color:#146c54;font-weight:650;text-decoration:underline}
-    @media(max-width:560px){.chat-tools-modal{padding:0}.chat-tools-dialog{height:100dvh;border-radius:0}.chat-tools-head{height:48px;flex-basis:48px}}
   </style>
 
   <script src="backend-config.js" defer></script>
@@ -1055,11 +1054,13 @@
       <form id="form" class="composer">
         <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.txt,.md,.csv" multiple hidden>
         <div id="attachmentList" class="attachment-list hidden"></div>
-        <button id="attachBtn" class="attach-button" type="button" aria-label="Add files or photos" title="Add files or photos" aria-expanded="false" aria-controls="attachMenu">
+        <button id="attachBtn" class="attach-button" type="button" aria-label="Add files or photos" title="Add files or photos" aria-expanded="false" aria-controls="attachMenu" aria-haspopup="menu">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         </button>
-        <div id="attachMenu" class="attach-menu hidden" role="menu" aria-label="Add to chat"><button type="button" role="menuitem" data-upload-kind="file">Upload files</button><button type="button" role="menuitem" data-upload-kind="photo">Upload photos</button></div>
-        <button id="chatToolsBtn" class="attach-button tools-chat-button hidden" type="button" aria-label="Open file tools" title="Tools">Tools</button>
+        <div id="attachMenu" class="attach-menu hidden" role="menu" aria-label="Add to chat">
+          <button type="button" role="menuitem" data-upload-kind="file"><span class="upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span><span class="upload-label">Files</span></button>
+          <button type="button" role="menuitem" data-upload-kind="photo"><span class="upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span><span class="upload-label">Photos</span></button>
+        </div>
         <textarea id="question" maxlength="2000"
           placeholder="Ask Walid AI..."
           aria-label="Ask a question"></textarea>
@@ -1161,10 +1162,6 @@
       </nav>
       <div class="brand-version">Walid AI 1.0</div>
     </section>
-  </div>
-
-  <div id="chatToolsModal" class="chat-tools-modal hidden" role="dialog" aria-modal="true" aria-labelledby="chatToolsTitle">
-    <section class="chat-tools-dialog"><div class="chat-tools-head"><span id="chatToolsTitle">PDF &amp; Image Tools</span><button id="closeChatTools" type="button" aria-label="Close tools">×</button></div><iframe title="PDF and image tools" src="/tools.html?embedded=1"></iframe></section>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>

@@ -1226,6 +1226,7 @@
           }
           const fileBytes = Uint8Array.from(atob(toolResult.file), (character) => character.charCodeAt(0));
           const downloadUrl = URL.createObjectURL(new Blob([fileBytes], { type: toolResult.type }));
+          window.WalidUsage?.tool("tool_success", pdfTool);
           const toolAnswer = addMessage("ai", "Your file is ready.", "File tool", { question, messageIndex: answerIndex });
           const download = document.createElement("a");
           download.className = "tool-result-link";

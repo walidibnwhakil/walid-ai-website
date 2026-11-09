@@ -36,6 +36,10 @@ ul{padding-left:1.2em}li{margin:8px 0}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Walid AI","item":"https://walid-ai.com/"},{"@type":"ListItem","position":2,"name":"গোপনীয়তা নীতি","item":"https://walid-ai.com/privacy.html"}]}
 </script>
+
+<link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
 </head>
 <body>
 <main>
@@ -62,7 +66,7 @@ ul{padding-left:1.2em}li{margin:8px 0}
 </ul>
 
 <h2>AI অনুরোধ</h2>
-<p>চ্যাট পৃষ্ঠা সরাসরি Gemini API ডাকে না। প্রশ্ন, অতিথি আইডি ও সংযুক্ত ফাইল Walid AI ব্যাকএন্ডে যায়। অপারেটরের অ্যাডমিন স্ক্রিন সেই কলকে Gemini API অনুরোধ হিসেবে গোনে। ওয়েবসাইটে Gemini-এর API কী বা মডেলের নাম নেই।</p>
+<p>চ্যাট পৃষ্ঠা সরাসরি Gemini API ডাকে না। প্রশ্ন, অতিথি আইডি ও সংযুক্ত ফাইল Walid AI ব্যাকএন্ডে যায়। ব্যাকএন্ড Gemini, Groq ও OpenRouter-এর মতো configured provider-এ প্রশ্ন পাঠাতে পারে এবং একটি unavailable হলে অন্যটি চেষ্টা করতে পারে। পরিচালকের সুরক্ষিত dashboard-এ retry ও error-সহ আসল API call গোনা হয়। ওয়েবসাইটে Gemini-এর API কী বা মডেলের নাম নেই।</p>
 <p><strong>Gemini API-এর বর্তমান স্তর: বিনামূল্য (unpaid)।</strong> পরিচালক জানিয়েছেন প্রজেক্টটি Google-এর বিনামূল্যের স্তরে আছে। এই বিনামূল্যের স্তরে Gemini API-তে পাঠানো বিষয়বস্তু — প্রশ্ন এবং সেই অনুরোধে থাকা ফাইল — Google তার পণ্য উন্নত করতে ব্যবহার করতে পারে, এবং মানুষ তা পর্যালোচনা করতে পারে। সংবেদনশীল ব্যক্তিগত তথ্য পাঠাবেন না। Google-এর <a href="https://ai.google.dev/gemini-api/terms">Gemini API শর্ত</a> এই ব্যবহার বর্ণনা করে। পরে প্রজেক্ট অর্থপ্রদত্ত স্তরে গেলে এই অনুচ্ছেদটি সেই স্তরের ভাষা দিয়ে বদলাতে হবে।</p>
 <p>চ্যাট উত্তরকে আপনার ফাইল বা PDF থেকে আসা বলে চিহ্নিত করতে পারে, এবং বলতে পারে OCR বা সেটআপ লাগবে, বা পড়ার মতো লেখা পাওয়া যায়নি। এতে বোঝা যায় ব্যাকএন্ড উত্তরের জন্য ফাইল পড়তে পারে। এতে পৃষ্ঠার সীমা, OCR ভাষা, বা ফাইল সেভ হয় — এমন কিছু প্রমাণ হয় না। এই ওয়েবসাইটের কোডে চ্যাট-সংযুক্ত ফাইল ডিস্কে লেখার কোড নেই।</p>
 
@@ -95,6 +99,6 @@ ul{padding-left:1.2em}li{margin:8px 0}
 <h2>পরিবর্তন ও যোগাযোগ</h2>
 <p>নীতি বদলালে এই পৃষ্ঠা ও ইংরেজি পৃষ্ঠা আপডেট হবে এবং কার্যকর তারিখ বদলাবে। ইমেইল: <a href="mailto:support@walid-ai.com">support@walid-ai.com</a>। <a href="/about-us.html">আমাদের সম্পর্কে</a> · <a href="/contact-us.html">যোগাযোগ</a> · <a href="/terms-of-service.html">ব্যবহারের শর্তাবলি</a></p>
 <small>Walid AI 1.0</small>
-</main>
-</body>
+<section><h2>ব্যবহারের সামগ্রিক হিসাব</h2><p>পাতা দেখা, সক্রিয় সময়, গেম শুরু, টুল সফল/ব্যর্থ হওয়া এবং API কলের সামগ্রিক হিসাব শুধু পরিচালকের সুরক্ষিত dashboard-এ দেখা যায়। প্রশ্ন, ফাইল, নাম, ইমেইল বা account ID এই হিসাবে রাখা হয় না। Browser-এর random guest ID থেকে আনুমানিক unique browser গোনা হয়; raw ID রাখা হয় না। GeoJS-এ browser-এর IP যায় দেশ ও বাংলাদেশের বিভাগ অনুমান করার জন্য; আমাদের হিসাবে IP বা সুনির্দিষ্ট অবস্থান রাখা হয় না। Daily aggregate ৯০ দিন, সামগ্রিক মোট হিসাব দীর্ঘমেয়াদে থাকে। Do Not Track ও Global Privacy Control মানা হয়।</p><button type="button" id="usageOptOut">Usage tracking বন্ধ করুন</button><p id="usageChoice" role="status"></p></section><script>document.getElementById("usageOptOut").onclick=()=>{localStorage.setItem("walidUsageOptOut","1");document.getElementById("usageChoice").textContent="Browser usage tracking disabled. This choice stays on this browser."};</script></main>
+<script src="/usage.js?v=20261109-1"></script></body>
 </html>

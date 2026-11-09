@@ -1004,6 +1004,10 @@
 
 <link rel="stylesheet" href="/about-contact-fonts.css">
 <link rel="stylesheet" href="/walid-branding.css">
+
+<link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
 </head>
 
 <body>
@@ -1172,7 +1176,7 @@
   <script>
     (()=>{if(!matchMedia('(max-width: 650px)').matches)return;let startX=0,startY=0,reloaded=false;document.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;startX=event.touches[0].clientX;startY=event.touches[0].clientY;reloaded=false},{passive:true});document.addEventListener('touchmove',event=>{if(reloaded||event.touches.length!==1)return;const chat=document.getElementById('chat');if(chat&&(chat.contains(event.target)||chat.scrollTop>0))return;if(event.target.closest&&event.target.closest('#form,.composer'))return;const dx=event.touches[0].clientX-startX,dy=event.touches[0].clientY-startY;if(startY<100&&dy>120&&Math.abs(dx)<70){reloaded=true;location.reload()}},{passive:true})})();
   </script>  <script src="/chat-ui.js" defer></script><script src="/app.js" defer></script>
-</body>
+<script src="/usage.js?v=20261109-1"></script></body>
 </html>
 
 

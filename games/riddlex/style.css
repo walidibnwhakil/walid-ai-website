@@ -21,6 +21,7 @@ main:has(.office:not([hidden])){max-width:960px}
 .office-shell{position:relative}
 .office-shell:has(.office[hidden]){display:none}
 .games-nav{background:#fff;border-right:1px solid #e3e6e9;padding:24px 14px}
+.games-nav{display:none}
 .games-nav a{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:#f4f7f5;font-weight:600;text-decoration:none;width:max-content}
 .games-nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
 .legal-footer{display:block;clear:both;width:100%;margin:48px 0 0;padding:18px 20px 16px;border-top:1px solid #e5e7eb;background:transparent;text-align:center;color:#6b7280;font:13px/1.6 "Times New Roman",serif}
@@ -46,6 +47,12 @@ body:has(main:has(#play:not([hidden])))>footer{margin-top:0}
  width:100%;border:4px solid #68452b;border-radius:20px
 }
 .splash-art img{display:block;width:100%;height:100%;position:absolute;object-fit:cover;object-position:center top}
+.menu-back{position:absolute;z-index:4;top:18px;left:22px;padding:8px 16px;border:1px solid #e6bd68;border-radius:999px;background:#24150dcc;color:#ffe6a4;text-decoration:none;font-weight:700;box-shadow:0 3px 8px #0008}
+body:has(#play:not([hidden])){overflow:hidden}
+body:has(#play:not([hidden])) main:has(#play:not([hidden])){margin:0;height:100vh}
+body:has(#play:not([hidden])) .splash-art{height:100%;aspect-ratio:auto;border:0;border-radius:0}
+body:has(#play:not([hidden])) .splash-art img{object-fit:contain;background:#17100b}
+body:has(#play:not([hidden])) .legal-footer{position:fixed;z-index:5;left:0;right:0;bottom:0;margin:0;padding:5px 10px;background:#fff;font-size:11px}
 .splash-art::after{
  content:"";position:absolute;inset:0;pointer-events:none;
  background:linear-gradient(90deg,transparent 77%,#27191180),linear-gradient(0deg,#27190f33,transparent 22%)

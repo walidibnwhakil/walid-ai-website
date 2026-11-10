@@ -2,8 +2,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test engine.test.mjs simulation.test.mjs quality.test.mjs curated.test.mjs wikidata.test.mjs engine-v2.test.mjs chronology.test.mjs runtime.test.mjs resume.test.mjs",
-    "validate": "node build-curated.mjs --check && node build-wikidata.mjs --check && node validate-knowledge.mjs && node validate-v2.mjs && node build-runtime.mjs --check",
-    "benchmark": "node benchmark.mjs --output knowledge/benchmark-results.json"
+    "test": "node --test engine.test.mjs",
+    "harvest": "python3 knowledge/harvest.py",
+    "pack": "python3 knowledge/pack.py",
+    "simulate": "node simulate.mjs"
   }
 }

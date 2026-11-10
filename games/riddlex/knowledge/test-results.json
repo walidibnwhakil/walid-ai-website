@@ -1,8 +1,0 @@
-{
-  "validationExit": 0,
-  "testExit": 0,
-  "testsPassed": 59,
-  "testSeconds": 120.63233652400004,
-  "manifestSha256": "b99880d0af977219c9fa1dcb997b79f17dbff62f94420b5644b61bf2810db08e",
-  "phase": "bulk-final"
-}

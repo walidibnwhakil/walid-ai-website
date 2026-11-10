@@ -1,187 +1,310 @@
-import {setGameInProgress} from "../refresh-guard.mjs";
-import {animateWelcome,animateProps} from "./scene-props.js?v=release";
-import {animateOffice} from "./scene-motion.js?v=desk-reveal";
-import {loadCategory} from "./runtime-loader.js?v=adaptive-rc1";
-import {ANSWERS as answerKeys,scoreCandidates,nextQuestion,selectGuess,selectTentativeGuess} from "./engine-v2.js?v=release";
-import {rejectGuess,rewindRejections,rejectedIds} from "./history.js";
-import {createGuessReveal} from "./guess-reveal.js?v=release";
-let allEntries=[],allQuestions={};
-const contextKey="relationship_context";
-const contextQuestion="Are you thinking of someone by their relationship to you, such as a relative or friend?";
-let loadToken=0;
-let questionSeed;
-const $=id=>document.getElementById(id);
-let category=null,answers=[],rejected=new Set(),rejectionHistory=[],mode="splash",currentKey=null,guess=null;
-let tentative=false;
-const office=document.querySelector(".office");
-const reveal=createGuessReveal(office);
-animateOffice(office);
-animateWelcome($("splash-art"));
-animateProps(office,office.querySelector(".scene-art"));
-const status=$("status"), statusHome=status.parentElement;
-function mood(value){office.dataset.mood=value;}
-function progress(){const el=document.getElementById("progress");if(el)el.textContent=category?"Questions answered: "+answers.length+" · Wrong guesses: "+rejected.size:"";}
-const categories=$("categories"),answerPanel=$("answers"),guessPanel=$("guess"),back=$("back");
+import { setGameInProgress } from "../refresh-guard.mjs";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, rejectIndex, rewind } from "./engine.js";
+import { UI, guessFont } from "./i18n.js";
+import { imageSrc, loadKnowledge, mergePools, poolFromEntries } from "./kb.js";
+import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
+import { createScene } from "./scene.js";
 
-function submitAnswer(value){if((mode!=="ask"&&mode!=="edit")||!currentKey||!answerKeys.includes(value))return;answers.push({key:currentKey,value});currentKey=null;mode="ask";render();}
-function visible(node,yes){node.hidden=!yes;}
-function guessName(){
- // This imported label appends a Kannada transliteration to the English name.
- return guess.id==="wd-q3351726"?"Tarasankar Bandyopadhyay":guess.name;
+const $ = (id) => document.getElementById(id);
+const menu = $("menu");
+const game = $("game");
+const status = $("status");
+const answers = $("answers");
+const guessBox = $("guess");
+const learnForm = $("learn");
+const scene = createScene($("stage"));
+
+let lang = localStorage.getItem("riddlex-lang") || "bn";
+let manifest = null;
+let pool = null;
+let state = null;
+let mode = "menu";
+let currentQ = null;
+let guessIndex = -1;
+let loading = null;
+
+function text() { return UI[lang] || UI.en; }
+
+function applyLanguage() {
+  document.documentElement.lang = lang;
+  const copy = text();
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    const key = node.dataset.i18n;
+    if (copy[key]) node.textContent = copy[key];
+  });
+  $("play").setAttribute("aria-label", copy.play);
+  $("answer-yes").textContent = copy.yes;
+  $("answer-no").textContent = copy.no;
+  $("answer-unknown").textContent = copy.unknown;
+  $("answer-probably").textContent = copy.probably;
+  $("answer-probably-not").textContent = copy.probablyNot;
+  $("correct").textContent = copy.correct;
+  $("wrong").textContent = copy.wrong;
+  $("retry").textContent = copy.retry;
+  $("new").textContent = copy.newGame;
+  $("to-menu").textContent = copy.menu;
+  $("back").textContent = copy.undo;
+  $("learn-name-label").textContent = copy.name;
+  $("learn-photo-label").textContent = copy.photo;
+  $("learn-save").textContent = copy.save;
+  document.querySelectorAll("[data-lang-toggle]").forEach((node) => { node.textContent = copy.lang; });
 }
-function setStatus(message, parent=statusHome){
- if(status.parentElement!==parent){
-  if(parent===statusHome)parent.insertBefore(status,$("progress"));
-  else parent.append(status);
- }
- status.textContent=message;
+
+function showMenu() {
+  mode = "menu";
+  menu.hidden = false;
+  game.hidden = true;
+  setGameInProgress(false);
+  scene.stop();
 }
-function showQuestion(){
- mood("thinking");
- setStatus(allQuestions[currentKey],office);
- visible(answerPanel,true);
+
+async function boot() {
+  applyLanguage();
+  loading = loadKnowledge("./kb").then(async (loaded) => {
+    manifest = loaded.manifest;
+    const learned = await loadLearned(loaded.manifest.questions);
+    pool = learned.length
+      ? mergePools([loaded.pool, poolFromEntries(loaded.manifest.questions, learned)])
+      : loaded.pool;
+    pool.opening = loaded.manifest.opening;
+    return pool;
+  });
+  loading.catch(() => {});
 }
-function showNote(){
- const note=$("case-note");
- const show=mode==="guess"||mode==="done"||mode==="wrong"||mode==="retrying";
- visible(note,show);
- note.dataset.guessId=show?guess.id:"";
- if(!show&&mode!=="retrying"){
-  reveal.clear();
-  note.dataset.result="";
- }
- if(!show)return;
- $("case-note-label").textContent=mode==="done"?"Case solved":mode==="wrong"?"Guess ruled out":"Detective’s note";
- $("case-note-name").textContent=guessName();
- if(mode==="wrong")note.dataset.result="rejected";
- if(mode==="wrong"||mode==="retrying")return;
- reveal.start(guess,guessName(),phase=>{
-  note.dataset.result=phase;
-  if(mode==="guess"&&(phase==="printed"||phase==="written"))presentGuess();
- });
+
+function setStatus(message) {
+  status.textContent = message;
 }
-function guessPrompt(){
- const name=guessName();
- return tentative?"My best lead is "+name+". Is that what you had in mind?":"Are you thinking of "+name+"?";
+
+function showOnly(which) {
+  answers.hidden = which !== "ask";
+  guessBox.hidden = which !== "guess" && which !== "wrong";
+  $("correct").hidden = which !== "guess";
+  $("wrong").hidden = which !== "guess";
+  $("retry").hidden = which !== "wrong";
+  learnForm.hidden = which !== "learn";
+  $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
 }
-function presentGuess(){
- showNote();
- mood("guess");
- const ready=["printed","written"].includes($("case-note").dataset.result);
- setStatus(ready?guessPrompt():"The detective is preparing the evidence…");
- visible(guessPanel,ready);visible($("correct"),true);visible($("wrong"),true);
-}
-function showUnresolved(){
- mood("unsure");showNote();visible(guessPanel,true);visible($("retry"),true);
- setStatus("I don’t have enough evidence to make a reliable guess. You can change an answer or retry with a new case.");
-}
-function reset(){loadToken++;category=null;answers=[];rejected=new Set();rejectionHistory=[];mode="start";currentKey=null;guess=null;render();}
-function render(){
- setGameInProgress(!["splash","start","done"].includes(mode));
- progress();
- const splash=mode==="splash";
- visible($("splash-art"),splash);
- visible(office,!splash);
- if(!splash){
-  const artwork=office.querySelector(".scene-art[data-src]");
-  if(artwork){
-   artwork.src=artwork.dataset.src;
-   delete artwork.dataset.src;
+
+async function startGame() {
+  menu.hidden = true;
+  game.hidden = false;
+  mode = "loading";
+  setGameInProgress(true);
+  scene.setMood("thinking");
+  await scene.start();
+  setStatus(text().loading);
+  showOnly("none");
+  try {
+    await loading;
+  } catch {
+    setStatus(text().failedSave);
+    return;
   }
- }
- for(const id of ["status","progress","new","privacy-note"])visible($(id),!splash);
- visible($("play"),splash);
- visible(categories,mode==="start");visible(answerPanel,false);visible(guessPanel,false);showNote();visible($("correct"),mode==="guess");visible($("wrong"),mode==="guess");visible($("retry"),mode==="wrong"||mode==="unsure");
- visible(back,mode!=="start"&&mode!=="done"&&answers.length>0);
- if(splash)return;
- if(mode==="loading"){mood("thinking");setStatus("Opening the casebook…");return;}
- if(mode==="start"){mood("ready");setStatus("Think of a character, animal, object or someone you know.");return;}
- if(mode==="wrong"){mood("wrong");setStatus("That guess was wrong. Shall I try again?");visible(guessPanel,true);showNote();return;}
- if(mode==="retrying"){mood("retrying");setStatus("Reopening the case…");return;}
- if(mode==="done"){mood("happy");setStatus("Case closed!");showNote();return;}
- if(mode==="edit"){showQuestion();return;}
- if(mode==="guess"){presentGuess();return;}
- if(mode==="unsure"){showUnresolved();return;}
- const context=answers.find(answer=>answer.key===contextKey);
- if(category==="characters"&&!context){
-  currentKey=contextKey;mode="ask";showQuestion();return;
- }
- const candidates=allEntries.filter(entry=>{
-  if(context?.value==="yes")return entry.category==="relationships";
-  return entry.category===category;
- });
- const clues=answers.filter(answer=>answer.key!==contextKey);
- const ranked=scoreCandidates(candidates,clues,rejected);
- const suggestion=selectGuess(ranked,clues);
- if(suggestion){tentative=clues.some(({value})=>value==="probably"||value==="probably-not");guess=suggestion;mode="guess";presentGuess();return;}
- currentKey=nextQuestion(ranked,clues,allQuestions,questionSeed);
- if(!currentKey){
-   guess=selectTentativeGuess(ranked,clues);
-   if(guess){tentative=true;mode="guess";presentGuess();return;}
-   guess=null;mode="unsure";showUnresolved();
-   return;
- }
- mode="ask";showQuestion();
+  state = createState(pool, { opening: pool.opening || manifest.opening });
+  mode = "ask";
+  await step();
 }
-document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",async()=>{
- const token=++loadToken;category=b.dataset.category;answers=[];rejected=new Set();rejectionHistory=[];mode="loading";render();
- questionSeed=crypto.getRandomValues(new Uint32Array(1))[0];
- try{
-  const pools=category==="characters"?["characters","relationships"]:[category];
-  const data=await Promise.all(pools.map(loadCategory));
-  if(token!==loadToken)return;
-  allEntries=data.flatMap(pool=>pool.entries);
-  allQuestions=Object.assign({},...data.map(pool=>pool.questions));
-  if(category==="characters"){
-   allQuestions[contextKey]=contextQuestion;
+
+async function step() {
+  if (!state) return;
+  const decision = decide(state);
+  if (decision.type === "ask") {
+    currentQ = decision.qid;
+    mode = "ask";
+    const question = pool.questions[pool.qIndex.get(currentQ)];
+    setStatus(lang === "bn" ? question.bn : question.en);
+    $("progress").textContent = text().progress(state.answers.length + 1);
+    scene.setMood(state.answers.length ? "thinking" : "curious");
+    showOnly("ask");
+    return;
   }
-  mode="ask";render();
- if(mode==="ask")answerPanel.querySelector("button").focus();
- }catch{
-  if(token!==loadToken)return;
-  reset();
-  setStatus("The casebook could not load. Please choose a category to retry.");
- }
-}));
-$("play").addEventListener("click",()=>{reset();categories.querySelector("button").focus();});
-document.querySelectorAll("[data-answer]").forEach(b=>b.addEventListener("click",()=>submitAnswer(b.dataset.answer)));
-$("correct").addEventListener("click",()=>{if(mode!=="guess"||!guess)return;mode="done";render();});
-$("wrong").addEventListener("click",()=>{if(mode!=="guess")return;mode="wrong";render();});
-$("retry").addEventListener("click",async()=>{
- if(mode==="unsure"){reset();return;}
- if(mode!=="wrong")return;
+  if (decision.type === "guess") {
+    await beginGuess(decision.index);
+    return;
+  }
+  await beginDefeat();
+}
 
- const token=++loadToken;
- mode="retrying";render();
- if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
-  await new Promise(resolve=>setTimeout(resolve,1650));
- }
- if(token!==loadToken||mode!=="retrying")return;
- rejectionHistory=rejectGuess(rejectionHistory,guess.id,answers.length);
- rejected=rejectedIds(rejectionHistory);
- guess=null;mode="ask";render();
-});
-document.addEventListener("keydown",event=>{
- if(event.altKey||event.ctrlKey||event.metaKey||event.repeat||event.target instanceof Element&&event.target.closest("input,textarea,select,[contenteditable]"))return;
- if((mode==="ask"||mode==="edit")&&/^[1-5]$/.test(event.key)){event.preventDefault();submitAnswer(answerKeys[Number(event.key)-1]);}
-});
-back.addEventListener("click",()=>{
- const previous=answers.pop();
- if(!previous)return;
- rejectionHistory=rewindRejections(rejectionHistory,answers.length);
- rejected=rejectedIds(rejectionHistory);
- guess=null;currentKey=previous.key;mode="edit";render();
- answerPanel.querySelector('[data-answer="'+previous.value+'"]').focus();
-});
-$("new").addEventListener("click",reset);
-render();
+async function beginGuess(index) {
+  guessIndex = index;
+  mode = "reveal";
+  const entity = entityView(pool, index);
+  const name = displayName(entity, lang);
+  const printable = canPrint(pool, index);
+  setStatus(text().writing);
+  showOnly("none");
+  scene.setMood("confident");
+  const font = guessFont(lang, name);
+  if (document.fonts?.load) {
+    try { await document.fonts.load(font); } catch { /* the canvas falls back */ }
+  }
+  const result = await scene.playReveal({
+    name,
+    font,
+    imageUrl: printable ? imageSrc(entity.image) : "",
+  });
+  if (mode !== "reveal") return;
+  mode = "guess";
+  setStatus(text().prompt(name));
+  $("credit").textContent = result.printed && entity.credit ? `${text().credit}: ${entity.credit}` : "";
+  showOnly("guess");
+}
 
-const footer=document.createElement('footer');
-footer.className='legal-footer';
-footer.innerHTML='<nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p>';
-document.body.append(footer);
+async function onAnswer(value) {
+  if (mode !== "ask" || !currentQ) return;
+  const moods = { yes: "curious", no: "thinking", probably: "confused", probably_not: "confused", unknown: "thinking" };
+  scene.setMood(moods[value] || "thinking");
+  applyAnswer(state, currentQ, value);
+  currentQ = null;
+  await step();
+}
 
-const layoutStyle=document.createElement('link');
-layoutStyle.rel='stylesheet';
-layoutStyle.href='./style.css?v=footer-layout-v3';
-document.head.append(layoutStyle);
+async function onWrong() {
+  if (mode !== "guess" || guessIndex < 0) return;
+  mode = "wrong";
+  setStatus(text().missed);
+  showOnly("wrong");
+  await scene.playWrong();
+}
+
+async function onRetry() {
+  if (mode !== "wrong") return;
+  mode = "retry";
+  showOnly("none");
+  scene.setMood("happy");
+  await scene.playRetry();
+  rejectIndex(state, guessIndex);
+  guessIndex = -1;
+  $("credit").textContent = "";
+  if (state.guesses >= 4) {
+    await beginDefeat();
+    return;
+  }
+  await step();
+}
+
+async function beginDefeat() {
+  mode = "learn";
+  scene.playDefeat();
+  const adult = answersImplyAdult(state?.answers || []);
+  setStatus(text().defeat);
+  learnForm.hidden = false;
+  answers.hidden = true;
+  guessBox.hidden = true;
+  $("learn-photo-row").hidden = adult;
+  $("learn-note").textContent = adult ? text().noPhoto : "";
+  $("learn-photo").value = "";
+  $("learn-name").value = "";
+  $("back").hidden = true;
+}
+
+async function onLearnSubmit(event) {
+  event.preventDefault();
+  const name = $("learn-name").value.trim();
+  if (!name) return;
+  const adult = answersImplyAdult(state.answers) || nameMatchesAdult(pool, name);
+  const file = adult ? null : $("learn-photo").files?.[0] || null;
+  $("learn-save").disabled = true;
+  try {
+    await submitLearning({
+      name,
+      nameBn: lang === "bn" ? name : "",
+      file,
+      adult,
+      answers: state.answers,
+    });
+    setStatus(text().saved);
+  } catch {
+    setStatus(text().failedSave);
+  } finally {
+    $("learn-save").disabled = false;
+    learnForm.hidden = true;
+  }
+}
+
+function onCorrect() {
+  if (mode !== "guess") return;
+  mode = "solved";
+  scene.setMood("happy");
+  setStatus(text().solved);
+  showOnly("none");
+  $("back").hidden = true;
+}
+
+function onUndo() {
+  if (!state?.answers.length) return;
+  if (mode === "guess" || mode === "reveal" || mode === "wrong") {
+    scene.clearReveal();
+    guessIndex = -1;
+    $("credit").textContent = "";
+  }
+  const previous = state.answers.at(-1);
+  rewind(state);
+  currentQ = previous.qid;
+  mode = "ask";
+  const question = pool.questions[pool.qIndex.get(currentQ)];
+  setStatus(lang === "bn" ? question.bn : question.en);
+  showOnly("ask");
+}
+
+function toggleLanguage() {
+  lang = lang === "bn" ? "en" : "bn";
+  localStorage.setItem("riddlex-lang", lang);
+  applyLanguage();
+  if (mode === "ask" && currentQ) {
+    const question = pool.questions[pool.qIndex.get(currentQ)];
+    setStatus(lang === "bn" ? question.bn : question.en);
+  }
+}
+
+$("play").addEventListener("click", () => { startGame(); });
+$("new").addEventListener("click", () => { scene.clearReveal(); startGame(); });
+$("to-menu").addEventListener("click", showMenu);
+$("correct").addEventListener("click", onCorrect);
+$("wrong").addEventListener("click", onWrong);
+$("retry").addEventListener("click", onRetry);
+$("back").addEventListener("click", onUndo);
+learnForm.addEventListener("submit", onLearnSubmit);
+document.querySelectorAll("[data-lang-toggle]").forEach((node) => node.addEventListener("click", toggleLanguage));
+document.querySelectorAll("[data-answer]").forEach((node) => node.addEventListener("click", () => onAnswer(node.dataset.answer)));
+document.addEventListener("keydown", (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey || mode !== "ask") return;
+  const values = ["yes", "no", "unknown", "probably", "probably_not"];
+  if (/^[1-5]$/.test(event.key)) {
+    event.preventDefault();
+    onAnswer(values[Number(event.key) - 1]);
+  }
+});
+window.addEventListener("resize", () => scene.resize());
+
+if (new URLSearchParams(location.search).has("autotest")) {
+  window.__riddlex = {
+    ready: () => loading,
+    start: startGame,
+    answer: onAnswer,
+    correct: onCorrect,
+    wrong: onWrong,
+    retry: onRetry,
+    state: () => state && ({
+      mode,
+      question: currentQ,
+      status: status.textContent,
+      answers: state.answers.map((item) => item.qid),
+      guesses: state.guesses,
+      best: guessIndex >= 0 ? pool.ids[guessIndex] : "",
+    }),
+    poolSize: () => pool?.count || 0,
+    find: (id) => pool?.ids.indexOf(id) ?? -1,
+    replyFor: (id) => {
+      const index = pool.ids.indexOf(id);
+      const qi = pool.qIndex.get(currentQ);
+      const base = index * pool.attrBytes + (qi >> 2);
+      const bit = (pool.attrs[base] >> ((qi & 3) << 1)) & 3;
+      return bit === 2 ? "yes" : bit === 1 ? "no" : "unknown";
+    },
+  };
+}
+
+boot();
+showMenu();

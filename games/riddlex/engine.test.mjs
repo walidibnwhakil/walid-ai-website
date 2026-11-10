@@ -1,185 +1,119 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {scoreCandidates,nextQuestion,selectGuess} from './engine.js';
-import {entries,questions} from './casebook.js';
-import {roles,relationshipQuestions} from './relationships.js';
-test('1796 casebook entries and 15 roles are unique',()=>{const all=[...entries,...roles];assert.equal(new Set(all.map(e=>e.id)).size,all.length);assert.equal(roles.length,15);assert.equal(entries.length,1796);});
-test('missing facts are not treated as false',()=>{const ranked=scoreCandidates([{id:'a',name:'A',facts:{}},{id:'b',name:'B',facts:{x:false}}],[{key:'x',value:'no'}]);assert.equal(ranked[0].entry.id,'b');assert.equal(ranked[1].score,0);});
-test('unknown answer does not penalize candidates',()=>{const ranked=scoreCandidates(entries,[{key:'mammal',value:'unknown'}]);assert.ok(ranked.every(e=>e.score===0));});
-test('rejecting a guess excludes it',()=>{const ranked=scoreCandidates(entries,[],new Set(['cat']));assert.ok(!ranked.some(e=>e.entry.id==='cat'));});
-test('question picker does not repeat a question',()=>{const ranked=scoreCandidates(entries.filter(e=>e.category==='animals'),[]);const first=nextQuestion(ranked,[],questions);assert.ok(first);assert.notEqual(nextQuestion(ranked,[{key:first,value:'yes'}],questions),first);});
-test('distinguishing evidence favors cat over dog',()=>{const ranked=scoreCandidates(entries.filter(e=>e.category==='animals'),[{key:'meows',value:'yes'}]);assert.equal(ranked[0].entry.id,'cat');});
-test('relationship branch is answerable',()=>{const ranked=scoreCandidates(roles,[{key:'spouse',value:'yes'},{key:'female',value:'yes'}]);assert.equal(ranked[0].entry.id,'role-wife');assert.ok(Object.keys(relationshipQuestions).length>=10);});
-test('tentative guesses require some evidence',()=>{const ranked=scoreCandidates(entries.filter(e=>e.category==='objects'),[]);assert.equal(selectGuess(ranked,[],questions),null);});
+import assert from "node:assert/strict";
+import test from "node:test";
+import { answer, adultAllowed, canPrint, chooseQuestion, createState, decide, rejectIndex, recompute } from "./engine.js";
+import { poolFromEntries } from "./kb.js";
 
-test('all unknown answers never produce a guessed identity',()=>{
- const ranked=scoreCandidates(entries.filter(e=>e.category==='animals'),[{key:'pet',value:'unknown'}]);
- assert.equal(selectGuess(ranked,[{key:'pet',value:'unknown'}],questions),null);
-});
-test('probably answer is weaker than a definite answer',()=>{
- const sample=[{id:'yes',name:'Yes',facts:{x:true}},{id:'no',name:'No',facts:{x:false}}];
- const soft=scoreCandidates(sample,[{key:'x',value:'probably'}]);
- const hard=scoreCandidates(sample,[{key:'x',value:'yes'}]);
- assert.ok(hard[0].score>soft[0].score);
-});
-test('no candidate is returned after every guess is rejected',()=>{
- const sample=[{id:'one',name:'One',facts:{x:true}}];
- assert.equal(scoreCandidates(sample,[],new Set(['one'])).length,0);
-});
+const questions = [
+  { id: "real", group: "kind" },
+  { id: "fictional", group: "kind" },
+  { id: "animal", group: "kind" },
+  { id: "object", group: "kind" },
+  { id: "named", group: "kind" },
+  { id: "male", group: "person" },
+  { id: "female", group: "person" },
+  { id: "alive", group: "life" },
+  { id: "from_bd", group: "country" },
+  { id: "from_in", group: "country" },
+  { id: "cricketer", group: "job" },
+  { id: "all_rounder", group: "job" },
+  { id: "writer", group: "job" },
+  { id: "actor", group: "job" },
+  { id: "adult_ent", group: "adult" },
+  { id: "from_novel", group: "fiction" },
+  { id: "from_cartoon", group: "fiction" },
+  { id: "from_bengali_lit", group: "fiction" },
+  { id: "by_humayun", group: "fiction" },
+  { id: "wears_yellow", group: "fiction" },
+  { id: "detective_role", group: "fiction" },
+  { id: "is_cat", group: "animal" },
+  { id: "is_mouse", group: "animal" },
+  { id: "mammal", group: "animal" },
+  { id: "pet", group: "animal" },
+  { id: "kitchen", group: "object" },
+  { id: "cooking", group: "object" },
+  { id: "uses_pressure", group: "object" },
+  { id: "metal", group: "object" },
+  { id: "electronic", group: "object" },
+].map((question) => ({ ...question, en: question.id, bn: question.id }));
 
-test('conflicting evidence does not yield a confident guess',()=>{
- const ranked=scoreCandidates([{id:'a',name:'A',facts:{x:false}}],[{key:'x',value:'yes'}]);
- assert.equal(selectGuess(ranked,[{key:'x',value:'yes'}],{x:'Question'}),null);
-});
-test('casebook contains expected Bangladesh-first coverage',()=>{
- for(const id of ['himu','misir-ali','feluda','byomkesh','padmaja','meena','gopal-bhar']){
-  assert.ok(entries.some(e=>e.id===id),'Missing '+id);
- }
- assert.ok(entries.filter(e=>e.category==='characters').length>=70);
- assert.ok(entries.filter(e=>e.category==='animals').length>=40);
- assert.ok(entries.filter(e=>e.category==='objects').length>=45);
-});
-test('each fact key has a matching question',()=>{
- for(const e of entries)for(const key of Object.keys(e.facts))assert.ok(questions[key],e.id+': '+key);
-});
+function entry(id, pop, yes, extra = {}) {
+  return { id, en: extra.en || id, bn: extra.bn || "", pop, yes, no: extra.no || [], adult: extra.adult, image: extra.image || "" };
+}
 
-test('no two casebook entries share identical known facts in one category',()=>{
- const seen=new Map();
- for(const e of entries){
-  const signature=e.category+':'+JSON.stringify(Object.entries(e.facts).sort(([a],[b])=>a.localeCompare(b)));
-  assert.ok(!seen.has(signature),e.id+' cannot be distinguished from '+seen.get(signature));
-  seen.set(signature,e.id);
- }
-});
-test('all five answer modes are supported',async()=>{
- const {ANSWERS}=await import('./engine.js');
- assert.deepEqual(ANSWERS,['yes','no','probably','probably-not','unknown']);
-});
+const world = poolFromEntries(questions, [
+  entry("shakib", 400, ["real", "named", "male", "alive", "from_bd", "cricketer", "all_rounder"], { en: "Shakib Al Hasan", bn: "সাকিব আল হাসান", no: ["fictional", "animal", "object", "female", "from_in", "writer", "actor", "adult_ent"] }),
+  entry("tamim", 200, ["real", "named", "male", "alive", "from_bd", "cricketer"], { no: ["fictional", "animal", "object", "all_rounder", "from_in", "actor", "adult_ent"] }),
+  entry("kohli", 500, ["real", "named", "male", "alive", "from_in", "cricketer"], { no: ["from_bd", "fictional", "all_rounder", "adult_ent", "animal", "object"] }),
+  entry("himu", 160, ["fictional", "named", "male", "from_novel", "from_bengali_lit", "by_humayun", "wears_yellow"], { en: "Himu", bn: "হিমু", no: ["real", "animal", "object", "detective_role", "from_cartoon", "adult_ent"] }),
+  entry("misir", 120, ["fictional", "named", "male", "from_novel", "from_bengali_lit", "by_humayun", "detective_role"], { no: ["real", "wears_yellow", "animal", "from_cartoon"] }),
+  entry("feluda", 180, ["fictional", "named", "male", "from_novel", "from_bengali_lit", "detective_role"], { no: ["by_humayun", "wears_yellow", "real", "animal"] }),
+  entry("tom", 300, ["fictional", "named", "male", "animal", "is_cat", "mammal", "from_cartoon", "pet"], { en: "Tom", bn: "টম", no: ["real", "object", "is_mouse", "from_bengali_lit"] }),
+  entry("jerry", 250, ["fictional", "named", "male", "animal", "is_mouse", "mammal", "from_cartoon"], { no: ["is_cat", "real", "object"] }),
+  entry("cat", 600, ["animal", "mammal", "is_cat", "pet"], { en: "Cat", bn: "বিড়াল", no: ["real", "fictional", "named", "object", "is_mouse"] }),
+  entry("dog", 500, ["animal", "mammal", "pet"], { no: ["is_cat", "is_mouse", "real", "fictional", "named", "object"] }),
+  entry("cooker", 80, ["object", "kitchen", "cooking", "metal", "uses_pressure"], { en: "Pressure cooker", bn: "প্রেসার কুকার", no: ["real", "fictional", "animal", "named", "electronic"], image: "Pressure_cooker.jpg" }),
+  entry("pot", 70, ["object", "kitchen", "cooking", "metal"], { no: ["uses_pressure", "electronic", "real", "named", "animal"] }),
+  entry("phone", 90, ["object", "electronic"], { no: ["kitchen", "cooking", "uses_pressure", "real", "animal"] }),
+  entry("adult-a", 40, ["real", "named", "male", "actor", "adult_ent", "alive"], { adult: true, image: "secret.jpg", no: ["fictional", "cricketer", "writer", "animal", "object"] }),
+  entry("adult-b", 30, ["real", "named", "female", "actor", "adult_ent", "alive"], { adult: true, no: ["fictional", "cricketer", "animal", "object"] }),
+  entry("actor", 60, ["real", "named", "male", "actor", "alive"], { no: ["adult_ent", "cricketer", "fictional", "animal", "object"] }),
+]);
 
-test('bulk importer rejects unknown facts and duplicate entries',async()=>{
- const {validateImport}=await import('./import-knowledge.mjs');
- const result=validateImport([
-  {id:'cat',name:'Duplicate cat',category:'animals',facts:{mammal:true,bird:false}},
-  {id:'new-animal-1',name:'Example animal',category:'animals',facts:{mammal:true,bird:false,unsupported:true}},
-  {id:'new-animal-2',name:'Insufficient',category:'animals',facts:{mammal:true}}
- ]);
- assert.equal(result.accepted.length,1);
- assert.deepEqual(result.rejected,[0,2]);
- assert.equal(Object.hasOwn(result.accepted[0].facts,'unsupported'),false);
-});
+function bit(pool, id, qid) {
+  const index = pool.ids.indexOf(id);
+  const qi = pool.qIndex.get(qid);
+  const base = index * pool.attrBytes + (qi >> 2);
+  return (pool.attrs[base] >> ((qi & 3) << 1)) & 3;
+}
 
-test('after eight answers a leading plausible candidate may be guessed early',()=>{
- const sample=[
-  {id:'lead',name:'Lead',facts:{a:true,b:true}},
-  {id:'other',name:'Other',facts:{a:true,b:false}}
- ];
- const answers=[
-  {key:'a',value:'yes'},{key:'b',value:'yes'},
-  ...Array.from({length:6},(_,i)=>({key:'unknown'+i,value:'unknown'}))
- ];
- const ranked=scoreCandidates(sample,answers);
- assert.equal(selectGuess(ranked,answers,{a:'A?',b:'B?'}).id,'lead');
-});
+function play(pool, id, { flip = -1 } = {}) {
+  const target = pool.ids.indexOf(id);
+  const state = createState(pool, { opening: "real" });
+  recompute(state);
+  let flipped = false;
+  for (let step = 0; step < 28; step++) {
+    const decision = decide(state);
+    if (decision.type === "guess") {
+      if (decision.index === target) return { ok: true, step, guesses: state.guesses + 1 };
+      rejectIndex(state, decision.index);
+      continue;
+    }
+    if (decision.type !== "ask") return { ok: false, step, reason: decision.type };
+    let value = bit(pool, id, decision.qid) === 2 ? "yes" : bit(pool, id, decision.qid) === 1 ? "no" : "unknown";
+    if (!flipped && flip >= 0 && value !== "unknown" && state.answers.length === flip) {
+      value = value === "yes" ? "no" : "yes";
+      flipped = true;
+    }
+    answer(state, decision.qid, value);
+  }
+  return { ok: false, step: 28 };
+}
 
-
-test('question picker can reach a sparse entry outside the top twenty',()=>{
- const sample=[
-  ...Array.from({length:20},(_,i)=>({id:'top'+i,name:'Top '+i,facts:{common:true}})),
-  {id:'sparse',name:'Zzz Sparse',facts:{rare:true}}
- ];
- const ranked=scoreCandidates(sample,[]);
- const next=nextQuestion(ranked,[{key:'common',value:'unknown'}],{common:'Common?',rare:'Rare?'});
- assert.equal(next,'rare');
-});
-
-test('bulk importer rejects blank names, unsafe IDs and malformed facts',async()=>{
- const {validateImport}=await import('./import-knowledge.mjs');
- const input=[
-  {id:'',name:'Empty ID',category:'animals',facts:{mammal:true,bird:false}},
-  {id:'../escape',name:'Bad ID',category:'animals',facts:{mammal:true,bird:false}},
-  {id:'valid-new',name:'   ',category:'animals',facts:{mammal:true,bird:false}},
-  {id:'array-facts',name:'Array',category:'animals',facts:[true,false]},
-  {id:'safe-new',name:'Safe',category:'animals',facts:{mammal:true,bird:false}},
-  {id:'safe-new',name:'Duplicate',category:'animals',facts:{mammal:true,bird:false}}
- ];
- const result=validateImport(input);
- assert.deepEqual(result.accepted.map(x=>x.id),['safe-new']);
- assert.deepEqual(result.rejected,[0,1,2,3,5]);
+test("guesses the five briefed targets from truthful answers", () => {
+  for (const id of ["shakib", "himu", "tom", "cat", "cooker"]) {
+    const result = play(world, id);
+    assert.equal(result.ok, true, `${id} ${JSON.stringify(result)}`);
+  }
 });
 
-test('bulk importer rejects different IDs with identical known facts',async()=>{
- const {validateImport}=await import('./import-knowledge.mjs');
- const input=[
-  {id:'import-unique-one',name:'First',category:'animals',facts:{mammal:true,bird:false}},
-  {id:'import-unique-two',name:'Second',category:'animals',facts:{bird:false,mammal:true}}
- ];
- const result=validateImport(input);
- assert.ok(result.accepted.length<=1,'Indistinguishable records cannot both be imported');
- assert.ok(result.rejected.includes(1),'Later duplicate fact signature must be rejected');
+test("one wrong answer still leaves Shakib reachable", () => {
+  const result = play(world, "shakib", { flip: 2 });
+  assert.equal(result.ok, true, JSON.stringify(result));
 });
 
-test('Bengali question translations refer only to known questions',async()=>{
- const {banglaQuestions}=await import('./questions.bn.js');
- assert.ok(Object.keys(banglaQuestions).length>=100);
- for(const [key,value] of Object.entries(banglaQuestions)){
-  assert.ok(questions[key], 'Missing source question for '+key);
-  assert.ok(typeof value==='string'&&value.trim().length>5,'Missing Bengali text for '+key);
- }
-});
-
-test('changing an earlier answer restores guesses rejected using later evidence',async()=>{
- const {rejectGuess,rewindRejections,rejectedIds}=await import('./history.js');
- let history=rejectGuess([], 'first', 3);
- history=rejectGuess(history,'second',6);
- history=rejectGuess(history,'second',6);
- assert.deepEqual([...rejectedIds(history)],['first','second']);
- assert.deepEqual([...rejectedIds(rewindRejections(history,4))],['first']);
- assert.deepEqual([...rejectedIds(rewindRejections(history,2))],[]);
-});
-
-test('casebook photo printer requires a verified identity-to-photo mapping',async()=>{
- const {localPhotoPath}=await import('./print-photo.js');
- assert.equal(localPhotoPath({id:'einstein'}),'./images/einstein.jpg');
- assert.equal(localPhotoPath({id:'himu',image:'./images/einstein.jpg'}),null);
- assert.equal(localPhotoPath({id:'himu',image:'./images/himu.webp'}),null);
- assert.equal(localPhotoPath({image:'https://example.com/photo.png'}),null);
- assert.equal(localPhotoPath({image:'../private.jpg'}),null);
- assert.equal(localPhotoPath({image:'./images/../../secret.png'}),null);
- assert.equal(localPhotoPath({}),null);
-});
-
-
-test('unknown-history optimization preserves original rankings, evidence weights and rejected candidates',()=>{
- function reference(pool,answers,rejected){
-  return pool.filter(e=>!rejected.has(e.id)).map(entry=>{
-   let score=0,conflicts=0,matches=0;
-   for(const {key,value} of answers){
-    if(value==='unknown'||!Object.hasOwn(entry.facts,key))continue;
-    const expected=value==='yes'||value==='probably',weight=value==='probably'||value==='probably-not'?0.4:1;
-    if(entry.facts[key]===expected){score+=weight;matches+=weight;}else{score-=2*weight;conflicts+=weight;}
-   }
-   return {entry,score,conflicts,matches};
-  }).sort((a,b)=>b.score-a.score||a.conflicts-b.conflicts||b.matches-a.matches||a.entry.name.localeCompare(b.entry.name));
- }
- for(const category of ['characters','animals','objects']){
-  const pool=entries.filter(e=>e.category===category),keys=[...new Set(pool.flatMap(e=>Object.keys(e.facts)))].slice(0,80);
-  const answers=keys.map((key,i)=>({key,value:['yes','no','probably','probably-not','unknown'][i%5]}));
-  answers.splice(4,0,...Array.from({length:1000},(_,i)=>({key:'missing_'+i,value:'unknown'})));
-  const rejected=new Set([pool[0].id]);assert.deepEqual(scoreCandidates(pool,answers,rejected),reference(pool,answers,rejected));
- }
-});
-
-test('contradicted targets do not force irrelevant questions after consistent candidates are exhausted',()=>{
- const pool=[{id:'a',name:'A',facts:{real:false,known:true}},{id:'b',name:'B',facts:{real:true,irrelevant:true}}];
- const answers=[{key:'real',value:'no'},{key:'known',value:'yes'}];
- assert.equal(nextQuestion(scoreCandidates(pool,answers),answers,{real:'Real?',known:'Known?',irrelevant:'Irrelevant?'}),null);
- const corrected=[{key:'real',value:'yes'}];
- assert.equal(nextQuestion(scoreCandidates(pool,corrected),corrected,{real:'Real?',known:'Known?',irrelevant:'Irrelevant?'}),'irrelevant');
-});
-
-test('sparse lower-ranked candidates remain reachable after evidence leaders are rejected',()=>{
- const pool=[{id:'lead',name:'Lead',facts:{a:true,b:true}},{id:'sparse',name:'Sparse',facts:{rare:true,other:true}}];
- const answers=[{key:'a',value:'yes'},{key:'b',value:'yes'}],bank={a:'A?',b:'B?',rare:'Rare?',other:'Other?'};
- assert.equal(nextQuestion(scoreCandidates(pool,answers),answers,bank),null);
- assert.equal(nextQuestion(scoreCandidates(pool,answers,new Set(['lead'])),answers,bank),'rare');
- assert.equal(selectGuess(scoreCandidates([{id:'one',name:'One',facts:{a:true}},{id:'two',name:'Two',facts:{a:true}}],[{key:'a',value:'yes'}]),[{key:'a',value:'yes'}],{a:'A?'}),null);
+test("the adult-entertainment question stays late and name-only", () => {
+  const actors = poolFromEntries(questions, [
+    entry("plain", 50, ["real", "male", "actor", "alive", "named"], { no: ["adult_ent", "fictional", "cricketer", "writer", "politician", "scientist", "footballer", "athlete", "animal", "object"] }),
+    entry("star", 40, ["real", "male", "actor", "adult_ent", "alive", "named"], { adult: true, image: "nope.jpg", no: ["fictional", "cricketer", "writer", "politician", "scientist", "footballer", "athlete", "animal", "object"] }),
+  ]);
+  const state = createState(actors);
+  recompute(state);
+  for (let count = 0; count < 9; count++) answer(state, "real", "yes");
+  assert.equal(adultAllowed(state), false);
+  assert.notEqual(chooseQuestion(state), "adult_ent");
+  answer(state, "male", "yes");
+  assert.equal(adultAllowed(state), true);
+  assert.equal(canPrint(actors, actors.ids.indexOf("star")), false);
+  assert.equal(canPrint(world, world.ids.indexOf("cooker")), true);
+  assert.equal(canPrint(world, world.ids.indexOf("shakib")), false);
 });

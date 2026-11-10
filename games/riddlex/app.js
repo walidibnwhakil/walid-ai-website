@@ -175,3 +175,8 @@ back.addEventListener("click",()=>{
 });
 $("new").addEventListener("click",reset);
 render();
+
+const footer=document.createElement('footer');
+footer.className='site-footer';
+footer.innerHTML='<a href="/about-us.html">About Us</a> · <a href="/contact-us.html">Contact Us</a> · <a href="/privacy-policy.html">Privacy Policy</a> · <a href="/terms-of-service.html">Terms of Service</a>';
+document.querySelector('main')?.append(footer);

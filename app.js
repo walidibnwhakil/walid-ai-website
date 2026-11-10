@@ -911,6 +911,7 @@
       const isTurn = ["user", "ai"].includes(kind);
       const index = Number.isInteger(meta.messageIndex) ? meta.messageIndex : chatMessages.length;
       const bubble = document.createElement("div"); bubble.className = "msg " + kind;
+      if (kind === "ai" && meta.answeringMode === "live_weather") bubble.classList.add("weather-answer");
       if (hasBengaliScript(text)) bubble.classList.add("bengali");
       if (isTurn) bubble.dataset.messageIndex = String(index);
       const body = document.createElement("span"); body.className = "message-body";
@@ -919,7 +920,7 @@
       const old = isTurn ? chat.querySelector(`[data-message-index="${index}"]`) : null;
       if (old && !restoringChat) old.replaceWith(bubble); else chat.append(bubble);
       if (isTurn && !restoringChat) {
-        chatMessages[index] = { kind, text: String(text || ""), source, sources: ChatUI.normalizeSources(meta.sources), seconds: meta.seconds ?? null };
+        chatMessages[index] = { kind, text: String(text || ""), source, sources: ChatUI.normalizeSources(meta.sources), seconds: meta.seconds ?? null, answeringMode: meta.answeringMode || "" };
         dismissWelcome(); void persistConversation();
       }
       const currentText = () => String(chatMessages[index]?.text || "");
@@ -1376,7 +1377,7 @@
         }
         clearInterval(timer); thinking.remove();
         const answer = addMessage("ai", data.answer, sourceLabel(data.answering_mode), {
-          question, seconds, sources: data.sources, messageIndex: answerIndex
+          question, seconds, sources: data.sources, answeringMode: data.answering_mode, messageIndex: answerIndex
         });
         void persistConversation();
 

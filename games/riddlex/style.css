@@ -61,7 +61,7 @@ body:has(main:has(#play:not([hidden])))>footer{margin-top:0}
 }
 #status,#progress,#categories,#guess,#back,#new,#privacy-note{display:none!important}
 #play[hidden]{display:none}
-.welcome-motion{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;pointer-events:none}
+.welcome-motion{display:none!important}
 
 .office{
  position:relative;isolation:isolate;overflow:hidden;

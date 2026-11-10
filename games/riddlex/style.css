@@ -52,7 +52,7 @@ body:has(#play:not([hidden])){overflow:hidden}
 body:has(#play:not([hidden])) main:has(#play:not([hidden])){margin:0;height:100vh}
 body:has(#play:not([hidden])) .splash-art{height:100%;aspect-ratio:auto;border:0;border-radius:0}
 body:has(#play:not([hidden])) .splash-art img{object-fit:contain;background:#17100b}
-body:has(#play:not([hidden])) .legal-footer{position:fixed;z-index:5;left:0;right:0;bottom:0;margin:0;padding:5px 10px;background:#fff;font-size:11px}
+body:has(#play:not([hidden])) .legal-footer{position:fixed;z-index:5;left:0;right:0;bottom:0;margin:0;padding:18px 20px 16px;background:#fff;font-size:13px}
 .splash-art::after{
  content:"";position:absolute;inset:0;pointer-events:none;
  background:linear-gradient(90deg,transparent 77%,#27191180),linear-gradient(0deg,#27190f33,transparent 22%)

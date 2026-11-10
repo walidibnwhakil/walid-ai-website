@@ -31,7 +31,6 @@ body{display:block}
 .games-nav{border-bottom:1px solid #e3e6e9;border-right:0;padding:14px 24px}
 .legal-footer{width:100%;max-width:none;margin:48px 0 0;padding:18px 20px 16px}
 
-body{display:grid;grid-template-columns:170px minmax(0,1fr)}
 .panel{
  padding:clamp(14px,4vw,28px);background:var(--cream);border:1px solid #d7c3a6;
  border-radius:0 0 20px 20px;text-align:center;box-shadow:0 12px 28px #4b342b22
@@ -88,7 +87,6 @@ body:has(main:has(#play:not([hidden])))>footer{margin-top:0}
 }
 .guess-reveal,.evidence-cat{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 @media(max-width:720px){
- body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
  .games-nav{align-self:start;border-right:0;border-bottom:1px solid #d7c3a6;padding:4px 8px}
 }
 @media(max-width:500px){

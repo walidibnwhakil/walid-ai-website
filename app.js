@@ -195,6 +195,14 @@
       return "walidActiveChatId:" + uid;
     }
 
+    function accountRecordsKey(uid) { return "walidAccountChats:" + uid; }
+    function localAccountRecords(uid) {
+      try { return JSON.parse(localStorage.getItem(accountRecordsKey(uid)) || "[]"); } catch { return []; }
+    }
+    function saveLocalAccountRecords(uid, records) {
+      try { localStorage.setItem(accountRecordsKey(uid), JSON.stringify(records.slice(0, 50))); } catch {}
+    }
+
     function rememberActiveConversation() {
       if (historyOwner) {
         localStorage.setItem(accountChatKey(historyOwner), currentConversationId);
@@ -238,10 +246,18 @@
               .collection("chats").doc(record.id).set(record, { merge: true });
           } catch (error) {
             const smaller = { ...record, messages: record.messages.slice(-12) };
-            await firestoreDB.collection("users").doc(ownerAtSave)
-              .collection("chats").doc(record.id).set(smaller, { merge: true });
-            console.warn("Chat history was saved without the oldest messages.", error);
+            try {
+              await firestoreDB.collection("users").doc(ownerAtSave)
+                .collection("chats").doc(record.id).set(smaller, { merge: true });
+              console.warn("Chat history was saved without the oldest messages.", error);
+            } catch {
+              const records = localAccountRecords(ownerAtSave).filter((item) => item.id !== record.id);
+              records.unshift(record); saveLocalAccountRecords(ownerAtSave, records);
+            }
           }
+        } else if (ownerAtSave) {
+          const records = localAccountRecords(ownerAtSave).filter((item) => item.id !== record.id);
+          records.unshift(record); saveLocalAccountRecords(ownerAtSave, records);
         } else {
           const records = guestRecords().filter((item) => item.id !== record.id);
           records.unshift(record);
@@ -260,9 +276,14 @@
     }
 
     async function loadAccountRecords(render = true) {
-      if (!historyOwner || !firestoreDB) return [];
-      const snapshot = await firestoreDB.collection("users").doc(historyOwner).collection("chats").get();
-      const records = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      if (!historyOwner) return [];
+      let records = localAccountRecords(historyOwner);
+      try {
+        const snapshot = await firestoreDB.collection("users").doc(historyOwner).collection("chats").get();
+        const remote = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        records = [...new Map([...records, ...remote].map((item) => [item.id, item])).values()]
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      } catch {}
       if (render) drawHistory(records);
       return records;
     }

@@ -377,6 +377,7 @@
       font-weight: 400;
       font-synthesis: none;
       max-width: 84%;
+      width: fit-content;
       margin: 13px 0;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
@@ -397,7 +398,10 @@
       border-radius: 17px 17px 17px 5px;
       background: var(--ai-bubble);
       font-family: "Times New Roman", serif;
+      width: fit-content;
+      max-width: min(84%, 900px);
     }
+    .msg.weather-answer { max-width: min(94%, 980px); }
     .chat .msg.bengali,
     .chat .msg.bengali :not(svg):not(path) {
       font-family: SolaimanLipi, "Times New Roman", Times, serif !important;

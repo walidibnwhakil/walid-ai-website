@@ -103,7 +103,7 @@ main { max-width: 1050px; }
 /* Riddlex uses the same square premium-card footprint as the other board games. */
 .artwork-tile.riddlex-tile {padding:6px;border:2px solid #bd9360;border-radius:20px;background:linear-gradient(145deg,#4e392e,#201713);box-shadow:0 5px 0 #24160f,0 12px 24px #29150d55}
 .artwork-tile.riddlex-tile .premium-game-preview {display:block;width:100%;height:auto;aspect-ratio:1 / 1;border-radius:12px;position:relative;overflow:hidden;background:#4e392e}
-.artwork-tile.riddlex-tile .premium-game-preview img {display:block;width:100%;height:100%;min-width:0;min-height:0;aspect-ratio:1 / 1;object-fit:contain;background:#201713}
-.riddlex-card-title {position:absolute;left:10%;right:10%;top:5%;padding:5px 12px;color:#ffd86b;font:700 clamp(1.1rem,4.5vw,1.65rem) Georgia,serif;letter-spacing:.04em;text-align:center;text-shadow:0 2px 2px #351000}
-.riddlex-card-subtitle {position:absolute;left:13%;right:13%;top:62%;color:#fff0d0;font:600 clamp(.72rem,2.7vw,1rem) Georgia,serif;line-height:1.2;text-align:center;text-shadow:0 2px 3px #1d0b04}
+.artwork-tile.riddlex-tile .premium-game-preview img {display:block;width:100%;height:100%;min-width:0;min-height:0;aspect-ratio:1 / 1;object-fit:cover;background:#201713}
+.riddlex-card-title {position:absolute;left:8%;right:8%;top:5%;padding:3px 10px;color:#ffd86b;font:700 clamp(1.1rem,4.5vw,1.65rem) Georgia,serif;letter-spacing:.04em;text-align:center;text-shadow:0 2px 3px #1b0902,0 0 8px #7b3d0e}
+.riddlex-card-subtitle {position:absolute;left:10%;right:10%;top:63%;padding:5px 8px;color:#fff0d0;font:600 clamp(.72rem,2.7vw,1rem) Georgia,serif;line-height:1.2;text-align:center;text-shadow:0 2px 3px #1d0b04;background:#24100799}
 .riddlex-card-cta {position:absolute;left:21.5%;right:21.5%;bottom:6%;padding:7px 12px;border:2px solid #f0c35c;border-radius:999px;background:linear-gradient(180deg,#b87324,#71300f);box-shadow:inset 0 1px #ffe7a0,0 3px 8px #0009;color:#fff0c2;font:700 clamp(.85rem,3.2vw,1.15rem) Georgia,serif;text-align:center;text-shadow:0 2px 2px #351000}

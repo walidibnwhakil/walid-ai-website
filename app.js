@@ -996,7 +996,10 @@
         table.headers.forEach(value => { const cell = document.createElement("th"); cell.textContent = value; row.append(cell); });
         head.append(row); element.append(head); const tbody = document.createElement("tbody");
         table.rows.forEach(values => { const tr = document.createElement("tr"); values.forEach(value => { const td = document.createElement("td"); td.textContent = value; tr.append(td); }); tbody.append(tr); });
-        element.append(tbody); wrapper.append(element); node.replaceChildren(wrapper); return;
+        element.append(tbody);
+        const prefix = body.slice(0, body.indexOf("|")).trim();
+        if (prefix) { const intro = document.createElement("p"); intro.className = "weather-summary"; intro.textContent = prefix.replace(/পূর্বাভাস:\s*$/i, "").replace(/Forecast:\s*$/i, "").trim(); node.append(intro); }
+        wrapper.append(element); node.append(wrapper); return;
       }
       const fragment = document.createDocumentFragment(); let last = 0;
       for (const link of ChatUI.markdownLinks(body)) {

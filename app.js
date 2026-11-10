@@ -989,7 +989,8 @@
       const { body } = ChatUI.splitAnswer(text);
       const table = parseMarkdownTable(body);
       if (table) {
-        const wrapper = document.createElement("div"); wrapper.className = "answer-table-wrap";
+        const wrapper = document.createElement("details"); wrapper.className = "answer-table-wrap answer-details";
+        const summary = document.createElement("summary"); summary.textContent = languageSelect.value === "bn" ? "৭ দিনের বিস্তারিত পূর্বাভাস দেখুন" : "View detailed forecast"; wrapper.append(summary);
         const element = document.createElement("table"); element.className = "answer-table";
         const head = document.createElement("thead"); const row = document.createElement("tr");
         table.headers.forEach(value => { const cell = document.createElement("th"); cell.textContent = value; row.append(cell); });

@@ -25,6 +25,8 @@ main:has(.office:not([hidden])){max-width:960px}
 .games-nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
 .site-footer,body>footer{display:block;clear:both;width:100%;max-width:1100px;margin:64px auto 24px;padding:18px 20px 16px;border-top:1px solid #e5e7eb;background:transparent;text-align:center;font-size:13px;line-height:1.6;color:#6b7280}
 .site-footer a,body>footer a{color:#604225}
+.site-footer nav{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap}
+.site-footer p{margin:4px 0 0}
 body>footer{grid-column:2}
 body>footer::after{content:"© 2026 Walid AI. All rights reserved.";display:block;margin-top:4px}
 

@@ -31,7 +31,8 @@ body{display:grid;grid-template-columns:170px minmax(0,1fr)}
  border-radius:0 0 20px 20px;text-align:center;box-shadow:0 12px 28px #4b342b22
 }
 main:has(#play:not([hidden])){
- display:grid;grid-template-columns:1.33fr 1fr;min-height:555px;
+ display:grid;grid-template-columns:1.33fr 1fr;min-height:640px;
+ width:min(100% - 48px,1100px);margin:clamp(24px,5vh,56px) auto 72px;
  align-content:stretch;align-self:start;color:#ffdd9c
 }
 .splash-art{
@@ -92,6 +93,10 @@ main:has(#play:not([hidden])){
  .panel{padding:14px 8px}
  button{flex:1 1 40%;max-width:260px}
  #back,#new{width:calc(100% - 20px);max-width:340px}
+}
+
+@media(min-width:501px){
+ .splash-art,.panel:has(#play:not([hidden])){min-height:640px}
 }
 
 .office #status{

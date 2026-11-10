@@ -1,68 +1,15 @@
-import {setGameInProgress} from "./refresh-guard.mjs";
-import {gameShell, control, choose} from "./shell.mjs";
-
-const zones = ["Left", "Center", "Right"];
-let phase, shots, goals, shot, result;
-const game = gameShell({reset() {
-  phase = "shoot";
-  shots = [0, 0];
-  goals = [0, 0];
-  shot = null;
-  result = "";
-  render();
-}});
-game.board.classList.add("pitch");
-game.board.innerHTML = '<div class="goal" aria-hidden="true"></div><div class="keeper" aria-hidden="true">◆</div><div class="ball" aria-hidden="true">⚽</div>';
-const ball = game.board.querySelector(".ball");
-const keeper = game.board.querySelector(".keeper");
-const choices = zones.map((zone, index) => control(zone, () => pick(index)));
-document.querySelector("#actions").append(...choices);
-
-function pick(zone) {
-  const player = (shots[0] + shots[1]) % 2;
-  if (phase === "shoot") {
-    shot = zone;
-    if (!game.bot) {
-      phase = "save";
-      render();
-      return;
-    }
-    resolve(player, choose([0, 1, 2]));
-    return;
-  }
-  resolve(player, zone);
-}
-
-function resolve(player, save) {
-  const scored = shot !== save;
-  shots[player]++;
-  goals[player] += Number(scored);
-  result = scored ? "Goal!" : "Saved!";
-  ball.style.setProperty("--lane", shot - 1);
-  keeper.style.setProperty("--lane", save - 1);
-  phase = "replay";
-  render();
-  game.later(() => {
-    const complete = shots[0] >= 5 && shots[0] === shots[1] && goals[0] !== goals[1];
-    phase = complete ? "end" : "shoot";
-    if (game.bot && !complete && shots[0] > shots[1]) {
-      phase = "save";
-      shot = choose([0, 1, 2]);
-    }
-    render();
-  });
-}
-
-function render() {
-  setGameInProgress(phase!=="end"&&(shot!==null||shots[0]+shots[1]>0));
-  game.board.dataset.phase = phase;
-  choices.forEach(button => {button.disabled = phase === "replay" || phase === "end";});
-  const shooter = (shots[0] + shots[1]) % 2;
-  const names = game.bot ? ["You", "Bot"] : ["Player 1", "Player 2"];
-  const score = `${names[0]} ${goals[0]}–${goals[1]} ${names[1]}. `;
-  const prompt = phase === "shoot" ? `${names[shooter]}, choose where to shoot.`
-    : phase === "save" ? `${names[1 - shooter]}, choose where to dive.`
-    : phase === "end" ? `${names[goals[0] > goals[1] ? 0 : 1]} wins!` : "";
-  game.status.textContent = score + (result ? result + " " : "") + prompt;
-}
-game.restart();
+export const decidePenalty=({shot,save,power=70,difficulty='normal',random=Math.random})=>{const accuracy=(power/100)*.18;const read={easy:.25,normal:.5,hard:.68,expert:.82}[difficulty]??.5;const guessed=save===shot;const saveChance=guessed?read:Math.max(0,(read-.28)+accuracy);return {goal:random()>saveChance,saveChance,guessed};};
+export const nextShootoutState=(s,scored)=>{const side=s.turn;const out={...s,goals:[...s.goals],shots:[...s.shots],turn:side===0?1:0};out.shots[side]++;if(scored)out.goals[side]++;if(s.sudden){out.finished=out.shots[0]===out.shots[1]&&out.goals[0]!==out.goals[1];return out;}const remaining=s.maxShots-out.shots[0];out.finished=(out.shots[0]>=s.maxShots&&out.shots[1]>=s.maxShots&&out.goals[0]!==out.goals[1])||(out.shots[0]===out.shots[1]&&out.goals[0]!==out.goals[1]&&out.shots[0]>=s.maxShots)||(out.goals[0]>out.goals[1]+remaining)||(out.goals[1]>out.goals[0]+remaining);out.sudden=out.shots[0]>=s.maxShots&&out.shots[1]>=s.maxShots&&out.goals[0]===out.goals[1];if(out.sudden){out.maxShots+=1;out.suddenPair=[null,null];}return out;};
+if(typeof document !== 'undefined'){const $=s=>document.querySelector(s);const teams=[['Bangladesh','BAN','🇧🇩'],['Argentina','ARG','🇦🇷'],['Brazil','BRA','🇧🇷'],['Japan','JPN','🇯🇵']];let team=teams[0],opponent=teams[1],mode='classic',difficulty='normal',muted=false,state;
+const modal=(html)=>{$('#card').innerHTML=html;$('#modal').classList.add('open')};const close=()=>$('#modal').classList.remove('open');
+function reset(){state={goals:[0,0],shots:[0,0],turn:0,maxShots:5,finished:false,sudden:false};$('#finish').classList.add('hidden');$('#result').classList.add('hidden');$('#game').classList.add('active');$('#menu').classList.remove('active');$('#keeper').className='keeper';$('#ball').className='ball';$('#player').className='player';render();}
+function render(){const s=state;$('#youName').textContent=team[1];$('#oppName').textContent=opponent[1];$('#youFlag').textContent=team[2];$('#oppFlag').textContent=opponent[2];$('#score').textContent=`${s.goals[0]} - ${s.goals[1]}`;$('#round').textContent=s.sudden?`Sudden Death · Round ${s.shots[0]-4}`:`Round ${Math.min(s.shots[0]+1,5)} / 5`;$('#marks').textContent=[0,1].map(i=>Array.from({length:5},(_,n)=>n<s.shots[i]?(n<s.goals[i]?'●':'×'):'○').join(' ')).join('  |  ');$('#hint').textContent=s.turn===0?'Drag on the goal, then release to shoot':'Opponent is preparing…';$('#actions').classList.toggle('hidden',s.turn!==0||s.finished);}
+function shot(shot){if(state.turn!==0||state.finished)return;const power=+$('#power').value;$('#keeper').className='keeper ready';$('#player').className='player run';setTimeout(()=>{$('#player').classList.add('kick');setTimeout(()=>resolve(shot,power,false),350)},360)}
+function resolve(shot,power,opp){const save=opp?Math.floor(Math.random()*3):Math.floor(Math.random()*3);const result=decidePenalty({shot,save,power,difficulty,random:Math.random});$('#keeper').className=`keeper ${save<shot?'dive-left':save>shot?'dive-right':'ready'}`;$('#ball').style.setProperty('--target-x',`${22+shot*28}%`);$('#ball').style.setProperty('--target-y',`${52+(shot===1?3:0)}%`);$('#ball').classList.add('fly');setTimeout(()=>{state=nextShootoutState(state,result.goal);showResult(result.goal,opp?'Opponent scores':'Your shot',result.guessed);if(state.finished){setTimeout(finish,1100)}else if(opp){setTimeout(()=>{state.turn=0;resetScene();render()},1400)}else{setTimeout(()=>{state.turn=1;resetScene();render();setTimeout(opponentShot,500)},1400)}},900)}
+function resetScene(){$('#ball').className='ball';$('#player').className='player';$('#keeper').className='keeper';$('#result').classList.add('hidden')}
+function showResult(goal,who,guessed){$('#resultTitle').textContent=goal?'GOAL!':'SAVED!';$('#resultText').textContent=`${who} ${goal?'finds the net.':guessed?'The goalkeeper read it perfectly.':'It goes wide of the target.'}`;$('#result').classList.remove('hidden')}
+function opponentShot(){if(state.finished)return;$('#keeper').className='keeper ready';setTimeout(()=>resolve(Math.floor(Math.random()*3),55,true),650)}
+function finish(){const win=state.goals[0]>state.goals[1];$('#finishTitle').textContent=win?'WINNER':'YOU LOSE';$('#finishText').textContent=`${team[0]} ${state.goals[0]} – ${state.goals[1]} ${opponent[0]}`;$('#finish').classList.remove('hidden');const key='walid-penalty-leaderboard';const list=JSON.parse(localStorage.getItem(key)||'[]');list.push({team:team[0],score:state.goals[0],opponent:opponent[0],won:win,date:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(list.slice(-20)));}
+function showMenu(){ $('#game').classList.remove('active');$('#menu').classList.add('active');close(); }
+$('#play').onclick=reset;$('#again').onclick=reset;$('#home').onclick=showMenu;$('#modal').onclick=e=>{if(e.target.id==='modal')close()};$('#power').oninput=e=>$('#powerOut').textContent=`${e.target.value}%`;$('#settings').onclick=()=>modal(`<h2>Settings</h2><p>Difficulty</p><select id="diff"><option>easy</option><option selected>normal</option><option>hard</option><option>expert</option></select><p><button class="btn" id="mute">${muted?'Unmute':'Mute'} sound</button></p><button class="btn" id="close">Done</button>`);$('#modal').addEventListener('click',e=>{if(e.target.id==='diff')difficulty=e.target.value;if(e.target.id==='mute'){muted=!muted;e.target.textContent=muted?'Unmute sound':'Mute sound'}if(e.target.id==='close')close()});$('#modes').onclick=()=>modal(`<h2>Game Modes</h2><button class="btn primary" id="classic">Classic Shootout<br><small>5 penalties each + sudden death</small></button><br><br><button class="btn blue" id="practice">Practice Mode<br><small>Unlimited shots, no score pressure</small></button>`);$('#modal').addEventListener('click',e=>{if(e.target.id==='classic'){mode='classic';close()}if(e.target.id==='practice'){mode='practice';close()}});$('#teams').onclick=()=>modal(`<h2>Choose Teams</h2><div class="team-grid">${teams.map((t,i)=>`<button class="team ${i===0?'selected':''}" data-team="${i}"><span class="flag">${t[2]}</span>${t[0]}</button>`).join('')}</div><p><button class="btn" id="close">Done</button></p>`);$('#modal').addEventListener('click',e=>{if(e.target.dataset.team){team=teams[+e.target.dataset.team];close()}});$('#leaderboard').onclick=()=>{const list=JSON.parse(localStorage.getItem('walid-penalty-leaderboard')||'[]').slice(-10).reverse();modal(`<h2>Local Leaderboard</h2><p>Your scores on this device — not a global ranking.</p>${list.length?list.map(x=>`<p>${x.won?'🏆':'•'} ${x.team} ${x.score} · ${x.opponent}</p>`).join(''):'<p>No completed matches yet.</p>'}<button class="btn" id="close">Close</button>`)};$('#how').onclick=()=>modal(`<h2>How to Play</h2><p>Hold and drag across the goal to place the target. Release to run up and kick. Power changes the flight. The keeper reacts after you start aiming. Then watch the opponent take a complete animated shot.</p><button class="btn" id="close">Got it</button>`);$('#pause').onclick=()=>modal(`<h2>Paused</h2><p>Take a breath. Resume when ready.</p><button class="btn primary" id="close">Resume</button>`);
+let drag=false;const aim=(x,y)=>{$('#aim').style.left=`${Math.max(16,Math.min(84,x))}%`;$('#aim').style.top=`${Math.max(30,Math.min(58,y))}%`;return x<35?0:x>65?2:1};$('#game').addEventListener('pointerdown',e=>{if(e.target.closest('button,input'))return;drag=true;$('#keeper').className='keeper ready';const r=$('#game').getBoundingClientRect();aim((e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100);});$('#game').addEventListener('pointermove',e=>{if(!drag)return;const r=$('#game').getBoundingClientRect();aim((e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100)});window.addEventListener('pointerup',e=>{if(!drag)return;drag=false;const r=$('#game').getBoundingClientRect();shot(aim((e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100))});$('#shoot').onclick=()=>shot(1);}

@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: clamp(14px, 4vw, 32px);
-  background: #f5f0e6;
+  background: #fff;
   color: #35291f;
   font: 16px/1.5 system-ui, sans-serif;
 }
@@ -14,7 +14,7 @@ button, select {
   font: inherit;
   min-height: 44px;
   color: inherit;
-  background: #fffaf1;
+  background: #fff;
   border: 1px solid #907a60;
   border-radius: 8px;
   padding: 4px 10px;

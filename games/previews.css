@@ -102,8 +102,13 @@ main { max-width: 1050px; }
 
 /* Riddlex uses the same square premium-card footprint as the other board games. */
 .artwork-tile.riddlex-tile {padding:6px;border:2px solid #bd9360;border-radius:20px;background:linear-gradient(145deg,#4e392e,#201713);box-shadow:0 5px 0 #24160f,0 12px 24px #29150d55}
-.artwork-tile.riddlex-tile .premium-game-preview {display:block;height:auto;aspect-ratio:1;border-radius:12px;position:relative;overflow:hidden;background:#4e392e}
-.artwork-tile.riddlex-tile .premium-game-preview img {display:block;width:100%;height:100%;aspect-ratio:1;object-fit:contain;background:#241207}
+.artwork-tile.riddlex-tile .premium-game-preview {display:block;height:auto;aspect-ratio:1;border-radius:12px;position:relative;overflow:hidden;background:
+  radial-gradient(circle at 50% 22%,#8c5b28 0,#4b2416 34%,transparent 62%),
+  linear-gradient(180deg,#32130e 0 18%,#6a3218 18% 22%,#241008 22% 78%,#6a3218 78% 82%,#32130e 82%);
+  box-shadow:inset 0 0 0 3px #d9a63b,inset 0 0 0 6px #5b260f,inset 0 0 22px #120603;
+}
+.artwork-tile.riddlex-tile .premium-game-preview::before {content:"";position:absolute;inset:8px;border:1px solid #f0c85c99;border-radius:9px;box-shadow:inset 0 0 0 1px #3a160c;pointer-events:none;z-index:2}
+.artwork-tile.riddlex-tile .premium-game-preview img {position:relative;z-index:1;display:block;width:100%;height:100%;aspect-ratio:1;object-fit:contain;background:transparent}
 .riddlex-play-button {position:absolute;left:19%;right:19%;bottom:7%;display:grid;place-items:center;min-height:13%;padding:0 4%;box-sizing:border-box;border:3px solid #f5c94a;border-radius:999px;background:linear-gradient(180deg,#7b1b16,#3e0908);box-shadow:0 0 0 2px #6e2b0d,0 3px 0 #2a0904,0 0 14px #ffcf4d99;color:#fff3b0;font:700 clamp(.8rem,2.5vw,1.35rem)/1 Georgia,serif;text-shadow:0 2px #4c0a05;letter-spacing:.01em;pointer-events:none}
 .riddlex-play-button::before,.riddlex-play-button::after {content:"✦";color:#f8d15b;font-size:.75em;margin:0 .55em}
 @media (max-width: 720px) {.riddlex-play-button {left:18%;right:18%;border-width:2px}}

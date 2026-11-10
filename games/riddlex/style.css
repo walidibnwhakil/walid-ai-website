@@ -37,13 +37,13 @@ body{display:block}
 }
 main:has(#play:not([hidden])){
  display:block;min-height:0;
- width:min(100% - 32px,1200px);margin:clamp(18px,4vh,44px) auto 48px;
+ width:100%;max-width:none;margin:clamp(18px,4vh,44px) auto 48px;padding:0;
  align-content:stretch;align-self:start;color:#ffdd9c
 }
 body:has(main:has(#play:not([hidden])))>footer{margin-top:0}
 .splash-art{
  position:relative;aspect-ratio:1669/939;overflow:hidden;background:#271911;container-type:inline-size;
- border:4px solid #68452b;border-radius:20px
+ width:100%;border:4px solid #68452b;border-radius:20px
 }
 .splash-art img{display:block;width:100%;height:100%;position:absolute;object-fit:cover;object-position:center top}
 .splash-art::after{

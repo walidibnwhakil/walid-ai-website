@@ -299,7 +299,7 @@ function allowedInCategory(state, question) {
   if (!state.category) return true;
   if (!CATEGORY_GROUPS[state.category]?.has(question.group)) return false;
   if (state.category === "character" && (question.id === "animal" || question.id === "object")) return false;
-  if (state.category !== "character" && question.group === "kind") return false;
+  if (state.category !== "character" && question.group === "kind" && question.id !== "named") return false;
   return true;
 }
 

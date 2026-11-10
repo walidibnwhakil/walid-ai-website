@@ -165,19 +165,53 @@ export async function loadManifest(base = "./kb") {
   return response.json();
 }
 
+function grow(pool, need) {
+  if ((pool.capacity || pool.count) >= need) return;
+  const cap = Math.max(need, (pool.capacity || pool.count) * 2 || need);
+  const attrs = new Uint8Array(cap * pool.attrBytes);
+  const pop = new Uint16Array(cap);
+  const flags = new Uint8Array(cap);
+  attrs.set(pool.attrs.subarray(0, pool.count * pool.attrBytes));
+  pop.set(pool.pop.subarray(0, pool.count));
+  flags.set(pool.flags.subarray(0, pool.count));
+  pool.attrs = attrs;
+  pool.pop = pop;
+  pool.flags = flags;
+  pool.capacity = cap;
+}
+
+export function appendShard(pool, shard) {
+  if (!pool) return shard;
+  const need = pool.count + shard.count;
+  grow(pool, need);
+  pool.attrs.set(shard.attrs, pool.count * pool.attrBytes);
+  pool.pop.set(shard.pop, pool.count);
+  pool.flags.set(shard.flags, pool.count);
+  for (let index = 0; index < shard.count; index++) {
+    pool.ids.push(shard.ids[index]);
+    pool.ens.push(shard.ens[index]);
+    pool.bns.push(shard.bns[index]);
+    pool.images.push(shard.images[index]);
+    pool.credits.push(shard.credits[index]);
+  }
+  if (shard.aliasMap) {
+    for (const [id, aliases] of shard.aliasMap) pool.aliasMap.set(id, aliases);
+  }
+  pool.count = need;
+  return pool;
+}
+
 export async function loadShards(base, manifest, names, onPool) {
   let pool = null;
   const questions = manifest.questions;
-  for (let index = 0; index < names.length; index += 2) {
-    const batch = names.slice(index, index + 2);
-    const shards = await Promise.all(batch.map(async (name) => {
-      const response = await fetch(`${base}/${name}`);
-      if (!response.ok) throw new Error("Knowledge shard failed");
-      return decodeShard(await response.arrayBuffer(), questions);
-    }));
-    pool = pool ? mergePools([pool, ...shards]) : mergePools(shards);
+  for (const name of names) {
+    const response = await fetch(`${base}/${name}`);
+    if (!response.ok) throw new Error("Knowledge shard failed");
+    const shard = decodeShard(await response.arrayBuffer(), questions);
+    pool = appendShard(pool, shard);
     attachManifest(pool, manifest);
     if (onPool) onPool(pool);
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
   return pool;
 }

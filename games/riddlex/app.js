@@ -1,7 +1,7 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, rejectIndex, rewind } from "./engine.js";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js";
 import { UI, guessFont } from "./i18n.js";
-import { imageSrc, loadKnowledge, mergePools, poolFromEntries } from "./kb.js";
+import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, poolFromEntries } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
 import { createScene } from "./scene.js";
 
@@ -14,7 +14,8 @@ const guessBox = $("guess");
 const learnForm = $("learn");
 const scene = createScene($("stage"));
 
-let lang = localStorage.getItem("riddlex-lang") || "bn";
+let lang = localStorage.getItem("riddlex-lang") || "en";
+let category = null;
 let manifest = null;
 let pool = null;
 let state = null;
@@ -44,10 +45,17 @@ function applyLanguage() {
   $("new").textContent = copy.newGame;
   $("to-menu").textContent = copy.menu;
   $("back").textContent = copy.undo;
+  document.querySelectorAll("[data-cat]").forEach((node) => {
+    const key = node.dataset.cat === "animal" ? "animalCat" : node.dataset.cat === "object" ? "objectCat" : "character";
+    node.textContent = copy[key];
+  });
+  $("pick-label").textContent = copy.pick;
+  document.querySelectorAll("[data-set-lang]").forEach((node) => {
+    node.setAttribute("aria-pressed", String(node.dataset.setLang === lang));
+  });
   $("learn-name-label").textContent = copy.name;
   $("learn-photo-label").textContent = copy.photo;
   $("learn-save").textContent = copy.save;
-  document.querySelectorAll("[data-lang-toggle]").forEach((node) => { node.textContent = copy.lang; });
 }
 
 function showMenu() {
@@ -60,23 +68,28 @@ function showMenu() {
 
 async function boot() {
   applyLanguage();
-  loading = loadKnowledge("./kb").then(async (loaded) => {
-    manifest = loaded.manifest;
-    const learned = await loadLearned(loaded.manifest.questions);
-    pool = learned.length
-      ? mergePools([loaded.pool, poolFromEntries(loaded.manifest.questions, learned)])
-      : loaded.pool;
-    pool.opening = loaded.manifest.opening;
-    return pool;
-  });
+  loading = loadManifest("./kb").then((loaded) => { manifest = loaded; return loaded; });
   loading.catch(() => {});
+}
+
+let loadToken = 0;
+function adoptPool(next) {
+  pool = next;
+  if (!state || state.category !== category || !pool) return;
+  state.pool = pool;
+  if (state.weights.length !== pool.count) state.weights = new Float64Array(pool.count);
+  recompute(state);
 }
 
 function setStatus(message) {
   status.textContent = message;
+  status.classList.remove("pop");
+  void status.offsetWidth;
+  status.classList.add("pop");
 }
 
 function showOnly(which) {
+  $("categories").hidden = which !== "pick";
   answers.hidden = which !== "ask";
   guessBox.hidden = which !== "guess" && which !== "wrong";
   $("correct").hidden = which !== "guess";
@@ -84,26 +97,44 @@ function showOnly(which) {
   $("retry").hidden = which !== "wrong";
   learnForm.hidden = which !== "learn";
   $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
+  $("credit").hidden = which === "pick" || which === "ask";
 }
 
-async function startGame() {
+async function openPlay() {
   menu.hidden = true;
   game.hidden = false;
-  mode = "loading";
+  mode = "pick";
+  category = null;
+  state = null;
   setGameInProgress(true);
-  scene.setMood("thinking");
+  scene.setMood("curious");
   await scene.start();
+  setStatus(text().pick);
+  showOnly("pick");
+  try { await loading; } catch { setStatus(text().failedSave); }
+}
+
+async function startGame(chosen) {
+  category = chosen;
+  const token = ++loadToken;
   setStatus(text().loading);
-  showOnly("none");
-  try {
-    await loading;
-  } catch {
-    setStatus(text().failedSave);
-    return;
-  }
-  state = createState(pool, { opening: pool.opening || manifest.opening });
-  mode = "ask";
-  await step();
+  try { await loading; } catch { setStatus(text().failedSave); return; }
+  if (token !== loadToken) return;
+  const names = categoryShards(manifest, chosen);
+  let started = false;
+  await loadShards("./kb", manifest, names, (partial) => {
+    if (token !== loadToken) return;
+    adoptPool(partial);
+    if (started) return;
+    started = true;
+    state = createState(pool, { opening: "real", category: chosen });
+    mode = "ask";
+    step();
+    loadLearned(manifest.questions).then((rows) => {
+      if (!rows.length || token !== loadToken || !pool) return;
+      adoptPool(mergePools([pool, poolFromEntries(manifest.questions, rows)]));
+    }).catch(() => {});
+  });
 }
 
 async function step() {
@@ -177,7 +208,7 @@ async function onRetry() {
   rejectIndex(state, guessIndex);
   guessIndex = -1;
   $("credit").textContent = "";
-  if (state.guesses >= 4) {
+  if (state.guesses >= 4 || state.answers.length >= 72) {
     await beginDefeat();
     return;
   }
@@ -248,25 +279,26 @@ function onUndo() {
   showOnly("ask");
 }
 
-function toggleLanguage() {
-  lang = lang === "bn" ? "en" : "bn";
+function setLanguage(next) {
+  lang = next === "bn" ? "bn" : "en";
   localStorage.setItem("riddlex-lang", lang);
   applyLanguage();
-  if (mode === "ask" && currentQ) {
+  if (mode === "ask" && currentQ && pool) {
     const question = pool.questions[pool.qIndex.get(currentQ)];
     setStatus(lang === "bn" ? question.bn : question.en);
-  }
+  } else if (mode === "pick") setStatus(text().pick);
 }
 
-$("play").addEventListener("click", () => { startGame(); });
-$("new").addEventListener("click", () => { scene.clearReveal(); startGame(); });
+$("play").addEventListener("click", () => { openPlay(); });
+$("new").addEventListener("click", () => { scene.clearReveal(); openPlay(); });
+document.querySelectorAll("[data-cat]").forEach((node) => node.addEventListener("click", () => startGame(node.dataset.cat)));
 $("to-menu").addEventListener("click", showMenu);
 $("correct").addEventListener("click", onCorrect);
 $("wrong").addEventListener("click", onWrong);
 $("retry").addEventListener("click", onRetry);
 $("back").addEventListener("click", onUndo);
 learnForm.addEventListener("submit", onLearnSubmit);
-document.querySelectorAll("[data-lang-toggle]").forEach((node) => node.addEventListener("click", toggleLanguage));
+document.querySelectorAll("[data-set-lang]").forEach((node) => node.addEventListener("click", () => setLanguage(node.dataset.setLang)));
 document.querySelectorAll("[data-answer]").forEach((node) => node.addEventListener("click", () => onAnswer(node.dataset.answer)));
 document.addEventListener("keydown", (event) => {
   if (event.altKey || event.ctrlKey || event.metaKey || mode !== "ask") return;
@@ -281,7 +313,7 @@ window.addEventListener("resize", () => scene.resize());
 if (new URLSearchParams(location.search).has("autotest")) {
   window.__riddlex = {
     ready: () => loading,
-    start: startGame,
+    start: async (cat = "character") => { await openPlay(); await startGame(cat); },
     answer: onAnswer,
     correct: onCorrect,
     wrong: onWrong,

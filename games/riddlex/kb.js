@@ -139,23 +139,51 @@ export function imageSrc(image) {
   return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(image) + "?width=480";
 }
 
-export async function loadKnowledge(base = "./kb") {
-  const manifest = await fetch(`${base}/manifest.json`).then((response) => {
-    if (!response.ok) throw new Error("Knowledge manifest failed");
-    return response.json();
-  });
-  const questions = manifest.questions;
-  const shards = await Promise.all(manifest.shards.map(async (name) => {
-    const response = await fetch(`${base}/${name}`);
-    if (!response.ok) throw new Error("Knowledge shard failed");
-    return decodeShard(await response.arrayBuffer(), questions);
-  }));
-  const pool = mergePools(shards);
+export function attachManifest(pool, manifest) {
   if (manifest.aliases) {
     for (const [id, aliases] of Object.entries(manifest.aliases)) pool.aliasMap.set(id, aliases);
   }
   pool.opening = manifest.opening;
   pool.total = manifest.total;
   pool.sources = manifest.sources;
+  return pool;
+}
+
+export function categoryShards(manifest, category) {
+  const groups = manifest.groups || {};
+  if (groups[category]?.length) return groups[category];
+  return manifest.shards.filter((name) => {
+    if (category === "animal") return name.startsWith("animal");
+    if (category === "object") return name.startsWith("object");
+    return name.startsWith("real") || name.startsWith("fiction") || name.startsWith("people") || name.startsWith("curated");
+  });
+}
+
+export async function loadManifest(base = "./kb") {
+  const response = await fetch(`${base}/manifest.json`);
+  if (!response.ok) throw new Error("Knowledge manifest failed");
+  return response.json();
+}
+
+export async function loadShards(base, manifest, names, onPool) {
+  let pool = null;
+  const questions = manifest.questions;
+  for (let index = 0; index < names.length; index += 2) {
+    const batch = names.slice(index, index + 2);
+    const shards = await Promise.all(batch.map(async (name) => {
+      const response = await fetch(`${base}/${name}`);
+      if (!response.ok) throw new Error("Knowledge shard failed");
+      return decodeShard(await response.arrayBuffer(), questions);
+    }));
+    pool = pool ? mergePools([pool, ...shards]) : mergePools(shards);
+    attachManifest(pool, manifest);
+    if (onPool) onPool(pool);
+  }
+  return pool;
+}
+
+export async function loadKnowledge(base = "./kb") {
+  const manifest = await loadManifest(base);
+  const pool = await loadShards(base, manifest, manifest.shards);
   return { manifest, pool };
 }

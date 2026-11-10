@@ -5,8 +5,9 @@ service cloud.firestore {
       return request.auth != null;
     }
     function owner() {
-      return signedIn() && (
-        (request.auth.token.email == "iwhakil@gmail.com" && request.auth.token.email_verified == true)
+      return signedIn() && request.auth.token.email_verified == true && (
+        request.auth.token.email == "walid.ibnwhakil@gmail.com"
+        || request.auth.token.email == "iwhakil@gmail.com"
         || request.auth.token.riddlexOwner == true
       );
     }

@@ -68,7 +68,8 @@ function bit(pool, id, qid) {
 
 function play(pool, id, { flip = -1 } = {}) {
   const target = pool.ids.indexOf(id);
-  const state = createState(pool, { opening: "real" });
+  const category = ["cat", "dog"].includes(id) ? "animal" : ["cooker", "pot", "phone"].includes(id) ? "object" : "character";
+  const state = createState(pool, { opening: "real", category });
   recompute(state);
   let flipped = false;
   for (let step = 0; step < 28; step++) {

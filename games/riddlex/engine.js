@@ -4,11 +4,11 @@
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
 const MATCH = {
-  yes: { 2: 0.9, 1: 0.16, 0: 1 },
-  probably: { 2: 0.72, 1: 0.38, 0: 1 },
-  probably_not: { 2: 0.38, 1: 0.72, 0: 1 },
-  no: { 2: 0.16, 1: 0.9, 0: 1 },
-  unknown: { 2: 0.78, 1: 0.78, 0: 1 },
+  yes: { 2: 0.92, 1: 0.14, 0: 0.58 },
+  probably: { 2: 0.74, 1: 0.36, 0: 0.66 },
+  probably_not: { 2: 0.36, 1: 0.74, 0: 0.66 },
+  no: { 2: 0.14, 1: 0.92, 0: 0.58 },
+  unknown: { 2: 0.8, 1: 0.8, 0: 1 },
 };
 
 const LOG_MATCH = {};
@@ -50,6 +50,21 @@ function binaryEntropy(p) {
   return -(p * Math.log2(p) + (1 - p) * Math.log2(1 - p));
 }
 
+export function inCategory(pool, index, category) {
+  const bit = (id) => {
+    const qi = pool.qIndex.get(id);
+    return qi == null ? 0 : attrAt(pool.attrs, pool.attrBytes, index, qi);
+  };
+  const real = bit("real") === 2;
+  const fictional = bit("fictional") === 2;
+  const animal = bit("animal") === 2;
+  const object = bit("object") === 2;
+  if (category === "character") return real || fictional;
+  if (category === "animal") return animal && !real && !fictional;
+  if (category === "object") return object && !real && !fictional;
+  return true;
+}
+
 export function createState(pool, options = {}) {
   return {
     pool,
@@ -58,6 +73,7 @@ export function createState(pool, options = {}) {
     guesses: 0,
     sinceGuess: 0,
     opening: options.opening || null,
+    category: options.category || null,
     weights: new Float64Array(pool.count),
     alive: [],
   };
@@ -80,7 +96,7 @@ export function recompute(state) {
   const logW = new Float64Array(n);
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
-    if (rejected.has(i) || pool.flags[i] & 128) {
+    if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
@@ -143,11 +159,12 @@ export function shouldGuess(state) {
   const { bestP, secondP } = topTwo(state);
   if (!(bestP > 0)) return false;
   const ratio = secondP > 0 ? bestP / secondP : 99;
-  if (state.guesses > 0 && state.sinceGuess < 2 && bestP < 0.9) return false;
-  if (asked >= 20) return true;
-  if (asked < 7 && !(bestP >= 0.86 && ratio >= 6)) return false;
-  if (bestP >= 0.62 && ratio >= 3.2) return true;
-  if (asked >= 14 && bestP >= 0.34 && ratio >= 2.2) return true;
+  if (state.guesses > 0 && state.sinceGuess < 4 && bestP < 0.88) return false;
+  if (asked >= 72) return true;
+  if (asked < 8 && !(bestP >= 0.9 && ratio >= 8)) return false;
+  if (bestP >= 0.55 && ratio >= 3.5) return true;
+  if (asked >= 24 && bestP >= 0.22 && ratio >= 2.4) return true;
+  if (asked >= 48 && bestP >= 0.12 && ratio >= 1.8) return true;
   return false;
 }
 
@@ -252,20 +269,53 @@ function gated(state, question, rows) {
   return true;
 }
 
+const CATEGORY_GROUPS = {
+  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction"]),
+  animal: new Set(["animal", "look", "size"]),
+  object: new Set(["object", "look", "size"]),
+};
+const COUNTRIES = ["from_bd", "from_in", "from_pk", "from_us", "from_gb", "from_jp", "from_kr", "from_cn", "from_fr", "from_de", "from_ru", "from_br", "from_ca", "from_au", "from_es", "from_it", "from_mx", "from_ng", "from_eg", "from_tr", "from_id", "from_sa", "from_ar", "from_za"];
+const BIRTHS = ["born_pre1900", "born_1900_1949", "born_1950_1969", "born_1970_1979", "born_1980_1989", "born_1990_1999", "born_2000_plus"];
+
+function said(state, qid, values) {
+  return state.answers.some((answer) => answer.qid === qid && values.includes(answer.value));
+}
+
+function skippedAsDuplicate(state, id) {
+  const yes = (qid) => said(state, qid, ["yes", "probably"]);
+  const answered = (qid) => state.answers.some((answer) => answer.qid === qid && answer.value !== "unknown");
+  if ((id === "dead" && answered("alive")) || (id === "alive" && answered("dead"))) return true;
+  if ((id === "female" && yes("male")) || (id === "male" && yes("female"))) return true;
+  if (id === "musician" && yes("singer")) return true;
+  if (id === "singer" && said(state, "musician", ["no", "probably_not"])) return true;
+  if (id === "athlete" && (yes("cricketer") || yes("footballer"))) return true;
+  if ((id === "wild" && yes("pet")) || (id === "pet" && yes("wild"))) return true;
+  if (COUNTRIES.includes(id) && COUNTRIES.some((country) => country !== id && yes(country))) return true;
+  if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;
+  return false;
+}
+
+function allowedInCategory(state, question) {
+  if (!state.category) return true;
+  if (!CATEGORY_GROUPS[state.category]?.has(question.group)) return false;
+  if (state.category === "character" && (question.id === "animal" || question.id === "object")) return false;
+  if (state.category !== "character" && question.group === "kind") return false;
+  return true;
+}
+
 export function chooseQuestion(state) {
   const { pool, answers } = state;
   if (!state.alive.length) return null;
   const asked = new Set(answers.map((answer) => answer.qid));
-  if (!asked.has("real")) return "real";
-  const realAnswer = answers.find((item) => item.qid === "real");
-  const saidNo = (qid) => answers.some((item) => item.qid === qid && (item.value === "no" || item.value === "probably_not"));
-  const saidYes = (qid) => answers.some((item) => item.qid === qid && (item.value === "yes" || item.value === "probably"));
-  if (realAnswer && saidNo("real")) {
-    if (!asked.has("fictional")) return "fictional";
-    if (saidNo("fictional") && !asked.has("animal")) return "animal";
-    if (saidNo("fictional") && saidNo("animal") && !asked.has("object")) return "object";
+  const saidNo = (qid) => said(state, qid, ["no", "probably_not"]);
+  const saidYes = (qid) => said(state, qid, ["yes", "probably"]);
+  if (state.category === "character" || !state.category) {
+    if (!asked.has("real")) return "real";
   }
-  if (saidYes("fictional") && !asked.has("animal") && yesMass(state, "animal", state.alive.length > 7000 ? sampleAlive(state, 4000) : state.alive) > 0.18 && answers.length < 8) {
+  if ((state.category === "character" || !state.category) && saidNo("real") && !asked.has("fictional")) return "fictional";
+  if (!state.category && saidNo("real") && saidNo("fictional") && !asked.has("animal")) return "animal";
+  if (!state.category && saidNo("real") && saidNo("fictional") && saidNo("animal") && !asked.has("object")) return "object";
+  if (!state.category && saidYes("fictional") && !asked.has("animal") && yesMass(state, "animal", state.alive.length > 7000 ? sampleAlive(state, 4000) : state.alive) > 0.18 && answers.length < 8) {
     return "animal";
   }
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -274,6 +324,7 @@ export function chooseQuestion(state) {
   for (let qi = 0; qi < pool.questions.length; qi++) {
     const question = pool.questions[qi];
     if (asked.has(question.id)) continue;
+    if (!allowedInCategory(state, question) || skippedAsDuplicate(state, question.id)) continue;
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
@@ -309,7 +360,7 @@ export function rejectIndex(state, index) {
 export function decide(state) {
   recompute(state);
   if (!state.alive.length) return { type: "defeat" };
-  if (state.guesses >= 4) return { type: "defeat" };
+  if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
   if (shouldGuess(state)) {
     const { best } = topTwo(state);
     return { type: "guess", index: best };

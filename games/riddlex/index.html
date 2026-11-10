@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="Riddlex — The Guessing Detective | Walid AI">
   <meta name="twitter:description" content="Think of a real person, character, animal or object. Riddlex asks one question at a time and tries to guess.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
-  <link rel="stylesheet" href="./style.css?v=akinator-1">
+  <link rel="stylesheet" href="./style.css?v=akinator-2">
   <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
@@ -26,10 +26,13 @@
 <body>
   <div id="menu">
     <div class="menu-art">
-      <a class="menu-back" href="/games/" data-i18n="back">পেছনে</a>
-      <button class="lang-toggle" type="button" data-lang-toggle>English</button>
+      <a class="menu-back" href="/games/">Back</a>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="true">English</button>
+        <button type="button" data-set-lang="bn">বাংলা</button>
+      </div>
       <img src="./images/approved/menu-card.png" alt="Riddlex — The Guessing Detective" width="1672" height="941">
-      <button id="play" type="button" aria-label="খেলুন"></button>
+      <button id="play" type="button" aria-label="Play"></button>
     </div>
     <footer class="legal-footer">
       <nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav>
@@ -37,42 +40,55 @@
     </footer>
   </div>
   <div id="game" hidden>
+    <header class="play-top">
+      <button id="to-menu" type="button">Menu</button>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en">English</button>
+        <button type="button" data-set-lang="bn">বাংলা</button>
+      </div>
+    </header>
     <div class="stage-wrap">
       <canvas id="stage" aria-hidden="true"></canvas>
-      <p id="status" aria-live="polite"></p>
+      <p id="status" class="speech pop" aria-live="polite"></p>
+      <div id="categories" hidden>
+        <p id="pick-label">What are you thinking of?</p>
+        <div class="cat-row">
+          <button type="button" data-cat="character">Character</button>
+          <button type="button" data-cat="object">Object</button>
+          <button type="button" data-cat="animal">Animal</button>
+        </div>
+      </div>
     </div>
     <div id="hud">
-      <p id="progress"></p>
       <div id="answers" role="group" aria-label="Answer">
-        <button id="answer-yes" type="button" data-answer="yes">হ্যাঁ</button>
-        <button id="answer-no" type="button" data-answer="no">না</button>
-        <button id="answer-unknown" type="button" data-answer="unknown">জানি না</button>
-        <button id="answer-probably" type="button" data-answer="probably">সম্ভবত</button>
-        <button id="answer-probably-not" type="button" data-answer="probably_not">সম্ভবত না</button>
+        <button id="answer-yes" type="button" data-answer="yes">Yes</button>
+        <button id="answer-no" type="button" data-answer="no">No</button>
+        <button id="answer-unknown" type="button" data-answer="unknown">Don't know</button>
+        <button id="answer-probably" type="button" data-answer="probably">Probably</button>
+        <button id="answer-probably-not" type="button" data-answer="probably_not">Probably not</button>
       </div>
       <div id="guess" hidden>
-        <button id="correct" type="button">হ্যাঁ, ঠিক ধরেছ</button>
-        <button id="wrong" type="button">না</button>
-        <button id="retry" type="button" hidden>আবার চেষ্টা</button>
+        <button id="correct" type="button">Yes, that's it</button>
+        <button id="wrong" type="button">No</button>
+        <button id="retry" type="button" hidden>Try again</button>
       </div>
       <p id="credit"></p>
       <form id="learn" hidden>
-        <label id="learn-name-label">নাম<input id="learn-name" name="name" required maxlength="80" autocomplete="off"></label>
+        <label id="learn-name-label">Name<input id="learn-name" name="name" required maxlength="80" autocomplete="off"></label>
         <div id="learn-photo-row">
-          <label id="learn-photo-label">ছবি, থাকলে<input id="learn-photo" name="photo" type="file" accept="image/*"></label>
+          <label id="learn-photo-label">Picture, if you have one<input id="learn-photo" name="photo" type="file" accept="image/*"></label>
         </div>
         <p id="learn-note"></p>
-        <button id="learn-save" type="submit">গোয়েন্দাকে শেখাও</button>
+        <button id="learn-save" type="submit">Teach the detective</button>
       </form>
       <div class="hud-row">
-        <button id="back" type="button">শেষ উত্তর বদলাও</button>
-        <button id="new" type="button">নতুন খেলা</button>
-        <button id="to-menu" type="button">মেনু</button>
-        <button id="lang-game" type="button" data-lang-toggle>English</button>
+        <button id="back" type="button">Back</button>
+        <button id="new" type="button">New game</button>
+        <span id="progress"></span>
       </div>
     </div>
   </div>
-  <script type="module" src="./app.js?v=akinator-1"></script>
+  <script type="module" src="./app.js?v=akinator-2"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>
 </html>

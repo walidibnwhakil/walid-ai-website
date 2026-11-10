@@ -39,10 +39,11 @@ export function createScene(canvas) {
 
   const smoke = Array.from({ length: 42 }, () => makePuff(true));
   const cat = {
-    mode: "perch", x: 0.78, y: 0.40, vx: 0, frame: 6, face: 1,
+    mode: "perch", x: 0.78, y: 0.40, vx: 0, frame: 6, face: 1, squash: 1,
     timer: rand(4, 8), fromX: 0.78, fromY: 0.40, toX: 0.78, toY: 0.40, t: 0, dur: 1,
   };
   let mood = "curious";
+  const moodShown = { lift: 0, sad: 0, happy: 0, think: 0 };
   let blink = 0;
   let nextBlink = rand(2.2, 5);
   let clock = 0;
@@ -84,14 +85,15 @@ export function createScene(canvas) {
     return [col * (sheet.width / 4), row * (sheet.height / 2), sheet.width / 4, sheet.height / 2];
   }
 
-  function drawCatSprite(x, y, scale, frame, face, angry) {
+  function drawCatSprite(x, y, scale, frame, face, angry, rot = 0) {
     const image = angry ? images.catAngry : images.catSheet;
     if (!image) return;
     const w = canvas.width * scale;
     const h = angry ? w * (image.height / image.width) : w;
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(face, 1);
+    ctx.rotate(rot);
+    ctx.scale(face, cat.squash || 1);
     if (angry) ctx.drawImage(image, -w / 2, -h * 0.85, w, h);
     else {
       const box = frameBox(frame);
@@ -182,10 +184,26 @@ export function createScene(canvas) {
     ctx.globalAlpha = 1;
   }
 
+  function easeInOut(p) {
+    return p < 0.5 ? 2 * p * p : 1 - ((-2 * p + 2) ** 2) / 2;
+  }
+  function easeOut(p) {
+    return 1 - (1 - p) ** 3;
+  }
+  function approachMood(dt) {
+    const goal = {
+      lift: mood === "surprised" ? -1 : mood === "sad" || mood === "defeated" ? 0.65 : mood === "confused" ? 0.35 : 0,
+      sad: mood === "sad" || mood === "defeated" ? 1 : 0,
+      happy: mood === "happy" || mood === "confident" ? 1 : 0,
+      think: mood === "thinking" || mood === "curious" ? 1 : 0,
+    };
+    const blend = 1 - Math.exp(-dt * 7);
+    for (const key of Object.keys(goal)) moodShown[key] += (goal[key] - moodShown[key]) * blend;
+  }
   function drawFace(time) {
     const x = canvas.width * 0.50;
-    const y = canvas.height * 0.255;
-    const lift = mood === "surprised" ? -canvas.height * 0.012 : mood === "sad" || mood === "defeated" ? canvas.height * 0.008 : mood === "confused" ? canvas.height * 0.004 : 0;
+    const y = canvas.height * 0.255 + Math.sin(time * 1.6) * canvas.height * 0.002;
+    const lift = moodShown.lift * canvas.height * 0.012;
     ctx.save();
     ctx.strokeStyle = "rgba(70,42,28,0.8)";
     ctx.lineWidth = Math.max(2, canvas.width * 0.004);
@@ -208,13 +226,14 @@ export function createScene(canvas) {
         ctx.fill();
       }
     }
-    if (mood === "sad" || mood === "defeated") {
-      ctx.fillStyle = "rgba(40,55,80,0.16)";
+    if (moodShown.sad > 0.04) {
+      ctx.fillStyle = `rgba(40,55,80,${0.16 * moodShown.sad})`;
       ctx.beginPath();
       ctx.ellipse(x, y + span * 0.4, span * 2.4, span * 1.6, 0, 0, Math.PI * 2);
       ctx.fill();
-    } else if (mood === "happy" || mood === "confident") {
-      ctx.fillStyle = "rgba(255,190,80,0.10)";
+    }
+    if (moodShown.happy > 0.04) {
+      ctx.fillStyle = `rgba(255,190,80,${0.12 * moodShown.happy})`;
       ctx.beginPath();
       ctx.ellipse(x, y, span * 2.6, span * 1.8, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -237,10 +256,19 @@ export function createScene(canvas) {
     }
     if (cat.mode === "jumpDown" || cat.mode === "jumpUp") {
       const p = Math.min(1, cat.t / cat.dur);
-      const arc = Math.sin(p * Math.PI);
-      cat.x = cat.fromX + (cat.toX - cat.fromX) * p;
-      cat.y = cat.fromY + (cat.toY - cat.fromY) * p - arc * 0.08;
+      if (p < 0.22) {
+        cat.squash = 1 - (p / 0.22) * 0.18;
+        cat.x = cat.fromX;
+        cat.y = cat.fromY + 0.012 * (p / 0.22);
+      } else {
+        const q = easeInOut((p - 0.22) / 0.78);
+        const arc = Math.sin(q * Math.PI);
+        cat.squash = 0.82 + 0.22 * q;
+        cat.x = cat.fromX + (cat.toX - cat.fromX) * q;
+        cat.y = cat.fromY + (cat.toY - cat.fromY) * q - arc * 0.1;
+      }
       if (p >= 1) {
+        cat.squash = 1;
         cat.x = cat.toX;
         cat.y = cat.toY;
         cat.mode = cat.mode === "jumpDown" ? "walk" : "perch";
@@ -299,7 +327,8 @@ export function createScene(canvas) {
     const scale = angry ? 0.2 : 0.15;
     const catX = angry ? canvas.width * 0.50 : canvas.width * cat.x;
     const catY = angry ? canvas.height * 0.60 : canvas.height * (cat.y + bob);
-    drawCatSprite(catX, catY, scale, frame, angry ? 1 : (cat.face || 1), angry);
+    const sway = cat.mode === "walk" ? Math.sin(clock * 10) * 0.06 : 0;
+    drawCatSprite(catX, catY, scale, frame, angry ? 1 : (cat.face || 1), angry, sway);
   }
 
   function prepareInk(name, font) {
@@ -369,16 +398,20 @@ export function createScene(canvas) {
     const px = canvas.width * 0.73;
     const py = canvas.height * 0.40;
     ctx.drawImage(printer, px, py, pw, ph);
-    const slide = Math.min(1, progress);
+    const slide = easeOut(Math.min(1, progress));
     const photoW = pw * 0.72;
     const photoH = photoW * 0.75;
     const photoX = px + pw * 0.14;
-    const photoY = py + ph * 0.62 + slide * canvas.height * 0.08;
+    const photoY = py + ph * 0.55 + slide * canvas.height * 0.1;
+    ctx.save();
+    ctx.translate(photoX, photoY);
+    ctx.transform(1, 0, -0.18 * (1 - slide), 1, 0, 0);
     ctx.fillStyle = "#f7f1e4";
-    ctx.fillRect(photoX, photoY, photoW, photoH);
-    ctx.drawImage(reveal.photo, photoX + 4, photoY + 4, photoW - 8, photoH * 0.72);
+    ctx.fillRect(0, 0, photoW, photoH);
+    ctx.drawImage(reveal.photo, 4, 4, photoW - 8, photoH * 0.72);
     ctx.strokeStyle = "#d9c7a4";
-    ctx.strokeRect(photoX, photoY, photoW, photoH);
+    ctx.strokeRect(0, 0, photoW, photoH);
+    ctx.restore();
   }
 
   function drawPresent() {
@@ -519,6 +552,7 @@ export function createScene(canvas) {
     const dt = Math.min(0.034, (now - (frame.last || now)) / 1000 || 0.016);
     frame.last = now;
     clock += dt;
+    approachMood(dt);
     resize();
     const room = images.room;
     if (room) ctx.drawImage(room, 0, 0, canvas.width, canvas.height);

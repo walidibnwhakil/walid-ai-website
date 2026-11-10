@@ -239,6 +239,11 @@
         updatedAt: Date.now()
       };
       const ownerAtSave = historyOwner;
+      if (ownerAtSave) {
+        const localRecords = localAccountRecords(ownerAtSave).filter((item) => item.id !== record.id);
+        localRecords.unshift(record);
+        saveLocalAccountRecords(ownerAtSave, localRecords);
+      }
       persistQueue = persistQueue.then(async () => {
         if (ownerAtSave && firestoreDB) {
           try {

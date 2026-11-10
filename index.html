@@ -359,14 +359,12 @@
       border-radius: 0;
       background: transparent;
       box-shadow: none;
-      scrollbar-width: thin;
-      scrollbar-color: #c7c7c7 transparent;
+      scrollbar-width: none;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
     }
-    .chat::-webkit-scrollbar { width: 6px; }
-    .chat::-webkit-scrollbar-thumb { border-radius: 999px; background: #c7c7c7; }
+    .chat::-webkit-scrollbar { display:none; width:0; height:0; }
     .chat:empty { display:none; }
     .main:has(.chat .msg) { justify-content: flex-start; }
     .main:has(.chat .msg) .chat { flex: 1 1 auto; min-height: 0; max-height: none; }

@@ -394,14 +394,14 @@
 
     .msg.ai {
       padding: 12px 15px;
-      border: 1px solid var(--line);
-      border-radius: 17px 17px 17px 5px;
-      background: var(--ai-bubble);
+      border: 0;
+      border-radius: 0;
+      background: transparent;
       font-family: "Times New Roman", serif;
       width: fit-content;
       max-width: min(84%, 900px);
     }
-    .msg.weather-answer { max-width: min(94%, 980px); }
+    .msg.weather-answer { max-width: min(94%, 980px); padding-left:0; padding-right:0; }
     .chat .msg.bengali,
     .chat .msg.bengali :not(svg):not(path) {
       font-family: SolaimanLipi, "Times New Roman", Times, serif !important;
@@ -420,8 +420,9 @@
     }
 
     .answer-table-wrap { max-width: 100%; overflow-x: auto; }
-    .weather-answer .message-body { background:linear-gradient(180deg,#f7fbff,#fff); border:1px solid #d9e8f5; border-radius:18px; padding:18px 20px; box-shadow:0 6px 20px #2b6f9a12; }
-    .weather-answer .answer-table { margin-top:14px; border-radius:12px; overflow:hidden; }
+    .weather-answer .message-body { background:transparent; border:0; border-radius:0; padding:8px 0; box-shadow:none; }
+    .weather-answer .answer-table { margin-top:14px; border:0; border-radius:12px; overflow:hidden; }
+    .weather-answer .answer-table th,.weather-answer .answer-table td { border-color:#e8eef3; padding:8px 12px; }
 
     .answer-table {
       width: 100%;

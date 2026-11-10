@@ -55,8 +55,8 @@ export function createScene(canvas) {
 
   function makePuff(scatter) {
     return {
-      x: 0.18 + rand(-0.006, 0.006),
-      y: 0.50,
+      x: 0.31 + rand(-0.006, 0.006),
+      y: 0.56,
       vx: rand(-0.01, 0.015),
       vy: rand(-0.045, -0.02),
       life: scatter ? Math.random() * 2 : 0,
@@ -118,9 +118,9 @@ export function createScene(canvas) {
   }
 
   function drawHookah(time) {
-    const x = canvas.width * 0.17;
-    const baseY = canvas.height * 0.63;
-    const u = canvas.height * 0.2;
+    const x = canvas.width * 0.31;
+    const baseY = canvas.height * 0.72;
+    const u = canvas.height * 0.105;
     ctx.save();
     ctx.translate(x, baseY);
     ctx.fillStyle = "rgba(40,20,8,0.28)";
@@ -131,41 +131,45 @@ export function createScene(canvas) {
     ctx.beginPath();
     ctx.ellipse(0, u * 0.28, u * 0.72, u * 0.12, 0, 0, Math.PI * 2);
     ctx.fill();
-    const glass = ctx.createRadialGradient(-u * 0.2, -u * 0.05, u * 0.05, 0, u * 0.05, u * 0.7);
-    glass.addColorStop(0, "#f4fffb");
-    glass.addColorStop(0.55, "#6fbfb2");
-    glass.addColorStop(1, "#1c6a62");
+    const glass = ctx.createLinearGradient(0, -u * 0.6, 0, u * 0.5);
+    glass.addColorStop(0, "#e8fff8");
+    glass.addColorStop(0.45, "#7ecfc2");
+    glass.addColorStop(1, "#1d6d64");
     ctx.fillStyle = glass;
     ctx.beginPath();
-    ctx.ellipse(0, 0, u * 0.58, u * 0.36, 0, 0, Math.PI * 2);
+    ctx.moveTo(-u * 0.16, -u * 0.62);
+    ctx.bezierCurveTo(-u * 0.9, -u * 0.15, -u * 0.78, u * 0.38, -u * 0.24, u * 0.46);
+    ctx.quadraticCurveTo(0, u * 0.58, u * 0.24, u * 0.46);
+    ctx.bezierCurveTo(u * 0.78, u * 0.38, u * 0.9, -u * 0.15, u * 0.16, -u * 0.62);
+    ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = "#f0d092";
     ctx.lineWidth = Math.max(2, u * 0.04);
     ctx.stroke();
-    ctx.fillStyle = "rgba(210,245,250,0.7)";
+    ctx.fillStyle = "rgba(210,245,250,0.55)";
     ctx.beginPath();
-    ctx.ellipse(0, u * 0.08, u * 0.4, u * 0.08, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, u * 0.08, u * 0.34, u * 0.1, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = "#e1b45a";
-    ctx.lineWidth = Math.max(4, u * 0.07);
+    ctx.lineWidth = Math.max(3, u * 0.06);
     ctx.beginPath();
-    ctx.moveTo(0, -u * 0.28);
-    ctx.lineTo(0, -u * 1.15);
+    ctx.moveTo(0, -u * 0.58);
+    ctx.lineTo(0, -u * 1.35);
     ctx.stroke();
     ctx.fillStyle = "#5a3218";
     ctx.beginPath();
-    ctx.ellipse(0, -u * 1.22, u * 0.2, u * 0.1, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, -u * 1.42, u * 0.22, u * 0.1, 0, 0, Math.PI * 2);
     ctx.fill();
     const glow = 0.65 + Math.sin(time * 3) * 0.25;
     ctx.fillStyle = `rgba(255,80,20,${glow})`;
     ctx.beginPath();
-    ctx.arc(u * 0.05, -u * 1.28, u * 0.06, 0, Math.PI * 2);
+    ctx.arc(u * 0.04, -u * 1.5, u * 0.06, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = "#4a2a16";
-    ctx.lineWidth = Math.max(3, u * 0.045);
+    ctx.lineWidth = Math.max(3, u * 0.055);
     ctx.beginPath();
-    ctx.moveTo(u * 0.35, -u * 0.05);
-    ctx.bezierCurveTo(u * 2.2, u * 0.15, canvas.width * 0.18, -canvas.height * 0.08, canvas.width * 0.3, -canvas.height * 0.22);
+    ctx.moveTo(u * 0.42, u * 0.05);
+    ctx.bezierCurveTo(u * 1.6, -u * 0.35, canvas.width * 0.1, -canvas.height * 0.22, canvas.width * 0.16, -canvas.height * 0.34);
     ctx.stroke();
     ctx.restore();
   }

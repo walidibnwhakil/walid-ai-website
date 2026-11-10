@@ -110,6 +110,7 @@ async function openPlay() {
   scene.setMood("curious");
   await scene.start();
   setStatus(text().pick);
+  $("progress").textContent = "";
   showOnly("pick");
   try { await loading; } catch { setStatus(text().failedSave); }
 }
@@ -286,7 +287,11 @@ function setLanguage(next) {
   if (mode === "ask" && currentQ && pool) {
     const question = pool.questions[pool.qIndex.get(currentQ)];
     setStatus(lang === "bn" ? question.bn : question.en);
-  } else if (mode === "pick") setStatus(text().pick);
+    $("progress").textContent = text().progress(state.answers.length + 1);
+  } else if (mode === "pick") {
+    setStatus(text().pick);
+    $("progress").textContent = "";
+  }
 }
 
 $("play").addEventListener("click", () => { openPlay(); });

@@ -177,6 +177,6 @@ $("new").addEventListener("click",reset);
 render();
 
 const footer=document.createElement('footer');
-footer.className='site-footer';
+footer.className='legal-footer';
 footer.innerHTML='<nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p>';
 document.body.append(footer);

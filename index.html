@@ -425,6 +425,12 @@
     .weather-answer .answer-table th,.weather-answer .answer-table td { border-color:transparent; padding:8px 12px; }
     .weather-answer .answer-table th { font-weight:600; background:transparent; }
     .weather-answer .answer-table tr:nth-child(even) { background:#f8fafb; }
+    .weather-answer .answer-table { display:block; border-spacing:0 8px; }
+    .weather-answer .answer-table thead { display:none; }
+    .weather-answer .answer-table tbody { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:8px; }
+    .weather-answer .answer-table tr { display:grid; gap:2px; padding:10px 12px; border-radius:14px; background:#f7fafc; }
+    .weather-answer .answer-table td { border:0; padding:2px 0; font-size:14px; }
+    .weather-answer .answer-table td:first-child { font-weight:600; color:#374151; }
     .answer-details summary { cursor:pointer; color:var(--green); font-size:14px; margin-top:12px; }
 
     .answer-table {

@@ -618,6 +618,42 @@
     "bn": "এটা কি নরম?"
   },
   {
+    "id": "party_bnp",
+    "group": "politics",
+    "en": "Are they in the BNP?",
+    "bn": "তিনি কি বিএনপির?"
+  },
+  {
+    "id": "party_al",
+    "group": "politics",
+    "en": "Are they in the Awami League?",
+    "bn": "তিনি কি আওয়ামী লীগের?"
+  },
+  {
+    "id": "led_gov",
+    "group": "politics",
+    "en": "Have they led a government?",
+    "bn": "তিনি কি সরকার প্রধান ছিলেন?"
+  },
+  {
+    "id": "zia_family",
+    "group": "politics",
+    "en": "Are they in Ziaur Rahman's family?",
+    "bn": "তিনি কি জিয়াউর রহমানের পরিবারের?"
+  },
+  {
+    "id": "mujib_family",
+    "group": "politics",
+    "en": "Are they in Sheikh Mujib's family?",
+    "bn": "তিনি কি শেখ মুজিবের পরিবারের?"
+  },
+  {
+    "id": "lives_abroad",
+    "group": "politics",
+    "en": "Do they live abroad?",
+    "bn": "তিনি কি দেশের বাইরে থাকেন?"
+  },
+  {
     "id": "daily_use",
     "group": "object",
     "en": "Do people use it every day?",

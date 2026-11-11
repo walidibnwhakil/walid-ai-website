@@ -3,7 +3,7 @@ import { answer as applyAnswer, canPrint, createState, decide, displayName, enti
 import { UI, guessFont } from "./i18n.js";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, poolFromEntries } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js";
+import { createScene } from "./scene.js?v=akinator-12";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -45,25 +45,33 @@ function applyLanguage() {
   $("new").textContent = copy.newGame;
   $("to-menu").textContent = copy.menu;
   $("back").textContent = copy.undo;
+  $("confirm-text").textContent = copy.confirmNew;
+  $("confirm-yes").textContent = copy.confirmYes;
+  $("confirm-no").textContent = copy.confirmNo;
   document.querySelectorAll("[data-cat]").forEach((node) => {
     const key = node.dataset.cat === "animal" ? "animalCat" : node.dataset.cat === "object" ? "objectCat" : "character";
     node.textContent = copy[key];
   });
-  $("pick-label").textContent = copy.pick;
   document.querySelectorAll("[data-set-lang]").forEach((node) => {
     node.setAttribute("aria-pressed", String(node.dataset.setLang === lang));
   });
-  $("learn-name-label").textContent = copy.name;
-  $("learn-photo-label").textContent = copy.photo;
+  $("learn-name-text").textContent = copy.name;
+  $("learn-photo-text").textContent = copy.photo;
   $("learn-save").textContent = copy.save;
+  $("play-label").textContent = copy.play;
 }
 
 function showMenu() {
   mode = "menu";
   menu.hidden = false;
   game.hidden = true;
+  $("confirm").hidden = true;
   setGameInProgress(false);
   scene.stop();
+}
+
+function gameInProgress() {
+  return mode === "ask" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
 }
 
 async function boot() {
@@ -111,6 +119,7 @@ async function openPlay() {
   await scene.start();
   setStatus(text().pick);
   $("progress").textContent = "";
+  $("confirm").hidden = true;
   showOnly("pick");
   try { await loading; } catch { setStatus(text().failedSave); }
 }
@@ -196,8 +205,10 @@ async function onWrong() {
   if (mode !== "guess" || guessIndex < 0) return;
   mode = "wrong";
   setStatus(text().missed);
-  showOnly("wrong");
+  showOnly("none");
   await scene.playWrong();
+  if (mode !== "wrong") return;
+  showOnly("wrong");
 }
 
 async function onRetry() {
@@ -231,27 +242,38 @@ async function beginDefeat() {
   $("back").hidden = true;
 }
 
+function showLearnMessage(message) {
+  setStatus(message);
+  const note = $("learn-note");
+  if (note) note.textContent = message;
+}
+
 async function onLearnSubmit(event) {
   event.preventDefault();
-  const name = $("learn-name").value.trim();
-  if (!name) return;
-  const adult = answersImplyAdult(state.answers) || nameMatchesAdult(pool, name);
-  const file = adult ? null : $("learn-photo").files?.[0] || null;
-  $("learn-save").disabled = true;
+  const nameInput = $("learn-name");
+  const name = nameInput?.value.trim() || "";
+  if (!name) {
+    showLearnMessage(text().needName);
+    nameInput?.focus();
+    return;
+  }
+  const adult = answersImplyAdult(state?.answers || []) || nameMatchesAdult(pool, name);
+  const file = adult ? null : $("learn-photo")?.files?.[0] || null;
+  const save = $("learn-save");
+  if (save) save.disabled = true;
   try {
     await submitLearning({
       name,
       nameBn: lang === "bn" ? name : "",
       file,
       adult,
-      answers: state.answers,
+      answers: state?.answers || [],
     });
-    setStatus(text().saved);
+    showLearnMessage(text().saved);
+    learnForm.querySelectorAll("input").forEach((input) => { input.disabled = true; });
   } catch {
-    setStatus(text().failedSave);
-  } finally {
-    $("learn-save").disabled = false;
-    learnForm.hidden = true;
+    showLearnMessage(text().failedSave);
+    if (save) save.disabled = false;
   }
 }
 
@@ -295,7 +317,20 @@ function setLanguage(next) {
 }
 
 $("play").addEventListener("click", () => { openPlay(); });
-$("new").addEventListener("click", () => { scene.clearReveal(); openPlay(); });
+$("new").addEventListener("click", () => {
+  if (gameInProgress()) {
+    $("confirm").hidden = false;
+    return;
+  }
+  scene.clearReveal();
+  openPlay();
+});
+$("confirm-yes").addEventListener("click", () => {
+  $("confirm").hidden = true;
+  scene.clearReveal();
+  openPlay();
+});
+$("confirm-no").addEventListener("click", () => { $("confirm").hidden = true; });
 document.querySelectorAll("[data-cat]").forEach((node) => node.addEventListener("click", () => startGame(node.dataset.cat)));
 $("to-menu").addEventListener("click", showMenu);
 $("correct").addEventListener("click", onCorrect);

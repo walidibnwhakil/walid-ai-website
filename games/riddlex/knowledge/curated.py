@@ -151,7 +151,77 @@ def curated_entities():
     rows.append(person("c-bankim", "Bankim Chandra Chatterjee", "বঙ্কিমচন্দ্র চট্টোপাধ্যায়", 160, year=1838, country="from_in", gender="male", alive=False, jobs=("writer",), aliases=("বঙ্কিমচন্দ্র", "Bankim Chandra Chattopadhyay")))
     rows.append(person("c-sarat", "Sarat Chandra Chattopadhyay", "শরৎচন্দ্র চট্টোপাধ্যায়", 170, year=1876, country="from_in", gender="male", alive=False, jobs=("writer",), aliases=("শরৎচন্দ্র",)))
     rows.append(person("Q8873", "Satyajit Ray", "সত্যজিৎ রায়", 400, year=1921, country="from_in", gender="male", alive=False, jobs=("director", "writer"), aliases=("সত্যজিৎ",)))
-    rows.append(person("c-mujib", "Sheikh Mujibur Rahman", "শেখ মুজিবুর রহমান", 340, year=1920, country="from_bd", gender="male", alive=False, jobs=("politician",), aliases=("বঙ্গবন্ধু", "মুজিব", "Sheikh Mujib")))
+    rows.append(person(
+        "Q191375", "Sheikh Mujibur Rahman", "শেখ মুজিবুর রহমান", 500,
+        year=1920, country="from_bd", gender="male", alive=False, jobs=("politician",),
+        extra_yes=("party_al", "led_gov", "mujib_family"),
+        extra_no=("party_bnp", "zia_family", "lives_abroad"),
+        aliases=("বঙ্গবন্ধু", "মুজিব", "Sheikh Mujib"),
+    ))
+    # Facts below are the Wikidata claims checked for these items (birth, death, party, office, family).
+    rows.append(person(
+        "Q52183", "Sheikh Hasina", "শেখ হাসিনা", 480,
+        year=1947, country="from_bd", gender="female", alive=True, jobs=("politician",),
+        extra_yes=("party_al", "led_gov", "mujib_family"),
+        extra_no=("party_bnp", "zia_family"),
+        aliases=("Hasina", "হাসিনা"),
+    ))
+    rows.append(person(
+        "Q234814", "Khaleda Zia", "খালেদা জিয়া", 420,
+        year=1945, country="from_bd", gender="female", alive=False, jobs=("politician",),
+        extra_yes=("party_bnp", "led_gov", "zia_family"),
+        extra_no=("party_al", "mujib_family"),
+        aliases=("Khaleda", "খালেদা"),
+    ))
+    rows.append(person(
+        "Q198313", "Ziaur Rahman", "জিয়াউর রহমান", 300,
+        year=1936, country="from_bd", gender="male", alive=False, jobs=("politician",),
+        extra_yes=("party_bnp", "led_gov", "zia_family"),
+        extra_no=("party_al", "mujib_family", "lives_abroad"),
+        aliases=("জিয়া", "Zia"),
+    ))
+    rows.append(person(
+        "Q7686199", "Tarique Rahman", "তারেক রহমান", 280,
+        year=1968, country="from_bd", gender="male", alive=True, jobs=("politician",),
+        extra_yes=("party_bnp", "led_gov", "zia_family"),
+        extra_no=("party_al", "mujib_family", "lives_abroad"),
+        aliases=("Tarek Rahman", "Tareq Rahman", "তারেক"),
+    ))
+    rows.append(person(
+        "Q43969", "Muhammad Yunus", "মুহাম্মদ ইউনূস", 360,
+        year=1940, country="from_bd", gender="male", alive=True, jobs=("politician", "scientist"),
+        extra_yes=("led_gov",),
+        extra_no=("party_bnp", "party_al", "zia_family", "mujib_family"),
+        aliases=("Yunus", "ইউনূস"),
+    ))
+    rows.append(person(
+        "Q7402629", "Sajeeb Wazed", "সজীব ওয়াজেদ", 150,
+        year=1971, country="from_bd", gender="male", alive=True, jobs=("politician",),
+        extra_yes=("party_al", "mujib_family"),
+        extra_no=("party_bnp", "led_gov", "zia_family"),
+        aliases=("Joy", "সজীব"),
+    ))
+    rows.append(person(
+        "Q14325293", "Obaidul Quader", "ওবায়দুল কাদের", 170,
+        year=1952, country="from_bd", gender="male", alive=True, jobs=("politician",),
+        extra_yes=("party_al",),
+        extra_no=("party_bnp", "led_gov", "zia_family", "mujib_family"),
+        aliases=("কাদের",),
+    ))
+    rows.append(person(
+        "Q6874839", "Mirza Fakhrul Islam Alamgir", "মির্জা ফখরুল ইসলাম আলমগীর", 190,
+        year=1948, country="from_bd", gender="male", alive=True, jobs=("politician",),
+        extra_yes=("party_bnp",),
+        extra_no=("party_al", "led_gov", "zia_family", "mujib_family", "lives_abroad"),
+        aliases=("Fakhrul", "ফখরুল"),
+    ))
+    rows.append(person(
+        "Q1058", "Narendra Modi", "নরেন্দ্র মোদী", 520,
+        year=1950, country="from_in", gender="male", alive=True, jobs=("politician",),
+        extra_yes=("led_gov",),
+        extra_no=("party_bnp", "party_al", "zia_family", "mujib_family", "from_bd"),
+        aliases=("Modi", "মোদী", "মোদি"),
+    ))
     rows.append(person("c-rokeya", "Begum Rokeya", "বেগম রোকেয়া", 150, year=1880, country="from_bd", gender="female", alive=False, jobs=("writer",), aliases=("রোকেয়া সাখাওয়াত হোসেন", "Rokeya", "Begum Rokeya Sakhawat Hossain")))
 
     rows.append(character("Q5765519", "Himu", "হিমু", 160, {

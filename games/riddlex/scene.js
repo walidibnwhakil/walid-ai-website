@@ -64,6 +64,7 @@ export function createScene(canvas) {
   const moodShown = { lift: 0, sad: 0, happy: 0, think: 0 };
   let blink = 0;
   let nextBlink = rand(2.2, 5);
+  let flash = null;
   let clock = 0;
   let running = false;
   let raf = 0;
@@ -204,12 +205,39 @@ export function createScene(canvas) {
     ctx.restore();
   }
 
+  const REACT = {
+  yes: ["happy", 0.82],
+  probably: ["happy", 0.46],
+  no: ["serious", 0.92],
+  probably_not: ["serious", 0.5],
+  unknown: ["confused", 0.9],
+};
+
+  function react(answer) {
+    const spec = REACT[answer];
+    if (!spec) return;
+    flash = { key: spec[0], peak: spec[1], life: 1.05 };
+  }
+
   function stepExpr(dt) {
-    const goal = mood === "happy" || mood === "confident" ? "happy"
-      : mood === "sad" || mood === "defeated" ? "sad"
-      : mood === "thinking" || mood === "confused" ? "worried" : "";
-    const blend = 1 - Math.exp(-dt / 0.25);
-    for (const key of Object.keys(expr)) expr[key] += ((goal === key ? 1 : 0) - expr[key]) * blend;
+    // Win and a wrong guess hold. An answer only flashes, then thinking is the neutral face.
+    let goal = "";
+    let peak = 1;
+    if (mood === "happy" || mood === "confident") goal = "happy";
+    else if (mood === "sad" || mood === "defeated") goal = "sad";
+    else if (flash) {
+      const plates = images.overlays || {};
+      const key = plates[flash.key] ? flash.key : (flash.key === "serious" && plates.worried ? "worried" : "");
+      if (key) {
+        goal = key;
+        const fade = flash.life < 0.32 ? Math.max(0, flash.life / 0.32) : 1;
+        peak = flash.peak * fade;
+      }
+      flash.life -= dt;
+      if (flash.life <= 0) flash = null;
+    }
+    const blend = 1 - Math.exp(-dt / 0.2);
+    for (const key of Object.keys(expr)) expr[key] += ((goal === key ? peak : 0) - expr[key]) * blend;
   }
 
   function drawExpr() {
@@ -245,7 +273,7 @@ export function createScene(canvas) {
     const body = portraitMode ? [0.18, 0.30, 0.55, 0.10] : [0.36, 0.27, 0.30, 0.14];
     nudge(body, 0, -Math.max(0, breath), base);
     const shut = blink > 0 ? Math.sin(Math.min(1, blink) * Math.PI) : 0;
-    const showingFace = Math.max(expr.happy, expr.sad, expr.worried) > 0.45;
+    const showingFace = Math.max(expr.happy, expr.sad, expr.worried, expr.serious, expr.confused) > 0.35;
     if (!showingFace) {
       const sway = Math.sin(time * 0.45) * 0.007;
       nudge(portraitMode ? [0.28, 0.12, 0.44, 0.22] : [0.42, 0.05, 0.18, 0.22], sway, 0, base);
@@ -646,6 +674,7 @@ export function createScene(canvas) {
   return {
     start, stop, resize,
     setMood(value) { mood = value; },
+    react,
     playReveal, playWrong, playRetry, playDefeat, clearReveal,
   };
 }

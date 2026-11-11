@@ -240,8 +240,8 @@ async function beginGuess(index) {
 
 async function onAnswer(value) {
   if (mode !== "ask" || !currentQ) return;
-  const moods = { yes: "curious", no: "thinking", probably: "confused", probably_not: "confused", unknown: "thinking" };
-  scene.setMood(moods[value] || "thinking");
+  scene.react(value);
+  scene.setMood("thinking");
   applyAnswer(state, currentQ, value);
   currentQ = null;
   await step();

@@ -59,7 +59,7 @@ export function createScene(canvas) {
 
   let portraitMode = false;
   const smoke = Array.from({ length: 5 }, () => makePuff(true));
-  const catAct = { kind: "idle", t: 0, next: rand(7, 12) };
+  const catLife = { blink: 0, nextBlink: rand(3.4, 6.5), tail: 0, nextTail: rand(4, 8), tailAmp: 0.006 };
   let mood = "curious";
   const moodShown = { lift: 0, sad: 0, happy: 0, think: 0 };
   let blink = 0;
@@ -253,17 +253,26 @@ export function createScene(canvas) {
     }
   }
 
-  function stepCreatures(dt) {
+  const CAT_FACE = {
+    landscape: { u: 0.67464, v: 0.33794, w: 0.14354, h: 0.18278 },
+    portrait: { u: 0.72222, v: 0.35313, w: 0.20556, h: 0.10781 },
+  };
+
+  function stepCat(dt) {
     if (reveal) return;
-    catAct.t += dt;
-    if (catAct.kind === "idle" && catAct.t > catAct.next) {
-      catAct.kind = Math.random() < 0.55 ? "hop" : "stretch";
-      catAct.t = 0;
-    } else if (catAct.kind !== "idle" && catAct.t > 0.85) {
-      catAct.kind = "idle";
-      catAct.t = 0;
-      catAct.next = rand(8, 15);
+    catLife.nextBlink -= dt;
+    if (catLife.nextBlink <= 0) {
+      catLife.blink = 1;
+      catLife.nextBlink = rand(4.5, 9);
     }
+    if (catLife.blink > 0) catLife.blink -= dt * 6.5;
+    catLife.nextTail -= dt;
+    if (catLife.nextTail <= 0 && catLife.tail <= 0) {
+      catLife.tail = 1;
+      catLife.tailAmp = rand(0.004, 0.009);
+      catLife.nextTail = rand(6, 12);
+    }
+    if (catLife.tail > 0) catLife.tail -= dt * 0.85;
   }
 
   function drawLife(time) {
@@ -282,31 +291,29 @@ export function createScene(canvas) {
         eyelid(0.545, 0.208, 0.014, 0.010, shut);
       }
     }
-    const catBox = portraitMode ? [0.62, 0.32, 0.24, 0.10] : [0.70, 0.36, 0.22, 0.10];
-    const catBreath = Math.sin(time * 1.6 + 1) * 0.007;
-    nudge(catBox, 0, -Math.max(0, catBreath), base);
-    if (!portraitMode) {
-      nudge([0.688, 0.318, 0.045, 0.06], Math.sin(time * 2.4) * 0.006, 0, base);
-      nudge([0.84, 0.40, 0.08, 0.06], Math.sin(time * 1.7) * 0.008, 0, base);
-      eyelid(0.720, 0.400, 0.012, 0.008, shut * 0.85);
-      eyelid(0.753, 0.404, 0.012, 0.008, shut * 0.85);
+    const catBody = portraitMode ? [0.62, 0.32, 0.30, 0.12] : [0.68, 0.34, 0.26, 0.14];
+    nudge(catBody, 0, -Math.max(0, Math.sin(time * 1.5 + 1) * 0.004), base);
+    if (catLife.tail > 0) {
+      const sway = Math.sin((1 - Math.max(0, catLife.tail)) * Math.PI) * catLife.tailAmp;
+      const tail = portraitMode ? [0.86, 0.34, 0.08, 0.06] : [0.84, 0.38, 0.09, 0.07];
+      nudge(tail, sway, sway * 0.35, base);
     }
-    if (catAct.kind === "hop") {
-      const p = Math.sin(Math.min(1, catAct.t / 0.85) * Math.PI);
-      nudge(portraitMode ? [0.60, 0.30, 0.28, 0.14] : [0.69, 0.33, 0.26, 0.16], 0, -0.015 * p, base);
-    } else if (catAct.kind === "stretch" && !portraitMode) {
-      const p = Math.sin(Math.min(1, catAct.t / 0.85) * Math.PI);
-      nudge([0.70, 0.36, 0.26, 0.13], 0.01 * p, 0.004 * p, base);
-    }
-    const plate = moodShown.sad > moodShown.happy
-      ? (moodShown.sad > 0.25 ? images.sad : null)
-      : (moodShown.happy > 0.25 ? images.happy : (moodShown.think > 0.55 ? images.worried : null));
-    const plateAlpha = plate === images.sad ? moodShown.sad : plate === images.happy ? moodShown.happy : moodShown.think;
-    if (plate) {
+    const catShut = catLife.blink > 0 ? Math.sin(Math.min(1, catLife.blink) * Math.PI) : 0;
+    const catCrop = images.overlays && images.overlays.cat;
+    if (catCrop && catShut > 0.04) {
+      const box = CAT_FACE[portraitMode ? "portrait" : "landscape"];
       ctx.save();
-      ctx.globalAlpha = Math.max(0, Math.min(1, plateAlpha));
-      ctx.drawImage(plate, view.x, view.y, view.w, view.h);
+      ctx.globalAlpha = Math.min(1, catShut * 1.15);
+      ctx.drawImage(catCrop, ix(box.u), iy(box.v), view.w * box.w, view.h * box.h);
       ctx.restore();
+    } else if (catShut > 0.05) {
+      if (portraitMode) {
+        eyelid(0.78, 0.385, 0.012, 0.006, catShut);
+        eyelid(0.82, 0.388, 0.012, 0.006, catShut);
+      } else {
+        eyelid(0.720, 0.400, 0.012, 0.008, catShut);
+        eyelid(0.753, 0.404, 0.012, 0.008, catShut);
+      }
     }
   }
 
@@ -544,7 +551,7 @@ export function createScene(canvas) {
       }
     }
     if (!reduce) drawSmoke(dt);
-    if (!reduce) stepCreatures(dt);
+    if (!reduce) stepCat(dt);
     updateReveal(dt);
     if (!reduce) drawLife(clock);
     const hands = portraitMode ? [0.28, 0.28, 0.44, 0.12] : [0.42, 0.30, 0.24, 0.13];
@@ -675,6 +682,7 @@ export function createScene(canvas) {
     start, stop, resize,
     setMood(value) { mood = value; },
     react,
+    blinkCat() { catLife.blink = 1; },
     playReveal, playWrong, playRetry, playDefeat, clearReveal,
   };
 }

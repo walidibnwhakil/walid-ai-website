@@ -31,7 +31,7 @@ main { max-width: 1050px; }
   background: #4e392e;
   font-size: 2.5rem;
 }
-.riddlex-preview { background: #4e392e url("./riddlex-preview.jpg") center 42% / cover; }
+.riddlex-preview { background: #4e392e; }
 .riddlex-tile {padding:6px;border:2px solid #bd9360;border-radius:20px;background:linear-gradient(145deg,#4e392e,#201713);box-shadow:0 5px 0 #24160f,0 12px 24px #29150d55}
 .note {
   position: absolute;

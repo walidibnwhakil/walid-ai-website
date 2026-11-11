@@ -90,6 +90,23 @@ function play(pool, id, { flip = -1 } = {}) {
   return { ok: false, step: 28 };
 }
 
+test("Bangladesh is asked within the first five character questions", () => {
+  const state = createState(world, { category: "character", opening: "real" });
+  recompute(state);
+  const asked = [];
+  for (let step = 0; step < 6; step++) {
+    const decision = decide(state);
+    assert.equal(decision.type, "ask", asked.join(","));
+    asked.push(decision.qid);
+    if (decision.qid === "from_bd") break;
+    const value = bit(world, "shakib", decision.qid) === 2 ? "yes" : bit(world, "shakib", decision.qid) === 1 ? "no" : "unknown";
+    answer(state, decision.qid, value);
+  }
+  const at = asked.indexOf("from_bd");
+  assert.ok(at >= 0 && at < 5, asked.join(","));
+  assert.ok(asked[0] === "real");
+});
+
 test("guesses the five briefed targets from truthful answers", () => {
   for (const id of ["shakib", "himu", "tom", "cat", "cooker"]) {
     const result = play(world, id);

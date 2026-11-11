@@ -42,9 +42,12 @@ service cloud.firestore {
     }
 
     match /riddlex_entries/{slug} {
-      allow get, list: if resource.data.status in ["approved", "confirmed"]
+      allow get: if resource == null
+        || resource.data.status in ["approved", "confirmed", "pending"]
         || owner()
         || (signedIn() && resource.data.createdBy == request.auth.uid);
+      allow list: if resource.data.status in ["approved", "confirmed"]
+        || owner();
 
       allow create: if signedIn()
         && slug == request.resource.data.slug

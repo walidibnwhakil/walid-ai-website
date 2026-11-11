@@ -10,13 +10,18 @@ const SCRIPTS = [
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) {
+      if (existing.dataset.loaded === "1") resolve();
+      else {
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener("error", () => reject(new Error(src)), { once: true });
+      }
       return;
     }
     const script = document.createElement("script");
     script.src = src;
-    script.onload = () => resolve();
+    script.onload = () => { script.dataset.loaded = "1"; resolve(); };
     script.onerror = () => reject(new Error(src));
     document.head.append(script);
   });
@@ -129,8 +134,15 @@ export async function submitLearning({ name, nameBn, file, answers, adult }) {
   const uid = auth.currentUser.uid;
   const hour = Math.floor(Date.now() / 3600000);
   const ref = db.collection("riddlex_entries").doc(slug);
-  const existing = await ref.get();
-  if (!existing.exists) {
+  let existing = null;
+  try {
+    existing = await ref.get();
+  } catch (error) {
+    const text = `${error?.code || ""} ${error?.message || error}`;
+    const denied = /permission/i.test(text);
+    if (!denied) throw new Error(text);
+  }
+  if (!existing?.exists) {
     let slot = -1;
     for (let n = 0; n < 5; n++) {
       try {

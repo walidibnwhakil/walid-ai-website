@@ -1,5 +1,6 @@
-// Bayesian question picker. Unknown facts do not move the odds.
-// A contradictory answer lowers an entity sharply but does not erase it.
+// Bayesian question picker. A firm yes or no on a hard fact (country, gender,
+// life, real or fictional, human or not) outweighs fame. Probably stays soft.
+// Someone ruled out that way only returns if the player contradicts that fact.
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -90,10 +91,62 @@ function massOf(state, qi, bit) {
   return total;
 }
 
+const HARD_CONTRA = Math.log(1e-12);
+const HARD_MISSING = Math.log(1e-5);
+let hardLookup = null;
+
+function hardFacts() {
+  if (hardLookup) return hardLookup;
+  const families = [
+    COUNTRIES,
+    BIRTHS,
+    ["male", "female"],
+    ["alive", "dead"],
+    ["real", "fictional"],
+    ["animal", "object"],
+    ["party_bnp", "party_al"],
+    ["led_gov"],
+    ["zia_family"],
+    ["mujib_family"],
+    ["lives_abroad"],
+  ];
+  const index = new Map();
+  families.forEach((ids, fam) => ids.forEach((id) => index.set(id, fam)));
+  hardLookup = { families, index };
+  return hardLookup;
+}
+
+function conflictedFamilies(answers) {
+  const { families, index } = hardFacts();
+  const yes = families.map(() => new Set());
+  const no = families.map(() => new Set());
+  const conflicted = new Set();
+  for (const answer of answers) {
+    if (answer.value !== "yes" && answer.value !== "no") continue;
+    const fam = index.get(answer.qid);
+    if (fam == null) continue;
+    (answer.value === "yes" ? yes : no)[fam].add(answer.qid);
+    if (yes[fam].size > 1) conflicted.add(fam);
+    for (const id of yes[fam]) if (no[fam].has(id)) conflicted.add(fam);
+  }
+  return conflicted;
+}
+
+function hardLog(answer, bit, conflicted) {
+  const fam = hardFacts().index.get(answer.qid);
+  if (fam == null || conflicted.has(fam)) return null;
+  if (answer.value !== "yes" && answer.value !== "no") return null;
+  const contradicts = (answer.value === "yes" && bit === 1) || (answer.value === "no" && bit === 2);
+  if (contradicts) return HARD_CONTRA;
+  if (answer.value === "yes" && bit === 0) return HARD_MISSING;
+  return null;
+}
+
 export function recompute(state) {
   const { pool, answers, rejected } = state;
   const n = pool.count;
   const logW = new Float64Array(n);
+  const conflicted = conflictedFamilies(answers);
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
     if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
@@ -105,7 +158,8 @@ export function recompute(state) {
       const answer = answers[a];
       if (answer.value === "unknown") continue;
       const bit = attrAt(pool.attrs, pool.attrBytes, i, answer.qi);
-      score += LOG_MATCH[answer.value][bit];
+      const firm = hardLog(answer, bit, conflicted);
+      score += firm == null ? LOG_MATCH[answer.value][bit] : firm;
     }
     logW[i] = score;
     if (score > max) max = score;
@@ -153,18 +207,35 @@ function topTwo(state) {
   return { best, second, bestP, secondP };
 }
 
+function oddsRatio(bestP, secondP) {
+  return secondP > 0 ? bestP / secondP : 99;
+}
+
+// After a miss, Akinator keeps asking. Guess again only when one name is
+// far ahead, or after several new questions. Close scores wait longer.
+export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
+  if (!state || state.guesses <= 0) return 0;
+  if (bestP >= 0.8 && ratio >= 8) return 0;
+  if (ratio < 2.5) return 6;
+  return 4;
+}
+
 export function shouldGuess(state) {
   const asked = state.answers.length;
   if (!state.alive.length) return false;
   const { bestP, secondP } = topTwo(state);
   if (!(bestP > 0)) return false;
-  const ratio = secondP > 0 ? bestP / secondP : 99;
-  if (state.guesses > 0 && state.sinceGuess < 4 && bestP < 0.88) return false;
+  const ratio = oddsRatio(bestP, secondP);
+  if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
   if (asked >= 72) return true;
-  if (asked < 8 && !(bestP >= 0.9 && ratio >= 8)) return false;
-  if (bestP >= 0.55 && ratio >= 3.5) return true;
-  if (asked >= 24 && bestP >= 0.22 && ratio >= 2.4) return true;
-  if (asked >= 48 && bestP >= 0.12 && ratio >= 1.8) return true;
+  // After a miss, one name far ahead of everyone else can be said at once.
+  if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;
+  // Shared facts such as country and job are not enough. Wait until one person stands clear.
+  if (asked < 6) return false;
+  if (bestP >= 0.88 && ratio >= 10) return true;
+  if (asked >= 12 && bestP >= 0.62 && ratio >= 5) return true;
+  if (asked >= 24 && bestP >= 0.4 && ratio >= 3) return true;
+  if (asked >= 48 && bestP >= 0.22 && ratio >= 2) return true;
   return false;
 }
 
@@ -246,6 +317,7 @@ function gated(state, question, rows) {
     if (id === "all_rounder") return yesMass(state, "cricketer", rows) > 0.35;
     return real() > 0.42;
   }
+  if (group === "politics") return yesMass(state, "politician", rows) > 0.3;
   if (group === "person") return real() + fictional() > 0.32 || animal() > 0.55;
   if (group === "fiction") {
     if (fictional() < 0.28) return false;
@@ -270,7 +342,7 @@ function gated(state, question, rows) {
 }
 
 const CATEGORY_GROUPS = {
-  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction"]),
+  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics"]),
   animal: new Set(["animal", "look", "size"]),
   object: new Set(["object", "look", "size"]),
 };
@@ -292,6 +364,7 @@ function skippedAsDuplicate(state, id) {
   if ((id === "wild" && yes("pet")) || (id === "pet" && yes("wild"))) return true;
   if (COUNTRIES.includes(id) && COUNTRIES.some((country) => country !== id && yes(country))) return true;
   if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;
+  if ((id === "party_al" && yes("party_bnp")) || (id === "party_bnp" && yes("party_al"))) return true;
   return false;
 }
 
@@ -301,6 +374,17 @@ function allowedInCategory(state, question) {
   if (state.category === "character" && (question.id === "animal" || question.id === "object")) return false;
   if (state.category !== "character" && question.group === "kind" && question.id !== "named") return false;
   return true;
+}
+
+function firstAllowedQuestion(state) {
+  const asked = new Set(state.answers.map((answer) => answer.qid));
+  for (let qi = 0; qi < state.pool.questions.length; qi++) {
+    const question = state.pool.questions[qi];
+    if (asked.has(question.id)) continue;
+    if (!allowedInCategory(state, question) || skippedAsDuplicate(state, question.id)) continue;
+    return question.id;
+  }
+  return null;
 }
 
 export function chooseQuestion(state) {
@@ -361,13 +445,13 @@ export function decide(state) {
   recompute(state);
   if (!state.alive.length) return { type: "defeat" };
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
-  if (shouldGuess(state)) {
-    const { best } = topTwo(state);
-    return { type: "guess", index: best };
-  }
-  const qid = chooseQuestion(state);
+  const { best, bestP, secondP } = topTwo(state);
+  const ratio = oddsRatio(bestP, secondP);
+  const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
+  if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
+  let qid = chooseQuestion(state);
+  if (!qid && waiting) qid = firstAllowedQuestion(state);
   if (!qid) {
-    const { best, bestP } = topTwo(state);
     if (best >= 0 && bestP > 0) return { type: "guess", index: best };
     return { type: "defeat" };
   }

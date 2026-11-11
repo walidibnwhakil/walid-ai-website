@@ -12,6 +12,9 @@ export const UI = {
     wrong: "No",
     retry: "Try again",
     newGame: "New game",
+    confirmNew: "Start a new game?",
+    confirmYes: "Yes",
+    confirmNo: "No",
     menu: "Menu",
     undo: "Back",
     character: "Character",
@@ -26,10 +29,11 @@ export const UI = {
     name: "Name",
     photo: "Picture, if you have one",
     save: "Teach the detective",
+    needName: "Type the name first.",
     saved: "Thank you. This stays pending until more players agree, or the owner approves it.",
     noPhoto: "Pictures are not kept for this kind of answer.",
     progress: (n) => `Question ${n}`,
-    failedSave: "The answer could not be saved just now. The game can still continue.",
+    failedSave: "That could not be saved. Check your connection and try again.",
     solved: "Case closed.",
     credit: "Picture",
   },
@@ -46,6 +50,9 @@ export const UI = {
     wrong: "না",
     retry: "আবার চেষ্টা",
     newGame: "নতুন খেলা",
+    confirmNew: "নতুন খেলা শুরু করব?",
+    confirmYes: "হ্যাঁ",
+    confirmNo: "না",
     menu: "মেনু",
     undo: "পেছনে",
     character: "চরিত্র",
@@ -60,10 +67,11 @@ export const UI = {
     name: "নাম",
     photo: "ছবি, থাকলে",
     save: "গোয়েন্দাকে শেখাও",
+    needName: "আগে নামটি লিখুন।",
     saved: "ধন্যবাদ। এই নামটি আরও কয়েকজন মিললে, বা মালিক অনুমোদন করলে, খেলায় যোগ হবে।",
     noPhoto: "এই ধরনের উত্তরের ছবি রাখা হয় না।",
     progress: (n) => `প্রশ্ন ${n}`,
-    failedSave: "এই মুহূর্তে উত্তরটি জমা হয়নি। খেলা চালানো যাবে।",
+    failedSave: "এটি জমা হয়নি। সংযোগ দেখে আবার চেষ্টা করুন।",
     solved: "ধরে ফেলেছি।",
     credit: "ছবি",
   },
@@ -73,5 +81,5 @@ export function guessFont(lang, name) {
   const bangla = lang === "bn" || /[\u0980-\u09FF]/.test(name || "");
   return bangla
     ? '400 28px SolaimanLipi, "Times New Roman", Times, serif'
-    : '400 28px "Times New Roman", Times, serif';
+    : '500 34px Caveat, "Segoe Script", cursive';
 }

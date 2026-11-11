@@ -92,6 +92,7 @@ def _record(event, **data):
 
 def firebase_configured():
     return bool(os.environ.get("FIREBASE_CREDENTIALS_JSON", "").strip() or
+                os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON", "").strip() or
                 os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "").strip())
 
 
@@ -232,6 +233,10 @@ def run_approved_code_tests(proposal, repo_path=None):
     source = Path(repo_path or os.environ.get("WALID_CODE_REPO", Path.cwd())).resolve()
     if not (source / ".git").exists():
         raise ValueError("A git repository is required.")
+    actual_branch = subprocess.run(["git", "branch", "--show-current"], cwd=source,
+                                   capture_output=True, text=True, check=True).stdout.strip()
+    if actual_branch != branch:
+        raise ValueError("The checkout branch must exactly match the approved feature branch.")
     command = os.environ.get("WALID_CODE_TEST_COMMAND", "python -m unittest discover -s tests")
     with tempfile.TemporaryDirectory(prefix="walid-code-test-") as isolated:
         target = Path(isolated) / "repo"

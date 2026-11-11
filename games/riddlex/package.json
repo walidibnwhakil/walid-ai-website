@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test engine.test.mjs learn-form.test.mjs",
+    "test": "node --test engine.test.mjs learn-form.test.mjs kb-plan.test.mjs",
     "harvest": "python3 knowledge/harvest.py",
     "pack": "python3 knowledge/pack.py",
     "simulate": "node simulate.mjs"

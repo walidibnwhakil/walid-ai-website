@@ -474,7 +474,6 @@ export function createScene(canvas) {
     clock += dt;
     approachMood(dt);
     stepExpr(dt);
-    resize();
     const room = images.room;
     const art = portraitMode && images.portrait ? images.portrait : room;
     ctx.fillStyle = "#1a100c";
@@ -508,6 +507,12 @@ export function createScene(canvas) {
     if (blink > 0) blink -= dt * 6;
     raf = requestAnimationFrame(frame);
   }
+
+  // Track real element size changes rather than measuring layout 60 times per second.
+  const sizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => {
+    if (running) resize();
+  });
+  sizeObserver?.observe(canvas);
 
   async function start() {
     if (!images.room) {

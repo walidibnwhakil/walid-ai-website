@@ -13,11 +13,22 @@ import urllib.error
 import urllib.request
 import threading
 
-from walid_staff import enqueue as enqueue_staff_task, list_tasks as list_staff_tasks, run_checks as run_staff_checks, staff_status as get_staff_status
 from walid_providers import (
-    collect_web_sources,
     configured_provider_names,
     generate_fallback_answer,
+    mentions_creator,
+)
+from walid_staff import (
+    staff_status as get_staff_status,
+    list_tasks as list_staff_tasks,
+    mail_check_status,
+    propose_code_change,
+    approve_code_proposal,
+    get_code_approval,
+    run_approved_code_tests,
+    route_task,
+    run_checks as run_staff_checks,
+    scheduled_checks,
 )
 from datetime import datetime, timedelta, timezone
 
@@ -225,8 +236,14 @@ def small_talk_answer(question):
         "hello", "hi", "hey", "assalamu alaikum", "assalamualaikum",
         "assalamu-alaikum", "salam", "সালাম", "আসসালামুআলাইকুম",
     }
+    if normalized in {"iloveyou", "loveyou"}:
+        return "That's kind of you to say! I'm here if you'd like to chat."
+    if normalized in {"আমিতোমাকেভালোবাসি", "আমিতোমাকেভালবাসি", "amitomakebhalobashi", "amitomakevalobashi"}:
+        return "এত সুন্দর কথা বলার জন্য ধন্যবাদ! তোমার সঙ্গে কথা বলতে ভালো লাগছে।"
     normalized_greetings = {normalize_text(item) for item in greetings}
     if normalized in normalized_greetings:
+        if normalized in {"hi", "hey", "hello", "howareyou"}:
+            return "Hi! What would you like to talk about with Walid AI?"
         return "আমি ভালো আছি, ধন্যবাদ! তুমি কেমন আছো? Walid AI-কে কী জানতে চাও?"
     return None
 
@@ -239,7 +256,8 @@ def asks_for_current_information(question):
         "weather", "temperature", "teperature", "temparature", "temp",
         "bristi", "brishti", "gorom", "tapmatra", "abohawa",
         "আবহাওয়া", "আবহাওয়া", "তাপমাত্রা", "ডিগ্রি", "বৃষ্টি",
-        "dhaka", "dhakay", "ঢাকা", "latest news",
+        "live", "price", "exchange rate", "stock price", "score", "forecast",
+        "দাম", "মূল্য", "স্কোর", "লাইভ", "আজ", "এখন", "dam", "daam", "koto dam",
         # Office holders and cabinet membership change over time. Route
         # these questions to Google Search grounding in Bangla and Banglish.
         "minister", "ministers", "cabinet", "prime minister", "president",
@@ -250,7 +268,7 @@ def asks_for_current_information(question):
         "প্রধানমন্ত্রী", "রাষ্ট্রপতি",
     )
     normalized = unicodedata.normalize("NFC", question).lower()
-    return any(term in normalized for term in terms)
+    return any(re.search(r"(?<!\w)" + re.escape(term) + r"(?!\w)", normalized) for term in terms)
 
 
 def known_geography_answer(question):
@@ -336,7 +354,7 @@ def consume_gemini_quota(user, is_search, language="bn"):
                 if language != "en" else
                 "Walid AI has reached today's free AI limit. Please try again tomorrow."
             )
-        if GEMINI_API_KEY and is_search and _GEMINI_USAGE.get("search", 0) >= GEMINI_DAILY_SEARCH_LIMIT:
+        if is_search and _GEMINI_USAGE.get("search", 0) >= GEMINI_DAILY_SEARCH_LIMIT:
             return False, (
                 "আজকের বিনামূল্যের খবর-খোঁজার সীমা শেষ। আগামীকাল আবার চেষ্টা করুন।"
                 if language != "en" else
@@ -354,7 +372,7 @@ def consume_gemini_quota(user, is_search, language="bn"):
         if GEMINI_API_KEY:
             users[user_key] = users.get(user_key, 0) + 1
             _GEMINI_USAGE["total"] = _GEMINI_USAGE.get("total", 0) + 1
-        if GEMINI_API_KEY and is_search:
+        if is_search:
             _GEMINI_USAGE["search"] = _GEMINI_USAGE.get("search", 0) + 1
         try:
             temporary_path = GEMINI_USAGE_PATH.with_suffix(".tmp")
@@ -1379,7 +1397,7 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"status": "ok", "providers": configured_provider_names()})
             return
         staff_path = self.path.split("?", 1)[0]
-        if staff_path in {"/api/admin/staff", "/api/admin/staff/tasks"}:
+        if staff_path in {"/api/admin/staff", "/api/admin/staff/tasks", "/api/admin/staff/checks", "/api/admin/staff/mail"}:
             if not self.require_authorized():
                 return
             if self.authenticated_user.get("role") != "admin":
@@ -1387,16 +1405,12 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                 return
             if staff_path == "/api/admin/staff":
                 self.send_json(200, {"status": get_staff_status(), "tasks": list_staff_tasks()})
-            else:
+            elif staff_path == "/api/admin/staff/tasks":
                 self.send_json(200, {"tasks": list_staff_tasks()})
-            return
-        if staff_path == "/api/admin/staff/checks":
-            if not self.require_authorized():
-                return
-            if self.authenticated_user.get("role") != "admin":
-                self.send_json(403, {"error": "Admin access is required."})
-                return
-            self.send_json(200, {"checks": run_staff_checks()})
+            elif staff_path == "/api/admin/staff/mail":
+                self.send_json(200, {"mail": mail_check_status()})
+            else:
+                self.send_json(200, {"checks": run_staff_checks()})
             return
         if self.path == "/api/upload-quota":
             if not self.require_authorized():
@@ -1516,11 +1530,10 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                 flight.event.set()
 
     def _post_dispatch(self):
-        if self.path == "/api/chat":
-            self.authenticated_user = self.authenticate() or {"role": "guest"}
-        elif not self.require_authorized():
-            return
-        if self.path == "/api/admin/staff/tasks":
+        staff_path = self.path.split("?", 1)[0]
+        if staff_path in {"/api/admin/staff/route", "/api/admin/staff/code-proposal", "/api/admin/staff/code-approve", "/api/admin/staff/code-test"}:
+            if not self.require_authorized():
+                return
             if self.authenticated_user.get("role") != "admin":
                 self.send_json(403, {"error": "Admin access is required."})
                 return
@@ -1528,22 +1541,34 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                 length = int(self.headers.get("Content-Length", "0"))
                 data = json.loads(self.rfile.read(length))
             except (ValueError, json.JSONDecodeError):
-                self.send_json(400, {"error": "Invalid task payload."})
+                self.send_json(400, {"error": "Staff request could not be read."})
                 return
             if not isinstance(data, dict):
-                self.send_json(400, {"error": "Invalid task payload."})
+                self.send_json(400, {"error": "Staff request must be an object."})
                 return
-            try:
-                task = enqueue_staff_task(data.get("type", ""), data.get("payload"), "admin")
-            except PermissionError as error:
-                self.send_json(403, {"error": str(error)})
-                return
-            except ValueError as error:
-                self.send_json(400, {"error": str(error)})
-                return
-            self.send_json(202, {"task": task})
+            if staff_path.endswith("/route"):
+                self.send_json(200, {"task": route_task(data.get("text", ""), data.get("language", "auto"), "admin")})
+            elif staff_path.endswith("/code-approve"):
+                try:
+                    self.send_json(200, {"approval": approve_code_proposal(data.get("proposal_id", ""), self.authenticated_user.get("email", "admin"))})
+                except ValueError as error:
+                    self.send_json(400, {"error": str(error)})
+            elif staff_path.endswith("/code-test"):
+                approval = get_code_approval(data.get("approval_id", ""))
+                if approval is None:
+                    self.send_json(400, {"error": "An approved code proposal is required."})
+                else:
+                    self.send_json(200, {"test": run_approved_code_tests(approval)})
+            else:
+                try:
+                    self.send_json(200, {"proposal": propose_code_change(data.get("description", ""), data.get("branch"))})
+                except ValueError as error:
+                    self.send_json(400, {"error": str(error)})
             return
-
+        if self.path == "/api/chat":
+            self.authenticated_user = self.authenticate() or {"role": "guest"}
+        elif not self.require_authorized():
+            return
         if self.path == "/api/feedback":
             if self.authenticated_user["role"] != "admin":
                 self.send_json(403, {"error": "উত্তর সংশোধনের অধিকার শুধু ওয়াকিলের আছে।"})
@@ -1714,48 +1739,32 @@ class WalidAIHandler(BaseHTTPRequestHandler):
                 })
                 return
 
-        try:
-            answers = load_dataset()
-        except (OSError, ValueError, json.JSONDecodeError) as error:
-            self.send_json(500, {"error": f"প্রশ্ন–উত্তরের ফাইল পড়তে সমস্যা হয়েছে: {error}"})
-            return
-
-        geography_answer = known_geography_answer(question)
-        if geography_answer is not None:
-            self.send_json(200, {
-                "answer": geography_answer,
-                "answering_mode": "known_geography",
-                "sources": [],
-            })
-            return
-
-        # Saved Q&A should answer immediately without waiting for a large PDF
-        # library to finish indexing.
-        try:
-            answer = find_dataset_answer(question, answers)
-        except (OSError, ValueError, json.JSONDecodeError) as error:
-            self.send_json(500, {"error": f"প্রশ্ন–উত্তরের ফাইল পড়তে সমস্যা হয়েছে: {error}"})
-            return
-        if answer is not None:
-            self.send_json(200, {
-                "answer": answer,
-                "answering_mode": "dataset_lookup",
-                "sources": [],
-            })
-            return
-
         greeting = small_talk_answer(question)
         if greeting is not None:
-            self.send_json(200, {
-                "answer": greeting,
-                "answering_mode": "small_talk",
-                "sources": [],
-            })
+            self.send_json(200, {"answer": greeting, "answering_mode": "small_talk", "sources": []})
             return
+
+        history = data.get("history") if isinstance(data.get("history"), list) else []
+        files = data.get("files") if isinstance(data.get("files"), list) else []
+        if not use_search and not (history or files):
+            geography_answer = known_geography_answer(question) if language == "bn" else None
+            try:
+                answer = geography_answer or find_dataset_answer(question, load_dataset())
+            except (OSError, ValueError, json.JSONDecodeError) as error:
+                print(f"Walid AI: dataset lookup failed ({type(error).__name__}).", flush=True)
+                answer = None
+            if answer is not None and not mentions_creator(answer):
+                self.send_json(200, {
+                    "answer": answer,
+                    "answering_mode": "known_geography" if geography_answer else "dataset_lookup",
+                    "sources": [],
+                })
+                return
 
         passages, no_text_files, read_errors = [], [], []
         try:
-            passages, _, no_text_files, read_errors = get_pdf_index_for_chat()
+            if not use_search:
+                passages, _, no_text_files, read_errors = get_pdf_index_for_chat()
         except Exception as error:
             print(f"Walid AI: PDF index failed ({type(error).__name__}).", flush=True)
 
@@ -1765,21 +1774,11 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             print(f"Walid AI: PDF search failed ({type(error).__name__}).", flush=True)
             matches = []
         comparison_table = find_comparison_table(question, matches) if matches else None
-        web_sources = []
-        if use_search:
-            try:
-                web_sources = collect_web_sources(question)
-            except Exception as error:
-                print(f"Walid AI: web search failed ({type(error).__name__}).", flush=True)
-
-        history = data.get("history") if isinstance(data.get("history"), list) else []
-        files = data.get("files") if isinstance(data.get("files"), list) else []
         try:
             result = generate_fallback_answer(
                 question,
                 history=history,
                 passages=matches,
-                sources=web_sources,
                 language=language,
                 files=files,
                 use_search=use_search,
@@ -1791,7 +1790,7 @@ class WalidAIHandler(BaseHTTPRequestHandler):
         if result is not None and result.text:
             response_data = {
                 "answer": result.text,
-                "answering_mode": "web" if (web_sources or result.sources) else "model",
+                "answering_mode": "web" if result.sources else ("search_unavailable" if use_search else "model"),
                 "sources": result.sources,
                 "provider": result.provider,
                 "model": result.model,
@@ -1852,7 +1851,7 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             self.send_chat({"answer": answer, "answering_mode": answer_mode, "sources": []})
             return
 
-        refund_question_quota(quota_user, use_search)
+        refund_question_quota(quota_user)
         message = result.error if result is not None and result.error else (
             "Sorry, I can't answer right now. Please try again in a little while."
             if language == "en" else

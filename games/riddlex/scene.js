@@ -77,10 +77,11 @@ export function createScene(canvas) {
     const dpr = Math.min(2, devicePixelRatio || 1);
     const width = Math.max(320, Math.round(rect.width * dpr));
     const height = Math.max(180, Math.round(rect.height * dpr));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
+    // Layout is only dependent on canvas dimensions and the loaded artwork.
+    // Avoid recalculating layout and writing CSS variables on every animation frame.
+    if (canvas.width === width && canvas.height === height) return;
+    canvas.width = width;
+    canvas.height = height;
     layoutRoom();
   }
 

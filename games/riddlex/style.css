@@ -35,6 +35,7 @@ button { cursor: pointer; }
   aspect-ratio: 1672 / 941;
 }
 .menu-card { display: block; width: 100%; height: 100%; object-fit: contain; }
+.menu-port { display: none; }
 .menu-back, .lang-switch {
   position: absolute; z-index: 3; top: 3%;
 }
@@ -88,6 +89,11 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   border: 8px solid transparent; border-top: 12px solid #c5a16c; border-bottom: 0;
 }
 .stage-wrap.tossing .speech { left: 10px; top: 8px; max-width: min(16rem, 70%); }
+.stage-wrap.portrait-scene.tossing .speech {
+  left: max(10px, calc(var(--bubble-left, 0.04) * 100%));
+  top: calc(var(--bubble-top, 0.22) * 100%);
+  max-width: 42%;
+}
 .stage-wrap.tossing .speech::after { display: none; }
 .stage-wrap.bubble-below .speech {
   left: max(8px, calc(var(--mouth-x, 0.3) * 100% - 1rem));
@@ -140,10 +146,29 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 .confirm p { margin: 0 0 10px; }
 .confirm div { display: flex; gap: 8px; }
 .confirm button { flex: 1; }
+@media (max-aspect-ratio: 4/5) {
+  #menu { position: relative; }
+  .menu-stage { position: absolute; inset: 0; display: block; }
+  .menu-blur, .menu-card { display: none; }
+  .menu-frame { width: 100%; height: 100%; aspect-ratio: auto; }
+  .menu-port { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center center; }
+  .menu-back, .lang-switch { top: 10px; }
+  #play { left: 16%; right: auto; top: 86%; bottom: auto; width: 68%; height: 8%; }
+  .legal-footer {
+    position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; margin: 0;
+    padding: 5px 8px 6px; background: #1a100cf2; color: #f6ead2;
+    font-size: 11px; line-height: 1.35;
+  }
+  .legal-footer a, .legal-footer a:hover { color: #f6ead2; }
+}
 @media (max-width: 520px) {
   .speech { max-width: 46%; font-size: 15px; padding: 7px 10px; background: #fff8ea; }
   #learn { grid-template-columns: 1fr; }
   #new { font-size: 13px; padding: 4px 8px; }
+  .stage-wrap.portrait-scene .speech {
+    left: max(10px, calc(var(--bubble-left, 0.04) * 100%));
+    max-width: 38%; font-size: 15px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

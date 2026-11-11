@@ -4,15 +4,15 @@
 
 const ART = {
   room: "./images/approved/game-desk.png",
+  portrait: "./images/approved/portrait-neutral.webp",
   printer: "./images/approved/printer.png",
   ball: "./images/approved/crumpled.png",
-};
-// Optional expression plates. Same 1672×941 frame as the room, transparent
-// everywhere except the replaced head. Missing files leave the painted face.
-const EXPRESSIONS = {
-  happy: "./images/approved/expressions/detective-happy.png",
-  sad: "./images/approved/expressions/detective-sad.png",
-  worried: "./images/approved/expressions/detective-worried.png",
+  lHappy: "./images/approved/expression-happy.webp",
+  lSad: "./images/approved/expression-sad.webp",
+  lWorried: "./images/approved/expression-worried.webp",
+  pHappy: "./images/approved/portrait-happy.webp",
+  pSad: "./images/approved/portrait-sad.webp",
+  pWorried: "./images/approved/portrait-worried.webp",
 };
 
 function loadImage(src) {
@@ -41,6 +41,7 @@ export function createScene(canvas) {
   puffCtx.fillStyle = puffGrad;
   puffCtx.fillRect(0, 0, 32, 32);
 
+  let portraitMode = false;
   const smoke = Array.from({ length: 5 }, () => makePuff(true));
   const catAct = { kind: "idle", t: 0, next: rand(7, 12) };
   let mood = "curious";
@@ -52,13 +53,14 @@ export function createScene(canvas) {
   let raf = 0;
   let reveal = null;
   let view = { x: 0, y: 0, w: 1, h: 1 };
+  const expr = { happy: 0, sad: 0, worried: 0 };
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
   function makePuff(scatter) {
     return {
-      x: 0.592 + rand(-0.004, 0.004),
-      y: scatter ? rand(0.16, 0.25) : 0.255,
+      x: (portraitMode ? 0.58 : 0.592) + rand(-0.004, 0.004),
+      y: scatter ? rand(0.16, 0.25) : (portraitMode ? 0.275 : 0.255),
       vx: rand(-0.003, 0.003),
       vy: rand(-0.018, -0.008),
       life: scatter ? Math.random() * 2.4 : 0,
@@ -87,33 +89,34 @@ export function createScene(canvas) {
     const room = images.room;
     const cw = canvas.width;
     const ch = canvas.height;
-    if (!room) {
+    portraitMode = !!(images.portrait && cw / ch < 0.8);
+    const art = portraitMode ? images.portrait : room;
+    if (!art) {
       view = { x: 0, y: 0, w: cw, h: ch };
-    } else if (cw < ch) {
-      // Portrait: the whole painting, correct shape, logo through the cat.
-      const w = cw;
-      const h = Math.min(ch, cw * (room.height / room.width));
-      view = { x: 0, y: 0, w, h };
     } else {
-      const scale = Math.max(cw / room.width, ch / room.height);
-      const w = room.width * scale;
-      const h = room.height * scale;
-      let x = cw * 0.50 - w * 0.52;
-      let y = ch * 0.42 - h * 0.38;
+      const scale = Math.max(cw / art.width, ch / art.height);
+      const w = art.width * scale;
+      const h = art.height * scale;
+      let x = (cw - w) / 2;
+      let y = (ch - h) / 2;
+      if (!portraitMode) {
+        x = cw * 0.50 - w * 0.52;
+        y = ch * 0.42 - h * 0.38;
+      }
       x = Math.min(0, Math.max(cw - w, x));
       y = Math.min(0, Math.max(ch - h, y));
       view = { x, y, w, h };
     }
     const parent = canvas.parentElement;
     if (!parent || !cw || !ch) return;
-    const faceLeft = (view.x + view.w * 0.34) / cw;
-    const eyeY = (view.y + view.h * 0.22) / ch;
-    const desk = (view.y + view.h * 0.58) / ch;
-    const imageBottom = (view.y + view.h) / ch;
-    parent.style.setProperty("--bubble-left", Math.max(0.012, faceLeft - 0.30).toFixed(4));
-    parent.style.setProperty("--bubble-top", Math.max(0.012, eyeY).toFixed(4));
-    parent.style.setProperty("--desk-y", Math.min(desk, Math.max(0.1, imageBottom - 0.1)).toFixed(4));
-    parent.classList.toggle("portrait-scene", cw < ch);
+    const spot = portraitMode
+      ? { bu: 0.03, bv: 0.20, dv: 0.455 }
+      : { bu: 0.05, bv: 0.15, dv: 0.58 };
+    const bubbleLeft = (view.x + view.w * spot.bu) / cw;
+    parent.style.setProperty("--bubble-left", Math.max(10 / cw, bubbleLeft).toFixed(4));
+    parent.style.setProperty("--bubble-top", ((view.y + view.h * spot.bv) / ch).toFixed(4));
+    parent.style.setProperty("--desk-y", ((view.y + view.h * spot.dv) / ch).toFixed(4));
+    parent.classList.toggle("portrait-scene", portraitMode);
   }
 
   function drawSmoke(dt) {
@@ -143,8 +146,8 @@ export function createScene(canvas) {
     const blend = 1 - Math.exp(-dt * 7);
     for (const key of Object.keys(goal)) moodShown[key] += (goal[key] - moodShown[key]) * blend;
   }
-  function nudge(box, du, dv) {
-    const room = images.room;
+  function nudge(box, du, dv, source) {
+    const room = source || (portraitMode && images.portrait ? images.portrait : images.room);
     if (!room) return;
     ctx.save();
     ctx.beginPath();
@@ -177,6 +180,28 @@ export function createScene(canvas) {
     ctx.restore();
   }
 
+  function stepExpr(dt) {
+    const goal = mood === "happy" || mood === "confident" ? "happy"
+      : mood === "sad" || mood === "defeated" ? "sad"
+      : mood === "thinking" || mood === "confused" ? "worried" : "";
+    const blend = 1 - Math.exp(-dt / 0.25);
+    for (const key of Object.keys(expr)) expr[key] += ((goal === key ? 1 : 0) - expr[key]) * blend;
+  }
+
+  function drawExpr() {
+    const plates = portraitMode
+      ? { happy: images.pHappy, sad: images.pSad, worried: images.pWorried }
+      : { happy: images.lHappy, sad: images.lSad, worried: images.lWorried };
+    for (const key of ["worried", "sad", "happy"]) {
+      const plate = plates[key];
+      if (!plate || expr[key] < 0.03) continue;
+      ctx.save();
+      ctx.globalAlpha = expr[key];
+      ctx.drawImage(plate, view.x, view.y, view.w, view.h);
+      ctx.restore();
+    }
+  }
+
   function stepCreatures(dt) {
     if (reveal) return;
     catAct.t += dt;
@@ -193,27 +218,35 @@ export function createScene(canvas) {
   function drawLife(time) {
     const room = images.room;
     if (!room) return;
+    const base = portraitMode && images.portrait ? images.portrait : room;
     const breath = Math.sin(time * 1.35) * 0.008;
-    nudge([0.36, 0.27, 0.30, 0.14], 0, -Math.max(0, breath));
-    const sway = Math.sin(time * 0.45) * 0.007;
-    nudge([0.42, 0.05, 0.18, 0.22], sway, 0);
+    const body = portraitMode ? [0.18, 0.30, 0.55, 0.10] : [0.36, 0.27, 0.30, 0.14];
+    nudge(body, 0, -Math.max(0, breath), base);
     const shut = blink > 0 ? Math.sin(Math.min(1, blink) * Math.PI) : 0;
-    const brow = (moodShown.happy - moodShown.sad) * 0.004;
-    if (Math.abs(brow) > 0.001) nudge([0.46, 0.16, 0.12, 0.045], 0, -brow);
-    eyelid(0.505, 0.205, 0.018, 0.012, shut);
-    eyelid(0.545, 0.208, 0.014, 0.010, shut);
+    const showingFace = Math.max(expr.happy, expr.sad, expr.worried) > 0.45;
+    if (!showingFace) {
+      const sway = Math.sin(time * 0.45) * 0.007;
+      nudge(portraitMode ? [0.28, 0.12, 0.44, 0.22] : [0.42, 0.05, 0.18, 0.22], sway, 0, base);
+      if (!portraitMode) {
+        eyelid(0.505, 0.205, 0.018, 0.012, shut);
+        eyelid(0.545, 0.208, 0.014, 0.010, shut);
+      }
+    }
+    const catBox = portraitMode ? [0.62, 0.32, 0.24, 0.10] : [0.70, 0.36, 0.22, 0.10];
     const catBreath = Math.sin(time * 1.6 + 1) * 0.007;
-    nudge([0.70, 0.36, 0.22, 0.10], 0, -Math.max(0, catBreath));
-    nudge([0.688, 0.318, 0.045, 0.06], Math.sin(time * 2.4) * 0.006, 0);
-    nudge([0.84, 0.40, 0.08, 0.06], Math.sin(time * 1.7) * 0.008, 0);
-    eyelid(0.720, 0.400, 0.012, 0.008, shut * 0.85);
-    eyelid(0.753, 0.404, 0.012, 0.008, shut * 0.85);
+    nudge(catBox, 0, -Math.max(0, catBreath), base);
+    if (!portraitMode) {
+      nudge([0.688, 0.318, 0.045, 0.06], Math.sin(time * 2.4) * 0.006, 0, base);
+      nudge([0.84, 0.40, 0.08, 0.06], Math.sin(time * 1.7) * 0.008, 0, base);
+      eyelid(0.720, 0.400, 0.012, 0.008, shut * 0.85);
+      eyelid(0.753, 0.404, 0.012, 0.008, shut * 0.85);
+    }
     if (catAct.kind === "hop") {
       const p = Math.sin(Math.min(1, catAct.t / 0.85) * Math.PI);
-      nudge([0.69, 0.33, 0.26, 0.16], 0, -0.02 * p);
-    } else if (catAct.kind === "stretch") {
+      nudge(portraitMode ? [0.60, 0.30, 0.28, 0.14] : [0.69, 0.33, 0.26, 0.16], 0, -0.015 * p, base);
+    } else if (catAct.kind === "stretch" && !portraitMode) {
       const p = Math.sin(Math.min(1, catAct.t / 0.85) * Math.PI);
-      nudge([0.70, 0.36, 0.26, 0.13], 0.01 * p, 0.004 * p);
+      nudge([0.70, 0.36, 0.26, 0.13], 0.01 * p, 0.004 * p, base);
     }
     const plate = moodShown.sad > moodShown.happy
       ? (moodShown.sad > 0.25 ? images.sad : null)
@@ -228,8 +261,8 @@ export function createScene(canvas) {
   }
 
   function prepareInk(name, font) {
-    const w = Math.round(view.w * 0.24);
-    const h = Math.round(view.h * 0.12);
+    const w = Math.round(view.w * (portraitMode ? 0.52 : 0.24));
+    const h = Math.round(view.h * (portraitMode ? 0.05 : 0.12));
     ink.width = w;
     ink.height = h;
     mask.width = w;
@@ -252,10 +285,10 @@ export function createScene(canvas) {
 
   function drawSheet(turn) {
     const u = Math.max(0, Math.min(1, turn));
-    const x = ix(0.49);
-    const y = iy(0.56 - 0.18 * u);
-    const w = view.w * (0.26 + 0.08 * u);
-    const h = view.h * (0.16 + 0.05 * u);
+    const x = ix(portraitMode ? 0.50 : 0.49);
+    const y = iy(portraitMode ? 0.64 + 0.02 * u : 0.56 - 0.18 * u);
+    const w = view.w * (portraitMode ? 0.50 + 0.10 * u : 0.26 + 0.08 * u);
+    const h = view.h * (portraitMode ? 0.07 + 0.015 * u : 0.16 + 0.05 * u);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI * (1 - u));
@@ -279,7 +312,12 @@ export function createScene(canvas) {
       ctx.lineTo(w - 14, h * line / 5);
       ctx.stroke();
     }
-    if (reveal?.page) ctx.drawImage(reveal.page.canvas, 18, h * 0.28, reveal.page.w, reveal.page.h);
+    if (reveal?.page) {
+      const maxW = w - 36;
+      const maxH = h * 0.62;
+      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, 1.4);
+      ctx.drawImage(reveal.page.canvas, 18, h * 0.2, reveal.page.w * scale, reveal.page.h * scale);
+    }
     if (reveal?.printed && reveal.photo) {
       const pw = w * 0.34;
       const ph = h * 0.72;
@@ -295,8 +333,8 @@ export function createScene(canvas) {
     if (!printer || !reveal?.photo) return;
     const pw = view.w * 0.16;
     const ph = pw * (printer.height / printer.width);
-    const px = ix(0.62);
-    const py = iy(0.48);
+    const px = ix(portraitMode ? 0.68 : 0.62);
+    const py = iy(portraitMode ? 0.46 : 0.48);
     ctx.drawImage(printer, px, py, pw, ph);
     const slide = easeOut(Math.min(1, progress));
     const photoW = pw * 0.72;
@@ -405,10 +443,10 @@ export function createScene(canvas) {
   }
 
   function paperPose(p) {
-    const fromX = 0.49;
-    const fromY = 0.38;
+    const fromX = portraitMode ? 0.50 : 0.49;
+    const fromY = portraitMode ? 0.66 : 0.38;
     const handX = 0.50;
-    const handY = 0.36;
+    const handY = portraitMode ? 0.34 : 0.36;
     if (p < 0.22) {
       const u = easeOut(p / 0.22);
       return { x: fromX + (handX - fromX) * u, y: fromY + (handY - fromY) * u, crumple: 0, toss: 0 };
@@ -444,7 +482,7 @@ export function createScene(canvas) {
     const sx = (1 - c * 0.72) * (1 + Math.sin(c * 9) * 0.04 * c);
     const sy = (1 - c * 0.78) * (1 - Math.sin(c * 7) * 0.06 * c);
     ctx.scale(sx, sy);
-    ctx.globalAlpha = fade * (1 - c * 0.85);
+    ctx.globalAlpha = fade * Math.max(0, 1 - c * 2.4);
     ctx.fillStyle = "#f4e6c8";
     ctx.strokeStyle = "#8a6844";
     ctx.lineWidth = 3;
@@ -468,10 +506,10 @@ export function createScene(canvas) {
       ctx.drawImage(reveal.page.canvas, -w * 0.46, -h * 0.22, w * 0.5, h * 0.4);
     }
     ctx.restore();
-    if (c > 0.35 && images.ball) {
-      const ball = view.w * 0.075;
+    if (c > 0.18 && images.ball) {
+      const ball = view.w * (portraitMode ? 0.11 : 0.075);
       ctx.save();
-      ctx.globalAlpha = fade * Math.min(1, (c - 0.35) / 0.4);
+      ctx.globalAlpha = fade * Math.min(1, (c - 0.18) / 0.22);
       ctx.translate(x, y);
       ctx.rotate(pose.toss * 3);
       ctx.drawImage(images.ball, -ball / 2, -ball / 2, ball, ball);
@@ -480,11 +518,12 @@ export function createScene(canvas) {
   }
 
   function coverDetective() {
-    const room = images.room;
+    const room = portraitMode && images.portrait ? images.portrait : images.room;
     if (!room) return;
     ctx.save();
     ctx.beginPath();
-    ctx.ellipse(ix(0.50), iy(0.17), view.w * 0.15, view.h * 0.15, 0, 0, Math.PI * 2);
+    const head = portraitMode ? [0.50, 0.26, 0.24, 0.14] : [0.50, 0.17, 0.15, 0.15];
+    ctx.ellipse(ix(head[0]), iy(head[1]), view.w * head[2], view.h * head[3], 0, 0, Math.PI * 2);
     ctx.clip();
     ctx.drawImage(room, view.x, view.y, view.w, view.h);
     ctx.restore();
@@ -512,14 +551,17 @@ export function createScene(canvas) {
     frame.last = now;
     clock += dt;
     approachMood(dt);
+    stepExpr(dt);
     resize();
     const room = images.room;
+    const art = portraitMode && images.portrait ? images.portrait : room;
     ctx.fillStyle = "#1a100c";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (room) {
-      ctx.drawImage(room, view.x, view.y, view.w, view.h);
+    if (art) {
+      ctx.drawImage(art, view.x, view.y, view.w, view.h);
+      drawExpr();
       const gapTop = view.y + view.h;
-      if (canvas.height - gapTop > 2) {
+      if (!portraitMode && canvas.height - gapTop > 2) {
         const fade = ctx.createLinearGradient(0, gapTop - 2, 0, canvas.height);
         fade.addColorStop(0, "#6b3a1c");
         fade.addColorStop(1, "#2a160e");
@@ -531,12 +573,13 @@ export function createScene(canvas) {
     if (!reduce) stepCreatures(dt);
     updateReveal(dt);
     if (!reduce) drawLife(clock);
+    const hands = portraitMode ? [0.28, 0.28, 0.44, 0.12] : [0.42, 0.30, 0.24, 0.13];
     if (reveal?.phase === "write") {
-      nudge([0.42, 0.30, 0.24, 0.13], Math.sin(clock * 16) * 0.01, Math.sin(clock * 16) * 0.003);
+      nudge(hands, Math.sin(clock * 16) * 0.01, Math.sin(clock * 16) * 0.003);
     }
     if (reveal?.phase === "wrong" && reveal.t < 0.5) {
       const reach = Math.sin(Math.min(1, reveal.t / 0.4) * Math.PI) * 0.014;
-      nudge([0.42, 0.30, 0.24, 0.13], 0, reach);
+      nudge(hands, 0, reach);
     }
     drawReveal();
     nextBlink -= dt;
@@ -552,8 +595,6 @@ export function createScene(canvas) {
     if (!images.room) {
       const loaded = await Promise.all(Object.entries(ART).map(async ([key, src]) => [key, await loadImage(src)]));
       for (const [key, image] of loaded) images[key] = image;
-      const faces = await Promise.all(Object.entries(EXPRESSIONS).map(async ([key, src]) => [key, await loadImage(src)]));
-      for (const [key, image] of faces) if (image) images[key] = image;
     }
     resize();
     if (running) return;

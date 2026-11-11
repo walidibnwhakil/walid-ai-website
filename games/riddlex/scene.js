@@ -6,7 +6,6 @@ const ART = {
   room: "./images/approved/game-desk.png",
   portrait: "./images/approved/portrait-neutral.webp",
   printer: "./images/approved/printer.png",
-  ball: "./images/approved/crumpled.png",
   lHappy: "./images/approved/expression-happy.webp",
   lSad: "./images/approved/expression-sad.webp",
   lWorried: "./images/approved/expression-worried.webp",
@@ -97,11 +96,13 @@ export function createScene(canvas) {
       const scale = Math.max(cw / art.width, ch / art.height);
       const w = art.width * scale;
       const h = art.height * scale;
-      let x = (cw - w) / 2;
+      let x = 0;
       let y = (ch - h) / 2;
       if (!portraitMode) {
         x = cw * 0.50 - w * 0.52;
         y = ch * 0.42 - h * 0.38;
+        const logoPad = Math.max(8, cw * 0.012);
+        if (x + w * 0.03 < logoPad) x = logoPad - w * 0.03;
       }
       x = Math.min(0, Math.max(cw - w, x));
       y = Math.min(0, Math.max(ch - h, y));
@@ -429,7 +430,7 @@ export function createScene(canvas) {
         reveal.resolve({ printed: !!reveal.printed });
       }
     } else if (reveal.phase === "wrong") {
-      if (reveal.t > 2.05 && !reveal.done) {
+      if (reveal.t > 1.15 && !reveal.done) {
         reveal.done = true;
         reveal.resolve();
       }
@@ -442,90 +443,12 @@ export function createScene(canvas) {
     }
   }
 
-  function paperPose(p) {
-    const fromX = portraitMode ? 0.50 : 0.49;
-    const fromY = portraitMode ? 0.66 : 0.38;
-    const handX = 0.50;
-    const handY = portraitMode ? 0.34 : 0.36;
-    if (p < 0.22) {
-      const u = easeOut(p / 0.22);
-      return { x: fromX + (handX - fromX) * u, y: fromY + (handY - fromY) * u, crumple: 0, toss: 0 };
-    }
-    if (p < 0.55) {
-      return { x: handX, y: handY, crumple: (p - 0.22) / 0.33, toss: 0 };
-    }
-    const u = Math.min(1, (p - 0.55) / 0.45);
-    const e = u * u * (3 - 2 * u);
-    const c1x = 0.74;
-    const c1y = 0.08;
-    const c2x = 0.62;
-    const c2y = -0.16;
-    const o = 1 - e;
-    return {
-      x: o * o * handX + 2 * o * e * c1x + e * e * c2x,
-      y: o * o * handY + 2 * o * e * c1y + e * e * c2y,
-      crumple: 1,
-      toss: e,
-    };
-  }
-
-  function drawCrumple(pose) {
-    const x = ix(pose.x);
-    const y = iy(pose.y);
-    const w = view.w * 0.20;
-    const h = view.h * 0.14;
-    const c = pose.crumple;
-    const fade = 1 - pose.toss * 0.15;
+  function drawDismiss(u) {
+    const fade = 1 - u;
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(-0.04 + c * 1.4 + pose.toss * 2.2);
-    const sx = (1 - c * 0.72) * (1 + Math.sin(c * 9) * 0.04 * c);
-    const sy = (1 - c * 0.78) * (1 - Math.sin(c * 7) * 0.06 * c);
-    ctx.scale(sx, sy);
-    ctx.globalAlpha = fade * Math.max(0, 1 - c * 2.4);
-    ctx.fillStyle = "#f4e6c8";
-    ctx.strokeStyle = "#8a6844";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(-w / 2, -h / 2, w, h, 8 + c * h * 0.45);
-    ctx.fill();
-    ctx.stroke();
-    ctx.strokeStyle = `rgba(90,55,30,${0.25 + c * 0.5})`;
-    ctx.beginPath();
-    ctx.moveTo(-w * 0.3, -h * 0.1);
-    ctx.quadraticCurveTo(0, h * 0.15, w * 0.28, -h * 0.05);
-    ctx.moveTo(-w * 0.15, h * 0.12);
-    ctx.quadraticCurveTo(w * 0.05, -h * 0.05, w * 0.2, h * 0.2);
-    ctx.stroke();
-    if (reveal.photo) {
-      const pw = w * 0.42;
-      const ph = h * 0.7;
-      ctx.drawImage(reveal.photo, w * 0.02, -ph / 2, pw, ph * 0.75);
-    }
-    if (reveal.page?.canvas) {
-      ctx.drawImage(reveal.page.canvas, -w * 0.46, -h * 0.22, w * 0.5, h * 0.4);
-    }
-    ctx.restore();
-    if (c > 0.18 && images.ball) {
-      const ball = view.w * (portraitMode ? 0.11 : 0.075);
-      ctx.save();
-      ctx.globalAlpha = fade * Math.min(1, (c - 0.18) / 0.22);
-      ctx.translate(x, y);
-      ctx.rotate(pose.toss * 3);
-      ctx.drawImage(images.ball, -ball / 2, -ball / 2, ball, ball);
-      ctx.restore();
-    }
-  }
-
-  function coverDetective() {
-    const room = portraitMode && images.portrait ? images.portrait : images.room;
-    if (!room) return;
-    ctx.save();
-    ctx.beginPath();
-    const head = portraitMode ? [0.50, 0.26, 0.24, 0.14] : [0.50, 0.17, 0.15, 0.15];
-    ctx.ellipse(ix(head[0]), iy(head[1]), view.w * head[2], view.h * head[3], 0, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.drawImage(room, view.x, view.y, view.w, view.h);
+    ctx.globalAlpha = Math.max(0, fade);
+    ctx.translate(-view.w * 0.03 * u, -view.h * 0.12 * u);
+    drawSheet(1);
     ctx.restore();
   }
 
@@ -538,10 +461,8 @@ export function createScene(canvas) {
       drawSheet(easeOut(Math.min(1, reveal.t / 0.8)));
     } else if (reveal.phase === "present") {
       drawSheet(1);
-    } else if (reveal.phase === "wrong" && reveal.t < 2) {
-      const pose = paperPose(Math.min(1, reveal.t / 2));
-      drawCrumple(pose);
-      if (pose.toss > 0.55) coverDetective();
+    } else if (reveal.phase === "wrong" && reveal.t < 1.05) {
+      drawDismiss(Math.min(1, reveal.t / 1.0));
     }
   }
 
@@ -576,10 +497,6 @@ export function createScene(canvas) {
     const hands = portraitMode ? [0.28, 0.28, 0.44, 0.12] : [0.42, 0.30, 0.24, 0.13];
     if (reveal?.phase === "write") {
       nudge(hands, Math.sin(clock * 16) * 0.01, Math.sin(clock * 16) * 0.003);
-    }
-    if (reveal?.phase === "wrong" && reveal.t < 0.5) {
-      const reach = Math.sin(Math.min(1, reveal.t / 0.4) * Math.PI) * 0.014;
-      nudge(hands, 0, reach);
     }
     drawReveal();
     nextBlink -= dt;

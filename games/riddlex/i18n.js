@@ -1,7 +1,7 @@
 export const UI = {
   en: {
     lang: "বাংলা",
-    play: "Play",
+    play: "Play Game",
     back: "Back",
     yes: "Yes",
     no: "No",

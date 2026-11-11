@@ -3,7 +3,7 @@ import { answer as applyAnswer, canPrint, createState, decide, displayName, enti
 import { UI, guessFont } from "./i18n.js";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, poolFromEntries } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js";
+import { createScene } from "./scene.js?v=akinator-12";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -58,6 +58,7 @@ function applyLanguage() {
   $("learn-name-text").textContent = copy.name;
   $("learn-photo-text").textContent = copy.photo;
   $("learn-save").textContent = copy.save;
+  $("play-label").textContent = copy.play;
 }
 
 function showMenu() {
@@ -205,9 +206,7 @@ async function onWrong() {
   mode = "wrong";
   setStatus(text().missed);
   showOnly("none");
-  document.querySelector(".stage-wrap").classList.add("tossing");
   await scene.playWrong();
-  document.querySelector(".stage-wrap").classList.remove("tossing");
   if (mode !== "wrong") return;
   showOnly("wrong");
 }

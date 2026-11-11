@@ -513,6 +513,8 @@ export function createScene(canvas) {
     if (!images.room) {
       const loaded = await Promise.all(Object.entries(ART).map(async ([key, src]) => [key, await loadImage(src)]));
       for (const [key, image] of loaded) images[key] = image;
+      // Artwork can change the crop even when the canvas size stays the same.
+      layoutRoom();
     }
     resize();
     if (running) return;

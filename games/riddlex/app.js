@@ -414,6 +414,7 @@ if (new URLSearchParams(location.search).has("autotest")) {
     }),
     poolSize: () => pool?.count || 0,
     bytes: () => traffic.bytes,
+    blinkCat: () => scene.blinkCat(),
     loaded: () => loadedNames.slice(),
     find: (id) => pool?.ids.indexOf(id) ?? -1,
     replyFor: (id) => {

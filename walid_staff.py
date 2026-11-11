@@ -86,6 +86,11 @@ def _record(event, **data):
         items = _load()
         items.append(item)
         _save(items)
+        audit_path = Path(os.environ.get("WALID_STAFF_AUDIT_PATH",
+                                        _QUEUE_PATH.with_name("walid_staff_audit.jsonl")))
+        audit_path.parent.mkdir(parents=True, exist_ok=True)
+        with audit_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(item, ensure_ascii=False) + "\n")
     _persist_remote(item)
     return item
 
@@ -147,9 +152,30 @@ def route_task(text, language="auto", requested_by="admin"):
 
 
 def enqueue(task_type, payload=None, requested_by="admin"):
+    """Queue a task while enforcing the staff safety boundary at the API edge."""
     if task_type not in ROUTE_TYPES:
         raise ValueError("Unsupported staff task type.")
-    return route_task((payload or {}).get("text", task_type), requested_by=requested_by) if task_type == "manager_review" else route_task(task_type, requested_by=requested_by)
+    payload = dict(payload or {})
+    if task_type == "code_proposal":
+        branch = str(payload.get("branch", "")).strip()
+        if not branch.startswith(("codex/", "feature/")):
+            raise PermissionError("CSE proposals must target a codex/ or feature/ branch.")
+        if payload.get("deploy") or payload.get("merge") or payload.get("write") or payload.get("apply"):
+            raise PermissionError("Code proposals cannot request merge, deploy, or direct writes.")
+        task = {
+            "id": f"staff-{int(time.time() * 1000)}", "type": task_type,
+            "status": "approval_required", "staff": "code", "payload": payload,
+            "requested_by": requested_by, "created_at": _now(), "approval_required": True,
+        }
+        with _LOCK:
+            items = _load()
+            items.append(task)
+            _save(items)
+        _record("task_queued", task_id=task["id"], task_type=task_type,
+                branch=branch, requested_by=requested_by)
+        return task
+    return route_task((payload.get("text", task_type) if task_type == "manager_review" else task_type),
+                      requested_by=requested_by)
 
 
 def _http_check(url):

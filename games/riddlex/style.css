@@ -74,14 +74,14 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
 .stage-wrap { position: relative; min-height: 0; overflow: hidden; }
 #stage { display: block; width: 100%; height: 100%; background: #24160f; }
 .speech {
-  position: absolute; z-index: 2;
-  left: max(8px, calc(var(--mouth-x, 0.46) * 100% - 13.5rem));
-  top: calc(var(--mouth-y, 0.30) * 100% - 2.6rem);
-  max-width: min(16rem, 46%);
+  position: absolute; z-index: 4;
+  left: calc(var(--bubble-left, 0.06) * 100%);
+  top: calc(var(--bubble-top, 0.14) * 100%);
+  max-width: min(240px, 46%);
   margin: 0; padding: 8px 12px; border-radius: 16px;
-  background: #fff6e4; border: 2px solid #c5a16c; color: #2a1a12;
-  box-shadow: 0 8px 16px #20120944;
-  font-size: clamp(14px, 2.1vw, 20px); line-height: 1.25;
+  background: #fff8ea; border: 2px solid #8a5a28; color: #1c100a;
+  box-shadow: 0 6px 14px #20120966;
+  font-size: 16px; line-height: 1.25; opacity: 1;
 }
 .speech::after {
   content: ""; position: absolute; right: 22px; bottom: -12px; top: auto;
@@ -140,8 +140,8 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 .confirm p { margin: 0 0 10px; }
 .confirm div { display: flex; gap: 8px; }
 .confirm button { flex: 1; }
-@media (max-width: 420px) {
-  .speech { max-width: min(15rem, 70%); font-size: 13px; padding: 6px 8px; }
+@media (max-width: 520px) {
+  .speech { max-width: 46%; font-size: 15px; padding: 7px 10px; background: #fff8ea; }
   #learn { grid-template-columns: 1fr; }
   #new { font-size: 13px; padding: 4px 8px; }
 }

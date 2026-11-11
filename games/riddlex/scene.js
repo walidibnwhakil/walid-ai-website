@@ -89,25 +89,31 @@ export function createScene(canvas) {
     const ch = canvas.height;
     if (!room) {
       view = { x: 0, y: 0, w: cw, h: ch };
+    } else if (cw < ch) {
+      // Portrait: the whole painting, correct shape, logo through the cat.
+      const w = cw;
+      const h = Math.min(ch, cw * (room.height / room.width));
+      view = { x: 0, y: 0, w, h };
     } else {
       const scale = Math.max(cw / room.width, ch / room.height);
       const w = room.width * scale;
       const h = room.height * scale;
-      let x = cw * 0.46 - w * 0.50;
-      let y = ch * 0.38 - h * 0.36;
+      let x = cw * 0.50 - w * 0.52;
+      let y = ch * 0.42 - h * 0.38;
       x = Math.min(0, Math.max(cw - w, x));
       y = Math.min(0, Math.max(ch - h, y));
       view = { x, y, w, h };
     }
     const parent = canvas.parentElement;
     if (!parent || !cw || !ch) return;
-    const mouthX = (view.x + view.w * 0.46) / cw;
-    const mouthY = (view.y + view.h * 0.30) / ch;
-    const deskY = (view.y + view.h * 0.60) / ch;
-    parent.style.setProperty("--mouth-x", mouthX.toFixed(4));
-    parent.style.setProperty("--mouth-y", mouthY.toFixed(4));
-    parent.style.setProperty("--desk-y", Math.min(0.72, Math.max(0.46, deskY)).toFixed(4));
-    parent.classList.toggle("bubble-below", mouthX < 0.36);
+    const faceLeft = (view.x + view.w * 0.34) / cw;
+    const eyeY = (view.y + view.h * 0.22) / ch;
+    const desk = (view.y + view.h * 0.58) / ch;
+    const imageBottom = (view.y + view.h) / ch;
+    parent.style.setProperty("--bubble-left", Math.max(0.012, faceLeft - 0.30).toFixed(4));
+    parent.style.setProperty("--bubble-top", Math.max(0.012, eyeY).toFixed(4));
+    parent.style.setProperty("--desk-y", Math.min(desk, Math.max(0.1, imageBottom - 0.1)).toFixed(4));
+    parent.classList.toggle("portrait-scene", cw < ch);
   }
 
   function drawSmoke(dt) {
@@ -187,24 +193,24 @@ export function createScene(canvas) {
   function drawLife(time) {
     const room = images.room;
     if (!room) return;
-    const breath = Math.sin(time * 1.35) * 0.0045;
+    const breath = Math.sin(time * 1.35) * 0.008;
     nudge([0.36, 0.27, 0.30, 0.14], 0, -Math.max(0, breath));
-    const sway = Math.sin(time * 0.45) * 0.0035;
-    nudge([0.43, 0.07, 0.16, 0.20], sway, 0);
+    const sway = Math.sin(time * 0.45) * 0.007;
+    nudge([0.42, 0.05, 0.18, 0.22], sway, 0);
     const shut = blink > 0 ? Math.sin(Math.min(1, blink) * Math.PI) : 0;
     const brow = (moodShown.happy - moodShown.sad) * 0.004;
     if (Math.abs(brow) > 0.001) nudge([0.46, 0.16, 0.12, 0.045], 0, -brow);
     eyelid(0.505, 0.205, 0.018, 0.012, shut);
     eyelid(0.545, 0.208, 0.014, 0.010, shut);
-    const catBreath = Math.sin(time * 1.6 + 1) * 0.0035;
-    nudge([0.70, 0.35, 0.24, 0.12], 0, -Math.max(0, catBreath));
-    nudge([0.688, 0.318, 0.045, 0.06], Math.sin(time * 2.2) * 0.003, 0);
-    nudge([0.725, 0.322, 0.04, 0.05], Math.sin(time * 2.2 + 1) * 0.0025, 0);
+    const catBreath = Math.sin(time * 1.6 + 1) * 0.007;
+    nudge([0.70, 0.36, 0.22, 0.10], 0, -Math.max(0, catBreath));
+    nudge([0.688, 0.318, 0.045, 0.06], Math.sin(time * 2.4) * 0.006, 0);
+    nudge([0.84, 0.40, 0.08, 0.06], Math.sin(time * 1.7) * 0.008, 0);
     eyelid(0.720, 0.400, 0.012, 0.008, shut * 0.85);
     eyelid(0.753, 0.404, 0.012, 0.008, shut * 0.85);
     if (catAct.kind === "hop") {
       const p = Math.sin(Math.min(1, catAct.t / 0.85) * Math.PI);
-      nudge([0.69, 0.33, 0.26, 0.16], 0, -0.012 * p);
+      nudge([0.69, 0.33, 0.26, 0.16], 0, -0.02 * p);
     } else if (catAct.kind === "stretch") {
       const p = Math.sin(Math.min(1, catAct.t / 0.85) * Math.PI);
       nudge([0.70, 0.36, 0.26, 0.13], 0.01 * p, 0.004 * p);
@@ -510,7 +516,17 @@ export function createScene(canvas) {
     const room = images.room;
     ctx.fillStyle = "#1a100c";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (room) ctx.drawImage(room, view.x, view.y, view.w, view.h);
+    if (room) {
+      ctx.drawImage(room, view.x, view.y, view.w, view.h);
+      const gapTop = view.y + view.h;
+      if (canvas.height - gapTop > 2) {
+        const fade = ctx.createLinearGradient(0, gapTop - 2, 0, canvas.height);
+        fade.addColorStop(0, "#6b3a1c");
+        fade.addColorStop(1, "#2a160e");
+        ctx.fillStyle = fade;
+        ctx.fillRect(0, gapTop - 2, canvas.width, canvas.height - gapTop + 2);
+      }
+    }
     if (!reduce) drawSmoke(dt);
     if (!reduce) stepCreatures(dt);
     updateReveal(dt);

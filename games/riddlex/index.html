@@ -19,7 +19,7 @@
   <meta name="twitter:description" content="Think of a real person, character, animal or object. Riddlex asks one question at a time and tries to guess.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap">
-  <link rel="stylesheet" href="./style.css?v=akinator-12">
+  <link rel="stylesheet" href="./style.css?v=akinator-13">
   <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
@@ -27,15 +27,25 @@
 <body>
   <div id="menu">
     <div class="menu-stage">
-      <img class="menu-blur" src="./images/approved/menu-card.png" alt="">
+      <img class="menu-blur" alt="" data-landscape="./images/approved/menu-blur.webp">
       <div class="menu-frame">
         <a class="menu-back" href="/games/">Back</a>
         <div class="lang-switch" role="group" aria-label="Language">
           <button type="button" data-set-lang="en" aria-pressed="true">English</button>
           <button type="button" data-set-lang="bn">বাংলা</button>
         </div>
-        <img class="menu-card" src="./images/approved/menu-card.png" alt="Riddlex — The Guessing Detective" width="1672" height="941">
-        <img class="menu-port" src="./images/approved/menu-portrait.webp" alt="" width="720" height="1280">
+        <img class="menu-card" alt="Riddlex — The Guessing Detective" width="1672" height="941" data-landscape="./images/approved/menu-desk.webp">
+        <img class="menu-port" alt="" width="720" height="1280" data-portrait="./images/approved/menu-portrait.webp">
+        <script>
+          (function () {
+            var portrait = matchMedia("(max-aspect-ratio: 4/5)").matches;
+            document.documentElement.dataset.orient = portrait ? "portrait" : "landscape";
+            document.querySelectorAll("#menu img").forEach(function (img) {
+              var src = portrait ? img.getAttribute("data-portrait") : img.getAttribute("data-landscape");
+              if (src) img.src = src;
+            });
+          })();
+        </script>
         <button id="play" type="button"><span class="play-glyph" aria-hidden="true"></span><span id="play-label">Play Game</span></button>
       </div>
     </div>
@@ -101,7 +111,7 @@
     </div>
     </div>
   </div>
-  <script type="module" src="./app.js?v=akinator-12"></script>
+  <script type="module" src="./app.js?v=akinator-13"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>
 </html>

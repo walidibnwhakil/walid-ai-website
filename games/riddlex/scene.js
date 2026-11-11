@@ -2,16 +2,33 @@
 // A light wisp rises from the pipe already in his hand. The notebook and
 // printer are drawn on top. There is no second cat and no hookah.
 
-const ART = {
-  room: "./images/approved/game-desk.png",
+const BASE = {
+  landscape: "./images/approved/game-desk.webp",
   portrait: "./images/approved/portrait-neutral.webp",
-  printer: "./images/approved/printer.png",
-  lHappy: "./images/approved/expression-happy.webp",
-  lSad: "./images/approved/expression-sad.webp",
-  lWorried: "./images/approved/expression-worried.webp",
-  pHappy: "./images/approved/portrait-happy.webp",
-  pSad: "./images/approved/portrait-sad.webp",
-  pWorried: "./images/approved/portrait-worried.webp",
+};
+const PRINTER = "./images/approved/printer.png";
+// Feathered face crops, one orientation only. Loaded after the first paint.
+const OVERLAYS = {
+  landscape: {
+    happy: "./images/approved/face-landscape-happy.webp",
+    sad: "./images/approved/face-landscape-sad.webp",
+    worried: "./images/approved/face-landscape-worried.webp",
+    serious: "./images/approved/face-landscape-serious.webp",
+    confused: "./images/approved/face-landscape-confused.webp",
+    cat: "./images/approved/cat-landscape-blink.webp",
+  },
+  portrait: {
+    happy: "./images/approved/face-portrait-happy.webp",
+    sad: "./images/approved/face-portrait-sad.webp",
+    worried: "./images/approved/face-portrait-worried.webp",
+    serious: "./images/approved/face-portrait-serious.webp",
+    confused: "./images/approved/face-portrait-confused.webp",
+    cat: "./images/approved/cat-portrait-blink.webp",
+  },
+};
+const FACE = {
+  landscape: { u: 0.36902, v: 0.0255, w: 0.32177, h: 0.37938 },
+  portrait: { u: 0.23889, v: 0.13047, w: 0.52222, h: 0.25938 },
 };
 
 function loadImage(src) {
@@ -52,7 +69,7 @@ export function createScene(canvas) {
   let raf = 0;
   let reveal = null;
   let view = { x: 0, y: 0, w: 1, h: 1 };
-  const expr = { happy: 0, sad: 0, worried: 0 };
+  const expr = { happy: 0, sad: 0, worried: 0, serious: 0, confused: 0 };
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
@@ -84,12 +101,18 @@ export function createScene(canvas) {
     layoutRoom();
   }
 
+  function currentArt() {
+    const narrow = canvas.width / Math.max(1, canvas.height) < 0.8;
+    if (narrow && images.portrait) return images.portrait;
+    if (!narrow && images.room) return images.room;
+    return images.base || null;
+  }
+
   function layoutRoom() {
-    const room = images.room;
     const cw = canvas.width;
     const ch = canvas.height;
-    portraitMode = !!(images.portrait && cw / ch < 0.8);
-    const art = portraitMode ? images.portrait : room;
+    const art = currentArt();
+    portraitMode = !!(art && cw / ch < 0.8);
     if (!art) {
       view = { x: 0, y: 0, w: cw, h: ch };
     } else {
@@ -159,7 +182,7 @@ export function createScene(canvas) {
   }
 
   function eyelid(cx, cy, rw, rh, amount) {
-    const room = images.room;
+    const room = currentArt();
     if (!room || amount < 0.05) return;
     ctx.save();
     ctx.beginPath();
@@ -190,15 +213,14 @@ export function createScene(canvas) {
   }
 
   function drawExpr() {
-    const plates = portraitMode
-      ? { happy: images.pHappy, sad: images.pSad, worried: images.pWorried }
-      : { happy: images.lHappy, sad: images.lSad, worried: images.lWorried };
-    for (const key of ["worried", "sad", "happy"]) {
+    const box = FACE[portraitMode ? "portrait" : "landscape"];
+    const plates = images.overlays || {};
+    for (const key of ["worried", "confused", "serious", "sad", "happy"]) {
       const plate = plates[key];
-      if (!plate || expr[key] < 0.03) continue;
+      if (!plate || (expr[key] || 0) < 0.03) continue;
       ctx.save();
       ctx.globalAlpha = expr[key];
-      ctx.drawImage(plate, view.x, view.y, view.w, view.h);
+      ctx.drawImage(plate, ix(box.u), iy(box.v), view.w * box.w, view.h * box.h);
       ctx.restore();
     }
   }
@@ -217,9 +239,8 @@ export function createScene(canvas) {
   }
 
   function drawLife(time) {
-    const room = images.room;
-    if (!room) return;
-    const base = portraitMode && images.portrait ? images.portrait : room;
+    const base = currentArt();
+    if (!base) return;
     const breath = Math.sin(time * 1.35) * 0.008;
     const body = portraitMode ? [0.18, 0.30, 0.55, 0.10] : [0.36, 0.27, 0.30, 0.14];
     nudge(body, 0, -Math.max(0, breath), base);
@@ -474,8 +495,12 @@ export function createScene(canvas) {
     approachMood(dt);
     stepExpr(dt);
     resize();
-    const room = images.room;
-    const art = portraitMode && images.portrait ? images.portrait : room;
+    const wantOrient = canvas.width / Math.max(1, canvas.height) < 0.8 ? "portrait" : "landscape";
+    if (images.baseOrient && wantOrient !== images.baseOrient && !images.swapping) {
+      images.swapping = true;
+      useOrient(wantOrient).finally(() => { images.swapping = false; });
+    }
+    const art = currentArt();
     ctx.fillStyle = "#1a100c";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (art) {
@@ -508,11 +533,48 @@ export function createScene(canvas) {
     raf = requestAnimationFrame(frame);
   }
 
+  function screenOrient() {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = rect.width > 0 ? rect.width / Math.max(1, rect.height) : 1;
+    if (rect.width > 0) return ratio < 0.8 ? "portrait" : "landscape";
+    return matchMedia("(max-aspect-ratio: 4/5)").matches ? "portrait" : "landscape";
+  }
+
+  let overlayToken = 0;
+  function lazyOverlays(orient) {
+    const token = ++overlayToken;
+    const jobs = Object.entries(OVERLAYS[orient] || {});
+    const run = () => {
+      if (token !== overlayToken) return;
+      for (const [key, src] of jobs) {
+        loadImage(src).then((image) => {
+          if (token !== overlayToken || !image) return;
+          images.overlays[key] = image;
+        });
+      }
+      if (!images.printer) {
+        loadImage(PRINTER).then((image) => {
+          if (image) images.printer = image;
+        });
+      }
+    };
+    requestAnimationFrame(() => requestAnimationFrame(run));
+  }
+
+  async function useOrient(orient) {
+    if (images.baseOrient === orient && images.base) return;
+    const image = await loadImage(BASE[orient]);
+    if (!image) return;
+    images.base = image;
+    images.baseOrient = orient;
+    if (orient === "portrait") images.portrait = image;
+    else images.room = image;
+    images.overlays = {};
+    lazyOverlays(orient);
+  }
+
   async function start() {
-    if (!images.room) {
-      const loaded = await Promise.all(Object.entries(ART).map(async ([key, src]) => [key, await loadImage(src)]));
-      for (const [key, image] of loaded) images[key] = image;
-    }
+    await useOrient(screenOrient());
     resize();
     if (running) return;
     running = true;

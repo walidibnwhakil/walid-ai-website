@@ -120,8 +120,9 @@ def staff_status():
 
 
 def list_tasks():
+    """Return queued tasks only; audit events are persisted separately."""
     with _LOCK:
-        return list(reversed(_load()))
+        return list(reversed([item for item in _load() if item.get("type") in ROUTE_TYPES]))
 
 
 def route_task(text, language="auto", requested_by="admin"):
@@ -156,6 +157,8 @@ def enqueue(task_type, payload=None, requested_by="admin"):
     if task_type not in ROUTE_TYPES:
         raise ValueError("Unsupported staff task type.")
     payload = dict(payload or {})
+    if task_type == "mail_check" and not staff_status()["mail"]["available"]:
+        raise PermissionError("Mail checks require explicitly authorized IMAP configuration.")
     if task_type == "code_proposal":
         branch = str(payload.get("branch", "")).strip()
         if not branch.startswith(("codex/", "feature/")):

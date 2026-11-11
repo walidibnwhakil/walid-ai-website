@@ -13,6 +13,7 @@ import urllib.error
 import urllib.request
 import threading
 
+from walid_staff import enqueue as enqueue_staff_task, list_tasks as list_staff_tasks, run_checks as run_staff_checks, staff_status as get_staff_status
 from walid_providers import (
     collect_web_sources,
     configured_provider_names,
@@ -1377,6 +1378,26 @@ class WalidAIHandler(BaseHTTPRequestHandler):
         if self.path == "/health":
             self.send_json(200, {"status": "ok", "providers": configured_provider_names()})
             return
+        staff_path = self.path.split("?", 1)[0]
+        if staff_path in {"/api/admin/staff", "/api/admin/staff/tasks"}:
+            if not self.require_authorized():
+                return
+            if self.authenticated_user.get("role") != "admin":
+                self.send_json(403, {"error": "Admin access is required."})
+                return
+            if staff_path == "/api/admin/staff":
+                self.send_json(200, {"status": get_staff_status(), "tasks": list_staff_tasks()})
+            else:
+                self.send_json(200, {"tasks": list_staff_tasks()})
+            return
+        if staff_path == "/api/admin/staff/checks":
+            if not self.require_authorized():
+                return
+            if self.authenticated_user.get("role") != "admin":
+                self.send_json(403, {"error": "Admin access is required."})
+                return
+            self.send_json(200, {"checks": run_staff_checks()})
+            return
         if self.path == "/api/upload-quota":
             if not self.require_authorized():
                 return
@@ -1499,6 +1520,30 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             self.authenticated_user = self.authenticate() or {"role": "guest"}
         elif not self.require_authorized():
             return
+        if self.path == "/api/admin/staff/tasks":
+            if self.authenticated_user.get("role") != "admin":
+                self.send_json(403, {"error": "Admin access is required."})
+                return
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+                data = json.loads(self.rfile.read(length))
+            except (ValueError, json.JSONDecodeError):
+                self.send_json(400, {"error": "Invalid task payload."})
+                return
+            if not isinstance(data, dict):
+                self.send_json(400, {"error": "Invalid task payload."})
+                return
+            try:
+                task = enqueue_staff_task(data.get("type", ""), data.get("payload"), "admin")
+            except PermissionError as error:
+                self.send_json(403, {"error": str(error)})
+                return
+            except ValueError as error:
+                self.send_json(400, {"error": str(error)})
+                return
+            self.send_json(202, {"task": task})
+            return
+
         if self.path == "/api/feedback":
             if self.authenticated_user["role"] != "admin":
                 self.send_json(403, {"error": "উত্তর সংশোধনের অধিকার শুধু ওয়াকিলের আছে।"})

@@ -75,13 +75,13 @@ try {
     await openTool(p, "/tools/pdf-browser/studio.html?tool=edit");
     await p.locator("#file").setInputFiles({ name: "three-pages.pdf", mimeType: "application/pdf", buffer: await fixturePdf({ pages: 3 }) });
     await p.locator("#panelEdit").waitFor({ state: "visible" });
-    await p.waitForFunction(() => /1\\s*\\/\\s*3/.test(document.querySelector("#pageLabel")?.textContent || ""));
+    await p.waitForFunction(() => (document.querySelector("#pageLabel")?.textContent || "").includes("1 / 3"));
     await p.locator("#rotateRight").click();
     await p.locator("#pageNext").click();
     await p.locator("#deletePage").click();
-    await p.waitForFunction(() => /2\\s*\\/\\s*2/.test(document.querySelector("#pageLabel")?.textContent || ""));
+    await p.waitForFunction(() => (document.querySelector("#pageLabel")?.textContent || "").includes("2 / 2"));
     await p.locator("#saveEdit").click();
-    await p.waitForFunction(() => /^Done\\./.test(document.querySelector("#status")?.textContent || ""));
+    await p.waitForFunction(() => (document.querySelector("#status")?.textContent || "").startsWith("Done."));
     const bytes = await download(p, p.locator("#download"));
     const pages = await inspectPdf(bytes);
     assert.equal(pages.length, 2);

@@ -85,7 +85,7 @@ function wordFloatingImage(relId,width,height) {
 function wordTextBox(block,index) {
   const x=Math.max(0,Math.round((block.x||0)*9525)), y=Math.max(0,Math.round((block.y||0)*9525));
   const cx=Math.max(1,Math.round((block.width||120)*9525)), cy=Math.max(1,Math.round((block.height||24)*9525));
-  return '<w:p><w:r><w:drawing><wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="'+(index+2)+'" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>'+x+'</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>'+y+'</wp:posOffset></wp:positionV><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:wrapNone/><wp:docPr id="'+(index+10)+'" name="Editable OCR text '+index+'"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingShape"><wps:wsp xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"><wps:cNvSpPr/><wps:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"/><a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr><wps:txbx><w:txbxContent><w:p><w:r><w:t xml:space="preserve">'+xmlEscape(block.text||'')+'</w:t></w:r></w:p></w:txbxContent></wps:txbx><wps:bodyPr/></wps:wsp></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>';
+  return '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr><w:r><w:drawing><wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="'+(index+2)+'" behindDoc="0" locked="0" layoutInCell="0" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>'+x+'</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>'+y+'</wp:posOffset></wp:positionV><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:wrapNone/><wp:docPr id="'+(index+10)+'" name="Editable OCR text '+index+'"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingShape"><wps:wsp xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"><wps:cNvSpPr/><wps:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"/><a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr><wps:txbx><w:txbxContent><w:p><w:r><w:rPr><w:vanish/><w:color w:val="FFFFFF"/></w:rPr><w:t xml:space="preserve">'+xmlEscape(block.text||'')+'</w:t></w:r></w:p></w:txbxContent></wps:txbx><wps:bodyPr/></wps:wsp></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>';
 }
 async function createEditableDocx(pages, filename) {
   const JSZip=(await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
@@ -123,15 +123,10 @@ function detectBlocks(words,width) {
   return [{type:'table',rows},...nonRows];
 }
 function maskTextRegions(canvas,words) {
-  const copy=document.createElement('canvas'); copy.width=canvas.width; copy.height=canvas.height;
-  const copyCtx=copy.getContext('2d'); copyCtx.drawImage(canvas,0,0);
-  copyCtx.fillStyle='#ffffff';
-  for(const word of words) {
-    const x=Math.max(0,Math.floor(word.bbox.x0-3)), y=Math.max(0,Math.floor(word.bbox.y0-3));
-    const right=Math.min(copy.width,Math.ceil(word.bbox.x1+3)), bottom=Math.min(copy.height,Math.ceil(word.bbox.y1+3));
-    copyCtx.fillRect(x,y,Math.max(1,right-x),Math.max(1,bottom-y));
-  }
-  return copy.toDataURL('image/png');
+  // Keep the source page intact. Painting OCR rectangles here destroys logos,
+  // signatures, barcodes, and background texture; the OCR layer is carried
+  // separately as editable Word text boxes.
+  return canvas.toDataURL('image/png');
 }
 async function ocrPdfToDocx(file,onProgress) {
   const {createWorker}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm');
@@ -196,5 +191,7 @@ function bindFileDrop(zone,input,multiple){if(!zone||!input)return;zone.addEvent
    another optional initializer fails earlier in the page. */
 (()=>{const params=new URLSearchParams(location.search),tool=params.get('tool');if(!tool)return;const activate=()=>{const card=document.querySelector('.tool-card[data-tool="'+CSS.escape(tool)+'"]');if(!card)return;document.body.classList.add('tool-mode');try{if(typeof openTool==='function'){openTool(card,false);return}}catch(error){console.error('Tool workspace initialization failed',error)}const workspace=document.getElementById('workspace'),pdf=document.getElementById('pdfPanel'),image=document.getElementById('imagePanel');if(!workspace)return;workspace.hidden=false;if(pdf)pdf.hidden=card.dataset.kind!=='pdf';if(image)image.hidden=card.dataset.kind!=='image';document.getElementById('toolGrid')?.setAttribute('hidden','');document.getElementById('toolGrid')?.setAttribute('aria-hidden','true')};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(activate,0),{once:true});else setTimeout(activate,0)})();
 </script><script src="/usage.js?v=20261109-2"></script></body></html>
+
+
 
 

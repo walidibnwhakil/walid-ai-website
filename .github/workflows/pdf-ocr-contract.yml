@@ -5,6 +5,8 @@ on:
     paths:
       - "tools/pdf-browser/**"
       - "tools/pdf-to-word/**"
+      - "tools/image-to-word/**"
+      - "tool-workspace.html"
       - "tool-workspace.html"
       - "fonts/NotoSansBengali-Regular.ttf"
       - "tests/fixtures/bengali-mixed*"

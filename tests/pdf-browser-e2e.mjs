@@ -36,7 +36,7 @@ async function pdfFixture(page, count, bengali = false) {
     const { PDFDocument, rgb } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm");
     const doc = await PDFDocument.create();
     let font;
-    if (bengali) { const bytes = new Uint8Array(await (await fetch("/fonts/NotoSansBengali-Regular.ttf")).arrayBuffer()); const fontkit = await import("https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/+esm"); doc.registerFontkit(fontkit.default || fontkit); font = await doc.embedFont(bytes, { subset: true }); }
+    if (bengali) { await import("https://cdn.jsdelivr.net/npm/regenerator-runtime@0.14.1/runtime.min.js"); const bytes = new Uint8Array(await (await fetch("/fonts/NotoSansBengali-Regular.ttf")).arrayBuffer()); const fontkit = await import("https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/+esm"); doc.registerFontkit(fontkit.default || fontkit); font = await doc.embedFont(bytes, { subset: true }); }
     for (let i = 0; i < n; i++) { const p = doc.addPage([595, 842]); p.drawRectangle({ x: 0, y: 0, width: 595, height: 842, color: rgb(.9 - i * .05, .95, .92) }); p.drawText(bengali ? "বাংলা লেখা সম্পাদনাযোগ্য" : "fixture page " + (i + 1), { x: 40, y: 760, size: 24, ...(font ? { font } : {}) }); }
     return Array.from(await doc.save());
   }, { count, bengali });

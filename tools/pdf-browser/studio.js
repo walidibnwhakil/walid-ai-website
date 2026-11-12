@@ -1,4 +1,6 @@
 import { PDFDocument, degrees, rgb, BlendMode } from "https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm";
+
+const BENGALI_FONT_URL = "/fonts/NotoSansBengali-Regular.ttf";
 import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
@@ -602,6 +604,50 @@ function hexRgb(hex) {
   return rgb(((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255);
 }
 
+async function embedBengaliFont(pdfDoc) {
+  if (pdfDoc.__walidBengaliFont) return pdfDoc.__walidBengaliFont;
+  const response = await fetch(BENGALI_FONT_URL, { cache: "force-cache" });
+  if (!response.ok) throw new Error("Bengali font could not be loaded.");
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  const fontkitModule = await import("https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/+esm");
+  const fontkit = fontkitModule.default || fontkitModule;
+  pdfDoc.registerFontkit(fontkit);
+  pdfDoc.__walidBengaliFont = await pdfDoc.embedFont(bytes, { subset: true });
+  return pdfDoc.__walidBengaliFont;
+}
+
+async function drawTextAnnotation(pdfDoc, page, view, ann) {
+  const font = await embedBengaliFont(pdfDoc);
+  const pad = ann.type === "note" ? 8 : 2;
+  const lines = wrapLines(ann.text, ann.fontSize, Math.max(8, ann.w - pad * 2));
+  const lineHeight = ann.fontSize * 1.35;
+  const boxHeight = Math.max(ann.h, pad * 2 + lines.length * lineHeight);
+  const box = visualRectToPdf(view, ann.x, ann.y, ann.w, boxHeight);
+  if (ann.type === "note") {
+    page.drawRectangle({
+      x: box.left,
+      y: box.bottom,
+      width: box.width,
+      height: box.height,
+      color: rgb(1, 0.956, 0.66),
+      borderColor: rgb(0.886, 0.784, 0.353),
+      borderWidth: 0.8
+    });
+  }
+  for (let index = 0; index < lines.length; index += 1) {
+    const [x, baseline] = view.convertToPdfPoint(ann.x + pad, ann.y + pad + index * lineHeight + ann.fontSize);
+    page.drawText(lines[index], {
+      x,
+      y: baseline - ann.fontSize * 0.18,
+      size: ann.fontSize,
+      font,
+      color: hexRgb(ann.color || "#14241f"),
+      opacity: ann.opacity ?? 1
+    });
+  }
+  return true;
+}
+
 async function drawAnnotation(pdfDoc, page, view, ann, rotation) {
   if ((ann.type === "text" || ann.type === "note") && !String(ann.text || "").trim()) return;
   if (ann.type === "highlight") {
@@ -625,6 +671,14 @@ async function drawAnnotation(pdfDoc, page, view, ann, rotation) {
       page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: ann.stroke || 2, color });
     }
     return;
+  }
+  if (ann.type === "text" || ann.type === "note") {
+    try {
+      await drawTextAnnotation(pdfDoc, page, view, ann);
+      return;
+    } catch (error) {
+      console.warn("Selectable Bengali export unavailable; using raster fallback.", error);
+    }
   }
   let canvas;
   let boxHeight = ann.h;

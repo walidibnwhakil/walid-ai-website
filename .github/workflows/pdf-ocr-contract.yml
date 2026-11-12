@@ -1,28 +1,40 @@
-name: PDF OCR contract
+name: PDF OCR and browser E2E
 
 on:
   pull_request:
     paths:
-      - "tools/pdf-browser/studio.js"
-      - "tests/fixtures/bengali-mixed.json"
+      - "tools/pdf-browser/**"
+      - "fonts/NotoSansBengali-Regular.ttf"
+      - "tests/fixtures/bengali-mixed*"
       - "tests/ocr-language-contract.mjs"
+      - "tests/pdf-bengali-export-contract.mjs"
+      - "tests/pdf-browser-e2e.mjs"
+      - "tests/tesseract-benchmark.mjs"
       - ".github/workflows/pdf-ocr-contract.yml"
   push:
-    branches:
-      - main
-      - "fix/**"
-      - "codex/**"
+    branches: [main, "fix/**", "codex/**"]
 
 permissions:
   contents: read
 
 jobs:
-  ocr-contract:
+  pdf-e2e:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+        with: { node-version: 20 }
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Install OCR engine and Bengali language data
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick fonts-noto-core tesseract-ocr tesseract-ocr-ben tesseract-ocr-eng
+          convert -background white -fill black -font NotoSansBengali-Regular -pointsize 54 tests/fixtures/bengali-mixed.svg tests/fixtures/bengali-mixed.png
+          tesseract tests/fixtures/bengali-mixed.png tests/fixtures/bengali-mixed-ocr -l ben+eng --psm 6
+      - run: node tests/tesseract-benchmark.mjs
       - run: node tests/ocr-language-contract.mjs
       - run: node tests/pdf-bengali-export-contract.mjs
+      - run: node tests/pdf-browser-e2e.mjs

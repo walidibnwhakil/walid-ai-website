@@ -71,8 +71,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .page-label { color: var(--muted); }
 .stage {
   position: relative;
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;\r\n  max-width: 100%;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -80,7 +79,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   overflow: hidden;
   touch-action: none;
 }
-.stage canvas { display: block; width: auto; height: auto; max-width: 100%; max-height: 72vh; }
+.stage canvas { display: block; width: 100%; height: auto; max-width: 100%; max-height: none; }
 .overlay { position: absolute; inset: 0; }
 .ann { position: absolute; box-sizing: border-box; }
 .ann.selected { outline: 2px solid var(--green); outline-offset: 1px; }
@@ -211,3 +210,4 @@ textarea.ocr-text { min-height: 220px; resize: vertical; font-family: "Noto Sans
   .layout { grid-template-columns: 1fr; }
   .select-file { height: 68px; }
 }
+

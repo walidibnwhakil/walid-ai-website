@@ -23,7 +23,6 @@ const page = await browser.newPage({ acceptDownloads: true });
 const errors = [];
 page.on("pageerror", (error) => errors.push(String(error)));
 await page.goto(`http://127.0.0.1:${port}/tools/pdf-browser/studio.html?tool=edit`, { waitUntil: "networkidle" });
-assert.equal(await page.locator("#panelEdit").isVisible(), true);
 const pdfBytes = await page.evaluate(async () => {
   const { PDFDocument } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm");
   const doc = await PDFDocument.create();
@@ -31,6 +30,7 @@ const pdfBytes = await page.evaluate(async () => {
   return Array.from(await doc.save());
 });
 await page.setInputFiles("#file", { name: "fixture.pdf", mimeType: "application/pdf", buffer: Buffer.from(pdfBytes) });
+await page.locator("#panelEdit").waitFor({ state: "visible" });
 await page.locator("#stage").waitFor({ state: "visible" });
 await page.locator('[data-edit="text"]').click();
 await page.locator("#overlay").click({ position: { x: 80, y: 80 } });

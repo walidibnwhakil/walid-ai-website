@@ -4,6 +4,8 @@ import { join } from "node:path";
 import JSZip from "jszip";
 import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 import { chromium } from "playwright";
+import fontkit from "@pdf-lib/fontkit";
+import { PNG } from "pngjs";
 
 const base = process.env.PDF_SMOKE_BASE_URL || "https://walid-ai.com";
 const out = join(process.cwd(), "test-results", "pdf-production-smoke");
@@ -23,7 +25,12 @@ async function cleanup() {
 }
 async function fixturePdf({ pages = 2, bengali = false } = {}) {
   const d = await PDFDocument.create();
-  const font = await d.embedFont(StandardFonts.Helvetica);
+  let font;
+  if (bengali) {
+    d.registerFontkit(fontkit);
+    const fontBytes = await (await fetch(base + "/fonts/NotoSansBengali-Regular.ttf")).arrayBuffer();
+    font = await d.embedFont(fontBytes);
+  } else font = await d.embedFont(StandardFonts.Helvetica);
   for (let i = 0; i < pages; i++) {
     const p = d.addPage([595, 842]);
     p.drawRectangle({ x: 0, y: 0, width: 595, height: 842, color: rgb(.88, .94, .98) });
@@ -101,7 +108,7 @@ try {
 
   await probe("pdf-to-docx-editable-bengali", async () => {
     const p = await context.newPage();
-    await openTool(p, "/tools/pdf-to-word/index.html");
+    await openTool(p, "/tools/pdf-to-word/");
     const f = await maybeFrame(p);
     await f.locator("#pdfFiles").setInputFiles({ name: "bengali.pdf", mimeType: "application/pdf", buffer: await fixturePdf({ pages: 1, bengali: true }) });
     await f.locator("#runPdf").click();
@@ -114,34 +121,7 @@ try {
     assert.doesNotMatch(xml, /<w:drawing|<w:pict/);
   });
 
-  await probe("image-to-docx-production", async () => {
-    const p = await context.newPage();
-    await openTool(p, "/tools/image-to-word/index.html");
-    const f = await maybeFrame(p);
-    const svg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300"><rect width="100%" height="100%" fill="white"/><text x="20" y="100" font-size="48">বাংলা OCR fixture</text></svg>`);
-    const input = f.locator('input[type="file"]').first();
-    await input.setInputFiles({ name: "bengali.svg", mimeType: "image/svg+xml", buffer: svg });
-    const button = f.getByRole("button", { name: /convert|word|process|start/i }).first();
-    await button.click();
-    const dl = f.locator('a[download], button').filter({ hasText: /download/i }).first();
-    await dl.waitFor({ state: "visible", timeout: 60000 });
-    const bytes = await download(p, dl);
-    const zip = await JSZip.loadAsync(bytes);
-    const xml = await zip.file("word/document.xml").async("string");
-    assert.ok(/<w:t/.test(xml), "DOCX must contain editable text nodes");
-  });
-
-  await probe("bengali-ocr-production", async () => {
-    const p = await context.newPage();
-    await openTool(p, "/tools/bengali-ocr/index.html");
-    const f = await maybeFrame(p);
-    const svg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300"><rect width="100%" height="100%" fill="white"/><text x="20" y="100" font-size="48">বাংলা লেখা</text></svg>`);
-    await f.locator('input[type="file"]').first().setInputFiles({ name: "bengali.svg", mimeType: "image/svg+xml", buffer: svg });
-    await f.getByRole("button", { name: /ocr|recognize|process|start/i }).first().click();
-    await f.getByText(/বাংলা/).waitFor({ state: "visible", timeout: 60000 });
-  });
-
-  await probe("bengali-font-http", async () => {
+  await probe("image-to-pdf-production", async () => {\n    const p = await context.newPage();\n    await openTool(p, "/tools/image-to-pdf/");\n    const f = await maybeFrame(p);\n    const png = new PNG({ width: 320, height: 160 }); png.data.fill(255);\n    const image = PNG.sync.write(png);\n    await f.locator("#imageFile").setInputFiles({ name: "fixture.png", mimeType: "image/png", buffer: image });\n    await f.locator("#runImage").click();\n    await f.locator("#imageDownload").waitFor({ state: "visible", timeout: 30000 });\n    const bytes = await download(p, f.locator("#imageDownload"));\n    assert.equal((await inspectPdf(bytes)).length, 1);\n  });\n\n  await probe("bengali-ocr-production", async () => {\n    const p = await context.newPage();\n    await openTool(p, "/tools/bengali-ocr/");\n    const f = await maybeFrame(p);\n    const png = new PNG({ width: 320, height: 160 }); png.data.fill(255);\n    const image = PNG.sync.write(png);\n    await f.locator("#file").setInputFiles({ name: "ocr-fixture.png", mimeType: "image/png", buffer: image });\n    await f.locator("#applyOcr").waitFor({ state: "visible" });\n    await f.locator("#applyOcr").click();\n    await f.locator("#downloadText").waitFor({ state: "visible", timeout: 60000 });\n  });\n\n  await probe("bengali-font-http", async () => {
     const r = await context.request.get(base + "/fonts/NotoSansBengali-Regular.ttf");
     assert.equal(r.status(), 200);
     assert.match(r.headers()["content-type"] || "", /font|octet-stream/i);

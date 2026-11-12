@@ -39,7 +39,7 @@ const contracts = [
   [/doc\.addPage\(/, "image-to-PDF must create one page per image"],
   [/imagePageSize/, "image-to-PDF page sizing must remain configurable"],
   [/createWorker\(["']ben\+eng["']/, "OCR must use Bengali plus English"],
-  [/Math\.min\(10, state\.pages\.length\)/, "PDF OCR must keep its first-ten-page safety bound"],
+  [/Math\.min\(state\.pages\.length, 10\)/, "PDF OCR must keep its first-ten-page safety bound"],
   [/prepareOcrCanvas/, "OCR must preprocess rendered pages/images before recognition"],
   [/embedPng\(/, "raster fallback must remain available for annotations"]
 ];

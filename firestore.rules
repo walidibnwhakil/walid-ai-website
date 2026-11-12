@@ -1,0 +1,116 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function owner() {
+      return signedIn() && request.auth.token.email_verified == true && (
+        request.auth.token.email == "walid.ibnwhakil@gmail.com"
+        || request.auth.token.email == "iwhakil@gmail.com"
+        || request.auth.token.riddlexOwner == true
+      );
+    }
+    function hourNow() {
+      return int(request.time.toMillis() / 3600000);
+    }
+    function validImage(data) {
+      return !("image" in data) || (
+        data.image is string
+        && data.image.size() > 20
+        && data.image.size() < 150000
+        && data.image.matches("^data:image/(webp|jpeg);base64,")
+      );
+    }
+    function noAdultPicture(data) {
+      return data.adult == false || !("image" in data);
+    }
+
+    match /riddlex_slots/{id} {
+      allow create: if signedIn()
+        && id.split("~")[0] == request.auth.uid
+        && id.split("~").size() == 3
+        && int(id.split("~")[1]) == hourNow()
+        && int(id.split("~")[2]) >= 0
+        && int(id.split("~")[2]) <= 4
+        && request.resource.data.keys().hasOnly(["slug"])
+        && request.resource.data.slug is string
+        && request.resource.data.slug.size() > 0
+        && request.resource.data.slug.size() < 120
+        && request.resource.size() < 2000;
+      allow read: if signedIn() && id.split("~")[0] == request.auth.uid;
+    }
+
+    match /riddlex_entries/{slug} {
+      allow get: if resource == null
+        || resource.data.status in ["approved", "confirmed", "pending"]
+        || owner()
+        || (signedIn() && resource.data.createdBy == request.auth.uid);
+      allow list: if resource.data.status in ["approved", "confirmed"]
+        || owner();
+
+      allow create: if signedIn()
+        && slug == request.resource.data.slug
+        && slug.size() > 0
+        && slug.size() < 120
+        && request.resource.data.keys().hasOnly([
+          "slug", "nameEn", "nameBn", "adult", "answers", "image", "status",
+          "confirmations", "confirmers", "createdBy", "createdAt", "updatedAt", "slot"
+        ])
+        && request.resource.data.nameEn is string
+        && request.resource.data.nameEn.size() > 0
+        && request.resource.data.nameEn.size() <= 80
+        && request.resource.data.nameBn is string
+        && request.resource.data.nameBn.size() <= 80
+        && request.resource.data.adult is bool
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() > 0
+        && request.resource.data.answers.size() <= 36
+        && request.resource.data.status == "pending"
+        && request.resource.data.confirmations == 1
+        && request.resource.data.confirmers == [request.auth.uid]
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.slot is int
+        && request.resource.data.slot >= 0
+        && request.resource.data.slot <= 4
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && validImage(request.resource.data)
+        && noAdultPicture(request.resource.data)
+        && request.resource.size() < 220000
+        && exists(/databases/$(database)/documents/riddlex_slots/$(request.auth.uid + "~" + string(hourNow()) + "~" + string(request.resource.data.slot)))
+        && get(/databases/$(database)/documents/riddlex_slots/$(request.auth.uid + "~" + string(hourNow()) + "~" + string(request.resource.data.slot))).data.slug == slug;
+
+      allow update: if signedIn()
+        && request.resource.data.slug == resource.data.slug
+        && request.resource.data.nameEn == resource.data.nameEn
+        && request.resource.data.nameBn == resource.data.nameBn
+        && request.resource.data.adult == resource.data.adult
+        && request.resource.data.answers == resource.data.answers
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (("image" in resource.data) == ("image" in request.resource.data))
+        && (!("image" in resource.data) || request.resource.data.image == resource.data.image)
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.confirmers.size() == resource.data.confirmers.size() + 1
+        && request.resource.data.confirmers.size() <= 12
+        && request.auth.uid in request.resource.data.confirmers
+        && !(request.auth.uid in resource.data.confirmers)
+        && request.resource.data.confirmations == resource.data.confirmations + 1
+        && request.resource.data.confirmations <= 12
+        && (
+          request.resource.data.status == resource.data.status
+          || (resource.data.status == "pending" && request.resource.data.status == "confirmed" && request.resource.data.confirmations >= 3)
+        )
+        && request.resource.size() < 220000
+        || owner()
+        && request.resource.data.slug == resource.data.slug
+        && request.resource.data.nameEn == resource.data.nameEn
+        && request.resource.data.answers == resource.data.answers
+        && request.resource.data.status in ["approved", "rejected", "pending", "confirmed"]
+        && request.resource.size() < 220000;
+
+      allow delete: if owner();
+    }
+  }
+}

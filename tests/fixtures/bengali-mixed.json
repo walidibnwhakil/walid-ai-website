@@ -1,0 +1,6 @@
+{
+  "text": "বাংলা OCR test — Walid AI 2026, PDF #55.",
+  "scripts": ["Bengali", "Latin", "digits", "punctuation"],
+  "expectedLanguage": "ben+eng",
+  "requiredTokens": ["বাংলা", "2026"]
+}

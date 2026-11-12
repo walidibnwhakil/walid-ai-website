@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
+<title>PDF tools | Walid AI</title>
+<link rel="stylesheet" href="/tools/pdf-browser/studio.css">
+</head>
+<body>
+<div class="file-drop" id="drop">
+  <button class="select-file" type="button" id="choose"><span id="chooseLabel">Select PDF file</span></button>
+  <input id="file" type="file" hidden>
+  <p class="drop-hint" id="dropHint">or drop a PDF here</p>
+</div>
+<section class="work" id="work" hidden>
+  <div class="summary">
+    <span id="fileLabel"></span>
+    <button class="minor" type="button" id="clearFile">Clear</button>
+  </div>
+  <div class="layout">
+    <div class="stage-wrap" id="previewColumn">
+      <div class="page-bar" id="pageBar" hidden>
+        <button class="minor" type="button" id="pagePrev">Previous</button>
+        <span class="page-label" id="pageLabel"></span>
+        <button class="minor" type="button" id="pageNext">Next</button>
+      </div>
+      <div class="stage" id="stage" hidden>
+        <canvas id="pageCanvas"></canvas>
+        <div class="overlay" id="overlay"></div>
+      </div>
+      <div class="organize" id="organizeGrid" hidden></div>
+      <div class="image-list" id="imageList" hidden></div>
+      <label class="field" id="ocrField" hidden>Recognized text
+        <textarea class="ocr-text" id="ocrOutput" readonly></textarea>
+      </label>
+    </div>
+    <form class="options" id="options" autocomplete="off" onsubmit="return false">
+      <div id="passwordBox" hidden>
+        <p class="hint" id="passwordHint">This PDF asks for a password to open.</p>
+        <label class="field">Password
+          <input id="openPassword" type="password" autocomplete="off">
+        </label>
+        <button class="action" type="button" id="submitPassword">Open PDF</button>
+      </div>
+      <div id="panelEdit" hidden>
+        <p class="hint">Click the page to add text. Bengali uses a bundled licensed font for selectable PDF text when available; a rasterized browser-canvas fallback is used if embedding fails. Turn a sideways page before adding text. The file stays in this browser.</p>
+        <div class="tool-row" id="editTools">
+          <button class="minor tool-btn" type="button" data-edit="text">Text</button>
+          <button class="minor tool-btn" type="button" data-edit="image">Image</button>
+          <button class="minor tool-btn" type="button" data-edit="highlight">Highlight</button>
+          <button class="minor tool-btn" type="button" data-edit="ink">Draw</button>
+          <button class="minor tool-btn" type="button" data-edit="note">Note</button>
+          <button class="minor tool-btn" type="button" data-edit="select">Select</button>
+        </div>
+        <div class="option-row">
+          <label class="field">Size <input id="fontSize" type="number" min="8" max="96" value="22"></label>
+          <label class="field">Color <input id="textColor" type="color" value="#14241f"></label>
+        </div>
+        <div class="option-row">
+          <label class="field">Ink <input id="inkColor" type="color" value="#14241f"></label>
+          <label class="field">Ink width <input id="inkWidth" type="number" min="1" max="16" value="2"></label>
+        </div>
+        <input id="placeImage" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        <div class="tool-row">
+          <button class="minor" type="button" id="rotateLeft">Rotate left</button>
+          <button class="minor" type="button" id="rotateRight">Rotate right</button>
+          <button class="minor" type="button" id="moveEarlier">Move earlier</button>
+          <button class="minor" type="button" id="moveLater">Move later</button>
+          <button class="minor" type="button" id="deletePage">Delete page</button>
+        </div>
+        <button class="action" type="button" id="saveEdit">Download PDF</button>
+      </div>
+      <div id="panelOrganize" hidden>
+        <p class="hint">Drag pages to reorder them. Rotate or delete a page, then download. The file stays in this browser.</p>
+        <button class="action" type="button" id="saveOrganize">Download PDF</button>
+      </div>
+      <div id="panelNumbers" hidden>
+        <p class="hint">Page numbers are drawn on the pages in this browser.</p>
+        <label class="field">Position
+          <select id="numberPosition">
+            <option value="bottom-center">Bottom center</option>
+            <option value="bottom-right">Bottom right</option>
+            <option value="bottom-left">Bottom left</option>
+            <option value="top-center">Top center</option>
+            <option value="top-right">Top right</option>
+          </select>
+        </label>
+        <label class="field">Start at <input id="numberStart" type="number" min="1" max="9999" value="1"></label>
+        <label class="field">Size <input id="numberSize" type="number" min="8" max="48" value="12"></label>
+        <label class="choice"><input id="numberBengali" type="checkbox"> Bengali digits</label>
+        <label class="choice"><input id="numberSkip" type="checkbox"> Skip the first page</label>
+        <button class="action" type="button" id="applyNumbers">Add page numbers</button>
+      </div>
+      <div id="panelWatermark" hidden>
+        <p class="hint">The watermark is drawn in this browser. Bengali uses Noto Sans Bengali.</p>
+        <label class="field">Text <input id="watermarkText" type="text" value="Walid AI" maxlength="80"></label>
+        <label class="field">Opacity <input id="watermarkOpacity" type="range" min="5" max="60" value="18"></label>
+        <label class="field">Angle <input id="watermarkAngle" type="number" min="-180" max="180" value="-32"></label>
+        <label class="choice"><input id="watermarkTile" type="checkbox"> Repeat across the page</label>
+        <button class="action" type="button" id="applyWatermark">Add watermark</button>
+      </div>
+      <div id="panelSign" hidden>
+        <p class="hint">Draw a signature, place it, then drag it on the page. You can also use an image.</p>
+        <canvas class="sign-pad" id="signPad" width="560" height="160"></canvas>
+        <div class="tool-row">
+          <button class="minor" type="button" id="clearSign">Clear</button>
+          <button class="minor" type="button" id="uploadSign">Use an image</button>
+          <input id="signImage" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        </div>
+        <label class="field">Width on the page <input id="signWidth" type="number" min="40" max="500" value="160"></label>
+        <button class="action" type="button" id="placeSign">Place signature</button>
+        <button class="action" type="button" id="saveSign">Download PDF</button>
+      </div>
+      <div id="panelProtect" hidden>
+        <p class="hint">Lock asks for a password to open the PDF. Unlock removes that password. There is no separate owner password.</p>
+        <div class="choice">
+          <label class="choice"><input type="radio" name="protectMode" value="lock" checked> Lock</label>
+          <label class="choice"><input type="radio" name="protectMode" value="unlock"> Unlock</label>
+        </div>
+        <label class="field">Password <input id="protectPassword" type="password" autocomplete="off"></label>
+        <label class="field" id="confirmWrap">Confirm password <input id="protectConfirm" type="password" autocomplete="off"></label>
+        <button class="action" type="button" id="applyProtect">Protect PDF</button>
+      </div>
+      <div id="panelImage" hidden>
+        <p class="hint">Each image becomes one page. The pictures stay in this browser.</p>
+        <label class="field">Page size
+          <select id="imagePageSize">
+            <option value="fit">Match the image</option>
+            <option value="a4">Fit on A4</option>
+          </select>
+        </label>
+        <button class="minor" type="button" id="addImages">Add images</button>
+        <input id="moreImages" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+        <button class="action" type="button" id="applyImages">Create PDF</button>
+      </div>
+      <div id="panelCompress" hidden>
+        <p class="hint">Pages are redrawn as JPEG images in this browser. Text will not stay selectable. A text-only PDF may not get smaller.</p>
+        <label class="field">Quality
+          <select id="compressQuality">
+            <option value="small">Smaller file</option>
+            <option value="balanced" selected>Balanced</option>
+            <option value="clear">Higher quality</option>
+          </select>
+        </label>
+        <button class="action" type="button" id="applyCompress">Compress PDF</button>
+      </div>
+      <div id="panelOcr" hidden>
+        <p class="hint">Bengali and English text are read in this browser with Tesseract (<code>ben+eng</code>). The first 10 pages are read. The file is not uploaded.</p>
+        <button class="action" type="button" id="applyOcr">Read Bengali text</button>
+        <a class="download" id="downloadText" hidden>Download text</a>
+      </div>
+      <p class="status" id="status" role="status"></p>
+      <a class="download" id="download" hidden></a>
+    </form>
+  </div>
+</section>
+<script type="module" src="/tools/pdf-browser/studio.js"></script>
+</body>
+</html>

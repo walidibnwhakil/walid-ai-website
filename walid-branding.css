@@ -1,0 +1,116 @@
+/* Shared Walid AI branding. Page layout stays in each page's own styles.
+   Logo size and the chat-page flower are defined here so every non-game page matches. */
+a.brand,
+a.brand-logo-link,
+a.legal-brand,
+a.site-logo-link {
+  text-decoration: none;
+}
+a.brand > img,
+a.brand-logo-link > img,
+a.site-brand > img,
+a.legal-brand > img,
+.legal-brand > img,
+a.site-logo-link > img,
+.side-brand > img,
+.page-brand > img {
+  display: block;
+  width: 132px !important;
+  height: 44px !important;
+  max-width: 132px !important;
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+/* The wordmark image already reads "Walid AI". */
+.legal-brand > span { display: none !important; }
+.side-brand { gap: 4px !important; align-items: center; }
+.page-brand { min-height: 44px; align-items: center; justify-items: center; }
+.page-brand > img { display: none; }
+.brand > .brand-copy, .brand-tagline, .tagline-ribbon, .site-brand small { display: none !important; }
+.site-brand, a.brand { gap: 0 !important; }
+a.site-logo-link { display: inline-flex; margin: 0 0 12px; line-height: 0; }
+
+/* One viewport-fixed kathgolap, the same asset, size, opacity, and spin as chat. */
+body { isolation: isolate; }
+body::before {
+  content: "" !important;
+  position: fixed !important;
+  z-index: -1 !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: min(68vw, 760px) !important;
+  height: auto !important;
+  aspect-ratio: 1 !important;
+  margin: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  background: url("/walid-ai-approved-flower.png") center / contain no-repeat !important;
+  opacity: .04 !important;
+  pointer-events: none !important;
+  filter: drop-shadow(0 8px 18px #8a641f30) saturate(1.08) !important;
+  animation: walid-approved-flower-turn 10s linear infinite !important;
+}
+/* The chat sidebar occupies the left column, so the flower sits in the content area. */
+@media (min-width: 651px) {
+  body:has(.sidebar)::before { left: calc(50% + 125px) !important; }
+}
+/* Tools and ZIP pages also paint .wrap::before. That copy scrolls inside the page
+   and, with overflow clipping, leaves a second band at the footer. Keep only the fixed layer. */
+.wrap::before {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+  background: none !important;
+}
+.legal-footer {
+  background: transparent !important;
+  position: relative;
+  z-index: 1;
+}
+@keyframes walid-approved-flower-turn {
+  from { rotate: 0deg; }
+  to { rotate: 360deg; }
+}
+.welcome {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.welcome.is-exiting {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+.welcome-brand {
+  display: block;
+  width: min(180px, 48vw);
+  height: auto;
+  margin: 0 auto 12px;
+  object-fit: contain;
+}
+@media (max-width: 650px) {
+  a.brand > img,
+  a.brand-logo-link > img,
+  a.site-brand > img,
+  a.legal-brand > img,
+  .legal-brand > img,
+  a.site-logo-link > img,
+  .side-brand > img,
+  .page-brand > img {
+    width: 112px !important;
+    height: 38px !important;
+    max-width: 112px !important;
+  }
+  .page-brand > img { display: block; }
+  .welcome-brand { width: min(156px, 44vw); margin-bottom: 8px; }
+  body::before {
+    left: 50% !important;
+    width: min(92vw, 520px) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: walid-approved-flower-turn 10s linear infinite !important; }
+  .welcome { transition: none !important; }
+}

@@ -1,0 +1,68 @@
+{
+  "updated": "2026-11-06",
+  "productionBaseline": "5c114fda6d484fb9598ea1a062c8327693e873f5",
+  "releases": [
+    {"game":"ludo","url":"https://walid-ai.com/games/ludo/","state":"released","redesign":"touch-first-addendum-pr-12-merge-48928b0","liveVerification":"HTTP 200; Chromium 390/1280 verified dotted die, launch and direct token movement, board fit and no page errors"},
+    {"game":"chess","url":"https://walid-ai.com/games/chess/","state":"released","redesign":"released-pr-11-merge-bf8d21c","liveVerification":"Chromium at 320/1280: wood theme, bot/friend, capture, history, checkmate and no overflow/errors"},
+    {"game":"football-penalty","url":"https://walid-ai.com/games/penalty/","state":"released","redesign":"pending"},
+    {"game":"tic-tac-toe","url":"https://walid-ai.com/games/tic-tac-toe/","state":"released","redesign":"released-pr-6-merge-cbcc572","liveVerification":"HTTP 200; Chromium 320/1280 passed CSS, bot, friend, line, overflow and page-error checks"},
+    {"game":"snake","url":"https://walid-ai.com/games/snake/","state":"released","redesign":"touch-first-redesign-pr-14-merge-5c114fd","liveVerification":"HTTP 200; Chromium 390/1280 verified swipe/keyboard, pause, no overflow and no page errors"},
+    {"game":"2048","url":"https://walid-ai.com/games/2048/","state":"released","redesign":"released-pr-7-merge-93db437","liveVerification":"HTTP 200; Chromium 320 touch and 1280 keyboard passed neon CSS, merge, best score, overflow and page-error checks"},
+    {"game":"riddlex","url":"https://walid-ai.com/games/riddlex/","state":"production-baseline-preserved","redesign":"unreleased-animation-failed"}
+  ],
+  "riddlex": {
+    "runtimeEntries": 2400,
+    "runtimeCategories": {"realPeople":2053,"fictionalCharacters":130,"unflaggedCharacters":5,"animals":96,"objects":101,"relationshipRoles":15},
+    "mappedEntityImages": {"characters":1,"animals":1,"objects":1,"relationships":0},
+    "idealAnswerSimulation":{"runtimeEntriesSolved":1797,"runtimeEntriesTotal":1797,"curatedSolved":216,"curatedTotal":216,"meanQuestions":30.995,"maximumQuestions":291},
+    "productionReleaseAllowed": false
+  },
+  "riddlexLearning": {"state":"not implemented","privateSubmissions":"not persisted","globalModeration":"not implemented","safeImageUpload":"not implemented","approvedEntityIngestion":"not implemented","productionReleaseAllowed":false},
+  "addendum": {
+    "ludoTouchFirst": {"state":"released-and-live-verified","acceptance":["on-board graphical pip die","tap-to-roll with animation lock","automatic move for one legal token","direct token tap when multiple","square-by-square animation","animated bots","winner overlay"],"unitTests":"5/5 rule tests pass","chromiumWidths":[320,360,390,768,1280],"browserRegression":"touch taps on die/token; six-dot die; animation lock; direct choice; automatic sole move; bot movement; 2/3/4 players; complete winner/replay; all game routes/previews; no overflow or page errors","visualInspection":[390,1280],"pullRequest":12,"mergeCommit":"48928b0565bc0275f6aa4fb203729e80ee04101f","productionLiveChromiumWidths":[390,1280],"state":"released-and-live-verified"},
+    "snakeTouchFirst": {"state":"released-and-live-verified","acceptance":["touch swipe","arrows and WASD","accessible optional D-pad","anti-reverse","food/eat/collision","pause/resume/restart","prevent page scroll"],"unitTests":"8/8 pass","chromiumWidths":[320,360,390,768,1280],"browserRegression":"mobile swipe and no-scroll; arrow and WASD; anti-reversal; deterministic fruit and score/best; collision/game-over/replay; pause/resume/new game; landscape; all routes/previews; no overflow or page errors","visualInspection":[320,390,1280],"pullRequest":14,"mergeCommit":"5c114fda6d484fb9598ea1a062c8327693e873f5","productionLiveChromiumWidths":[390,1280]}
+  },
+  "pendingGames": ["carrom-rules-research","checkers","sudoku","memory","connect-four","solitaire"],
+  "ticTacToeNeonGate": {
+    "unitTests":"4/4 pass",
+    "chromiumWidths":[320,360,390,768,1280],
+    "chromiumRegression":"all six games and seven previews pass; no overflow or page errors",
+    "bot":"verified reply",
+    "sameDeviceFriend":"verified X win",
+    "visualInspection":[320,390],
+    "state":"released",
+    "pullRequest":6,
+    "mergeCommit":"cbcc572f5ff2f8769f1d25675dea97810607c746",
+    "productionLiveChromiumWidths":[320,1280]
+  },
+  "2048NeonGate": {
+    "unitTests":"14 core/motion assertions pass",
+    "chromiumWidths":[320,360,390,768,1280],
+    "browserRegression":"all six games and seven previews pass; swipe, best score, restart, keyboard focus, no overflow or page errors",
+    "visualInspection":[320],
+    "state":"released",
+    "pullRequest":7,
+    "mergeCommit":"93db43782fe4cb47b8403136db978742fa619c2f",
+    "productionLiveChromiumWidths":[320,1280]
+  },
+  "ludoPlayerCountGate": {
+    "unitTests":"5 rule tests pass, including 2/3/4 seats, wrap, captures and bonus rolls",
+    "chromiumWidths":[320,360,390,768,1280],
+    "browserRegression":"all six games and seven previews pass; 2/3/4 seats, mixed human/bot setup, four-player bot move, active controls, no overflow/errors",
+    "visualInspection":[320,1280],
+    "state":"released",
+    "pullRequest":9,
+    "mergeCommit":"cb67e7e0bab345ad2bb7f982452222aa4c3491d8",
+    "productionLiveChromiumWidths":[320,1280]
+  },
+  "chessWoodenGate": {
+    "unitTests":"5/5 game rule tests pass",
+    "chromiumWidths":[320,360,390,768,1280],
+    "browserRegression":"all six games/seven previews; legal moves, bot, friend checkmate, captures/history; no overflow or page errors",
+    "visualInspection":[320,1280],
+    "state":"released-and-live-verified",
+    "pullRequest":11,
+    "mergeCommit":"bf8d21cc7d587555b8c5febf0ec7ee5a747d2c6a",
+    "productionLiveChromiumWidths":[320,1280]
+  }
+}

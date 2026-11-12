@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow">
+<title>Privacy Policy | Walid AI</title>
+<meta name="description" content="How Walid AI handles chat, Firebase sign-in, files, browser tools, games, local storage, and Google AdSense.">
+<link rel="canonical" href="https://walid-ai.com/privacy-policy.html">
+<link rel="alternate" hreflang="en" href="https://walid-ai.com/privacy-policy.html">
+<link rel="alternate" hreflang="bn" href="https://walid-ai.com/privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://walid-ai.com/privacy-policy.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://walid-ai.com/privacy-policy.html">
+<meta property="og:title" content="Privacy Policy | Walid AI">
+<meta property="og:description" content="How Walid AI handles chat, Firebase sign-in, files, browser tools, games, local storage, and Google AdSense.">
+<meta property="og:image" content="https://walid-ai.com/walid-ai-preview.jpg">
+<meta property="og:image:width" content="640">
+<meta property="og:image:height" content="336">
+<meta property="og:image:alt" content="Walid AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy Policy | Walid AI">
+<meta name="twitter:description" content="How Walid AI handles chat, Firebase sign-in, files, browser tools, games, local storage, and Google AdSense.">
+<meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
+<link rel="stylesheet" href="/walid-legal.css">
+<link rel="stylesheet" href="/walid-branding.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Walid AI","item":"https://walid-ai.com/"},{"@type":"ListItem","position":2,"name":"Privacy Policy","item":"https://walid-ai.com/privacy-policy.html"}]}
+</script>
+
+<link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
+</head>
+<body>
+<main class="legal-page">
+<a class="legal-brand" href="/"><img src="/walid-ai-approved-logo.png" alt="Walid AI"><span>Walid AI</span></a>
+<h1>Privacy Policy</h1>
+<p>Effective November 7, 2026. This policy describes Walid AI at <a href="https://walid-ai.com/">https://walid-ai.com/</a>. A Bangla version is at <a href="/privacy.html">গোপনীয়তা নীতি</a>.</p>
+<p>Walid AI is operated by Whakil Ahamed Shakil, an individual developer in Bangladesh. Privacy questions can be sent to <a href="mailto:support@walid-ai.com">support@walid-ai.com</a>.</p>
+
+<h2>About this policy</h2>
+<p>This policy describes how Walid AI handles personal information when you use its services. Walid AI uses Google and other third-party services for sign-in, data processing, and certain features. These services may handle user information under their applicable privacy policies.</p>
+
+<h2>Information the site handles</h2>
+<ul class="review-list">
+<li><strong>Chat text.</strong> When you send a question, the page sends it to the chat service, together with a guest identifier stored in this browser.</li>
+<li><strong>Account.</strong> Sign-in uses Firebase Authentication. Google sign-in is implemented with a Google account popup. The page can also ask Firebase to email a sign-in link. The address you type for that link is stored in this browser’s local storage until you open the link. Whether email-link sign-in is enabled in the Firebase project is controlled by Firebase, not by a switch in this page.</li>
+<li><strong>Saved chats.</strong> If you are signed in, chat text is saved in Cloud Firestore under your user id, in a <code>chats</code> collection. Each saved record has an id, a short title, the message text, a source label when the interface has one, and an updated time. You can delete one saved chat from the chat list. The website has no button that deletes the Firebase account or every chat at once.</li>
+<li><strong>Guest chats.</strong> If you are not signed in, chat text is kept in this browser’s session storage, up to 50 conversations. It is removed when that browser session ends and when you use Log out. It is not written to Firestore.</li>
+<li><strong>Files and photos in chat.</strong> Sign-in is required before you can attach files, unless the operator admin session is in use. You can attach up to 5 files to one message, and each file must be 5 MB or smaller. The photo picker accepts PNG, JPEG, WebP, and GIF. The file picker accepts PDF, DOCX, TXT, MD, and CSV. The page then checks the type reported by the browser and refuses a file that does not match those types. The file name, reported type, and file bytes are sent to the backend as Base64 in the chat request. The saved chat record stores the question and answer text, not those file bytes.</li>
+<li><strong>Upload count.</strong> Before a file is added, the page asks the backend <code>/api/upload-quota</code> how many uploads remain today. The number is returned by the backend. This website file does not contain that daily number. The interface can show that an admin session has no upload limit.</li>
+<li><strong>Guest identifier and settings.</strong> The page stores a random guest id, your English or Bangla language choice, up to 100 liked-answer texts, the active chat id, and, during email-link sign-in, the email address you entered. Language, guest id, liked answers, and the signed-in active chat id use local storage. Guest chats and the guest active-chat id use session storage.</li>
+<li><strong>Personal memory label.</strong> If the backend says an answer was saved as a personal memory, the chat labels it that way. This website does not show a list of those memories or a delete control for them, and it does not show where the backend keeps them.</li>
+<li><strong>Help and contact.</strong> The Help form and the contact page open your own email app addressed to support@walid-ai.com. They do not submit the message to the Walid AI server. A separate operator admin page says that help reports shown there, and an optional reply email, are kept for up to 30 days. The public form does not send messages into that inbox.</li>
+</ul>
+
+<h2>AI requests</h2>
+<p>The specific AI APIs and models used by Walid AI are not publicly disclosed. This does not change the data-processing disclosures below.</p>
+<p>When you submit a chat request or attachment, Walid AI may send the content to Google or other third-party processing services as needed to generate a response. Provider availability and processing arrangements may change.</p>
+<p><strong>Important privacy notice:</strong> Depending on the provider and service terms that apply, submitted questions and files may be reviewed by people or used by a provider to improve its services. Please do not submit sensitive personal information. You can contact <a href="mailto:support@walid-ai.com">support@walid-ai.com</a> to ask which providers currently process your information and for more details about their applicable terms.</p>
+<p>Uploaded files may be read to provide requested answers. The site does not represent that uploaded files are retained as part of your saved chat history.</p>
+
+<h2>PDF, image, and ZIP tools</h2>
+<ul class="review-list">
+<li><strong>PDF tools.</strong> Some PDF operations send uploaded files to Walid AI processing services to generate a downloadable result. Other PDF operations run locally in your browser without uploading the file. The relevant tool indicates its capabilities and limits.</li>
+<li><strong>Image tools.</strong> Image editing and conversion tools generally process files in your browser. Some tools download processing resources from third-party services. For tools that operate locally, the image itself is not uploaded to Walid AI processing services.</li>
+<li><strong>ZIP tools.</strong> ZIP creation and extraction are performed in your browser. Files are not uploaded to Walid AI processing services for these operations.</li>
+</ul>
+
+<h2>Games</h2>
+<p>Available games include Riddlex, Ludu Mahir, Chess, Tic Tac Toe, Snakes &amp; Ladders, and 2048. Games generally run in your browser. Some may store scores or preferences locally on your device. You can remove locally stored data through your browser settings. Games do not require an account.</p>
+
+<h2>Cookies, local storage, and advertising</h2>
+<p>The website’s own scripts do not set a first-party analytics cookie, and the pages do not include a Google Analytics tag. They do use local storage and session storage, as described above. Those stores stay on your device until you clear them, the session ends, or the page removes them.</p>
+<p>The chat page loads Firebase and Google Identity Services. Those Google scripts may store identifiers in cookies or similar browser storage to keep you signed in. Cookie names are chosen by those providers.</p>
+<p>Walid AI may use third-party advertising services. Advertising partners may store or read cookies and use browser information to deliver and measure ads, including personalized ads where permitted.</p>
+<p>Google explains that use here: <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites or apps that use its services</a> and <a href="https://policies.google.com/technologies/ads">Advertising</a>. You can control personalized ads at <a href="https://adssettings.google.com/">Google Ad Settings</a>. You can also use the Digital Advertising Alliance opt-out at <a href="https://optout.aboutads.info/">optout.aboutads.info</a>. Those controls are Google’s, not a switch inside Walid AI.</p>
+<p>This website does not show a cookie-consent banner. Google requires a Google-certified consent management platform before personalized ads are served to people in the EEA, the UK, or Switzerland. That banner is not part of the site today.</p>
+
+<h2>Retention, deletion, and security</h2>
+<p>Signed-in chats stay in Firestore until you delete that chat or the data is removed from Firebase. Guest chats stay only for the browser session, and Log out clears them. Liked answers, the guest id, and the language choice stay in local storage until you clear site data. The operator does not set a retention period for server logs. The hosting provider, Render, may keep temporary technical server logs, such as IP address and request time, for security and operations for a limited period under <a href="https://render.com/privacy">Render’s privacy policy</a>. This website does not show those logs and does not state Render’s exact number of days. Third-party providers may have their own retention policies, which Walid AI does not control.</p>
+<p>To ask for deletion of chat data tied to your sign-in, email <a href="mailto:support@walid-ai.com">support@walid-ai.com</a> from the address you can access, and say which Google account you used. The website cannot confirm deletion from provider backups or from Google’s systems.</p>
+<p>Authentication information may be sent securely with requests when needed to authorize access. Walid AI cannot independently audit every third-party provider’s security controls.</p>
+
+<h2>Children</h2>
+<p>Walid AI is for a general audience. People use it for games, PDF and image tools, and study questions. The site does not set its own age limit and does not ask for a date of birth. It is not directed specifically at children under 13, and it does not knowingly collect personal information from children under 13. Children should use the site with a parent or guardian. Third-party services may have additional age requirements. These do not replace the guidance above.</p>
+
+<h2>Changes</h2>
+<p>If this policy changes, the new text will replace this page and the effective date above will change. The Bangla page will be updated to match.</p>
+
+<h2>Contact</h2>
+<p>Email <a href="mailto:support@walid-ai.com">support@walid-ai.com</a>. Related pages: <a href="/about-us.html">About Us</a> · <a href="/contact-us.html">Contact Us</a> · <a href="/terms-of-service.html">Terms of Service</a> · <a href="/">Walid AI</a></p>
+<section><h2>Aggregate usage measurement</h2><p>The protected owner dashboard measures page views, active page time, game starts, tool results and server API calls. Usage records contain no prompts, files, filenames, names, email or account IDs. A random browser guest ID is processed into aggregate unique-browser estimates; the raw ID is not stored in usage records. The browser contacts GeoJS, which receives its IP to estimate country and Bangladesh division. Walid AI usage records retain neither IP nor exact location. Daily aggregates are kept for 90 days; lifetime totals remain aggregate. Do Not Track and Global Privacy Control disable browser tracking. Server API counters continue without browser identity.</p><button type="button" id="usageOptOut">Disable browser usage tracking</button><p id="usageChoice" role="status"></p></section><script>document.getElementById("usageOptOut").onclick=()=>{localStorage.setItem("walidUsageOptOut","1");document.getElementById("usageChoice").textContent="Browser usage tracking disabled. This choice stays on this browser."};</script></main>
+<script src="/usage.js?v=20261109-2"></script></body>
+</html>

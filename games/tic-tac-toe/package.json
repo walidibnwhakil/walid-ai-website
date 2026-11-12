@@ -1,0 +1,14 @@
+{
+  "name": "walid-ai-royal-tic-tac-toe",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test engine.test.mjs",
+    "test:browser": "node browser-check.cjs",
+    "check": "node --check ../tic-tac-toe.mjs && node --check engine.mjs && node --check bot.mjs && node --check bot-worker.mjs && node --check effects.mjs && node --check menu-demo.mjs",
+    "test:fire": "node fire-text-check.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.60.0"
+  }
+}

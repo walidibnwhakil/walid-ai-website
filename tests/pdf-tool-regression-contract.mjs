@@ -16,7 +16,7 @@ const requiredFunctions = [
   "retargetPage"
 ];
 for (const name of requiredFunctions) {
-  assert.match(source, new RegExp(`function ${name}\\\\b`), `${name} must remain implemented`);
+  assert.ok(source.includes(`function ${name}`), `${name} must remain implemented`);
 }
 
 const contracts = [

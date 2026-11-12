@@ -52,7 +52,7 @@ const edit = await context.newPage(); await studio("edit", edit);
 const input = await pdfFixture(edit, 3);
 await edit.setInputFiles("#file", { name: "three-pages.pdf", mimeType: "application/pdf", buffer: Buffer.from(input) });
 await edit.locator("#panelEdit").waitFor({ state: "visible" });
-await edit.waitForFunction(() => document.querySelector("#pageLabel")?.textContent.includes("Page 1 of 3"));
+await edit.waitForFunction(() => document.querySelector("#pageLabel")?.textContent.includes("1 / 3"));
 await edit.locator("#rotateRight").click(); await edit.locator("#deletePage").click(); await edit.locator("#saveEdit").click();
 await edit.waitForFunction(() => document.querySelector("#status")?.textContent.startsWith("Done."));
 const edited = await download(edit, "#download"); assert.equal(edited[0], 37);

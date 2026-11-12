@@ -85,7 +85,7 @@ const wordPath = await wordDownload.path();
 assert.ok(wordPath, "DOCX download path should be available");
 const wordBytes = await readFile(wordPath);
 const doc = await JSZip.loadAsync(wordBytes); const xml = await doc.file("word/document.xml").async("string");
-const textNodes = [...xml.matchAll(/<w:t[^>]*>([\\s\\S]*?)<\\/w:t>/g)].map((m) => m[1]).join("");
+const textNodes = [...xml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map((m) => m[1]).join("");
 assert.match(textNodes, /বাংলা/, "DOCX must contain Bengali in editable Word text nodes");
 assert.doesNotMatch(xml, /<w:drawing|<w:pict/, "Bengali must not be an embedded screenshot");
 console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX");

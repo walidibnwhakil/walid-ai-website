@@ -66,7 +66,7 @@ context = await browser.newContext({ acceptDownloads: true });
 context.setDefaultTimeout(15000);
 context.setDefaultNavigationTimeout(15000);
 const errors = [];
-context.on("page", (p) => p.on("pageerror", (e) => errors.push(String(e))));
+context.on("page", (p) => p.on("pageerror", (e) => errors.push(String(e.stack || e))));
 
 async function pdfFixture(page, count, bengali = false) {
   return page.evaluate(async ({ count: n, bengali }) => {

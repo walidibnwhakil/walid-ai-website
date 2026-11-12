@@ -1,0 +1,27 @@
+name: PDF OCR contract
+
+on:
+  pull_request:
+    paths:
+      - "tools/pdf-browser/studio.js"
+      - "tests/fixtures/bengali-mixed.json"
+      - "tests/ocr-language-contract.mjs"
+      - ".github/workflows/pdf-ocr-contract.yml"
+  push:
+    branches:
+      - main
+      - "fix/**"
+      - "codex/**"
+
+permissions:
+  contents: read
+
+jobs:
+  ocr-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tests/ocr-language-contract.mjs

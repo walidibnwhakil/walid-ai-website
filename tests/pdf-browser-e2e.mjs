@@ -31,13 +31,15 @@ const context = await browser.newContext({ acceptDownloads: true });
 const errors = [];
 context.on("page", (p) => p.on("pageerror", (e) => errors.push(String(e))));
 
-async function pdfFixture(page, count) {
-  return page.evaluate(async (n) => {
+async function pdfFixture(page, count, bengali = false) {
+  return page.evaluate(async ({ count: n, bengali }) => {
     const { PDFDocument, rgb } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm");
     const doc = await PDFDocument.create();
-    for (let i = 0; i < n; i++) { const p = doc.addPage([595, 842]); p.drawRectangle({ x: 0, y: 0, width: 595, height: 842, color: rgb(.9 - i * .05, .95, .92) }); p.drawText("fixture page " + (i + 1), { x: 40, y: 760, size: 24 }); }
+    let font;
+    if (bengali) { const bytes = new Uint8Array(await (await fetch("/fonts/NotoSansBengali-Regular.ttf")).arrayBuffer()); const fontkit = await import("https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/+esm"); doc.registerFontkit(fontkit.default || fontkit); font = await doc.embedFont(bytes, { subset: true }); }
+    for (let i = 0; i < n; i++) { const p = doc.addPage([595, 842]); p.drawRectangle({ x: 0, y: 0, width: 595, height: 842, color: rgb(.9 - i * .05, .95, .92) }); p.drawText(bengali ? "বাংলা লেখা সম্পাদনাযোগ্য" : "fixture page " + (i + 1), { x: 40, y: 760, size: 24, ...(font ? { font } : {}) }); }
     return Array.from(await doc.save());
-  }, count);
+  }, { count, bengali });
 }
 async function inspect(bytes) {
   const page = await context.newPage();
@@ -75,7 +77,7 @@ const compressed = await download(compress, "#download"); assert.equal(compresse
 const word = await context.newPage();
 await word.goto("http://127.0.0.1:" + port + "/tools/pdf-to-word/index.html", { waitUntil: "networkidle" });
 const frame = word.frameLocator('iframe[title="PDF to Word tool"]');
-const wordInput = await pdfFixture(word, 1);
+const wordInput = await pdfFixture(word, 1, true);
 await frame.locator("#pdfFiles").setInputFiles({ name: "bengali-source.pdf", mimeType: "application/pdf", buffer: Buffer.from(wordInput) });
 await frame.locator("#runPdf").click(); await frame.locator("#pdfDownload").waitFor({ state: "visible" });
 const wordEvent = word.waitForEvent("download");

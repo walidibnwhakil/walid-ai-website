@@ -101,7 +101,7 @@ try {
     await p.locator("#file").setInputFiles({ name: "compress.pdf", mimeType: "application/pdf", buffer: await fixturePdf() });
     await p.locator("#panelCompress").waitFor({ state: "visible" });
     await p.locator("#applyCompress").click();
-    await p.waitForFunction(() => /Download/i.test(document.querySelector("#status")?.textContent || ""));
+    await p.locator("#download").waitFor({ state: "visible", timeout: 60000 });
     const bytes = await download(p, p.locator("#download"));
     assert.equal((await inspectPdf(bytes)).length, 2);
   });

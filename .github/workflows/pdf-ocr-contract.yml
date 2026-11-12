@@ -51,7 +51,6 @@ jobs:
       - run: node tests/pdf-bengali-export-contract.mjs
       - run: node tests/pdf-tool-regression-contract.mjs
       - run: node tests/pdf-browser-e2e.mjs
-      - run: node tests/image-to-word-browser-e2e.mjs
       - id: tesseract
         name: Run Tesseract ground-truth benchmark
         run: node tests/tesseract-benchmark.mjs

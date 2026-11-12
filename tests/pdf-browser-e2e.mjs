@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
-import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { chromium } from "playwright";
 
@@ -29,6 +28,7 @@ const pdfBytes = await page.evaluate(async () => {
   doc.addPage([595, 842]);
   return Array.from(await doc.save());
 });
+assert.equal(pdfBytes[0], 37, "the generated input fixture must start with %PDF");
 await page.setInputFiles("#file", { name: "fixture.pdf", mimeType: "application/pdf", buffer: Buffer.from(pdfBytes) });
 await page.locator("#panelEdit").waitFor({ state: "visible" });
 await page.locator("#stage").waitFor({ state: "visible" });
@@ -39,14 +39,23 @@ await page.locator("#saveEdit").click();
 await page.waitForFunction(() => document.querySelector("#status")?.textContent.startsWith("Done."), null, { timeout: 30000 });
 const href = await page.locator("#download").getAttribute("href");
 assert.match(href || "", /^blob:/, "the edited PDF must download");
-const savedBytes = await page.evaluate(async () => Array.from(await (await fetch(document.querySelector("#download").href)).arrayBuffer()));
+const downloadPromise = page.waitForEvent("download");
+await page.locator("#download").click();
+const download = await downloadPromise;
+const savedPath = await download.path();
+assert.ok(savedPath, "Playwright must expose the downloaded file");
+const savedBytes = await readFile(savedPath);
+assert.equal(savedBytes[0], 37, "downloaded bytes must start with %PDF");
 const reopened = await browser.newPage();
 await reopened.goto(`http://127.0.0.1:${port}/tools/pdf-browser/studio.html?tool=edit`);
-await reopened.setInputFiles("#file", { name: "roundtrip.pdf", mimeType: "application/pdf", buffer: Buffer.from(savedBytes) });
+await reopened.setInputFiles("#file", { name: "roundtrip.pdf", mimeType: "application/pdf", buffer: savedBytes });
 await reopened.waitForTimeout(1000);
-const pageCount = await reopened.evaluate(async (bytes) => { const { PDFDocument } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm"); return (await PDFDocument.load(new Uint8Array(bytes))).getPageCount(); }, savedBytes);
+const pageCount = await reopened.evaluate(async (bytes) => {
+  const { PDFDocument } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm");
+  return (await PDFDocument.load(new Uint8Array(bytes))).getPageCount();
+}, [...savedBytes]);
 assert.equal(pageCount, 1, "the downloaded PDF must reopen and contain its page");
 assert.equal(errors.length, 0, errors.join("\n"));
 await browser.close();
 server.close();
-console.log("PDF browser E2E passed: Bengali edit download and reopen");
+console.log("PDF browser E2E passed: Bengali edit download, %PDF header, and reopen");

@@ -19,5 +19,7 @@ assert.match(source, /wordTextBox/);
 assert.match(source, /<wp:anchor/);
 assert.doesNotMatch(source, /<wp:inline/);
 assert.doesNotMatch(source, /type:'table'/);
+assert.match(source, /const rels=includeRaster\?pages\.map\(\(page,index\)=>\`<Relationship/);
+console.log("PDF to Word inline JavaScript syntax contract passed");
 console.log("PDF to Word media contract passed: binary PNG media, one image per page, editable OCR paragraphs");
 

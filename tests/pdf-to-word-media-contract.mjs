@@ -9,7 +9,17 @@ assert.match(source, /word\/media\/page-/);
 assert.match(source, /Extension="png" ContentType="image\/png"/);
 assert.match(source, /relationships\/image/);
 assert.match(source, /maskTextRegions\(canvas,words\)/);
+assert.match(source, /return canvas\.toDataURL\('image\/png'\)/);
+assert.doesNotMatch(source, /copyCtx\.fillRect/);
+assert.match(source, /<w:vanish\/><w:color w:val=\"FFFFFF\"/);
 assert.doesNotMatch(source, /block\.type==='table'\?wordTable/);
-assert.match(source, /return lines\.map\(line=>\(\{type:'paragraph'/);\nassert.match(source, /wordFloatingImage/);\nassert.match(source, /wordTextBox/);\nassert.match(source, /<wp:anchor/);\nassert.doesNotMatch(source, /<wp:inline/);\nassert.doesNotMatch(source, /type:'table'/);
+assert.match(source, /return lines\.map\(line=>\(\{type:'paragraph'/);
+assert.match(source, /wordFloatingImage/);
+assert.match(source, /wordTextBox/);
+assert.match(source, /<wp:anchor/);
+assert.doesNotMatch(source, /<wp:inline/);
+assert.doesNotMatch(source, /type:'table'/);
+assert.match(source, /const rels=includeRaster\?pages\.map\(\(page,index\)=>\`<Relationship/);
+console.log("PDF to Word inline JavaScript syntax contract passed");
 console.log("PDF to Word media contract passed: binary PNG media, one image per page, editable OCR paragraphs");
 

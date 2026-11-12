@@ -153,8 +153,7 @@ try {
     assert.ok((await r.body()).length > 10000);
   });
 
-  if (pageErrors.length) await writeFile(join(out, "page-errors.txt"), pageErrors.join("
-"));
+  if (pageErrors.length) await writeFile(join(out, "page-errors.txt"), pageErrors.join("\\n"));
 } finally {
   await writeFile(join(out, "results.json"), JSON.stringify({ base, phase, results }, null, 2));
   await cleanup();

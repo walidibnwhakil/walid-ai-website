@@ -1,6 +1,11 @@
 name: Production PDF tools smoke test
 
 on:
+  pull_request:
+    paths:
+      - ".github/workflows/pdf-production-smoke.yml"
+      - "tests/pdf-production-smoke.mjs"
+      - "tools/**"
   workflow_dispatch:
   schedule:
     - cron: "17 3 * * 1"

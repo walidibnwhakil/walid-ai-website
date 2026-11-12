@@ -121,14 +121,40 @@ try {
     assert.doesNotMatch(xml, /<w:drawing|<w:pict/);
   });
 
-  await probe("image-to-pdf-production", async () => {\n    const p = await context.newPage();\n    await openTool(p, "/tools/image-to-pdf/");\n    const f = await maybeFrame(p);\n    const png = new PNG({ width: 320, height: 160 }); png.data.fill(255);\n    const image = PNG.sync.write(png);\n    await f.locator("#imageFile").setInputFiles({ name: "fixture.png", mimeType: "image/png", buffer: image });\n    await f.locator("#runImage").click();\n    await f.locator("#imageDownload").waitFor({ state: "visible", timeout: 30000 });\n    const bytes = await download(p, f.locator("#imageDownload"));\n    assert.equal((await inspectPdf(bytes)).length, 1);\n  });\n\n  await probe("bengali-ocr-production", async () => {\n    const p = await context.newPage();\n    await openTool(p, "/tools/bengali-ocr/");\n    const f = await maybeFrame(p);\n    const png = new PNG({ width: 320, height: 160 }); png.data.fill(255);\n    const image = PNG.sync.write(png);\n    await f.locator("#file").setInputFiles({ name: "ocr-fixture.png", mimeType: "image/png", buffer: image });\n    await f.locator("#applyOcr").waitFor({ state: "visible" });\n    await f.locator("#applyOcr").click();\n    await f.locator("#downloadText").waitFor({ state: "visible", timeout: 60000 });\n  });\n\n  await probe("bengali-font-http", async () => {
+  await probe("image-to-pdf-production", async () => {
+    const p = await context.newPage();
+    await openTool(p, "/tools/image-to-pdf/");
+    const f = await maybeFrame(p);
+    const png = new PNG({ width: 320, height: 160 }); png.data.fill(255);
+    const image = PNG.sync.write(png);
+    await f.locator("#imageFile").setInputFiles({ name: "fixture.png", mimeType: "image/png", buffer: image });
+    await f.locator("#runImage").click();
+    await f.locator("#imageDownload").waitFor({ state: "visible", timeout: 30000 });
+    const bytes = await download(p, f.locator("#imageDownload"));
+    assert.equal((await inspectPdf(bytes)).length, 1);
+  });
+
+  await probe("bengali-ocr-production", async () => {
+    const p = await context.newPage();
+    await openTool(p, "/tools/bengali-ocr/");
+    const f = await maybeFrame(p);
+    const png = new PNG({ width: 320, height: 160 }); png.data.fill(255);
+    const image = PNG.sync.write(png);
+    await f.locator("#file").setInputFiles({ name: "ocr-fixture.png", mimeType: "image/png", buffer: image });
+    await f.locator("#applyOcr").waitFor({ state: "visible" });
+    await f.locator("#applyOcr").click();
+    await f.locator("#downloadText").waitFor({ state: "visible", timeout: 60000 });
+  });
+
+  await probe("bengali-font-http", async () => {
     const r = await context.request.get(base + "/fonts/NotoSansBengali-Regular.ttf");
     assert.equal(r.status(), 200);
     assert.match(r.headers()["content-type"] || "", /font|octet-stream/i);
     assert.ok((await r.body()).length > 10000);
   });
 
-  if (pageErrors.length) await writeFile(join(out, "page-errors.txt"), pageErrors.join("\n"));
+  if (pageErrors.length) await writeFile(join(out, "page-errors.txt"), pageErrors.join("
+"));
 } finally {
   await writeFile(join(out, "results.json"), JSON.stringify({ base, phase, results }, null, 2));
   await cleanup();

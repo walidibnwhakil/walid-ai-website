@@ -1049,6 +1049,36 @@ async function compressPdf() {
   setStatus("Original " + formatSize(state.bytes.length) + ". Download " + formatSize(bytes.length) + "." + (smaller ? "" : " The new file is not smaller. Keep the original if you need the smaller one."));
 }
 
+async function prepareOcrCanvas(source, { scale = 3 } = {}) {
+  const image = await new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(source instanceof Blob ? source : new Blob([source], { type: "image/png" }));
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(Error("The page image could not be prepared.")); };
+    img.src = url;
+  });
+  const maxDimension = 2600;
+  const ratio = Math.min(scale, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+  canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.fillStyle = "#fff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+  const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    const gray = Math.round(pixels.data[i] * 0.299 + pixels.data[i + 1] * 0.587 + pixels.data[i + 2] * 0.114);
+    const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.45 + 128));
+    pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = contrast;
+    pixels.data[i + 3] = 255;
+  }
+  context.putImageData(pixels, 0, 0);
+  return canvas;
+}
+
 async function runOcr() {
   if (!state.doc && !state.images.length) {
     setStatus("Choose a PDF or an image first.");
@@ -1061,12 +1091,18 @@ async function runOcr() {
   const tesseract = tesseractModule.createWorker ? tesseractModule : tesseractModule.default;
   let worker;
   try {
-    worker = await tesseract.createWorker("ben", 1, {
+    // Bengali plus English avoids dropping Latin words, digits, and punctuation in mixed documents.
+    worker = await tesseract.createWorker("ben+eng", 1, {
       logger: (message) => {
         if (!message?.status) return;
         const progress = typeof message.progress === "number" ? " " + Math.round(message.progress * 100) + "%" : "";
         setStatus(message.status + progress);
       }
+    });
+    await worker.setParameters({
+      tessedit_pageseg_mode: "6",
+      preserve_interword_spaces: "1",
+      user_defined_dpi: "300"
     });
     const parts = [];
     if (state.doc) {
@@ -1075,21 +1111,23 @@ async function runOcr() {
         setStatus("Reading page " + (index + 1) + " of " + total + "…");
         const { pdfPage, view } = await viewportFor(state.pages[index], 1);
         const renderView = pdfPage.getViewport({
-          scale: Math.min(2, 1600 / Math.max(view.width, view.height)),
+          scale: Math.min(3, 2600 / Math.max(view.width, view.height)),
           rotation: totalRotation(state.pages[index])
         });
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.ceil(renderView.width);
-        canvas.height = Math.ceil(renderView.height);
-        await pdfPage.render({ canvasContext: canvas.getContext("2d"), viewport: renderView }).promise;
-        const result = await worker.recognize(canvas);
+        const raw = document.createElement("canvas");
+        raw.width = Math.ceil(renderView.width);
+        raw.height = Math.ceil(renderView.height);
+        await pdfPage.render({ canvasContext: raw.getContext("2d"), viewport: renderView }).promise;
+        const prepared = await prepareOcrCanvas(await new Promise((resolve) => raw.toBlob(resolve, "image/png")), { scale: 1 });
+        const result = await worker.recognize(prepared);
         parts.push("Page " + (index + 1) + "\n" + (result.data.text || "").trim());
       }
       if (state.pages.length > 10) parts.push("Stopped after 10 pages.");
     } else {
       for (let index = 0; index < state.images.length; index += 1) {
         setStatus("Reading image " + (index + 1) + " of " + state.images.length + "…");
-        const result = await worker.recognize(new Blob([state.images[index].bytes], { type: state.images[index].mime }));
+        const prepared = await prepareOcrCanvas(new Blob([state.images[index].bytes], { type: state.images[index].mime }), { scale: 3 });
+        const result = await worker.recognize(prepared);
         parts.push((state.images[index].name || "Image " + (index + 1)) + "\n" + (result.data.text || "").trim());
       }
     }

@@ -1057,8 +1057,14 @@ async function prepareOcrCanvas(source, { scale = 3 } = {}) {
     img.onerror = () => { URL.revokeObjectURL(url); reject(Error("The page image could not be prepared.")); };
     img.src = url;
   });
-  const maxDimension = 2600;
-  const ratio = Math.min(scale, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+  // Keep OCR useful on desktop while bounding RGBA memory on phones. A 2600px
+  // canvas can exceed 100 MB once decoded and copied by getImageData().
+  const mobile = matchMedia("(max-width: 700px)").matches || (navigator.deviceMemory && navigator.deviceMemory <= 4);
+  const maxDimension = mobile ? 2200 : 2600;
+  const maxPixels = mobile ? 3_500_000 : 5_500_000;
+  const dimensionRatio = maxDimension / Math.max(image.naturalWidth, image.naturalHeight);
+  const pixelRatio = Math.sqrt(maxPixels / Math.max(1, image.naturalWidth * image.naturalHeight));
+  const ratio = Math.min(scale, dimensionRatio, pixelRatio);
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
   canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
@@ -1071,7 +1077,9 @@ async function prepareOcrCanvas(source, { scale = 3 } = {}) {
   const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
   for (let i = 0; i < pixels.data.length; i += 4) {
     const gray = Math.round(pixels.data[i] * 0.299 + pixels.data[i + 1] * 0.587 + pixels.data[i + 2] * 0.114);
-    const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.45 + 128));
+    // Moderate normalization avoids clipping Bengali vowel marks and thin
+    // conjunct strokes on already high-contrast scans.
+    const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.2 + 128));
     pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = contrast;
     pixels.data[i + 3] = 255;
   }
@@ -1100,7 +1108,9 @@ async function runOcr() {
       }
     });
     await worker.setParameters({
-      tessedit_pageseg_mode: "6",
+      // Auto layout handles paragraphs, columns, and tables better than the
+      // old fixed-block mode while retaining Bengali conjuncts and vowel signs.
+      tessedit_pageseg_mode: "3",
       preserve_interword_spaces: "1",
       user_defined_dpi: "300"
     });
@@ -1118,9 +1128,11 @@ async function runOcr() {
         raw.width = Math.ceil(renderView.width);
         raw.height = Math.ceil(renderView.height);
         await pdfPage.render({ canvasContext: raw.getContext("2d"), viewport: renderView }).promise;
-        const prepared = await prepareOcrCanvas(await new Promise((resolve) => raw.toBlob(resolve, "image/png")), { scale: 1 });
+        const prepared = await prepareOcrCanvas(await canvasBlob(raw, "image/png"), { scale: 1 });
         const result = await worker.recognize(prepared);
         parts.push("Page " + (index + 1) + "\n" + (result.data.text || "").trim());
+        raw.width = raw.height = 1;
+        prepared.width = prepared.height = 1;
       }
       if (state.pages.length > 10) parts.push("Stopped after 10 pages.");
     } else {

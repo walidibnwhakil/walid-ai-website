@@ -116,6 +116,7 @@ mark("open pdf-to-word");
 await word.goto("http://127.0.0.1:" + port + "/tools/pdf-to-word/index.html", { waitUntil: "domcontentloaded", timeout: 15000 });
 const frame = word.frameLocator('iframe[title="PDF to Word tool"]');
 await frame.locator('html[data-walid-tool-ready="true"]').waitFor({ state: "attached", timeout: 15000 });
+console.log("[pdf-e2e] iframe errors", errors);
 mark("build Bengali PDF fixture"); const wordInput = await withTimeout(pdfFixture(word, 1, true), 30000, "Bengali PDF fixture");
 await frame.locator("#pdfFiles").setInputFiles({ name: "bengali-source.pdf", mimeType: "application/pdf", buffer: Buffer.from(wordInput) });
 await frame.locator("#pdfFiles").evaluate((input) => input.dispatchEvent(new Event("change", { bubbles: true })));

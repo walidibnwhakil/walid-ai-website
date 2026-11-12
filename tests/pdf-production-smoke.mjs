@@ -127,10 +127,10 @@ try {
     const f = await maybeFrame(p);
     const png = new PNG({ width: 320, height: 160 }); png.data.fill(255);
     const image = PNG.sync.write(png);
-    await f.locator("#imageFile").setInputFiles({ name: "fixture.png", mimeType: "image/png", buffer: image });
-    await f.locator("#runImage").click();
-    await f.locator("#imageDownload").waitFor({ state: "visible", timeout: 30000 });
-    const bytes = await download(p, f.locator("#imageDownload"));
+    await f.locator("#moreImages").setInputFiles({ name: "fixture.png", mimeType: "image/png", buffer: image });
+    await f.locator("#applyImages").click();
+    await f.locator("#download").waitFor({ state: "visible", timeout: 30000 });
+    const bytes = await download(p, f.locator("#download"));
     assert.equal((await inspectPdf(bytes)).length, 1);
   });
 

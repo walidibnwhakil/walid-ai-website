@@ -13,6 +13,9 @@ on:
       - "tests/tesseract-benchmark.mjs"
       - "tests/pdf-tool-regression-contract.mjs"
       - "tests/pdf-table-detection.mjs"
+      - "tests/pdf-to-word-media-contract.mjs"
+      - "tool-workspace.html"
+      - "tools/pdf-to-word/index.html"
       - "tests/fixtures/pdf-table-layouts.json"
       - ".github/workflows/pdf-ocr-contract.yml"
   push:

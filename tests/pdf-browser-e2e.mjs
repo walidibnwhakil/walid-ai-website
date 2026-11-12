@@ -127,5 +127,14 @@ const wordBytes = await readFile(wordPath);
 const doc = await JSZip.loadAsync(wordBytes); const xml = await doc.file("word/document.xml").async("string");
 const textNodes = [...xml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map((m) => m[1]).join("");
 assert.match(textNodes, /বাংলা/, "DOCX must contain Bengali in editable Word text nodes");
-assert.doesNotMatch(xml, /<w:drawing|<w:pict/, "Bengali must not be an embedded screenshot");
+assert.match(xml, /<w:drawing|<w:pict/, "PDF page visuals must be preserved as a drawing");
+const mediaNames = Object.keys(doc.files).filter((name) => /^word\/media\/.*\.png$/i.test(name));
+assert.ok(mediaNames.length >= 1, "DOCX must contain PNG page media");
+const mediaBytes = await doc.file(mediaNames[0]).async("nodebuffer");
+assert.deepEqual([...mediaBytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], "page media must have a PNG signature");
+const rels = await doc.file("word/_rels/document.xml.rels").async("string");
+assert.match(rels, /relationships\/image/, "DOCX must relate the page drawing to image media");
+const types = await doc.file("[Content_Types].xml").async("string");
+assert.match(types, /Extension="png" ContentType="image\/png"/, "DOCX must declare PNG content");
+
 console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX"); await cleanup();

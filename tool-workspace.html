@@ -89,7 +89,7 @@ function wordTextBox(block,index) {
 }
 async function createEditableDocx(pages, filename) {
   const JSZip=(await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
-  const body=pages.map((page,index)=>wordFloatingImage('rId'+(index+2),page.width,page.height)+page.blocks.map((block,blockIndex)=>wordTextBox(block,blockIndex)).join()+(index<pages.length-1?wordParagraph(''):'')).join('')+pageSection(pages[pages.length-1].width,pages[pages.length-1].height,pages[pages.length-1].margin);
+  const body=pages.map((page,index)=>wordFloatingImage('rId'+(index+2),page.width,page.height)+(page.overlayBlocks||page.blocks).map((block,blockIndex)=>wordTextBox(block,blockIndex)).join()+(index<pages.length-1?wordParagraph(''):'')).join('')+pageSection(pages[pages.length-1].width,pages[pages.length-1].height,pages[pages.length-1].margin);
   const documentXml='<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'</w:body></w:document>';
   const zip=new JSZip();
   zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
@@ -120,7 +120,7 @@ function detectBlocks(words,width) {
     const cells=[]; for(const word of line.words){let cell=cells[cells.length-1];if(!cell||word.bbox.x0-cell.end>Math.max(22,(word.bbox.x1-word.bbox.x0)*1.25)){cell={text:'',end:word.bbox.x1};cells.push(cell);}cell.text+=(cell.text?' ':'')+word.text;cell.end=word.bbox.x1;} return cells.map(cell=>cell.text);
   });
   const nonRows=lines.filter(line=>!rowCandidates.includes(line)).map(line=>({type:'paragraph',text:line.text}));
-  return lines.map(line=>({type:'paragraph',text:line.text,x:line.x,y:line.y-line.height/2,width:line.width,height:Math.max(18,line.height*1.35)}));
+  return [{type:'table',rows},...nonRows];
 }
 function maskTextRegions(canvas,words) {
   const copy=document.createElement('canvas'); copy.width=canvas.width; copy.height=canvas.height;
@@ -150,9 +150,9 @@ async function ocrPdfToDocx(file,onProgress) {
       const textContent=await page.getTextContent();
       let words=textContent.items.filter(item=>item.str.trim()).map(item=>({text:item.str,bbox:{x0:item.transform[4]*2,y0:height-item.transform[5]*2-item.height*2,x1:(item.transform[4]+item.width)*2,y1:height-item.transform[5]*2}}));
       if(words.length<3){const result=await worker.recognize(canvas);words=(result.data.words||[]).map(word=>({text:word.text,bbox:{x0:word.bbox.x0,y0:word.bbox.y0,x1:word.bbox.x1,y1:word.bbox.y1}}));}
-      const margin=72, blocks=detectBlocks(words,width-2*margin);
+      const margin=72, blocks=detectBlocks(words,width-2*margin), overlayBlocks=clusterLines(words).map(line=>({type:'paragraph',text:line.text,x:line.x,y:line.y-line.height/2,width:line.width,height:Math.max(18,line.height*1.35)}));
       if(!blocks.length)throw Error('No editable text was found. The PDF may be empty or unreadable.');
-      pages.push({width,height,margin,blocks,imageDataUrl:maskTextRegions(canvas,words)});
+      pages.push({width,height,margin,blocks,overlayBlocks,imageDataUrl:maskTextRegions(canvas,words)});
     }
   } finally {await worker.terminate();}
   return pages;

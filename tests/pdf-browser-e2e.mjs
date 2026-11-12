@@ -14,10 +14,29 @@ zip.file("word/document.xml", '<w:document xmlns:w="http://schemas.openxmlformat
 const docxBytes = await zip.generateAsync({ type: "nodebuffer" });
 
 let phase = "startup";
-const watchdog = setTimeout(() => {
-  console.error("PDF browser E2E timed out after 120s; last phase:", phase);
-  process.exit(124);
-}, 120000);
+let browser;
+let context;
+let server;
+let watchdog;
+let cleaning = false;
+async function cleanup() {
+  if (cleaning) return;
+  cleaning = true;
+  clearTimeout(watchdog);
+  await Promise.allSettled([
+    context?.close(),
+    browser?.close(),
+    new Promise((resolve) => server?.close(() => resolve()))
+  ]);
+}
+function failWatchdog() {
+  const error = new Error("PDF browser E2E timed out after 120s; last phase: " + phase);
+  console.error(error.message);
+  cleanup().finally(() => process.exitCode = 124);
+}
+watchdog = setTimeout(failWatchdog, 120000);
+process.once("SIGTERM", () => { cleanup().finally(() => process.exit(143)); });
+process.once("SIGINT", () => { cleanup().finally(() => process.exit(130)); });
 function mark(name) {
   phase = name;
   console.log("[pdf-e2e]", name);
@@ -29,7 +48,7 @@ function withTimeout(promise, ms, label) {
   ]);
 }
 
-const server = createServer(async (req, res) => {
+server = createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (req.method === "POST" && url.pathname === "/api/tools/pdf-to-word") {
     res.writeHead(200, { "content-type": "application/json" });
@@ -42,8 +61,8 @@ const server = createServer(async (req, res) => {
 });
 server.listen(0, "127.0.0.1"); await withTimeout(once(server, "listening"), 10000, "server startup");
 const port = server.address().port;
-const browser = await withTimeout(chromium.launch({ headless: true }), 20000, "browser launch");
-const context = await browser.newContext({ acceptDownloads: true });
+ browser = await withTimeout(chromium.launch({ headless: true }), 20000, "browser launch");
+context = await browser.newContext({ acceptDownloads: true });
 context.setDefaultTimeout(15000);
 context.setDefaultNavigationTimeout(15000);
 const errors = [];
@@ -69,7 +88,7 @@ async function download(page, selector) {
 async function studio(tool, page) { mark("open " + tool + " studio"); await page.goto("http://127.0.0.1:" + port + "/tools/pdf-browser/studio.html?tool=" + tool, { waitUntil: "domcontentloaded", timeout: 15000 }); }
 
 const edit = await context.newPage(); await studio("edit", edit); mark("edit fixture");
-const input = await pdfFixture(edit, 3);
+const input = await withTimeout(pdfFixture(edit, 3), 30000, "edit PDF fixture");
 await edit.setInputFiles("#file", { name: "three-pages.pdf", mimeType: "application/pdf", buffer: Buffer.from(input) });
 await edit.locator("#panelEdit").waitFor({ state: "visible" });
 await edit.waitForFunction(() => document.querySelector("#pageLabel")?.textContent.includes("1 / 3"));
@@ -81,16 +100,16 @@ await edit.locator("#deletePage").click();
 await edit.waitForFunction(() => document.querySelector("#pageLabel")?.textContent.includes("2 / 2")); await edit.locator("#saveEdit").click();
 await edit.waitForFunction(() => document.querySelector("#status")?.textContent.startsWith("Done."));
 const edited = await download(edit, "#download"); assert.equal(edited[0], 37);
-const pages = await inspect(edited); assert.equal(pages.length, 2); assert.deepEqual(pages[0], [595, 842, 90]);
+const pages = await withTimeout(inspect(edited), 15000, "edited PDF inspection"); assert.equal(pages.length, 2); assert.deepEqual(pages[0], [595, 842, 90]);
 
 const compress = await context.newPage(); await studio("compress", compress); mark("compress fixture");
-const compressInput = await pdfFixture(compress, 2);
+const compressInput = await withTimeout(pdfFixture(compress, 2), 30000, "compress PDF fixture");
 await compress.setInputFiles("#file", { name: "compress-me.pdf", mimeType: "application/pdf", buffer: Buffer.from(compressInput) });
 await compress.locator("#panelCompress").waitFor({ state: "visible" });
 await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("2 pages ready"));
 await compress.locator("#applyCompress").click();
 await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("Download"));
-const compressed = await download(compress, "#download"); assert.equal(compressed[0], 37); assert.equal((await inspect(compressed)).length, 2);
+const compressed = await download(compress, "#download"); assert.equal(compressed[0], 37); assert.equal((await withTimeout(inspect(compressed), 15000, "compressed PDF inspection")).length, 2);
 
 const word = await context.newPage();
 mark("open pdf-to-word");
@@ -109,4 +128,4 @@ const doc = await JSZip.loadAsync(wordBytes); const xml = await doc.file("word/d
 const textNodes = [...xml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map((m) => m[1]).join("");
 assert.match(textNodes, /বাংলা/, "DOCX must contain Bengali in editable Word text nodes");
 assert.doesNotMatch(xml, /<w:drawing|<w:pict/, "Bengali must not be an embedded screenshot");
-console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX"); clearTimeout(watchdog);
+console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX"); await cleanup();

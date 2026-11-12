@@ -74,7 +74,7 @@ function pageSection(width,height,margin) {
 }
 async function createEditableDocx(pages, filename) {
   const JSZip=(await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
-  const body=pages.map(page=>page.blocks.map(block=>block.type==='table'?wordTable(block.rows,page.width):wordParagraph(block.text,block.heading?'':'')).join('')+pageSection(page.width,page.height,page.margin)).join('');
+  const body=pages.map((page,index)=>page.blocks.map(block=>block.type==='table'?wordTable(block.rows,page.width):wordParagraph(block.text,block.heading?'':'')).join()+(index<pages.length-1?wordParagraph(''):'')).join('')+pageSection(pages[pages.length-1].width,pages[pages.length-1].height,pages[pages.length-1].margin);
   const documentXml='<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'</w:body></w:document>';
   const zip=new JSZip();
   zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');

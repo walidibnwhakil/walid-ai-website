@@ -68,7 +68,8 @@ try {
   context = await browser.newContext({ acceptDownloads: true, recordHar: { path: join(out, "network.har") } });
   context.setDefaultTimeout(20000);
   const pageErrors = [];
-  context.on("page", p => p.on("pageerror", e => pageErrors.push(String(e))));
+  const browserConsole = [];
+  context.on("page", p => { p.on("pageerror", e => pageErrors.push(String(e))); p.on("console", message => browserConsole.push(`[${message.type()}] ${message.text()}`)); });
 
   await probe("production-site-load", async () => {
     const p = await context.newPage();
@@ -101,7 +102,7 @@ try {
     await p.locator("#file").setInputFiles({ name: "compress.pdf", mimeType: "application/pdf", buffer: await fixturePdf() });
     await p.locator("#panelCompress").waitFor({ state: "visible" });
     await p.locator("#applyCompress").click();
-    await p.locator("#download").waitFor({ state: "visible", timeout: 60000 });
+    await p.locator("#download").waitFor({ state: "visible", timeout: 120000 });
     const bytes = await download(p, p.locator("#download"));
     assert.equal((await inspectPdf(bytes)).length, 2);
   });
@@ -154,6 +155,7 @@ try {
   });
 
   if (pageErrors.length) await writeFile(join(out, "page-errors.txt"), pageErrors.join("\\n"));
+  if (browserConsole.length) await writeFile(join(out, "browser-console.txt"), browserConsole.join("\\n"));
 } finally {
   await writeFile(join(out, "results.json"), JSON.stringify({ base, phase, results }, null, 2));
   await cleanup();

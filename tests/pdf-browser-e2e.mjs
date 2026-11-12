@@ -41,7 +41,7 @@ async function pdfFixture(page, count) {
 }
 async function inspect(bytes) {
   const page = await context.newPage();
-  return page.evaluate(async (b) => { const { PDFDocument } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm"); const d = await PDFDocument.load(new Uint8Array(b)); return d.getPages().map((p) => [p.getWidth(), p.getHeight()]); }, [...bytes]);
+  return page.evaluate(async (b) => { const { PDFDocument } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm"); const d = await PDFDocument.load(new Uint8Array(b)); return d.getPages().map((p) => [p.getWidth(), p.getHeight(), p.getRotation().angle]); }, [...bytes]);
 }
 async function download(page, selector) {
   const event = page.waitForEvent("download"); await page.locator(selector).click(); const d = await event; const path = await d.path(); assert.ok(path); return readFile(path);
@@ -61,7 +61,7 @@ await edit.locator("#deletePage").click();
 await edit.waitForFunction(() => document.querySelector("#pageLabel")?.textContent.includes("2 / 2")); await edit.locator("#saveEdit").click();
 await edit.waitForFunction(() => document.querySelector("#status")?.textContent.startsWith("Done."));
 const edited = await download(edit, "#download"); assert.equal(edited[0], 37);
-const pages = await inspect(edited); assert.equal(pages.length, 2); assert.deepEqual(pages[0], [842, 595]);
+const pages = await inspect(edited); assert.equal(pages.length, 2); assert.deepEqual(pages[0], [595, 842, 90]);
 
 const compress = await context.newPage(); await studio("compress", compress);
 const compressInput = await pdfFixture(compress, 2);

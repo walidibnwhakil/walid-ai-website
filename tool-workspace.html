@@ -78,13 +78,18 @@ function imageBytesFromDataUrl(dataUrl) {
   for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
   return bytes;
 }
-function wordImageParagraph(relId,width,height) {
+function wordFloatingImage(relId,width,height) {
   const cx=Math.round(width*9525), cy=Math.round(height*9525);
-  return '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1"/></w:pPr><w:r><w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0"><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:docPr id="1" name="PDF page image"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="page.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="'+relId+'" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"/></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>';
+  return '<w:p><w:r><w:drawing><wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="0" behindDoc="1" locked="1" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:wrapNone/><wp:docPr id="1" name="PDF page image"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/wordprocessingml/2006/wordprocessingDrawing"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="page.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="'+relId+'" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"/></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>';
+}
+function wordTextBox(block,index) {
+  const x=Math.max(0,Math.round((block.x||0)*9525)), y=Math.max(0,Math.round((block.y||0)*9525));
+  const cx=Math.max(1,Math.round((block.width||120)*9525)), cy=Math.max(1,Math.round((block.height||24)*9525));
+  return '<w:p><w:r><w:drawing><wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="'+(index+2)+'" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>'+x+'</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>'+y+'</wp:posOffset></wp:positionV><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:wrapNone/><wp:docPr id="'+(index+10)+'" name="Editable OCR text '+index+'"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingShape"><wps:wsp xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"><wps:cNvSpPr/><wps:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"/><a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr><wps:txbx><w:txbxContent><w:p><w:r><w:t xml:space="preserve">'+xmlEscape(block.text||'')+'</w:t></w:r></w:p></w:txbxContent></wps:txbx><wps:bodyPr/></wps:wsp></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>';
 }
 async function createEditableDocx(pages, filename) {
   const JSZip=(await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
-  const body=pages.map((page,index)=>wordImageParagraph('rId'+(index+2),page.width,page.height)+page.blocks.map(block=>wordParagraph(block.text,block.heading?'':'')).join()+(index<pages.length-1?wordParagraph(''):'')).join('')+pageSection(pages[pages.length-1].width,pages[pages.length-1].height,pages[pages.length-1].margin);
+  const body=pages.map((page,index)=>wordFloatingImage('rId'+(index+2),page.width,page.height)+page.blocks.map((block,blockIndex)=>wordTextBox(block,blockIndex)).join()+(index<pages.length-1?wordParagraph(''):'')).join('')+pageSection(pages[pages.length-1].width,pages[pages.length-1].height,pages[pages.length-1].margin);
   const documentXml='<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'</w:body></w:document>';
   const zip=new JSZip();
   zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
@@ -101,7 +106,7 @@ function clusterLines(words) {
     const center=(word.bbox.y0+word.bbox.y1)/2, line=lines.find(item=>Math.abs(item.center-center)<Math.max(8,(word.bbox.y1-word.bbox.y0)*.55));
     if(line){line.words.push(word);line.center=(line.center*(line.words.length-1)+center)/line.words.length;} else lines.push({center,words:[word]});
   }
-  return lines.map(line=>({y:line.center,words:line.words.sort((a,b)=>a.bbox.x0-b.bbox.x0),text:line.words.map(w=>w.text).join(' ')}));
+  return lines.map(line=>{const words=line.words.sort((a,b)=>a.bbox.x0-b.bbox.x0);const x=Math.min(...words.map(w=>w.bbox.x0)), right=Math.max(...words.map(w=>w.bbox.x1)), top=Math.min(...words.map(w=>w.bbox.y0)), bottom=Math.max(...words.map(w=>w.bbox.y1));return {y:line.center,words,text:words.map(w=>w.text).join(' '),x,width:right-x,height:bottom-top};});
 }
 function detectBlocks(words,width) {
   const lines=clusterLines(words); if(!lines.length)return [];
@@ -110,12 +115,12 @@ function detectBlocks(words,width) {
   const aligned=anchors.filter(x=>rowCandidates.filter(line=>line.words.some(word=>Math.abs(word.bbox.x0-x)<18)).length>=3);
   const isTable=rowCandidates.length>=3 && aligned.length>=2 &&
     rowCandidates.every(line=>aligned.every(x=>line.words.some(word=>Math.abs(word.bbox.x0-x)<18)));
-  if(!isTable)return lines.map(line=>({type:'paragraph',text:line.text}));
+  if(!isTable)return lines.map(line=>({type:'paragraph',text:line.text,x:line.x,y:line.y-line.height/2,width:line.width,height:Math.max(18,line.height*1.35)}));
   const rows=rowCandidates.map(line=>{
     const cells=[]; for(const word of line.words){let cell=cells[cells.length-1];if(!cell||word.bbox.x0-cell.end>Math.max(22,(word.bbox.x1-word.bbox.x0)*1.25)){cell={text:'',end:word.bbox.x1};cells.push(cell);}cell.text+=(cell.text?' ':'')+word.text;cell.end=word.bbox.x1;} return cells.map(cell=>cell.text);
   });
   const nonRows=lines.filter(line=>!rowCandidates.includes(line)).map(line=>({type:'paragraph',text:line.text}));
-  return [{type:'table',rows},...nonRows];
+  return lines.map(line=>({type:'paragraph',text:line.text,x:line.x,y:line.y-line.height/2,width:line.width,height:Math.max(18,line.height*1.35)}));
 }
 function maskTextRegions(canvas,words) {
   const copy=document.createElement('canvas'); copy.width=canvas.width; copy.height=canvas.height;

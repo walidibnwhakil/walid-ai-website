@@ -19,13 +19,7 @@ context.setDefaultTimeout(30000);
 const page = await context.newPage();
 await page.goto(`http://127.0.0.1:${port}/tools/image-to-word/index.html`);
 const frame = page.frameLocator('iframe[title="Image to Word tool"]');
-const image = await page.evaluate(async () => {
-  const canvas = document.createElement("canvas"); canvas.width = 1400; canvas.height = 260;
-  const c = canvas.getContext("2d"); c.fillStyle = "white"; c.fillRect(0,0,1400,260);
-  c.fillStyle = "black"; c.font = "54px Arial"; c.fillText("Editable Word OCR Walid AI 2026", 40, 100);
-  c.font = "48px serif"; c.fillText("বাংলা লেখা সম্পাদনাযোগ্য", 40, 180);
-  return [...new Uint8Array(await new Promise(resolve => canvas.toBlob(async b => resolve(await b.arrayBuffer()), "image/png")))];
-});
+const image = [...await readFile(new URL("fixtures/bengali-mixed.png", import.meta.url))];
 await frame.locator("#imageFile").setInputFiles({name:"bengali-mixed.png",mimeType:"image/png",buffer:Buffer.from(image)});
 await frame.locator("#runImage").click();
 await frame.locator("#imageDownload").waitFor({state:"visible"});

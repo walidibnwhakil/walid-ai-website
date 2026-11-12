@@ -109,7 +109,7 @@ try {
     const bytes = await download(p, f.locator("#pdfDownload"));
     const zip = await JSZip.loadAsync(bytes);
     const xml = await zip.file("word/document.xml").async("string");
-    const text = [...xml.matchAll(/<w:t[^>]*>([\\s\\S]*?)<\\/w:t>/g)].map(m => m[1]).join("");
+    const text = xml.replace(/<[^>]+>/g, " ");
     assert.match(text, /বাংলা|Bengali/);
     assert.doesNotMatch(xml, /<w:drawing|<w:pict/);
   });

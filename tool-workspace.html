@@ -92,15 +92,30 @@ function clusterLines(words) {
 }
 function detectBlocks(words,width) {
   const lines=clusterLines(words); if(!lines.length)return [];
-  const rowCandidates=lines.filter(line=>line.words.length>=2);
-  const xs=[]; for(const line of rowCandidates)for(const word of line.words)if(!xs.some(x=>Math.abs(x-word.bbox.x0)<Math.max(18,(word.bbox.x1-word.bbox.x0)*.7)))xs.push(word.bbox.x0);
-  const isTable=rowCandidates.length>=3 && xs.length>=2;
-  if(!isTable)return lines.map(line=>({type:'paragraph',text:line.text}));
-  const rows=rowCandidates.map(line=>{
-    const cells=[]; for(const word of line.words){let cell=cells[cells.length-1];if(!cell||word.bbox.x0-cell.end>Math.max(22,(word.bbox.x1-word.bbox.x0)*1.25)){cell={text:'',end:word.bbox.x1};cells.push(cell);}cell.text+=(cell.text?' ':'')+word.text;cell.end=word.bbox.x1;} return cells.map(cell=>cell.text);
+  const paragraphBlocks=lines.map(line=>({type:'paragraph',text:line.text}));
+  const candidates=lines.filter(line=>line.words.length>=2);
+  if(candidates.length<3)return paragraphBlocks;
+  const rows=candidates.map(line=>{
+    const cells=[]; for(const word of line.words){let cell=cells[cells.length-1];if(!cell||word.bbox.x0-cell.end>Math.max(22,(word.bbox.x1-word.bbox.x0)*1.25)){cell={text:'',start:word.bbox.x0,end:word.bbox.x1};cells.push(cell);}cell.text+=(cell.text?' ':'')+word.text;cell.end=word.bbox.x1;}
+    return {line,cells};
   });
-  const nonRows=lines.filter(line=>!rowCandidates.includes(line)).map(line=>({type:'paragraph',text:line.text}));
-  return [...nonRows.slice(0,Math.max(0,nonRows.length-1)),{type:'table',rows}];
+  const usable=rows.filter(row=>row.cells.length>=2);
+  if(usable.length<3)return paragraphBlocks;
+  const maxColumns=Math.max(...usable.map(row=>row.cells.length));
+  if(maxColumns<2)return paragraphBlocks;
+  const anchors=[];
+  for(let column=0;column<maxColumns;column++){
+    const points=usable.map(row=>row.cells[column]?.start).filter(value=>Number.isFinite(value));
+    if(points.length<3)continue;
+    const median=[...points].sort((a,b)=>a-b)[Math.floor(points.length/2)];
+    const tolerance=18;
+    if(points.filter(value=>Math.abs(value-median)<=tolerance).length>=3)anchors.push(median);
+  }
+  const alignedRows=usable.filter(row=>row.cells.length===maxColumns&&row.cells.every((cell,index)=>anchors.some(anchor=>Math.abs(anchor-cell.start)<=18)));
+  const alignedColumns=anchors.length>=2;
+  const consistentRows=alignedRows.length>=3 && alignedRows.length/usable.length>=0.75;
+  if(!alignedColumns||!consistentRows)return paragraphBlocks;
+  return [{type:'table',rows:alignedRows.map(row=>row.cells.map(cell=>cell.text))}];
 }
 async function ocrPdfToDocx(file,onProgress) {
   const {createWorker}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm');

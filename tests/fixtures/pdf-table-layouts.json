@@ -1,0 +1,5 @@
+{
+  "description": "Synthetic OCR layouts matching a one-page certificate and a genuine two-column table.",
+  "certificate": "paragraph-only",
+  "table": "aligned-rows-and-columns"
+}

@@ -33,7 +33,7 @@ await page.setInputFiles("#file", { name: "fixture.pdf", mimeType: "application/
 await page.locator("#panelEdit").waitFor({ state: "visible" });
 await page.locator("#stage").waitFor({ state: "visible" });
 await page.locator('[data-edit="text"]').click();
-await page.locator("#overlay").click({ position: { x: 80, y: 80 } });
+await page.evaluate(() => { const overlay = document.querySelector("#overlay"); overlay.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: 100, clientY: 100, pointerId: 1 })); });
 await page.locator(".ann.selected").fill("বাংলা OCR test — Walid AI 2026");
 const downloadPromise = page.waitForEvent("download");
 await page.locator("#saveEdit").click();

@@ -17,8 +17,7 @@ const record = (name, status, detail = "") => {
   results.push({ name, status, detail });
   console.log(`[production-pdf-smoke] ${status} ${name}${detail ? " — " + detail : ""}`);
 };
-const withTimeout = (p, ms, label) => Promise.race([p, new Promise((_, reject) =>
-  setTimeout(() => reject(new Error(label + " timed out after " + ms + "ms")), ms)]);
+const withTimeout = (p, ms, label) => Promise.race([p, new Promise((_, reject) => setTimeout(() => reject(new Error(label + " timed out after " + ms + "ms")), ms))]);
 async function cleanup() {
   await Promise.allSettled([context?.close(), browser?.close()]);
 }

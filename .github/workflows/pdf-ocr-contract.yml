@@ -10,6 +10,7 @@ on:
       - "tests/pdf-bengali-export-contract.mjs"
       - "tests/pdf-browser-e2e.mjs"
       - "tests/tesseract-benchmark.mjs"
+      - "tests/pdf-tool-regression-contract.mjs"
       - ".github/workflows/pdf-ocr-contract.yml"
   push:
     branches: [main, "fix/**", "codex/**"]
@@ -43,6 +44,7 @@ jobs:
           cat tests/fixtures/bengali-mixed-ocr.txt
       - run: node tests/ocr-language-contract.mjs
       - run: node tests/pdf-bengali-export-contract.mjs
+      - run: node tests/pdf-tool-regression-contract.mjs
       - run: node tests/pdf-browser-e2e.mjs
       - id: tesseract
         name: Run Tesseract ground-truth benchmark

@@ -34,7 +34,12 @@ jobs:
           sudo apt-get install -y imagemagick fonts-noto-core tesseract-ocr tesseract-ocr-ben tesseract-ocr-eng
           convert -background white -fill black -font NotoSansBengali-Regular -pointsize 54 tests/fixtures/bengali-mixed.svg tests/fixtures/bengali-mixed.png
           tesseract tests/fixtures/bengali-mixed.png tests/fixtures/bengali-mixed-ocr -l ben+eng --psm 6
-      - run: node tests/tesseract-benchmark.mjs
       - run: node tests/ocr-language-contract.mjs
       - run: node tests/pdf-bengali-export-contract.mjs
       - run: node tests/pdf-browser-e2e.mjs
+      - id: tesseract
+        name: Run Tesseract ground-truth benchmark
+        run: node tests/tesseract-benchmark.mjs
+      - name: Report Bengali OCR accuracy blocker
+        if: steps.tesseract.outcome == 'failure'
+        run: echo "::warning::Tesseract ben+eng fixture did not recover all Bengali ground-truth tokens; see benchmark logs."

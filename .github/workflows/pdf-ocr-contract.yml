@@ -12,6 +12,8 @@ on:
       - "tests/pdf-browser-e2e.mjs"
       - "tests/tesseract-benchmark.mjs"
       - "tests/pdf-tool-regression-contract.mjs"
+      - "tests/pdf-table-detection.mjs"
+      - "tests/fixtures/pdf-table-layouts.json"
       - ".github/workflows/pdf-ocr-contract.yml"
   push:
     branches: [main, "fix/**", "codex/**"]

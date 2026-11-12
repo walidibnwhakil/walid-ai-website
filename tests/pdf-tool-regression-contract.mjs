@@ -38,7 +38,7 @@ const contracts = [
   [/setPassword|encrypt|userPassword|ownerPassword/, "protect path must invoke PDF password protection"],
   [/doc\.addPage\(/, "image-to-PDF must create one page per image"],
   [/imagePageSize/, "image-to-PDF page sizing must remain configurable"],
-  [/createWorker\(["']ben\\+eng["']/, "OCR must use Bengali plus English"],
+  [/createWorker\(["']ben\+eng["']/, "OCR must use Bengali plus English"],
   [/Math\.min\(10, state\.pages\.length\)/, "PDF OCR must keep its first-ten-page safety bound"],
   [/prepareOcrCanvas/, "OCR must preprocess rendered pages/images before recognition"],
   [/embedPng\(/, "raster fallback must remain available for annotations"]

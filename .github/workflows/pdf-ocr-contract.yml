@@ -27,7 +27,7 @@ jobs:
       - name: Install browser test dependencies
         run: |
           npm install --no-save playwright@1.52.0
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
       - name: Install OCR engine and Bengali language data
         run: |
           sudo apt-get update

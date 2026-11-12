@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 20
       - name: Install smoke-test dependencies
-        run: npm install --no-save playwright jszip pdf-lib pngjs
+        run: npm install --no-save playwright jszip pdf-lib pngjs @pdf-lib/fontkit
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run production smoke test

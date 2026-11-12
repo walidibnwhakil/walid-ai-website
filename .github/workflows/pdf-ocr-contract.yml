@@ -32,8 +32,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick fonts-noto-core tesseract-ocr tesseract-ocr-ben tesseract-ocr-eng
-          convert -background white -fill black -font NotoSansBengali-Regular -pointsize 54 tests/fixtures/bengali-mixed.svg tests/fixtures/bengali-mixed.png
+          BENGALI_FONT="$(fc-match -f '%{file}' 'Noto Sans Bengali:lang=bn' | head -n 1)"
+          test -s "$BENGALI_FONT"
+          echo "Using Bengali fixture font: $BENGALI_FONT"
+          convert -background white -fill black -font "$BENGALI_FONT" -pointsize 54 tests/fixtures/bengali-mixed.svg tests/fixtures/bengali-mixed.png
+          identify tests/fixtures/bengali-mixed.png
+          tesseract --list-langs | grep -qx ben
+          tesseract --list-langs | grep -qx eng
           tesseract tests/fixtures/bengali-mixed.png tests/fixtures/bengali-mixed-ocr -l ben+eng --psm 6
+          cat tests/fixtures/bengali-mixed-ocr.txt
       - run: node tests/ocr-language-contract.mjs
       - run: node tests/pdf-bengali-export-contract.mjs
       - run: node tests/pdf-browser-e2e.mjs

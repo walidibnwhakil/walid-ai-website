@@ -135,6 +135,6 @@ assert.deepEqual([...mediaBytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 1
 const rels = await doc.file("word/_rels/document.xml.rels").async("string");
 assert.match(rels, /relationships\/image/, "DOCX must relate the page drawing to image media");
 const types = await doc.file("[Content_Types].xml").async("string");
-assert.match(types, /Extension="png" ContentType="image\\/png"/, "DOCX must declare PNG content");
+assert.match(types, /Extension="png" ContentType="image\/png"/, "DOCX must declare PNG content");
 
 console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX"); await cleanup();

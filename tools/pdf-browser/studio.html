@@ -46,7 +46,7 @@
         <button class="action" type="button" id="submitPassword">Open PDF</button>
       </div>
       <div id="panelEdit" hidden>
-        <p class="hint">Click the page to add text. Bengali is drawn with Noto Sans Bengali. Turn a sideways page before adding text. The file stays in this browser.</p>
+        <p class="hint">Click the page to add text. Bengali uses a bundled licensed font for selectable PDF text when available; a rasterized browser-canvas fallback is used if embedding fails. Turn a sideways page before adding text. The file stays in this browser.</p>
         <div class="tool-row" id="editTools">
           <button class="minor tool-btn" type="button" data-edit="text">Text</button>
           <button class="minor tool-btn" type="button" data-edit="image">Image</button>
@@ -148,7 +148,7 @@
         <button class="action" type="button" id="applyCompress">Compress PDF</button>
       </div>
       <div id="panelOcr" hidden>
-        <p class="hint">Bengali text is read in this browser with Tesseract (<code>ben</code>). The first 10 pages are read. The file is not uploaded.</p>
+        <p class="hint">Bengali and English text are read in this browser with Tesseract (<code>ben+eng</code>). The first 10 pages are read. The file is not uploaded.</p>
         <button class="action" type="button" id="applyOcr">Read Bengali text</button>
         <a class="download" id="downloadText" hidden>Download text</a>
       </div>

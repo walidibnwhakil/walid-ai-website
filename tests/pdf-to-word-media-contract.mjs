@@ -8,7 +8,7 @@ assert.match(source, /imageBytesFromDataUrl/);
 assert.match(source, /word\/media\/page-/);
 assert.match(source, /Extension="png" ContentType="image\/png"/);
 assert.match(source, /relationships\/image/);
-assert.match(source, /maskTextRegions\(canvas,words\)/);
+assert.match(source, /maskTextRegions\(canvas,words\)/);\nassert.match(source, /return canvas\.toDataURL\('image\\/png'\)/);\nassert.doesNotMatch(source, /copyCtx\.fillRect/);\nassert.match(source, /<w:vanish\\/><w:color w:val=\"FFFFFF\"/);
 assert.doesNotMatch(source, /block\.type==='table'\?wordTable/);
 assert.match(source, /return lines\.map\(line=>\(\{type:'paragraph'/);\nassert.match(source, /wordFloatingImage/);\nassert.match(source, /wordTextBox/);\nassert.match(source, /<wp:anchor/);\nassert.doesNotMatch(source, /<wp:inline/);\nassert.doesNotMatch(source, /type:'table'/);
 console.log("PDF to Word media contract passed: binary PNG media, one image per page, editable OCR paragraphs");

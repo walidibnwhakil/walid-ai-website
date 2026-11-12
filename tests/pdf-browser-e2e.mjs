@@ -13,6 +13,22 @@ zip.file("_rels/.rels", '<Relationships xmlns="http://schemas.openxmlformats.org
 zip.file("word/document.xml", '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>'+text+'</w:t></w:r></w:p></w:body></w:document>');
 const docxBytes = await zip.generateAsync({ type: "nodebuffer" });
 
+let phase = "startup";
+const watchdog = setTimeout(() => {
+  console.error("PDF browser E2E timed out after 120s; last phase:", phase);
+  process.exit(124);
+}, 120000);
+function mark(name) {
+  phase = name;
+  console.log("[pdf-e2e]", name);
+}
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(label + " timed out after " + ms + "ms")), ms))
+  ]);
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (req.method === "POST" && url.pathname === "/api/tools/pdf-to-word") {
@@ -24,10 +40,12 @@ const server = createServer(async (req, res) => {
   try { const body = await readFile(new URL(file, root)); res.writeHead(200, { "content-type": file.endsWith(".js") ? "text/javascript" : file.endsWith(".html") ? "text/html" : "application/octet-stream" }); res.end(body); }
   catch { res.writeHead(404); res.end("not found"); }
 });
-server.listen(0, "127.0.0.1"); await once(server, "listening");
+server.listen(0, "127.0.0.1"); await withTimeout(once(server, "listening"), 10000, "server startup");
 const port = server.address().port;
-const browser = await chromium.launch({ headless: true });
+const browser = await withTimeout(chromium.launch({ headless: true }), 20000, "browser launch");
 const context = await browser.newContext({ acceptDownloads: true });
+context.setDefaultTimeout(15000);
+context.setDefaultNavigationTimeout(15000);
 const errors = [];
 context.on("page", (p) => p.on("pageerror", (e) => errors.push(String(e))));
 
@@ -48,9 +66,9 @@ async function inspect(bytes) {
 async function download(page, selector) {
   const event = page.waitForEvent("download"); await page.locator(selector).click(); const d = await event; const path = await d.path(); assert.ok(path); return readFile(path);
 }
-async function studio(tool, page) { await page.goto("http://127.0.0.1:" + port + "/tools/pdf-browser/studio.html?tool=" + tool, { waitUntil: "networkidle" }); }
+async function studio(tool, page) { mark("open " + tool + " studio"); await page.goto("http://127.0.0.1:" + port + "/tools/pdf-browser/studio.html?tool=" + tool, { waitUntil: "domcontentloaded", timeout: 15000 }); }
 
-const edit = await context.newPage(); await studio("edit", edit);
+const edit = await context.newPage(); await studio("edit", edit); mark("edit fixture");
 const input = await pdfFixture(edit, 3);
 await edit.setInputFiles("#file", { name: "three-pages.pdf", mimeType: "application/pdf", buffer: Buffer.from(input) });
 await edit.locator("#panelEdit").waitFor({ state: "visible" });
@@ -65,7 +83,7 @@ await edit.waitForFunction(() => document.querySelector("#status")?.textContent.
 const edited = await download(edit, "#download"); assert.equal(edited[0], 37);
 const pages = await inspect(edited); assert.equal(pages.length, 2); assert.deepEqual(pages[0], [595, 842, 90]);
 
-const compress = await context.newPage(); await studio("compress", compress);
+const compress = await context.newPage(); await studio("compress", compress); mark("compress fixture");
 const compressInput = await pdfFixture(compress, 2);
 await compress.setInputFiles("#file", { name: "compress-me.pdf", mimeType: "application/pdf", buffer: Buffer.from(compressInput) });
 await compress.locator("#panelCompress").waitFor({ state: "visible" });
@@ -75,12 +93,13 @@ await compress.waitForFunction(() => document.querySelector("#status")?.textCont
 const compressed = await download(compress, "#download"); assert.equal(compressed[0], 37); assert.equal((await inspect(compressed)).length, 2);
 
 const word = await context.newPage();
-await word.goto("http://127.0.0.1:" + port + "/tools/pdf-to-word/index.html", { waitUntil: "networkidle" });
+mark("open pdf-to-word");
+await word.goto("http://127.0.0.1:" + port + "/tools/pdf-to-word/index.html", { waitUntil: "domcontentloaded", timeout: 15000 });
 const frame = word.frameLocator('iframe[title="PDF to Word tool"]');
-const wordInput = await pdfFixture(word, 1, true);
+mark("build Bengali PDF fixture"); const wordInput = await withTimeout(pdfFixture(word, 1, true), 30000, "Bengali PDF fixture");
 await frame.locator("#pdfFiles").setInputFiles({ name: "bengali-source.pdf", mimeType: "application/pdf", buffer: Buffer.from(wordInput) });
-await frame.locator("#runPdf").click(); await frame.locator("#pdfDownload").waitFor({ state: "visible" });
-const wordEvent = word.waitForEvent("download");
+mark("convert PDF to DOCX"); await frame.locator("#runPdf").click(); await frame.locator("#pdfDownload").waitFor({ state: "visible", timeout: 30000 });
+mark("download DOCX"); const wordEvent = word.waitForEvent("download", { timeout: 15000 });
 await frame.locator("#pdfDownload").click();
 const wordDownload = await wordEvent;
 const wordPath = await wordDownload.path();
@@ -90,4 +109,4 @@ const doc = await JSZip.loadAsync(wordBytes); const xml = await doc.file("word/d
 const textNodes = [...xml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map((m) => m[1]).join("");
 assert.match(textNodes, /বাংলা/, "DOCX must contain Bengali in editable Word text nodes");
 assert.doesNotMatch(xml, /<w:drawing|<w:pict/, "Bengali must not be an embedded screenshot");
-console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX");
+console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX"); clearTimeout(watchdog);

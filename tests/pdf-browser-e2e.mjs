@@ -66,7 +66,9 @@ const pages = await inspect(edited); assert.equal(pages.length, 2); assert.deepE
 const compress = await context.newPage(); await studio("compress", compress);
 const compressInput = await pdfFixture(compress, 2);
 await compress.setInputFiles("#file", { name: "compress-me.pdf", mimeType: "application/pdf", buffer: Buffer.from(compressInput) });
-await compress.locator("#panelCompress").waitFor({ state: "visible" }); await compress.locator("#applyCompress").click();
+await compress.locator("#panelCompress").waitFor({ state: "visible" });
+await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("2 pages ready"));
+await compress.locator("#applyCompress").click();
 await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("Download"));
 const compressed = await download(compress, "#download"); assert.equal(compressed[0], 37); assert.equal((await inspect(compressed)).length, 2);
 

@@ -106,14 +106,16 @@ function clusterLines(words) {
 function detectBlocks(words,width) {
   const lines=clusterLines(words); if(!lines.length)return [];
   const rowCandidates=lines.filter(line=>line.words.length>=2);
-  const xs=[]; for(const line of rowCandidates)for(const word of line.words)if(!xs.some(x=>Math.abs(x-word.bbox.x0)<Math.max(18,(word.bbox.x1-word.bbox.x0)*.7)))xs.push(word.bbox.x0);
-  const isTable=rowCandidates.length>=3 && xs.length>=2;
+  const anchors=(rowCandidates[0]?.words||[]).map(word=>word.bbox.x0);
+  const aligned=anchors.filter(x=>rowCandidates.filter(line=>line.words.some(word=>Math.abs(word.bbox.x0-x)<18)).length>=3);
+  const isTable=rowCandidates.length>=3 && aligned.length>=2 &&
+    rowCandidates.every(line=>aligned.every(x=>line.words.some(word=>Math.abs(word.bbox.x0-x)<18)));
   if(!isTable)return lines.map(line=>({type:'paragraph',text:line.text}));
   const rows=rowCandidates.map(line=>{
     const cells=[]; for(const word of line.words){let cell=cells[cells.length-1];if(!cell||word.bbox.x0-cell.end>Math.max(22,(word.bbox.x1-word.bbox.x0)*1.25)){cell={text:'',end:word.bbox.x1};cells.push(cell);}cell.text+=(cell.text?' ':'')+word.text;cell.end=word.bbox.x1;} return cells.map(cell=>cell.text);
   });
   const nonRows=lines.filter(line=>!rowCandidates.includes(line)).map(line=>({type:'paragraph',text:line.text}));
-  return lines.map(line=>({type:'paragraph',text:line.text}));
+  return [{type:'table',rows},...nonRows];
 }
 function maskTextRegions(canvas,words) {
   const copy=document.createElement('canvas'); copy.width=canvas.width; copy.height=canvas.height;

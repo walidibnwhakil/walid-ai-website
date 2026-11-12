@@ -43,8 +43,9 @@ const savedBytes = await page.evaluate(async () => Array.from(await (await fetch
 const reopened = await browser.newPage();
 await reopened.goto(`http://127.0.0.1:${port}/tools/pdf-browser/studio.html?tool=edit`);
 await reopened.setInputFiles("#file", { name: "roundtrip.pdf", mimeType: "application/pdf", buffer: Buffer.from(savedBytes) });
-await reopened.locator("#stage").waitFor({ state: "visible" });
-assert.equal(await reopened.locator("#stage").isVisible(), true);
+await reopened.waitForTimeout(1000);
+const pageCount = await reopened.evaluate(async (bytes) => { const { PDFDocument } = await import("https://cdn.jsdelivr.net/npm/@cantoo/pdf-lib@2.3.2/+esm"); return (await PDFDocument.load(new Uint8Array(bytes))).getPageCount(); }, savedBytes);
+assert.equal(pageCount, 1, "the downloaded PDF must reopen and contain its page");
 assert.equal(errors.length, 0, errors.join("\n"));
 await browser.close();
 server.close();

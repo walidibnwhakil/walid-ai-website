@@ -55,48 +55,77 @@ body.checker-preview #canvas{background-color:#e7e9ee;background-image:linear-gr
 </section></main>
 <script src="backend-config.js"></script><script src="ads-config.js"></script><script>
 
-async function createEditableDocx(paragraphs, filename) {
-  const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
-  const esc = value => String(value || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const body = paragraphs.map(text => '<w:p><w:r><w:t xml:space="preserve">'+esc(text)+'</w:t></w:r></w:p>').join('');
-  const zip = new JSZip();
+function xmlEscape(value) {
+  return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+function wordRun(text) {
+  return '<w:r><w:t xml:space="preserve">'+xmlEscape(text)+'</w:t></w:r>';
+}
+function wordParagraph(text, props='') {
+  return '<w:p>'+props+wordRun(text||'')+'</w:p>';
+}
+function wordTable(rows, width) {
+  const cols=Math.max(1,...rows.map(row=>row.length));
+  const grid=Array.from({length:cols},(_,i)=>'<w:gridCol w:w="'+Math.max(500,Math.round(width/cols))+'"/>').join('');
+  return '<w:tbl><w:tblPr><w:tblLayout w:type="fixed"/><w:tblW w:w="'+Math.round(width)+'" w:type="dxa"/><w:tblBorders><w:top w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/><w:bottom w:val="single" w:sz="4"/><w:right w:val="single" w:sz="4"/><w:insideH w:val="single" w:sz="4"/><w:insideV w:val="single" w:sz="4"/></w:tblBorders></w:tblPr><w:tblGrid>'+grid+'</w:tblGrid>'+rows.map(row=>'<w:tr>'+Array.from({length:cols},(_,i)=>'<w:tc><w:tcPr><w:tcW w:w="'+Math.max(500,Math.round(width/cols))+'" w:type="dxa"/></w:tcPr>'+wordParagraph(row[i]||'')+'</w:tc>').join('')+'</w:tr>').join('')+'</w:tbl>';
+}
+function pageSection(width,height,margin) {
+  return '<w:sectPr><w:pgSz w:w="'+Math.round(width*1440/96)+'" w:h="'+Math.round(height*1440/96)+'"/><w:pgMar w:top="'+margin+'" w:right="'+margin+'" w:bottom="'+margin+'" w:left="'+margin+'" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr>';
+}
+async function createEditableDocx(pages, filename) {
+  const JSZip=(await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
+  const body=pages.map(page=>page.blocks.map(block=>block.type==='table'?wordTable(block.rows,page.width):wordParagraph(block.text,block.heading?'':'')).join('')+pageSection(page.width,page.height,page.margin)).join('');
+  const documentXml='<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'</w:body></w:document>';
+  const zip=new JSZip();
   zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
   zip.file('_rels/.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
-  zip.file('word/document.xml','<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'<w:sectPr/></w:body></w:document>');
-  const bytes = await zip.generateAsync({type:'uint8array'});
-  return {bytes, filename};
+  zip.file('word/document.xml',documentXml);
+  return {bytes:await zip.generateAsync({type:'uint8array'}),filename};
 }
-async function ocrImageToDocx(file, onProgress) {
-  const { createWorker } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm');
-  const worker = await createWorker('ben+eng', 1, { logger: info => onProgress?.(info) });
-  try {
-    const result = await worker.recognize(file);
-    return (result.data.text || '').replace(/\r/g,'').split(/\n+/).map(line=>line.trim()).filter(Boolean);
-  } finally { await worker.terminate(); }
-}
-async function ocrPdfToDocx(file, onProgress) {
-  const pdfjs = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs');
-  pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
-  const pdf = await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
-  if (pdf.numPages > 10) throw Error('For browser OCR, use a PDF with at most 10 pages.');
-  const paragraphs = [];
-  for (let number=1; number<=pdf.numPages; number++) {
-    onProgress?.({status:'recognizing text', page:number, pages:pdf.numPages});
-    const page = await pdf.getPage(number);
-    const textContent = await page.getTextContent();
-    const selectable = textContent.items.map(item=>item.str).join(' ').replace(/\s+/g,' ').trim();
-    if (selectable.length >= 40) { paragraphs.push(selectable); continue; }
-    const viewport = page.getViewport({scale:2});
-    const canvas = document.createElement('canvas');
-    canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
-    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
-    const lines = await ocrImageToDocx(canvas, info=>onProgress?.({...info,page:number,pages:pdf.numPages}));
-    paragraphs.push(...lines);
+function clusterLines(words) {
+  const lines=[];
+  for(const word of words.filter(item=>String(item.text||'').trim()).sort((a,b)=>a.bbox.y0-b.bbox.y0||a.bbox.x0-b.bbox.x0)) {
+    const center=(word.bbox.y0+word.bbox.y1)/2, line=lines.find(item=>Math.abs(item.center-center)<Math.max(8,(word.bbox.y1-word.bbox.y0)*.55));
+    if(line){line.words.push(word);line.center=(line.center*(line.words.length-1)+center)/line.words.length;} else lines.push({center,words:[word]});
   }
-  if (!paragraphs.length) throw Error('No editable text was found. The PDF may be empty or unreadable.');
-  return paragraphs;
+  return lines.map(line=>({y:line.center,words:line.words.sort((a,b)=>a.bbox.x0-b.bbox.x0),text:line.words.map(w=>w.text).join(' ')}));
 }
-
+function detectBlocks(words,width) {
+  const lines=clusterLines(words); if(!lines.length)return [];
+  const rowCandidates=lines.filter(line=>line.words.length>=2);
+  const xs=[]; for(const line of rowCandidates)for(const word of line.words)if(!xs.some(x=>Math.abs(x-word.bbox.x0)<Math.max(18,(word.bbox.x1-word.bbox.x0)*.7)))xs.push(word.bbox.x0);
+  const isTable=rowCandidates.length>=3 && xs.length>=2;
+  if(!isTable)return lines.map(line=>({type:'paragraph',text:line.text}));
+  const rows=rowCandidates.map(line=>{
+    const cells=[]; for(const word of line.words){let cell=cells[cells.length-1];if(!cell||word.bbox.x0-cell.end>Math.max(22,(word.bbox.x1-word.bbox.x0)*1.25)){cell={text:'',end:word.bbox.x1};cells.push(cell);}cell.text+=(cell.text?' ':'')+word.text;cell.end=word.bbox.x1;} return cells.map(cell=>cell.text);
+  });
+  const nonRows=lines.filter(line=>!rowCandidates.includes(line)).map(line=>({type:'paragraph',text:line.text}));
+  return [...nonRows.slice(0,Math.max(0,nonRows.length-1)),{type:'table',rows}];
+}
+async function ocrPdfToDocx(file,onProgress) {
+  const {createWorker}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm');
+  const pdfjs=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+  const pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
+  if(pdf.numPages>10)throw Error('For browser OCR, use a PDF with at most 10 pages.');
+  const pages=[];
+  const worker=await createWorker('ben+eng',1,{logger:info=>onProgress?.(info)});
+  try {
+    for(let number=1;number<=pdf.numPages;number++){
+      onProgress?.({status:'recognizing text',page:number,pages:pdf.numPages});
+      const page=await pdf.getPage(number), viewport=page.getViewport({scale:2}), width=viewport.width,height=viewport.height;
+      const canvas=document.createElement('canvas');canvas.width=Math.ceil(width);canvas.height=Math.ceil(height);
+      await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+      const textContent=await page.getTextContent();
+      let words=textContent.items.filter(item=>item.str.trim()).map(item=>({text:item.str,bbox:{x0:item.transform[4]*2,y0:height-item.transform[5]*2-item.height*2,x1:(item.transform[4]+item.width)*2,y1:height-item.transform[5]*2}}));
+      if(words.length<3){const result=await worker.recognize(canvas);words=(result.data.words||[]).map(word=>({text:word.text,bbox:{x0:word.bbox.x0,y0:word.bbox.y0,x1:word.bbox.x1,y1:word.bbox.y1}}));}
+      const margin=72, blocks=detectBlocks(words,width-2*margin);
+      if(!blocks.length)throw Error('No editable text was found. The PDF may be empty or unreadable.');
+      pages.push({width,height,margin,blocks});
+    }
+  } finally {await worker.terminate();}
+  return pages;
+}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],grid=$('#toolGrid'),workspace=$('#workspace'),status=$('#status');let activeTool=null,imageCanvas=$('#canvas'),ctx=imageCanvas.getContext('2d',{willReadFrequently:true}),original=null,pickedColor=null,pickedPoint=null,selection=null,dragStart=null,imageBaseName='walid-image';
 function walidDownloadName(filename){const name=String(filename||'file');return name.startsWith('Walid AI_')?name:'Walid AI_'+name}
 const messages={choosePdf:'Choose a PDF file first.',onePdf:'Choose one PDF for this tool.',twoPdfs:'Choose at least two PDF files to merge.',tooLarge:'The total file size must be under 20 MB.',working:'Working…',done:'Done.',chooseImage:'Choose an image first.',chooseColor:'Select the paper color in the image first.',chooseArea:'Select a small area in the image first.',areaTooLarge:'Select a smaller area for best results.',badSize:'Enter a width and height between 1 and 10,000 pixels.',imageReady:'',colorPicked:'Background color selected.',restored:'Original image restored.',backgroundDone:'Background removed.',markDone:'Selected area filled using nearby pixels.',sizeDone:'Image resized.',imageError:'The image could not be opened.',fileError:'The file could not be processed. Please try another file.'};

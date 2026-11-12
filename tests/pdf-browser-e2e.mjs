@@ -118,6 +118,8 @@ const frame = word.frameLocator('iframe[title="PDF to Word tool"]');
 await frame.locator('html[data-walid-tool-ready="true"]').waitFor({ state: "attached", timeout: 15000 });
 mark("build Bengali PDF fixture"); const wordInput = await withTimeout(pdfFixture(word, 1, true), 30000, "Bengali PDF fixture");
 await frame.locator("#pdfFiles").setInputFiles({ name: "bengali-source.pdf", mimeType: "application/pdf", buffer: Buffer.from(wordInput) });
+await frame.locator("#pdfFiles").evaluate((input) => input.dispatchEvent(new Event("change", { bubbles: true })));
+await frame.locator("#runPdf").waitFor({ state: "visible", timeout: 5000 });
 mark("convert PDF to DOCX"); await frame.locator("#runPdf").click(); await frame.locator("#pdfDownload").waitFor({ state: "visible", timeout: 30000 });
 mark("download DOCX"); const wordEvent = word.waitForEvent("download", { timeout: 15000 });
 await frame.locator("#pdfDownload").click();

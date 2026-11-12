@@ -25,3 +25,4 @@ jobs:
         with:
           node-version: 20
       - run: node tests/ocr-language-contract.mjs
+      - run: node tests/pdf-bengali-export-contract.mjs

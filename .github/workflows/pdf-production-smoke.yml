@@ -22,7 +22,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
       - name: Install smoke-test dependencies
         run: npm install --no-save playwright jszip pdf-lib pngjs
       - name: Install Chromium

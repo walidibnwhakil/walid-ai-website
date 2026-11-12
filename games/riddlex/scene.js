@@ -77,10 +77,11 @@ export function createScene(canvas) {
     const dpr = Math.min(2, devicePixelRatio || 1);
     const width = Math.max(320, Math.round(rect.width * dpr));
     const height = Math.max(180, Math.round(rect.height * dpr));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
+    // Layout is only dependent on canvas dimensions and the loaded artwork.
+    // Avoid recalculating layout and writing CSS variables on every animation frame.
+    if (canvas.width === width && canvas.height === height) return;
+    canvas.width = width;
+    canvas.height = height;
     layoutRoom();
   }
 
@@ -473,7 +474,6 @@ export function createScene(canvas) {
     clock += dt;
     approachMood(dt);
     stepExpr(dt);
-    resize();
     const room = images.room;
     const art = portraitMode && images.portrait ? images.portrait : room;
     ctx.fillStyle = "#1a100c";
@@ -508,10 +508,18 @@ export function createScene(canvas) {
     raf = requestAnimationFrame(frame);
   }
 
+  // Track real element size changes rather than measuring layout 60 times per second.
+  const sizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => {
+    if (running) resize();
+  });
+  sizeObserver?.observe(canvas);
+
   async function start() {
     if (!images.room) {
       const loaded = await Promise.all(Object.entries(ART).map(async ([key, src]) => [key, await loadImage(src)]));
       for (const [key, image] of loaded) images[key] = image;
+      // Artwork can change the crop even when the canvas size stays the same.
+      layoutRoom();
     }
     resize();
     if (running) return;

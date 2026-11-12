@@ -915,9 +915,7 @@ async function acceptPdfFile(file) {
   }
   state.fileName = file.name;
   state.bytes = new Uint8Array(await file.arrayBuffer());
-  state.encrypted = await detectEncrypted(state.bytes);
-  showWork(file.name);
-  if (tool === "protect") {
+  // Encryption detection is only needed by the protect workflow. Running a second\n  // full PDF parse here made ordinary tools, including compression, stall before\n  // their PDF.js document was ready.\n  state.encrypted = tool === "protect" ? await detectEncrypted(state.bytes) : false;\n  showWork(file.name);\n  if (tool === "protect") {
     $("stage").hidden = true;
     $("pageBar").hidden = true;
     setStatus(state.encrypted ? "This PDF is locked. Use Unlock and the password that opens it." : "This PDF is not locked. Use Lock to add a password.");

@@ -1391,3 +1391,40 @@ body.ludo-game.playing-ludo #ludo-play #status:empty{display:none!important}
 
 /* Keep turn and roll feedback out of the layout so the board never shifts. */
 body.ludo-game.playing-ludo #ludo-play #status{display:none!important}
+
+
+/* Ludu pawn visibility and finish celebration corrections. */
+body.ludo-game.playing-ludo #board.board.ludo :is(.track,.lane,.yard,.final-square),
+body.ludo-game.playing-ludo #board.board.ludo span.ludo-pawn,
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn-art{
+  overflow:visible!important;
+}
+/* One or two pawns keep the established artwork size; only 3+ share-cell piles scale. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2:not(.finished-pawn-slot) .pin-pawn-art{
+  width:100%!important;height:100%!important;
+}
+/* Finished pawns never shrink. Their feet stay in the owning color's final square. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn-slot .pin-pawn-art{
+  width:100%!important;height:100%!important;
+}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn-slot{
+  overflow:visible!important;z-index:calc(40 + var(--pawn-order,0))!important;
+}
+/* Keep neighboring full-size pawns layered instead of clipped by a sibling tile. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn:not(.stacked-pawn){
+  z-index:calc(30 + var(--pawn-order,0))!important;
+}
+/* A pearl-like, color-wide progress shimmer, separate from the winner treatment. */
+body.ludo-game.playing-ludo #board.board.ludo [class*="finish-celebration-"]{
+  position:relative!important;z-index:5!important;
+  animation:finish-color-pearl 1.05s ease-in-out infinite alternate!important;
+}
+@keyframes finish-color-pearl{
+  from{filter:brightness(1) saturate(1);box-shadow:0 0 0 0 transparent}
+  to{filter:brightness(1.18) saturate(1.12);box-shadow:0 0 11px 3px #fff6,0 0 20px 5px color-mix(in srgb,var(--tile-color,#ffd86a) 65%,transparent)}
+}
+@media(prefers-reduced-motion:reduce){
+  body.ludo-game.playing-ludo #board.board.ludo [class*="finish-celebration-"]{
+    animation:none!important;filter:brightness(1.12) saturate(1.05)!important;box-shadow:0 0 8px 2px #fff8!important;
+  }
+}

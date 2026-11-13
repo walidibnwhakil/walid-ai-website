@@ -1,11 +1,11 @@
 import {setGameInProgress} from "./refresh-guard.mjs";
-import {pawnSlots, layoutTrackPawns} from "./ludo/pawn-layout.mjs";
+import {pawnSlots, layoutBoardPawns} from "./ludo/pawn-layout.mjs";
 import {gameShell, control, choose} from "./shell.mjs";
 import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs?v=20261107goal56";
 
 const pawnResizeObserver = new ResizeObserver(() => {
   const board = document.querySelector("#board");
-  if (board) layoutTrackPawns(board);
+  if (board) layoutBoardPawns(board);
 });
 pawnResizeObserver.observe(document.documentElement);
 
@@ -640,9 +640,9 @@ function render() {
     });
   }
   pawnResizeObserver.observe(game.board);
-  game.board.querySelectorAll(".track, .lane:not(.final-square)").forEach(tile=>pawnResizeObserver.observe(tile));
-  layoutTrackPawns(game.board);
-  window.__luduResolvePawnGeometry=()=>layoutTrackPawns(game.board);
+  game.board.querySelectorAll(".track, .lane, .yard").forEach(tile=>pawnResizeObserver.observe(tile));
+  layoutBoardPawns(game.board);
+  window.__luduResolvePawnGeometry=()=>layoutBoardPawns(game.board);
 
   game.board.classList.toggle("final-rank-board",(state.pieces.length>=3 || (state.pieces.length===2&&modeSelect.value!=="bot"))&&state.winner!==null);
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());

@@ -2,7 +2,7 @@
 
 The fixture uses actual SVG pawns and the existing geometry resolver on adjacent
 route tiles, with custom lane tints and protected-square stars. Before images
-have only `pawn-layers.css` disabled; after images enable it. Both use identical
+load without `pawn-layers.css`; after images load with it enabled. Both use identical
 pawn geometry, a two-pawn pair on each tile, and DPR 3. Images are native browser
 close-ups, without resizing or artwork edits.
 
@@ -11,7 +11,7 @@ close-ups, without resizing or artwork edits.
 
 `results.json` records the regression checks at 360, 390, and 1440px. Tests compare
 rendered opaque head pixels against the same scene with tile decorations hidden,
-assert identical painted outline/tile bounds with the fix enabled and disabled,
+assert identical painted outline/tile bounds with and without the fix,
 and exercise both single and paired pawns. Normal-motion tests pause the finish
 shimmer at its peak; reduced-motion tests cover idle and finished-color tiles.
 

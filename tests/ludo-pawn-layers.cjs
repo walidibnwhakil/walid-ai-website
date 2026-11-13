@@ -71,12 +71,17 @@ async function closeup(page, path) {
       const page=await browser.newPage({viewport:{width,height:1000},deviceScaleFactor:3,reducedMotion:'reduce'});
       await page.goto(`${process.env.BASE_URL||'http://127.0.0.1:4173'}/games/ludo/?screen=board&players=4&mode=friend`,{waitUntil:'networkidle'});
       for(const count of [1,2]) for(const celebration of [false,true]) {
-        await page.evaluate(()=>document.querySelector('link[href*="pawn-layers.css"]').disabled=true);
+        await page.route('**/pawn-layers.css*', route => route.fulfill({contentType:'text/css',body:''}));
+        await page.reload({waitUntil:'networkidle'});
         await fixture(page,count,celebration);
         const before=await inspect(page);
         if(width!==390 && count===2 && !celebration) await closeup(page,`${out}/before-${width}.png`);
-        await page.evaluate(()=>document.querySelector('link[href*="pawn-layers.css"]').disabled=false);
-        await page.evaluate(()=>new Promise(r=>requestAnimationFrame(r)));
+        // A fresh load avoids Chromium 136 retaining the disabled stylesheet's
+        // composited brightness filter after a runtime link.disabled toggle.
+        // Production loads this stylesheet from the start.
+        await page.unroute('**/pawn-layers.css*');
+        await page.reload({waitUntil:'networkidle'});
+        await fixture(page,count,celebration);
         const after=await inspect(page);
         assert.deepEqual(after.map(p=>p.geometry),before.map(p=>p.geometry),'layer fix must not change artwork size, arrangement, or anchor');
         // PR #126 may contain single pawns inside their tiles; the approved

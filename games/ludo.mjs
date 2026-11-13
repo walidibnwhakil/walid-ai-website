@@ -617,7 +617,27 @@ function render() {
       piece.style.zIndex=piece.classList.contains("playable-token")?"80":String(20+index);
     });
   }
-  // Keep full-size pawns visually inside adjacent squares.\n  for(const [squareKey,square] of squares){\n    const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));\n    if(pile.length!==1)continue;\n    const [row,col]=squareKey.split(",").map(Number);\n    const neighbours=[\n      {key:row+","+ (col-1),x:12,y:0},{key:row+","+ (col+1),x:-12,y:0},\n      {key:(row-1)+","+col,x:0,y:12},{key:(row+1)+","+col,x:0,y:-12}\n    ];\n    for(const neighbour of neighbours){\n      const other=squares.get(neighbour.key);\n      if(!other||![...other.children].some(piece=>piece.classList.contains("ludo-pawn")))continue;\n      const pawn=pile[0];\n      pawn.classList.add("adjacent-pawn");\n      pawn.style.setProperty("--edge-x",neighbour.x+"%");\n      pawn.style.setProperty("--edge-y",neighbour.y+"%");\n      break;\n    }\n  }\n\n  game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
+  // Keep full-size pawns visually inside adjacent squares.
+  for(const [squareKey,square] of squares){
+    const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
+    if(pile.length!==1)continue;
+    const [row,col]=squareKey.split(",").map(Number);
+    const neighbours=[
+      {key:row+","+ (col-1),x:12,y:0},{key:row+","+ (col+1),x:-12,y:0},
+      {key:(row-1)+","+col,x:0,y:12},{key:(row+1)+","+col,x:0,y:-12}
+    ];
+    for(const neighbour of neighbours){
+      const other=squares.get(neighbour.key);
+      if(!other||![...other.children].some(piece=>piece.classList.contains("ludo-pawn")))continue;
+      const pawn=pile[0];
+      pawn.classList.add("adjacent-pawn");
+      pawn.style.setProperty("--edge-x",neighbour.x+"%");
+      pawn.style.setProperty("--edge-y",neighbour.y+"%");
+      break;
+    }
+  }
+
+  game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
   state.ranks.forEach((rank,player)=>{
     if(!rank||locked) return;
     const teamId=activeTeams[player];

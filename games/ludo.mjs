@@ -710,4 +710,4 @@ function render() {
   showBotResult();
 }
 game.restart();
-if(boardLaunch)persistGameSettings();\n  showBotResult();
+if(boardLaunch)persistGameSettings();

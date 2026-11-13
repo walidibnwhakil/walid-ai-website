@@ -38,6 +38,7 @@ jobs:
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ludu-http.log 2>&1 &
           node tests/ludo-pr-101.spec.mjs
           node tests/ludo-tip-geometry.cjs
+          node tests/ludo-pawn-layers.cjs
         env:
           BASE_URL: http://127.0.0.1:4173
       - name: Upload screenshots and test artifacts
@@ -48,5 +49,6 @@ jobs:
           path: |
             test-results/
             screenshots/
+            tests/fixtures/ludo-layers/
             /tmp/ludu-http.log
           if-no-files-found: warn

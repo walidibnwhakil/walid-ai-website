@@ -628,6 +628,7 @@ function render() {
       pawn.classList.remove("adjacent-pawn");
       pawn.style.removeProperty("--adjacent-x");
       pawn.style.removeProperty("--adjacent-y");
+      pawn.querySelector(".pin-pawn-art")?.style.removeProperty("transform");
     });
     const offsets=new Map(candidates.map(({pawn})=>[pawn,{x:0,y:0}]));
     const overlaps=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
@@ -655,10 +656,11 @@ function render() {
             offsets.get(b).y+=direction*push;
           }
           a.classList.add("adjacent-pawn"); b.classList.add("adjacent-pawn");
-          a.style.setProperty("--adjacent-x",offsets.get(a).x+"px");
-          a.style.setProperty("--adjacent-y",offsets.get(a).y+"px");
-          b.style.setProperty("--adjacent-x",offsets.get(b).x+"px");
-          b.style.setProperty("--adjacent-y",offsets.get(b).y+"px");
+          const applyOffset=(pawn,offset)=>{
+            pawn.querySelector(".pin-pawn-art")?.style.setProperty("transform",`translate(calc(-50% + ${offset.x}px),calc(-50% + ${offset.y}px))`,"important");
+          };
+          applyOffset(a,offsets.get(a));
+          applyOffset(b,offsets.get(b));
         }
       }
     }

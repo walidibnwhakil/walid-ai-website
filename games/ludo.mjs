@@ -682,7 +682,7 @@ function render() {
             setTransform();
             const head=pawn.querySelector(".pin-face")||art;
             const headRect=head.getBoundingClientRect();
-            const squareRect=square?.getBoundingClientRect();
+            const squareRect=square;
             if(squareRect){
               if(headRect.left<squareRect.left)x+=squareRect.left-headRect.left;
               if(headRect.right>squareRect.right)x-=headRect.right-squareRect.right;

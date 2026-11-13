@@ -25,7 +25,7 @@ try {
   });
 
   await check("open color picker stays above the board", async () => {
-    const label = page.locator("#dice-green .player-dice-label");
+    const label = page.locator(".player-dice-label:not(:disabled)").first();
     await label.click();
     const data = await page.evaluate(() => {
       const picker = document.querySelector("#dice-green .player-color-picker");

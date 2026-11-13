@@ -52,6 +52,41 @@ try {
     assert.match(data[0].height, /px$/);
   });
 
+  await check("adjacent single pawns have no painted-rectangle overlap", async () => {
+    const data = await page.evaluate(async () => {
+      const board = document.querySelector("#board");
+      const tiles = [...board.querySelectorAll(".track")].slice(0, 4);
+      const pawns = tiles.map((tile, index) => {
+        const pawn = document.createElement("span");
+        pawn.className = "pin-pawn ludo-pawn";
+        pawn.dataset.testPawn = String(index);
+        const art = document.createElement("span");
+        art.className = "pin-pawn-art";
+        pawn.append(art); tile.append(pawn); return { pawn, art };
+      });
+      window.__luduResolvePawnGeometry();
+      await new Promise(requestAnimationFrame);
+      const rects = pawns.map(({art}) => {
+        const rect = art.getBoundingClientRect();
+        return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height };
+      });
+      return { rects, tiles: tiles.map(tile => tile.getBoundingClientRect().toJSON()) };
+    });
+    for (const rect of data.rects) {
+      assert.ok(rect.width > 0 && rect.height > 0);
+    }
+    for (let i = 0; i < data.rects.length; i++) {
+      for (let j = i + 1; j < data.rects.length; j++) {
+        const a = data.rects[i], b = data.rects[j];
+        const overlapWidth = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+        const overlapHeight = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+        assert.equal(overlapWidth * overlapHeight, 0, "painted pawns " + i + "/" + j + " overlap");
+      }
+    }
+    assert.ok(data.rects.every(rect => rect.width >= 40 && rect.height >= 40), "single pawns stayed full-size");
+    await page.screenshot({ path: "screenshots/ludo-desktop-adjacent-no-overlap.png", fullPage: true });
+  });
+
   await check("three-pawn pile may use compact layout", async () => {
     const compact = await page.evaluate(() => {
       const board = document.querySelector("#board");

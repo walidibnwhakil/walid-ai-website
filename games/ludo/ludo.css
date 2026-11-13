@@ -1438,3 +1438,35 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn .pin-p
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn-slot .pin-pawn-art{
   width:100%!important;height:100%!important;
 }
+
+
+/* Performance guardrails: keep the board readable while reducing mobile paint cost. */
+@media (max-width: 600px) {
+  body.ludo-game.playing-ludo .board.ludo .track,
+  body.ludo-game.playing-ludo .board.ludo .lane,
+  body.ludo-game.playing-ludo .board.ludo .yard,
+  body.ludo-game.playing-ludo .board.ludo .home-base,
+  body.ludo-game.playing-ludo .board.ludo .home-center {
+    box-shadow: inset 0 1px #fff7 !important;
+  }
+
+  body.ludo-game.playing-ludo .board.ludo span.ludo-pawn:not(.playable-token),
+  body.ludo-game.playing-ludo .board.ludo span.pin-pawn:not(.playable-token) .pin-pawn-art {
+    filter: none !important;
+  }
+
+  body.ludo-game.playing-ludo .board.ludo .home-base.score-flash::after,
+  body.ludo-game.playing-ludo .board.ludo .home-center.has-finished::after {
+    box-shadow: 0 0 8px 2px #ffdc7788, inset 0 0 8px #fff4 !important;
+  }
+
+  body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 {
+    box-shadow: inset 0 0 0 2px #ffdf6888, 0 0 14px 5px #ffd335 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.ludo-game.playing-ludo .board.ludo .yard-celebration.rank-1 {
+    box-shadow: inset 0 0 0 2px #ffdf6888, 0 0 8px 3px #ffd335 !important;
+  }
+}

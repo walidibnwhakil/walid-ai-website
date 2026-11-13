@@ -1,0 +1,49 @@
+name: Ludu Mahir PR #101 Playwright verification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'games/ludo.mjs'
+      - 'games/ludo/**'
+      - '.github/workflows/ludu-pr-101-playwright.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  ludo-playwright:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.number == 101
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium
+      - name: Run Ludu browser verification
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ludu-http.log 2>&1 &
+          node tests/ludo-pr-101.spec.mjs
+        env:
+          BASE_URL: http://127.0.0.1:4173
+      - name: Upload screenshots and test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ludu-pr-101-playwright-evidence
+          path: |
+            test-results/
+            screenshots/
+            /tmp/ludu-http.log
+          if-no-files-found: warn

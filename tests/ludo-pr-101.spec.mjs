@@ -63,26 +63,7 @@ try {
 
   // Track anchor and painted-bound regressions live in ludo-tip-geometry.cjs.
 
-  await check("four finished pawns remain full-size inside their color region", async () => {
-    const data = await page.evaluate(() => {
-      const board = document.querySelector("#board");
-      const base = document.createElement("div"); base.className = "home-base base-0"; base.dataset.ludoSeat = "0";
-      const square = document.createElement("div"); square.className = "lane red final-square"; square.dataset.ludoSeat = "0";
-      const pawns = Array.from({length: 4}, (_, i) => {
-        const pawn = document.createElement("span"); pawn.className = "pin-pawn finished-pawn finished-pawn-slot final-slot-" + (i + 1);
-        const art = document.createElement("span"); art.className = "pin-pawn-art"; pawn.append(art); square.append(pawn); return { pawn, art };
-      });
-      board.append(base, square);
-      return { sizes: pawns.map(({art}) => [getComputedStyle(art).width, getComputedStyle(art).height]), region: square.dataset.ludoSeat };
-    });
-    assert.equal(new Set(data.sizes.map(([width]) => width)).size, 1);
-    assert.equal(new Set(data.sizes.map(([, height]) => height)).size, 1);
-    for (const [width, height] of data.sizes) {
-      assert.match(width, /px$/);
-      assert.match(height, /px$/);
-    }
-    assert.equal(data.region, "0");
-  });
+  // Finished/home slots are measured as real SVG artwork in ludo-tip-geometry.cjs.
 
   await check("custom colors drive seat-specific shimmer and mute is respected", async () => {
     const data = await page.evaluate(() => {

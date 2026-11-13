@@ -207,6 +207,9 @@ const game = gameShell({reset() {
   locked=false; animationToken=null; pendingCaptureSteps.clear(); finishSlots.clear();
   for(const timer of scoreLightTimers.values())clearTimeout(timer);
   scoreLightTimers.clear();
+  game.board.querySelectorAll('[class*="finish-celebration-"]').forEach(node=>{
+    [...node.classList].filter(name=>name.startsWith("finish-celebration-")).forEach(name=>node.classList.remove(name));
+  });
   clearTimeout(diceAnimationTimer);rollingTeam=-1;rollingValue=0;
   playerColorPickers.forEach(picker=>picker.hidden=true);
   playerLabels.forEach(label=>label.setAttribute("aria-expanded","false"));
@@ -461,12 +464,21 @@ async function play(index) {
     if(soundEnabled)playFinishSound();
     message=`${getColor(move.player)[0]} pawn reached the final square (${finishedCount}/4). `;
     const teamId=activeTeams[move.player];
-    const home=game.board.querySelector(`.base-${teamId}`);
+    const teamClass=teams[teamId].toLowerCase();
+    const celebrationNodes=[
+      game.board.querySelector(`.base-${teamId}`),
+      ...game.board.querySelectorAll(`.lane-${teamId}, .yard-seat-${teamId}, .start-square.${teamClass}, .safe-route-${teamClass}`)
+    ].filter(Boolean);
     if(scoreLightTimers.has(teamId))clearTimeout(scoreLightTimers.get(teamId));
-    home.classList.remove("score-flash");
-    void home.offsetWidth;
-    home.classList.add("score-flash");
-    const timer=setTimeout(()=>{home.classList.remove("score-flash");scoreLightTimers.delete(teamId);},3500);
+    celebrationNodes.forEach(node=>{
+      node.classList.remove(`finish-celebration-${teamId}`);
+      void node.offsetWidth;
+      node.classList.add(`finish-celebration-${teamId}`);
+    });
+    const timer=setTimeout(()=>{
+      celebrationNodes.forEach(node=>node.classList.remove(`finish-celebration-${teamId}`));
+      scoreLightTimers.delete(teamId);
+    },3500);
     scoreLightTimers.set(teamId,timer);
   }
   render();
@@ -578,10 +590,9 @@ function render() {
         const arrivingAtFinish=animationToken&&piece.dataset.token===`${activeTeams[animationToken.player]}-${animationToken.token}`&&animationToken.step===56;
         if(!arrivingAtFinish)piece.classList.add("finished-pawn");
         if(count>1){
-          const {x,y,width,height}=slots[slot];
-          piece.style.setProperty("--pawn-width",`${width}%`);
-          piece.style.setProperty("--pawn-height",`${height}%`);
-          piece.classList.add("stacked-pawn","pile-size-finished",finishSize);
+          const finalOffsets=[[-18,-16],[18,-16],[-18,16],[18,16]];
+          const [x,y]=finalOffsets[slot%finalOffsets.length];
+          piece.classList.add("stacked-pawn","finished-pawn-slot",finishSize,`final-slot-${(slot%finalOffsets.length)+1}`);
           piece.style.setProperty("--pile-x",`${x}%`);
           piece.style.setProperty("--pile-y",`${y}%`);
         }

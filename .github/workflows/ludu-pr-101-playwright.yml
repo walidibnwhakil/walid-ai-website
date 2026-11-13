@@ -1,4 +1,4 @@
-name: Ludu Mahir PR #101 Playwright verification
+name: Ludu Mahir Playwright verification
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   ludo-playwright:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.number == 101
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -41,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ludu-pr-101-playwright-evidence
+          name: ludu-playwright-evidence
           path: |
             test-results/
             screenshots/

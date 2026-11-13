@@ -101,7 +101,7 @@ try {
         art.className = "pin-pawn-art";
         art.style.cssText = "position:relative;display:block";
         const head = document.createElement("span");
-        head.className = "test-pawn-head";
+        head.className = "test-pawn-head pin-face";
         head.style.cssText = "position:absolute;left:50%;top:8%;width:34%;height:34%;border-radius:50%;background:#fff;border:2px solid #123;transform:translateX(-50%)";
         art.append(head); pawn.append(art); tile.append(pawn); return { pawn, art, head, tile };
       });

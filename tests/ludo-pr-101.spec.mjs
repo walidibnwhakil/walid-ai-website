@@ -28,7 +28,7 @@ try {
     const label = page.locator(".player-dice-label:not(:disabled)").first();
     await label.click();
     const data = await page.evaluate(() => {
-      const picker = document.querySelector("#dice-green .player-color-picker");
+      const picker = document.querySelector(".player-color-picker:not([hidden])");
       const panel = picker.closest(".player-dice");
       const rect = picker.getBoundingClientRect();
       return {

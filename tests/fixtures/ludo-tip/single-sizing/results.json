@@ -1,0 +1,363 @@
+[
+  {
+    "scenario": "approved before-mobile.png visual reference",
+    "meanChannelDifference": 2.4256535947712417,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "all colors across all regions",
+    "offset": 1,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "all colors across all regions",
+    "offset": 2,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "all colors across all regions",
+    "offset": 3,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "live resize without manual resolver",
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "Chromium visual viewport zoom 125%",
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "scenario": "all colors across all regions",
+    "offset": 1,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "scenario": "all colors across all regions",
+    "offset": 2,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "scenario": "all colors across all regions",
+    "offset": 3,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "scenario": "live resize without manual resolver",
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "scenario": "Chromium visual viewport zoom 125%",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 1,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 2,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 3,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 4,
+    "tiles": 92,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "all colors across all regions",
+    "offset": 1,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "all colors across all regions",
+    "offset": 2,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "all colors across all regions",
+    "offset": 3,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "live resize without manual resolver",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "Chromium visual viewport zoom 125%",
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "high-DPI single-pawn closeups across regions",
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "single-pawn ready hint at peak retains size, centered tip and containment",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "high-DPI single-pawn closeups across regions",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "single-pawn ready hint at peak retains size, centered tip and containment",
+    "status": "passed"
+  }
+]

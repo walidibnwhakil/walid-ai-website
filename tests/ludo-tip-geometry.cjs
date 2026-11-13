@@ -25,7 +25,10 @@ async function measure(page) {
     for(let y=0;y<810;y++) for(let x=0;x<640;x++) if(pixels[(y*640+x)*4+3]) {
       left=Math.min(left,x);right=Math.max(right,x+1);top=Math.min(top,y);bottom=Math.max(bottom,y+1);
     }
-    return [...document.querySelectorAll('.track, .lane:not(.final-square)')].map(tile => ({
+    return [...document.querySelectorAll('.track, .lane, .yard')].map(tile => ({
+      region:tile.classList.contains('yard')?'yard':tile.classList.contains('final-square')?'finish':tile.classList.contains('lane')?'lane':tile.classList.contains('safe')?'safe':'track',
+      seat:tile.dataset.ludoSeat,cell:tile.style.gridArea,
+      base:tile.classList.contains('yard')?document.querySelector(`.base-${tile.dataset.ludoSeat}`).getBoundingClientRect().toJSON():null,
       tile:tile.getBoundingClientRect().toJSON(),board:document.querySelector("#board").getBoundingClientRect().toJSON(),phone:matchMedia("(max-width:620px)").matches,
       pawns:[...tile.querySelectorAll('svg.pin-pawn-art')].map(svg => {
         const r=svg.querySelector('.pin-outline').getBoundingClientRect();
@@ -34,51 +37,86 @@ async function measure(page) {
         const a=new DOMPoint(left/10,top/10).matrixTransform(m),b=new DOMPoint(right/10,bottom/10).matrixTransform(m);
         const pathTip=new DOMPoint(32,77).matrixTransform(m);
         const face=svg.querySelector('.pin-face').getBoundingClientRect();
-        return {scale:m.a,pathTip:{x:pathTip.x,y:pathTip.y},head:{left:face.left-m.a,right:face.right+m.a,top:face.top-m.d,bottom:face.bottom+m.d},tip:{x:tip.x,y:tip.y},bounds:{left:a.x,top:a.y,right:b.x,bottom:b.y}};
+        return {color:svg.parentElement.style.getPropertyValue("--piece-color"),scale:m.a,pathTip:{x:pathTip.x,y:pathTip.y},head:{left:face.left-m.a,right:face.right+m.a,top:face.top-m.d,bottom:face.bottom+m.d},tip:{x:tip.x,y:tip.y},bounds:{left:a.x,top:a.y,right:b.x,bottom:b.y}};
       })
     }));
   });
 }
 
 function verify(data,count) {
-  const eps=.1;
-  const heads=[];
-  for(const {tile,board,phone,pawns} of data) {
-    assert.equal(pawns.length,count);
+  const eps=.1,heads=[],singleSizes=[],homeScales=[],homeCounts=new Map();
+  const routeCells=data.filter(t=>t.region!=='yard');
+  const singleScale=Math.min(...routeCells.flatMap(({tile})=>[
+    tile.width*.94/56.5,tile.height*.47/(77+1.25*Math.hypot(10,12)/10-1.75)
+  ]));
+  const homeCells=data.filter(t=>t.region==='yard');
+  const homeScale=Math.min(...homeCells.flatMap(({tile})=>[tile.width*.9/56.5,tile.height*.9/78.25]));
+  for(const {tile,board,phone,pawns,region,base,seat} of data) {
+    if(region==='yard') {
+      assert.ok(pawns.length<=1,'one pawn per deliberate home slot');
+      homeCounts.set(seat,(homeCounts.get(seat)||0)+pawns.length);
+    } else assert.equal(pawns.length,count);
     const cx=(tile.left+tile.right)/2,cy=(tile.top+tile.bottom)/2;
-    const approvedScale=Math.min(tile.width/64,tile.height/77)*(phone?(count===2?1.1:1.2):1);
+    const pair=count===2 && !['yard','finish'].includes(region);
     for(const [i,p] of pawns.entries()) {
       const {tip,bounds:b}=p;
-      assert.ok(tip.x>=tile.left-eps && tip.x<=tile.right+eps && tip.y>=tile.top-eps && tip.y<=tile.bottom+eps,JSON.stringify({tile,tip}));
+      assert.ok(tip.x>=tile.left-eps && tip.x<=tile.right+eps && tip.y>=tile.top-eps && tip.y<=tile.bottom+eps,JSON.stringify({region,tile,tip}));
       assert.ok(b.left>=board.left-eps && b.right<=board.right+eps && b.top>=board.top-eps && b.bottom<=board.bottom+eps,'painted bounds inside board');
-      if(count<=2) {
-        const x=tile.left+tile.width*(count===1?.5:i?.74:.26);
-        const edgeFit=Math.min((x-board.left)/28.25,(board.right-x)/28.25,(cy-board.top)/75.25,(board.bottom-cy)/3);
-        // Every pawn on a tile uses the same scale; only board-edge overflow may reduce it.
-        const allEdgeFits=pawns.map((_,j)=>{
-          const tx=tile.left+tile.width*(count===1?.5:j?.74:.26);
-          return Math.min((tx-board.left)/28.25,(board.right-tx)/28.25,(cy-board.top)/75.25,(board.bottom-cy)/3);
-        });
-        const expected=Math.min(approvedScale,edgeFit,...allEdgeFits);
-        assert.ok(Math.abs(p.scale-expected)<.003,'preserve approved artwork size except actual board-edge overflow');
-        assert.ok(Math.abs(p.pathTip.x-x)<eps && Math.abs(p.pathTip.y-cy)<eps,'approved path-tip anchor');
+      if(pair) {
+        const x=tile.left+tile.width*(i?.74:.26);
+        const approvedScale=Math.min(tile.width/64,tile.height/77)*(phone?1.1:1);
+        const allEdgeFits=[.26,.74].map(f=>Math.min((tile.left+tile.width*f-board.left)/28.25,(board.right-tile.left-tile.width*f)/28.25,(cy-board.top)/75.25,(board.bottom-cy)/3));
+        assert.ok(Math.abs(p.scale-Math.min(approvedScale,...allEdgeFits))<.003,'approved two-pawn size');
+        assert.ok(Math.abs(p.pathTip.x-x)<eps && Math.abs(p.pathTip.y-cy)<eps,'approved two-pawn path anchor');
         heads.push(p.head);
       } else {
-        assert.ok(b.left>=tile.left-eps && b.right<=tile.right+eps && b.top>=tile.top-eps && b.bottom<=tile.bottom+eps,JSON.stringify({tile,b}));
+        assert.ok(b.left>=tile.left-eps && b.right<=tile.right+eps && b.top>=tile.top-eps && b.bottom<=tile.bottom+eps,JSON.stringify({region,tile,b}));
+        if(region==='yard') {
+          assert.ok(b.left>=base.left-eps && b.right<=base.right+eps && b.top>=base.top-eps && b.bottom<=base.bottom+eps,'home artwork inside its color base');
+          assert.ok(Math.abs(p.scale-homeScale)<.003,JSON.stringify({reason:'deliberate shared home-slot size',p,homeScale,tile,base}));
+          const expectedY=cy+(77+1.25*Math.hypot(10,12)/10-40.875)*homeScale;
+          assert.ok(Math.abs(tip.x-cx)<eps && Math.abs(tip.y-expectedY)<eps,'home slot painted-center alignment');
+          homeScales.push(p.scale);
+        } else if(count===1) {
+          assert.ok(Math.abs(tip.x-cx)<eps && Math.abs(tip.y-cy)<eps,'visible single tip at tile center');
+          assert.ok(Math.abs(p.scale-singleScale)<.003,'one shared single scale from actual route-cell dimensions');
+          singleSizes.push({w:b.right-b.left,h:b.bottom-b.top});
+        }
       }
     }
-    assert.ok(Math.abs(pawns.reduce((s,p)=>s+p.pathTip.x,0)/count-cx)<eps,'tip x symmetry');
-    const anchors=pawns.map(p=>count<=2?p.pathTip:p.tip);
+    if(region==='yard')continue;
+    const anchors=pawns.map(p=>pair?p.pathTip:p.tip);
+    assert.ok(Math.abs(anchors.reduce((s,p)=>s+p.x,0)/count-cx)<eps,'tip x symmetry');
     assert.ok(Math.abs(anchors.reduce((s,p)=>s+p.y,0)/count-cy)<eps,'tip y symmetry');
-    if(count>=3) for(let i=0;i<count;i++) for(let j=i+1;j<count;j++) {
+    if(!pair)for(let i=0;i<count;i++)for(let j=i+1;j<count;j++) {
       const a=pawns[i].bounds,b=pawns[j].bounds;
-      assert.ok(a.right<=b.left+eps || b.right<=a.left+eps || a.bottom<=b.top+eps || b.bottom<=a.top+eps,'compact painted artwork does not overlap');
+      assert.ok(a.right<=b.left+eps||b.right<=a.left+eps||a.bottom<=b.top+eps||b.bottom<=a.top+eps,'compact artwork does not overlap');
     }
   }
-  for(let i=0;i<heads.length;i++) for(let j=i+1;j<heads.length;j++) {
-    const a=heads[i],b=heads[j];
-    assert.ok(a.right<=b.left+eps || b.right<=a.left+eps || a.bottom<=b.top+eps || b.bottom<=a.top+eps,'approved artwork overhang does not obscure another head');
+  if(singleSizes.length)for(const axis of ['w','h'])assert.ok(Math.max(...singleSizes.map(s=>s[axis]))-Math.min(...singleSizes.map(s=>s[axis]))<eps,'all single artwork has identical size across track, star, home-path, finish, color and orientation');
+  if(homeScales.length)assert.ok(Math.max(...homeScales)-Math.min(...homeScales)<.003,'all four bases share the same home-slot size');
+  for(const n of homeCounts.values())assert.equal(n,count,'requested home pawn count distributed across existing slots');
+  for(let i=0;i<heads.length;i++)for(let j=i+1;j<heads.length;j++) {
+    const a=heads[i],b=heads[j];assert.ok(a.right<=b.left+eps||b.right<=a.left+eps||a.bottom<=b.top+eps||b.bottom<=a.top+eps,'approved pairs retain visible heads');
   }
+}
+
+async function populate(page,count,colorOffset=0,zoom=1) {
+  await page.evaluate(({count,colorOffset,zoom})=>{
+    document.body.style.zoom=zoom;
+    window.pawnTemplate??=document.querySelector('.pin-pawn').cloneNode(true);
+    document.querySelectorAll('.pin-pawn').forEach(p=>p.remove());
+    const colors=['#ed0010','#0064ff','#00c600','#ffdf00'];
+    function add(tile,index,color) {
+      const p=window.pawnTemplate.cloneNode(true);p.className=`ludo-pawn sprite-pawn pin-pawn ${count>1?'stacked-pawn pile-size-'+count:''}`;
+      if(tile.classList.contains('yard'))p.className='ludo-pawn sprite-pawn pin-pawn yard-pawn';
+      if(tile.classList.contains('final-square'))p.classList.add('finished-pawn','finished-pawn-slot',`final-slot-${index+1}`);
+      p.removeAttribute('style');p.style.setProperty('--piece-color',colors[color%4]);tile.append(p);
+    }
+    [...document.querySelectorAll('.track, .lane')].forEach((tile,n)=>{for(let i=0;i<count;i++)add(tile,i,n+i+colorOffset);});
+    for(let seat=0;seat<4;seat++)[...document.querySelectorAll(`.yard-seat-${seat}`)].slice(0,count).forEach((tile,i)=>add(tile,i,seat+colorOffset));
+    window.__luduResolvePawnGeometry();
+  },{count,colorOffset,zoom});
 }
 
 async function approvedReference(page) {
@@ -119,27 +157,25 @@ async function approvedReference(page) {
     results.push(await approvedReference(approved));await approved.close();
     for(const width of [360,390,1440]) {
       const page=await browser.newPage({viewport:{width,height:1000},reducedMotion:'reduce'});
-      await page.goto(`${process.env.BASE_URL || 'http://127.0.0.1:4173'}/games/ludo/?screen=board&players=2&mode=friend`,{waitUntil:'networkidle'});
+      await page.goto(`${process.env.BASE_URL || 'http://127.0.0.1:4173'}/games/ludo/?screen=board&players=4&mode=friend`,{waitUntil:'networkidle'});
       await page.evaluate(() => {window.pawnTemplate=document.querySelector('.pin-pawn').cloneNode(true);});
       for(const zoom of [1,1.25,.8]) for(const count of [1,2,3,4]) {
-        await page.evaluate(({count,zoom}) => {
-          document.body.style.zoom=zoom;
-          document.querySelectorAll('.pin-pawn').forEach(p=>p.remove());
-          for(const tile of document.querySelectorAll('.track, .lane:not(.final-square)')) for(let i=0;i<count;i++) {
-            const p=window.pawnTemplate.cloneNode(true);
-            p.className=`ludo-pawn sprite-pawn pin-pawn ${count>1?'stacked-pawn pile-size-'+count:''}`;
-            p.removeAttribute('style');p.style.setProperty('--piece-color',['#ffdf00','#ec202c','#1685ef','#23b544'][i]);
-            tile.append(p);
-          }
-          window.__luduResolvePawnGeometry();
-        },{count,zoom});
-        await page.waitForFunction(() => [...document.querySelectorAll('.track svg, .lane:not(.final-square) svg')].every(svg=>svg.classList.contains('tile-anchored') && getComputedStyle(svg).transform==='none'));
+        await populate(page,count,0,zoom);
+        await page.waitForFunction(() => [...document.querySelectorAll('.track svg, .lane svg, .yard svg')].every(svg=>svg.classList.contains('tile-anchored') && getComputedStyle(svg).transform==='none'));
         // Force a complete rendered browser frame before measuring path bounds.
         await page.locator('#board').screenshot({path:`screenshots/ludo-tip-${width}-${zoom}-${count}.png`});
         const data=await measure(page); verify(data,count);
         fs.writeFileSync(`test-results/ludo-tip-${width}-${zoom}-${count}.json`,JSON.stringify(data,null,2));
         results.push({width,zoom,count,tiles:data.length,status:'passed'});
       }
+      for(const offset of [1,2,3]) {
+        await populate(page,1,offset);
+        await page.locator('#board').screenshot({path:`screenshots/ludo-single-colors-${width}-${offset}.png`});
+        const data=await measure(page);verify(data,1);
+        fs.writeFileSync(`test-results/ludo-single-colors-${width}-${offset}.json`,JSON.stringify(data,null,2));
+        results.push({width,scenario:'all colors across all regions',offset,status:'passed'});
+      }
+      await populate(page,4,0,.8);
       await page.setViewportSize({width:width===360?600:360,height:850});
       await page.locator('#board').screenshot({path:`screenshots/ludo-tip-resized-${width}.png`});
       await page.waitForTimeout(100);
@@ -150,6 +186,34 @@ async function approvedReference(page) {
       await page.locator('#board').screenshot({path:`screenshots/ludo-tip-browser-zoom-${width}.png`});
       verify(await measure(page),4);
       results.push({width,scenario:'Chromium visual viewport zoom 125%',status:'passed'});
+      await page.close();
+    }
+    for(const width of [360,1440]) {
+      const page=await browser.newPage({viewport:{width,height:1000},deviceScaleFactor:width===360?3:2,reducedMotion:'reduce'});
+      await page.goto(`${process.env.BASE_URL || 'http://127.0.0.1:4173'}/games/ludo/?screen=board&players=4&mode=friend`,{waitUntil:'networkidle'});
+      await populate(page,1);
+      await page.locator('#board').screenshot({path:`screenshots/ludo-single-board-${width}.png`});
+      verify(await measure(page),1);
+      const clips=await page.evaluate(()=>{
+        const cells=[...document.querySelectorAll('#board .track')];
+        const groups={upper:cells.filter(t=>parseInt(t.style.gridRowStart)<=3),bottom:cells.filter(t=>parseInt(t.style.gridRowStart)>=13),'red-path':[...document.querySelectorAll('.lane.red')],home:[...document.querySelectorAll('.yard-seat-3')]};
+        return Object.fromEntries(Object.entries(groups).map(([name,tiles])=>{
+          const r=tiles.map(t=>t.getBoundingClientRect());const x=Math.min(...r.map(t=>t.left))-2,y=Math.min(...r.map(t=>t.top))-2;
+          return [name,{x,y,width:Math.max(...r.map(t=>t.right))-x+2,height:Math.max(...r.map(t=>t.bottom))-y+2}];
+        }));
+      });
+      for(const [name,clip]of Object.entries(clips))await page.screenshot({path:`screenshots/ludo-single-${name}-${width}.png`,clip});
+      results.push({width,scenario:'high-DPI single-pawn closeups across regions',status:'passed'});
+      await page.emulateMedia({reducedMotion:'no-preference'});
+      await page.evaluate(()=>{
+        for(const pawn of document.querySelectorAll('.track>.single-tile-pawn, .lane:not(.final-square)>.single-tile-pawn')) {
+          pawn.classList.add('pawn-ready-hint','playable-token');
+          for(const animation of pawn.getAnimations()){animation.pause();animation.currentTime=310;}
+        }
+      });
+      await page.locator('#board').screenshot({path:`screenshots/ludo-single-ready-hints-${width}.png`});
+      verify(await measure(page),1);
+      results.push({width,scenario:'single-pawn ready hint at peak retains size, centered tip and containment',status:'passed'});
       await page.close();
     }
   } finally {

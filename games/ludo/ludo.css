@@ -1336,7 +1336,7 @@ body.ludo-game.playing-ludo .board.ludo span.pin-pawn.finished-pawn.moving{
 /* Keep the whole pin inside its board square instead of hanging above it. */
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn .pin-pawn-art{
   left:calc(50% + var(--pile-x,0%))!important;top:calc(50% + var(--pile-y,0%))!important;
-  width:100%!important;height:100%!important;transform:translate(-50%,-50%)!important;overflow:visible
+  width:100%!important;height:100%!important;transform:translate(-50%,-96.25%)!important;overflow:visible
 }
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2 .pin-pawn-art{width:44%!important;height:54%!important}
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-3 .pin-pawn-art,
@@ -1520,3 +1520,6 @@ body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration.rank-
 
 /* Final track-size lock: start squares and numbered path squares use identical artwork bounds. */
 body.ludo-game.playing-ludo #board.board.ludo :is(.track,.lane)>.pin-pawn:not(.pile-size-3):not(.pile-size-4):not(.pile-size-dense)>.pin-pawn-art{width:100%!important;height:100%!important;scale:1!important;zoom:1!important}
+
+/* The pointed tip, not the art box center, is anchored to the middle of each board tile. */
+body.ludo-game.playing-ludo #board.board.ludo :is(.track,.lane)>.pin-pawn>.pin-pawn-art{transform:translate(-50%,-96.25%)!important;transform-origin:50% 50%}

@@ -3,7 +3,7 @@ name: Ludu Mahir PR #101 Playwright verification
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches: [main, fix/ludo-pawn-visibility-celebration]
     paths:
       - 'games/ludo.mjs'
       - 'games/ludo/**'
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   ludo-playwright:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.number == 101
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.number == 101 || github.event.pull_request.number == 102
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

@@ -41,6 +41,7 @@ document.getElementById("setup-colors").addEventListener("click",()=>{document.g
 document.getElementById("online-coming").addEventListener("click",()=>document.getElementById("notice-dialog").showModal());
 document.getElementById("close-notice").addEventListener("click",()=>document.getElementById("notice-dialog").close());
 const playScreen=document.querySelector("#ludo-play");
+const resultPanel=document.querySelector("#result-panel");
 if(boardLaunch){
   setupScreen.hidden=true;
   playScreen.hidden=false;
@@ -607,9 +608,20 @@ function render() {
     const teamId=activeTeams[player];
     const badge=document.createElement("div");
     badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;
-    badge.innerHTML=rank===1 ? `<span class="winner-firework winner-firework-left" aria-hidden="true"></span><span class="winner-firework winner-firework-right" aria-hidden="true"></span><svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><strong class="winner-place">1st</strong><span class="winner-ribbon">WINNER</span>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
+    badge.innerHTML=rank===1 ? `<span class="winner-firework winner-firework-left" aria-hidden="true"></span><span class="winner-firework winner-firework-right" aria-hidden="true"></span><svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><strong class="winner-place">1st</strong><span class="winner-ribbon">WINNER</span>` : rank===2 ? `<span class="silver-crown" aria-hidden="true">♛</span><strong>2nd</strong><span class="winner-ribbon">RUNNER-UP</span>` : `<strong>${rank}${rank===3?"rd":"th"}</strong>`;
     game.board.querySelector(`.base-${teamId}`).append(badge);
   });
+
+  if(state.winner!==null){
+    const twoPlayer=state.pieces.length===2;
+    const rows=twoPlayer
+      ? state.pieces.map((_,player)=>({player,label:player===state.winner?(isBot(player)?"You Lose":"Winner"):(isBot(player)?"Bot":"You Lose")}))
+      : state.ranks.map((rank,player)=>({player,label:`${rank}${rank===1?"st":rank===2?"nd":rank===3?"rd":"th"}`})).sort((a,b)=>a.label.localeCompare(b.label,undefined,{numeric:true}));
+    resultPanel.hidden=false;
+    resultPanel.className=`result-panel ${twoPlayer?(state.winner===0&&!isBot(0)||state.winner!==0&&isBot(0)?"winner":"defeat"):"ranked"}`;
+    resultPanel.innerHTML=`<h2>${twoPlayer?(isBot(state.winner)?"You Lose":"Winner"):"Final Results"}</h2><div class="result-list">${rows.map(row=>{const p=row.player;return `<div class="result-row"><span class="result-color" style="--result-color:${getColor(p)[1]}"></span><strong>${getColor(p)[0]}</strong><span>${row.label}</span></div>`}).join("")}</div><button type="button" class="result-new-game">New Game</button>`;
+    resultPanel.querySelector(".result-new-game")?.addEventListener("click",()=>game.restart());
+  } else resultPanel.hidden=true;
 
   const currentTeam=getColor(state.turn)[0];
 

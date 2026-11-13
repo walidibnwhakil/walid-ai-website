@@ -56,6 +56,13 @@ export function moveLudo(state,index) {
   const ranks=[...state.ranks];
   let rankCount=state.rankCount;
   const finished=pieces[turn].every(position=>position===56);
+  const bonus=roll===6 || captured.length>0 || step===56;
+  // A two-player game is a head-to-head result, not a ranking table.
+  // Keep ranks empty so the UI can show Winner/You Lose instead of 1st/2nd.
+  if(pieces.length===2) {
+    const next=finished?turn:bonus?turn:nextPlayer(state,turn);
+    return {...state,pieces,turn:next,roll:0,sixChain:bonus?state.sixChain:0,ranks:[0,0],rankCount:0,winner:finished?turn:null,lastCaptured:captured,lastMove:{player:turn,token:index,from:old,to:step,roll}};
+  }
   if(finished && !ranks[turn]) ranks[turn]=++rankCount;
   const remaining=pieces.length-rankCount;
   if(remaining===1) {
@@ -64,7 +71,6 @@ export function moveLudo(state,index) {
   }
   const winner=ranks.includes(1) ? ranks.indexOf(1) : null;
   const terminal=rankCount===pieces.length;
-  const bonus=roll===6 || captured.length>0 || step===56;
   const next=terminal ? turn : ranks[turn] ? nextPlayer(state,turn) : bonus ? turn : nextPlayer(state,turn);
   return {...state,pieces,turn:next,roll:0,sixChain:bonus ? state.sixChain : 0,ranks,rankCount,winner:terminal ? winner : null,lastCaptured:captured,lastMove:{player:turn,token:index,from:old,to:step,roll}};
 }

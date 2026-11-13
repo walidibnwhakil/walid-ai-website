@@ -23,9 +23,9 @@ test("safe squares protect tokens and open-square capture grants another roll",(
  s=newLudo(2,[0,1]); s.pieces[0][0]=0; s.pieces[1][0]=14;
  s=rollLudo(s,1); s=moveLudo(s,0); assert.deepEqual(s.lastCaptured,[{player:1,token:0,step:14}]); assert.equal(s.pieces[1][0],-1); assert.equal(s.turn,0);
 });
-test("finished players receive ranks and are skipped",()=>{
+test("two-player finish is a head-to-head winner result",()=>{
  let s=newLudo(2); s.pieces[0]=[55,56,56,56]; s=rollLudo(s,1); s=moveLudo(s,0);
- assert.equal(s.ranks[0],1); assert.equal(s.ranks[1],2); assert.equal(s.winner,0);
+ assert.deepEqual(s.ranks,[0,0]); assert.equal(s.winner,0); assert.equal(s.rankCount,0);
 });
 test("invalid moves and rolls cannot mutate state",()=>{
  const s=newLudo(2); assert.equal(moveLudo(s,0),s); assert.equal(rollLudo(s,0),s);

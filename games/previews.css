@@ -108,7 +108,7 @@ main { max-width: 1050px; }
 .riddlex-card-subtitle {position:absolute;left:10%;right:10%;top:63%;padding:5px 8px;color:#fff0d0;font:600 clamp(.72rem,2.7vw,1rem) Georgia,serif;line-height:1.2;text-align:center;text-shadow:0 2px 3px #1d0b04;background:#24100799}
 .riddlex-card-cta {position:absolute;left:21.5%;right:21.5%;bottom:6%;padding:7px 12px;border:2px solid #f0c35c;border-radius:999px;background:linear-gradient(180deg,#b87324,#71300f);box-shadow:inset 0 1px #ffe7a0,0 3px 8px #0009;color:#fff0c2;font:700 clamp(.85rem,3.2vw,1.15rem) Georgia,serif;text-align:center;text-shadow:0 2px 2px #351000}
 
-/* Keep the games-page heading and requested subheading centered above the artwork cards. */
+/* Keep the games-page heading and requested subheading centered above the artwork cards. */\n.games > li { min-width: 0; }
 .games-heading,
 .games-subheading { text-align: center; }
 .games-heading { margin: 0.35em 0 0; }

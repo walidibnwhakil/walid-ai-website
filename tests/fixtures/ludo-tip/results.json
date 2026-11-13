@@ -1,0 +1,284 @@
+[
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 1.25,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "zoom": 0.8,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "live resize without manual resolver",
+    "status": "passed"
+  },
+  {
+    "width": 360,
+    "scenario": "Chromium visual viewport zoom 125%",
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 1.25,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "zoom": 0.8,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "scenario": "live resize without manual resolver",
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "scenario": "Chromium visual viewport zoom 125%",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 1.25,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 1,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 2,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 3,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "zoom": 0.8,
+    "count": 4,
+    "tiles": 72,
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "live resize without manual resolver",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "scenario": "Chromium visual viewport zoom 125%",
+    "status": "passed"
+  }
+]

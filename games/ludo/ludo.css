@@ -1523,3 +1523,10 @@ body.ludo-game.playing-ludo #board.board.ludo :is(.track,.lane)>.pin-pawn:not(.p
 
 /* The pointed tip, not the art box center, is anchored to the middle of each board tile. */
 body.ludo-game.playing-ludo #board.board.ludo :is(.track,.lane)>.pin-pawn>.pin-pawn-art{transform:translate(-50%,-96.25%)!important;transform-origin:50% 50%}
+
+/* The SVG viewport is the tile; only its inner group carries anchor geometry. */
+body.ludo-game.playing-ludo #board.board.ludo :is(.track,.lane):not(.final-square)>span.ludo-pawn.pin-pawn>svg.pin-pawn-art.tile-anchored {
+  position:absolute!important;overflow:visible!important;filter:none!important;
+  left:0!important;top:0!important;width:100%!important;height:100%!important;
+  transform:none!important;scale:1!important;zoom:1!important;
+}

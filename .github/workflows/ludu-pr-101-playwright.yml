@@ -8,6 +8,8 @@ on:
       - 'games/ludo.mjs'
       - 'games/ludo/**'
       - '.github/workflows/ludu-pr-101-playwright.yml'
+      - 'tests/ludo*.cjs'
+      - 'tests/ludo*.mjs'
 
 permissions:
   contents: read
@@ -35,6 +37,7 @@ jobs:
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ludu-http.log 2>&1 &
           node tests/ludo-pr-101.spec.mjs
+          node tests/ludo-tip-geometry.cjs
         env:
           BASE_URL: http://127.0.0.1:4173
       - name: Upload screenshots and test artifacts

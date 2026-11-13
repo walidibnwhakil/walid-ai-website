@@ -1,7 +1,13 @@
 import {setGameInProgress} from "./refresh-guard.mjs";
-import {pawnSlots} from "./ludo/pawn-layout.mjs";
+import {pawnSlots, layoutTrackPawns} from "./ludo/pawn-layout.mjs";
 import {gameShell, control, choose} from "./shell.mjs";
 import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs?v=20261107goal56";
+
+const pawnResizeObserver = new ResizeObserver(() => {
+  const board = document.querySelector("#board");
+  if (board) layoutTrackPawns(board);
+});
+pawnResizeObserver.observe(document.documentElement);
 
 const teams = ["Red", "Blue", "Green", "Yellow"];
 const setupScreen=document.querySelector("#ludo-setup");
@@ -591,22 +597,6 @@ function render() {
     }
     square.append(marker);
   }));
-  // Use one measured board-square footprint so path orientation/cell geometry cannot resize single pawns.
-  const referenceSquare=[...squares.values()].find(square=>square.classList.contains("track")||square.classList.contains("lane"));
-  const referenceRect=referenceSquare?.getBoundingClientRect();
-  if(referenceRect){
-    const baseWidth=referenceRect.width;
-    const baseHeight=referenceRect.height;
-    game.board.querySelectorAll(".track > .pin-pawn > .pin-pawn-art, .lane > .pin-pawn > .pin-pawn-art").forEach(art=>{
-      const pawn=art.parentElement;
-      const compact=pawn.classList.contains("pile-size-3")||pawn.classList.contains("pile-size-4")||pawn.classList.contains("pile-size-dense");
-      if(!compact){
-        art.style.setProperty("width",`${baseWidth}px`,"important");
-        art.style.setProperty("height",`${baseHeight}px`,"important");
-      }
-    });
-  }
-
   for(const square of squares.values()){
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
     if(!pile.length)continue;
@@ -649,75 +639,10 @@ function render() {
       piece.style.zIndex=piece.classList.contains("playable-token")?"80":String(20+index);
     });
   }
-  // Resolve the actual painted pawn rectangles, not just the square relationship.
-  // This keeps full-size artwork and leaves every pawn anchored to its own square.
-  function resolveAdjacentPawnGeometry() {
-    const candidates=[...squares.entries()].map(([key,square])=>({
-      key, pawn:[...square.children].find(piece=>piece.classList.contains("ludo-pawn")),
-      pile:[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"))
-    })).filter(item=>item.pawn&&item.pile.length===1);
-    candidates.forEach(({pawn})=>{
-      pawn.classList.remove("adjacent-pawn");
-      pawn.style.removeProperty("--adjacent-x");
-      pawn.style.removeProperty("--adjacent-y");
-      pawn.querySelector(".pin-pawn-art")?.style.removeProperty("transform");
-    });
-    const offsets=new Map(candidates.map(({pawn})=>[pawn,{x:0,y:0}]));
-    const overlaps=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
-    const gap=2;
-    // Four passes handle horizontal, vertical, diagonal, and several neighbors deterministically.
-    for(let pass=0;pass<4;pass++){
-      for(let i=0;i<candidates.length;i++){
-        for(let j=i+1;j<candidates.length;j++){
-          const a=candidates[i].pawn,b=candidates[j].pawn;
-          const ar=a.querySelector(".pin-pawn-art")?.getBoundingClientRect();
-          const br=b.querySelector(".pin-pawn-art")?.getBoundingClientRect();
-          if(!ar||!br||!overlaps(ar,br))continue;
-          const acx=(ar.left+ar.right)/2,acy=(ar.top+ar.bottom)/2;
-          const bcx=(br.left+br.right)/2,bcy=(br.top+br.bottom)/2;
-          const dx=bcx-acx,dy=bcy-acy;
-          if(Math.abs(dx)>=Math.abs(dy)){
-            const push=(Math.min(ar.right,br.right)-Math.max(ar.left,br.left))/2+gap;
-            const direction=dx>=0?1:-1;
-            offsets.get(a).x-=direction*push*2;
-          } else {
-            const push=(Math.min(ar.bottom,br.bottom)-Math.max(ar.top,br.top))/2+gap;
-            const direction=dy>=0?1:-1;
-            offsets.get(a).y-=direction*push*2;
-          }
-          a.classList.add("adjacent-pawn"); b.classList.add("adjacent-pawn");
-          const applyOffset=(pawn,offset)=>{
-            const square=pawn.parentElement?.getBoundingClientRect();
-            const limitX=square? square.width*.28:24;
-            const limitY=square? square.height*.28:24;
-            let x=Math.max(-limitX,Math.min(limitX,offset.x));
-            let y=Math.max(-limitY,Math.min(limitY,offset.y));
-            const art=pawn.querySelector(".pin-pawn-art");
-            if(!art)return;
-            const setTransform=()=>art.style.setProperty("transform",`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`,"important");
-            setTransform();
-            const head=pawn.querySelector(".pin-face")||art;
-            const headRect=head.getBoundingClientRect();
-            const squareRect=square;
-            if(squareRect){
-              if(headRect.left<squareRect.left)x+=squareRect.left-headRect.left;
-              if(headRect.right>squareRect.right)x-=headRect.right-squareRect.right;
-              if(headRect.top<squareRect.top)y+=squareRect.top-headRect.top;
-              if(headRect.bottom>squareRect.bottom)y-=headRect.bottom-squareRect.bottom;
-              x=Math.max(-limitX,Math.min(limitX,x));
-              y=Math.max(-limitY,Math.min(limitY,y));
-              setTransform();
-            }
-          };
-          applyOffset(a,offsets.get(a));
-          applyOffset(b,offsets.get(b));
-        }
-      }
-    }
-    return candidates.map(({key,pawn})=>({key,pawn}));
-  }
-  window.__luduResolvePawnGeometry=resolveAdjacentPawnGeometry;
-  resolveAdjacentPawnGeometry();
+  pawnResizeObserver.observe(game.board);
+  game.board.querySelectorAll(".track, .lane:not(.final-square)").forEach(tile=>pawnResizeObserver.observe(tile));
+  layoutTrackPawns(game.board);
+  window.__luduResolvePawnGeometry=()=>layoutTrackPawns(game.board);
 
   game.board.classList.toggle("final-rank-board",(state.pieces.length>=3 || (state.pieces.length===2&&modeSelect.value!=="bot"))&&state.winner!==null);
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());

@@ -12,7 +12,7 @@ async function check(name, fn) {
   catch (error) { results.push({ name, status: "failed", error: String(error.stack || error) }); throw error; }
 }
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH });
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
@@ -61,85 +61,7 @@ try {
     await four.close();
   });
 
-  await check("two adjacent pawns keep full artwork and are not clipped", async () => {
-    const data = await page.evaluate(() => {
-      const board = document.querySelector("#board");
-      const tile = document.createElement("div");
-      tile.className = "track";
-      tile.style.cssText = "position:relative;width:100px;height:100px;overflow:visible";
-      const pawns = [1, 2].map((n) => {
-        const pawn = document.createElement("span");
-        pawn.className = "pin-pawn pile-size-2";
-        pawn.dataset.testPawn = String(n);
-        const art = document.createElement("span");
-        art.className = "pin-pawn-art";
-        pawn.append(art); tile.append(pawn); return { pawn, art };
-      });
-      board.append(tile);
-      return pawns.map(({ pawn, art }) => ({
-        width: getComputedStyle(art).width,
-        height: getComputedStyle(art).height,
-        overflow: getComputedStyle(pawn).overflow
-      }));
-    });
-    assert.equal(data[0].width, data[1].width);
-    assert.equal(data[0].height, data[1].height);
-    for (const item of data) assert.equal(item.overflow, "visible");
-    assert.match(data[0].width, /px$/);
-    assert.match(data[0].height, /px$/);
-  });
-
-  await check("adjacent pawn heads stay visible while bodies may overlap", async () => {
-    const data = await page.evaluate(async () => {
-      const board = document.querySelector("#board");
-      const tiles = [...board.querySelectorAll(".track")].slice(0, 4);
-      const pawns = tiles.map((tile, index) => {
-        const pawn = document.createElement("span");
-        pawn.className = "pin-pawn ludo-pawn";
-        pawn.dataset.testPawn = String(index);
-        const art = document.createElement("span");
-        art.className = "pin-pawn-art";
-        art.style.cssText = "position:relative;display:block";
-        const head = document.createElement("span");
-        head.className = "test-pawn-head pin-face";
-        head.style.cssText = "position:absolute;left:50%;top:8%;width:34%;height:34%;border-radius:50%;background:#fff;border:2px solid #123;transform:translateX(-50%)";
-        art.append(head); pawn.append(art); tile.append(pawn); return { pawn, art, head, tile };
-      });
-      window.__luduResolvePawnGeometry();
-      await new Promise(requestAnimationFrame);
-      return pawns.map(({art, head, tile}) => ({
-        art: art.getBoundingClientRect().toJSON(),
-        head: head.getBoundingClientRect().toJSON(),
-        tile: tile.getBoundingClientRect().toJSON()
-      }));
-    });
-    for (const item of data) {
-      assert.ok(item.art.width >= 40 && item.art.height >= 40, "single pawn stayed full-size");
-      assert.ok(item.head.width > 0 && item.head.height > 0, "pawn head is painted");
-      assert.ok(item.head.left >= item.tile.left && item.head.right <= item.tile.right, "head stays inside its tile horizontally");
-      assert.ok(item.head.top >= item.tile.top && item.head.bottom <= item.tile.bottom, "head stays inside its tile vertically");
-    }
-    for (let i = 0; i < data.length; i++) {
-      for (let j = i + 1; j < data.length; j++) {
-        const a = data[i].head, b = data[j].head;
-        const overlapWidth = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
-        const overlapHeight = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
-        assert.equal(overlapWidth * overlapHeight, 0, "pawn heads " + i + "/" + j + " overlap");
-      }
-    }
-    await page.screenshot({ path: "screenshots/ludo-desktop-adjacent-heads-visible.png", fullPage: true });
-  });
-
-  await check("three-pawn pile may use compact layout", async () => {
-    const compact = await page.evaluate(() => {
-      const board = document.querySelector("#board");
-      const tile = document.createElement("div"); tile.className = "track";
-      const pawn = document.createElement("span"); pawn.className = "pin-pawn pile-size-3";
-      const art = document.createElement("span"); art.className = "pin-pawn-art"; pawn.append(art); tile.append(pawn); board.append(tile);
-      return getComputedStyle(art).width;
-    });
-    assert.match(compact, /px$/);
-  });
+  // Track anchor and painted-bound regressions live in ludo-tip-geometry.cjs.
 
   await check("four finished pawns remain full-size inside their color region", async () => {
     const data = await page.evaluate(() => {

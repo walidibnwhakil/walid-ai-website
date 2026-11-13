@@ -89,7 +89,7 @@ try {
     assert.match(data[0].height, /px$/);
   });
 
-  await check("adjacent single pawns have no painted-rectangle overlap", async () => {
+  await check("adjacent pawn heads stay visible while bodies may overlap", async () => {
     const data = await page.evaluate(async () => {
       const board = document.querySelector("#board");
       const tiles = [...board.querySelectorAll(".track")].slice(0, 4);
@@ -99,29 +99,35 @@ try {
         pawn.dataset.testPawn = String(index);
         const art = document.createElement("span");
         art.className = "pin-pawn-art";
-        pawn.append(art); tile.append(pawn); return { pawn, art };
+        art.style.cssText = "position:relative;display:block";
+        const head = document.createElement("span");
+        head.className = "test-pawn-head";
+        head.style.cssText = "position:absolute;left:50%;top:8%;width:34%;height:34%;border-radius:50%;background:#fff;border:2px solid #123;transform:translateX(-50%)";
+        art.append(head); pawn.append(art); tile.append(pawn); return { pawn, art, head, tile };
       });
       window.__luduResolvePawnGeometry();
       await new Promise(requestAnimationFrame);
-      const rects = pawns.map(({art}) => {
-        const rect = art.getBoundingClientRect();
-        return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height };
-      });
-      return { rects, tiles: tiles.map(tile => tile.getBoundingClientRect().toJSON()) };
+      return pawns.map(({art, head, tile}) => ({
+        art: art.getBoundingClientRect().toJSON(),
+        head: head.getBoundingClientRect().toJSON(),
+        tile: tile.getBoundingClientRect().toJSON()
+      }));
     });
-    for (const rect of data.rects) {
-      assert.ok(rect.width > 0 && rect.height > 0);
+    for (const item of data) {
+      assert.ok(item.art.width >= 40 && item.art.height >= 40, "single pawn stayed full-size");
+      assert.ok(item.head.width > 0 && item.head.height > 0, "pawn head is painted");
+      assert.ok(item.head.left >= item.tile.left && item.head.right <= item.tile.right, "head stays inside its tile horizontally");
+      assert.ok(item.head.top >= item.tile.top && item.head.bottom <= item.tile.bottom, "head stays inside its tile vertically");
     }
-    for (let i = 0; i < data.rects.length; i++) {
-      for (let j = i + 1; j < data.rects.length; j++) {
-        const a = data.rects[i], b = data.rects[j];
+    for (let i = 0; i < data.length; i++) {
+      for (let j = i + 1; j < data.length; j++) {
+        const a = data[i].head, b = data[j].head;
         const overlapWidth = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
         const overlapHeight = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
-        assert.equal(overlapWidth * overlapHeight, 0, "painted pawns " + i + "/" + j + " overlap");
+        assert.equal(overlapWidth * overlapHeight, 0, "pawn heads " + i + "/" + j + " overlap");
       }
     }
-    assert.ok(data.rects.every(rect => rect.width >= 40 && rect.height >= 40), "single pawns stayed full-size");
-    await page.screenshot({ path: "screenshots/ludo-desktop-adjacent-no-overlap.png", fullPage: true });
+    await page.screenshot({ path: "screenshots/ludo-desktop-adjacent-heads-visible.png", fullPage: true });
   });
 
   await check("three-pawn pile may use compact layout", async () => {

@@ -773,117 +773,6 @@ dialog .promotion img {
     width: 110%;
   }
 }
-
-@media (max-width: 520px) and (max-height: 900px) {
-  .hero-pieces {
-    height: 120px;
-  }
-  .setup-panel {
-    padding-top: 9px;
-    padding-bottom: 9px;
-  }
-  fieldset {
-    padding-top: 5px;
-    padding-bottom: 8px;
-  }
-  .start-button {
-    margin-top: 10px;
-    margin-bottom: 12px;
-  }
-  .menu-bottom button {
-    min-height: 68px;
-  }
-}
-
-/* The menu is a single-screen surface on short desktop and phone viewports.
-   Keep every control reachable without making the page taller than the viewport. */
-@media (min-width: 1001px) and (max-height: 900px) {
-  main {
-    min-height: 100dvh;
-    padding: max(6px, env(safe-area-inset-top)) 22px
-      max(8px, env(safe-area-inset-bottom));
-  }
-  header {
-    min-height: 72px;
-  }
-  .hero-pieces {
-    height: 112px;
-  }
-  .setup-panel {
-    padding: 8px 24px;
-  }
-  fieldset {
-    padding: 5px 0 8px;
-  }
-  legend {
-    font-size: 20px;
-  }
-  .choices {
-    gap: 12px;
-  }
-  .choices button {
-    padding: 9px 8px;
-    min-height: 42px;
-  }
-  .start-button {
-    margin: 8px auto 10px;
-    padding: 10px;
-    font-size: 28px;
-    min-height: 54px;
-  }
-  .menu-bottom {
-    gap: 10px;
-  }
-  .menu-bottom button {
-    min-height: 66px;
-  }
-}
-
-@media (max-width: 520px) and (max-height: 780px) {
-  body {
-    min-height: 100dvh;
-  }
-  main {
-    min-height: 100dvh;
-    padding-bottom: max(4px, env(safe-area-inset-bottom));
-  }
-  header {
-    min-height: 58px;
-  }
-  .hero-pieces {
-    height: 104px;
-  }
-  .setup-panel {
-    padding: 8px 10px;
-  }
-  fieldset {
-    padding: 3px 0 5px;
-  }
-  legend {
-    font-size: 17px;
-  }
-  .choices {
-    gap: 5px;
-  }
-  .choices button {
-    min-height: 42px;
-    padding: 7px 3px;
-  }
-  .start-button {
-    margin: 8px auto 10px;
-    min-height: 48px;
-    font-size: 25px;
-    padding: 9px;
-  }
-  .menu-bottom {
-    gap: 7px;
-  }
-  .menu-bottom button {
-    min-height: 58px;
-    font-size: 15px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *:before,
@@ -1056,3 +945,145 @@ dialog .promotion img {
 header .gold-button {
   white-space: nowrap;
 }
+
+@media (max-width: 600px) {
+  body.game-shell { min-height: 100dvh; height: 100dvh; overflow: hidden; }
+  body.game-shell main {
+    height: 100dvh;
+    min-height: 0;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+  body.game-shell #game {
+    height: calc(100dvh - 78px - env(safe-area-inset-bottom));
+    min-height: 0;
+    overflow: hidden;
+    align-content: start;
+  }
+  body.game-shell #game .board-area { flex: 0 0 auto; }
+  body.game-shell #game .game-controls {
+    flex: 0 0 auto;
+    max-height: 91px;
+    overflow: hidden;
+    padding: 2px 0;
+    gap: 5px;
+  }
+  body.game-shell #game .game-controls button,
+  body.game-shell #game .game-controls button:nth-child(n + 5) {
+    min-height: 39px;
+    padding: 7px 4px;
+  }
+  body.game-shell #game .history { display: none; }
+}
+
+
+@media (max-width: 520px) and (max-height: 900px) {
+  .hero-pieces {
+    height: 120px;
+  }
+  .setup-panel {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+  fieldset {
+    padding-top: 5px;
+    padding-bottom: 8px;
+  }
+  .start-button {
+    margin-top: 10px;
+    margin-bottom: 12px;
+  }
+  .menu-bottom button {
+    min-height: 68px;
+  }
+}
+
+/* The menu is a single-screen surface on short desktop and phone viewports.
+   Keep every control reachable without making the page taller than the viewport. */
+@media (min-width: 1001px) and (max-height: 900px) {
+  main {
+    min-height: 100dvh;
+    padding: max(6px, env(safe-area-inset-top)) 22px
+      max(8px, env(safe-area-inset-bottom));
+  }
+  header {
+    min-height: 72px;
+  }
+  .hero-pieces {
+    height: 112px;
+  }
+  .setup-panel {
+    padding: 8px 24px;
+  }
+  fieldset {
+    padding: 5px 0 8px;
+  }
+  legend {
+    font-size: 20px;
+  }
+  .choices {
+    gap: 12px;
+  }
+  .choices button {
+    padding: 9px 8px;
+    min-height: 42px;
+  }
+  .start-button {
+    margin: 8px auto 10px;
+    padding: 10px;
+    font-size: 28px;
+    min-height: 54px;
+  }
+  .menu-bottom {
+    gap: 10px;
+  }
+  .menu-bottom button {
+    min-height: 66px;
+  }
+}
+
+@media (max-width: 520px) and (max-height: 780px) {
+  body {
+    min-height: 100dvh;
+  }
+  main {
+    min-height: 100dvh;
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+  header {
+    min-height: 58px;
+  }
+  .hero-pieces {
+    height: 104px;
+  }
+  .setup-panel {
+    padding: 8px 10px;
+  }
+  fieldset {
+    padding: 3px 0 5px;
+  }
+  legend {
+    font-size: 17px;
+  }
+  .choices {
+    gap: 5px;
+  }
+  .choices button {
+    min-height: 42px;
+    padding: 7px 3px;
+  }
+  .start-button {
+    margin: 8px auto 10px;
+    min-height: 48px;
+    font-size: 25px;
+    padding: 9px;
+  }
+  .menu-bottom {
+    gap: 7px;
+  }
+  .menu-bottom button {
+    min-height: 58px;
+    font-size: 15px;
+  }
+}
+

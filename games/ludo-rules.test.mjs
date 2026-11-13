@@ -77,7 +77,7 @@ test("all four outer routes leave into the matching player home lane",()=>{
 
 
 test("bot chooses an available capture over a non-capturing move",()=>{
- let s=newLudo(2,[0,1]); s.pieces[0]=[4,10,20,30]; s.pieces[1]=[9,40,41,42]; s=rollLudo(s,5);
+ let s=newLudo(2,[0,1]); s.pieces[0]=[4,10,20,30]; s.pieces[1]=[22,40,41,42]; s=rollLudo(s,5);
  assert.equal(chooseBotToken(s),0);
 });
 test("bot prioritizes finishing a pawn",()=>{

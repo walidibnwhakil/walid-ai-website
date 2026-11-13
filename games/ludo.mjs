@@ -663,13 +663,11 @@ function render() {
           if(Math.abs(dx)>=Math.abs(dy)){
             const push=(Math.min(ar.right,br.right)-Math.max(ar.left,br.left))/2+gap;
             const direction=dx>=0?1:-1;
-            offsets.get(a).x-=direction*push;
-            offsets.get(b).x+=direction*push;
+            offsets.get(a).x-=direction*push*2;
           } else {
             const push=(Math.min(ar.bottom,br.bottom)-Math.max(ar.top,br.top))/2+gap;
             const direction=dy>=0?1:-1;
-            offsets.get(a).y-=direction*push;
-            offsets.get(b).y+=direction*push;
+            offsets.get(a).y-=direction*push*2;
           }
           a.classList.add("adjacent-pawn"); b.classList.add("adjacent-pawn");
           const applyOffset=(pawn,offset)=>{

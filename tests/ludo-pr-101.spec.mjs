@@ -24,6 +24,29 @@ try {
     await page.screenshot({ path: "screenshots/ludo-desktop.png", fullPage: true });
   });
 
+  await check("open color picker stays above the board", async () => {
+    const label = page.locator(".player-dice-label:not(:disabled)").first();
+    await label.click();
+    const data = await page.evaluate(() => {
+      const picker = document.querySelector(".player-color-picker:not([hidden])");
+      const panel = picker.closest(".player-dice");
+      const rect = picker.getBoundingClientRect();
+      return {
+        hidden: picker.hidden,
+        zIndex: getComputedStyle(picker).zIndex,
+        panelZIndex: getComputedStyle(panel).zIndex,
+        width: rect.width,
+        height: rect.height
+      };
+    });
+    assert.equal(data.hidden, false);
+    assert.equal(data.zIndex, "100");
+    assert.equal(data.panelZIndex, "30");
+    assert.ok(data.width > 200 && data.height > 20);
+    await page.screenshot({ path: "screenshots/ludo-desktop-color-picker-layer.png", fullPage: true });
+    await label.click();
+  });
+
   await check("two adjacent pawns keep full artwork and are not clipped", async () => {
     const data = await page.evaluate(() => {
       const board = document.querySelector("#board");

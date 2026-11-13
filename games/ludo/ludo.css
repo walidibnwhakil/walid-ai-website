@@ -1472,7 +1472,7 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn-slot .
 }
 
 
-/* Adjacent occupied squares: keep full-size artwork separated. */
+/* Adjacent occupied squares: use measured pixel offsets while preserving full-size art. */
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.adjacent-pawn .pin-pawn-art{
-  transform:translate(calc(-50% + var(--edge-x,0%)),calc(-50% + var(--edge-y,0%)))!important;
+  transform:translate(calc(-50% + var(--adjacent-x,0px)),calc(-50% + var(--adjacent-y,0px)))!important;
 }

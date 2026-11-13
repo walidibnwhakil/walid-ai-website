@@ -1,0 +1,38 @@
+/* Route tiles must not trap pawns in separate stacking contexts. A later
+   tile's tint/star would otherwise paint over an earlier tile's pawn head.
+   Keep the positioned tile as the geometry anchor, but let its pawns take
+   part in the board's shared stacking context. No pawn geometry belongs here. */
+body.ludo-game.playing-ludo #ludo-play #board.board.ludo > :is(.track,.lane,.home-center) {
+  z-index:auto!important;
+  overflow:visible!important;
+}
+
+/* The progress shimmer animates filter, which also creates a stacking
+   context. Keep its shadow animation on the tile and its brightness on the
+   decorative tint, below the independently layered pawns. */
+body.ludo-game.playing-ludo #ludo-play #board.board.ludo > :is(.track,.lane,.home-center)[class*="finish-celebration-"] {
+  filter:none!important;
+  animation-name:pawn-tile-progress-shadow!important;
+}
+body.ludo-game.playing-ludo #ludo-play #board.board.ludo > :is(.track,.lane)[class*="finish-celebration-"]::before {
+  animation:pawn-tile-shimmer 1.05s ease-in-out infinite alternate;
+}
+@keyframes pawn-tile-shimmer {
+  from { filter:brightness(1) saturate(1); }
+  to { filter:brightness(1.18) saturate(1.12); }
+}
+/* Animating filter can reserve a stacking context even when its computed
+   value is overridden to none. The tile animation must contain only shadow. */
+@keyframes pawn-tile-progress-shadow {
+  from { box-shadow:0 0 0 0 transparent; }
+  to { box-shadow:0 0 11px 3px #fff6,0 0 20px 5px color-mix(in srgb,var(--celebration-color,var(--tile-color,#ffd86a)) 65%,transparent); }
+}
+@media(prefers-reduced-motion:reduce) {
+  body.ludo-game.playing-ludo #ludo-play #board.board.ludo > :is(.track,.lane,.home-center)[class*="finish-celebration-"] {
+    animation:none!important;
+  }
+  body.ludo-game.playing-ludo #ludo-play #board.board.ludo > :is(.track,.lane)[class*="finish-celebration-"]::before {
+    animation:none;
+    filter:brightness(1.12) saturate(1.05);
+  }
+}

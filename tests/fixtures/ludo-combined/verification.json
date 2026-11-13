@@ -1,0 +1,536 @@
+{
+  "main": "55e4d562106c0902002aea095704ffed30a1ce35",
+  "geometry": [
+    {
+      "scenario": "approved before-mobile.png visual reference",
+      "meanChannelDifference": 1.420479302832244,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1.25,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1.25,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1.25,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 1.25,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 0.8,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 0.8,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 0.8,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "zoom": 0.8,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "scenario": "all colors across all regions",
+      "offset": 1,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "scenario": "all colors across all regions",
+      "offset": 2,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "scenario": "all colors across all regions",
+      "offset": 3,
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "scenario": "live resize without manual resolver",
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "scenario": "Chromium visual viewport zoom 125%",
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1.25,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1.25,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1.25,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 1.25,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 0.8,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 0.8,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 0.8,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "zoom": 0.8,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "scenario": "all colors across all regions",
+      "offset": 1,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "scenario": "all colors across all regions",
+      "offset": 2,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "scenario": "all colors across all regions",
+      "offset": 3,
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "scenario": "live resize without manual resolver",
+      "status": "passed"
+    },
+    {
+      "width": 390,
+      "scenario": "Chromium visual viewport zoom 125%",
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1.25,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1.25,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1.25,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 1.25,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 0.8,
+      "count": 1,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 0.8,
+      "count": 2,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 0.8,
+      "count": 3,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "zoom": 0.8,
+      "count": 4,
+      "tiles": 92,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "scenario": "all colors across all regions",
+      "offset": 1,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "scenario": "all colors across all regions",
+      "offset": 2,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "scenario": "all colors across all regions",
+      "offset": 3,
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "scenario": "live resize without manual resolver",
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "scenario": "Chromium visual viewport zoom 125%",
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "scenario": "high-DPI single-pawn closeups across regions",
+      "status": "passed"
+    },
+    {
+      "width": 360,
+      "scenario": "single-pawn ready hint at peak retains size, centered tip and containment",
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "scenario": "high-DPI single-pawn closeups across regions",
+      "status": "passed"
+    },
+    {
+      "width": 1440,
+      "scenario": "single-pawn ready hint at peak retains size, centered tip and containment",
+      "status": "passed"
+    }
+  ],
+  "layering": [
+    {
+      "width": 360,
+      "count": 1,
+      "celebration": false,
+      "pawns": 72,
+      "hiddenBefore": 0,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 360,
+      "count": 1,
+      "celebration": true,
+      "pawns": 72,
+      "hiddenBefore": 0,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 360,
+      "count": 2,
+      "celebration": false,
+      "pawns": 144,
+      "hiddenBefore": 34,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 360,
+      "count": 2,
+      "celebration": true,
+      "pawns": 144,
+      "hiddenBefore": 34,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 360,
+      "count": 2,
+      "celebration": true,
+      "reducedMotion": false,
+      "animationPeak": true,
+      "pawns": 144,
+      "hiddenAfter": 0
+    },
+    {
+      "width": 390,
+      "count": 1,
+      "celebration": false,
+      "pawns": 72,
+      "hiddenBefore": 0,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 390,
+      "count": 1,
+      "celebration": true,
+      "pawns": 72,
+      "hiddenBefore": 0,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 390,
+      "count": 2,
+      "celebration": false,
+      "pawns": 144,
+      "hiddenBefore": 34,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 390,
+      "count": 2,
+      "celebration": true,
+      "pawns": 144,
+      "hiddenBefore": 34,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 390,
+      "count": 2,
+      "celebration": true,
+      "reducedMotion": false,
+      "animationPeak": true,
+      "pawns": 144,
+      "hiddenAfter": 0
+    },
+    {
+      "width": 1440,
+      "count": 1,
+      "celebration": false,
+      "pawns": 72,
+      "hiddenBefore": 0,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 1440,
+      "count": 1,
+      "celebration": true,
+      "pawns": 72,
+      "hiddenBefore": 0,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 1440,
+      "count": 2,
+      "celebration": false,
+      "pawns": 144,
+      "hiddenBefore": 34,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 1440,
+      "count": 2,
+      "celebration": true,
+      "pawns": 144,
+      "hiddenBefore": 34,
+      "hiddenAfter": 0,
+      "geometryUnchanged": true
+    },
+    {
+      "width": 1440,
+      "count": 2,
+      "celebration": true,
+      "reducedMotion": false,
+      "animationPeak": true,
+      "pawns": 144,
+      "hiddenAfter": 0
+    }
+  ],
+  "browser": [
+    {
+      "name": "desktop board launch",
+      "status": "passed"
+    },
+    {
+      "name": "open color picker stays above the board",
+      "status": "passed"
+    },
+    {
+      "name": "player seats follow cross and clockwise order",
+      "status": "passed"
+    },
+    {
+      "name": "custom colors drive seat-specific shimmer and mute is respected",
+      "status": "passed"
+    },
+    {
+      "name": "mobile reduced-motion board evidence",
+      "status": "passed"
+    }
+  ],
+  "node": {
+    "tests": 31,
+    "passed": 31,
+    "failed": 0,
+    "includes": {
+      "rules_and_slots": 29,
+      "layout_checks": 156,
+      "sound_checks": 35
+    }
+  },
+  "mixed_scene_measurements": "measurements.json"
+}

@@ -1,0 +1,137 @@
+[
+  {
+    "width": 360,
+    "count": 1,
+    "celebration": false,
+    "pawns": 72,
+    "hiddenBefore": 0,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 360,
+    "count": 1,
+    "celebration": true,
+    "pawns": 72,
+    "hiddenBefore": 0,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 360,
+    "count": 2,
+    "celebration": false,
+    "pawns": 144,
+    "hiddenBefore": 34,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 360,
+    "count": 2,
+    "celebration": true,
+    "pawns": 144,
+    "hiddenBefore": 34,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 360,
+    "count": 2,
+    "celebration": true,
+    "reducedMotion": false,
+    "animationPeak": true,
+    "pawns": 144,
+    "hiddenAfter": 0
+  },
+  {
+    "width": 390,
+    "count": 1,
+    "celebration": false,
+    "pawns": 72,
+    "hiddenBefore": 0,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 390,
+    "count": 1,
+    "celebration": true,
+    "pawns": 72,
+    "hiddenBefore": 0,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 390,
+    "count": 2,
+    "celebration": false,
+    "pawns": 144,
+    "hiddenBefore": 34,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 390,
+    "count": 2,
+    "celebration": true,
+    "pawns": 144,
+    "hiddenBefore": 34,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 390,
+    "count": 2,
+    "celebration": true,
+    "reducedMotion": false,
+    "animationPeak": true,
+    "pawns": 144,
+    "hiddenAfter": 0
+  },
+  {
+    "width": 1440,
+    "count": 1,
+    "celebration": false,
+    "pawns": 72,
+    "hiddenBefore": 0,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 1440,
+    "count": 1,
+    "celebration": true,
+    "pawns": 72,
+    "hiddenBefore": 0,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 1440,
+    "count": 2,
+    "celebration": false,
+    "pawns": 144,
+    "hiddenBefore": 34,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 1440,
+    "count": 2,
+    "celebration": true,
+    "pawns": 144,
+    "hiddenBefore": 34,
+    "hiddenAfter": 0,
+    "geometryUnchanged": true
+  },
+  {
+    "width": 1440,
+    "count": 2,
+    "celebration": true,
+    "reducedMotion": false,
+    "animationPeak": true,
+    "pawns": 144,
+    "hiddenAfter": 0
+  }
+]

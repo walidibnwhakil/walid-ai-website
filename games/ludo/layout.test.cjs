@@ -201,31 +201,28 @@ fs.mkdirSync(output, { recursive: true });
       }),
     );
     check(colors, `lane and safe tile colors match ${tag}`);
-    const yardFeet = await page
-      .locator("#board .yard .pin-pawn-art")
-      .evaluateAll((svgs) =>
-        svgs.every((svg) => {
-          const f = new DOMPoint(32, 77).matrixTransform(svg.getScreenCTM()),
-            r = svg.closest(".yard").getBoundingClientRect();
-          return (
-            Math.abs(f.x - r.x - r.width / 2) < 0.75 &&
-            Math.abs(f.y - r.y - r.height / 2) < 0.75
-          );
-        }),
-      );
-    check(yardFeet, `yard pawn feet centered ${tag}`);
-    const pawnScale = await page
-      .locator("#board .yard .pin-pawn-art")
-      .first()
-      .evaluate(
-        (svg) =>
-          svg.getBoundingClientRect().height /
-          svg.closest(".yard").getBoundingClientRect().height,
-      );
-    check(
-      Math.abs(pawnScale - (width <= 620 ? 1.2 : 1)) < 0.02,
-      `phone pawn enlargement and unchanged desktop size ${tag}`,
+    // The outer SVG is now the cell viewport. Measure the transformed artwork,
+    // whose full stroke-inclusive envelope is centered in each approved home slot.
+    const homeGeometry = await page.locator("#board .yard .pin-pawn-art").evaluateAll((svgs) =>
+      svgs.map((svg) => {
+        const matrix = svg.querySelector(".pin-shape").getScreenCTM();
+        const center = new DOMPoint(32, (1.75 + 80) / 2).matrixTransform(matrix);
+        const left = new DOMPoint(3.75, 1.75).matrixTransform(matrix);
+        const right = new DOMPoint(60.25, 80).matrixTransform(matrix);
+        const tile = svg.closest(".yard").getBoundingClientRect();
+        return {
+          height: right.y - left.y,
+          centered: Math.abs(center.x - tile.x - tile.width / 2) < .75 &&
+            Math.abs(center.y - tile.y - tile.height / 2) < .75,
+          contained: left.x >= tile.left - .1 && right.x <= tile.right + .1 &&
+            left.y >= tile.top - .1 && right.y <= tile.bottom + .1,
+        };
+      }),
     );
+    check(homeGeometry.length > 0 && homeGeometry.every(p => p.centered), `home artwork centered ${tag}`);
+    check(homeGeometry.every(p => p.contained) &&
+      Math.max(...homeGeometry.map(p => p.height)) - Math.min(...homeGeometry.map(p => p.height)) < .1,
+      `uniform painted home-slot size and containment ${tag}`);
 
     await screenshot(page, `board-${tag}`);
     if (width === 1366 || width === 390) {
@@ -267,13 +264,20 @@ fs.mkdirSync(output, { recursive: true });
         `live pawn move works ${tag}`,
       );
       async function checkPawnCenter(count) {
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
         const geometry = await page
           .locator(".track:has(.pin-pawn)")
           .first()
           .evaluate((tile) => {
             const t = tile.getBoundingClientRect();
             const feet = [...tile.querySelectorAll(".pin-pawn-art")].map(
-              (svg) => new DOMPoint(32, 77).matrixTransform(svg.getScreenCTM()),
+              (svg) => {
+                const r = svg.querySelector(".pin-outline").getBoundingClientRect();
+                const matrix = new DOMMatrix([r.width / 54, 0, 0, r.height / 74,
+                  r.left - 5 * r.width / 54, r.top - 3 * r.height / 74]);
+                return new DOMPoint(32, tile.querySelectorAll(".pin-pawn-art").length === 2 ? 77 :
+                  77 + 1.25 * Math.hypot(10, 12) / 10).matrixTransform(matrix);
+              },
             );
             const left = Math.min(...feet.map((p) => p.x)),
               right = Math.max(...feet.map((p) => p.x));
@@ -297,7 +301,7 @@ fs.mkdirSync(output, { recursive: true });
             geometry.dx < 0.75 &&
             geometry.dy < 0.75 &&
             geometry.inside,
-          `${count} pawn feet centered inside tile ${tag}`,
+          `${count} pawn feet centered inside tile ${tag}: ${JSON.stringify(geometry)}`,
         );
       }
       await checkPawnCenter(1);
@@ -337,7 +341,7 @@ fs.mkdirSync(output, { recursive: true });
       const soloCentered = await page
         .locator('.track .pin-pawn[data-step="6"] .pin-pawn-art')
         .evaluate((svg) => {
-          const foot = new DOMPoint(32, 77).matrixTransform(svg.getScreenCTM()),
+          const foot = new DOMPoint(32, 77 + 1.25 * Math.hypot(10, 12) / 10).matrixTransform(svg.querySelector(".pin-shape").getScreenCTM()),
             b = svg.closest(".track").getBoundingClientRect();
           return (
             Math.abs(foot.x - b.x - b.width / 2) < 0.75 &&

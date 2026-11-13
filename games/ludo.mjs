@@ -617,25 +617,55 @@ function render() {
       piece.style.zIndex=piece.classList.contains("playable-token")?"80":String(20+index);
     });
   }
-  // Keep full-size pawns visually inside adjacent squares.
-  for(const [squareKey,square] of squares){
-    const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
-    if(pile.length!==1)continue;
-    const [row,col]=squareKey.split(",").map(Number);
-    const neighbours=[
-      {key:row+","+ (col-1),x:12,y:0},{key:row+","+ (col+1),x:-12,y:0},
-      {key:(row-1)+","+col,x:0,y:12},{key:(row+1)+","+col,x:0,y:-12}
-    ];
-    for(const neighbour of neighbours){
-      const other=squares.get(neighbour.key);
-      if(!other||![...other.children].some(piece=>piece.classList.contains("ludo-pawn")))continue;
-      const pawn=pile[0];
-      pawn.classList.add("adjacent-pawn");
-      pawn.style.setProperty("--edge-x",neighbour.x+"%");
-      pawn.style.setProperty("--edge-y",neighbour.y+"%");
-      break;
+  // Resolve the actual painted pawn rectangles, not just the square relationship.
+  // This keeps full-size artwork and leaves every pawn anchored to its own square.
+  function resolveAdjacentPawnGeometry() {
+    const candidates=[...squares.entries()].map(([key,square])=>({
+      key, pawn:[...square.children].find(piece=>piece.classList.contains("ludo-pawn")),
+      pile:[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"))
+    })).filter(item=>item.pawn&&item.pile.length===1);
+    candidates.forEach(({pawn})=>{
+      pawn.classList.remove("adjacent-pawn");
+      pawn.style.removeProperty("--adjacent-x");
+      pawn.style.removeProperty("--adjacent-y");
+    });
+    const offsets=new Map(candidates.map(({pawn})=>[pawn,{x:0,y:0}]));
+    const overlaps=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+    const gap=2;
+    // Four passes handle horizontal, vertical, diagonal, and several neighbors deterministically.
+    for(let pass=0;pass<4;pass++){
+      for(let i=0;i<candidates.length;i++){
+        for(let j=i+1;j<candidates.length;j++){
+          const a=candidates[i].pawn,b=candidates[j].pawn;
+          const ar=a.querySelector(".pin-pawn-art")?.getBoundingClientRect();
+          const br=b.querySelector(".pin-pawn-art")?.getBoundingClientRect();
+          if(!ar||!br||!overlaps(ar,br))continue;
+          const acx=(ar.left+ar.right)/2,acy=(ar.top+ar.bottom)/2;
+          const bcx=(br.left+br.right)/2,bcy=(br.top+br.bottom)/2;
+          const dx=bcx-acx,dy=bcy-acy;
+          if(Math.abs(dx)>=Math.abs(dy)){
+            const push=(Math.min(ar.right,br.right)-Math.max(ar.left,br.left))/2+gap;
+            const direction=dx>=0?1:-1;
+            offsets.get(a).x-=direction*push;
+            offsets.get(b).x+=direction*push;
+          } else {
+            const push=(Math.min(ar.bottom,br.bottom)-Math.max(ar.top,br.top))/2+gap;
+            const direction=dy>=0?1:-1;
+            offsets.get(a).y-=direction*push;
+            offsets.get(b).y+=direction*push;
+          }
+          a.classList.add("adjacent-pawn"); b.classList.add("adjacent-pawn");
+          a.style.setProperty("--adjacent-x",offsets.get(a).x+"px");
+          a.style.setProperty("--adjacent-y",offsets.get(a).y+"px");
+          b.style.setProperty("--adjacent-x",offsets.get(b).x+"px");
+          b.style.setProperty("--adjacent-y",offsets.get(b).y+"px");
+        }
+      }
     }
+    return candidates.map(({key,pawn})=>({key,pawn}));
   }
+  window.__luduResolvePawnGeometry=resolveAdjacentPawnGeometry;
+  resolveAdjacentPawnGeometry();
 
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
   state.ranks.forEach((rank,player)=>{

@@ -1421,7 +1421,7 @@ body.ludo-game.playing-ludo #board.board.ludo [class*="finish-celebration-"]{
 }
 @keyframes finish-color-pearl{
   from{filter:brightness(1) saturate(1);box-shadow:0 0 0 0 transparent}
-  to{filter:brightness(1.18) saturate(1.12);box-shadow:0 0 11px 3px #fff6,0 0 20px 5px color-mix(in srgb,var(--tile-color,#ffd86a) 65%,transparent)}
+  to{filter:brightness(1.18) saturate(1.12);box-shadow:0 0 11px 3px #fff6,0 0 20px 5px color-mix(in srgb,var(--celebration-color,var(--tile-color,#ffd86a)) 65%,transparent)}
 }
 @media(prefers-reduced-motion:reduce){
   body.ludo-game.playing-ludo #board.board.ludo [class*="finish-celebration-"]{

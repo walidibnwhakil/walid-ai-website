@@ -673,7 +673,12 @@ function render() {
           }
           a.classList.add("adjacent-pawn"); b.classList.add("adjacent-pawn");
           const applyOffset=(pawn,offset)=>{
-            pawn.querySelector(".pin-pawn-art")?.style.setProperty("transform",`translate(calc(-50% + ${offset.x}px),calc(-50% + ${offset.y}px))`,"important");
+            const square=pawn.parentElement?.getBoundingClientRect();
+            const limitX=square? square.width*.28:24;
+            const limitY=square? square.height*.28:24;
+            const x=Math.max(-limitX,Math.min(limitX,offset.x));
+            const y=Math.max(-limitY,Math.min(limitY,offset.y));
+            pawn.querySelector(".pin-pawn-art")?.style.setProperty("transform",`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`,"important");
           };
           applyOffset(a,offsets.get(a));
           applyOffset(b,offsets.get(b));

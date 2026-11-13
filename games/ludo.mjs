@@ -198,9 +198,10 @@ function updatePlayerColorPickers(){
 const game = gameShell({reset() {
   const count=Number(playerSelect.value);
   const botMode=modeSelect.value==="bot";
-  activeTeams=botMode
-    ? count===2?[3,0]:[3,...Array.from({length:count-1},(_,index)=>index)]
-    : count===2?[0,3]:Array.from({length:count},(_,index)=>index);
+  // Physical seats: 0=top-left, 1=bottom-left, 2=top-right, 3=bottom-right.
+  // Two players use the requested cross layout; 3/4 players follow clockwise order.
+  const seatOrder=count===2?[3,0]:count===3?[3,1,0]:[3,1,0,2];
+  activeTeams=[...seatOrder];
   state=newLudo(count,activeTeams);
   applySeatColors();
   started=false;

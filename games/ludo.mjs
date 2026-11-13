@@ -489,7 +489,7 @@ async function play(index) {
   render();
 }
 function showBotResult() {
-  if(modeSelect.value!=="bot" || state.pieces.length===4 || state.winner===null) return;
+  if(modeSelect.value!=="bot" || state.pieces.length!==2 || state.winner===null) return;
   if(document.querySelector("#ludo-bot-result")) return;
   const overlay=document.createElement("section"); overlay.id="ludo-bot-result";
   overlay.className=state.ranks[0]===1?"bot-result win":"bot-result lose";
@@ -680,17 +680,17 @@ function render() {
   window.__luduResolvePawnGeometry=resolveAdjacentPawnGeometry;
   resolveAdjacentPawnGeometry();
 
-  game.board.classList.toggle("final-rank-board",state.pieces.length===4&&state.winner!==null);
+  game.board.classList.toggle("final-rank-board",state.pieces.length>=3&&state.winner!==null);
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
-  const botOnlyResult=modeSelect.value==="bot"&&state.pieces.length<4;
+  const botOnlyResult=modeSelect.value==="bot"&&state.pieces.length===2;
   if(!botOnlyResult) state.ranks.forEach((rank,player)=>{
     if(!rank||locked) return;
     const teamId=activeTeams[player],badge=document.createElement("div");
     badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;
-    const finalFour=state.pieces.length===4&&state.winner!==null;
-    const labels={1:"Winner",2:"1st Runner-up",3:"2nd Runner-up",4:"Loser"};
+    const finalRankBoard=state.pieces.length>=3&&state.winner!==null;
+    const labels=state.pieces.length===3?{1:"Winner",2:"1st Runner-up",3:"Loser"}:{1:"Winner",2:"1st Runner-up",3:"2nd Runner-up",4:"Loser"};
     const crownColors={1:"#ffd552",2:"#e7edf5",3:"#c78345"};
-    badge.innerHTML=finalFour
+    badge.innerHTML=finalRankBoard
       ? `<svg class="rank-crown crown-${rank}" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="${crownColors[rank]||"#8b735f"}" stroke="#6b3514" stroke-width="2"/><path d="M5 25h32v4H5z" fill="${crownColors[rank]||"#8b735f"}"/></svg><strong class="winner-place">${labels[rank]}</strong>`
       : rank===1 ? `<strong class="winner-place">1st</strong><span class="winner-ribbon">WINNER</span>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
     game.board.querySelector(`.base-${teamId}`).append(badge);

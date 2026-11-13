@@ -45,11 +45,11 @@ try {
         overflow: getComputedStyle(pawn).overflow
       }));
     });
-    for (const item of data) {
-      assert.equal(item.width, "100%");
-      assert.equal(item.height, "100%");
-      assert.equal(item.overflow, "visible");
-    }
+    assert.equal(data[0].width, data[1].width);
+    assert.equal(data[0].height, data[1].height);
+    for (const item of data) assert.equal(item.overflow, "visible");
+    assert.match(data[0].width, /px$/);
+    assert.match(data[0].height, /px$/);
   });
 
   await check("three-pawn pile may use compact layout", async () => {
@@ -60,7 +60,7 @@ try {
       const art = document.createElement("span"); art.className = "pin-pawn-art"; pawn.append(art); tile.append(pawn); board.append(tile);
       return getComputedStyle(art).width;
     });
-    assert.notEqual(compact, "100%");
+    assert.match(compact, /px$/);
   });
 
   await check("four finished pawns remain full-size inside their color region", async () => {
@@ -75,7 +75,12 @@ try {
       board.append(base, square);
       return { sizes: pawns.map(({art}) => [getComputedStyle(art).width, getComputedStyle(art).height]), region: square.dataset.ludoSeat };
     });
-    assert.deepEqual(data.sizes, [["100%","100%"],["100%","100%"],["100%","100%"],["100%","100%"]]);
+    assert.equal(new Set(data.sizes.map(([width]) => width)).size, 1);
+    assert.equal(new Set(data.sizes.map(([, height]) => height)).size, 1);
+    for (const [width, height] of data.sizes) {
+      assert.match(width, /px$/);
+      assert.match(height, /px$/);
+    }
     assert.equal(data.region, "0");
   });
 

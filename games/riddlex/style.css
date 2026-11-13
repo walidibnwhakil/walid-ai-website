@@ -29,6 +29,12 @@ button { cursor: pointer; }
   object-fit: cover; filter: blur(18px) brightness(0.4) saturate(0.85);
   transform: scale(1.12);
 }
+/* The blurred duplicate is decorative only. Avoid a full-viewport blur pass on
+   phones; the artwork remains unchanged and the pre-game menu stays intact. */
+@media (max-width: 600px) {
+  .menu-blur { display: none; }
+  .menu-stage { background: #120c09; }
+}
 .menu-frame {
   position: relative; z-index: 1;
   width: min(100cqw, calc(100cqh * 1672 / 941));

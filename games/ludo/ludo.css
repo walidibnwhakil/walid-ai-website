@@ -1428,3 +1428,13 @@ body.ludo-game.playing-ludo #board.board.ludo [class*="finish-celebration-"]{
     animation:none!important;filter:brightness(1.12) saturate(1.05)!important;box-shadow:0 0 8px 2px #fff8!important;
   }
 }
+
+
+/* Final precedence guard: exact-size two-pawn piles and all finished pawns. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.pile-size-2:not(.finished-pawn-slot) .pin-pawn-art{
+  width:100%!important;height:100%!important;
+}
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn .pin-pawn-art,
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn-slot .pin-pawn-art{
+  width:100%!important;height:100%!important;
+}

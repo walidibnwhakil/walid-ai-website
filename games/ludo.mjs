@@ -687,10 +687,10 @@ function render() {
     if(!rank||locked) return;
     const teamId=activeTeams[player],badge=document.createElement("div");
     badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;
-    const finalRankBoard=state.pieces.length>=3&&state.winner!==null;
+    const rankedMatch=state.pieces.length>=3 || (state.pieces.length===2&&modeSelect.value!=="bot");
     const labels=state.pieces.length===2?{1:"Winner",2:"Loser"}:state.pieces.length===3?{1:"Winner",2:"1st Runner-up",3:"Loser"}:{1:"Winner",2:"1st Runner-up",3:"2nd Runner-up",4:"Loser"};
     const crownColors={1:"#ffd552",2:"#e7edf5",3:"#c78345"};
-    badge.innerHTML=finalRankBoard
+    badge.innerHTML=rankedMatch
       ? `<svg class="rank-crown crown-${rank}" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="${crownColors[rank]||"#8b735f"}" stroke="#6b3514" stroke-width="2"/><path d="M5 25h32v4H5z" fill="${crownColors[rank]||"#8b735f"}"/></svg><strong class="winner-place">${labels[rank]}</strong>`
       : rank===1 ? `<strong class="winner-place">1st</strong><span class="winner-ribbon">WINNER</span>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
     game.board.querySelector(`.base-${teamId}`).append(badge);

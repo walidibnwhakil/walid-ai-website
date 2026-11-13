@@ -663,17 +663,35 @@ function render() {
           if(Math.abs(dx)>=Math.abs(dy)){
             const push=(Math.min(ar.right,br.right)-Math.max(ar.left,br.left))/2+gap;
             const direction=dx>=0?1:-1;
-            offsets.get(a).x-=direction*push;
-            offsets.get(b).x+=direction*push;
+            offsets.get(a).x-=direction*push*2;
           } else {
             const push=(Math.min(ar.bottom,br.bottom)-Math.max(ar.top,br.top))/2+gap;
             const direction=dy>=0?1:-1;
-            offsets.get(a).y-=direction*push;
-            offsets.get(b).y+=direction*push;
+            offsets.get(a).y-=direction*push*2;
           }
           a.classList.add("adjacent-pawn"); b.classList.add("adjacent-pawn");
           const applyOffset=(pawn,offset)=>{
-            pawn.querySelector(".pin-pawn-art")?.style.setProperty("transform",`translate(calc(-50% + ${offset.x}px),calc(-50% + ${offset.y}px))`,"important");
+            const square=pawn.parentElement?.getBoundingClientRect();
+            const limitX=square? square.width*.28:24;
+            const limitY=square? square.height*.28:24;
+            let x=Math.max(-limitX,Math.min(limitX,offset.x));
+            let y=Math.max(-limitY,Math.min(limitY,offset.y));
+            const art=pawn.querySelector(".pin-pawn-art");
+            if(!art)return;
+            const setTransform=()=>art.style.setProperty("transform",`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`,"important");
+            setTransform();
+            const head=pawn.querySelector(".pin-face")||art;
+            const headRect=head.getBoundingClientRect();
+            const squareRect=square?.getBoundingClientRect();
+            if(squareRect){
+              if(headRect.left<squareRect.left)x+=squareRect.left-headRect.left;
+              if(headRect.right>squareRect.right)x-=headRect.right-squareRect.right;
+              if(headRect.top<squareRect.top)y+=squareRect.top-headRect.top;
+              if(headRect.bottom>squareRect.bottom)y-=headRect.bottom-squareRect.bottom;
+              x=Math.max(-limitX,Math.min(limitX,x));
+              y=Math.max(-limitY,Math.min(limitY,y));
+              setTransform();
+            }
           };
           applyOffset(a,offsets.get(a));
           applyOffset(b,offsets.get(b));

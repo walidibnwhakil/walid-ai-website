@@ -36,11 +36,16 @@ jobs:
       - name: Run Ludu browser verification
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ludu-http.log 2>&1 &
+          export CHROMIUM_PATH="$(node -p 'require("playwright").chromium.executablePath()')"
+          node --test games/ludo-rules.test.mjs games/ludo/pawn-layout.test.mjs games/ludo/layout.test.cjs games/ludo/sound.test.cjs
           node tests/ludo-pr-101.spec.mjs
           node tests/ludo-tip-geometry.cjs
           node tests/ludo-pawn-layers.cjs
+          node tests/ludo-combined-evidence.cjs
         env:
           BASE_URL: http://127.0.0.1:4173
+          LUDO_BASE_URL: http://127.0.0.1:4173
+          LUDO_SCREENSHOTS: screenshots/ludo-layout
       - name: Upload screenshots and test artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -50,5 +55,6 @@ jobs:
             test-results/
             screenshots/
             tests/fixtures/ludo-layers/
+            tests/fixtures/ludo-combined/
             /tmp/ludu-http.log
           if-no-files-found: warn

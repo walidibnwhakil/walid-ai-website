@@ -4,7 +4,7 @@
     "count": 1,
     "celebration": false,
     "pawns": 72,
-    "hiddenBefore": 17,
+    "hiddenBefore": 0,
     "hiddenAfter": 0,
     "geometryUnchanged": true
   },
@@ -13,7 +13,7 @@
     "count": 1,
     "celebration": true,
     "pawns": 72,
-    "hiddenBefore": 17,
+    "hiddenBefore": 0,
     "hiddenAfter": 0,
     "geometryUnchanged": true
   },
@@ -49,7 +49,7 @@
     "count": 1,
     "celebration": false,
     "pawns": 72,
-    "hiddenBefore": 17,
+    "hiddenBefore": 0,
     "hiddenAfter": 0,
     "geometryUnchanged": true
   },
@@ -58,7 +58,7 @@
     "count": 1,
     "celebration": true,
     "pawns": 72,
-    "hiddenBefore": 17,
+    "hiddenBefore": 0,
     "hiddenAfter": 0,
     "geometryUnchanged": true
   },
@@ -94,7 +94,7 @@
     "count": 1,
     "celebration": false,
     "pawns": 72,
-    "hiddenBefore": 17,
+    "hiddenBefore": 0,
     "hiddenAfter": 0,
     "geometryUnchanged": true
   },
@@ -103,7 +103,7 @@
     "count": 1,
     "celebration": true,
     "pawns": 72,
-    "hiddenBefore": 17,
+    "hiddenBefore": 0,
     "hiddenAfter": 0,
     "geometryUnchanged": true
   },

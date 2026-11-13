@@ -1,5 +1,10 @@
 [
   {
+    "scenario": "approved before-mobile.png visual reference",
+    "meanChannelDifference": 2.81781045751634,
+    "status": "passed"
+  },
+  {
     "width": 360,
     "zoom": 1,
     "count": 1,

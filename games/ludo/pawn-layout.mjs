@@ -33,7 +33,7 @@ export function layoutTrackPawns(board) {
     if (!width || !height) continue;
     const columns = pawns.length <= 3 ? pawns.length : Math.ceil(Math.sqrt(pawns.length));
     const rows = Math.ceil(pawns.length / columns);
-    const tips = pawns.map((_, i) => {
+    let tips = pawns.map((_, i) => {
       const row = Math.floor(i / columns);
       const inRow = Math.min(columns, pawns.length - row * columns);
       return { x: width * (.5 + (i % columns - (inRow - 1) / 2) * .96 / columns),
@@ -41,7 +41,7 @@ export function layoutTrackPawns(board) {
     });
     const g = pinGeometry;
     // Fit above each tip and between columns/rows, with a tile-relative margin.
-    const scale = Math.min(...tips.flatMap(t => [
+    let scale = Math.min(...tips.flatMap(t => [
       (t.x - width * .03) / (g.tipX - g.left),
       (width * .97 - t.x) / (g.right - g.tipX),
       (t.y - height * .03) / (g.tipY - g.top),
@@ -49,6 +49,26 @@ export function layoutTrackPawns(board) {
       width * .9 / columns / (g.right - g.left),
       rows > 1 ? height * .76 / rows / (g.bottom - g.top) : Infinity
     ]));
+    if (pawns.length <= 2) {
+      // Approved reference: full-size pins with path tips together at tile center.
+      // Artwork above the tile is intentional; do not shrink it to a half-tile box.
+      const phone = matchMedia("(max-width: 620px)").matches;
+      scale = Math.min(width / 64, height / 77) * (phone ? (pawns.length === 2 ? 1.1 : 1.2) : 1);
+      tips = pawns.map((_, i) => ({x: width * (pawns.length === 1 ? .5 : i ? .74 : .26), y: height * .5}));
+      const tileRect = tile.getBoundingClientRect(), boardRect = board.getBoundingClientRect();
+      const unitX = width / tileRect.width, unitY = height / tileRect.height;
+      // Only actual board-edge overflow justifies reducing the approved footprint.
+      const left = (boardRect.left - tileRect.left) * unitX;
+      const right = (boardRect.right - tileRect.left) * unitX;
+      const top = (boardRect.top - tileRect.top) * unitY;
+      const bottom = (boardRect.bottom - tileRect.top) * unitY;
+      scale = Math.min(scale, ...tips.flatMap(t => [
+        (t.x - left) / (32 - g.left), (right - t.x) / (g.right - 32),
+        (t.y - top) / (77 - g.top), (bottom - t.y) / (g.bottom - 77)
+      ]));
+      // t.y below refers to the stroke tip used by the shared transform.
+      tips = tips.map(t => ({...t, y: t.y + (g.tipY - 77) * scale}));
+    }
     pawns.forEach((pawn, i) => {
       const art = pawn.querySelector('svg.pin-pawn-art');
       if (!art) return;

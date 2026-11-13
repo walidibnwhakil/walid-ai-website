@@ -6,7 +6,7 @@
   <title>Ludu Mahir | Walid AI Games</title>
 
   <link rel="stylesheet" href="../arcade.css?v=20261107ludu-board21">
-  <link rel="stylesheet" href="./ludo.css?v=20261108pawn-center">
+  <link rel="stylesheet" href="./ludo.css?v=20261113perf1">
   <link rel="stylesheet" href="./layout.css?v=20261108sound-toggle">
   <link rel="stylesheet" href="./brand.css?v=20261108shared-logo">
   <script type="module" src="../ludo.mjs?v=20261108sound-toggle"></script>
@@ -32,7 +32,7 @@
           <a class="menu-round-button" href="/games/" aria-label="Back to Games">
             <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M21 9 5 24l16 15v-9c13-2 18 4 22 11-1-18-7-27-22-28z" fill="#fff0c9" stroke="#8d4d14" stroke-width="3" stroke-linejoin="round"/></svg>
           </a>
-          <div class="brand-lockup" role="img" aria-label="Ludu Mahir"><span class="mahir-brand" aria-hidden="true"><img class="mahir-brand-art" src="./ludo-menu-header.webp" alt="" width="900" height="300"><span class="mahir-brand-words"><span>Ludu</span><strong>Mahir</strong></span></span></div>
+          <div class="brand-lockup" role="img" aria-label="Ludu Mahir"><span class="mahir-brand" aria-hidden="true"><img class="mahir-brand-art" src="./ludo-menu-header.webp" alt="" width="900" height="300" decoding="async"><span class="mahir-brand-words"><span>Ludu</span><strong>Mahir</strong></span></span></div>
           <div class="menu-top-actions">
             <button class="menu-round-button" id="menu-sound" type="button" aria-label="Turn sound on" aria-pressed="false">
               <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 19h9l12-9v28l-12-9H7z" fill="#fff0cf" stroke="#704016" stroke-width="2"/><path class="sound-waves" d="M33 17q9 7 0 14m4-20q14 13 0 26" fill="none" stroke="#fff0cf" stroke-width="4" stroke-linecap="round"/><path class="sound-mute-mark" d="M8 8 40 40" fill="none" stroke="#ffd96d" stroke-width="5" stroke-linecap="round"/></svg>
@@ -84,7 +84,7 @@
         <button id="start-game" type="button" class="start-game"><svg viewBox="0 0 48 54" aria-hidden="true"><path d="M6 4v46l38-23z" fill="#55250a" stroke="#371506" stroke-width="3" stroke-linejoin="round"/></svg><span>Start Game</span></button>
 
         <div class="menu-footer-art" aria-hidden="true">
-          <img class="footer-artwork" src="./ludo-menu-footer.webp" alt="" width="1500" height="500" loading="lazy">
+          <img class="footer-artwork" src="./ludo-menu-footer.webp" alt="" width="1500" height="500" loading="lazy" fetchpriority="low" decoding="async">
           <div class="footer-pawns left"><i class="pawn red"></i><i class="pawn blue"></i></div>
           <svg class="footer-die die-one" viewBox="0 0 90 90"><rect x="4" y="4" width="82" height="82" rx="20" fill="url(#menuDie3)" stroke="#87501c" stroke-width="4"/><g fill="#22140d"><circle cx="26" cy="26" r="6"/><circle cx="64" cy="26" r="6"/><circle cx="45" cy="45" r="6"/><circle cx="26" cy="64" r="6"/><circle cx="64" cy="64" r="6"/></g></svg>
           <svg class="footer-die die-two" viewBox="0 0 90 90"><rect x="4" y="4" width="82" height="82" rx="20" fill="url(#menuDie4)" stroke="#87501c" stroke-width="4"/><g fill="#22140d"><circle cx="26" cy="26" r="6"/><circle cx="64" cy="26" r="6"/><circle cx="26" cy="64" r="6"/><circle cx="64" cy="64" r="6"/></g></svg>

@@ -617,6 +617,26 @@ function render() {
       piece.style.zIndex=piece.classList.contains("playable-token")?"80":String(20+index);
     });
   }
+  // Keep full-size pawns visually inside adjacent squares.
+  for(const [squareKey,square] of squares){
+    const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
+    if(pile.length!==1)continue;
+    const [row,col]=squareKey.split(",").map(Number);
+    const neighbours=[
+      {key:row+","+ (col-1),x:12,y:0},{key:row+","+ (col+1),x:-12,y:0},
+      {key:(row-1)+","+col,x:0,y:12},{key:(row+1)+","+col,x:0,y:-12}
+    ];
+    for(const neighbour of neighbours){
+      const other=squares.get(neighbour.key);
+      if(!other||![...other.children].some(piece=>piece.classList.contains("ludo-pawn")))continue;
+      const pawn=pile[0];
+      pawn.classList.add("adjacent-pawn");
+      pawn.style.setProperty("--edge-x",neighbour.x+"%");
+      pawn.style.setProperty("--edge-y",neighbour.y+"%");
+      break;
+    }
+  }
+
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
   state.ranks.forEach((rank,player)=>{
     if(!rank||locked) return;

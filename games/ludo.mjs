@@ -489,7 +489,11 @@ async function play(index) {
   render();
 }
 function showBotResult() {
-  if(modeSelect.value!=="bot" || state.pieces.length!==2 || state.winner===null) return;
+  if(modeSelect.value!=="bot" || state.winner===null) return;
+  const humanRank=state.ranks[0];
+  const isHumanWinner=humanRank===1;
+  const isHumanLoser=humanRank===state.pieces.length;
+  if(!isHumanWinner&&!isHumanLoser) return;
   if(document.querySelector("#ludo-bot-result")) return;
   const overlay=document.createElement("section"); overlay.id="ludo-bot-result";
   overlay.className=state.ranks[0]===1?"bot-result win":"bot-result lose";

@@ -47,6 +47,20 @@ try {
     await label.click();
   });
 
+  await check("player seats follow cross and clockwise order", async () => {
+    const four = await context.newPage();
+    await four.goto(`${baseURL}/games/ludo/?screen=board&players=4&mode=bot`, { waitUntil: "networkidle" });
+    await four.locator("#board").waitFor({ state: "visible" });
+    const labels = await four.evaluate(() => Object.fromEntries(
+      [...document.querySelectorAll(".player-dice:not([hidden])")].map(panel => [panel.id, panel.querySelector(".player-dice-label").textContent])
+    ));
+    assert.match(labels["dice-yellow"], /Player 1/);
+    assert.match(labels["dice-blue"], /Player 2/);
+    assert.match(labels["dice-red"], /Player 3/);
+    assert.match(labels["dice-green"], /Player 4/);
+    await four.close();
+  });
+
   await check("two adjacent pawns keep full artwork and are not clipped", async () => {
     const data = await page.evaluate(() => {
       const board = document.querySelector("#board");

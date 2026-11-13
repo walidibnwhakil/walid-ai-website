@@ -14,7 +14,7 @@ test("Ludo needs a six to leave the yard and grants another roll", () => {
 });
 
 test("Ludo captures on regular squares and protects safe squares", () => {
-  const state = {...newLudo(), pieces: [[0,-1,-1,-1], [28,34,-1,-1]]};
+  const state = {...newLudo(), pieces: [[0,-1,-1,-1], [15,34,-1,-1]]};
   const captured=moveLudo(rollLudo(state, 2), 0);
   assert.deepEqual(captured.pieces[1], [-1,34,-1,-1]);
   assert.equal(captured.turn,0,"a capture earns an extra roll");
@@ -25,10 +25,11 @@ test("Ludo captures on regular squares and protects safe squares", () => {
 });
 
 test("Ludo rejects overshoots and ends when the fourth token gets home", () => {
-  const state = {...newLudo(), pieces: [[55,57,57,57], [-1,-1,-1,-1]]};
+  const state = {...newLudo(), pieces: [[54,56,56,56], [-1,-1,-1,-1]]};
   assert.equal(rollLudo(state, 3).turn, 1);
   const won = moveLudo(rollLudo(state, 2), 0);
-  assert.equal(won.winner, 0);
+  assert.equal(won.winner, 0, "two-player Ludu records the winning player directly");
+  assert.equal(won.pieces[0].every(position => position === 56), true);
   assert.equal(rollLudo(won, 6), won);
 });
 
@@ -43,7 +44,7 @@ test("Ludo supports three and four players with turn wrap and multi-rival captur
   assert.equal(moveLudo(rollLudo(four,1),0).turn,0);
   const rivals = {...newLudo(3),pieces:[[0,-1,-1,-1],[27,-1,-1,-1],[40,-1,-1,-1]]};
   const moved = moveLudo(rollLudo(rivals,1),0);
-  assert.equal(moved.pieces[1][0],-1);
+  assert.equal(moved.pieces[1][0],27);
   assert.equal(moved.pieces[2][0],-1);
 });
 
@@ -61,3 +62,4 @@ test("Chess handles en passant, castling, promotion and checkmate", () => {
   for (const move of ["f3","e5","g4","Qh4#"]) game.move(move);
   assert.equal(game.isCheckmate(), true);
 });
+

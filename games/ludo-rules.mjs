@@ -26,6 +26,32 @@ export function legalTokens(state) {
   });
 }
 
+export function chooseBotToken(state) {
+  const legal=legalTokens(state);
+  if(legal.length<=1) return legal[0] ?? null;
+  const candidates=legal.map(index=>{
+    const result=moveLudo(state,index);
+    const move=result.lastMove;
+    const step=move?.to ?? -1;
+    const captured=result.lastCaptured.length;
+    const finished=result.pieces[state.turn].filter(position=>position===56).length - state.pieces[state.turn].filter(position=>position===56).length;
+    const onSafe=step>=0 && step<51 && safe.has(trackPosition(state.colors[state.turn],step));
+    let danger=0;
+    if(step>=0 && step<51 && !onSafe) {
+      for(let rival=0;rival<state.pieces.length;rival++) if(rival!==state.turn) for(const rivalStep of result.pieces[rival]) {
+        if(rivalStep<0 || rivalStep>=51) continue;
+        const distance=(trackPosition(state.colors[state.turn],step)-trackPosition(state.colors[rival],rivalStep)+52)%52;
+        if(distance>=1 && distance<=6) danger++;
+      }
+    }
+    const advances=step<0 ? -1 : step;
+    const score=finished*100000+captured*10000+(onSafe?1200:0)-danger*450+advances;
+    return {index,score};
+  });
+  candidates.sort((a,b)=>b.score-a.score || a.index-b.index);
+  return candidates[0].index;
+}
+
 export function rollLudo(state, roll) {
   if(state.roll || state.winner!==null || !Number.isInteger(roll) || roll<1 || roll>6 || state.ranks[state.turn]) return state;
   const sixChain=roll===6 ? state.sixChain+1 : 0;
@@ -56,6 +82,13 @@ export function moveLudo(state,index) {
   const ranks=[...state.ranks];
   let rankCount=state.rankCount;
   const finished=pieces[turn].every(position=>position===56);
+  const bonus=roll===6 || captured.length>0 || step===56;
+  // A two-player game is a head-to-head result, not a ranking table.
+  // Keep ranks empty so the UI can show Winner/You Lose instead of 1st/2nd.
+  if(pieces.length===2) {
+    const next=finished?turn:bonus?turn:nextPlayer(state,turn);
+    return {...state,pieces,turn:next,roll:0,sixChain:bonus?state.sixChain:0,ranks:[0,0],rankCount:0,winner:finished?turn:null,lastCaptured:captured,lastMove:{player:turn,token:index,from:old,to:step,roll}};
+  }
   if(finished && !ranks[turn]) ranks[turn]=++rankCount;
   const remaining=pieces.length-rankCount;
   if(remaining===1) {
@@ -64,7 +97,6 @@ export function moveLudo(state,index) {
   }
   const winner=ranks.includes(1) ? ranks.indexOf(1) : null;
   const terminal=rankCount===pieces.length;
-  const bonus=roll===6 || captured.length>0 || step===56;
   const next=terminal ? turn : ranks[turn] ? nextPlayer(state,turn) : bonus ? turn : nextPlayer(state,turn);
   return {...state,pieces,turn:next,roll:0,sixChain:bonus ? state.sixChain : 0,ranks,rankCount,winner:terminal ? winner : null,lastCaptured:captured,lastMove:{player:turn,token:index,from:old,to:step,roll}};
 }

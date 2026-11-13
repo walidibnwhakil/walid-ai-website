@@ -1,0 +1,8 @@
+/* Shared low-overhead shell: rendering/layout only, no game-state changes. */
+body.game-shell { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+body.game-shell :is(canvas, .board, .game-board, .playfield, #board) { contain: layout paint; }
+@media (max-width: 600px) {
+  body.game-shell { overflow: hidden; min-height: 100dvh; }
+  body.game-shell :is(.page, .game-page) { height: 100dvh; max-height: 100dvh; overflow: hidden; }
+  body.game-shell :is(.ambient, .background-particles, .sparkles, .confetti) { animation: none !important; }
+}

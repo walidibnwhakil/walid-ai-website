@@ -1116,7 +1116,11 @@ body.ludo-game.playing-ludo .board.ludo .home-base.inactive-home{background:tran
 body.ludo-game.playing-ludo .board.ludo .lane.inactive-lane{background:transparent!important}
 @media(max-width:620px){body.ludo-game.playing-ludo .board.ludo{padding:2.7% 4% 9.25%;border:0!important;border-radius:0!important;width:min(100%,min(83vh,100vw))}}
 
-/* Color is chosen from the player's own header; all eight swatches stay in one row. */
+/* Keep an open color picker above the board and every neighboring dice panel. */
+body.ludo-game.playing-ludo .ludo-stage{position:relative;isolation:isolate}
+body.ludo-game.playing-ludo .player-dice:has(.player-color-picker:not([hidden])){position:relative;z-index:30}
+body.ludo-game.playing-ludo .player-dice:has(.player-color-picker:not([hidden])) .player-color-picker{z-index:100}
+\n/* Color is chosen from the player's own header; all eight swatches stay in one row. */
 body.ludo-game.playing-ludo .player-dice{position:relative;overflow:visible}
 body.ludo-game.playing-ludo .player-dice-label{cursor:pointer;touch-action:manipulation}
 body.ludo-game.playing-ludo .player-dice-label:disabled{cursor:default;opacity:.82}

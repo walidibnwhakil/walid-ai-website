@@ -24,40 +24,55 @@ export function pawnSlots(count) {
 // Include the 2.5-unit outline stroke and its pointed miter in the fit envelope.
 export const pinGeometry = { tipX: 32, tipY: 77 + 1.25 * Math.hypot(10, 12) / 10, left: 3.75, right: 60.25, top: 1.75, bottom: 80 };
 
-export function layoutTrackPawns(board) {
-  for (const tile of board.querySelectorAll('.track, .lane:not(.final-square)')) {
+// One viewport per assigned cell. Only this inner group scales the original paths.
+function paintPawn(pawn, width, height, scale, tip) {
+  const art = pawn.querySelector('svg.pin-pawn-art');
+  if (!art) return;
+  art.classList.add("tile-anchored");
+  let shape = art.querySelector("g.pin-shape");
+  if (!shape) {
+    shape = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    shape.classList.add("pin-shape");
+    shape.append(...art.children);
+    art.append(shape);
+  }
+  art.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  art.setAttribute("preserveAspectRatio", "none");
+  shape.setAttribute("transform", `translate(${tip.x - pinGeometry.tipX * scale} ${tip.y - pinGeometry.tipY * scale}) scale(${scale})`);
+}
+
+function cellSize(tile) {
+  const css = getComputedStyle(tile);
+  return css.display === "none" ? {width: 0, height: 0} : {width: parseFloat(css.width), height: parseFloat(css.height)};
+}
+
+export function layoutBoardPawns(board) {
+  const g = pinGeometry;
+  const routeCells = [...board.querySelectorAll('.track, .lane')]
+    .map(tile => ({tile, ...cellSize(tile)})).filter(({width, height}) => width > 0 && height > 0);
+  // The board's raised edge rows have different rendered heights. Use one fit
+  // across ALL route cells, including empty cells, so location cannot change size.
+  const singleScale = Math.min(...routeCells.flatMap(({width, height}) => [
+    width * .94 / (g.right - g.left), height * .47 / (g.tipY - g.top),
+    height * .47 / (g.bottom - g.tipY)
+  ]));
+  for (const {tile, width, height} of routeCells) {
     const pawns = [...tile.children].filter(p => p.classList.contains('pin-pawn'));
     if (!pawns.length) continue;
-    const css = getComputedStyle(tile);
-    const width = parseFloat(css.width), height = parseFloat(css.height);
-    if (!width || !height) continue;
-    const columns = pawns.length <= 3 ? pawns.length : Math.ceil(Math.sqrt(pawns.length));
-    const rows = Math.ceil(pawns.length / columns);
-    let tips = pawns.map((_, i) => {
-      const row = Math.floor(i / columns);
-      const inRow = Math.min(columns, pawns.length - row * columns);
-      return { x: width * (.5 + (i % columns - (inRow - 1) / 2) * .96 / columns),
-        y: height * (.5 + (row - (rows - 1) / 2) * .8 / rows) };
-    });
-    const g = pinGeometry;
-    // Fit above each tip and between columns/rows, with a tile-relative margin.
-    let scale = Math.min(...tips.flatMap(t => [
-      (t.x - width * .03) / (g.tipX - g.left),
-      (width * .97 - t.x) / (g.right - g.tipX),
-      (t.y - height * .03) / (g.tipY - g.top),
-      (height * .97 - t.y) / (g.bottom - g.tipY),
-      width * .9 / columns / (g.right - g.left),
-      rows > 1 ? height * .76 / rows / (g.bottom - g.top) : Infinity
-    ]));
-    if (pawns.length <= 2) {
-      // Approved reference: full-size pins with path tips together at tile center.
-      // Artwork above the tile is intentional; do not shrink it to a half-tile box.
-      const phone = matchMedia("(max-width: 620px)").matches;
-      scale = Math.min(width / 64, height / 77) * (phone ? (pawns.length === 2 ? 1.1 : 1.2) : 1);
-      tips = pawns.map((_, i) => ({x: width * (pawns.length === 1 ? .5 : i ? .74 : .26), y: height * .5}));
+    pawns.forEach(pawn => pawn.classList.toggle("single-tile-pawn", pawns.length === 1));
+    let tips, scale;
+    if (pawns.length === 1) {
+      // A centered bottom tip leaves the upper half-cell for the entire artwork.
+      // The common fit depends on actual cells, never color, position or phone CSS.
+      tips = [{x: width / 2, y: height / 2}];
+      scale = singleScale;
+    } else if (pawns.length === 2 && !tile.classList.contains('final-square')) {
+      // Preserve before-mobile.png exactly: paired path tips at 26%/74%, 50%.
+      // This approved multi-pawn artwork overhang is NOT a single-pawn size policy.
+      scale = Math.min(width / 64, height / 77) * (matchMedia("(max-width: 620px)").matches ? 1.1 : 1);
+      tips = [{x: width * .26, y: height / 2}, {x: width * .74, y: height / 2}];
       const tileRect = tile.getBoundingClientRect(), boardRect = board.getBoundingClientRect();
       const unitX = width / tileRect.width, unitY = height / tileRect.height;
-      // Only actual board-edge overflow justifies reducing the approved footprint.
       const left = (boardRect.left - tileRect.left) * unitX;
       const right = (boardRect.right - tileRect.left) * unitX;
       const top = (boardRect.top - tileRect.top) * unitY;
@@ -66,24 +81,39 @@ export function layoutTrackPawns(board) {
         (t.x - left) / (32 - g.left), (right - t.x) / (g.right - 32),
         (t.y - top) / (77 - g.top), (bottom - t.y) / (g.bottom - 77)
       ]));
-      // t.y below refers to the stroke tip used by the shared transform.
       tips = tips.map(t => ({...t, y: t.y + (g.tipY - 77) * scale}));
+    } else {
+      const columns = pawns.length <= 3 ? pawns.length : Math.ceil(Math.sqrt(pawns.length));
+      const rows = Math.ceil(pawns.length / columns);
+      tips = pawns.map((_, i) => {
+        const row = Math.floor(i / columns);
+        const inRow = Math.min(columns, pawns.length - row * columns);
+        return {x: width * (.5 + (i % columns - (inRow - 1) / 2) * .96 / columns),
+          y: height * (.5 + (row - (rows - 1) / 2) * .8 / rows)};
+      });
+      scale = Math.min(...tips.flatMap(t => [
+        (t.x - width * .03) / (g.tipX - g.left),
+        (width * .97 - t.x) / (g.right - g.tipX),
+        (t.y - height * .03) / (g.tipY - g.top),
+        (height * .97 - t.y) / (g.bottom - g.tipY),
+        width * .9 / columns / (g.right - g.left),
+        rows > 1 ? height * .76 / rows / (g.bottom - g.top) : Infinity
+      ]));
     }
-    pawns.forEach((pawn, i) => {
-      const art = pawn.querySelector('svg.pin-pawn-art');
-      if (!art) return;
-      art.classList.add("tile-anchored");
-      const t = tips[i];
-      let shape = art.querySelector("g.pin-shape");
-      if (!shape) {
-        shape = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        shape.classList.add("pin-shape");
-        shape.append(...art.children);
-        art.append(shape);
-      }
-      art.setAttribute("viewBox", `0 0 ${width} ${height}`);
-      art.setAttribute("preserveAspectRatio", "none");
-      shape.setAttribute("transform", `translate(${t.x - g.tipX * scale} ${t.y - g.tipY * scale}) scale(${scale})`);
-    });
+    pawns.forEach((pawn, i) => paintPawn(pawn, width, height, scale, tips[i]));
+  }
+
+  // Yard pawns occupy deliberate home slots, not track cells. Center their full
+  // painted artwork within those existing slots at one common home-slot scale.
+  const homes = [...board.querySelectorAll('.yard')].map(tile => ({tile, ...cellSize(tile)}))
+    .filter(({width, height}) => width > 0 && height > 0);
+  const homeScale = Math.min(...homes.flatMap(({width, height}) => [
+    width * .9 / (g.right - g.left), height * .9 / (g.bottom - g.top)
+  ]));
+  for (const {tile, width, height} of homes) {
+    const tip = {x: width / 2, y: height / 2 + (g.tipY - (g.top + g.bottom) / 2) * homeScale};
+    for (const pawn of tile.children) if (pawn.classList.contains('pin-pawn')) {
+      paintPawn(pawn, width, height, homeScale, tip);
+    }
   }
 }

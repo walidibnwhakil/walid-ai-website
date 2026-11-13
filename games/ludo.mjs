@@ -707,7 +707,10 @@ function render() {
   const statusText=state.winner!==null?`Game over — ${getColor(state.winner)[0]} wins!`
     :message+(botTurn?`${currentTeam} bot is playing…`:"");
   game.status.textContent=statusText;
-  if(!locked && rollingTeam<0 && state.winner===null && state.roll>0 && legal.length===1) {
+  const activeSteps=state.pieces[state.turn].filter(step=>step>=0&&step<56);
+  const allActivePawnsShareSquare=activeSteps.length>=2&&new Set(activeSteps).size===1;
+  const shouldAutoMove=legal.length===1||allActivePawnsShareSquare;
+  if(!locked && rollingTeam<0 && state.winner===null && state.roll>0 && shouldAutoMove && legal.length) {
     game.later(()=>play(legal[0]), 420);
   } else if(!locked && rollingTeam<0 && botTurn) {
     game.later(()=>state.roll?play(choose(legal)):throwDie());

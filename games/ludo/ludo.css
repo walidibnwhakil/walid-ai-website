@@ -1512,3 +1512,15 @@ body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration .winn
 body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration.rank-1{background:linear-gradient(145deg,#785014f5,#2d1607f2);box-shadow:0 0 20px #ffd34fdd,inset 0 1px #fff8}
 body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration.rank-2{background:linear-gradient(145deg,#526071f2,#20242bf2);box-shadow:0 0 14px #dce8f5aa,inset 0 1px #fff8}
 body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration.rank-3{background:linear-gradient(145deg,#70472ff2,#26140cf2);box-shadow:0 0 12px #c7834566,inset 0 1px #fff8}
+
+
+/* Preserve the restored board treatment while applying each player's selected color. */
+body.ludo-game.playing-ludo .board.ludo .home-base.custom-color{
+  background:linear-gradient(145deg,
+    color-mix(in srgb,var(--yard-color) 70%,white),
+    var(--yard-color) 62%,
+    color-mix(in srgb,var(--yard-color) 82%,#24140f))!important;
+}
+body.ludo-game.playing-ludo .board.ludo .home-base.custom-color::before{
+  display:none!important;
+}

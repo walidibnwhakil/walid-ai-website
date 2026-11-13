@@ -1480,3 +1480,35 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn-slot .
 body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.adjacent-pawn .pin-pawn-art{
   transform:translate(calc(-50% + var(--adjacent-x,0px)),calc(-50% + var(--adjacent-y,0px)))!important;
 }
+
+
+/* Final result presentation: bot matches use a full-screen personal result. */
+body.ludo-game #ludo-bot-result{
+  position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;padding:24px;
+  background:radial-gradient(circle at 50% 28%,#633b1d 0,#241316 52%,#080914 100%);
+  color:#fff4cf;text-align:center;animation:bot-result-in .55s ease-out both;
+}
+body.ludo-game #ludo-bot-result::before{
+  content:"";position:absolute;inset:8%;border:2px solid #f3c96388;border-radius:28px;
+  box-shadow:inset 0 0 35px #ffd85c22,0 0 40px #ffbe3b22;pointer-events:none;
+}
+body.ludo-game #ludo-bot-result .board-logo{position:relative;width:min(70vw,360px);height:auto;margin:0}
+body.ludo-game #ludo-bot-result h2{position:relative;margin:0;font:1000 clamp(3.2rem,12vw,7rem)/1 system-ui,sans-serif;letter-spacing:.03em;text-shadow:0 5px #6d3217,0 10px 24px #000b}
+body.ludo-game #ludo-bot-result.win h2{color:#ffd34f}
+body.ludo-game #ludo-bot-result.lose h2{color:#f3d7d0}
+body.ludo-game #ludo-bot-result .bot-result-score{position:relative;margin:0;color:#fff1c4;font:900 clamp(1.1rem,4vw,2rem) system-ui,sans-serif}
+@keyframes bot-result-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){body.ludo-game #ludo-bot-result{animation:none}}
+/* Three/four-player final badges keep the existing board layout but show explicit roles. */
+body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration{
+  z-index:20!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;min-width:72%;min-height:44%;padding:4px;border:2px solid #ffe18a;border-radius:18px;
+  background:linear-gradient(145deg,#5d2b14ee,#25100cee);box-shadow:0 0 14px #ffcf5c99,inset 0 1px #fff8;
+  color:#fff5d2;text-align:center;line-height:1.05;
+}
+body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration .rank-crown{width:42%;height:auto;filter:drop-shadow(0 2px 2px #0008)}
+body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration .winner-place{font-size:clamp(8px,1.35vw,16px);white-space:nowrap}
+body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration.rank-1{background:linear-gradient(145deg,#785014f5,#2d1607f2);box-shadow:0 0 20px #ffd34fdd,inset 0 1px #fff8}
+body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration.rank-2{background:linear-gradient(145deg,#526071f2,#20242bf2);box-shadow:0 0 14px #dce8f5aa,inset 0 1px #fff8}
+body.ludo-game.playing-ludo .board.ludo.final-rank-board .yard-celebration.rank-3{background:linear-gradient(145deg,#70472ff2,#26140cf2);box-shadow:0 0 12px #c7834566,inset 0 1px #fff8}

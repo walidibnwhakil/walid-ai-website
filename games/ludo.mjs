@@ -488,6 +488,17 @@ async function play(index) {
   }
   render();
 }
+function showBotResult() {
+  if(modeSelect.value!=="bot" || state.pieces.length!==2 || state.winner===null) return;
+  if(document.querySelector("#ludo-bot-result")) return;
+  const overlay=document.createElement("section"); overlay.id="ludo-bot-result";
+  overlay.className=state.ranks[0]===1?"bot-result win":"bot-result lose";
+  const logo=document.querySelector(".board-logo")?.cloneNode(true);
+  const title=document.createElement("h2"); title.textContent=state.ranks[0]===1?"You Win":"You Lose";
+  const score=document.createElement("p"); score.className="bot-result-score";
+  score.textContent=state.ranks[0]===1?"Winner":"The bot finished first";
+  if(logo)overlay.append(logo); overlay.append(title,score); document.body.append(overlay);
+}
 function render() {
   setGameInProgress(boardLaunch&&state.winner===null);
   const botTurn=isBot(state.turn)&&state.winner===null;
@@ -669,13 +680,19 @@ function render() {
   window.__luduResolvePawnGeometry=resolveAdjacentPawnGeometry;
   resolveAdjacentPawnGeometry();
 
+  game.board.classList.toggle("final-rank-board",(state.pieces.length>=3 || (state.pieces.length===2&&modeSelect.value!=="bot"))&&state.winner!==null);
   game.board.querySelectorAll(".yard-celebration").forEach(badge=>badge.remove());
-  state.ranks.forEach((rank,player)=>{
+  const botOnlyResult=modeSelect.value==="bot"&&state.pieces.length===2;
+  if(!botOnlyResult) state.ranks.forEach((rank,player)=>{
     if(!rank||locked) return;
-    const teamId=activeTeams[player];
-    const badge=document.createElement("div");
+    const teamId=activeTeams[player],badge=document.createElement("div");
     badge.className=`yard-celebration rank-${rank} ${teams[teamId].toLowerCase()}`;
-    badge.innerHTML=rank===1 ? `<span class="winner-firework winner-firework-left" aria-hidden="true"></span><span class="winner-firework winner-firework-right" aria-hidden="true"></span><svg class="winner-crown" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="#ffd552" stroke="#8a470e" stroke-width="2"/><path d="M5 25h32v4H5z" fill="#ecaa24"/></svg><strong class="winner-place">1st</strong><span class="winner-ribbon">WINNER</span>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
+    const rankedMatch=state.pieces.length>=3 || (state.pieces.length===2&&modeSelect.value!=="bot");
+    const labels=state.pieces.length===2?{1:"Winner",2:"Loser"}:state.pieces.length===3?{1:"Winner",2:"1st Runner-up",3:"Loser"}:{1:"Winner",2:"1st Runner-up",3:"2nd Runner-up",4:"Loser"};
+    const crownColors={1:"#ffd552",2:"#e7edf5",3:"#c78345"};
+    badge.innerHTML=rankedMatch
+      ? `<svg class="rank-crown crown-${rank}" viewBox="0 0 42 30" aria-hidden="true"><path d="M4 24 2 8l11 7L21 3l8 12 11-7-3 16z" fill="${crownColors[rank]||"#8b735f"}" stroke="#6b3514" stroke-width="2"/><path d="M5 25h32v4H5z" fill="${crownColors[rank]||"#8b735f"}"/></svg><strong class="winner-place">${labels[rank]}</strong>`
+      : rank===1 ? `<strong class="winner-place">1st</strong><span class="winner-ribbon">WINNER</span>` : `<strong>${rank}${rank===2?"nd":rank===3?"rd":"th"}</strong>`;
     game.board.querySelector(`.base-${teamId}`).append(badge);
   });
 
@@ -690,6 +707,7 @@ function render() {
   } else if(!locked && rollingTeam<0 && botTurn) {
     game.later(()=>state.roll?play(choose(legal)):throwDie());
   }
+  showBotResult();
 }
 game.restart();
 if(boardLaunch)persistGameSettings();

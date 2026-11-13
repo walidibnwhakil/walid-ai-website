@@ -707,6 +707,7 @@ function render() {
   } else if(!locked && rollingTeam<0 && botTurn) {
     game.later(()=>state.roll?play(choose(legal)):throwDie());
   }
+  showBotResult();
 }
 game.restart();
 if(boardLaunch)persistGameSettings();\n  showBotResult();

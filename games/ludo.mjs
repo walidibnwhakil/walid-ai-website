@@ -591,6 +591,22 @@ function render() {
     }
     square.append(marker);
   }));
+  // Use one measured board-square footprint so path orientation/cell geometry cannot resize single pawns.
+  const referenceSquare=[...squares.values()].find(square=>square.classList.contains("track")||square.classList.contains("lane"));
+  const referenceRect=referenceSquare?.getBoundingClientRect();
+  if(referenceRect){
+    const baseWidth=referenceRect.width;
+    const baseHeight=referenceRect.height;
+    game.board.querySelectorAll(".track > .pin-pawn > .pin-pawn-art, .lane > .pin-pawn > .pin-pawn-art").forEach(art=>{
+      const pawn=art.parentElement;
+      const compact=pawn.classList.contains("pile-size-3")||pawn.classList.contains("pile-size-4")||pawn.classList.contains("pile-size-dense");
+      if(!compact){
+        art.style.setProperty("width",`${baseWidth}px`,"important");
+        art.style.setProperty("height",`${baseHeight}px`,"important");
+      }
+    });
+  }
+
   for(const square of squares.values()){
     const pile=[...square.children].filter(piece=>piece.classList.contains("ludo-pawn"));
     if(!pile.length)continue;

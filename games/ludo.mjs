@@ -243,6 +243,13 @@ for (let player=0;player<4;player++) {
   yards[player].forEach(([row,column])=>addSquare(row,column,`yard yard-seat-${player} ${teams[player].toLowerCase()}`));
 }
 addSquare(7,7,"home-center");
+// Tag each player-owned region by seat so celebrations follow custom color assignments.
+for(let seat=0;seat<4;seat++){
+  const physicalColor=teams[seat].toLowerCase();
+  game.board.querySelectorAll(`.base-${seat}, .lane-${seat}, .yard-seat-${seat}, .start-square.${physicalColor}, .safe-route-${physicalColor}`).forEach(node=>{
+    node.dataset.ludoSeat=String(seat);
+  });
+}
 function addSquare(row,column,kind) {
   const tile=document.createElement("div");
   tile.className=kind;
@@ -464,14 +471,12 @@ async function play(index) {
     if(soundEnabled)playFinishSound();
     message=`${getColor(move.player)[0]} pawn reached the final square (${finishedCount}/4). `;
     const teamId=activeTeams[move.player];
-    const teamClass=teams[teamId].toLowerCase();
-    const celebrationNodes=[
-      game.board.querySelector(`.base-${teamId}`),
-      ...game.board.querySelectorAll(`.lane-${teamId}, .yard-seat-${teamId}, .start-square.${teamClass}, .safe-route-${teamClass}`)
-    ].filter(Boolean);
+    const activeColor=getColor(move.player)[1];
+    const celebrationNodes=[...game.board.querySelectorAll(`[data-ludo-seat="${teamId}"]`)];
     if(scoreLightTimers.has(teamId))clearTimeout(scoreLightTimers.get(teamId));
     celebrationNodes.forEach(node=>{
       node.classList.remove(`finish-celebration-${teamId}`);
+      node.style.setProperty("--celebration-color",activeColor);
       void node.offsetWidth;
       node.classList.add(`finish-celebration-${teamId}`);
     });

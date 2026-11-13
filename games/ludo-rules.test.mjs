@@ -23,9 +23,9 @@ test("safe squares protect tokens and open-square capture grants another roll",(
  s=newLudo(2,[0,1]); s.pieces[0][0]=0; s.pieces[1][0]=14;
  s=rollLudo(s,1); s=moveLudo(s,0); assert.deepEqual(s.lastCaptured,[{player:1,token:0,step:14}]); assert.equal(s.pieces[1][0],-1); assert.equal(s.turn,0);
 });
-test("finished players receive ranks and are skipped",()=>{
+test("two-player finish is a head-to-head winner result",()=>{
  let s=newLudo(2); s.pieces[0]=[55,56,56,56]; s=rollLudo(s,1); s=moveLudo(s,0);
- assert.equal(s.ranks[0],1); assert.equal(s.ranks[1],2); assert.equal(s.winner,0);
+ assert.deepEqual(s.ranks,[0,0]); assert.equal(s.winner,0); assert.equal(s.rankCount,0);
 });
 test("invalid moves and rolls cannot mutate state",()=>{
  const s=newLudo(2); assert.equal(moveLudo(s,0),s); assert.equal(rollLudo(s,0),s);
@@ -73,4 +73,18 @@ test("all four outer routes leave into the matching player home lane",()=>{
   let s=newLudo(4,[0,1,2,3]);s.pieces[player][0]=50;s.turn=player;s.roll=1;
   s=moveLudo(s,0);assert.equal(s.pieces[player][0],51,"player "+player+" enters lane at step 51");
  }
+});
+
+
+test("bot chooses an available capture over a non-capturing move",()=>{
+ let s=newLudo(2,[0,1]); s.pieces[0]=[4,10,20,30]; s.pieces[1]=[9,40,41,42]; s=rollLudo(s,5);
+ assert.equal(chooseBotToken(s),0);
+});
+test("bot prioritizes finishing a pawn",()=>{
+ let s=newLudo(3,[0,1,2]); s.pieces[0]=[55,10,20,30]; s=rollLudo(s,1);
+ assert.equal(chooseBotToken(s),0);
+});
+test("bot prefers a safe landing when tactical outcomes are otherwise equal",()=>{
+ let s=newLudo(2,[0,1]); s.pieces[0]=[7,10,20,30]; s=rollLudo(s,1);
+ assert.equal(chooseBotToken(s),0);
 });

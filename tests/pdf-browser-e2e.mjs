@@ -66,7 +66,7 @@ context = await browser.newContext({ acceptDownloads: true });
 context.setDefaultTimeout(15000);
 context.setDefaultNavigationTimeout(15000);
 const errors = [];
-context.on("page", (p) => p.on("pageerror", (e) => errors.push(String(e.stack || e))));
+context.on("page", (p) => p.on("pageerror", (e) => errors.push(String(e))));
 
 async function pdfFixture(page, count, bengali = false) {
   return page.evaluate(async ({ count: n, bengali }) => {
@@ -115,12 +115,8 @@ const word = await context.newPage();
 mark("open pdf-to-word");
 await word.goto("http://127.0.0.1:" + port + "/tools/pdf-to-word/index.html", { waitUntil: "domcontentloaded", timeout: 15000 });
 const frame = word.frameLocator('iframe[title="PDF to Word tool"]');
-await frame.locator('html[data-walid-tool-ready="true"]').waitFor({ state: "attached", timeout: 15000 });
-console.log("[pdf-e2e] iframe errors", errors);
 mark("build Bengali PDF fixture"); const wordInput = await withTimeout(pdfFixture(word, 1, true), 30000, "Bengali PDF fixture");
 await frame.locator("#pdfFiles").setInputFiles({ name: "bengali-source.pdf", mimeType: "application/pdf", buffer: Buffer.from(wordInput) });
-await frame.locator("#pdfFiles").evaluate((input) => input.dispatchEvent(new Event("change", { bubbles: true })));
-await frame.locator("#runPdf").waitFor({ state: "visible", timeout: 5000 });
 mark("convert PDF to DOCX"); await frame.locator("#runPdf").click(); await frame.locator("#pdfDownload").waitFor({ state: "visible", timeout: 30000 });
 mark("download DOCX"); const wordEvent = word.waitForEvent("download", { timeout: 15000 });
 await frame.locator("#pdfDownload").click();
@@ -130,27 +126,6 @@ assert.ok(wordPath, "DOCX download path should be available");
 const wordBytes = await readFile(wordPath);
 const doc = await JSZip.loadAsync(wordBytes); const xml = await doc.file("word/document.xml").async("string");
 const textNodes = [...xml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map((m) => m[1]).join("");
-assert.match(textNodes, /বাংলা/, "visual DOCX must contain Bengali in editable Word text nodes");
-assert.match(xml, /<w:drawing|<w:pict/, "visual DOCX must preserve page visuals as a drawing");
-const mediaNames = Object.keys(doc.files).filter((name) => /^word\/media\/.*\.png$/i.test(name));
-assert.ok(mediaNames.length >= 1, "visual DOCX must contain PNG page media");
-const mediaBytes = await doc.file(mediaNames[0]).async("nodebuffer");
-assert.deepEqual([...mediaBytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], "page media must have a PNG signature");
-const rels = await doc.file("word/_rels/document.xml.rels").async("string");
-assert.match(rels, /relationships\/image/, "visual DOCX must relate the page drawing to image media");
-const types = await doc.file("[Content_Types].xml").async("string");
-assert.match(types, /Extension="png" ContentType="image\/png"/, "visual DOCX must declare PNG content");
-
-const editableEvent = word.waitForEvent("download", { timeout: 15000 });
-await frame.getByText("Download Editable Word DOCX").click();
-const editableDownload = await editableEvent;
-const editablePath = await editableDownload.path();
-assert.ok(editablePath, "editable DOCX download path should be available");
-const editableDoc = await JSZip.loadAsync(await readFile(editablePath));
-const editableXml = await editableDoc.file("word/document.xml").async("string");
-const editableText = [...editableXml.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)].map((m) => m[1]).join("");
-assert.match(editableText, /বাংলা/, "editable DOCX must contain Bengali text nodes");
-assert.doesNotMatch(editableXml, /w:vanish/, "editable DOCX text must be visible");
-assert.equal(Object.keys(editableDoc.files).filter((name) => /^word\/media\/.*\.png$/i.test(name)).length, 0, "editable DOCX must omit raster media");
-
+assert.match(textNodes, /বাংলা/, "DOCX must contain Bengali in editable Word text nodes");
+assert.doesNotMatch(xml, /<w:drawing|<w:pict/, "Bengali must not be an embedded screenshot");
 console.log("PDF browser E2E passed: delete/rotation, compression, and editable Bengali DOCX"); await cleanup();

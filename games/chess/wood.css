@@ -945,3 +945,33 @@ dialog .promotion img {
 header .gold-button {
   white-space: nowrap;
 }
+
+@media (max-width: 600px) {
+  body.game-shell { min-height: 100dvh; height: 100dvh; overflow: hidden; }
+  body.game-shell main {
+    height: 100dvh;
+    min-height: 0;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+  body.game-shell #game {
+    height: calc(100dvh - 78px - env(safe-area-inset-bottom));
+    min-height: 0;
+    overflow: hidden;
+    align-content: start;
+  }
+  body.game-shell #game .board-area { flex: 0 0 auto; }
+  body.game-shell #game .game-controls {
+    flex: 0 0 auto;
+    max-height: 91px;
+    overflow: hidden;
+    padding: 2px 0;
+    gap: 5px;
+  }
+  body.game-shell #game .game-controls button,
+  body.game-shell #game .game-controls button:nth-child(n + 5) {
+    min-height: 39px;
+    padding: 7px 4px;
+  }
+  body.game-shell #game .history { display: none; }
+}

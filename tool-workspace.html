@@ -72,36 +72,14 @@ function wordTable(rows, width) {
 function pageSection(width,height,margin) {
   return '<w:sectPr><w:pgSz w:w="'+Math.round(width*1440/96)+'" w:h="'+Math.round(height*1440/96)+'"/><w:pgMar w:top="'+margin+'" w:right="'+margin+'" w:bottom="'+margin+'" w:left="'+margin+'" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr>';
 }
-function imageBytesFromDataUrl(dataUrl) {
-  const encoded=String(dataUrl).split(',')[1]||'';
-  const binary=atob(encoded), bytes=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-  return bytes;
-}
-function wordFloatingImage(relId,width,height) {
-  const cx=Math.round(width*9525), cy=Math.round(height*9525);
-  return '<w:p><w:r><w:drawing><wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="0" behindDoc="1" locked="1" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:wrapNone/><wp:docPr id="1" name="PDF page image"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/wordprocessingml/2006/wordprocessingDrawing"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="page.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="'+relId+'" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"/></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>';
-}
-function wordTextBox(block,index,visible=false) {
-  const x=Math.max(0,Math.round((block.x||0)*9525)), y=Math.max(0,Math.round((block.y||0)*9525));
-  const cx=Math.max(1,Math.round((block.width||120)*9525)), cy=Math.max(1,Math.round((block.height||24)*9525));
-  return '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr><w:r><w:drawing><wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="'+(index+2)+'" behindDoc="0" locked="0" layoutInCell="0" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>'+x+'</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>'+y+'</wp:posOffset></wp:positionV><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:wrapNone/><wp:docPr id="'+(index+10)+'" name="Editable OCR text '+index+'"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingShape"><wps:wsp xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"><wps:cNvSpPr/><wps:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"/><a:noFill/><a:ln><a:noFill/></a:ln></wps:spPr><wps:txbx><w:txbxContent><w:p><w:r><w:rPr>'+(visible?'':'<w:vanish/>')+'<w:color w:val="'+(visible?'111111':'FFFFFF')+'"/></w:rPr><w:t xml:space="preserve">'+xmlEscape(block.text||'')+'</w:t></w:r></w:p></w:txbxContent></wps:txbx><wps:bodyPr/></wps:wsp></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p>';
-}
-async function createEditableDocx(pages, filename, options={}) {
+async function createEditableDocx(pages, filename) {
   const JSZip=(await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
-  const includeRaster=options.includeRaster!==false, visibleText=options.visibleText===true;
-  const body=pages.map((page,index)=>(includeRaster?wordFloatingImage('rId'+(index+2),page.width,page.height):'')+(page.overlayBlocks||page.blocks).map((block,blockIndex)=>wordTextBox(block,blockIndex,visibleText)).join()+(index<pages.length-1?wordParagraph(''):'')).join('')+pageSection(pages[pages.length-1].width,pages[pages.length-1].height,pages[pages.length-1].margin);
-  // Declare every drawing namespace on the document root. Word's OOXML parser
-  // is stricter than browser XML parsers and rejects a package when prefixes
-  // are only declared on nested elements (the old generator did that).
-  const documentXml='<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="wps"><w:body>'+body+'</w:body></w:document>';
+  const body=pages.map((page,index)=>page.blocks.map(block=>block.type==='table'?wordTable(block.rows,page.width):wordParagraph(block.text,block.heading?'':'')).join()+(index<pages.length-1?wordParagraph(''):'')).join('')+pageSection(pages[pages.length-1].width,pages[pages.length-1].height,pages[pages.length-1].margin);
+  const documentXml='<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'</w:body></w:document>';
   const zip=new JSZip();
-  zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
   zip.file('_rels/.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
   zip.file('word/document.xml',documentXml);
-  const rels=includeRaster?pages.map((page,index)=>`<Relationship Id="rId${index+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/page-${index+1}.png"/>`).join(''):'';
-  zip.file('word/_rels/document.xml.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+rels+'</Relationships>');
-  if(includeRaster)pages.forEach((page,index)=>zip.file('word/media/page-'+(index+1)+'.png',imageBytesFromDataUrl(page.imageDataUrl)));
   return {bytes:await zip.generateAsync({type:'uint8array'}),filename};
 }
 function clusterLines(words) {
@@ -110,27 +88,19 @@ function clusterLines(words) {
     const center=(word.bbox.y0+word.bbox.y1)/2, line=lines.find(item=>Math.abs(item.center-center)<Math.max(8,(word.bbox.y1-word.bbox.y0)*.55));
     if(line){line.words.push(word);line.center=(line.center*(line.words.length-1)+center)/line.words.length;} else lines.push({center,words:[word]});
   }
-  return lines.map(line=>{const words=line.words.sort((a,b)=>a.bbox.x0-b.bbox.x0);const x=Math.min(...words.map(w=>w.bbox.x0)), right=Math.max(...words.map(w=>w.bbox.x1)), top=Math.min(...words.map(w=>w.bbox.y0)), bottom=Math.max(...words.map(w=>w.bbox.y1));return {y:line.center,words,text:words.map(w=>w.text).join(' '),x,width:right-x,height:bottom-top};});
+  return lines.map(line=>({y:line.center,words:line.words.sort((a,b)=>a.bbox.x0-b.bbox.x0),text:line.words.map(w=>w.text).join(' ')}));
 }
 function detectBlocks(words,width) {
   const lines=clusterLines(words); if(!lines.length)return [];
   const rowCandidates=lines.filter(line=>line.words.length>=2);
-  const anchors=(rowCandidates[0]?.words||[]).map(word=>word.bbox.x0);
-  const aligned=anchors.filter(x=>rowCandidates.filter(line=>line.words.some(word=>Math.abs(word.bbox.x0-x)<18)).length>=3);
-  const isTable=rowCandidates.length>=3 && aligned.length>=2 &&
-    rowCandidates.every(line=>aligned.every(x=>line.words.some(word=>Math.abs(word.bbox.x0-x)<18)));
-  if(!isTable)return lines.map(line=>({type:'paragraph',text:line.text,x:line.x,y:line.y-line.height/2,width:line.width,height:Math.max(18,line.height*1.35)}));
+  const xs=[]; for(const line of rowCandidates)for(const word of line.words)if(!xs.some(x=>Math.abs(x-word.bbox.x0)<Math.max(18,(word.bbox.x1-word.bbox.x0)*.7)))xs.push(word.bbox.x0);
+  const isTable=rowCandidates.length>=3 && xs.length>=2;
+  if(!isTable)return lines.map(line=>({type:'paragraph',text:line.text}));
   const rows=rowCandidates.map(line=>{
     const cells=[]; for(const word of line.words){let cell=cells[cells.length-1];if(!cell||word.bbox.x0-cell.end>Math.max(22,(word.bbox.x1-word.bbox.x0)*1.25)){cell={text:'',end:word.bbox.x1};cells.push(cell);}cell.text+=(cell.text?' ':'')+word.text;cell.end=word.bbox.x1;} return cells.map(cell=>cell.text);
   });
   const nonRows=lines.filter(line=>!rowCandidates.includes(line)).map(line=>({type:'paragraph',text:line.text}));
-  return [{type:'table',rows},...nonRows];
-}
-function maskTextRegions(canvas,words) {
-  // Keep the source page intact. Painting OCR rectangles here destroys logos,
-  // signatures, barcodes, and background texture; the OCR layer is carried
-  // separately as editable Word text boxes.
-  return canvas.toDataURL('image/png');
+  return [...nonRows.slice(0,Math.max(0,nonRows.length-1)),{type:'table',rows}];
 }
 async function ocrPdfToDocx(file,onProgress) {
   const {createWorker}=await import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm');
@@ -149,9 +119,9 @@ async function ocrPdfToDocx(file,onProgress) {
       const textContent=await page.getTextContent();
       let words=textContent.items.filter(item=>item.str.trim()).map(item=>({text:item.str,bbox:{x0:item.transform[4]*2,y0:height-item.transform[5]*2-item.height*2,x1:(item.transform[4]+item.width)*2,y1:height-item.transform[5]*2}}));
       if(words.length<3){const result=await worker.recognize(canvas);words=(result.data.words||[]).map(word=>({text:word.text,bbox:{x0:word.bbox.x0,y0:word.bbox.y0,x1:word.bbox.x1,y1:word.bbox.y1}}));}
-      const margin=72, blocks=detectBlocks(words,width-2*margin), overlayBlocks=clusterLines(words).map(line=>({type:'paragraph',text:line.text,x:line.x,y:line.y-line.height/2,width:line.width,height:Math.max(18,line.height*1.35)}));
+      const margin=72, blocks=detectBlocks(words,width-2*margin);
       if(!blocks.length)throw Error('No editable text was found. The PDF may be empty or unreadable.');
-      pages.push({width,height,margin,blocks,overlayBlocks,imageDataUrl:maskTextRegions(canvas,words)});
+      pages.push({width,height,margin,blocks});
     }
   } finally {await worker.terminate();}
   return pages;
@@ -176,15 +146,11 @@ $('#runPdf').onclick=async()=>{
   try {
     if(activeTool==='pdf-to-word') {
       const paragraphs=await ocrPdfToDocx(files[0], info=>setStatus(info?.page?'Reading page '+info.page+' of '+info.pages+'…':'Loading OCR…'));
-      const baseName=files[0].name.replace(/\.pdf$/i,'');
-      const visual=await createEditableDocx(paragraphs,baseName+' - visual.docx',{includeRaster:true,visibleText:false});
-      const editable=await createEditableDocx(paragraphs,baseName+' - editable.docx',{includeRaster:false,visibleText:true});
-      const type='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      const visualUrl=URL.createObjectURL(new Blob([visual.bytes],{type})), editableUrl=URL.createObjectURL(new Blob([editable.bytes],{type}));
-      pdfLink.href=visualUrl;pdfLink.download=walidDownloadName(visual.filename);pdfLink.textContent='Download Visual fidelity DOCX';pdfLink.hidden=false;
-      const editableLink=document.createElement('a');editableLink.className='download';editableLink.href=editableUrl;editableLink.download=walidDownloadName(editable.filename);editableLink.textContent='Download Editable Word DOCX';pdfLink.after(editableLink);setStatus('done');window.WalidUsage?.tool('tool_success',activeTool);return;
+      const result=await createEditableDocx(paragraphs, files[0].name.replace(/\.pdf$/i,'')+'.docx');
+      const url=URL.createObjectURL(new Blob([result.bytes],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}));
+      pdfLink.href=url;pdfLink.download=walidDownloadName(result.filename);pdfLink.textContent='Download '+pdfLink.download;pdfLink.hidden=false;setStatus('done');window.WalidUsage?.tool('tool_success',activeTool);return;
     }
-    const encoded=await Promise.all(files.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)}))); const body=activeTool==='merge-pdf'?{files:encoded}:activeTool==='split-pdf'?{file:encoded[0],pages:$('#pages').value}:{file:encoded[0]}; const base=(window.WALID_AI_API||'').replace(/\/$/,''); const chatToken=await getChatToolToken(); const route=(window.parent===window||new URLSearchParams(location.search).has('standalone'))?'api/tools/'+activeTool:'api/chat-tool/'+activeTool; const headers={'Content-Type':'application/json'}; if(chatToken)headers.Authorization='Bearer '+chatToken; const response=await fetch(base+'/'+route,{method:'POST',headers,body:JSON.stringify(body)}); const result=await response.json();if(!response.ok)throw Error(result.error||messages.fileError);const bytes=Uint8Array.from(atob(result.file),char=>char.charCodeAt(0)),url=URL.createObjectURL(new Blob([bytes],{type:result.type}));pdfLink.href=url;pdfLink.download=walidDownloadName(result.name);pdfLink.textContent='Download '+pdfLink.download;pdfLink.hidden=false;setStatus('done');window.WalidUsage?.tool('tool_success',activeTool)
+    const encoded=await Promise.all(files.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)}))),body=activeTool==='merge-pdf'?{files:encoded}:activeTool==='split-pdf'?{file:encoded[0],pages:$('#pages').value}:{file:encoded[0]},base=(window.WALID_AI_API||'').replace(/\/$/,''),chatToken=await getChatToolToken(),route=(window.parent===window||new URLSearchParams(location.search).has('standalone'))?'api/tools/'+activeTool:'api/chat-tool/'+activeTool,headers={'Content-Type':'application/json'},_auth=chatToken&&(headers.Authorization='Bearer '+chatToken),response=await fetch(base+'/'+route,{method:'POST',headers,body:JSON.stringify(body)}),result=await response.json();if(!response.ok)throw Error(result.error||messages.fileError);const bytes=Uint8Array.from(atob(result.file),char=>char.charCodeAt(0)),url=URL.createObjectURL(new Blob([bytes],{type:result.type}));pdfLink.href=url;pdfLink.download=walidDownloadName(result.name);pdfLink.textContent='Download '+pdfLink.download;pdfLink.hidden=false;setStatus('done');window.WalidUsage?.tool('tool_success',activeTool)
   } catch(error){window.WalidUsage?.tool('tool_error',activeTool);status.textContent=error.message||messages.fileError} finally{button.disabled=false}
 };
 const imageFile=$('#imageFile');imageFile.onchange=()=>{let files=[...imageFile.files];if(imageFile.dataset.append==='1'&&activeTool==='image-convert'){files=[...(window._walidSelectedImages||[]),...files];delete imageFile.dataset.append;const transfer=new DataTransfer();files.forEach(file=>transfer.items.add(file));imageFile.files=transfer.files}if(activeTool==='image-convert'&&files.length>10){imageFile.value='';window._walidSelectedImages=[];setStatus('Choose up to 10 images per batch.');$('#runImage').disabled=true;return}window._walidSelectedImages=files;$('#batchDownloads').replaceChildren();const file=files[0];if(!file)return;$('#imageFileName').textContent=activeTool==='image-convert'?files.length+' image'+(files.length===1?'':'s')+' selected':file.name;const fileList=$('#imageFileList');fileList.replaceChildren();if(activeTool==='image-convert'){files.forEach(item=>{const row=document.createElement('div'),name=document.createElement('strong'),size=document.createElement('small');row.className='picked-file';name.textContent=item.name;size.textContent=(item.size/1048576).toFixed(2)+' MB';row.append(name,size);fileList.append(row)});fileList.hidden=false}else fileList.hidden=true;$('#imageSelectedSummary').hidden=false;$('#runImage').hidden=false;document.body.classList.add('file-selected');notifyEditor(true);if($('#bgOptions'))$('#bgOptions').hidden=activeTool!=='background-remove';syncCheckerPreview();imageBaseName=file.name.replace(/\.[^.]+$/,'').replace(/[^\p{L}\p{N}_-]+/gu,'-')||'walid-image';const url=URL.createObjectURL(file),image=new Image();image.onload=()=>{original=document.createElement('canvas');original.width=image.naturalWidth;original.height=image.naturalHeight;original.getContext('2d').drawImage(image,0,0);imageCanvas.width=image.naturalWidth;imageCanvas.height=image.naturalHeight;ctx.drawImage(image,0,0);$('#width').value=image.naturalWidth;$('#height').value=image.naturalHeight;imageCanvas.hidden=false;$('#runImage').disabled=false;$('#resetImage').hidden=false;setStatus('');URL.revokeObjectURL(url)};image.onerror=()=>{setStatus('imageError');URL.revokeObjectURL(url)};image.src=url};
@@ -197,11 +163,6 @@ function bindFileDrop(zone,input,multiple){if(!zone||!input)return;zone.addEvent
 </script><script>
 /* Standalone route recovery: keep deep links opening the selected tool even if
    another optional initializer fails earlier in the page. */
-(()=>{const params=new URLSearchParams(location.search),tool=params.get('tool');if(!tool)return;const activate=()=>{if(window.__walidToolReadyBooted)return;const card=document.querySelector('.tool-card[data-tool="'+CSS.escape(tool)+'"]');if(!card)return;document.body.classList.add('tool-mode');try{if(typeof openTool==='function'){openTool(card,false);return}}catch(error){console.error('Tool workspace initialization failed',error)}const workspace=document.getElementById('workspace'),pdf=document.getElementById('pdfPanel'),image=document.getElementById('imagePanel');if(!workspace)return;workspace.hidden=false;if(pdf)pdf.hidden=card.dataset.kind!=='pdf';if(image)image.hidden=card.dataset.kind!=='image';document.getElementById('toolGrid')?.setAttribute('hidden','');document.getElementById('toolGrid')?.setAttribute('aria-hidden','true')};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(activate,0),{once:true});else setTimeout(activate,0)})();
-</script><script src="/usage.js?v=20261109-2"></script><script>(()=>{window.__walidToolReadyBooted=true;const tool=new URLSearchParams(location.search).get("tool"),card=tool&&[...document.querySelectorAll(".tool-card")].find(item=>item.dataset.tool===tool);if(tool&&card&&typeof openTool==="function"){document.body.classList.add("tool-mode");openTool(card,false)}window.requestAnimationFrame(()=>document.documentElement.dataset.walidToolReady="true")})();</script></body></html>
-
-
-
-
-
+(()=>{const params=new URLSearchParams(location.search),tool=params.get('tool');if(!tool)return;const activate=()=>{const card=document.querySelector('.tool-card[data-tool="'+CSS.escape(tool)+'"]');if(!card)return;document.body.classList.add('tool-mode');try{if(typeof openTool==='function'){openTool(card,false);return}}catch(error){console.error('Tool workspace initialization failed',error)}const workspace=document.getElementById('workspace'),pdf=document.getElementById('pdfPanel'),image=document.getElementById('imagePanel');if(!workspace)return;workspace.hidden=false;if(pdf)pdf.hidden=card.dataset.kind!=='pdf';if(image)image.hidden=card.dataset.kind!=='image';document.getElementById('toolGrid')?.setAttribute('hidden','');document.getElementById('toolGrid')?.setAttribute('aria-hidden','true')};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(activate,0),{once:true});else setTimeout(activate,0)})();
+</script><script src="/usage.js?v=20261109-2"></script></body></html>
 

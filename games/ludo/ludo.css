@@ -1447,7 +1447,9 @@ body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn.finished-pawn-slot .
 }
 
 
-/* Performance guardrails: keep the board readable while reducing mobile paint cost. */
+/* Uniform pawn footprint: only 3+ pawns sharing one square may compact. */
+body.ludo-game.playing-ludo #board.board.ludo span.pin-pawn:not(.pile-size-3):not(.pile-size-4):not(.pile-size-dense) .pin-pawn-art{width:100%!important;height:100%!important}
+\n/* Performance guardrails: keep the board readable while reducing mobile paint cost. */
 @media (max-width: 600px) {
   body.ludo-game.playing-ludo .board.ludo .track,
   body.ludo-game.playing-ludo .board.ludo .lane,

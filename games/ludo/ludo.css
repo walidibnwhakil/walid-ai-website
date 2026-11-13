@@ -1524,3 +1524,14 @@ body.ludo-game.playing-ludo .board.ludo .home-base.custom-color::before{
 body.ludo-game.playing-ludo .board.ludo .home-base.custom-color:not(.score-flash)::after{
   box-shadow:none!important;
 }
+
+
+/* Remove the dark gradient stop as well as shadows from custom home quadrants. */
+body.ludo-game.playing-ludo .board.ludo .home-base.custom-color::before{
+  background:var(--yard-color)!important;
+  box-shadow:none!important;
+}
+body.ludo-game.playing-ludo .board.ludo .home-base.custom-color::after{
+  background:transparent!important;
+  box-shadow:none!important;
+}

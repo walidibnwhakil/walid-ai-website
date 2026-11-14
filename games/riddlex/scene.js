@@ -3,7 +3,7 @@
 // Face and cat plates cross-fade with opacity and share that same transform.
 // Nothing is ever a shifted rectangle of the painting.
 
-import { createExpressions } from "./expressions.js?v=akinator-15";
+import { createExpressions } from "./expressions.js?v=akinator-16";
 
 const BASE = {
   landscape: "./images/approved/game-desk.webp",
@@ -135,7 +135,7 @@ export function createScene(canvas) {
     const parent = canvas.parentElement;
     if (!parent || !cw || !ch) return;
     const spot = portraitMode
-      ? { bu: 0.30, bv: 0.045, dv: 0.50 }
+      ? { bu: 0.38, bv: 0.22, dv: 0.56 }
       : { bu: 0.60, bv: 0.07, dv: 0.58 };
     const bubbleLeft = (view.x + view.w * spot.bu) / cw;
     parent.style.setProperty("--bubble-left", Math.max(10 / cw, bubbleLeft).toFixed(4));
@@ -259,11 +259,11 @@ export function createScene(canvas) {
 
   function printerGeom() {
     const printer = images.printer;
-    const pw = view.w * (portraitMode ? 0.28 : 0.155);
+    const pw = view.w * (portraitMode ? 0.22 : 0.145);
     const ratio = printer ? printer.height / printer.width : 0.48;
     const ph = pw * ratio;
-    const px = ix(portraitMode ? 0.06 : 0.09);
-    const py = iy(portraitMode ? 0.70 : 0.66) - ph;
+    const px = ix(portraitMode ? 0.05 : 0.09);
+    const py = iy(portraitMode ? 0.64 : 0.655) - ph;
     return { px, py, pw, ph };
   }
 
@@ -506,7 +506,7 @@ export function createScene(canvas) {
 
   async function loadOverlaySet(orient) {
     const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-15`)];
+      return [key, await loadImage(`${src}?v=akinator-16`)];
     }));
     const overlays = {};
     for (const [key, image] of entries) if (image) overlays[key] = image;
@@ -517,7 +517,7 @@ export function createScene(canvas) {
     const [base, overlays, printer] = await Promise.all([
       loadImage(BASE[orient]),
       loadOverlaySet(orient),
-      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-15`),
+      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-16`),
     ]);
     if (printer) images.printer = printer;
     return { base, overlays };

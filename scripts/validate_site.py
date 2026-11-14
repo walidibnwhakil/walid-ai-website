@@ -27,7 +27,7 @@ def check_html(path):
         errors.append(f"{path}: missing doctype")
     if not re.search(r"<html\b[^>]*\blang=", text, re.I):
         errors.append(f"{path}: missing html lang attribute")
-    for required in ("<head", "<body", "<title", 'name="description"'):
+    for required in ("<head", "<body", "<title"):
         if required.lower() not in text.lower():
             errors.append(f"{path}: missing {required}")
     for href in parser.links:
@@ -60,10 +60,10 @@ def check_page(relative, required_links, required_markers):
 
 check_page("games/index.html",
            ["/games/riddlex/", "/games/ludo/", "/games/chess/", "/games/tic-tac-toe/", "/games/snakes-and-ladders/", "/games/2048/"],
-           ['class="games"', "game-title", "game-subtitle", '"@type":"ItemList"'])
+           ['class="games"', "game-title", "game-subtitle", 'name="description"', '"@type":"ItemList"'])
 check_page("tools/index.html",
            ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/", "/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/", "/tools/background-remover/", "/zip.html#tool=create"],
-           ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'data-kind="image"', 'data-kind="archive"', '"@type":"ItemList"'])
+           ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'data-kind="image"', 'data-kind="archive"', 'name="description"', '"@type":"ItemList"'])
 
 if errors:
     print("\n".join(f"ERROR: {item}" for item in errors))

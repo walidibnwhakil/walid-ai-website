@@ -1,9 +1,9 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
 import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js";
 import { UI, guessFont } from "./i18n.js";
-import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, poolFromEntries } from "./kb.js";
+import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js?v=akinator-12";
+import { createScene } from "./scene.js?v=akinator-14";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -17,12 +17,15 @@ const scene = createScene($("stage"));
 let lang = localStorage.getItem("riddlex-lang") || "en";
 let category = null;
 let manifest = null;
+let catalog = null;
 let pool = null;
 let state = null;
 let mode = "menu";
 let currentQ = null;
 let guessIndex = -1;
 let loading = null;
+let loadedNames = [];
+let loadChain = Promise.resolve();
 
 function text() { return UI[lang] || UI.en; }
 
@@ -76,7 +79,17 @@ function gameInProgress() {
 
 async function boot() {
   applyLanguage();
-  loading = loadManifest("./kb").then((loaded) => { manifest = loaded; return loaded; });
+  loading = Promise.all([
+    loadManifest("./kb"),
+    fetch("./kb/index.json").then((response) => {
+      if (!response.ok) throw new Error("Knowledge index failed");
+      return response.json();
+    }),
+  ]).then(([loaded, index]) => {
+    manifest = loaded;
+    catalog = index;
+    return loaded;
+  });
   loading.catch(() => {});
 }
 
@@ -124,32 +137,65 @@ async function openPlay() {
   try { await loading; } catch { setStatus(text().failedSave); }
 }
 
-async function startGame(chosen) {
-  category = chosen;
-  const token = ++loadToken;
-  setStatus(text().loading);
-  try { await loading; } catch { setStatus(text().failedSave); return; }
-  if (token !== loadToken) return;
-  const names = categoryShards(manifest, chosen);
-  let started = false;
+async function loadNamed(entries, token, begin) {
+  const names = entries.map((item) => item.file).filter((name) => !loadedNames.includes(name));
+  if (!names.length || token !== loadToken) return;
+  loadedNames.push(...names);
+  let started = !begin;
+  try {
   await loadShards("./kb", manifest, names, (partial) => {
     if (token !== loadToken) return;
     adoptPool(partial);
-    if (started) return;
+    if (started || !begin) return;
     started = true;
-    state = createState(pool, { opening: "real", category: chosen });
+    state = createState(pool, { opening: "real", category });
     mode = "ask";
     step();
     loadLearned(manifest.questions).then((rows) => {
       if (!rows.length || token !== loadToken || !pool) return;
       adoptPool(mergePools([pool, poolFromEntries(manifest.questions, rows)]));
     }).catch(() => {});
-  });
+  }, pool);
+  } catch (error) {
+    loadedNames = loadedNames.filter((name) => !names.includes(name));
+    throw error;
+  }
+}
+
+function queueShards(entries, token) {
+  if (!entries.length) return loadChain;
+  loadChain = loadChain.then(() => loadNamed(entries, token, false)).catch(() => {});
+  return loadChain;
+}
+
+async function startGame(chosen) {
+  category = chosen;
+  const token = ++loadToken;
+  loadedNames = [];
+  pool = null;
+  loadChain = Promise.resolve();
+  setStatus(text().loading);
+  try { await loading; } catch { setStatus(text().failedSave); return; }
+  if (token !== loadToken) return;
+  if (chosen === "character" && catalog) {
+    await loadNamed(planShardLoads(catalog, [], []), token, true);
+    return;
+  }
+  const names = categoryShards(manifest, chosen);
+  await loadNamed(names.map((file) => ({ file })), token, true);
 }
 
 async function step() {
   if (!state) return;
-  const decision = decide(state);
+  const pending = category === "character" && catalog
+    ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
+    : null;
+  let decision = decide(state);
+  if (decision.type === "guess" && pending) {
+    await pending;
+    if (!state) return;
+    decision = decide(state);
+  }
   if (decision.type === "ask") {
     currentQ = decision.qid;
     mode = "ask";
@@ -194,8 +240,8 @@ async function beginGuess(index) {
 
 async function onAnswer(value) {
   if (mode !== "ask" || !currentQ) return;
-  const moods = { yes: "curious", no: "thinking", probably: "confused", probably_not: "confused", unknown: "thinking" };
-  scene.setMood(moods[value] || "thinking");
+  scene.react(value);
+  scene.setMood("thinking");
   applyAnswer(state, currentQ, value);
   currentQ = null;
   await step();
@@ -367,6 +413,9 @@ if (new URLSearchParams(location.search).has("autotest")) {
       best: guessIndex >= 0 ? pool.ids[guessIndex] : "",
     }),
     poolSize: () => pool?.count || 0,
+    bytes: () => traffic.bytes,
+    blinkCat: () => scene.blinkCat(),
+    loaded: () => loadedNames.slice(),
     find: (id) => pool?.ids.indexOf(id) ?? -1,
     replyFor: (id) => {
       const index = pool.ids.indexOf(id);

@@ -405,6 +405,10 @@ export function chooseQuestion(state) {
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   let best = null;
   let bestGain = 0;
+  let bdGain = 0;
+  // Most players are Bangladeshi, so this lands just after real, gender and alive.
+  const boostBd = state.category === "character" && !asked.has("from_bd");
+  const openingLeft = (!asked.has("male") && !asked.has("female")) || (!asked.has("alive") && !asked.has("dead"));
   for (let qi = 0; qi < pool.questions.length; qi++) {
     const question = pool.questions[qi];
     if (asked.has(question.id)) continue;
@@ -412,11 +416,23 @@ export function chooseQuestion(state) {
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
+    if (state.category === "character" && answers.length < 4) {
+      const genderOpen = !asked.has("male") && !asked.has("female");
+      const lifeOpen = !asked.has("alive") && !asked.has("dead");
+      if (genderOpen && (question.id === "male" || question.id === "female")) gain *= 3;
+      if (!genderOpen && lifeOpen && (question.id === "alive" || question.id === "dead")) gain *= 3;
+    }
+    if (question.id === "from_bd" && boostBd) {
+      bdGain = gain;
+      if (answers.length >= 3 && !openingLeft) gain *= 8;
+      else if (answers.length >= 3) gain *= 2;
+    }
     if (gain > bestGain) {
       bestGain = gain;
       best = question.id;
     }
   }
+  if (boostBd && answers.length >= 4 && bdGain > 0.004) return "from_bd";
   return bestGain > 0.012 ? best : null;
 }
 

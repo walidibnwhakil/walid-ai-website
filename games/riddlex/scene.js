@@ -1,6 +1,9 @@
-// The room, detective, pipe and cat are the painted artwork.
-// A light wisp rises from the pipe already in his hand. The notebook and
-// printer are drawn on top. There is no second cat and no hookah.
+// The room, detective, pipe and cat are one painted picture.
+// Breathing is a slight scale of that whole picture, anchored at the floor.
+// Face and cat plates cross-fade with opacity and share that same transform.
+// Nothing is ever a shifted rectangle of the painting.
+
+import { createExpressions } from "./expressions.js?v=akinator-15";
 
 const BASE = {
   landscape: "./images/approved/game-desk.webp",
@@ -59,18 +62,15 @@ export function createScene(canvas) {
 
   let portraitMode = false;
   const smoke = Array.from({ length: 5 }, () => makePuff(true));
-  const catLife = { blink: 0, nextBlink: rand(3.4, 6.5), tail: 0, nextTail: rand(4, 8), tailAmp: 0.006 };
+  const catLife = { blink: 0, nextBlink: rand(3.4, 6.5) };
+  const faces = createExpressions();
+  let faceNow = faces.picture();
   let mood = "curious";
-  const moodShown = { lift: 0, sad: 0, happy: 0, think: 0 };
-  let blink = 0;
-  let nextBlink = rand(2.2, 5);
-  let flash = null;
   let clock = 0;
   let running = false;
   let raf = 0;
   let reveal = null;
   let view = { x: 0, y: 0, w: 1, h: 1 };
-  const expr = { happy: 0, sad: 0, worried: 0, serious: 0, confused: 0 };
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
@@ -161,118 +161,24 @@ export function createScene(canvas) {
   function easeOut(p) {
     return 1 - (1 - p) ** 3;
   }
-  function approachMood(dt) {
-    const goal = {
-      lift: mood === "surprised" ? -1 : mood === "sad" || mood === "defeated" ? 0.65 : mood === "confused" ? 0.35 : 0,
-      sad: mood === "sad" || mood === "defeated" ? 1 : 0,
-      happy: mood === "happy" || mood === "confident" ? 1 : 0,
-      think: mood === "thinking" || mood === "curious" ? 1 : 0,
-    };
-    const blend = 1 - Math.exp(-dt * 7);
-    for (const key of Object.keys(goal)) moodShown[key] += (goal[key] - moodShown[key]) * blend;
-  }
-  function nudge(box, du, dv, source) {
-    const room = source || (portraitMode && images.portrait ? images.portrait : images.room);
-    if (!room) return;
+
+  function drawPlate(plate, box, alpha) {
+    if (!plate || alpha < 0.02) return;
     ctx.save();
-    ctx.beginPath();
-    ctx.rect(ix(box[0]), iy(box[1]), view.w * box[2], view.h * box[3]);
-    ctx.clip();
-    ctx.drawImage(room, view.x + view.w * du, view.y + view.h * dv, view.w, view.h);
+    ctx.globalAlpha = Math.min(1, alpha);
+    ctx.drawImage(plate, ix(box.u), iy(box.v), view.w * box.w, view.h * box.h);
     ctx.restore();
   }
 
-  function eyelid(cx, cy, rw, rh, amount) {
-    const room = currentArt();
-    if (!room || amount < 0.05) return;
-    ctx.save();
-    ctx.beginPath();
-    ctx.ellipse(ix(cx), iy(cy), view.w * rw, view.h * rh, 0, 0, Math.PI * 2);
-    ctx.clip();
-    const srcY = cy - rh * 1.35;
-    const srcH = rh * 0.85;
-    ctx.drawImage(
-      room,
-      (cx - rw) * room.width,
-      Math.max(0, srcY) * room.height,
-      rw * 2 * room.width,
-      srcH * room.height,
-      ix(cx - rw),
-      iy(cy - rh),
-      view.w * rw * 2,
-      view.h * rh * 2 * amount,
-    );
-    ctx.restore();
-  }
-
-  function coverEyes(cx, cy, rw, rh, amount) {
-    const room = currentArt();
-    if (!room || amount < 0.08) return;
-    ctx.save();
-    ctx.beginPath();
-    ctx.ellipse(ix(cx), iy(cy), view.w * rw, view.h * rh * amount, 0, 0, Math.PI * 2);
-    ctx.clip();
-    const fur = Math.max(0, cy - 0.05);
-    ctx.drawImage(
-      room,
-      (cx - rw) * room.width,
-      fur * room.height,
-      rw * 2 * room.width,
-      rh * room.height,
-      ix(cx - rw),
-      iy(cy - rh * amount),
-      view.w * rw * 2,
-      view.h * rh * 2 * amount,
-    );
-    ctx.restore();
-  }
-
-  const REACT = {
-  yes: ["happy", 1],
-  probably: ["happy", 0.62],
-  no: ["serious", 1],
-  probably_not: ["serious", 0.62],
-  unknown: ["confused", 1],
-};
-
-  function react(answer) {
-    const spec = REACT[answer];
-    if (!spec) return;
-    flash = { key: spec[0], peak: spec[1], life: 1.55 };
-  }
-
-  function stepExpr(dt) {
-    // Win and a wrong guess hold. An answer only flashes, then thinking is the neutral face.
-    let goal = "";
-    let peak = 1;
-    if (mood === "happy" || mood === "confident") goal = "happy";
-    else if (mood === "sad" || mood === "defeated") goal = "sad";
-    else if (flash) {
-      const plates = images.overlays || {};
-      const key = plates[flash.key] ? flash.key : "";
-      if (key) {
-        goal = key;
-        const fade = flash.life < 0.35 ? Math.max(0, flash.life / 0.35) : 1;
-        peak = flash.peak * fade;
-      }
-      flash.life -= dt;
-      if (flash.life <= 0) flash = null;
-    }
-    const blend = 1 - Math.exp(-dt / 0.08);
-    for (const key of Object.keys(expr)) expr[key] += ((goal === key ? peak : 0) - expr[key]) * blend;
-  }
-
-  function drawExpr() {
+  function drawFaces() {
     const box = FACE[portraitMode ? "portrait" : "landscape"];
     const plates = images.overlays || {};
+    const levels = faceNow.levels || {};
     for (const key of ["worried", "confused", "serious", "sad", "happy"]) {
-      const plate = plates[key];
-      if (!plate || (expr[key] || 0) < 0.03) continue;
-      ctx.save();
-      ctx.globalAlpha = expr[key];
-      ctx.drawImage(plate, ix(box.u), iy(box.v), view.w * box.w, view.h * box.h);
-      ctx.restore();
+      drawPlate(plates[key], box, levels[key] || 0);
     }
+    const catShut = !reduce && catLife.blink > 0 ? Math.sin(Math.min(1, catLife.blink) * Math.PI) : 0;
+    drawPlate(plates.cat, CAT_FACE[portraitMode ? "portrait" : "landscape"], catShut);
   }
 
   const CAT_FACE = {
@@ -281,59 +187,13 @@ export function createScene(canvas) {
   };
 
   function stepCat(dt) {
-    if (reveal) return;
+    if (reveal || reduce) return;
     catLife.nextBlink -= dt;
     if (catLife.nextBlink <= 0) {
       catLife.blink = 1;
-      catLife.nextBlink = rand(4.5, 9);
+      catLife.nextBlink = rand(4.2, 7.5);
     }
-    if (catLife.blink > 0) catLife.blink -= dt * 3.2;
-    catLife.nextTail -= dt;
-    if (catLife.nextTail <= 0 && catLife.tail <= 0) {
-      catLife.tail = 1;
-      catLife.tailAmp = rand(0.004, 0.009);
-      catLife.nextTail = rand(6, 12);
-    }
-    if (catLife.tail > 0) catLife.tail -= dt * 0.85;
-  }
-
-  function drawLife(time) {
-    const base = currentArt();
-    if (!base) return;
-    const breath = Math.sin(time * 1.35) * 0.008;
-    const body = portraitMode ? [0.18, 0.30, 0.55, 0.10] : [0.36, 0.27, 0.30, 0.14];
-    nudge(body, 0, -Math.max(0, breath), base);
-    const shut = blink > 0 ? Math.sin(Math.min(1, blink) * Math.PI) : 0;
-    const showingFace = Math.max(expr.happy, expr.sad, expr.worried, expr.serious, expr.confused) > 0.35;
-    if (!showingFace) {
-      const sway = Math.sin(time * 0.45) * 0.007;
-      nudge(portraitMode ? [0.28, 0.12, 0.44, 0.22] : [0.42, 0.05, 0.18, 0.22], sway, 0, base);
-      if (!portraitMode) {
-        eyelid(0.505, 0.205, 0.018, 0.012, shut);
-        eyelid(0.545, 0.208, 0.014, 0.010, shut);
-      }
-    }
-    const catBody = portraitMode ? [0.62, 0.32, 0.30, 0.12] : [0.68, 0.34, 0.26, 0.14];
-    nudge(catBody, 0, -Math.max(0, Math.sin(time * 1.5 + 1) * 0.004), base);
-    if (catLife.tail > 0) {
-      const sway = Math.sin((1 - Math.max(0, catLife.tail)) * Math.PI) * catLife.tailAmp;
-      const tail = portraitMode ? [0.86, 0.34, 0.08, 0.06] : [0.84, 0.38, 0.09, 0.07];
-      nudge(tail, sway, sway * 0.35, base);
-    }
-    const catShut = catLife.blink > 0 ? Math.sin(Math.min(1, catLife.blink) * Math.PI) : 0;
-    const catCrop = images.overlays && images.overlays.cat;
-    if (catCrop && catShut > 0.04) {
-      const box = CAT_FACE[portraitMode ? "portrait" : "landscape"];
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, catShut * 1.15);
-      ctx.drawImage(catCrop, ix(box.u), iy(box.v), view.w * box.w, view.h * box.h);
-      ctx.restore();
-    } else if (catShut > 0.05) {
-      const shutEyes = portraitMode
-        ? [[0.90, 0.445], [0.948, 0.448]]
-        : [[0.720, 0.400], [0.753, 0.404]];
-      for (const [cx, cy] of shutEyes) coverEyes(cx, cy, portraitMode ? 0.03 : 0.016, portraitMode ? 0.016 : 0.01, catShut);
-    }
+    if (catLife.blink > 0) catLife.blink -= dt * 2.4;
   }
 
   function prepareInk(name, font) {
@@ -546,21 +406,34 @@ export function createScene(canvas) {
     const dt = Math.min(0.034, (now - (frame.last || now)) / 1000 || 0.016);
     frame.last = now;
     clock += dt;
-    approachMood(dt);
-    stepExpr(dt);
     resize();
     const wantOrient = canvas.width / Math.max(1, canvas.height) < 0.8 ? "portrait" : "landscape";
-    if (images.baseOrient && wantOrient !== images.baseOrient && !images.swapping) {
-      images.swapping = true;
-      useOrient(wantOrient).finally(() => { images.swapping = false; });
-    }
+    if (images.cache?.[wantOrient] && images.baseOrient !== wantOrient) applyPack(wantOrient);
+    const plates = images.overlays || {};
+    faceNow = faces.step(dt, (key) => !!plates[key]);
     const art = currentArt();
     ctx.fillStyle = "#1a100c";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (art) {
-      ctx.drawImage(art, view.x, view.y, view.w, view.h);
+    ctx.save();
+    // At most ±0.4% so the whole room, detective and cat stay one piece.
+    if (!reduce) {
+      const scale = 1 + Math.sin(clock * 1.05) * 0.004;
+      const ax = view.x + view.w * 0.5;
+      const ay = view.y + view.h;
+      ctx.translate(ax, ay);
+      ctx.scale(scale, scale);
+      ctx.translate(-ax, -ay);
+    }
+    if (art) ctx.drawImage(art, view.x, view.y, view.w, view.h);
+    if (!reduce) drawSmoke(dt);
+    if (!reduce) stepCat(dt);
+    updateReveal(dt);
+    drawFaces();
+    drawReveal();
+    ctx.restore();
+    if (art && !portraitMode) {
       const gapTop = view.y + view.h;
-      if (!portraitMode && canvas.height - gapTop > 2) {
+      if (canvas.height - gapTop > 2) {
         const fade = ctx.createLinearGradient(0, gapTop - 2, 0, canvas.height);
         fade.addColorStop(0, "#6b3a1c");
         fade.addColorStop(1, "#2a160e");
@@ -568,22 +441,6 @@ export function createScene(canvas) {
         ctx.fillRect(0, gapTop - 2, canvas.width, canvas.height - gapTop + 2);
       }
     }
-    if (!reduce) drawSmoke(dt);
-    if (!reduce) stepCat(dt);
-    updateReveal(dt);
-    if (!reduce) drawLife(clock);
-    drawExpr();
-    const hands = portraitMode ? [0.28, 0.28, 0.44, 0.12] : [0.42, 0.30, 0.24, 0.13];
-    if (reveal?.phase === "write") {
-      nudge(hands, Math.sin(clock * 16) * 0.01, Math.sin(clock * 16) * 0.003);
-    }
-    drawReveal();
-    nextBlink -= dt;
-    if (nextBlink <= 0) {
-      blink = 1;
-      nextBlink = rand(2.4, 6);
-    }
-    if (blink > 0) blink -= dt * 6;
     raf = requestAnimationFrame(frame);
   }
 
@@ -594,41 +451,44 @@ export function createScene(canvas) {
     return matchMedia("(max-aspect-ratio: 4/5)").matches ? "portrait" : "landscape";
   }
 
-  let overlayToken = 0;
-  function lazyOverlays(orient) {
-    const token = ++overlayToken;
-    const jobs = Object.entries(OVERLAYS[orient] || {});
-    const run = () => {
-      if (token !== overlayToken) return;
-      for (const [key, src] of jobs) {
-        loadImage(src).then((image) => {
-          if (token !== overlayToken || !image) return;
-          images.overlays[key] = image;
-        });
-      }
-      if (!images.printer) {
-        loadImage(PRINTER).then((image) => {
-          if (image) images.printer = image;
-        });
-      }
-    };
-    requestAnimationFrame(() => requestAnimationFrame(run));
+  function applyPack(orient) {
+    const pack = images.cache?.[orient];
+    if (!pack?.base) return;
+    images.base = pack.base;
+    images.baseOrient = orient;
+    images.overlays = pack.overlays || {};
+    if (orient === "portrait") images.portrait = pack.base;
+    else images.room = pack.base;
   }
 
-  async function useOrient(orient) {
-    if (images.baseOrient === orient && images.base) return;
-    const image = await loadImage(BASE[orient]);
-    if (!image) return;
-    images.base = image;
-    images.baseOrient = orient;
-    if (orient === "portrait") images.portrait = image;
-    else images.room = image;
-    images.overlays = {};
-    lazyOverlays(orient);
+  async function loadOverlaySet(orient) {
+    const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
+      return [key, await loadImage(`${src}?v=akinator-15`)];
+    }));
+    const overlays = {};
+    for (const [key, image] of entries) if (image) overlays[key] = image;
+    return overlays;
+  }
+
+  async function loadPack(orient) {
+    const [base, overlays, printer] = await Promise.all([
+      loadImage(BASE[orient]),
+      loadOverlaySet(orient),
+      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-15`),
+    ]);
+    if (printer) images.printer = printer;
+    return { base, overlays };
   }
 
   async function start() {
-    await useOrient(screenOrient());
+    const orient = screenOrient();
+    images.cache = images.cache || {};
+    if (!images.cache[orient]) images.cache[orient] = await loadPack(orient);
+    applyPack(orient);
+    const other = orient === "portrait" ? "landscape" : "portrait";
+    if (!images.cache[other]) {
+      loadPack(other).then((pack) => { images.cache[other] = pack; }).catch(() => {});
+    }
     resize();
     if (running) return;
     running = true;
@@ -660,6 +520,7 @@ export function createScene(canvas) {
       done: false,
     };
     mood = "confident";
+    faces.setMood("confident");
     if (reduce) {
       reveal.printed = !!photo;
       reveal.done = true;
@@ -672,6 +533,7 @@ export function createScene(canvas) {
 
   function playWrong() {
     mood = "sad";
+    faces.setMood("sad");
     if (!reveal) reveal = { page: null, name: "" };
     reveal.phase = "wrong";
     reveal.t = 0;
@@ -684,12 +546,14 @@ export function createScene(canvas) {
 
   function playRetry() {
     mood = "curious";
+    faces.setMood("curious");
     reveal = null;
     return Promise.resolve();
   }
 
   function playDefeat() {
     mood = "defeated";
+    faces.setMood("defeated");
     reveal = null;
   }
 
@@ -699,9 +563,17 @@ export function createScene(canvas) {
 
   return {
     start, stop, resize,
-    setMood(value) { mood = value; },
-    react,
+    setMood(value) { mood = value; faces.setMood(value); },
+    react(answer) { return faces.react(answer); },
     blinkCat() { catLife.blink = 0.62; },
+    debug() {
+      return {
+        expression: faces.picture(),
+        plates: Object.keys(images.overlays || {}),
+        orient: images.baseOrient || "",
+        portrait: portraitMode,
+      };
+    },
     playReveal, playWrong, playRetry, playDefeat, clearReveal,
   };
 }

@@ -211,7 +211,12 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #answers button { min-height: 42px; font-size: 15px; }
   #answers button:nth-child(odd) { border-right: 1px solid #d5dee8; }
   #answers button:nth-child(5) { grid-column: 1 / -1; border-right: 0; }
-  #hud:has(#guess:not([hidden])) { top: auto; bottom: 8px; }
+  #hud:has(#guess:not([hidden])) {
+    top: auto; bottom: 0; left: 0; right: 0; z-index: 6;
+    padding: 8px 8px 10px; background: #24150df2;
+  }
+  #guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #guess button { min-height: 44px; }
   #back { bottom: 8px; }
 }
 @media (max-width: 520px) {

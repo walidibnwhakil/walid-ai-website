@@ -127,7 +127,7 @@ export function createScene(canvas) {
         const useful = 0.755;
         scale = ch / (art.height * useful);
         const w = art.width * scale;
-        x = Math.min(0, cw - w * 0.975);
+        x = Math.min(0, cw - w * 0.905);
         y = 0;
         view = { x, y, w, h: art.height * scale };
       } else {
@@ -218,8 +218,8 @@ export function createScene(canvas) {
   }
 
   function prepareInk(name, font) {
-    const w = Math.round(view.w * (portraitMode ? 0.52 : 0.24));
-    const h = Math.round(view.h * (portraitMode ? 0.05 : 0.12));
+    const w = Math.round(portraitMode ? canvas.width * 0.42 : view.w * 0.24);
+    const h = Math.round(portraitMode ? canvas.width * 0.16 : view.h * 0.12);
     ink.width = w;
     ink.height = h;
     mask.width = w;
@@ -227,26 +227,28 @@ export function createScene(canvas) {
     const g = ink.getContext("2d");
     g.clearRect(0, 0, w, h);
     g.fillStyle = "#24160f";
-    g.font = font;
+    g.textAlign = "left";
     g.textBaseline = "middle";
-    let size = Math.round(h * 0.42);
+    let size = Math.round(h * (portraitMode ? 0.72 : 0.42));
     g.font = font.replace(/\d+px/, `${size}px`);
-    while (g.measureText(name).width > w - 16 && size > 12) {
+    while (g.measureText(name).width > w * (portraitMode ? 0.88 : 0.92) && size > 14) {
       size -= 2;
       g.font = font.replace(/\d+px/, `${size}px`);
     }
-    g.fillText(name, 8, h * 0.55);
+    const textW = g.measureText(name).width;
+    const textX = portraitMode ? Math.max(6, (w - textW) / 2) : 8;
+    g.fillText(name, textX, h * 0.55);
     mask.getContext("2d").clearRect(0, 0, w, h);
-    return { w, h, width: Math.max(20, g.measureText(name).width) };
+    return { w, h, width: Math.max(20, textW), textX };
   }
 
   function drawSheet(turn) {
     const u = Math.max(0, Math.min(1, turn));
     // Flat on the desk while he writes, then up in his hands. The printer stays to the left.
-    const x = ix(portraitMode ? 0.58 : 0.50);
-    const y = iy(portraitMode ? 0.50 - 0.16 * u : 0.58 - 0.20 * u);
-    const w = portraitMode ? canvas.width * 0.46 : view.w * 0.30;
-    const h = portraitMode ? canvas.width * 0.30 : view.h * 0.15;
+    const x = ix(portraitMode ? 0.56 : 0.50);
+    const y = iy(portraitMode ? 0.60 - 0.08 * u : 0.58 - 0.20 * u);
+    const w = portraitMode ? canvas.width * 0.50 : view.w * 0.30;
+    const h = portraitMode ? canvas.width * 0.26 : view.h * 0.15;
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI * (1 - u));
@@ -271,21 +273,26 @@ export function createScene(canvas) {
       ctx.stroke();
     }
     if (reveal?.page) {
-      const maxW = w - 36;
-      const maxH = h * 0.62;
-      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, 1.4);
-      ctx.drawImage(reveal.page.canvas, 18, h * 0.2, reveal.page.w * scale, reveal.page.h * scale);
+      const maxW = portraitMode ? w * 0.9 : w - 36;
+      const maxH = portraitMode ? h * 0.7 : h * 0.62;
+      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 4 : 1.4);
+      const dw = reveal.page.w * scale;
+      const dh = reveal.page.h * scale;
+      const dx = portraitMode ? (w - dw) / 2 : 18;
+      const dy = portraitMode ? (h - dh) / 2 : h * 0.2;
+      ctx.drawImage(reveal.page.canvas, dx, dy, dw, dh);
     }
     ctx.restore();
   }
 
   function printerGeom() {
     const printer = images.printer;
-    const pw = view.w * (portraitMode ? 0.15 : 0.20);
+    const showing = portraitMode && reveal && reveal.phase !== "write";
+    const pw = view.w * (portraitMode ? (showing ? 0.22 : 0.15) : 0.20);
     const ratio = printer ? printer.height / printer.width : 0.58;
     const ph = pw * ratio;
-    const px = ix(portraitMode ? 0.37 : 0.045);
-    const py = iy(portraitMode ? 0.515 : 0.69) - ph;
+    const px = ix(portraitMode ? (showing ? 0.52 : 0.37) : 0.045);
+    const py = iy(portraitMode ? (showing ? 0.655 : 0.515) : 0.69) - ph;
     return { px, py, pw, ph };
   }
 
@@ -369,7 +376,7 @@ export function createScene(canvas) {
     const slotY = py + ph * 0.62;
     const photoW = pw * 0.46;
     const photoH = photoW * 1.22;
-    const out = photoH * 0.86 * slide;
+    const out = photoH * (portraitMode ? 0.42 : 0.86) * slide;
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.beginPath();
@@ -423,7 +430,7 @@ export function createScene(canvas) {
       const p = Math.min(1, reveal.t / reveal.writeDur);
       const mg = mask.getContext("2d");
       const shown = Math.max(1, Math.ceil((reveal.name || "").length * p));
-      const slice = ink.getContext("2d").measureText((reveal.name || "").slice(0, shown)).width + 10;
+      const slice = (reveal.textX || 0) + ink.getContext("2d").measureText((reveal.name || "").slice(0, shown)).width + 2;
       mg.fillStyle = "#000";
       mg.fillRect(0, 0, slice, ink.height);
       if (!reveal.scratch) {
@@ -617,6 +624,7 @@ export function createScene(canvas) {
       printed: false,
       writeDur: reduce ? 0.01 : Math.min(2.6, Math.max(1.15, (options.name || "").length * 0.09)),
       inkWidth: prepared.width,
+      textX: prepared.textX || 0,
       present: 1,
       page: null,
       resolve: () => {},

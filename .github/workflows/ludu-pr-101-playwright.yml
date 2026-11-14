@@ -18,7 +18,7 @@ jobs:
   ludo-playwright:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: Check out PR head
         uses: actions/checkout@v4
@@ -38,6 +38,7 @@ jobs:
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ludu-http.log 2>&1 &
           export CHROMIUM_PATH="$(node -p 'require("playwright").chromium.executablePath()')"
           node --test games/ludo-rules.test.mjs games/ludo/pawn-layout.test.mjs games/ludo/layout.test.cjs games/ludo/sound.test.cjs
+          node tests/ludo-mobile-fit.cjs
           node tests/ludo-real-gameplay.cjs
           node tests/ludo-pr-101.spec.mjs
           node tests/ludo-tip-geometry.cjs
@@ -58,5 +59,6 @@ jobs:
             tests/fixtures/ludo-layers/
             tests/fixtures/ludo-combined/
             tests/fixtures/ludo-readable-gameplay/
+            tests/fixtures/ludo-mobile-fit/
             /tmp/ludu-http.log
           if-no-files-found: warn

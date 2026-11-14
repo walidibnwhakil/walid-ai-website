@@ -100,7 +100,7 @@ async function capture(page,width,name,token){
     if(!baseline && width===360){
       const before=JSON.parse(fs.readFileSync('tests/fixtures/ludo-readable-gameplay/before/measurements.json'));
       const approved=before.find(p=>p.name==='two-pawns'&&p.width===360);
-      assert.ok(Math.abs(pair.outline.width-approved.outline.width)<.1&&Math.abs(pair.outline.height-approved.outline.height)<.1,'real played pair keeps its approved artwork size');
+      assert.ok(Math.abs(pair.outline.width/pair.tileRect.width-approved.outline.width/approved.tileRect.width)<.003&&Math.abs(pair.outline.height/pair.tileRect.height-approved.outline.height/approved.tileRect.height)<.003,'real played pair keeps approved size relative to the board');
     }
     results.push(pair);
     await pairPage.close();

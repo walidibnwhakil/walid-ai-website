@@ -1,0 +1,242 @@
+{
+  "exactUserScreenshotConfiguration": null,
+  "exactUserScreenshotVerified": false,
+  "reason": "No Android screenshot or viewport/device settings arrived in the conversation.",
+  "browserCoverage": "Chromium with Android mobile user agent, mobile-device metrics and touch; no physical Brave Android hardware",
+  "measurements": [
+    {
+      "config": {
+        "label": "320",
+        "width": 320,
+        "height": 740,
+        "dpr": 2,
+        "mobile": true
+      },
+      "before": {
+        "board": 314,
+        "tileWidth": 20.53125,
+        "tileHeight": 18.03125,
+        "pawnHeight": 19.6412353515625,
+        "headWidth": 6.900970458984375
+      },
+      "after": {
+        "board": 318,
+        "tileWidth": 20.796875,
+        "tileHeight": 18.25,
+        "pawnHeight": 22.41485595703125,
+        "headWidth": 7.87548828125,
+        "scrollWidth": 320,
+        "cssViewportWidth": 320
+      },
+      "desktopPixelIdentical": false
+    },
+    {
+      "config": {
+        "label": "360",
+        "width": 360,
+        "height": 800,
+        "dpr": 3,
+        "mobile": true
+      },
+      "before": {
+        "board": 354,
+        "tileWidth": 23.15625,
+        "tileHeight": 20.328125,
+        "pawnHeight": 22.127960205078125,
+        "headWidth": 7.774688720703125
+      },
+      "after": {
+        "board": 358,
+        "tileWidth": 23.421875,
+        "tileHeight": 20.546875,
+        "pawnHeight": 25.232757568359375,
+        "headWidth": 8.865570068359375,
+        "scrollWidth": 360,
+        "cssViewportWidth": 360
+      },
+      "desktopPixelIdentical": false
+    },
+    {
+      "config": {
+        "label": "360-dpr1",
+        "width": 360,
+        "height": 800,
+        "dpr": 1,
+        "mobile": true
+      },
+      "before": {
+        "board": 354,
+        "tileWidth": 23.15625,
+        "tileHeight": 20.328125,
+        "pawnHeight": 22.127960205078125,
+        "headWidth": 7.774688720703125
+      },
+      "after": {
+        "board": 358,
+        "tileWidth": 23.421875,
+        "tileHeight": 20.546875,
+        "pawnHeight": 25.232757568359375,
+        "headWidth": 8.865570068359375,
+        "scrollWidth": 360,
+        "cssViewportWidth": 360
+      },
+      "desktopPixelIdentical": false
+    },
+    {
+      "config": {
+        "label": "390",
+        "width": 390,
+        "height": 844,
+        "dpr": 3,
+        "mobile": true
+      },
+      "before": {
+        "board": 384,
+        "tileWidth": 25.109375,
+        "tileHeight": 22.0625,
+        "pawnHeight": 24.019927978515625,
+        "headWidth": 8.439422607421875
+      },
+      "after": {
+        "board": 388,
+        "tileWidth": 25.375,
+        "tileHeight": 22.265625,
+        "pawnHeight": 27.3509521484375,
+        "headWidth": 9.609771728515625,
+        "scrollWidth": 390,
+        "cssViewportWidth": 390
+      },
+      "desktopPixelIdentical": false
+    },
+    {
+      "config": {
+        "label": "android-representative",
+        "width": 412,
+        "height": 915,
+        "dpr": 2.625,
+        "mobile": true
+      },
+      "before": {
+        "board": 406,
+        "tileWidth": 26.546875,
+        "tileHeight": 23.3125,
+        "pawnHeight": 25.389434814453125,
+        "headWidth": 8.92059326171875
+      },
+      "after": {
+        "board": 410,
+        "tileWidth": 26.8125,
+        "tileHeight": 23.53125,
+        "pawnHeight": 28.898101806640625,
+        "headWidth": 10.153366088867188,
+        "scrollWidth": 412,
+        "cssViewportWidth": 412
+      },
+      "desktopPixelIdentical": false
+    },
+    {
+      "config": {
+        "label": "landscape",
+        "width": 640,
+        "height": 360,
+        "dpr": 3,
+        "mobile": true
+      },
+      "before": {
+        "board": 371.828125,
+        "tileWidth": 24.3125,
+        "tileHeight": 21.34375,
+        "pawnHeight": 19.385940551757812,
+        "headWidth": 6.811279296875
+      },
+      "after": {
+        "board": 638,
+        "tileWidth": 41.71875,
+        "tileHeight": 36.640625,
+        "pawnHeight": 44.977081298828125,
+        "headWidth": 15.802734375,
+        "scrollWidth": 640,
+        "cssViewportWidth": 640
+      },
+      "desktopPixelIdentical": false
+    },
+    {
+      "config": {
+        "label": "desktop-800",
+        "width": 800,
+        "height": 700,
+        "dpr": 1,
+        "mobile": false
+      },
+      "before": {
+        "board": 398.625,
+        "tileWidth": 26.0625,
+        "tileHeight": 22.890625,
+        "pawnHeight": 20.782501220703125,
+        "headWidth": 7.30194091796875
+      },
+      "after": {
+        "board": 398.625,
+        "tileWidth": 26.0625,
+        "tileHeight": 22.890625,
+        "pawnHeight": 20.782501220703125,
+        "headWidth": 7.30194091796875,
+        "scrollWidth": 800,
+        "cssViewportWidth": 800
+      },
+      "desktopPixelIdentical": true
+    },
+    {
+      "config": {
+        "label": "desktop-1024",
+        "width": 1024,
+        "height": 600,
+        "dpr": 1,
+        "mobile": false
+      },
+      "before": {
+        "board": 480,
+        "tileWidth": 31.390625,
+        "tileHeight": 27.5625,
+        "pawnHeight": 25.016998291015625,
+        "headWidth": 8.789794921875
+      },
+      "after": {
+        "board": 480,
+        "tileWidth": 31.390625,
+        "tileHeight": 27.5625,
+        "pawnHeight": 25.016998291015625,
+        "headWidth": 8.789794921875,
+        "scrollWidth": 1024,
+        "cssViewportWidth": 1024
+      },
+      "desktopPixelIdentical": true
+    },
+    {
+      "config": {
+        "label": "desktop-1440",
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1,
+        "mobile": false
+      },
+      "before": {
+        "board": 800,
+        "tileWidth": 52.3125,
+        "tileHeight": 45.9375,
+        "pawnHeight": 41.7000732421875,
+        "headWidth": 14.6513671875
+      },
+      "after": {
+        "board": 800,
+        "tileWidth": 52.3125,
+        "tileHeight": 45.9375,
+        "pawnHeight": 41.7000732421875,
+        "headWidth": 14.6513671875,
+        "scrollWidth": 1440,
+        "cssViewportWidth": 1440
+      },
+      "desktopPixelIdentical": true
+    }
+  ]
+}

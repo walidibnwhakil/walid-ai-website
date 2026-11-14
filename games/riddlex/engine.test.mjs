@@ -434,6 +434,41 @@ test("batting questions stay unasked when no remaining candidate is a cricketer"
   }
 });
 
+test("a confirmed job skips unrelated occupations unless the candidates split", () => {
+  const qs = [
+    ["real", "kind"], ["male", "person"], ["footballer", "job", "Do they play football?"],
+    ["politician", "job", "Are they in politics?"], ["business", "job", "Do they run a business?"],
+    ["actor", "job", "Do they act?"], ["party_bnp", "politics", "Are they in the BNP?"],
+    ["played_barcelona", "job", "Did they play for Barcelona?"],
+  ].map(([id, group, en]) => ({ id, group, en: en || id, bn: id }));
+  const plain = poolFromEntries(qs, [
+    entry("messi", 200, ["real", "male", "footballer", "played_barcelona"], { no: ["politician", "business", "actor", "party_bnp"] }),
+    entry("aguero", 120, ["real", "male", "footballer"], { no: ["politician", "business", "actor", "party_bnp", "played_barcelona"] }),
+  ]);
+  const state = createState(plain, { category: "character", opening: "real" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "footballer", "yes");
+  for (const id of ["politician", "business", "actor", "party_bnp"]) assert.equal(questionBlocked(state, id), true, id);
+  assert.equal(questionBlocked(state, "played_barcelona"), false);
+  for (let n = 0; n < 6; n++) {
+    const qid = chooseQuestion(state);
+    assert.ok(!["politician", "business", "actor", "party_bnp"].includes(qid), qid);
+    if (!qid || qid === "played_barcelona") break;
+    answer(state, qid, "unknown");
+  }
+
+  const split = poolFromEntries(qs, [
+    entry("player", 200, ["real", "male", "footballer", "politician"], { no: ["business", "actor", "party_bnp"] }),
+    entry("minister", 180, ["real", "male", "footballer"], { no: ["politician", "business", "actor", "party_bnp"] }),
+  ]);
+  const mixed = createState(split, { category: "character", opening: "real" });
+  recompute(mixed);
+  answer(mixed, "footballer", "yes");
+  assert.equal(questionBlocked(mixed, "politician"), false);
+  assert.equal(questionBlocked(mixed, "business"), true);
+});
+
 test("truthful answers about Lionel Messi guess him, not Sergio Agüero", () => {
   const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));
   const buf = readFileSync(new URL("./kb/ix/top.bin", import.meta.url));

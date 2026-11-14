@@ -3,7 +3,7 @@
 // Face and cat plates cross-fade with opacity and share that same transform.
 // Nothing is ever a shifted rectangle of the painting.
 
-import { createExpressions } from "./expressions.js?v=akinator-24";
+import { createExpressions } from "./expressions.js?v=akinator-26";
 
 const BASE = {
   landscape: "./images/approved/game-desk.webp",
@@ -171,6 +171,8 @@ export function createScene(canvas) {
     parent.style.setProperty("--hands-y", hands.toFixed(4));
     parent.style.setProperty("--cat-top", catTop.toFixed(4));
     parent.style.setProperty("--desk-y", ((view.y + view.h * spot.dv) / ch).toFixed(4));
+    const [, noteBottom] = frac(0, portraitMode ? 0.62 : 0.44);
+    parent.style.setProperty("--note-bottom", Math.max(0.2, noteBottom).toFixed(4));
     parent.classList.toggle("portrait-scene", portraitMode);
   }
 
@@ -225,8 +227,8 @@ export function createScene(canvas) {
     portrait: { u: 0.69444, v: 0.36719, w: 0.29167, h: 0.14063 },
   };
   const CAT_TAIL = {
-    landscape: { u: 0.8014, v: 0.3613, w: 0.0897, h: 0.1382 },
-    portrait: { u: 0.8194, v: 0.3594, w: 0.1667, h: 0.1172 },
+    landscape: { u: 0.7536, v: 0.3486, w: 0.0957, h: 0.1509 },
+    portrait: { u: 0.7778, v: 0.3516, w: 0.2083, h: 0.1250 },
   };
 
   function stepCat(dt) {
@@ -242,7 +244,7 @@ export function createScene(canvas) {
       catLife.flick = 1;
       catLife.nextFlick = rand(4, 6);
     }
-    if (catLife.flick > 0) catLife.flick -= dt * 1.2;
+    if (catLife.flick > 0) catLife.flick -= dt * 0.8;
   }
 
   function prepareInk(name, font) {
@@ -512,7 +514,7 @@ export function createScene(canvas) {
       sg.drawImage(mask, 0, 0);
       reveal.page = { canvas: reveal.scratch, w: ink.width, h: ink.height, penX: 8 + reveal.inkWidth * p };
       if (p >= 1) {
-        reveal.phase = reveal.imageUrl && reveal.photo ? "print" : "turn";
+        reveal.phase = reveal.imageUrl && reveal.photo && reveal.photo.width > 0 ? "print" : "turn";
         reveal.t = 0;
         reveal.printed = false;
       }
@@ -667,7 +669,7 @@ export function createScene(canvas) {
 
   async function loadOverlaySet(orient) {
     const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-24`)];
+      return [key, await loadImage(`${src}?v=akinator-26`)];
     }));
     const overlays = {};
     for (const [key, image] of entries) if (image) overlays[key] = image;
@@ -678,7 +680,7 @@ export function createScene(canvas) {
     const [base, overlays, printer] = await Promise.all([
       loadImage(BASE[orient]),
       loadOverlaySet(orient),
-      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-24`),
+      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-26`),
     ]);
     if (printer) images.printer = printer;
     return { base, overlays };

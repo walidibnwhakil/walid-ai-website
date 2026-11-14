@@ -490,6 +490,40 @@ function said(state, qid, values) {
   return state.answers.some((answer) => answer.qid === qid && values.includes(answer.value));
 }
 
+const PRIMARY_JOBS = ["footballer", "cricketer", "actor", "singer", "politician", "writer", "scientist", "musician", "director", "business", "youtube"];
+
+function confirmedJob(state) {
+  return PRIMARY_JOBS.find((job) => said(state, job, ["yes", "probably"])) || "";
+}
+
+function candidatesSplit(state, id, rows) {
+  const qi = state.pool.qIndex.get(id);
+  if (qi == null || !rows?.length) return false;
+  let yes = 0;
+  let no = 0;
+  let total = 0;
+  for (let k = 0; k < rows.length; k++) {
+    const weight = state.weights[rows[k]];
+    if (weight <= 0) continue;
+    total += weight;
+    const bit = attrAt(state.pool.attrs, state.pool.attrBytes, rows[k], qi);
+    if (bit === 2) yes += weight;
+    else if (bit === 1) no += weight;
+  }
+  return total > 0 && yes / total >= 0.15 && no / total >= 0.15;
+}
+
+function unrelatedJob(state, id) {
+  const job = confirmedJob(state);
+  if (!job || job === id) return false;
+  const primary = PRIMARY_JOBS.includes(id);
+  const politics = id === "politician" || state.pool.questions[state.pool.qIndex.get(id)]?.group === "politics";
+  if (!primary && !(politics && job !== "politician")) return false;
+  const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  const probe = politics ? "politician" : id;
+  return !candidatesSplit(state, probe, rows);
+}
+
 function skippedAsDuplicate(state, id) {
   const yes = (qid) => said(state, qid, ["yes", "probably"]);
   const answered = (qid) => state.answers.some((answer) => answer.qid === qid && answer.value !== "unknown");
@@ -499,6 +533,7 @@ function skippedAsDuplicate(state, id) {
   if (id === "singer" && said(state, "musician", ["no", "probably_not"])) return true;
   if (id === "athlete" && (yes("cricketer") || yes("footballer"))) return true;
   if ((id === "played_barcelona" || id === "ballon_dor") && !yes("footballer")) return true;
+  if (unrelatedJob(state, id)) return true;
   if ((id === "wild" && yes("pet")) || (id === "pet" && yes("wild"))) return true;
   if (COUNTRIES.includes(id) && COUNTRIES.some((country) => country !== id && yes(country))) return true;
   if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;

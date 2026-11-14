@@ -84,10 +84,11 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
 #stage { display: block; width: 100%; height: 100%; background: #24160f; }
 #ask-panel {
   position: absolute; z-index: 4;
-  left: calc(var(--bubble-left, 0.58) * 100%);
-  top: calc(var(--bubble-top, 0.08) * 100%);
-  width: min(430px, calc(100% - var(--bubble-left, 0.58) * 100% - 14px));
-  display: flex; flex-direction: column; gap: 10px;
+  left: calc(var(--bubble-left, 0.63) * 100%);
+  top: calc(var(--bubble-top, 0.04) * 100%);
+  width: min(250px, calc(100% - var(--bubble-left, 0.63) * 100% - 12px));
+  max-height: calc((var(--cat-top, 0.34) - var(--bubble-top, 0.04)) * 100% - 8px);
+  display: flex; flex-direction: column; gap: 6px;
   pointer-events: none;
 }
 #ask-panel > * { pointer-events: auto; }
@@ -98,14 +99,14 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   color: #1a1f26;
 }
 .q-badge {
-  flex: 0 0 44px; display: grid; place-items: center;
-  background: #1c4f4a; color: #fff; font-size: 18px; font-weight: 700;
-  border-radius: 14px 0 0 14px;
+  flex: 0 0 32px; display: grid; place-items: center;
+  background: #1c4f4a; color: #fff; font-size: 15px; font-weight: 700;
+  border-radius: 12px 0 0 12px;
 }
 #status {
-  margin: 0; flex: 1; padding: 12px 16px;
+  margin: 0; flex: 1; padding: 7px 10px;
   background: #f7f9fc; color: #1a1f26;
-  border-radius: 14px; font-size: 20px; line-height: 1.32;
+  border-radius: 14px; font-size: 16px; line-height: 1.25;
 }
 .speech.has-badge #status { border-radius: 0 14px 14px 0; }
 .speech::after {
@@ -130,9 +131,9 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   box-shadow: 0 8px 16px rgba(20, 16, 10, 0.22);
 }
 #answers button {
-  min-height: 46px; margin: 0; padding: 8px 12px;
+  min-height: clamp(28px, 3.5vh, 40px); margin: 0; padding: 4px 8px;
   border: 0; border-radius: 0; border-bottom: 1px solid #d5dee8;
-  background: transparent; color: #1c2430; font-size: 18px; line-height: 1.2;
+  background: transparent; color: #1c2430; font-size: 15px; line-height: 1.15;
 }
 #answers button:last-child { border-bottom: 0; }
 #answers button:hover, #answers button:focus-visible { background: #d7e4f2; }
@@ -188,24 +189,29 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   .legal-footer a, .legal-footer a:hover { color: #f6ead2; }
 }
 @media (max-aspect-ratio: 4/5) {
-  #ask-panel { display: contents; }
-  .speech {
-    position: absolute; z-index: 4;
-    left: max(8px, calc(var(--bubble-left, 0.30) * 100%));
-    top: max(6px, calc(var(--bubble-top, 0.04) * 100%));
-    right: 8px; width: auto;
+  #ask-panel {
+    display: flex;
+    left: 36%;
+    right: 8px;
+    width: auto;
+    top: calc(var(--hands-y, 0.50) * 100%);
+    max-height: calc(100% - var(--hands-y, 0.50) * 100% - 52px);
   }
-  #status { font-size: 16px; padding: 10px 12px; }
-  .q-badge { flex-basis: 36px; font-size: 16px; }
+  .speech { position: relative; left: auto; top: auto; right: auto; width: 100%; }
+  .speech::after, .speech.has-badge::after {
+    left: 18%; top: -12px; bottom: auto; right: auto;
+    border: 7px solid transparent;
+    border-bottom: 12px solid #1c4f4a;
+  }
+  #status { font-size: 15px; padding: 8px 10px; }
   #answers {
-    position: absolute; z-index: 4;
-    left: 10px; right: 10px; width: auto;
-    top: min(calc(var(--desk-y, 0.50) * 100%), calc(100% - 198px));
+    position: relative; left: auto; right: auto; top: auto; width: auto;
     display: grid; grid-template-columns: 1fr 1fr;
   }
-  #answers button { min-height: 48px; font-size: 16px; }
+  #answers button { min-height: 42px; font-size: 15px; }
   #answers button:nth-child(odd) { border-right: 1px solid #d5dee8; }
   #answers button:nth-child(5) { grid-column: 1 / -1; border-right: 0; }
+  #hud:has(#guess:not([hidden])) { top: auto; bottom: 8px; }
   #back { bottom: 8px; }
 }
 @media (max-width: 520px) {

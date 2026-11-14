@@ -3,7 +3,7 @@
 // Face and cat plates cross-fade with opacity and share that same transform.
 // Nothing is ever a shifted rectangle of the painting.
 
-import { createExpressions } from "./expressions.js?v=akinator-16";
+import { createExpressions } from "./expressions.js?v=akinator-17";
 
 const BASE = {
   landscape: "./images/approved/game-desk.webp",
@@ -134,12 +134,21 @@ export function createScene(canvas) {
     }
     const parent = canvas.parentElement;
     if (!parent || !cw || !ch) return;
+    const face = FACE[portraitMode ? "portrait" : "landscape"];
+    const cat = CAT_FACE[portraitMode ? "portrait" : "landscape"];
     const spot = portraitMode
-      ? { bu: 0.38, bv: 0.22, dv: 0.56 }
-      : { bu: 0.60, bv: 0.07, dv: 0.58 };
-    const bubbleLeft = (view.x + view.w * spot.bu) / cw;
-    parent.style.setProperty("--bubble-left", Math.max(10 / cw, bubbleLeft).toFixed(4));
-    parent.style.setProperty("--bubble-top", ((view.y + view.h * spot.bv) / ch).toFixed(4));
+      ? { bu: 0.34, bv: face.v + face.h + 0.07, dv: 0.62 }
+      : { bu: 0.63, bv: 0.035, dv: 0.60 };
+    const frac = (u, v) => [(view.x + view.w * u) / cw, (view.y + view.h * v) / ch];
+    const [bubbleLeft, bubbleTop] = frac(spot.bu, spot.bv);
+    const [, chin] = frac(0, face.v + face.h);
+    const [, hands] = frac(0, face.v + face.h + (portraitMode ? 0.08 : 0.04));
+    const [, catTop] = frac(0, Math.max(0.08, cat.v - 0.045));
+    parent.style.setProperty("--bubble-left", Math.max(0.02, bubbleLeft).toFixed(4));
+    parent.style.setProperty("--bubble-top", Math.max(0.02, bubbleTop).toFixed(4));
+    parent.style.setProperty("--chin-y", chin.toFixed(4));
+    parent.style.setProperty("--hands-y", hands.toFixed(4));
+    parent.style.setProperty("--cat-top", catTop.toFixed(4));
     parent.style.setProperty("--desk-y", ((view.y + view.h * spot.dv) / ch).toFixed(4));
     parent.classList.toggle("portrait-scene", portraitMode);
   }
@@ -221,10 +230,11 @@ export function createScene(canvas) {
 
   function drawSheet(turn) {
     const u = Math.max(0, Math.min(1, turn));
-    const x = ix(portraitMode ? 0.50 : 0.49);
-    const y = iy(portraitMode ? 0.64 + 0.02 * u : 0.56 - 0.18 * u);
-    const w = view.w * (portraitMode ? 0.50 + 0.10 * u : 0.26 + 0.08 * u);
-    const h = view.h * (portraitMode ? 0.07 + 0.015 * u : 0.16 + 0.05 * u);
+    // Flat on the desk while he writes, then up in his hands. The printer stays to the left.
+    const x = ix(portraitMode ? 0.50 : 0.50);
+    const y = iy(portraitMode ? 0.62 - 0.20 * u : 0.58 - 0.20 * u);
+    const w = view.w * (portraitMode ? 0.42 : 0.30);
+    const h = view.h * (portraitMode ? 0.11 : 0.15);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI * (1 - u));
@@ -259,11 +269,11 @@ export function createScene(canvas) {
 
   function printerGeom() {
     const printer = images.printer;
-    const pw = view.w * (portraitMode ? 0.22 : 0.145);
-    const ratio = printer ? printer.height / printer.width : 0.48;
+    const pw = view.w * (portraitMode ? 0.20 : 0.20);
+    const ratio = printer ? printer.height / printer.width : 0.58;
     const ph = pw * ratio;
-    const px = ix(portraitMode ? 0.05 : 0.09);
-    const py = iy(portraitMode ? 0.64 : 0.655) - ph;
+    const px = ix(portraitMode ? 0.03 : 0.045);
+    const py = iy(portraitMode ? 0.60 : 0.69) - ph;
     return { px, py, pw, ph };
   }
 
@@ -271,10 +281,16 @@ export function createScene(canvas) {
     const printer = images.printer;
     if (!printer) return;
     const { px, py, pw, ph } = printerGeom();
+    const cx = px + pw * 0.50;
+    const cy = py + ph * 0.90;
+    const shade = ctx.createRadialGradient(cx, cy, pw * 0.04, cx, cy, pw * 0.62);
+    shade.addColorStop(0, "rgba(28, 14, 6, 0.55)");
+    shade.addColorStop(0.45, "rgba(28, 14, 6, 0.28)");
+    shade.addColorStop(1, "rgba(28, 14, 6, 0)");
     ctx.save();
-    ctx.fillStyle = "rgba(32, 16, 8, 0.30)";
+    ctx.fillStyle = shade;
     ctx.beginPath();
-    ctx.ellipse(px + pw * 0.52, py + ph * 0.96, pw * 0.42, Math.max(2, ph * 0.045), 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, cy, pw * 0.62, Math.max(8, ph * 0.11), 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.drawImage(printer, px, py, pw, ph);
     ctx.restore();
@@ -506,7 +522,7 @@ export function createScene(canvas) {
 
   async function loadOverlaySet(orient) {
     const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-16`)];
+      return [key, await loadImage(`${src}?v=akinator-17`)];
     }));
     const overlays = {};
     for (const [key, image] of entries) if (image) overlays[key] = image;
@@ -517,7 +533,7 @@ export function createScene(canvas) {
     const [base, overlays, printer] = await Promise.all([
       loadImage(BASE[orient]),
       loadOverlaySet(orient),
-      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-16`),
+      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-17`),
     ]);
     if (printer) images.printer = printer;
     return { base, overlays };

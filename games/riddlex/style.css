@@ -190,31 +190,31 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 }
 @media (max-aspect-ratio: 4/5) {
   #ask-panel {
-    display: flex;
-    flex-direction: column;
-    left: 8px;
-    right: 8px;
-    width: auto;
-    top: calc(var(--hands-y, 0.52) * 100% + 4px);
-    bottom: 10px;
-    max-height: none;
-    gap: 8px;
+    display: contents;
+    left: auto; right: auto; top: auto; width: auto; max-height: none;
   }
-  .speech { position: relative; left: auto; top: auto; right: auto; width: 100%; }
+  .speech {
+    position: absolute; left: 12px; right: 12px; width: auto; z-index: 5;
+    top: calc(var(--chin-y, 0.42) * 100% + 16px);
+  }
   .speech::after, .speech.has-badge::after {
-    left: 18%; top: -12px; bottom: auto; right: auto;
-    border: 7px solid transparent;
-    border-bottom: 12px solid #1c4f4a;
+    left: 50%; margin-left: -9px; top: -16px; bottom: auto; right: auto;
+    border: 9px solid transparent;
+    border-bottom: 16px solid #f7f9fc;
   }
-  #status { font-size: 15px; padding: 8px 10px; }
+  #status { font-size: 15px; padding: 8px 12px; }
   #answers {
-    position: relative; left: auto; right: auto; top: auto; width: auto;
-    flex: 1 1 auto; min-height: 0;
-    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr;
+    position: absolute; left: 12px; right: 12px; bottom: 8px; top: auto; width: auto;
+    display: flex; flex-direction: column; gap: 6px;
+    background: transparent; border: 0; box-shadow: none; border-radius: 0;
   }
-  #answers button { min-height: 46px; height: 100%; font-size: 16px; }
+  #answers button {
+    min-height: 44px; height: 44px; font-size: 16px;
+    border: 1px solid #d5dee8; border-radius: 12px; border-bottom: 1px solid #d5dee8;
+    background: #f7f9fc;
+  }
   #answers button:nth-child(odd) { border-right: 1px solid #d5dee8; }
-  #answers button:nth-child(5) { grid-column: 1 / -1; border-right: 0; }
+  #answers button:nth-child(5) { grid-column: auto; }
   #hud:has(#guess:not([hidden])) {
     top: auto; bottom: 0; left: 0; right: 0; z-index: 6;
     padding: 8px 8px 10px; background: #24150df2;

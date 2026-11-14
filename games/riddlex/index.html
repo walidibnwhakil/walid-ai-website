@@ -19,7 +19,7 @@
   <meta name="twitter:description" content="Think of a real person, character, animal or object. Riddlex asks one question at a time and tries to guess.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap">
-  <link rel="stylesheet" href="./style.css?v=akinator-14">
+  <link rel="stylesheet" href="./style.css?v=akinator-23">
   <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
@@ -67,7 +67,19 @@
     </header>
     <div class="stage-wrap">
       <canvas id="stage" aria-hidden="true"></canvas>
-      <p id="status" class="speech pop" aria-live="polite"></p>
+      <div id="ask-panel">
+        <div id="speech" class="speech">
+          <span id="q-badge" class="q-badge" hidden></span>
+          <p id="status" aria-live="polite"></p>
+        </div>
+        <div id="answers" role="group" aria-label="Answer">
+          <button id="answer-yes" type="button" data-answer="yes">Yes</button>
+          <button id="answer-no" type="button" data-answer="no">No</button>
+          <button id="answer-unknown" type="button" data-answer="unknown">Don't know</button>
+          <button id="answer-probably" type="button" data-answer="probably">Probably</button>
+          <button id="answer-probably-not" type="button" data-answer="probably_not">Probably not</button>
+        </div>
+      </div>
       <div id="categories" hidden>
         <div class="cat-row">
           <button type="button" data-cat="character">Character</button>
@@ -76,13 +88,7 @@
         </div>
       </div>
       <div id="hud">
-      <div id="answers" role="group" aria-label="Answer">
-        <button id="answer-yes" type="button" data-answer="yes">Yes</button>
-        <button id="answer-no" type="button" data-answer="no">No</button>
-        <button id="answer-unknown" type="button" data-answer="unknown">Don't know</button>
-        <button id="answer-probably" type="button" data-answer="probably">Probably</button>
-        <button id="answer-probably-not" type="button" data-answer="probably_not">Probably not</button>
-      </div>
+      <p id="guess-line" class="guess-line"></p>
       <div id="guess" hidden>
         <button id="correct" type="button">Yes, that's it</button>
         <button id="wrong" type="button">No</button>
@@ -97,11 +103,9 @@
         <p id="learn-note" role="status"></p>
         <button id="learn-save" type="submit">Teach the detective</button>
       </form>
-      <div class="hud-row">
-        <button id="back" type="button">Back</button>
-        <span id="progress"></span>
-      </div>
     </div>
+    <button id="back" type="button" hidden>Back</button>
+    <span id="progress"></span>
     <div id="confirm" class="confirm" hidden>
       <p id="confirm-text">Start a new game?</p>
       <div>
@@ -111,7 +115,7 @@
     </div>
     </div>
   </div>
-  <script type="module" src="./app.js?v=akinator-14"></script>
+  <script type="module" src="./app.js?v=akinator-23"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>
 </html>

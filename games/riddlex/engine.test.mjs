@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { answer, adultAllowed, canPrint, chooseQuestion, createState, decide, rejectIndex, recompute } from "./engine.js";
+import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, questionBlocked, rejectIndex, recompute } from "./engine.js";
 import { poolFromEntries } from "./kb.js";
 
 const questions = [
@@ -303,4 +303,132 @@ test("a firm fictional yes is not beaten by a famous real person", () => {
   ]);
   const guessed = firmGuesses(pool, "fictional", "yes");
   for (const id of guessed) assert.ok(["f1", "f2", "f3", "f4"].includes(id), id);
+});
+
+const CRICKET_ROLES = ["batsman", "bowler", "wicketkeeper", "captain", "all_rounder", "cricket_opener", "does_bat", "does_bowl"];
+
+test("parent nos block role questions, and a country yes implies its continent", () => {
+  const spec = [
+    ["real", "kind"], ["male", "person"], ["alive", "life"],
+    ["from_bd", "country", "Are they from Bangladesh?"],
+    ["from_in", "country", "Are they from India?"],
+    ["from_us", "country", "Are they from the United States?"],
+    ["from_asia", "country", "Are they from Asia?"],
+    ["cricketer", "job", "Do they play cricket?"],
+    ["batsman", "job", "Is he a batsman?"],
+    ["bowler", "job", "Is he a bowler?"],
+    ["wicketkeeper", "job", "Is he a wicketkeeper?"],
+    ["captain", "job", "Is he the captain?"],
+    ["all_rounder", "job", "Do they both bat and bowl?"],
+    ["cricket_opener", "job", "Does he open the batting?"],
+    ["does_bat", "job", "Does he bat?"],
+    ["does_bowl", "job", "Does he bowl?"],
+    ["footballer", "job", "Do they play football?"],
+    ["striker", "job", "Is he a striker?"],
+    ["goalkeeper", "job", "Is he a goalkeeper?"],
+    ["football_winger", "job", "Does he play on the wing?"],
+    ["politician", "job", "Are they in politics?"],
+    ["party_bnp", "politics", "Are they in the BNP?"],
+    ["led_gov", "politics", "Have they led a government?"],
+    ["actor", "job", "Do they act?"],
+    ["adult_ent", "adult", "Are they mainly an adult-film actor?"],
+    ["singer", "job", "Do they sing?"],
+    ["genre_pop", "job", "Is their genre pop?"],
+    ["writer", "job", "Do they write?"],
+  ];
+  const qs = spec.map(([id, group, en]) => ({ id, group, en: en || id, bn: id }));
+  const links = buildTraitLinks(qs);
+  assert.equal(links.parents.get("does_bat")[0], "cricketer");
+  assert.equal(links.parents.get("does_bowl")[0], "cricketer");
+  assert.equal(links.parents.get("cricket_opener")[0], "cricketer");
+  assert.equal(links.parents.get("all_rounder")[0], "cricketer");
+  assert.equal(links.parents.get("football_winger")[0], "footballer");
+  assert.equal(links.parents.get("genre_pop")[0], "singer");
+  assert.ok(links.parents.get("party_bnp").includes("politician"));
+  assert.ok(links.parents.get("from_bd").includes("from_asia"));
+
+  const noCricket = ["footballer", "striker", "goalkeeper", "football_winger", "politician", "party_bnp", "led_gov", "actor", "adult_ent", "singer", "genre_pop", "writer", "from_us"];
+  const pool = poolFromEntries(qs, [
+    entry("bat", 500, ["real", "male", "alive", "from_bd", "from_asia", "cricketer", "batsman", "captain", "cricket_opener", "does_bat"], { no: ["bowler", "wicketkeeper", "all_rounder", "does_bowl", "from_in", ...noCricket] }),
+    entry("bowl", 480, ["real", "male", "alive", "from_bd", "from_asia", "cricketer", "bowler", "does_bowl", "all_rounder"], { no: ["batsman", "wicketkeeper", "captain", "cricket_opener", "does_bat", "from_in", ...noCricket] }),
+    entry("keep", 460, ["real", "male", "alive", "from_in", "from_asia", "cricketer", "wicketkeeper"], { no: ["batsman", "bowler", "captain", "all_rounder", "does_bat", "does_bowl", "from_bd", "from_us", ...noCricket] }),
+    entry("messi", 520, ["real", "male", "alive", "from_us", "footballer", "striker", "football_winger"], { no: ["from_bd", "from_in", "from_asia", "cricketer", ...CRICKET_ROLES, "goalkeeper", "politician", "party_bnp", "led_gov", "actor", "adult_ent", "singer", "genre_pop", "writer"] }),
+    entry("pol", 300, ["real", "male", "alive", "from_bd", "from_asia", "politician", "party_bnp", "led_gov"], { no: ["cricketer", "footballer", "actor", "singer", "writer", "from_in", "from_us", ...CRICKET_ROLES] }),
+  ]);
+
+  function open(value, qid) {
+    const state = createState(pool, { category: "character", opening: "real" });
+    recompute(state);
+    answer(state, "real", "yes");
+    if (qid) answer(state, qid, value);
+    return state;
+  }
+
+  const before = open();
+  answer(before, "male", "yes");
+  answer(before, "alive", "yes");
+  assert.equal(questionBlocked(before, "batsman"), false);
+  answer(before, "cricketer", "probably_not");
+  for (const id of CRICKET_ROLES) assert.equal(questionBlocked(before, id), true, id);
+  for (let n = 0; n < 8; n++) {
+    const qid = chooseQuestion(before);
+    assert.ok(!CRICKET_ROLES.includes(qid), qid);
+    if (!qid) break;
+    answer(before, qid, "unknown");
+  }
+
+  const firm = open("no", "cricketer");
+  assert.equal(questionBlocked(firm, "does_bat"), true);
+  assert.equal(questionBlocked(firm, "does_bowl"), true);
+
+  const foot = open("no", "footballer");
+  for (const id of ["striker", "goalkeeper", "football_winger"]) assert.equal(questionBlocked(foot, id), true, id);
+  assert.equal(questionBlocked(foot, "cricketer"), false);
+
+  const poli = open("probably_not", "politician");
+  assert.equal(questionBlocked(poli, "party_bnp"), true);
+  assert.equal(questionBlocked(poli, "led_gov"), true);
+
+  const cast = open("no", "actor");
+  assert.equal(questionBlocked(cast, "adult_ent"), true);
+
+  const voice = open("no", "singer");
+  assert.equal(questionBlocked(voice, "genre_pop"), true);
+
+  const place = open("yes", "from_bd");
+  assert.equal(questionBlocked(place, "from_asia"), true);
+  assert.equal(questionBlocked(place, "from_in"), true);
+
+  const west = open("yes", "from_us");
+  assert.equal(questionBlocked(west, "from_asia"), true);
+  assert.equal(questionBlocked(west, "from_bd"), true);
+
+  const outside = open("no", "from_asia");
+  assert.equal(questionBlocked(outside, "from_bd"), true);
+  assert.equal(questionBlocked(outside, "from_in"), true);
+  assert.equal(questionBlocked(outside, "from_us"), false);
+});
+
+test("batting questions stay unasked when no remaining candidate is a cricketer", () => {
+  const qs = [
+    ["real", "kind"], ["cricketer", "job", "Do they play cricket?"],
+    ["batsman", "job", "Is he a batsman?"], ["does_bowl", "job", "Does he bowl?"],
+    ["writer", "job", "Do they write?"], ["male", "person"],
+  ].map(([id, group, en]) => ({ id, group, en: en || id, bn: id }));
+  const pool = poolFromEntries(qs, [
+    entry("pen", 200, ["real", "male", "writer", "batsman"], { no: ["cricketer", "does_bowl"] }),
+    entry("page", 180, ["real", "male", "does_bowl"], { no: ["cricketer", "batsman", "writer"] }),
+    entry("ink", 160, ["real", "writer"], { no: ["cricketer", "batsman", "does_bowl", "male"] }),
+  ]);
+  const state = createState(pool, { category: "character", opening: "real" });
+  recompute(state);
+  answer(state, "real", "yes");
+  assert.equal(questionBlocked(state, "batsman"), true);
+  assert.equal(questionBlocked(state, "does_bowl"), true);
+  for (let n = 0; n < 6; n++) {
+    const qid = chooseQuestion(state);
+    assert.ok(qid !== "batsman" && qid !== "does_bowl", qid);
+    if (!qid) break;
+    answer(state, qid, "unknown");
+  }
 });

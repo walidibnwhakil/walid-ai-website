@@ -3,7 +3,7 @@ import { answer as applyAnswer, canPrint, createState, decide, displayName, enti
 import { UI, guessFont } from "./i18n.js";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js?v=akinator-14";
+import { createScene } from "./scene.js?v=akinator-23";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -102,15 +102,25 @@ function adoptPool(next) {
   recompute(state);
 }
 
-function setStatus(message) {
+function setStatus(message, number) {
   status.textContent = message;
-  status.classList.remove("pop");
-  void status.offsetWidth;
-  status.classList.add("pop");
+  const badge = $("q-badge");
+  const speech = $("speech");
+  const showNumber = Number.isFinite(number) && number > 0;
+  if (badge) {
+    badge.hidden = !showNumber;
+    if (showNumber) badge.textContent = String(number);
+  }
+  speech?.classList.toggle("has-badge", showNumber);
+  speech?.classList.remove("pop");
+  void speech?.offsetWidth;
+  speech?.classList.add("pop");
 }
 
 function showOnly(which) {
   $("categories").hidden = which !== "pick";
+  const panel = $("ask-panel");
+  if (panel) panel.hidden = which !== "ask" && which !== "pick";
   answers.hidden = which !== "ask";
   guessBox.hidden = which !== "guess" && which !== "wrong";
   $("correct").hidden = which !== "guess";
@@ -200,7 +210,7 @@ async function step() {
     currentQ = decision.qid;
     mode = "ask";
     const question = pool.questions[pool.qIndex.get(currentQ)];
-    setStatus(lang === "bn" ? question.bn : question.en);
+    setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
     $("progress").textContent = text().progress(state.answers.length + 1);
     scene.setMood(state.answers.length ? "thinking" : "curious");
     showOnly("ask");
@@ -234,6 +244,8 @@ async function beginGuess(index) {
   if (mode !== "reveal") return;
   mode = "guess";
   setStatus(text().prompt(name));
+  const guessLine = $("guess-line");
+  if (guessLine) guessLine.textContent = text().prompt(name);
   $("credit").textContent = result.printed && entity.credit ? `${text().credit}: ${entity.credit}` : "";
   showOnly("guess");
 }
@@ -344,7 +356,8 @@ function onUndo() {
   currentQ = previous.qid;
   mode = "ask";
   const question = pool.questions[pool.qIndex.get(currentQ)];
-  setStatus(lang === "bn" ? question.bn : question.en);
+  setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
+  $("progress").textContent = text().progress(state.answers.length + 1);
   showOnly("ask");
 }
 
@@ -354,7 +367,7 @@ function setLanguage(next) {
   applyLanguage();
   if (mode === "ask" && currentQ && pool) {
     const question = pool.questions[pool.qIndex.get(currentQ)];
-    setStatus(lang === "bn" ? question.bn : question.en);
+    setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
     $("progress").textContent = text().progress(state.answers.length + 1);
   } else if (mode === "pick") {
     setStatus(text().pick);
@@ -415,6 +428,8 @@ if (new URLSearchParams(location.search).has("autotest")) {
     poolSize: () => pool?.count || 0,
     bytes: () => traffic.bytes,
     blinkCat: () => scene.blinkCat(),
+    expression: () => scene.debug(),
+    reveal: (name, imageUrl) => scene.playReveal({ name, imageUrl }),
     loaded: () => loadedNames.slice(),
     find: (id) => pool?.ids.indexOf(id) ?? -1,
     replyFor: (id) => {

@@ -349,6 +349,139 @@ const CATEGORY_GROUPS = {
 const COUNTRIES = ["from_bd", "from_in", "from_pk", "from_us", "from_gb", "from_jp", "from_kr", "from_cn", "from_fr", "from_de", "from_ru", "from_br", "from_ca", "from_au", "from_es", "from_it", "from_mx", "from_ng", "from_eg", "from_tr", "from_id", "from_sa", "from_ar", "from_za"];
 const BIRTHS = ["born_pre1900", "born_1900_1949", "born_1950_1969", "born_1970_1979", "born_1980_1989", "born_1990_1999", "born_2000_plus"];
 
+// A role question is a child of the job it depends on. Naming (cricket_opener),
+// the politics group, and wording ("Does he bat?") fill in anything not listed.
+const ROLE_PARENT = {
+  all_rounder: "cricketer",
+  batsman: "cricketer",
+  bowler: "cricketer",
+  wicketkeeper: "cricketer",
+  wicket_keeper: "cricketer",
+  striker: "footballer",
+  goalkeeper: "footballer",
+  midfielder: "footballer",
+  defender: "footballer",
+  winger: "footballer",
+  forward: "footballer",
+  bollywood: "actor",
+  hollywood: "actor",
+  tollywood: "actor",
+  dhallywood: "actor",
+  adult_ent: "actor",
+};
+const STEM_PARENT = {
+  cricket: "cricketer",
+  cricketer: "cricketer",
+  bat: "cricketer",
+  batsman: "cricketer",
+  bowl: "cricketer",
+  bowler: "cricketer",
+  wicket: "cricketer",
+  wicketkeeper: "cricketer",
+  football: "footballer",
+  footballer: "footballer",
+  soccer: "footballer",
+  party: "politician",
+  politician: "politician",
+  actor: "actor",
+  singer: "singer",
+  genre: "singer",
+  song: "singer",
+};
+const TEXT_RULES = [
+  ["cricketer", /\b(bats?|batting|bowls?|bowling|wickets?|wicket-?keepers?)\b/i],
+  ["footballer", /\b(strikers?|goalkeepers?|midfielders?|defenders?|wingers?)\b/i],
+  ["actor", /\b(bollywood|hollywood|tollywood|dhallywood|adult-film)\b/i],
+  ["singer", /\b(genres?|playback)\b/i],
+];
+const REGIONS = {
+  from_asia: ["from_bd", "from_in", "from_pk", "from_jp", "from_kr", "from_cn", "from_id", "from_sa", "from_tr"],
+  asia: ["from_bd", "from_in", "from_pk", "from_jp", "from_kr", "from_cn", "from_id", "from_sa", "from_tr"],
+  from_europe: ["from_gb", "from_fr", "from_de", "from_ru", "from_es", "from_it"],
+  europe: ["from_gb", "from_fr", "from_de", "from_ru", "from_es", "from_it"],
+  from_africa: ["from_ng", "from_eg", "from_za"],
+  africa: ["from_ng", "from_eg", "from_za"],
+  from_north_america: ["from_us", "from_ca", "from_mx"],
+  north_america: ["from_us", "from_ca", "from_mx"],
+  from_south_america: ["from_br", "from_ar"],
+  south_america: ["from_br", "from_ar"],
+  from_oceania: ["from_au"],
+  oceania: ["from_au"],
+  from_americas: ["from_us", "from_ca", "from_mx", "from_br", "from_ar"],
+  americas: ["from_us", "from_ca", "from_mx", "from_br", "from_ar"],
+};
+const NO_ENTAIL = new Set(["lives_abroad"]);
+
+export function buildTraitLinks(questions) {
+  const list = questions || [];
+  const idSet = new Set(list.map((question) => question.id));
+  const parents = new Map();
+  const massParents = new Map();
+  const entailedBy = new Map();
+  const members = new Map();
+
+  function add(parent, child, { entail = true, mass = false } = {}) {
+    if (!parent || !child || parent === child || !idSet.has(parent) || !idSet.has(child)) return;
+    const owned = parents.get(child) || [];
+    if (!owned.includes(parent)) parents.set(child, owned.concat(parent));
+    if (mass) {
+      const heavy = massParents.get(child) || [];
+      if (!heavy.includes(parent)) massParents.set(child, heavy.concat(parent));
+    }
+    if (entail) {
+      const kids = entailedBy.get(parent) || [];
+      if (!kids.includes(child)) entailedBy.set(parent, kids.concat(child));
+    }
+  }
+
+  for (const question of list) {
+    const id = question.id;
+    let parent = ROLE_PARENT[id] || null;
+    if (!parent && id.includes("_")) {
+      const stemmed = STEM_PARENT[id.split("_")[0]];
+      if (stemmed && stemmed !== id) parent = stemmed;
+    }
+    if (!parent && (id === "captain" || id.endsWith("_captain"))) {
+      const text = `${question.en || ""} ${question.bn || ""}`;
+      parent = /football|soccer/i.test(text) ? "footballer" : "cricketer";
+    }
+    if (!parent && (question.group === "job" || question.group === "adult")) {
+      const text = `${question.en || ""} ${question.bn || ""}`;
+      for (const [candidate, pattern] of TEXT_RULES) {
+        if (pattern.test(text)) {
+          parent = candidate;
+          break;
+        }
+      }
+    }
+    if (parent) add(parent, id, { entail: !NO_ENTAIL.has(id), mass: true });
+    if (question.group === "politics" && id !== "politician") {
+      add("politician", id, { entail: !NO_ENTAIL.has(id), mass: true });
+    }
+  }
+  for (const question of list) {
+    const regionMembers = REGIONS[question.id];
+    if (!regionMembers) continue;
+    const set = new Set();
+    for (const member of regionMembers) {
+      if (!idSet.has(member)) continue;
+      set.add(member);
+      add(question.id, member, { entail: true, mass: false });
+    }
+    if (set.size) members.set(question.id, set);
+  }
+  return { parents, massParents, entailedBy, members };
+}
+
+function linksFor(pool) {
+  if (!pool._traitLinks || pool._traitLinks.questions !== pool.questions) {
+    const links = buildTraitLinks(pool.questions);
+    links.questions = pool.questions;
+    pool._traitLinks = links;
+  }
+  return pool._traitLinks;
+}
+
 function said(state, qid, values) {
   return state.answers.some((answer) => answer.qid === qid && values.includes(answer.value));
 }
@@ -368,6 +501,79 @@ function skippedAsDuplicate(state, id) {
   return false;
 }
 
+function ancestorRejected(state, id, links) {
+  const stack = [...(links.parents.get(id) || [])];
+  const seen = new Set();
+  while (stack.length) {
+    const parent = stack.pop();
+    if (seen.has(parent)) continue;
+    seen.add(parent);
+    if (said(state, parent, ["no", "probably_not"])) return true;
+    for (const grand of links.parents.get(parent) || []) stack.push(grand);
+  }
+  return false;
+}
+
+function impliedYes(state, id, links) {
+  for (const child of links.entailedBy.get(id) || []) {
+    if (said(state, child, ["yes", "probably"])) return true;
+  }
+  const region = links.members.get(id);
+  if (!region) return false;
+  for (const country of COUNTRIES) {
+    if (region.has(country)) continue;
+    if (said(state, country, ["yes", "probably"])) return true;
+  }
+  return false;
+}
+
+function parentAbsent(state, parentId, rows, cache) {
+  if (cache.has(parentId)) return cache.get(parentId);
+  if (said(state, parentId, ["yes", "probably"])) {
+    cache.set(parentId, false);
+    return false;
+  }
+  const qi = state.pool.qIndex.get(parentId);
+  if (qi == null) {
+    cache.set(parentId, false);
+    return false;
+  }
+  const { pool, weights } = state;
+  let yes = 0;
+  let known = 0;
+  let total = 0;
+  for (let k = 0; k < rows.length; k++) {
+    const weight = weights[rows[k]];
+    if (weight <= 0) continue;
+    total += weight;
+    const bit = attrAt(pool.attrs, pool.attrBytes, rows[k], qi);
+    if (bit === 2) {
+      yes += weight;
+      known += weight;
+    } else if (bit === 1) known += weight;
+  }
+  const absent = total > 0 && known >= total * 0.35 && yes / total < 0.12;
+  cache.set(parentId, absent);
+  return absent;
+}
+
+function blockedQuestion(state, question, rows, cache) {
+  if (skippedAsDuplicate(state, question.id)) return true;
+  const links = linksFor(state.pool);
+  if (impliedYes(state, question.id, links) || ancestorRejected(state, question.id, links)) return true;
+  for (const parent of links.massParents.get(question.id) || []) {
+    if (parentAbsent(state, parent, rows, cache)) return true;
+  }
+  return false;
+}
+
+export function questionBlocked(state, qid) {
+  const qi = state.pool.qIndex.get(qid);
+  if (qi == null) return false;
+  const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  return blockedQuestion(state, state.pool.questions[qi], rows, new Map());
+}
+
 function allowedInCategory(state, question) {
   if (!state.category) return true;
   if (!CATEGORY_GROUPS[state.category]?.has(question.group)) return false;
@@ -378,10 +584,12 @@ function allowedInCategory(state, question) {
 
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
+  const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  const cache = new Map();
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if (!allowedInCategory(state, question) || skippedAsDuplicate(state, question.id)) continue;
+    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
     return question.id;
   }
   return null;
@@ -403,6 +611,7 @@ export function chooseQuestion(state) {
     return "animal";
   }
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  const absentCache = new Map();
   let best = null;
   let bestGain = 0;
   let bdGain = 0;
@@ -412,7 +621,7 @@ export function chooseQuestion(state) {
   for (let qi = 0; qi < pool.questions.length; qi++) {
     const question = pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if (!allowedInCategory(state, question) || skippedAsDuplicate(state, question.id)) continue;
+    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, absentCache)) continue;
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;

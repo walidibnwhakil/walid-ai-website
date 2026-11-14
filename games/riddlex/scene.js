@@ -135,8 +135,8 @@ export function createScene(canvas) {
     const parent = canvas.parentElement;
     if (!parent || !cw || !ch) return;
     const spot = portraitMode
-      ? { bu: 0.03, bv: 0.20, dv: 0.455 }
-      : { bu: 0.05, bv: 0.15, dv: 0.58 };
+      ? { bu: 0.30, bv: 0.045, dv: 0.50 }
+      : { bu: 0.60, bv: 0.07, dv: 0.58 };
     const bubbleLeft = (view.x + view.w * spot.bu) / cw;
     parent.style.setProperty("--bubble-left", Math.max(10 / cw, bubbleLeft).toFixed(4));
     parent.style.setProperty("--bubble-top", ((view.y + view.h * spot.bv) / ch).toFixed(4));

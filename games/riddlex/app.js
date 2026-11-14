@@ -102,11 +102,19 @@ function adoptPool(next) {
   recompute(state);
 }
 
-function setStatus(message) {
+function setStatus(message, number) {
   status.textContent = message;
-  status.classList.remove("pop");
-  void status.offsetWidth;
-  status.classList.add("pop");
+  const badge = $("q-badge");
+  const speech = $("speech");
+  const showNumber = Number.isFinite(number) && number > 0;
+  if (badge) {
+    badge.hidden = !showNumber;
+    if (showNumber) badge.textContent = String(number);
+  }
+  speech?.classList.toggle("has-badge", showNumber);
+  speech?.classList.remove("pop");
+  void speech?.offsetWidth;
+  speech?.classList.add("pop");
 }
 
 function showOnly(which) {
@@ -200,7 +208,7 @@ async function step() {
     currentQ = decision.qid;
     mode = "ask";
     const question = pool.questions[pool.qIndex.get(currentQ)];
-    setStatus(lang === "bn" ? question.bn : question.en);
+    setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
     $("progress").textContent = text().progress(state.answers.length + 1);
     scene.setMood(state.answers.length ? "thinking" : "curious");
     showOnly("ask");
@@ -344,7 +352,8 @@ function onUndo() {
   currentQ = previous.qid;
   mode = "ask";
   const question = pool.questions[pool.qIndex.get(currentQ)];
-  setStatus(lang === "bn" ? question.bn : question.en);
+  setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
+  $("progress").textContent = text().progress(state.answers.length + 1);
   showOnly("ask");
 }
 
@@ -354,7 +363,7 @@ function setLanguage(next) {
   applyLanguage();
   if (mode === "ask" && currentQ && pool) {
     const question = pool.questions[pool.qIndex.get(currentQ)];
-    setStatus(lang === "bn" ? question.bn : question.en);
+    setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
     $("progress").textContent = text().progress(state.answers.length + 1);
   } else if (mode === "pick") {
     setStatus(text().pick);

@@ -91,25 +91,25 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   position: absolute; z-index: 5; display: flex; align-items: stretch;
   left: calc(var(--bubble-left, 0.63) * 100%);
   top: calc(var(--bubble-top, 0.04) * 100%);
-  width: min(300px, calc(100% - var(--bubble-left, 0.63) * 100% - 16px));
+  width: min(420px, calc(100% - var(--bubble-left, 0.63) * 100% - 16px));
   margin: 0; padding: 0; border: 0; background: transparent;
   filter: drop-shadow(0 8px 14px rgba(32, 18, 9, 0.28));
   color: #1a1f26;
 }
 .q-badge {
-  flex: 0 0 32px; display: grid; place-items: center;
-  background: #1c4f4a; color: #fff; font-size: 15px; font-weight: 700;
-  border-radius: 12px 0 0 12px;
+  flex: 0 0 45px; display: grid; place-items: center;
+  background: #1c4f4a; color: #fff; font-size: 21px; font-weight: 700;
+  border-radius: 16px 0 0 16px;
 }
 #status {
-  margin: 0; flex: 1; padding: 7px 10px;
+  margin: 0; flex: 1; padding: 10px 14px;
   background: #f7f9fc; color: #1a1f26;
-  border-radius: 14px; font-size: 16px; line-height: 1.25;
+  border-radius: 20px; font-size: 22px; line-height: 1.25;
 }
 .speech.has-badge #status { border-radius: 0 14px 14px 0; }
 .speech::after {
-  content: ""; position: absolute; left: -13px; top: 18px;
-  border: 8px solid transparent; border-right: 14px solid #f7f9fc;
+  content: ""; position: absolute; left: -18px; top: 24px;
+  border: 11px solid transparent; border-right: 20px solid #f7f9fc;
 }
 .speech.has-badge::after { border-right-color: #1c4f4a; }
 .speech.pop { animation: bubble-in .38s cubic-bezier(.16,.84,.32,1) both; }
@@ -201,7 +201,8 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
     border: 9px solid transparent;
     border-bottom: 16px solid #f7f9fc;
   }
-  #status { font-size: 15px; padding: 8px 12px; }
+  .q-badge { flex: 0 0 32px; font-size: 15px; border-radius: 12px 0 0 12px; }
+  #status { font-size: 15px; padding: 8px 12px; border-radius: 14px; }
   #answers {
     position: absolute; left: 12px; right: 12px; bottom: 8px; top: auto; width: auto;
     display: flex; flex-direction: column; gap: 6px;
@@ -215,9 +216,9 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #answers button:nth-child(odd) { border-right: 1px solid #d5dee8; }
   #answers button:nth-child(5) { grid-column: auto; }
   #hud:has(#guess:not([hidden])) {
-    top: calc(100% - 258px); bottom: 0; left: 0; right: 0; z-index: 6;
-    padding: 12px 12px 14px; background: #1a100c;
-    display: flex; flex-direction: column; justify-content: flex-start; gap: 10px;
+    top: auto; bottom: 0; left: 0; right: 0; z-index: 6;
+    padding: 6px 12px 8px; background: #1a100c;
+    display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
   }
   .guess-line { display: block; margin: 0; text-align: center; color: #fff6e4; font-size: 16px; }
   #guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

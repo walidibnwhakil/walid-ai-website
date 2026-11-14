@@ -389,9 +389,14 @@ export function createScene(canvas) {
     const slide = easeOut(Math.min(1, Math.max(0, progress)));
     if (portraitMode || !images.printer) {
       const held = portraitMode ? paperBox() : null;
-      const w = portraitMode ? canvas.width * 0.22 : view.w * 0.18;
-      const h = portraitMode ? held.h : w * 1.15;
-      const x = portraitMode ? held.x + held.w + canvas.width * 0.03 : ix(0.14);
+      const aspect = reveal.photo.width / Math.max(1, reveal.photo.height);
+      const pad = portraitMode ? 4 : 6;
+      const h = portraitMode ? held.h : view.w * 0.18 * 1.15;
+      const innerH = h - pad * 2;
+      const innerW = portraitMode ? innerH * aspect : (h - pad * 2) * aspect;
+      const w = portraitMode ? innerW + pad * 2 : view.w * 0.18;
+      let x = portraitMode ? held.x + held.w + canvas.width * 0.03 : ix(0.14);
+      if (portraitMode) x = Math.min(x, canvas.width - w - 6);
       const y = portraitMode ? held.y : iy(0.48);
       ctx.save();
       ctx.globalAlpha = alpha;
@@ -406,7 +411,7 @@ export function createScene(canvas) {
       ctx.roundRect(x, y, w, h, 8);
       ctx.fill();
       ctx.stroke();
-      ctx.drawImage(reveal.photo, x + 8, y + 8, w - 16, h * 0.7);
+      ctx.drawImage(reveal.photo, x + pad, y + pad, portraitMode ? innerW : w - pad * 2, portraitMode ? innerH : h - pad * 2);
       ctx.restore();
       return;
     }
@@ -551,15 +556,27 @@ export function createScene(canvas) {
   function drawPortrait(art) {
     const scale = view.w / art.width;
     const v0 = 0.118;
-    const cut = 0.495;
+    let cut = 0.495;
+    if (reveal) {
+      const v = (canvas.height + 8 - view.y) / (art.height * scale);
+      cut = Math.max(0.495, Math.min(0.66, v));
+    }
     const srcX = Math.max(0, -view.x / scale);
     const srcW = Math.min(art.width - srcX, canvas.width / scale);
     const srcY = art.height * v0;
     const srcH = art.height * (cut - v0);
-    ctx.drawImage(
-      art, srcX, srcY, srcW, srcH,
-      view.x + srcX * scale, view.y + srcY * scale, srcW * scale, srcH * scale,
-    );
+    const destX = view.x + srcX * scale;
+    const destY = view.y + srcY * scale;
+    const destH = srcH * scale;
+    ctx.drawImage(art, srcX, srcY, srcW, srcH, destX, destY, srcW * scale, destH);
+    if (reveal) {
+      const target = canvas.height;
+      const drawn = destY + destH;
+      if (drawn < target - 1) {
+        const strip = art.height * 0.035;
+        ctx.drawImage(art, srcX, art.height * cut - strip, srcW, strip, destX, drawn - 1, srcW * scale, target - drawn + 1);
+      }
+    }
   }
 
   function frame(now) {

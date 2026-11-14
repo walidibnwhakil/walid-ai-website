@@ -119,7 +119,7 @@ export function layoutBoardPawns(board) {
   // The existing slot margin remains the limiting safety envelope.
   const homeScale = Math.min(...homes.flatMap(({width, height}) => [
     width * .9 / (g.right - g.left), height * .9 / (g.bottom - g.top)
-  ])) * 1.10;
+  ])) * (phoneLayout ? 1.20 : 1);
   for (const {tile, width, height} of homes) {
     const tip = {x: width / 2, y: height / 2 + (g.tipY - (g.top + g.bottom) / 2) * homeScale};
     for (const pawn of tile.children) if (pawn.classList.contains('pin-pawn')) {

@@ -1,0 +1,148 @@
+{
+  "before": [
+    {
+      "width": 360,
+      "scenario": "single-start-safe",
+      "height": 8.64404296875,
+      "headWidth": 3.037109375,
+      "tileHeight": 23.140625
+    },
+    {
+      "width": 360,
+      "scenario": "single-normal",
+      "height": 8.64404296875,
+      "headWidth": 3.037109375,
+      "tileHeight": 20.328125
+    },
+    {
+      "width": 360,
+      "scenario": "single-safe",
+      "height": 8.644012451171875,
+      "headWidth": 3.037109375,
+      "tileHeight": 20.3125
+    },
+    {
+      "width": 360,
+      "scenario": "two-pawns",
+      "height": 24.46295166015625,
+      "headWidth": 8.595062255859375,
+      "tileHeight": 23.140625
+    }
+  ],
+  "larger-reference": [
+    {
+      "width": 360,
+      "scenario": "single-start-safe",
+      "height": 26.686859130859375,
+      "headWidth": 9.37646484375,
+      "tileHeight": 23.140625
+    },
+    {
+      "width": 360,
+      "scenario": "single-normal",
+      "height": 23.443328857421875,
+      "headWidth": 8.236862182617188,
+      "tileHeight": 20.328125
+    },
+    {
+      "width": 360,
+      "scenario": "single-safe",
+      "height": 23.425323486328125,
+      "headWidth": 8.23052978515625,
+      "tileHeight": 20.3125
+    },
+    {
+      "width": 360,
+      "scenario": "two-pawns",
+      "height": 24.46295166015625,
+      "headWidth": 8.595062255859375,
+      "tileHeight": 23.140625
+    }
+  ],
+  "after": [
+    {
+      "width": 360,
+      "scenario": "single-start-safe",
+      "height": 22.127960205078125,
+      "headWidth": 7.774658203125,
+      "tileHeight": 23.140625
+    },
+    {
+      "width": 360,
+      "scenario": "single-normal",
+      "height": 22.127960205078125,
+      "headWidth": 7.774688720703125,
+      "tileHeight": 20.328125
+    },
+    {
+      "width": 360,
+      "scenario": "single-safe",
+      "height": 22.1279296875,
+      "headWidth": 7.774688720703125,
+      "tileHeight": 20.3125
+    },
+    {
+      "width": 360,
+      "scenario": "two-pawns",
+      "height": 24.46295166015625,
+      "headWidth": 8.595062255859375,
+      "tileHeight": 23.140625
+    },
+    {
+      "width": 390,
+      "scenario": "single-start-safe",
+      "height": 24.019927978515625,
+      "headWidth": 8.43939208984375,
+      "tileHeight": 25.109375
+    },
+    {
+      "width": 390,
+      "scenario": "single-normal",
+      "height": 24.019927978515625,
+      "headWidth": 8.439422607421875,
+      "tileHeight": 22.0625
+    },
+    {
+      "width": 390,
+      "scenario": "single-safe",
+      "height": 24.0198974609375,
+      "headWidth": 8.439422607421875,
+      "tileHeight": 22.046875
+    },
+    {
+      "width": 390,
+      "scenario": "two-pawns",
+      "height": 26.544189453125,
+      "headWidth": 9.326324462890625,
+      "tileHeight": 25.109375
+    },
+    {
+      "width": 1440,
+      "scenario": "single-start-safe",
+      "height": 41.7000732421875,
+      "headWidth": 14.6513671875,
+      "tileHeight": 52.3125
+    },
+    {
+      "width": 1440,
+      "scenario": "single-normal",
+      "height": 41.7000732421875,
+      "headWidth": 14.6513671875,
+      "tileHeight": 45.9375
+    },
+    {
+      "width": 1440,
+      "scenario": "single-safe",
+      "height": 41.7000732421875,
+      "headWidth": 14.6513671875,
+      "tileHeight": 45.9375
+    },
+    {
+      "width": 1440,
+      "scenario": "two-pawns",
+      "height": 50.27435302734375,
+      "headWidth": 17.6639404296875,
+      "tileHeight": 52.3125
+    }
+  ]
+}

@@ -46,9 +46,7 @@ async function measure(page) {
 function verify(data,count) {
   const eps=.1,heads=[],singleSizes=[],homeScales=[],homeCounts=new Map();
   const routeCells=data.filter(t=>t.region!=='yard');
-  const singleScale=Math.min(...routeCells.flatMap(({tile})=>[
-    tile.width*.94/56.5,tile.height*.47/(77+1.25*Math.hypot(10,12)/10-1.75)
-  ]));
+  const singleScale=Math.min(...routeCells.map(({tile})=>Math.min(tile.width/64,tile.height/77)))*(data[0].phone?1.2:1);
   const homeCells=data.filter(t=>t.region==='yard');
   const homeScale=Math.min(...homeCells.flatMap(({tile})=>[tile.width*.9/56.5,tile.height*.9/78.25]));
   for(const {tile,board,phone,pawns,region,base,seat} of data) {
@@ -61,7 +59,8 @@ function verify(data,count) {
     for(const [i,p] of pawns.entries()) {
       const {tip,bounds:b}=p;
       assert.ok(tip.x>=tile.left-eps && tip.x<=tile.right+eps && tip.y>=tile.top-eps && tip.y<=tile.bottom+eps,JSON.stringify({region,tile,tip}));
-      assert.ok(b.left>=board.left-eps && b.right<=board.right+eps && b.top>=board.top-eps && b.bottom<=board.bottom+eps,'painted bounds inside board');
+      if(count===1 && region!=='yard') assert.ok(b.left>=board.left-eps && b.right<=board.right+eps && b.top>=0,'readable single overhang remains visible');
+      else assert.ok(b.left>=board.left-eps && b.right<=board.right+eps && b.top>=board.top-eps && b.bottom<=board.bottom+eps,'painted bounds inside board');
       if(pair) {
         const x=tile.left+tile.width*(i?.74:.26);
         const approvedScale=Math.min(tile.width/64,tile.height/77)*(phone?1.1:1);
@@ -70,7 +69,7 @@ function verify(data,count) {
         assert.ok(Math.abs(p.pathTip.x-x)<eps && Math.abs(p.pathTip.y-cy)<eps,'approved two-pawn path anchor');
         heads.push(p.head);
       } else {
-        assert.ok(b.left>=tile.left-eps && b.right<=tile.right+eps && b.top>=tile.top-eps && b.bottom<=tile.bottom+eps,JSON.stringify({region,tile,b}));
+        if(count!==1 || region==='yard') assert.ok(b.left>=tile.left-eps && b.right<=tile.right+eps && b.top>=tile.top-eps && b.bottom<=tile.bottom+eps,JSON.stringify({region,tile,b}));
         if(region==='yard') {
           assert.ok(b.left>=base.left-eps && b.right<=base.right+eps && b.top>=base.top-eps && b.bottom<=base.bottom+eps,'home artwork inside its color base');
           assert.ok(Math.abs(p.scale-homeScale)<.003,JSON.stringify({reason:'deliberate shared home-slot size',p,homeScale,tile,base}));
@@ -80,6 +79,7 @@ function verify(data,count) {
         } else if(count===1) {
           assert.ok(Math.abs(tip.x-cx)<eps && Math.abs(tip.y-cy)<eps,'visible single tip at tile center');
           assert.ok(Math.abs(p.scale-singleScale)<.003,'one shared single scale from actual route-cell dimensions');
+          assert.ok((b.bottom-b.top)/tile.height>(phone?.8:.7),'single pawn remains visually prominent relative to its tile');
           singleSizes.push({w:b.right-b.left,h:b.bottom-b.top});
         }
       }
@@ -213,7 +213,7 @@ async function approvedReference(page) {
       });
       await page.locator('#board').screenshot({path:`screenshots/ludo-single-ready-hints-${width}.png`});
       verify(await measure(page),1);
-      results.push({width,scenario:'single-pawn ready hint at peak retains size, centered tip and containment',status:'passed'});
+      results.push({width,scenario:'single-pawn ready hint at peak retains readable size, centered tip and visible overhang',status:'passed'});
       await page.close();
     }
   } finally {

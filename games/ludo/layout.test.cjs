@@ -308,14 +308,9 @@ fs.mkdirSync(output, { recursive: true });
       for (const count of [2, 3, 4]) {
         await page.locator(".player-dice.active .die-face").click();
         await page.locator(".yard .playable-token").first().waitFor();
-        const pawn = await page
-          .locator(".yard .playable-token")
-          .first()
-          .boundingBox();
-        await page.mouse.click(
-          pawn.x + pawn.width / 2,
-          pawn.y + pawn.height / 2,
-        );
+        // Resolve the locator again if the roll-completion render replaces it.
+        // Click the actual artwork rather than a transient wrapper rectangle.
+        await page.locator(".yard .playable-token .pin-face").first().click({force:true});
         await page.waitForFunction(
           (n) =>
             document.querySelectorAll(".track .pin-pawn:not(.moving)")

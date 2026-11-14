@@ -50,20 +50,20 @@ export function layoutBoardPawns(board) {
   const g = pinGeometry;
   const routeCells = [...board.querySelectorAll('.track, .lane')]
     .map(tile => ({tile, ...cellSize(tile)})).filter(({width, height}) => width > 0 && height > 0);
-  // The board's raised edge rows have different rendered heights. Use one fit
-  // across ALL route cells, including empty cells, so location cannot change size.
-  const singleScale = Math.min(...routeCells.flatMap(({width, height}) => [
-    width * .94 / (g.right - g.left), height * .47 / (g.tipY - g.top),
-    height * .47 / (g.bottom - g.tipY)
-  ]));
+  // Restore the approved full-tile footprint. Fitting the whole artwork into
+  // the half-cell above a centered tip made real mobile pawns ~9px tall.
+  // Overhang is intentional; pawn-layers.css keeps heads above neighboring tiles.
+  // One shared scale across all route cells prevents position-dependent sizing.
+  const singleScale = Math.min(...routeCells.map(({width, height}) =>
+    Math.min(width / 64, height / 77)
+  )) * (matchMedia("(max-width: 620px)").matches ? 1.2 : 1);
   for (const {tile, width, height} of routeCells) {
     const pawns = [...tile.children].filter(p => p.classList.contains('pin-pawn'));
     if (!pawns.length) continue;
     pawns.forEach(pawn => pawn.classList.toggle("single-tile-pawn", pawns.length === 1));
     let tips, scale;
     if (pawns.length === 1) {
-      // A centered bottom tip leaves the upper half-cell for the entire artwork.
-      // The common fit depends on actual cells, never color, position or phone CSS.
+      // The visible pointed tip identifies the tile; the head may overhang it.
       tips = [{x: width / 2, y: height / 2}];
       scale = singleScale;
     } else if (pawns.length === 2 && !tile.classList.contains('final-square')) {

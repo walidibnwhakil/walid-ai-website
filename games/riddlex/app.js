@@ -3,7 +3,7 @@ import { answer as applyAnswer, canPrint, createState, decide, displayName, enti
 import { UI, guessFont } from "./i18n.js";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js?v=akinator-20";
+import { createScene } from "./scene.js?v=akinator-22";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -244,6 +244,8 @@ async function beginGuess(index) {
   if (mode !== "reveal") return;
   mode = "guess";
   setStatus(text().prompt(name));
+  const guessLine = $("guess-line");
+  if (guessLine) guessLine.textContent = text().prompt(name);
   $("credit").textContent = result.printed && entity.credit ? `${text().credit}: ${entity.credit}` : "";
   showOnly("guess");
 }

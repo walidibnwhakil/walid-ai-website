@@ -127,10 +127,10 @@ export function createScene(canvas) {
         const hatV = 0.118;
         const deskV = 0.495;
         const topY = chrome.logo + chrome.dpr * 2;
-        const bottomY = ch - chrome.buttons - chrome.dpr * 2;
+        const bottomY = ch - chrome.buttons;
         scale = Math.max(0.4, (bottomY - topY) / ((deskV - hatV) * art.height));
         const span = cw / (art.width * scale);
-        const u0 = Math.max(0.08, Math.min(0.36, 0.52 - span / 2));
+        const u0 = Math.max(0.16, Math.min(0.42, 0.61 - span / 2));
         view = {
           x: -art.width * u0 * scale,
           y: topY - hatV * art.height * scale,
@@ -155,7 +155,7 @@ export function createScene(canvas) {
     const cat = CAT_FACE[portraitMode ? "portrait" : "landscape"];
     const spot = portraitMode
       ? { bu: 0.34, bv: face.v + face.h + 0.07, dv: 0.62 }
-      : { bu: 0.63, bv: 0.035, dv: 0.60 };
+      : { bu: 0.62, bv: 0.16, dv: 0.60 };
     const frac = (u, v) => [(view.x + view.w * u) / cw, (view.y + view.h * v) / ch];
     const [bubbleLeft, bubbleTop] = frac(spot.bu, spot.bv);
     const [, chin] = frac(0, face.v + face.h);
@@ -234,17 +234,17 @@ export function createScene(canvas) {
     const g = ink.getContext("2d");
     g.clearRect(0, 0, w, h);
     g.fillStyle = "#24160f";
-    g.textAlign = "left";
+    g.textAlign = "center";
     g.textBaseline = "middle";
-    let size = Math.round(h * (portraitMode ? 0.72 : 0.42));
+    let size = Math.round(h * (portraitMode ? 0.62 : 0.46));
     g.font = font.replace(/\d+px/, `${size}px`);
-    while (g.measureText(name).width > w * (portraitMode ? 0.88 : 0.92) && size > 14) {
+    while (g.measureText(name).width > w * 0.86 && size > 14) {
       size -= 2;
       g.font = font.replace(/\d+px/, `${size}px`);
     }
     const textW = g.measureText(name).width;
-    const textX = portraitMode ? Math.max(6, (w - textW) / 2) : 8;
-    g.fillText(name, textX, h * 0.55);
+    const textX = (w - textW) / 2;
+    g.fillText(name, w / 2, h / 2);
     mask.getContext("2d").clearRect(0, 0, w, h);
     return { w, h, width: Math.max(20, textW), textX };
   }
@@ -264,7 +264,7 @@ export function createScene(canvas) {
     const w = canvas.width * 0.40;
     const h = canvas.width * 0.155;
     const limit = canvas.height - phoneChrome().buttons - 8;
-    const y = Math.min(chin + canvas.height * 0.012, limit - h);
+    const y = Math.min(chin + 6, limit - h);
     return { x: canvas.width * 0.08, y: Math.max(8, y), w, h };
   }
 
@@ -284,28 +284,21 @@ export function createScene(canvas) {
     ctx.beginPath();
     ctx.roundRect(10, 12, w, h, 10);
     ctx.fill();
-    ctx.fillStyle = "#f6ead2";
-    ctx.strokeStyle = "#8a6844";
-    ctx.lineWidth = 3;
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#d5d0c8";
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(0, 0, w, h, 10);
+    ctx.roundRect(0, 0, w, h, 8);
     ctx.fill();
     ctx.stroke();
-    ctx.strokeStyle = "rgba(170,130,90,0.35)";
-    for (let line = 1; line <= 4; line++) {
-      ctx.beginPath();
-      ctx.moveTo(14, h * line / 5);
-      ctx.lineTo(w - 14, h * line / 5);
-      ctx.stroke();
-    }
     if (reveal?.page) {
-      const maxW = portraitMode ? w * 0.9 : w - 36;
-      const maxH = portraitMode ? h * 0.7 : h * 0.62;
-      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 4 : 1.4);
+      const maxW = w * 0.88;
+      const maxH = h * 0.72;
+      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 4 : 1.6);
       const dw = reveal.page.w * scale;
       const dh = reveal.page.h * scale;
-      const dx = portraitMode ? (w - dw) / 2 : 18;
-      const dy = portraitMode ? (h - dh) / 2 : h * 0.2;
+      const dx = (w - dw) / 2;
+      const dy = (h - dh) / 2;
       ctx.drawImage(reveal.page.canvas, dx, dy, dw, dh);
     }
     ctx.restore();
@@ -397,9 +390,9 @@ export function createScene(canvas) {
     if (portraitMode || !images.printer) {
       const held = portraitMode ? paperBox() : null;
       const w = portraitMode ? canvas.width * 0.22 : view.w * 0.18;
-      const h = w * (portraitMode ? 1.05 : 1.15);
+      const h = portraitMode ? held.h : w * 1.15;
       const x = portraitMode ? held.x + held.w + canvas.width * 0.03 : ix(0.14);
-      const y = portraitMode ? held.y + (held.h - h) / 2 : iy(0.48);
+      const y = portraitMode ? held.y : iy(0.48);
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.fillStyle = "rgba(32,16,8,0.28)";
@@ -558,7 +551,7 @@ export function createScene(canvas) {
   function drawPortrait(art) {
     const scale = view.w / art.width;
     const v0 = 0.118;
-    const cut = 0.60;
+    const cut = 0.495;
     const srcX = Math.max(0, -view.x / scale);
     const srcW = Math.min(art.width - srcX, canvas.width / scale);
     const srcY = art.height * v0;

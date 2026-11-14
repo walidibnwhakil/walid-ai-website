@@ -13,7 +13,7 @@ async function tap(page,locator){
   await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);
 }
 async function launch(browser,width){
-  const page=await browser.newPage({viewport:{width,height:width===360?800:width===390?844:1000},deviceScaleFactor:width<600?3:2,hasTouch:true,reducedMotion:'reduce'});
+  const page=await browser.newPage({viewport:{width,height:width===360?800:width===390?844:1000},deviceScaleFactor:width<600?3:2,isMobile:width<600,hasTouch:true,reducedMotion:'reduce'});
   page.setDefaultTimeout(20000);
   await page.addInitScript(()=>{window.__diceRoll=6;Math.random=()=>(window.__diceRoll-.5)/6});
   if(process.env.LUDO_LAYOUT_REFERENCE)await page.route('**/__ludu-reference-base.mjs',route=>route.fulfill({contentType:'text/javascript',body:fs.readFileSync('games/ludo/pawn-layout.mjs','utf8')}));

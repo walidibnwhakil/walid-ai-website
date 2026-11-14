@@ -3,7 +3,7 @@
 Every screenshot in this folder comes from the actual game controls at a native
 360px, 390px, or 1440px viewport. No pawn DOM, positions, classes, dimensions, or
 game state were injected. Only `Math.random` is seeded so the die rolls are repeatable.
-The test starts a four-player friend game through the menu and uses touch events
+Mobile runs also enable mobile-device emulation and touch support. The test starts a four-player friend game through the menu and uses touch events
 on the die and on the actual pawn heads.
 
 Moves: roll 6 to release one pawn onto its safe start; roll 6 to move it to normal

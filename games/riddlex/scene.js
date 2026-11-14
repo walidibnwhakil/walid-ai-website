@@ -13,11 +13,17 @@ const OVERLAYS = {
     happy: "./images/approved/face-landscape-happy.webp",
     sad: "./images/approved/face-landscape-sad.webp",
     worried: "./images/approved/face-landscape-worried.webp",
+    serious: "./images/approved/face-landscape-serious.webp",
+    confused: "./images/approved/face-landscape-confused.webp",
+    cat: "./images/approved/cat-landscape-blink.webp",
   },
   portrait: {
     happy: "./images/approved/face-portrait-happy.webp",
     sad: "./images/approved/face-portrait-sad.webp",
     worried: "./images/approved/face-portrait-worried.webp",
+    serious: "./images/approved/face-portrait-serious.webp",
+    confused: "./images/approved/face-portrait-confused.webp",
+    cat: "./images/approved/cat-portrait-blink.webp",
   },
 };
 const FACE = {
@@ -222,17 +228,17 @@ export function createScene(canvas) {
   }
 
   const REACT = {
-  yes: ["happy", 0.82],
-  probably: ["happy", 0.46],
-  no: ["serious", 0.92],
-  probably_not: ["serious", 0.5],
-  unknown: ["confused", 0.9],
+  yes: ["happy", 1],
+  probably: ["happy", 0.62],
+  no: ["serious", 1],
+  probably_not: ["serious", 0.62],
+  unknown: ["confused", 1],
 };
 
   function react(answer) {
     const spec = REACT[answer];
     if (!spec) return;
-    flash = { key: spec[0], peak: spec[1], life: 1.05 };
+    flash = { key: spec[0], peak: spec[1], life: 1.55 };
   }
 
   function stepExpr(dt) {
@@ -243,16 +249,16 @@ export function createScene(canvas) {
     else if (mood === "sad" || mood === "defeated") goal = "sad";
     else if (flash) {
       const plates = images.overlays || {};
-      const key = plates[flash.key] ? flash.key : (flash.key === "serious" && plates.worried ? "worried" : "");
+      const key = plates[flash.key] ? flash.key : "";
       if (key) {
         goal = key;
-        const fade = flash.life < 0.32 ? Math.max(0, flash.life / 0.32) : 1;
+        const fade = flash.life < 0.35 ? Math.max(0, flash.life / 0.35) : 1;
         peak = flash.peak * fade;
       }
       flash.life -= dt;
       if (flash.life <= 0) flash = null;
     }
-    const blend = 1 - Math.exp(-dt / 0.2);
+    const blend = 1 - Math.exp(-dt / 0.08);
     for (const key of Object.keys(expr)) expr[key] += ((goal === key ? peak : 0) - expr[key]) * blend;
   }
 
@@ -270,8 +276,8 @@ export function createScene(canvas) {
   }
 
   const CAT_FACE = {
-    landscape: { u: 0.67464, v: 0.33794, w: 0.14354, h: 0.18278 },
-    portrait: { u: 0.72222, v: 0.35313, w: 0.20556, h: 0.10781 },
+    landscape: { u: 0.69318, v: 0.36132, w: 0.11962, h: 0.11158 },
+    portrait: { u: 0.69444, v: 0.36719, w: 0.29167, h: 0.14063 },
   };
 
   function stepCat(dt) {
@@ -281,7 +287,7 @@ export function createScene(canvas) {
       catLife.blink = 1;
       catLife.nextBlink = rand(4.5, 9);
     }
-    if (catLife.blink > 0) catLife.blink -= dt * 6.5;
+    if (catLife.blink > 0) catLife.blink -= dt * 3.2;
     catLife.nextTail -= dt;
     if (catLife.nextTail <= 0 && catLife.tail <= 0) {
       catLife.tail = 1;
@@ -695,7 +701,7 @@ export function createScene(canvas) {
     start, stop, resize,
     setMood(value) { mood = value; },
     react,
-    blinkCat() { catLife.blink = 0.55; },
+    blinkCat() { catLife.blink = 0.62; },
     playReveal, playWrong, playRetry, playDefeat, clearReveal,
   };
 }

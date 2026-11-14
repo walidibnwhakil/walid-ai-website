@@ -3,7 +3,7 @@ import { answer as applyAnswer, canPrint, createState, decide, displayName, enti
 import { UI, guessFont } from "./i18n.js";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js?v=akinator-23";
+import { createScene } from "./scene.js?v=akinator-24";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -428,6 +428,7 @@ if (new URLSearchParams(location.search).has("autotest")) {
     poolSize: () => pool?.count || 0,
     bytes: () => traffic.bytes,
     blinkCat: () => scene.blinkCat(),
+    flickCat: () => scene.flickCat(),
     expression: () => scene.debug(),
     reveal: (name, imageUrl) => scene.playReveal({ name, imageUrl }),
     loaded: () => loadedNames.slice(),

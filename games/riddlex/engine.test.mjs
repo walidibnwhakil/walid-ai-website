@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, questionBlocked, rejectIndex, recompute } from "./engine.js";
-import { poolFromEntries } from "./kb.js";
+import { decodeShard, poolFromEntries } from "./kb.js";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -431,4 +432,47 @@ test("batting questions stay unasked when no remaining candidate is a cricketer"
     if (!qid) break;
     answer(state, qid, "unknown");
   }
+});
+
+test("truthful answers about Lionel Messi guess him, not Sergio Agüero", () => {
+  const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));
+  const buf = readFileSync(new URL("./kb/ix/top.bin", import.meta.url));
+  const pool = decodeShard(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), manifest.questions);
+  pool.opening = manifest.opening;
+  const messi = pool.ids.indexOf("Q615");
+  assert.ok(messi >= 0);
+  const bit = (qid) => {
+    const qi = pool.qIndex.get(qid);
+    const row = messi * pool.attrBytes + (qi >> 2);
+    return (pool.attrs[row] >> ((qi & 3) << 1)) & 3;
+  };
+  assert.equal(bit("played_barcelona"), 2);
+  assert.equal(bit("ballon_dor"), 2);
+  assert.equal(bit("from_es"), 1);
+  const aguero = pool.ids.indexOf("Q119562");
+  const agueroBit = (qid) => {
+    const qi = pool.qIndex.get(qid);
+    const row = aguero * pool.attrBytes + (qi >> 2);
+    return (pool.attrs[row] >> ((qi & 3) << 1)) & 3;
+  };
+  assert.equal(agueroBit("played_barcelona"), 0);
+  assert.equal(agueroBit("ballon_dor"), 0);
+
+  const state = createState(pool, { category: "character", opening: "real" });
+  recompute(state);
+  const asked = [];
+  let guessed = "";
+  for (let n = 0; n < 40 && !guessed; n++) {
+    const decision = decide(state);
+    if (decision.type === "guess") {
+      guessed = pool.ids[decision.index];
+      break;
+    }
+    const qid = decision.qid;
+    const value = bit(qid) === 2 ? "yes" : bit(qid) === 1 ? "no" : "unknown";
+    asked.push(qid);
+    answer(state, qid, value);
+  }
+  assert.equal(guessed, "Q615", asked.join(","));
+  assert.ok(asked.length < 25, asked.length);
 });

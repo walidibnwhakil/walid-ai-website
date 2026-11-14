@@ -106,6 +106,8 @@ function hardFacts() {
     ["animal", "object"],
     ["party_bnp", "party_al"],
     ["led_gov"],
+    ["played_barcelona"],
+    ["ballon_dor"],
     ["zia_family"],
     ["mujib_family"],
     ["lives_abroad"],
@@ -363,6 +365,8 @@ const ROLE_PARENT = {
   defender: "footballer",
   winger: "footballer",
   forward: "footballer",
+  played_barcelona: "footballer",
+  ballon_dor: "footballer",
   bollywood: "actor",
   hollywood: "actor",
   tollywood: "actor",
@@ -494,6 +498,7 @@ function skippedAsDuplicate(state, id) {
   if (id === "musician" && yes("singer")) return true;
   if (id === "singer" && said(state, "musician", ["no", "probably_not"])) return true;
   if (id === "athlete" && (yes("cricketer") || yes("footballer"))) return true;
+  if ((id === "played_barcelona" || id === "ballon_dor") && !yes("footballer")) return true;
   if ((id === "wild" && yes("pet")) || (id === "pet" && yes("wild"))) return true;
   if (COUNTRIES.includes(id) && COUNTRIES.some((country) => country !== id && yes(country))) return true;
   if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;
@@ -625,6 +630,7 @@ export function chooseQuestion(state) {
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
+    if ((question.id === "played_barcelona" || question.id === "ballon_dor") && saidYes("footballer")) gain *= 3;
     if (state.category === "character" && answers.length < 4) {
       const genderOpen = !asked.has("male") && !asked.has("female");
       const lifeOpen = !asked.has("alive") && !asked.has("dead");

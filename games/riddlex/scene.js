@@ -3,7 +3,7 @@
 // Face and cat plates cross-fade with opacity and share that same transform.
 // Nothing is ever a shifted rectangle of the painting.
 
-import { createExpressions } from "./expressions.js?v=akinator-18";
+import { createExpressions } from "./expressions.js?v=akinator-24";
 
 const BASE = {
   landscape: "./images/approved/game-desk.webp",
@@ -19,6 +19,7 @@ const OVERLAYS = {
     serious: "./images/approved/face-landscape-serious.webp",
     confused: "./images/approved/face-landscape-confused.webp",
     cat: "./images/approved/cat-landscape-blink.webp",
+    tail: "./images/approved/cat-landscape-tail.webp",
   },
   portrait: {
     happy: "./images/approved/face-portrait-happy.webp",
@@ -27,6 +28,7 @@ const OVERLAYS = {
     serious: "./images/approved/face-portrait-serious.webp",
     confused: "./images/approved/face-portrait-confused.webp",
     cat: "./images/approved/cat-portrait-blink.webp",
+    tail: "./images/approved/cat-portrait-tail.webp",
   },
 };
 const FACE = {
@@ -62,7 +64,7 @@ export function createScene(canvas) {
 
   let portraitMode = false;
   const smoke = Array.from({ length: 5 }, () => makePuff(true));
-  const catLife = { blink: 0, nextBlink: rand(3.4, 6.5) };
+  const catLife = { blink: 0, nextBlink: rand(1.2, 2.4), flick: 0, nextFlick: rand(1.8, 3.2) };
   const faces = createExpressions();
   let faceNow = faces.picture();
   let mood = "curious";
@@ -205,23 +207,42 @@ export function createScene(canvas) {
     for (const key of ["worried", "confused", "serious", "sad", "happy"]) {
       drawPlate(plates[key], box, levels[key] || 0);
     }
-    const catShut = !reduce && catLife.blink > 0 ? Math.sin(Math.min(1, catLife.blink) * Math.PI) : 0;
+    const catShut = !reduce && catLife.blink > 0 ? blinkAlpha(catLife.blink) : 0;
     drawPlate(plates.cat, CAT_FACE[portraitMode ? "portrait" : "landscape"], catShut);
+    const flick = !reduce && catLife.flick > 0 ? blinkAlpha(catLife.flick) : 0;
+    drawPlate(plates.tail, CAT_TAIL[portraitMode ? "portrait" : "landscape"], flick);
+  }
+
+  function blinkAlpha(t) {
+    const u = 1 - Math.min(1, Math.max(0, t));
+    if (u < 0.22) return u / 0.22;
+    if (u < 0.68) return 1;
+    return Math.max(0, 1 - (u - 0.68) / 0.32);
   }
 
   const CAT_FACE = {
     landscape: { u: 0.69318, v: 0.36132, w: 0.11962, h: 0.11158 },
     portrait: { u: 0.69444, v: 0.36719, w: 0.29167, h: 0.14063 },
   };
+  const CAT_TAIL = {
+    landscape: { u: 0.8014, v: 0.3613, w: 0.0897, h: 0.1382 },
+    portrait: { u: 0.8194, v: 0.3594, w: 0.1667, h: 0.1172 },
+  };
 
   function stepCat(dt) {
-    if (reveal || reduce) return;
+    if (reduce) return;
     catLife.nextBlink -= dt;
     if (catLife.nextBlink <= 0) {
       catLife.blink = 1;
-      catLife.nextBlink = rand(4.2, 7.5);
+      catLife.nextBlink = rand(3, 5);
     }
-    if (catLife.blink > 0) catLife.blink -= dt * 2.4;
+    if (catLife.blink > 0) catLife.blink -= dt * 1.45;
+    catLife.nextFlick -= dt;
+    if (catLife.nextFlick <= 0) {
+      catLife.flick = 1;
+      catLife.nextFlick = rand(4, 6);
+    }
+    if (catLife.flick > 0) catLife.flick -= dt * 1.2;
   }
 
   function prepareInk(name, font) {
@@ -646,7 +667,7 @@ export function createScene(canvas) {
 
   async function loadOverlaySet(orient) {
     const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-18`)];
+      return [key, await loadImage(`${src}?v=akinator-24`)];
     }));
     const overlays = {};
     for (const [key, image] of entries) if (image) overlays[key] = image;
@@ -657,7 +678,7 @@ export function createScene(canvas) {
     const [base, overlays, printer] = await Promise.all([
       loadImage(BASE[orient]),
       loadOverlaySet(orient),
-      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-18`),
+      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-24`),
     ]);
     if (printer) images.printer = printer;
     return { base, overlays };
@@ -749,7 +770,8 @@ export function createScene(canvas) {
     start, stop, resize,
     setMood(value) { mood = value; faces.setMood(value); },
     react(answer) { return faces.react(answer); },
-    blinkCat() { catLife.blink = 0.62; },
+    blinkCat() { catLife.blink = 0.55; },
+    flickCat() { catLife.flick = 0.5; },
     debug() {
       return {
         expression: faces.picture(),

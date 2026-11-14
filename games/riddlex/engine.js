@@ -416,6 +416,12 @@ export function chooseQuestion(state) {
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
+    if (state.category === "character" && answers.length < 4) {
+      const genderOpen = !asked.has("male") && !asked.has("female");
+      const lifeOpen = !asked.has("alive") && !asked.has("dead");
+      if (genderOpen && (question.id === "male" || question.id === "female")) gain *= 3;
+      if (!genderOpen && lifeOpen && (question.id === "alive" || question.id === "dead")) gain *= 3;
+    }
     if (question.id === "from_bd" && boostBd) {
       bdGain = gain;
       if (answers.length >= 3 && !openingLeft) gain *= 8;

@@ -191,11 +191,14 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 @media (max-aspect-ratio: 4/5) {
   #ask-panel {
     display: flex;
+    flex-direction: column;
     left: 8px;
     right: 8px;
     width: auto;
-    top: calc(var(--hands-y, 0.58) * 100%);
-    max-height: calc(100% - var(--hands-y, 0.58) * 100% - 48px);
+    top: calc(var(--hands-y, 0.52) * 100% + 4px);
+    bottom: 10px;
+    max-height: none;
+    gap: 8px;
   }
   .speech { position: relative; left: auto; top: auto; right: auto; width: 100%; }
   .speech::after, .speech.has-badge::after {
@@ -206,9 +209,10 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #status { font-size: 15px; padding: 8px 10px; }
   #answers {
     position: relative; left: auto; right: auto; top: auto; width: auto;
-    display: grid; grid-template-columns: 1fr 1fr;
+    flex: 1 1 auto; min-height: 0;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr;
   }
-  #answers button { min-height: 42px; font-size: 15px; }
+  #answers button { min-height: 46px; height: 100%; font-size: 16px; }
   #answers button:nth-child(odd) { border-right: 1px solid #d5dee8; }
   #answers button:nth-child(5) { grid-column: 1 / -1; border-right: 0; }
   #hud:has(#guess:not([hidden])) {

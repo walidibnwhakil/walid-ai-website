@@ -122,10 +122,17 @@ export function createScene(canvas) {
       let x = 0;
       let y = (ch - art.height * scale) / 2;
       if (portraitMode) {
-        // Fit the whole width so his shoulders and the cat are both in frame.
-        // The carved desk front is not drawn; the desktop colour continues below it.
-        scale = cw / art.width;
-        view = { x: 0, y: 0, w: art.width * scale, h: art.height * scale };
+        // Cover the phone: crop the lamp on the left and the far shelf on the right,
+        // keep his hat-to-hands and nearly all of the cat.
+        const u0 = 0.155;
+        const u1 = 0.955;
+        scale = cw / (art.width * (u1 - u0));
+        view = {
+          x: -art.width * u0 * scale,
+          y: 0,
+          w: art.width * scale,
+          h: art.height * scale,
+        };
       } else {
         const w = art.width * scale;
         const h = art.height * scale;
@@ -148,8 +155,9 @@ export function createScene(canvas) {
     const frac = (u, v) => [(view.x + view.w * u) / cw, (view.y + view.h * v) / ch];
     const [bubbleLeft, bubbleTop] = frac(spot.bu, spot.bv);
     const [, chin] = frac(0, face.v + face.h);
-    const belowFace = face.v + face.h + (portraitMode ? 0.055 : 0.04);
-    const [, hands] = frac(0, belowFace);
+    const belowFace = face.v + face.h + (portraitMode ? 0.02 : 0.04);
+    const catPaws = cat.v + cat.h + 0.012;
+    const [, hands] = frac(0, portraitMode ? Math.max(belowFace, catPaws) : belowFace);
     const [, catTop] = frac(0, Math.max(0.08, cat.v - 0.045));
     parent.style.setProperty("--bubble-left", Math.max(0.02, bubbleLeft).toFixed(4));
     parent.style.setProperty("--bubble-top", Math.max(0.02, bubbleTop).toFixed(4));
@@ -237,13 +245,20 @@ export function createScene(canvas) {
     return { w, h, width: Math.max(20, textW), textX };
   }
 
+  function paperBox() {
+    const chin = iy(FACE.portrait.v + FACE.portrait.h);
+    const w = canvas.width * 0.46;
+    const h = canvas.width * 0.19;
+    return { x: (canvas.width - w) / 2, y: chin + canvas.height * 0.01, w, h };
+  }
+
   function drawSheet(turn) {
     const u = Math.max(0, Math.min(1, turn));
-    // Flat on the desk while he writes, then up in his hands. The printer stays to the left.
-    const x = ix(portraitMode ? 0.56 : 0.50);
-    const y = iy(portraitMode ? 0.60 - 0.08 * u : 0.58 - 0.20 * u);
-    const w = portraitMode ? canvas.width * 0.50 : view.w * 0.30;
-    const h = portraitMode ? canvas.width * 0.26 : view.h * 0.15;
+    const held = portraitMode ? paperBox() : null;
+    const x = held ? held.x + held.w / 2 : ix(0.50);
+    const y = held ? held.y + held.h / 2 + (1 - u) * held.h * 0.2 : iy(0.58 - 0.20 * u);
+    const w = held ? held.w : view.w * 0.30;
+    const h = held ? held.h : view.h * 0.15;
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI * (1 - u));
@@ -300,7 +315,7 @@ export function createScene(canvas) {
   function drawPhoneLogo() {
     const art = images.portrait;
     if (!portraitMode || !art) return;
-    if (view.x >= -2 && view.x + view.w <= canvas.width + 2) return;
+    if (ix(0.16) > 6) return;
     const sx = art.width * 0.0;
     const sy = 0;
     const sw = art.width * 0.46;
@@ -352,10 +367,13 @@ export function createScene(canvas) {
     if (!reveal?.photo || alpha < 0.02) return;
     const slide = easeOut(Math.min(1, Math.max(0, progress)));
     if (portraitMode || !images.printer) {
-      const w = portraitMode ? canvas.width * 0.42 : view.w * 0.18;
-      const h = w * 1.15;
+      const w = portraitMode ? canvas.width * 0.34 : view.w * 0.18;
+      const h = w * 1.05;
+      const held = portraitMode ? paperBox() : null;
       const x = portraitMode ? (canvas.width - w) / 2 : ix(0.14);
-      const y = portraitMode ? canvas.height - h - canvas.height * 0.16 : iy(0.48);
+      const y = portraitMode
+        ? Math.min(held.y + held.h + canvas.height * 0.018, canvas.height - h - canvas.height * 0.125)
+        : iy(0.48);
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.fillStyle = "rgba(32,16,8,0.28)";
@@ -511,6 +529,39 @@ export function createScene(canvas) {
     }
   }
 
+  let deskCache = null;
+  function deskTile(art, srcX, srcW, scale) {
+    const key = `${canvas.width}:${Math.round(srcX)}:${Math.round(srcW)}:${scale.toFixed(4)}`;
+    if (deskCache && deskCache.key === key) return deskCache.tile;
+    const top = 0.608;
+    const cut = 0.668;
+    const srcY = art.height * top;
+    const srcH = art.height * (cut - top);
+    const tileH = Math.max(8, Math.round(srcH * scale));
+    const raw = document.createElement("canvas");
+    raw.width = canvas.width;
+    raw.height = tileH;
+    const rg = raw.getContext("2d");
+    rg.translate(0, tileH);
+    rg.scale(1, -1);
+    rg.drawImage(art, srcX, srcY, srcW, srcH, 0, 0, canvas.width, tileH);
+    deskCache = { key, tile: raw };
+    return raw;
+  }
+
+  function drawPortrait(art) {
+    const scale = view.w / art.width;
+    const srcX = -view.x / scale;
+    const srcW = canvas.width / scale;
+    const cut = 0.668;
+    const destH = art.height * cut * scale;
+    ctx.drawImage(art, srcX, 0, srcW, art.height * cut, 0, 0, canvas.width, destH);
+    if (destH >= canvas.height - 1) return;
+    const tile = deskTile(art, srcX, srcW, scale);
+    const remain = canvas.height - destH + 2;
+    ctx.drawImage(tile, 0, 0, tile.width, tile.height, 0, destH - 1, canvas.width, remain);
+  }
+
   function frame(now) {
     if (!running) return;
     const dt = Math.min(0.034, (now - (frame.last || now)) / 1000 || 0.016);
@@ -535,25 +586,8 @@ export function createScene(canvas) {
       ctx.translate(-ax, -ay);
     }
     if (art) {
-      if (portraitMode) {
-        const useful = 0.735;
-        const srcH = art.height * useful;
-        const destH = srcH * (view.w / art.width);
-        ctx.drawImage(art, 0, 0, art.width, srcH, view.x, view.y, view.w, destH);
-        if (!art.deskStrip) {
-          const strip = document.createElement("canvas");
-          strip.width = art.width;
-          strip.height = 36;
-          strip.getContext("2d").drawImage(art, 0, art.height * 0.64, art.width, 28, 0, 0, art.width, 36);
-          art.deskStrip = strip;
-        }
-        const tileH = 36 * (view.w / art.width);
-        for (let y = destH - 2; y < canvas.height; y += tileH - 1) {
-          ctx.drawImage(art.deskStrip, 0, y, view.w, tileH);
-        }
-      } else {
-        ctx.drawImage(art, view.x, view.y, view.w, view.h);
-      }
+      if (portraitMode) drawPortrait(art);
+      else ctx.drawImage(art, view.x, view.y, view.w, view.h);
     }
     drawPhoneLogo();
     drawPrinter();

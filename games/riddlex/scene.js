@@ -13,17 +13,11 @@ const OVERLAYS = {
     happy: "./images/approved/face-landscape-happy.webp",
     sad: "./images/approved/face-landscape-sad.webp",
     worried: "./images/approved/face-landscape-worried.webp",
-    serious: "./images/approved/face-landscape-serious.webp",
-    confused: "./images/approved/face-landscape-confused.webp",
-    cat: "./images/approved/cat-landscape-blink.webp",
   },
   portrait: {
     happy: "./images/approved/face-portrait-happy.webp",
     sad: "./images/approved/face-portrait-sad.webp",
     worried: "./images/approved/face-portrait-worried.webp",
-    serious: "./images/approved/face-portrait-serious.webp",
-    confused: "./images/approved/face-portrait-confused.webp",
-    cat: "./images/approved/cat-portrait-blink.webp",
   },
 };
 const FACE = {
@@ -205,6 +199,28 @@ export function createScene(canvas) {
     ctx.restore();
   }
 
+  function coverEyes(cx, cy, rw, rh, amount) {
+    const room = currentArt();
+    if (!room || amount < 0.08) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(ix(cx), iy(cy), view.w * rw, view.h * rh * amount, 0, 0, Math.PI * 2);
+    ctx.clip();
+    const fur = Math.max(0, cy - 0.05);
+    ctx.drawImage(
+      room,
+      (cx - rw) * room.width,
+      fur * room.height,
+      rw * 2 * room.width,
+      rh * room.height,
+      ix(cx - rw),
+      iy(cy - rh * amount),
+      view.w * rw * 2,
+      view.h * rh * 2 * amount,
+    );
+    ctx.restore();
+  }
+
   const REACT = {
   yes: ["happy", 0.82],
   probably: ["happy", 0.46],
@@ -307,13 +323,10 @@ export function createScene(canvas) {
       ctx.drawImage(catCrop, ix(box.u), iy(box.v), view.w * box.w, view.h * box.h);
       ctx.restore();
     } else if (catShut > 0.05) {
-      if (portraitMode) {
-        eyelid(0.78, 0.385, 0.012, 0.006, catShut);
-        eyelid(0.82, 0.388, 0.012, 0.006, catShut);
-      } else {
-        eyelid(0.720, 0.400, 0.012, 0.008, catShut);
-        eyelid(0.753, 0.404, 0.012, 0.008, catShut);
-      }
+      const shutEyes = portraitMode
+        ? [[0.90, 0.445], [0.948, 0.448]]
+        : [[0.720, 0.400], [0.753, 0.404]];
+      for (const [cx, cy] of shutEyes) coverEyes(cx, cy, portraitMode ? 0.03 : 0.016, portraitMode ? 0.016 : 0.01, catShut);
     }
   }
 
@@ -540,7 +553,6 @@ export function createScene(canvas) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (art) {
       ctx.drawImage(art, view.x, view.y, view.w, view.h);
-      drawExpr();
       const gapTop = view.y + view.h;
       if (!portraitMode && canvas.height - gapTop > 2) {
         const fade = ctx.createLinearGradient(0, gapTop - 2, 0, canvas.height);
@@ -554,6 +566,7 @@ export function createScene(canvas) {
     if (!reduce) stepCat(dt);
     updateReveal(dt);
     if (!reduce) drawLife(clock);
+    drawExpr();
     const hands = portraitMode ? [0.28, 0.28, 0.44, 0.12] : [0.42, 0.30, 0.24, 0.13];
     if (reveal?.phase === "write") {
       nudge(hands, Math.sin(clock * 16) * 0.01, Math.sin(clock * 16) * 0.003);
@@ -682,7 +695,7 @@ export function createScene(canvas) {
     start, stop, resize,
     setMood(value) { mood = value; },
     react,
-    blinkCat() { catLife.blink = 1; },
+    blinkCat() { catLife.blink = 0.55; },
     playReveal, playWrong, playRetry, playDefeat, clearReveal,
   };
 }

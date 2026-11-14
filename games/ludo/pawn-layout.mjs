@@ -116,10 +116,10 @@ export function layoutBoardPawns(board) {
   const homes = [...board.querySelectorAll('.yard')].map(tile => ({tile, ...cellSize(tile)}))
     .filter(({width, height}) => width > 0 && height > 0);
   // A small mobile-only boost keeps home pawns readable while retaining a
-  // minimum ~2.8% painted margin inside every home slot. Desktop is unchanged.
+  // minimum ~1.9% painted margin inside every home slot. Desktop is unchanged.
   const homeScale = Math.min(...homes.flatMap(({width, height}) => [
     width * .9 / (g.right - g.left), height * .9 / (g.bottom - g.top)
-  ])) * (phoneLayout ? 1.08 : 1);
+  ])) * (phoneLayout ? 1.01 : 1);
   for (const {tile, width, height} of homes) {
     const tip = {x: width / 2, y: height / 2 + (g.tipY - (g.top + g.bottom) / 2) * homeScale};
     for (const pawn of tile.children) if (pawn.classList.contains('pin-pawn')) {

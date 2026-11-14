@@ -9,7 +9,7 @@ const BASE = {
   landscape: "./images/approved/game-desk.webp",
   portrait: "./images/approved/portrait-neutral.webp",
 };
-const PRINTER = "./images/approved/printer.png";
+const PRINTER = "./images/approved/printer.webp";
 // Feathered face crops, one orientation only. Loaded after the first paint.
 const OVERLAYS = {
   landscape: {
@@ -254,37 +254,75 @@ export function createScene(canvas) {
       const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, 1.4);
       ctx.drawImage(reveal.page.canvas, 18, h * 0.2, reveal.page.w * scale, reveal.page.h * scale);
     }
-    if (reveal?.printed && reveal.photo) {
-      const pw = w * 0.34;
-      const ph = h * 0.72;
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(w - pw - 16, h * 0.14, pw, ph);
-      ctx.drawImage(reveal.photo, w - pw - 12, h * 0.16, pw - 8, ph * 0.7);
-    }
     ctx.restore();
   }
 
-  function drawPrintedPhoto(progress) {
+  function printerGeom() {
     const printer = images.printer;
-    if (!printer || !reveal?.photo) return;
-    const pw = view.w * 0.16;
-    const ph = pw * (printer.height / printer.width);
-    const px = ix(portraitMode ? 0.68 : 0.62);
-    const py = iy(portraitMode ? 0.46 : 0.48);
-    ctx.drawImage(printer, px, py, pw, ph);
-    const slide = easeOut(Math.min(1, progress));
-    const photoW = pw * 0.72;
-    const photoH = photoW * 0.75;
-    const photoX = px + pw * 0.14;
-    const photoY = py + ph * 0.55 + slide * view.h * 0.08;
+    const pw = view.w * (portraitMode ? 0.28 : 0.155);
+    const ratio = printer ? printer.height / printer.width : 0.48;
+    const ph = pw * ratio;
+    const px = ix(portraitMode ? 0.06 : 0.09);
+    const py = iy(portraitMode ? 0.70 : 0.66) - ph;
+    return { px, py, pw, ph };
+  }
+
+  function drawPrinter() {
+    const printer = images.printer;
+    if (!printer) return;
+    const { px, py, pw, ph } = printerGeom();
     ctx.save();
-    ctx.translate(photoX, photoY);
-    ctx.transform(1, 0, -0.18 * (1 - slide), 1, 0, 0);
-    ctx.fillStyle = "#f7f1e4";
-    ctx.fillRect(0, 0, photoW, photoH);
-    ctx.drawImage(reveal.photo, 4, 4, photoW - 8, photoH * 0.72);
-    ctx.strokeStyle = "#d9c7a4";
-    ctx.strokeRect(0, 0, photoW, photoH);
+    ctx.fillStyle = "rgba(32, 16, 8, 0.30)";
+    ctx.beginPath();
+    ctx.ellipse(px + pw * 0.52, py + ph * 0.96, pw * 0.42, Math.max(2, ph * 0.045), 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.drawImage(printer, px, py, pw, ph);
+    ctx.restore();
+  }
+
+  function drawPrintout(progress, alpha) {
+    if (!reveal?.photo || alpha < 0.02) return;
+    const slide = easeOut(Math.min(1, Math.max(0, progress)));
+    if (!images.printer) {
+      const w = view.w * (portraitMode ? 0.36 : 0.18);
+      const h = w * 1.2;
+      const x = ix(portraitMode ? 0.32 : 0.14);
+      const y = iy(portraitMode ? 0.56 : 0.48);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = "rgba(32,16,8,0.28)";
+      ctx.beginPath();
+      ctx.ellipse(x + w * 0.5, y + h + 4, w * 0.36, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#f6f1e6";
+      ctx.strokeStyle = "#8a6844";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.drawImage(reveal.photo, x + 8, y + 8, w - 16, h * 0.7);
+      ctx.restore();
+      return;
+    }
+    const { px, py, pw, ph } = printerGeom();
+    const slotX = px + pw * 0.26;
+    const slotY = py + ph * 0.62;
+    const photoW = pw * 0.46;
+    const photoH = photoW * 1.22;
+    const out = photoH * 0.86 * slide;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.rect(slotX - 4, slotY - 1, photoW + 14, out + 16);
+    ctx.clip();
+    ctx.translate(slotX, slotY + out);
+    ctx.transform(1, 0, -0.05 * (1 - slide), 1, 0, 0);
+    ctx.fillStyle = "rgba(30,16,8,0.28)";
+    ctx.fillRect(6, -photoH + 7, photoW, photoH);
+    ctx.fillStyle = "#f4efe4";
+    ctx.fillRect(0, -photoH, photoW, photoH);
+    ctx.drawImage(reveal.photo, 5, -photoH + 5, photoW - 10, photoH * 0.7);
     ctx.restore();
   }
 
@@ -348,7 +386,7 @@ export function createScene(canvas) {
         reveal.printed = false;
       }
     } else if (reveal.phase === "print") {
-      if (reveal.t > 1.35) {
+      if (reveal.t > 1.6) {
         reveal.phase = "turn";
         reveal.t = 0;
         reveal.printed = true;
@@ -391,13 +429,17 @@ export function createScene(canvas) {
     if (!reveal) return;
     if (reveal.phase === "write" || reveal.phase === "print") {
       drawSheet(0);
-      if (reveal.phase === "print") drawPrintedPhoto(reveal.t / 1.1);
+      if (reveal.phase === "print") drawPrintout(reveal.t / 1.45, 1);
     } else if (reveal.phase === "turn") {
       drawSheet(easeOut(Math.min(1, reveal.t / 0.8)));
+      drawPrintout(1, 1);
     } else if (reveal.phase === "present") {
       drawSheet(1);
+      drawPrintout(1, 1);
     } else if (reveal.phase === "wrong" && reveal.t < 1.05) {
-      drawDismiss(Math.min(1, reveal.t / 1.0));
+      const gone = Math.min(1, reveal.t / 1.0);
+      drawDismiss(gone);
+      drawPrintout(1, 1 - gone);
     }
   }
 
@@ -425,6 +467,7 @@ export function createScene(canvas) {
       ctx.translate(-ax, -ay);
     }
     if (art) ctx.drawImage(art, view.x, view.y, view.w, view.h);
+    drawPrinter();
     if (!reduce) drawSmoke(dt);
     if (!reduce) stepCat(dt);
     updateReveal(dt);

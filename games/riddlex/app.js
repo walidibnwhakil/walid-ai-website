@@ -425,6 +425,7 @@ if (new URLSearchParams(location.search).has("autotest")) {
     bytes: () => traffic.bytes,
     blinkCat: () => scene.blinkCat(),
     expression: () => scene.debug(),
+    reveal: (name, imageUrl) => scene.playReveal({ name, imageUrl }),
     loaded: () => loadedNames.slice(),
     find: (id) => pool?.ids.indexOf(id) ?? -1,
     replyFor: (id) => {

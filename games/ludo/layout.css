@@ -198,6 +198,27 @@
   }
 }
 
+/* Phones use width, including touch phones rotated into the tablet breakpoint.
+   Keep a one-pixel gutter (or the device safe area) around the original frame.
+   Do not use overflow clipping to hide intrinsic grid-width problems. */
+@media (max-width: 620px), (max-width: 899px) and (pointer: coarse) {
+  body.ludo-game.playing-ludo main {
+    padding-left: max(1px, env(safe-area-inset-left)) !important;
+    padding-right: max(1px, env(safe-area-inset-right)) !important;
+  }
+  body.ludo-game.playing-ludo .ludo-stage {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body.ludo-game.playing-ludo .ludo-stage #board.board.ludo {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
 /* Grid boundaries are calibrated to the 1254 × 1254 board plate, including
    its non-uniform edge tiles. Percent padding scales with the square board. */
 body.ludo-game.playing-ludo .ludo-stage #board.board.ludo {

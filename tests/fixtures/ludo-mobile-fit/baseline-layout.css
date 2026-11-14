@@ -1,0 +1,315 @@
+/* Final layout rules: desktop fits the available height; phone layout stays stacked. */
+@media (min-width: 900px) {
+  body.ludo-game:not(.playing-ludo) main {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+  }
+  body.ludo-game #ludo-setup.ludo-setup {
+    width: min(100%, 940px) !important;
+    padding: 10px 16px !important;
+  }
+  body.ludo-game #ludo-setup .mahir-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 18px;
+    padding: 8px;
+  }
+  body.ludo-game #ludo-setup .menu-topbar {
+    grid-column: 1 / -1;
+    grid-template-columns: 52px minmax(0, 1fr) 112px;
+    min-height: 0;
+    height: clamp(96px, 15dvh, 132px);
+  }
+  body.ludo-game #ludo-setup .brand-lockup {
+    height: 100%;
+    width: min(100%, 480px);
+  }
+  body.ludo-game #ludo-setup .menu-wordmark {
+    top: 38%;
+    font-size: clamp(32px, 5dvh, 42px);
+  }
+  body.ludo-game #ludo-setup .menu-round-button {
+    width: 48px;
+    height: 48px;
+    padding: 5px;
+  }
+  body.ludo-game #ludo-setup .menu-top-actions {
+    gap: 10px;
+  }
+  body.ludo-game #ludo-setup .menu-ribbon {
+    grid-column: 1 / -1;
+    width: 48%;
+    height: clamp(36px, 6dvh, 50px);
+    min-height: 0;
+    margin: 0 auto 4px;
+    font-size: clamp(24px, 4dvh, 34px);
+  }
+  body.ludo-game #ludo-setup .mode-cards {
+    grid-column: 1 / -1;
+    gap: 18px;
+    margin: 0;
+  }
+  body.ludo-game #ludo-setup .mode-card {
+    min-height: clamp(94px, 16dvh, 150px);
+    padding: 8px;
+    gap: 4px;
+    font-size: clamp(20px, 3.2dvh, 28px);
+  }
+  body.ludo-game #ludo-setup .mode-card svg {
+    width: 65px;
+    height: 46px;
+  }
+  body.ludo-game #ludo-setup .menu-features {
+    grid-column: 1;
+    grid-row: 4 / 6;
+    align-self: stretch;
+    margin: 0;
+    gap: 8px;
+  }
+  body.ludo-game #ludo-setup .menu-features button {
+    min-height: 0;
+    padding: 8px 4px;
+    gap: 7px;
+    font-size: 17px;
+    border-width: 2px;
+  }
+  body.ludo-game #ludo-setup .menu-features svg {
+    width: 42px;
+    height: 42px;
+  }
+  body.ludo-game #ludo-setup .player-count-panel {
+    grid-column: 2;
+    grid-row: 4;
+    margin: 0;
+    padding: 6px 10px 10px;
+    border-width: 2px;
+  }
+  body.ludo-game #ludo-setup .player-count-panel h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+  }
+  body.ludo-game #ludo-setup .player-count-options {
+    gap: 8px;
+  }
+  body.ludo-game #ludo-setup .player-count-options button {
+    min-height: 44px;
+    padding: 5px;
+    gap: 4px;
+    font-size: 14px;
+  }
+  body.ludo-game #ludo-setup .player-count-options svg {
+    width: 22px;
+    height: 27px;
+  }
+  body.ludo-game #ludo-setup .start-game {
+    grid-column: 2;
+    grid-row: 5;
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    height: 52px;
+    margin: 0;
+    padding: 5px 15px;
+    font-size: 27px;
+    border-width: 3px;
+  }
+  body.ludo-game #ludo-setup .start-game svg {
+    width: 25px;
+    height: 28px;
+  }
+  body.ludo-game #ludo-setup .menu-footer-art {
+    grid-column: 1 / -1;
+    height: clamp(44px, 8dvh, 88px);
+    margin: 0;
+  }
+  body.ludo-game #ludo-setup .footer-artwork {
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  body.ludo-game.playing-ludo main {
+    max-width: 1180px !important;
+    padding: 8px 14px !important;
+  }
+  body.ludo-game.playing-ludo #ludo-play {
+    padding-bottom: 0;
+  }
+  body.ludo-game.playing-ludo .play-toolbar {
+    max-width: 1120px;
+    height: 88px;
+    margin-bottom: 6px;
+  }
+  body.ludo-game.playing-ludo .play-toolbar .board-logo {
+    height: 84px;
+  }
+  body.ludo-game.playing-ludo .ludo-stage {
+    --board-size: min(800px, calc(100dvh - 120px), calc(100vw - 410px));
+    width: max-content;
+    max-width: 100%;
+    grid-template-columns: 170px var(--board-size) 170px;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "red board green" "blue board yellow";
+    gap: 14px;
+    margin: 0 auto;
+  }
+  body.ludo-game.playing-ludo .ludo-stage #board {
+    width: 100%;
+  }
+  body.ludo-game.playing-ludo .player-dice {
+    box-sizing: border-box;
+    flex-direction: column;
+    align-self: start;
+    justify-content: center;
+    gap: 10px;
+    min-height: 0;
+    padding: 12px 7px;
+  }
+  body.ludo-game.playing-ludo #dice-blue,
+  body.ludo-game.playing-ludo #dice-yellow {
+    align-self: end;
+  }
+  body.ludo-game.playing-ludo .player-dice:not(.active) {
+    opacity: 0.8 !important;
+    filter: none;
+  }
+  body.ludo-game.playing-ludo .player-dice-label {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: 5px;
+    font-size: 14px;
+    white-space: normal;
+  }
+  body.ludo-game.playing-ludo .player-dice .die-face {
+    --die-size: 52px;
+  }
+  body.ludo-game.playing-ludo .player-color-picker {
+    max-width: calc(100vw - 32px);
+  }
+}
+
+/* Landscape tablets also reserve room for the toolbar and both player rows. */
+@media (min-width: 621px) and (max-width: 899px) {
+  body.ludo-game.playing-ludo .ludo-stage {
+    width: min(100%, max(220px, calc(100dvh - 310px)));
+  }
+}
+
+/* Grid boundaries are calibrated to the 1254 × 1254 board plate, including
+   its non-uniform edge tiles. Percent padding scales with the square board. */
+body.ludo-game.playing-ludo .ludo-stage #board.board.ludo {
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 2.551834% 3.668262% 8.452951% 3.827751%;
+  grid-template-columns: 80fr 77fr 76fr 76fr 75fr 75fr 82fr 81fr 82fr 75fr 76fr 75fr 76fr 75fr 79fr;
+  grid-template-rows: 78fr 71fr 71fr 71fr 71fr 68fr 76fr 75fr 82fr 72fr 72fr 71fr 72fr 72fr 94fr;
+}
+
+/* Stars and home lanes use one shared color and the same inset bevel.
+   The final lane square remains part of the central four-color artwork. */
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  :is(.start-square.red, .safe-route-red, .lane.red) {
+  --tile-color: var(--seat-0);
+}
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  :is(.start-square.blue, .safe-route-blue, .lane.blue) {
+  --tile-color: var(--seat-1);
+}
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  :is(.start-square.green, .safe-route-green, .lane.green) {
+  --tile-color: var(--seat-2);
+}
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  :is(.start-square.yellow, .safe-route-yellow, .lane.yellow) {
+  --tile-color: var(--seat-3);
+}
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  :is(.track.safe, .lane:not(.lane-step-5)) {
+  position: relative;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  :is(.track.safe, .lane:not(.lane-step-5))::after {
+  content: "";
+  display: block !important;
+  position: absolute;
+  inset: 1px;
+  z-index: 0;
+  border: 1px solid color-mix(in srgb, var(--tile-color) 65%, white);
+  border-radius: clamp(2px, 0.4vw, 6px);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--tile-color) 82%, white),
+    var(--tile-color) 60%,
+    color-mix(in srgb, var(--tile-color) 78%, #100700)
+  );
+  box-shadow:
+    inset 0 1px 2px #fff7,
+    inset 0 -2px 2px #0003;
+  pointer-events: none;
+}
+
+/* Keep the toolbar inside narrow phone screens without shrinking the board. */
+@media (max-width: 360px) {
+  body.ludo-game.playing-ludo .play-toolbar {
+    grid-template-columns: 50px minmax(0, 1fr) 76px;
+  }
+  body.ludo-game.playing-ludo .play-toolbar .board-logo {
+    width: 100%;
+  }
+}
+
+/* The SVG pin ends at (32, 77). Bottom-align that point to the tile center.
+   Every pile slot uses the same foot anchor, independent of SVG letterboxing. */
+body.ludo-game.playing-ludo
+  #board.board.ludo
+  span.ludo-pawn.pin-pawn
+  .pin-pawn-art {
+  left: calc(50% + var(--pile-x, 0%)) !important;
+  top: calc(50% + var(--pile-y, 0%)) !important;
+  width: var(--pawn-width, 100%) !important;
+  height: var(--pawn-height, 100%) !important;
+  transform: translate(-50%, -100%) !important;
+}
+
+/* Enlarge phone pawns around their foot, so the centered anchor never moves. */
+@media (max-width: 620px) {
+  body.ludo-game.playing-ludo
+    #board.board.ludo
+    span.ludo-pawn.pin-pawn
+    .pin-pawn-art {
+    transform-origin: 50% 100%;
+    transform: translate(-50%, -100%) scale(var(--phone-pawn-scale, 1.2)) !important;
+  }
+  body.ludo-game.playing-ludo
+    #board.board.ludo
+    span.ludo-pawn.pin-pawn.stacked-pawn {
+    --phone-pawn-scale: 1.1;
+  }
+}
+
+/* Both speaker controls reflect the same audio setting. */
+body.ludo-game :is(#menu-sound, #sound-toggle) .sound-mute-mark {
+  display: none;
+}
+body.ludo-game
+  :is(#menu-sound, #sound-toggle)[data-muted="true"]
+  .sound-mute-mark {
+  display: block;
+}
+body.ludo-game :is(#menu-sound, #sound-toggle)[data-muted="true"] .sound-waves {
+  display: none;
+}

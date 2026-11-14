@@ -54,9 +54,17 @@ export function layoutBoardPawns(board) {
   // the half-cell above a centered tip made real mobile pawns ~9px tall.
   // Overhang is intentional; pawn-layers.css keeps heads above neighboring tiles.
   // One shared scale across all route cells prevents position-dependent sizing.
-  const singleScale = Math.min(...routeCells.map(({width, height}) =>
+  const phoneLayout = matchMedia("(max-width: 620px), (max-width: 899px) and (pointer: coarse)").matches;
+  const desktopSingleScale = Math.min(...routeCells.map(({width, height}) =>
     Math.min(width / 64, height / 77)
-  )) * (matchMedia("(max-width: 620px)").matches ? 1.2 : 1);
+  ));
+  // On a phone, use the actual narrowest tile's painted width as the readability
+  // budget. Only singles use it; paired and home-slot geometry remain untouched.
+  // DPR is intentionally absent: these dimensions are CSS pixels, not pixels
+  // in a high-density screenshot. Keep the original artwork proportions.
+  const singleScale = phoneLayout
+    ? Math.min(...routeCells.map(({width}) => width * .9 / (g.right - g.left)))
+    : desktopSingleScale;
   for (const {tile, width, height} of routeCells) {
     const pawns = [...tile.children].filter(p => p.classList.contains('pin-pawn'));
     if (!pawns.length) continue;

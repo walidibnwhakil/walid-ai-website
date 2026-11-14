@@ -1,5 +1,5 @@
 import {setGameInProgress} from "./refresh-guard.mjs";
-import {pawnSlots, layoutBoardPawns} from "./ludo/pawn-layout.mjs?v=20261114readable1";
+import {pawnSlots, layoutBoardPawns} from "./ludo/pawn-layout.mjs?v=20261114mobilefit1";
 import {gameShell, control, choose} from "./shell.mjs";
 import {newLudo, rollLudo, moveLudo, legalTokens, trackPosition, safe, movementSteps, captureReturnSteps} from "./ludo-rules.mjs?v=20261107goal56";
 

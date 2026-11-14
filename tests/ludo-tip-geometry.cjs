@@ -46,7 +46,7 @@ async function measure(page) {
 function verify(data,count) {
   const eps=.1,heads=[],singleSizes=[],homeScales=[],homeCounts=new Map();
   const routeCells=data.filter(t=>t.region!=='yard');
-  const singleScale=Math.min(...routeCells.map(({tile})=>Math.min(tile.width/64,tile.height/77)))*(data[0].phone?1.2:1);
+  const singleScale=data[0].phone?Math.min(...routeCells.map(({tile})=>tile.width*.9/56.5)):Math.min(...routeCells.map(({tile})=>Math.min(tile.width/64,tile.height/77)));
   const homeCells=data.filter(t=>t.region==='yard');
   const homeScale=Math.min(...homeCells.flatMap(({tile})=>[tile.width*.9/56.5,tile.height*.9/78.25]));
   for(const {tile,board,phone,pawns,region,base,seat} of data) {
@@ -122,6 +122,9 @@ async function populate(page,count,colorOffset=0,zoom=1) {
 async function approvedReference(page) {
   await page.setViewportSize({width:360,height:800});
   await page.goto(`${process.env.BASE_URL || 'http://127.0.0.1:4173'}/games/ludo/?screen=board&players=2&mode=friend`,{waitUntil:'networkidle'});
+  // Compare the immutable pair reference at its original board geometry.
+  // Mobile board width is tested separately at the new edge-to-edge dimensions.
+  await page.addStyleTag({content:'body.ludo-game.playing-ludo main{padding:3px!important}body.ludo-game.playing-ludo .ludo-stage{width:354px!important}'});
   await page.evaluate(()=>{
     const tile=document.querySelector('.track.start-square.blue'),template=document.querySelector('.pin-pawn').cloneNode(true);
     document.querySelectorAll('.pin-pawn').forEach(p=>p.remove());

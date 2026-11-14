@@ -122,14 +122,10 @@ export function createScene(canvas) {
       let x = 0;
       let y = (ch - art.height * scale) / 2;
       if (portraitMode) {
-        // Drop the carved desk front. Fill the phone with the logo-to-desk scene,
-        // shifted right so the cat is inside the frame.
-        const useful = 0.755;
-        scale = ch / (art.height * useful);
-        const w = art.width * scale;
-        x = Math.min(0, cw - w * 0.905);
-        y = 0;
-        view = { x, y, w, h: art.height * scale };
+        // Fit the whole width so his shoulders and the cat are both in frame.
+        // The carved desk front is not drawn; the desktop colour continues below it.
+        scale = cw / art.width;
+        view = { x: 0, y: 0, w: art.width * scale, h: art.height * scale };
       } else {
         const w = art.width * scale;
         const h = art.height * scale;
@@ -152,9 +148,8 @@ export function createScene(canvas) {
     const frac = (u, v) => [(view.x + view.w * u) / cw, (view.y + view.h * v) / ch];
     const [bubbleLeft, bubbleTop] = frac(spot.bu, spot.bv);
     const [, chin] = frac(0, face.v + face.h);
-    const catBottom = cat.v + cat.h;
-    const belowFace = face.v + face.h + (portraitMode ? 0.10 : 0.04);
-    const [, hands] = frac(0, portraitMode ? Math.max(belowFace, catBottom + 0.015) : belowFace);
+    const belowFace = face.v + face.h + (portraitMode ? 0.055 : 0.04);
+    const [, hands] = frac(0, belowFace);
     const [, catTop] = frac(0, Math.max(0.08, cat.v - 0.045));
     parent.style.setProperty("--bubble-left", Math.max(0.02, bubbleLeft).toFixed(4));
     parent.style.setProperty("--bubble-top", Math.max(0.02, bubbleTop).toFixed(4));
@@ -287,18 +282,25 @@ export function createScene(canvas) {
 
   function printerGeom() {
     const printer = images.printer;
-    const showing = portraitMode && reveal && reveal.phase !== "write";
-    const pw = view.w * (portraitMode ? (showing ? 0.22 : 0.15) : 0.20);
     const ratio = printer ? printer.height / printer.width : 0.58;
+    if (portraitMode) {
+      const pw = canvas.width * 0.52;
+      const ph = pw * ratio;
+      const px = (canvas.width - pw) / 2;
+      const py = canvas.height - ph - canvas.height * 0.13;
+      return { px, py, pw, ph };
+    }
+    const pw = view.w * 0.20;
     const ph = pw * ratio;
-    const px = ix(portraitMode ? (showing ? 0.52 : 0.37) : 0.045);
-    const py = iy(portraitMode ? (showing ? 0.655 : 0.515) : 0.69) - ph;
+    const px = ix(0.045);
+    const py = iy(0.69) - ph;
     return { px, py, pw, ph };
   }
 
   function drawPhoneLogo() {
     const art = images.portrait;
     if (!portraitMode || !art) return;
+    if (view.x >= -2 && view.x + view.w <= canvas.width + 2) return;
     const sx = art.width * 0.0;
     const sy = 0;
     const sw = art.width * 0.46;
@@ -329,7 +331,7 @@ export function createScene(canvas) {
 
   function drawPrinter() {
     const printer = images.printer;
-    if (!printer) return;
+    if (!printer || portraitMode) return;
     const { px, py, pw, ph } = printerGeom();
     const cx = px + pw * 0.50;
     const cy = py + ph * 0.90;
@@ -349,11 +351,11 @@ export function createScene(canvas) {
   function drawPrintout(progress, alpha) {
     if (!reveal?.photo || alpha < 0.02) return;
     const slide = easeOut(Math.min(1, Math.max(0, progress)));
-    if (!images.printer) {
-      const w = view.w * (portraitMode ? 0.36 : 0.18);
-      const h = w * 1.2;
-      const x = ix(portraitMode ? 0.32 : 0.14);
-      const y = iy(portraitMode ? 0.56 : 0.48);
+    if (portraitMode || !images.printer) {
+      const w = portraitMode ? canvas.width * 0.42 : view.w * 0.18;
+      const h = w * 1.15;
+      const x = portraitMode ? (canvas.width - w) / 2 : ix(0.14);
+      const y = portraitMode ? canvas.height - h - canvas.height * 0.16 : iy(0.48);
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.fillStyle = "rgba(32,16,8,0.28)";
@@ -532,7 +534,27 @@ export function createScene(canvas) {
       ctx.scale(scale, scale);
       ctx.translate(-ax, -ay);
     }
-    if (art) ctx.drawImage(art, view.x, view.y, view.w, view.h);
+    if (art) {
+      if (portraitMode) {
+        const useful = 0.735;
+        const srcH = art.height * useful;
+        const destH = srcH * (view.w / art.width);
+        ctx.drawImage(art, 0, 0, art.width, srcH, view.x, view.y, view.w, destH);
+        if (!art.deskStrip) {
+          const strip = document.createElement("canvas");
+          strip.width = art.width;
+          strip.height = 36;
+          strip.getContext("2d").drawImage(art, 0, art.height * 0.64, art.width, 28, 0, 0, art.width, 36);
+          art.deskStrip = strip;
+        }
+        const tileH = 36 * (view.w / art.width);
+        for (let y = destH - 2; y < canvas.height; y += tileH - 1) {
+          ctx.drawImage(art.deskStrip, 0, y, view.w, tileH);
+        }
+      } else {
+        ctx.drawImage(art, view.x, view.y, view.w, view.h);
+      }
+    }
     drawPhoneLogo();
     drawPrinter();
     if (!reduce) drawSmoke(dt);

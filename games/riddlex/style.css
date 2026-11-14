@@ -191,7 +191,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 @media (max-aspect-ratio: 4/5) {
   #ask-panel {
     display: flex;
-    left: 30%;
+    left: 8px;
     right: 8px;
     width: auto;
     top: calc(var(--hands-y, 0.58) * 100%);

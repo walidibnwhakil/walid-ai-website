@@ -191,11 +191,11 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 @media (max-aspect-ratio: 4/5) {
   #ask-panel {
     display: flex;
-    left: 36%;
+    left: 30%;
     right: 8px;
     width: auto;
-    top: calc(var(--hands-y, 0.50) * 100%);
-    max-height: calc(100% - var(--hands-y, 0.50) * 100% - 52px);
+    top: calc(var(--hands-y, 0.58) * 100%);
+    max-height: calc(100% - var(--hands-y, 0.58) * 100% - 48px);
   }
   .speech { position: relative; left: auto; top: auto; right: auto; width: 100%; }
   .speech::after, .speech.has-badge::after {

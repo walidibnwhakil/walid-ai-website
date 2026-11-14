@@ -3,7 +3,7 @@
 // Face and cat plates cross-fade with opacity and share that same transform.
 // Nothing is ever a shifted rectangle of the painting.
 
-import { createExpressions } from "./expressions.js?v=akinator-17";
+import { createExpressions } from "./expressions.js?v=akinator-18";
 
 const BASE = {
   landscape: "./images/approved/game-desk.webp",
@@ -71,6 +71,7 @@ export function createScene(canvas) {
   let raf = 0;
   let reveal = null;
   let view = { x: 0, y: 0, w: 1, h: 1 };
+  let logoSprite = null;
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
@@ -117,20 +118,29 @@ export function createScene(canvas) {
     if (!art) {
       view = { x: 0, y: 0, w: cw, h: ch };
     } else {
-      const scale = Math.max(cw / art.width, ch / art.height);
-      const w = art.width * scale;
-      const h = art.height * scale;
+      let scale = Math.max(cw / art.width, ch / art.height);
       let x = 0;
-      let y = (ch - h) / 2;
-      if (!portraitMode) {
+      let y = (ch - art.height * scale) / 2;
+      if (portraitMode) {
+        // Drop the carved desk front. Fill the phone with the logo-to-desk scene,
+        // shifted right so the cat is inside the frame.
+        const useful = 0.755;
+        scale = ch / (art.height * useful);
+        const w = art.width * scale;
+        x = Math.min(0, cw - w * 0.975);
+        y = 0;
+        view = { x, y, w, h: art.height * scale };
+      } else {
+        const w = art.width * scale;
+        const h = art.height * scale;
         x = cw * 0.50 - w * 0.52;
         y = ch * 0.42 - h * 0.38;
         const logoPad = Math.max(8, cw * 0.012);
         if (x + w * 0.03 < logoPad) x = logoPad - w * 0.03;
+        x = Math.min(0, Math.max(cw - w, x));
+        y = Math.min(0, Math.max(ch - h, y));
+        view = { x, y, w, h };
       }
-      x = Math.min(0, Math.max(cw - w, x));
-      y = Math.min(0, Math.max(ch - h, y));
-      view = { x, y, w, h };
     }
     const parent = canvas.parentElement;
     if (!parent || !cw || !ch) return;
@@ -142,7 +152,9 @@ export function createScene(canvas) {
     const frac = (u, v) => [(view.x + view.w * u) / cw, (view.y + view.h * v) / ch];
     const [bubbleLeft, bubbleTop] = frac(spot.bu, spot.bv);
     const [, chin] = frac(0, face.v + face.h);
-    const [, hands] = frac(0, face.v + face.h + (portraitMode ? 0.08 : 0.04));
+    const catBottom = cat.v + cat.h;
+    const belowFace = face.v + face.h + (portraitMode ? 0.10 : 0.04);
+    const [, hands] = frac(0, portraitMode ? Math.max(belowFace, catBottom + 0.015) : belowFace);
     const [, catTop] = frac(0, Math.max(0.08, cat.v - 0.045));
     parent.style.setProperty("--bubble-left", Math.max(0.02, bubbleLeft).toFixed(4));
     parent.style.setProperty("--bubble-top", Math.max(0.02, bubbleTop).toFixed(4));
@@ -231,10 +243,10 @@ export function createScene(canvas) {
   function drawSheet(turn) {
     const u = Math.max(0, Math.min(1, turn));
     // Flat on the desk while he writes, then up in his hands. The printer stays to the left.
-    const x = ix(portraitMode ? 0.50 : 0.50);
-    const y = iy(portraitMode ? 0.62 - 0.20 * u : 0.58 - 0.20 * u);
-    const w = view.w * (portraitMode ? 0.42 : 0.30);
-    const h = view.h * (portraitMode ? 0.11 : 0.15);
+    const x = ix(portraitMode ? 0.58 : 0.50);
+    const y = iy(portraitMode ? 0.50 - 0.16 * u : 0.58 - 0.20 * u);
+    const w = portraitMode ? canvas.width * 0.46 : view.w * 0.30;
+    const h = portraitMode ? canvas.width * 0.30 : view.h * 0.15;
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI * (1 - u));
@@ -269,12 +281,43 @@ export function createScene(canvas) {
 
   function printerGeom() {
     const printer = images.printer;
-    const pw = view.w * (portraitMode ? 0.20 : 0.20);
+    const pw = view.w * (portraitMode ? 0.15 : 0.20);
     const ratio = printer ? printer.height / printer.width : 0.58;
     const ph = pw * ratio;
-    const px = ix(portraitMode ? 0.03 : 0.045);
-    const py = iy(portraitMode ? 0.60 : 0.69) - ph;
+    const px = ix(portraitMode ? 0.37 : 0.045);
+    const py = iy(portraitMode ? 0.515 : 0.69) - ph;
     return { px, py, pw, ph };
+  }
+
+  function drawPhoneLogo() {
+    const art = images.portrait;
+    if (!portraitMode || !art) return;
+    const sx = art.width * 0.0;
+    const sy = 0;
+    const sw = art.width * 0.46;
+    const sh = art.height * 0.17;
+    const dw = canvas.width * 0.70;
+    const dh = dw * (sh / sw);
+    if (!logoSprite) {
+      logoSprite = document.createElement("canvas");
+      logoSprite.width = Math.ceil(sw);
+      logoSprite.height = Math.ceil(sh);
+      const g = logoSprite.getContext("2d");
+      g.drawImage(art, sx, sy, sw, sh, 0, 0, logoSprite.width, logoSprite.height);
+      const fade = g.getImageData(0, 0, logoSprite.width, logoSprite.height);
+      const pix = fade.data;
+      const fw = logoSprite.width;
+      const fh = logoSprite.height;
+      for (let y = 0; y < fh; y++) {
+        for (let x = 0; x < fw; x++) {
+          const right = Math.min(1, (fw - x) / 28);
+          const bottom = Math.min(1, (fh - y) / 22);
+          pix[(y * fw + x) * 4 + 3] = Math.round(255 * Math.min(right, bottom));
+        }
+      }
+      g.putImageData(fade, 0, 0);
+    }
+    ctx.drawImage(logoSprite, 0, 0, dw, dh);
   }
 
   function drawPrinter() {
@@ -483,6 +526,7 @@ export function createScene(canvas) {
       ctx.translate(-ax, -ay);
     }
     if (art) ctx.drawImage(art, view.x, view.y, view.w, view.h);
+    drawPhoneLogo();
     drawPrinter();
     if (!reduce) drawSmoke(dt);
     if (!reduce) stepCat(dt);
@@ -522,7 +566,7 @@ export function createScene(canvas) {
 
   async function loadOverlaySet(orient) {
     const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-17`)];
+      return [key, await loadImage(`${src}?v=akinator-18`)];
     }));
     const overlays = {};
     for (const [key, image] of entries) if (image) overlays[key] = image;
@@ -533,7 +577,7 @@ export function createScene(canvas) {
     const [base, overlays, printer] = await Promise.all([
       loadImage(BASE[orient]),
       loadOverlaySet(orient),
-      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-17`),
+      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-18`),
     ]);
     if (printer) images.printer = printer;
     return { base, overlays };

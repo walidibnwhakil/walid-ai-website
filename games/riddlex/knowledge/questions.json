@@ -658,5 +658,17 @@
     "group": "object",
     "en": "Do people use it every day?",
     "bn": "এটা কি প্রায় প্রতিদিন লাগে?"
+  },
+  {
+    "id": "played_barcelona",
+    "group": "job",
+    "en": "Did they play for Barcelona?",
+    "bn": "তিনি কি বার্সেলোনায় খেলেছেন?"
+  },
+  {
+    "id": "ballon_dor",
+    "group": "job",
+    "en": "Have they won the Ballon d'Or?",
+    "bn": "তিনি কি ব্যালন ডি'অর জিতেছেন?"
   }
 ]

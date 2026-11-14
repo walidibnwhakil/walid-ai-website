@@ -158,7 +158,7 @@ async function approvedReference(page) {
   try {
     const approved=await browser.newPage();
     results.push(await approvedReference(approved));await approved.close();
-    for(const width of [360,390,1440]) {
+    for(const width of [320,360,390,1440]) {
       const page=await browser.newPage({viewport:{width,height:1000},reducedMotion:'reduce'});
       await page.goto(`${process.env.BASE_URL || 'http://127.0.0.1:4173'}/games/ludo/?screen=board&players=4&mode=friend`,{waitUntil:'networkidle'});
       await page.evaluate(() => {window.pawnTemplate=document.querySelector('.pin-pawn').cloneNode(true);});

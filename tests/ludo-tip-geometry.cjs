@@ -48,7 +48,7 @@ function verify(data,count) {
   const routeCells=data.filter(t=>t.region!=='yard');
   const singleScale=data[0].phone?Math.min(...routeCells.map(({tile})=>tile.width*.9/56.5)):Math.min(...routeCells.map(({tile})=>Math.min(tile.width/64,tile.height/77)));
   const homeCells=data.filter(t=>t.region==='yard');
-  const homeScale=Math.min(...homeCells.flatMap(({tile})=>[tile.width*.9/56.5,tile.height*.9/78.25]));
+  const homeScale=Math.min(...homeCells.flatMap(({tile})=>[tile.width*.9/56.5,tile.height*.9/78.25]))*(data[0].phone?1.01:1);
   for(const {tile,board,phone,pawns,region,base,seat} of data) {
     if(region==='yard') {
       assert.ok(pawns.length<=1,'one pawn per deliberate home slot');

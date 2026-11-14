@@ -9,20 +9,11 @@ errors = []
 class Parser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.tags = []
-        self.attrs = []
         self.links = []
     def handle_starttag(self, tag, attrs):
-        self.tags.append(tag)
         attrs = dict(attrs)
-        self.attrs.append((tag, attrs))
         if tag == "a" and attrs.get("href"):
             self.links.append(attrs["href"])
-    def handle_startendtag(self, tag, attrs):
-        self.handle_starttag(tag, attrs)
-    def handle_endtag(self, tag):
-        if tag in self.tags:
-            self.tags.remove(tag)
 
 def check_html(path):
     parser = Parser()
@@ -34,7 +25,7 @@ def check_html(path):
         errors.append(f"{path}: HTML parser error: {exc}")
     if not re.search(r"<!doctype html>", text, re.I):
         errors.append(f"{path}: missing doctype")
-    if not re.search(r"<html\\b[^>]*\\blang=", text, re.I):
+    if not re.search(r"<html\b[^>]*\blang=", text, re.I):
         errors.append(f"{path}: missing html lang attribute")
     for required in ("<head", "<body", "<title", 'name="description"'):
         if required.lower() not in text.lower():
@@ -42,7 +33,7 @@ def check_html(path):
     for href in parser.links:
         if href.startswith(("/", "./")):
             target = href.split("#", 1)[0].split("?", 1)[0]
-            if not target or target.endswith((".html", "/")):
+            if target.endswith((".html", "/")):
                 candidate = ROOT / target.lstrip("/")
                 if target.endswith("/"):
                     candidate = candidate / "index.html"

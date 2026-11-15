@@ -103,34 +103,57 @@ def read_openliga():
             winner=home if hs>as_ else away if as_>hs else "Draw"
         out.append({"homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"status":"finished" if finished else "scheduled","source":"OpenLigaDB"})
     return out
+def event_key(event):
+    """Prefer stable source IDs; fall back to team/time identity for legacy records."""
+    identifier=str(event.get("id") or "").strip()
+    return (event.get("source",""),identifier) if identifier else (
+        clean(event.get("homeTeam")), clean(event.get("awayTeam")), event.get("startTime")
+    )
+
+def dedupe_events(events):
+    found={}
+    for event in events:
+        key=event_key(event)
+        if key not in found:
+            found[key]=event
+        else:
+            # Prefer records with scores and useful status/timestamp data.
+            old=found[key]
+            if (event.get("homeScore") is not None or event.get("awayScore") is not None) and old.get("homeScore") is None:
+                found[key]=event
+    return sorted(found.values(),key=lambda x:x.get("startTime") or "")
+
 def scores(previous):
     result={}
+    old_sports=previous.get("sports") or {}
     for key,(name,next_url,past_url) in SPORTS.items():
         events=read_events(next_url,"scheduled")+read_events(past_url,"finished")
         providers=["TheSportsDB"] if events else []
         if key=="football":
             global_recent=read_global_soccer_recent()
-            if global_recent:
-                providers.append("TheSportsDB Soccer day feed")
-                seen={(x["homeTeam"],x["awayTeam"],x["startTime"]) for x in events}
-                events += [x for x in global_recent if (x["homeTeam"],x["awayTeam"],x["startTime"]) not in seen]
+            events += global_recent
             liga=read_openliga()
-            if liga:
-                providers.append("OpenLigaDB")
-                seen={(x["homeTeam"],x["awayTeam"],x["startTime"]) for x in events}
-                events += [x for x in liga if (x["homeTeam"],x["awayTeam"],x["startTime"]) not in seen]
-                events.sort(key=lambda x:x["startTime"])
-        old_sport=(previous.get("sports") or {}).get(key,{})
+            events += liga
+            if global_recent: providers.append("TheSportsDB")
+            if liga: providers.append("OpenLigaDB")
+        events=dedupe_events(events)
+        old_sport=old_sports.get(key,{})
         if events:
-            result[key]={"label":name,"coverage":"available","source":" + ".join(providers),"matches":events,"note":"Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."}
+            result[key]={"label":name,"coverage":"available","source":" + ".join(dict.fromkeys(providers)),"matches":events,"note":"Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."}
         elif old_sport.get("matches"):
-            result[key]={**old_sport,"coverage":"stale","note":"Provider did not return a fresh response; showing the last verified cache."}
+            result[key]={**old_sport,"coverage":"stale","note":"Match information could not be refreshed; showing previously verified information."}
         else:
-            result[key]={"label":name,"coverage":"unavailable","source":"","matches":[],"note":"No verified events were returned by the configured free providers; no matches or scores are shown."}
-    cricket=read_cricketdata()
-    result["cricket"]={"label":"Cricket","coverage":"available" if cricket else "unavailable","source":"CricketData" if cricket else "","matches":cricket,"note":"Verified fixtures/results from CricketData." if cricket else "No CricketData API key is configured; no verified cricket fixtures or scores are shown."}
+            result[key]={"label":name,"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
+    cricket, cricket_error=read_cricketdata()
+    old_cricket=old_sports.get("cricket",{})
+    if cricket:
+        result["cricket"]={"label":"Cricket","coverage":"available","source":"","matches":dedupe_events(cricket),"note":"Verified cricket fixtures and scores."}
+    elif old_cricket.get("matches"):
+        result["cricket"]={**old_cricket,"coverage":"stale","note":"Cricket information could not be refreshed; showing previously verified information."}
+    else:
+        result["cricket"]={"label":"Cricket","coverage":"unavailable","source":"","matches":[],"note":"No verified cricket information is available right now."}
     for key in ("tennis","volleyball","badminton"):
-        result[key]={"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No free, stable provider is configured for this sport yet; no matches or scores are shown."}
+        result[key]=old_sports.get(key) or {"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
     return result
 def read_cricketdata():
     """Fetch and normalize the CricAPI score feed; never log or return the credential."""

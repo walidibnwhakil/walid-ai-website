@@ -1,8 +1,15 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-15T15:56:07.360246+00:00",
+  "updatedAt": "2026-11-15T16:01:27.676393+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Judge blocks Trump closure of 'Trash Island' Washington DC golf course on Sunday",
+      "url": "https://www.bbc.co.uk/news/articles/c6j9mn7l14y0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T15:57:03+00:00",
+      "category": "World"
+    },
     {
       "title": "Hridoy hits century against South Africa",
       "url": "https://en.prothomalo.com/sports/cricket/v23u2338nh",
@@ -148,13 +155,6 @@
       "url": "https://www.bbc.co.uk/news/articles/c6wy9lynq4qno?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-15T07:10:31+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Trump barred from closing 'Trash Island' golf course on Sunday",
-      "url": "https://www.bbc.co.uk/news/articles/c6j9mn7l14y0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T03:21:04+00:00",
       "category": "World"
     },
     {

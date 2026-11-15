@@ -58,6 +58,29 @@ def read_events(url,status):
             except (TypeError,ValueError): pass
         out.append({"homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "League match","startTime":start,"status":status,"source":"TheSportsDB"})
     return out
+def read_global_soccer_recent():
+    out=[]
+    now=datetime.now(timezone.utc)
+    for offset in (2,1,0):
+        day=(now.date()).fromordinal(now.date().toordinal()-offset).isoformat()
+        url="https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d="+day+"&s=Soccer"
+        try:
+            with urlopen(Request(url,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
+        except Exception: continue
+        for e in (payload.get("events") or []):
+            start=iso(e.get("strTimestamp")) or iso((e.get("dateEvent") or "")+"T"+(e.get("strTime") or "00:00:00")+"Z")
+            home,away=clean(e.get("strHomeTeam")),clean(e.get("strAwayTeam"))
+            if not home or not away or not start: continue
+            hs,as_=e.get("intHomeScore"),e.get("intAwayScore")
+            if hs is None or as_ is None: continue
+            winner=home if str(hs).isdigit() and str(as_).isdigit() and int(hs)>int(as_) else away if str(hs).isdigit() and str(as_).isdigit() and int(as_)>int(hs) else "Draw"
+            out.append({"homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "Soccer","startTime":start,"status":"finished","source":"TheSportsDB"})
+    seen=set(); unique=[]
+    for x in sorted(out,key=lambda m:m["startTime"],reverse=True):
+        key=(x["homeTeam"],x["awayTeam"],x["startTime"])
+        if key not in seen: seen.add(key); unique.append(x)
+    return unique[:40]
+
 def read_openliga():
     try:
         with urlopen(Request(OPENLIGA_SEASON_URL,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
@@ -86,6 +109,11 @@ def scores(previous):
         events=read_events(next_url,"scheduled")+read_events(past_url,"finished")
         providers=["TheSportsDB"] if events else []
         if key=="football":
+            global_recent=read_global_soccer_recent()
+            if global_recent:
+                providers.append("TheSportsDB Soccer day feed")
+                seen={(x["homeTeam"],x["awayTeam"],x["startTime"]) for x in events}
+                events += [x for x in global_recent if (x["homeTeam"],x["awayTeam"],x["startTime"]) not in seen]
             liga=read_openliga()
             if liga:
                 providers.append("OpenLigaDB")

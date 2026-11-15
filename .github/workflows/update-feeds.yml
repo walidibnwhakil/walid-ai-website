@@ -7,7 +7,7 @@ on:
       - "tests/validate_updates.py"
       - ".github/workflows/update-feeds.yml"
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 permissions:
   contents: write

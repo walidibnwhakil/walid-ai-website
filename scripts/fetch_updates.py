@@ -167,6 +167,7 @@ def scores(previous):
     for key,(name,next_url,past_url) in SPORTS.items():
         events=read_events(next_url,"scheduled")+read_events(past_url,"finished")
         providers=["TheSportsDB"] if events else []
+        old_sport=old_sports.get(key,{})
         if key=="football":
             global_recent=read_global_soccer_recent()
             events += global_recent
@@ -174,8 +175,7 @@ def scores(previous):
             events += liga
             if global_recent: providers.append("TheSportsDB")
             if liga: providers.append("OpenLigaDB")
-        events=dedupe_events(events)
-        old_sport=old_sports.get(key,{})
+        events=recent_cache_matches(events,old_sport.get("matches",[]))
         if events:
             result[key]={"label":name,"coverage":"available","source":" + ".join(dict.fromkeys(providers)),"matches":events,"note":"Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."}
         elif old_sport.get("matches"):
@@ -185,13 +185,17 @@ def scores(previous):
     cricket, cricket_error=read_cricketdata()
     old_cricket=old_sports.get("cricket",{})
     if cricket:
-        result["cricket"]={"label":"Cricket","coverage":"available","source":"","matches":dedupe_events(cricket),"note":"Verified cricket fixtures and scores."}
+        result["cricket"]={"label":"Cricket","coverage":"available","source":"","matches":recent_cache_matches(cricket,old_cricket.get("matches",[])),"note":"Verified cricket fixtures and scores."}
     elif old_cricket.get("matches"):
         result["cricket"]={**old_cricket,"coverage":"stale","matches":recent_cache_matches([],old_cricket.get("matches",[])),"note":"Cricket information could not be refreshed; showing previously verified information."}
     else:
         result["cricket"]={"label":"Cricket","coverage":"unavailable","source":"","matches":[],"note":"No verified cricket information is available right now."}
     for key in ("tennis","volleyball","badminton"):
         result[key]=old_sports.get(key) or {"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
+    for entry in result.values():
+        entry.pop("source",None)
+        for match in entry.get("matches",[]):
+            match.pop("source",None)
     return result
 def read_cricketdata():
     """Combine scheduled match listings and score feed; never log the credential."""
@@ -202,7 +206,9 @@ def read_cricketdata():
     out=[]
     errors=[]
     for endpoint in ("matches","cricScore"):
-        url="https://api.cricapi.com/v1/"+endpoint+"?"+urlencode({"apikey":key,"offset":0})
+        params={"apikey":key}
+        if endpoint=="matches": params["offset"]=0
+        url="https://api.cricapi.com/v1/"+endpoint+"?"+urlencode(params)
         try:
             with urlopen(Request(url,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as response:
                 payload=json.load(response)

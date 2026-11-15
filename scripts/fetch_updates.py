@@ -253,7 +253,7 @@ def read_cricketdata():
             status="finished" if ended else "live" if live else "scheduled"
             winner=None
             if ended:
-                m=re.search(r"^(.+?)\\s+won by\\b",str(e.get("status") or ""),re.I)
+                m=re.search(r"^(.+?)\s+won by\b",str(e.get("status") or ""),re.I)
                 winner=clean(m.group(1)) if m else None
             out.append({
                 "id":str(e.get("id") or ""),

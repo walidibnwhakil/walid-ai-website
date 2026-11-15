@@ -42,4 +42,4 @@ def build(kind):
  DATA.mkdir(exist_ok=True); (DATA/(kind+".json")).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
  return bool(unique)
 if __name__=="__main__":
- ok=build("news") or build("news"); ok=build("sports") or ok; sys.exit(0 if ok else 1)
+ ok=build("news"); ok=build("sports") or ok; sys.exit(0 if ok else 1)

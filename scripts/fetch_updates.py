@@ -12,17 +12,25 @@ def clean(v): return re.sub(r"\s+"," ",re.sub(r"<[^>]+>","",v or "")).strip()
 def dt(v):
  try:return parsedate_to_datetime(v).astimezone(timezone.utc).isoformat()
  except:return v
-def read_feed(name,url):
+def category(title,kind):
+ if kind=="sports": return "Sports"
+ t=title.lower()
+ if any(x in t for x in ("bangladesh","dhaka","india","pakistan","nepal","myanmar")): return "Bangladesh"
+ if any(x in t for x in ("technology","tech","ai","artificial intelligence","cyber")): return "Technology"
+ return "World"
+def read_feed(name,url,kind):
  req=Request(url,headers={"User-Agent":"WalidAI-NewsBot/1.0 (+https://walid-ai.com/)"})
  with urlopen(req,timeout=20) as r: root=ET.fromstring(r.read())
  out=[]
  for n in root.findall(".//item")[:12]:
-  title,link=clean(n.findtext("title")),clean(n.findtext("link"))
-  if title and re.match(r"^https?://",link): out.append({"title":title,"url":link,"source":name,"publishedAt":dt(n.findtext("pubDate"))})
+  title,link=clean(n.findtext("title")),clean(n.findtext("link")); img=""
+  for child in list(n):
+   if child.tag.split("}")[-1] in ("content","thumbnail") and child.attrib.get("url"): img=child.attrib["url"]; break
+  if title and re.match(r"^https?://",link): out.append({"title":title,"url":link,"source":name,"publishedAt":dt(n.findtext("pubDate")),"category":category(title,kind),**({"imageUrl":img} if re.match(r"^https?://",img) else {})})
  if not out:
   for n in root.findall(".//{*}entry")[:12]:
-   l=n.find("{*}link"); link=l.get("href","") if l is not None else ""
-   if clean(n.findtext("{*}title")) and re.match(r"^https?://",link): out.append({"title":clean(n.findtext("{*}title")),"url":link,"source":name,"publishedAt":dt(n.findtext("{*}updated"))})
+   l=n.find("{*}link"); link=l.get("href","") if l is not None else ""; title=clean(n.findtext("{*}title"))
+   if title and re.match(r"^https?://",link): out.append({"title":title,"url":link,"source":name,"publishedAt":dt(n.findtext("{*}updated")),"category":category(title,kind)})
  return out
 def old(kind):
  try:return json.loads((DATA/(kind+".json")).read_text())
@@ -31,15 +39,16 @@ def build(kind):
  items=[]; sources=[]; errors=[]
  for name,url in FEEDS[kind]:
   try:
-   got=read_feed(name,url); items+=got; sources.append({"name":name,"url":url,"host":urlparse(url).netloc,"ok":bool(got)})
+   got=read_feed(name,url,kind); items+=got; sources.append({"name":name,"url":url,"host":urlparse(url).netloc,"ok":bool(got)})
   except Exception as e: sources.append({"name":name,"url":url,"host":urlparse(url).netloc,"ok":False}); errors.append(name+": "+type(e).__name__)
  seen=set(); unique=[]
  for x in sorted(items,key=lambda z:z.get("publishedAt") or "",reverse=True):
   if x["url"] not in seen: seen.add(x["url"]); unique.append(x)
  previous=old(kind); final=unique[:24] or previous.get("items",[])[:24]
  payload={"kind":kind,"updatedAt":datetime.now(timezone.utc).isoformat(),"status":"ok" if unique else ("stale" if final else "error"),"items":final,"sources":sources,"errors":errors}
- if kind=="sports": payload.update(scoreSupport="unavailable",scoreNote="No live-score API is configured; these are verified sports headlines only, not live scores.")
+ if kind=="sports": payload.update({"scoreSupport":"unavailable","scoreNote":"No live-score API is configured; fixtures and results are intentionally unavailable rather than fabricated.","matches":[]})
  DATA.mkdir(exist_ok=True); (DATA/(kind+".json")).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
  return bool(unique)
 if __name__=="__main__":
  ok=build("news"); ok=build("sports") or ok; sys.exit(0 if ok else 1)
+

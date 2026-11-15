@@ -24,6 +24,7 @@ body.checker-preview #canvas{background-color:#e7e9ee;background-image:linear-gr
 <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
+<link rel="stylesheet" href="/walid-legal.css">
 </head><body><main>
 <header><a href="/" class="brand-logo-link" aria-label="Walid AI home"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a><a href="/tools/" class="all-tools-link">Tools</a></header>
 <h1>PDF & Image Tools</h1><p class="lead">Choose a tool to get started.</p>
@@ -164,5 +165,6 @@ function bindFileDrop(zone,input,multiple){if(!zone||!input)return;zone.addEvent
 /* Standalone route recovery: keep deep links opening the selected tool even if
    another optional initializer fails earlier in the page. */
 (()=>{const params=new URLSearchParams(location.search),tool=params.get('tool');if(!tool)return;const activate=()=>{const card=document.querySelector('.tool-card[data-tool="'+CSS.escape(tool)+'"]');if(!card)return;document.body.classList.add('tool-mode');try{if(typeof openTool==='function'){openTool(card,false);return}}catch(error){console.error('Tool workspace initialization failed',error)}const workspace=document.getElementById('workspace'),pdf=document.getElementById('pdfPanel'),image=document.getElementById('imagePanel');if(!workspace)return;workspace.hidden=false;if(pdf)pdf.hidden=card.dataset.kind!=='pdf';if(image)image.hidden=card.dataset.kind!=='image';document.getElementById('toolGrid')?.setAttribute('hidden','');document.getElementById('toolGrid')?.setAttribute('aria-hidden','true')};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(activate,0),{once:true});else setTimeout(activate,0)})();
-</script><script src="/usage.js?v=20261109-2"></script></body></html>
+</script><script src="/usage.js?v=20261109-2"></script><footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
+</body></html>
 

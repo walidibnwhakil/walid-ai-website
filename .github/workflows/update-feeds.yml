@@ -19,7 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python scripts/fetch_updates.py
+      - name: Refresh verified feeds
+        env:
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+        run: python scripts/fetch_updates.py
       - run: python tests/validate_updates.py
       - name: Commit changed caches
         run: |

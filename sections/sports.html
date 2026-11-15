@@ -6,38 +6,30 @@
 <body><main><header class="top"><a href="/"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><a class="back" href="/">← Main menu</a></header><section class="hero"><div class="eyebrow">Walid AI match center</div><h1>Follow the game.</h1><p>See upcoming matches in date and time order, with the next match first. All times are shown in Bangladesh time; final scores appear when available.</p></section><nav id="sportsNav" class="sports-nav" aria-label="Sports"></nav><div class="notice" id="notice">Loading verified sports data…</div><section><h2 class="section-title">Recent Scores (Last 3 Days)</h2><div id="recent" class="match-list"></div></section><section><h2 class="section-title" id="upcomingTitle">Upcoming Matches</h2><div id="upcoming" class="match-list"></div></section><section class="news"><h2>Sports news</h2><div id="newsGrid" class="news-grid"></div></section><footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a> · <a href="/contact-us.html">Contact Us</a> · <a href="/privacy-policy.html">Privacy Policy</a> · <a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer></main>
 <script>
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;"
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
 }[char]));
 
 const when = (value) => value
   ? new Date(value).toLocaleString("en-GB", {
-      dateStyle: "medium",
-      timeStyle: "short",
-      timeZone: "Asia/Dhaka"
+      dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Dhaka"
     })
   : "Time unavailable";
 
 const sports = [
-  ["football", "Football"],
-  ["cricket", "Cricket"],
-  ["tennis", "Tennis"],
-  ["volleyball", "Volleyball"],
-  ["basketball", "Basketball"],
-  ["badminton", "Badminton"],
-  ["hockey", "Hockey"]
+  ["football", "Football"], ["cricket", "Cricket"], ["tennis", "Tennis"],
+  ["volleyball", "Volleyball"], ["basketball", "Basketball"],
+  ["badminton", "Badminton"], ["hockey", "Hockey"]
 ];
-
+const CACHE_REFRESH_MS = 5 * 60 * 1000;
+const RECENT_WINDOW_MS = 72 * 60 * 60 * 1000;
 let data = { sports: {} };
 let selected = "football";
+let refreshInFlight = false;
 
 function renderTabs() {
   const nav = document.querySelector("#sportsNav");
   nav.innerHTML = sports.map(([id, name]) =>
-    "<button class='sport-tab' type='button' data-sport='" + id + "'>" + name + "</button>"
+    "<button class='sport-tab' type='button' data-sport='" + id + "' aria-pressed='" + (id === selected) + "'>" + name + "</button>"
   ).join("");
   nav.querySelectorAll(".sport-tab").forEach((button) => {
     button.addEventListener("click", () => {
@@ -47,87 +39,136 @@ function renderTabs() {
   });
 }
 
-function card(match, result) {
-  const score = result && match.homeScore != null
-    ? esc(match.homeScore) + " – " + esc(match.awayScore)
-    : "vs";
+function matchStatus(match) {
+  const status = String(match.status || "").toLowerCase();
+  if (["live", "in_progress", "in progress"].includes(status)) return "LIVE";
+  if (["finished", "final", "completed"].includes(status)) return "Finished";
+  if (status === "postponed") return "Postponed";
+  if (status === "cancelled" || status === "canceled") return "Cancelled";
+  return "Upcoming";
+}
+
+function scoreText(match) {
+  if (match.homeScore == null || match.awayScore == null) return "vs";
+  return esc(match.homeScore) + " – " + esc(match.awayScore);
+}
+
+function card(match) {
+  const status = matchStatus(match);
+  const live = status === "LIVE";
+  const stamp = status === "Finished"
+    ? (match.finishedAt || match.endTime || match.startTime)
+    : match.startTime;
+  const cricket = selected === "cricket";
+  let cricketLine = "";
+  if (cricket) {
+    const innings = Array.isArray(match.innings) ? match.innings : [];
+    const inningsText = innings.map((inn) => {
+      const score = [inn.runs, inn.wickets == null ? null : inn.wickets].filter(x => x != null).join("/");
+      const overs = inn.overs == null ? "" : " (" + inn.overs + " ov)";
+      return [inn.team || "", score ? score + overs : ""].filter(Boolean).join(": ");
+    }).filter(Boolean).join(" · ");
+    const scorecard = inningsText || [match.homeScore, match.awayScore].some(x => x != null)
+      ? inningsText || (scoreText(match) + (match.overs ? " (" + esc(match.overs) + " ov)" : ""))
+      : "Score unavailable";
+    cricketLine = "<div class='status'>" + esc(match.matchType || match.format || "Cricket") +
+      " · " + esc(scorecard) + "</div>";
+  }
   return "<article class='match'><div class='team'><strong>" +
     esc(match.homeTeam) + "</strong><span class='competition'>" +
     esc(match.competition || "Competition") +
-    "</span></div><div class='score'>" + score +
-    "<div class='kickoff'>" + esc(when(match.startTime)) +
-    "</div><div class='status'>" + esc(match.status || "Scheduled") +
-    "</div></div><div class='team'><strong>" +
-    esc(match.awayTeam) + "</strong><span class='source'>" +
-    "Match information" + "</span></div></article>";
+    "</span></div><div class='score'>" + (live ? "<span class='live-badge'>LIVE </span>" : "") +
+    scoreText(match) + cricketLine +
+    "<div class='kickoff'>" + esc(when(stamp)) +
+    "</div><div class='status'>" + esc(status) +
+    (match.winner ? " · " + esc(match.winner) + " won" : "") + "</div></div><div class='team'>" +
+    "<strong>" + esc(match.awayTeam) + "</strong><span class='source'>Match information</span></div></article>";
+}
+
+function validDate(value) {
+  const parsed = value ? Date.parse(value) : NaN;
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function render() {
   const current = data.sports?.[selected] || {
-    coverage: "unavailable",
-    matches: [],
+    coverage: "unavailable", matches: [],
     note: "Match schedule is currently unavailable for this sport."
   };
   const label = sports.find(([id]) => id === selected)?.[1] || selected;
   document.querySelectorAll(".sport-tab").forEach((button) => {
     button.classList.toggle("active", button.dataset.sport === selected);
+    button.setAttribute("aria-pressed", String(button.dataset.sport === selected));
   });
-  document.querySelector("#notice").textContent = current.coverage === "available"
+  const updatedAt = validDate(data.updatedAt);
+  document.querySelector("#notice").textContent = updatedAt
     ? "Match information last updated " + when(data.updatedAt) + "."
-    : "Match schedule is temporarily unavailable. Last checked " + when(data.updatedAt) + ".";
-  const matches = Array.isArray(current.matches) ? current.matches : [];
-  const validTime = (match) => match.startTime && Number.isFinite(Date.parse(match.startTime));
-  const byKickoff = (a,b) => Date.parse(a.startTime) - Date.parse(b.startTime);
-  const upcoming = matches.filter((match) => match.status === "scheduled" && validTime(match)).sort(byKickoff);
+    : "Match information is temporarily unavailable.";
   const now = Date.now();
-  const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+  const matches = Array.isArray(current.matches) ? current.matches : [];
+  const upcoming = matches.filter((match) => {
+    const start = validDate(match.startTime);
+    return matchStatus(match) === "Upcoming" && start !== null && start >= now;
+  }).sort((a, b) => validDate(a.startTime) - validDate(b.startTime));
   const recent = matches.filter((match) => {
-    if (!validTime(match)) return false;
-    const kickoff = Date.parse(match.startTime);
-    const isLive = ["live", "in_progress"].includes(match.status);
-    const isFinished = match.status === "finished";
-    const endedAt = match.endTime || match.finishedAt || match.updatedAt;
-    const lastEvent = endedAt && Number.isFinite(Date.parse(endedAt)) ? Date.parse(endedAt) : kickoff;
-    return (isLive && kickoff <= now && now - kickoff <= threeDaysMs) ||
-      (isFinished && lastEvent <= now && now - lastEvent <= threeDaysMs);
-  }).sort((a,b) => byKickoff(b,a));
+    const status = matchStatus(match);
+    const start = validDate(match.startTime);
+    if (status === "LIVE") return start !== null && start <= now && now - start <= RECENT_WINDOW_MS;
+    if (status !== "Finished") return false;
+    const completed = validDate(match.finishedAt || match.endTime);
+    const eventTime = completed ?? start;
+    return eventTime !== null && eventTime <= now && now - eventTime <= RECENT_WINDOW_MS;
+  }).sort((a, b) => {
+    const aTime = validDate(a.finishedAt || a.endTime || a.startTime);
+    const bTime = validDate(b.finishedAt || b.endTime || b.startTime);
+    return bTime - aTime;
+  });
   document.querySelector("#upcoming").innerHTML = upcoming.length
-    ? upcoming.map((match) => card(match, false)).join("")
-    : "<div class='empty'>No verified upcoming matches are available for " +
-      esc(label) + " right now.</div>";
+    ? upcoming.map(card).join("")
+    : "<div class='empty'>No verified upcoming matches are available for " + esc(label) + " right now.</div>";
   document.querySelector("#recent").innerHTML = recent.length
-    ? recent.map((match) => card(match, true)).join("")
+    ? recent.map(card).join("")
     : "<div class='empty'>No verified recent scores are available for this sport right now.</div>";
 }
 
 function renderNews(items) {
   const safeItems = Array.isArray(items) ? items : [];
   document.querySelector("#newsGrid").innerHTML = safeItems.slice(0, 6).map((item) =>
-    "<article class='news-card'><div class='source'>" +
-    esc(item.source) + " · " + when(item.publishedAt) +
-    "</div><h3><a href='" + esc(item.url) +
-    "' target='_blank' rel='noopener noreferrer'>" +
+    "<article class='news-card'><div class='source'>" + esc(item.source) + " · " + when(item.publishedAt) +
+    "</div><h3><a href='" + esc(item.url) + "' target='_blank' rel='noopener noreferrer'>" +
     esc(item.title) + " ↗</a></h3></article>"
   ).join("") || "<p class='empty'>No verified sports headlines are available right now.</p>";
 }
 
+async function refreshData() {
+  if (refreshInFlight || document.hidden) return;
+  refreshInFlight = true;
+  try {
+    const response = await fetch("/data/sports.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const payload = await response.json();
+    if (payload && typeof payload === "object") {
+      data = payload;
+      render();
+      renderNews(data.items);
+    }
+  } catch (error) {
+    console.error("Sports data load failed:", error);
+    if (!validDate(data.updatedAt)) {
+      document.querySelector("#notice").textContent = "Sports information is temporarily unavailable.";
+      renderNews([]);
+    }
+  } finally {
+    refreshInFlight = false;
+  }
+}
+
 renderTabs();
 render();
-fetch("/data/sports.json", { cache: "no-store" })
-  .then((response) => {
-    if (!response.ok) throw new Error("HTTP " + response.status);
-    return response.json();
-  })
-  .then((payload) => {
-    data = payload && typeof payload === "object" ? payload : { sports: {} };
-    render();
-    renderNews(data.items);
-  })
-  .catch((error) => {
-    console.error("Sports data load failed:", error);
-    document.querySelector("#notice").textContent =
-      "Sports data is temporarily unavailable. Showing the category list and honest empty states.";
-    renderNews([]);
-  });
+refreshData();
+window.setInterval(refreshData, CACHE_REFRESH_MS);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) refreshData();
+});
 </script>
 </body></html>

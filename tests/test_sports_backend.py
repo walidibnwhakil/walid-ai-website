@@ -1,5 +1,4 @@
 import importlib.util
-import io
 import json
 import os
 import unittest
@@ -89,6 +88,35 @@ class SportsBackendTests(unittest.TestCase):
             result = fetch.scores(previous)
         self.assertEqual(result["cricket"]["coverage"], "stale")
         self.assertEqual(result["cricket"]["matches"][0]["id"], "known")
+
+    def test_recent_cache_expires_results_at_seventy_two_hours(self):
+        now = fetch.datetime(2026, 11, 15, 12, 0, tzinfo=fetch.timezone.utc)
+        rows = [
+            {"id": "old", "homeTeam": "A", "awayTeam": "B", "status": "finished",
+             "startTime": "2026-11-12T11:59:59Z"},
+            {"id": "fresh", "homeTeam": "C", "awayTeam": "D", "status": "finished",
+             "startTime": "2026-11-12T12:00:00Z"}
+        ]
+        kept = fetch.recent_cache_matches([], rows, now)
+        self.assertEqual([x["id"] for x in kept], ["fresh"])
+
+    def test_cached_live_is_not_kept_as_live_after_refresh(self):
+        now = fetch.datetime(2026, 11, 15, 12, 0, tzinfo=fetch.timezone.utc)
+        rows = [{"id": "live", "homeTeam": "A", "awayTeam": "B", "status": "live",
+                 "startTime": "2026-11-15T11:00:00Z"}]
+        kept = fetch.recent_cache_matches([], rows, now)
+        self.assertEqual(kept[0]["status"], "stale")
+
+    def test_expired_schedule_is_removed_and_future_schedule_is_kept(self):
+        now = fetch.datetime(2026, 11, 15, 12, 0, tzinfo=fetch.timezone.utc)
+        rows = [
+            {"id": "past", "homeTeam": "A", "awayTeam": "B", "status": "scheduled",
+             "startTime": "2026-11-15T11:00:00Z"},
+            {"id": "future", "homeTeam": "C", "awayTeam": "D", "status": "scheduled",
+             "startTime": "2026-11-15T13:00:00Z"}
+        ]
+        kept = fetch.recent_cache_matches([], rows, now)
+        self.assertEqual([x["id"] for x in kept], ["future"])
 
     def test_key_is_never_written_to_normalized_match_data(self):
         payload = {"status": "success", "data": [{

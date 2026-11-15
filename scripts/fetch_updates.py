@@ -194,77 +194,83 @@ def scores(previous):
         result[key]=old_sports.get(key) or {"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
     return result
 def read_cricketdata():
-    """Fetch and normalize the CricAPI score feed; never log or return the credential."""
+    """Combine scheduled match listings and score feed; never log the credential."""
     key=os.getenv("CRICKETDATA_API_KEY","").strip()
     if not key:
         print("Cricket feed unavailable: CRICKETDATA_API_KEY is missing from this workflow process.",file=sys.stderr)
         return [], "missing_key"
-    url="https://api.cricapi.com/v1/cricScore?"+urlencode({"apikey":key})
-    try:
-        with urlopen(Request(url,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as response:
-            payload=json.load(response)
-    except Exception as exc:
-        # HTTPError code is safe to report; exception strings may include request URLs.
-        code=getattr(exc,"code",None)
-        reason="http_"+str(code) if code else type(exc).__name__
-        print("Cricket feed request failed: "+reason,file=sys.stderr)
-        return [], reason
-    if not isinstance(payload,dict):
-        print("Cricket feed response invalid: expected object.",file=sys.stderr)
-        return [], "invalid_response"
-    if payload.get("status") != "success":
-        # API error text is provider-controlled; only report normalized status/code.
-        detail=(str(payload.get("status") or "")+" "+str(payload.get("message") or "")).lower()
-        if any(term in detail for term in ("quota","rate limit","limit exceeded","requests exhausted")):
-            reason="quota"
-        elif any(term in detail for term in ("unauthorized","invalid api key","api key invalid","authentication")):
-            reason="rejected_key"
-        elif any(term in detail for term in ("permission","plan does not","not allowed")):
-            reason="permission"
-        else:
-            reason="rejected"
-        print("Cricket feed rejected response: "+reason,file=sys.stderr)
-        return [], reason
-    rows=payload.get("data")
-    if not isinstance(rows,list):
-        print("Cricket feed response invalid: data is not a list.",file=sys.stderr)
-        return [], "invalid_data"
     out=[]
-    for e in rows:
-        if not isinstance(e,dict): continue
-        teams=e.get("teams") or []
-        start=iso(e.get("dateTimeGMT"))
-        if len(teams)<2 or not start: continue
-        scores=e.get("score") or []
-        innings=[]
-        for item in scores:
-            if not isinstance(item,dict): continue
-            innings.append({
-                "team":clean(str(item.get("inning") or "")),
-                "runs":item.get("r"), "wickets":item.get("w"), "overs":item.get("o")
+    errors=[]
+    for endpoint in ("matches","cricScore"):
+        url="https://api.cricapi.com/v1/"+endpoint+"?"+urlencode({"apikey":key,"offset":0})
+        try:
+            with urlopen(Request(url,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as response:
+                payload=json.load(response)
+        except Exception as exc:
+            code=getattr(exc,"code",None)
+            reason="http_"+str(code) if code else type(exc).__name__
+            print("Cricket "+endpoint+" request failed: "+reason,file=sys.stderr)
+            errors.append(reason)
+            continue
+        if not isinstance(payload,dict):
+            print("Cricket "+endpoint+" response invalid: expected object.",file=sys.stderr)
+            errors.append("invalid_response")
+            continue
+        if payload.get("status") != "success":
+            detail=(str(payload.get("status") or "")+" "+str(payload.get("message") or "")).lower()
+            if any(term in detail for term in ("quota","rate limit","limit exceeded","requests exhausted")):
+                reason="quota"
+            elif any(term in detail for term in ("unauthorized","invalid api key","api key invalid","authentication")):
+                reason="rejected_key"
+            elif any(term in detail for term in ("permission","plan does not","not allowed")):
+                reason="permission"
+            else:
+                reason="rejected"
+            print("Cricket "+endpoint+" rejected response: "+reason,file=sys.stderr)
+            errors.append(reason)
+            continue
+        rows=payload.get("data")
+        if not isinstance(rows,list):
+            print("Cricket "+endpoint+" response invalid: data is not a list.",file=sys.stderr)
+            errors.append("invalid_data")
+            continue
+        for e in rows:
+            if not isinstance(e,dict): continue
+            teams=e.get("teams") or []
+            start=iso(e.get("dateTimeGMT"))
+            if len(teams)<2 or not start: continue
+            raw_scores=e.get("score") or []
+            innings=[]
+            for item in raw_scores:
+                if not isinstance(item,dict): continue
+                innings.append({"team":clean(str(item.get("inning") or "")),
+                    "runs":item.get("r"),"wickets":item.get("w"),"overs":item.get("o")})
+            first=innings[0] if innings else {}
+            second=innings[1] if len(innings)>1 else {}
+            status_text=clean(str(e.get("status") or "")).lower()
+            ended=bool(e.get("matchEnded")) or any(x in status_text for x in ("match ended","completed","finished","won by","drawn","tied"))
+            live=bool(e.get("matchStarted")) and not ended
+            status="finished" if ended else "live" if live else "scheduled"
+            winner=None
+            if ended:
+                m=re.search(r"^(.+?)\\s+won by\\b",str(e.get("status") or ""),re.I)
+                winner=clean(m.group(1)) if m else None
+            out.append({
+                "id":str(e.get("id") or ""),
+                "homeTeam":clean(str(teams[0])),"awayTeam":clean(str(teams[1])),
+                "homeScore":first.get("runs"),"awayScore":second.get("runs"),
+                "innings":innings,"winner":winner,
+                "competition":clean(str(e.get("name") or e.get("series_id") or e.get("matchType") or "Cricket match")),
+                "matchType":clean(str(e.get("matchType") or "")),
+                "overs":first.get("overs"),"startTime":start,
+                "finishedAt":iso(e.get("matchEndedAt") or e.get("endTime")) if ended else None,
+                "status":status,"source":"CricketData"
             })
-        first=innings[0] if innings else {}
-        second=innings[1] if len(innings)>1 else {}
-        status_text=clean(str(e.get("status") or "")).lower()
-        ended=bool(e.get("matchEnded")) or any(x in status_text for x in ("match ended","completed","finished","won by","drawn","tied"))
-        live=bool(e.get("matchStarted")) and not ended
-        status="finished" if ended else "live" if live else "scheduled"
-        winner=None
-        if ended:
-            m=re.search(r"^(.+?)\s+won by\b",str(e.get("status") or ""),re.I)
-            winner=clean(m.group(1)) if m else None
-        out.append({
-            "id":str(e.get("id") or ""),
-            "homeTeam":clean(str(teams[0])), "awayTeam":clean(str(teams[1])),
-            "homeScore":first.get("runs"), "awayScore":second.get("runs"),
-            "innings":innings, "winner":winner,
-            "competition":clean(str(e.get("name") or e.get("series_id") or e.get("matchType") or "Cricket match")),
-            "matchType":clean(str(e.get("matchType") or "")),
-            "overs":first.get("overs"), "startTime":start,
-            "finishedAt":iso(e.get("matchEndedAt") or e.get("endTime")) if ended else None,
-            "status":status, "source":"CricketData"
-        })
-    return out, ("empty" if not out else None)
+    normalized=dedupe_events(out)
+    if normalized: return normalized, None
+    reason=errors[0] if errors else "empty"
+    if not errors: print("Cricket feeds returned valid empty data.",file=sys.stderr)
+    return [], reason
 def build(kind):
     items=[]; sources=[]; errors=[]
     for name,url in FEEDS[kind]:

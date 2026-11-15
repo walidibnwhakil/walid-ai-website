@@ -1,6 +1,6 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-15T14:52:38.056379+00:00",
+  "updatedAt": "2026-11-15T15:07:46.296127+00:00",
   "status": "ok",
   "items": [
     {
@@ -393,7 +393,7 @@
       "coverage": "unavailable",
       "source": "",
       "matches": [],
-      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
+      "note": "No CricketData API key is configured; no verified cricket fixtures or scores are shown."
     },
     "tennis": {
       "label": "Tennis",

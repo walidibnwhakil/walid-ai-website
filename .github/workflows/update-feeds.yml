@@ -30,15 +30,17 @@ jobs:
           set -euo pipefail
           git config user.name "walid-ai-updates[bot]"
           git config user.email "walid-ai-updates[bot]@users.noreply.github.com"
-          git add data/news.json data/sports.json
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "chore: refresh news and sports feeds"
+          if git diff --quiet -- data/news.json data/sports.json; then exit 0; fi
+          tmp_dir="$(mktemp -d)"
+          cp data/news.json data/sports.json "$tmp_dir/"
           for attempt in 1 2 3; do
-            if git push origin HEAD:main; then exit 0; fi
             git fetch origin main
-            git reset --soft origin/main
+            git reset --hard origin/main
+            cp "$tmp_dir/news.json" "$tmp_dir/sports.json" data/
             git add data/news.json data/sports.json
-            git commit --reuse-message=HEAD
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "chore: refresh news and sports feeds"
+            if git push origin HEAD:main; then exit 0; fi
           done
           echo "Unable to push refreshed caches after 3 attempts without force-pushing." >&2
           exit 1

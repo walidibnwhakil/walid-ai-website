@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json,re,sys
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import urlparse
@@ -8,6 +8,7 @@ from urllib.request import Request,urlopen
 from xml.etree import ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"data"
 FEEDS={"news":[("The Daily Star","https://www.thedailystar.net/rss.xml"),("Prothom Alo English","https://en.prothomalo.com/feed/"),("BBC World","https://feeds.bbci.co.uk/news/world/rss.xml")],"sports":[("BBC Sport","https://feeds.bbci.co.uk/sport/rss.xml"),("The Guardian Football","https://www.theguardian.com/football/rss")]}
+SPORTS={"football":("Football","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4328","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4328"),"basketball":("Basketball","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4387","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4387"),"hockey":("Hockey","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4380","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4380")}
 def clean(v): return re.sub(r"\s+"," ",re.sub(r"<[^>]+>","",v or "")).strip()
 def dt(v):
  try:return parsedate_to_datetime(v).astimezone(timezone.utc).isoformat()
@@ -23,32 +24,40 @@ def read_feed(name,url,kind):
  with urlopen(req,timeout=20) as r: root=ET.fromstring(r.read())
  out=[]
  for n in root.findall(".//item")[:12]:
-  title,link=clean(n.findtext("title")),clean(n.findtext("link")); img=""
-  for child in list(n):
-   if child.tag.split("}")[-1] in ("content","thumbnail") and child.attrib.get("url"): img=child.attrib["url"]; break
-  if title and re.match(r"^https?://",link): out.append({"title":title,"url":link,"source":name,"publishedAt":dt(n.findtext("pubDate")),"category":category(title,kind),**({"imageUrl":img} if re.match(r"^https?://",img) else {})})
- if not out:
-  for n in root.findall(".//{*}entry")[:12]:
-   l=n.find("{*}link"); link=l.get("href","") if l is not None else ""; title=clean(n.findtext("{*}title"))
-   if title and re.match(r"^https?://",link): out.append({"title":title,"url":link,"source":name,"publishedAt":dt(n.findtext("{*}updated")),"category":category(title,kind)})
+  title,link=clean(n.findtext("title")),clean(n.findtext("link"))
+  if title and re.match(r"^https?://",link): out.append({"title":title,"url":link,"source":name,"publishedAt":dt(n.findtext("pubDate")),"category":category(title,kind)})
  return out
 def old(kind):
  try:return json.loads((DATA/(kind+".json")).read_text())
  except:return {"items":[]}
+def read_events(url,status):
+ try:
+  with urlopen(Request(url,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
+ except Exception:return []
+ out=[]
+ for e in (payload.get("events") or [])[:20]:
+  if not e.get("strHomeTeam") or not e.get("strAwayTeam") or not e.get("dateEvent"): continue
+  start=e.get("strTimestamp") or e.get("dateEvent")+"T"+(e.get("strTime") or "00:00:00")+"Z"
+  out.append({"homeTeam":e["strHomeTeam"],"awayTeam":e["strAwayTeam"],"homeScore":e.get("intHomeScore"),"awayScore":e.get("intAwayScore"),"competition":e.get("strLeague") or "League match","startTime":start+"Z" if not start.endswith("Z") else start,"status":status,"source":"TheSportsDB"})
+ return out
+def scores():
+ result={}
+ for key,(name,next_url,past_url) in SPORTS.items():
+  events=read_events(next_url,"scheduled")+read_events(past_url,"finished")
+  result[key]={"label":name,"coverage":"available" if events else "unavailable","source":"TheSportsDB" if events else "","matches":events,"note":"Verified fixtures/results from TheSportsDB." if events else "TheSportsDB returned no verified events for this sport during the refresh."}
+ for key in ("cricket","tennis","volleyball","badminton"):
+  result[key]={"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No free, stable provider is configured for this sport yet; no matches or scores are shown."}
+ return result
 def build(kind):
  items=[]; sources=[]; errors=[]
  for name,url in FEEDS[kind]:
-  try:
-   got=read_feed(name,url,kind); items+=got; sources.append({"name":name,"url":url,"host":urlparse(url).netloc,"ok":bool(got)})
+  try: got=read_feed(name,url,kind); items+=got; sources.append({"name":name,"url":url,"host":urlparse(url).netloc,"ok":bool(got)})
   except Exception as e: sources.append({"name":name,"url":url,"host":urlparse(url).netloc,"ok":False}); errors.append(name+": "+type(e).__name__)
  seen=set(); unique=[]
  for x in sorted(items,key=lambda z:z.get("publishedAt") or "",reverse=True):
   if x["url"] not in seen: seen.add(x["url"]); unique.append(x)
  previous=old(kind); final=unique[:24] or previous.get("items",[])[:24]
  payload={"kind":kind,"updatedAt":datetime.now(timezone.utc).isoformat(),"status":"ok" if unique else ("stale" if final else "error"),"items":final,"sources":sources,"errors":errors}
- if kind=="sports": payload.update({"scoreSupport":"unavailable","scoreNote":"No live-score API is configured; fixtures and results are intentionally unavailable rather than fabricated.","matches":[]})
- DATA.mkdir(exist_ok=True); (DATA/(kind+".json")).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
- return bool(unique)
-if __name__=="__main__":
- ok=build("news"); ok=build("sports") or ok; sys.exit(0 if ok else 1)
-
+ if kind=="sports": payload.update({"scoreSupport":"partial","scoreNote":"Only sports with verified provider responses are shown.","sports":scores()})
+ DATA.mkdir(exist_ok=True); (DATA/(kind+".json")).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n"); return bool(unique)
+if __name__=="__main__": sys.exit(0 if build("news") or build("sports") else 1)

@@ -1,6 +1,6 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-15T14:37:19.278553+00:00",
+  "updatedAt": "2026-11-15T14:49:38.510023+00:00",
   "status": "ok",
   "items": [
     {
@@ -25,7 +25,7 @@
       "category": "Sports"
     },
     {
-      "title": "McIlroy targets 10 after equalling Montgomerie",
+      "title": "McIlroy targets 10 titles after equalling Montgomerie's European record",
       "url": "https://www.bbc.co.uk/sport/golf/articles/c6kg7rwmz1g8o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-15T12:14:04+00:00",
@@ -193,30 +193,8 @@
     "football": {
       "label": "Football",
       "coverage": "available",
-      "source": "TheSportsDB",
+      "source": "OpenLigaDB",
       "matches": [
-        {
-          "homeTeam": "SV 07 Elversberg",
-          "awayTeam": "SC Freiburg",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "FC Augsburg",
-          "awayTeam": "1. FSV Mainz 05",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-22T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
         {
           "homeTeam": "FC Bayern München",
           "awayTeam": "1. FC Köln",
@@ -273,6 +251,17 @@
           "source": "OpenLigaDB"
         },
         {
+          "homeTeam": "SV 07 Elversberg",
+          "awayTeam": "SC Freiburg",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-21T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
           "homeTeam": "FC Schalke 04",
           "awayTeam": "VfB Stuttgart",
           "homeScore": null,
@@ -280,6 +269,17 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T17:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "FC Augsburg",
+          "awayTeam": "1. FSV Mainz 05",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-22T14:30:00Z",
           "status": "scheduled",
           "source": "OpenLigaDB"
         },
@@ -293,23 +293,100 @@
           "startTime": "2026-11-22T16:30:00Z",
           "status": "scheduled",
           "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "SV Werder Bremen",
+          "awayTeam": "Borussia Mönchengladbach",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-27T19:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "1. FSV Mainz 05",
+          "awayTeam": "1. FC Union Berlin",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-28T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "Hamburger SV",
+          "awayTeam": "FC Bayern München",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-28T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "1. FC Köln",
+          "awayTeam": "SV 07 Elversberg",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-28T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "SC Paderborn 07",
+          "awayTeam": "FC Schalke 04",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-28T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "VfB Stuttgart",
+          "awayTeam": "Eintracht Frankfurt",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-28T17:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "SC Freiburg",
+          "awayTeam": "RB Leipzig",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-29T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
         }
       ],
-      "note": "Verified fixtures/results from TheSportsDB."
+      "note": "Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."
     },
     "basketball": {
       "label": "Basketball",
       "coverage": "unavailable",
       "source": "",
       "matches": [],
-      "note": "TheSportsDB returned no verified events during the refresh; no matches or scores are shown."
+      "note": "No verified events were returned by the configured free providers; no matches or scores are shown."
     },
     "hockey": {
       "label": "Hockey",
       "coverage": "unavailable",
       "source": "",
       "matches": [],
-      "note": "TheSportsDB returned no verified events during the refresh; no matches or scores are shown."
+      "note": "No verified events were returned by the configured free providers; no matches or scores are shown."
     },
     "cricket": {
       "label": "Cricket",

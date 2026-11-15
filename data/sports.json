@@ -193,7 +193,6 @@
     "football": {
       "label": "Football",
       "coverage": "available",
-      "source": "OpenLigaDB",
       "matches": [
         {
           "homeTeam": "FC Bayern München",
@@ -203,8 +202,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-20T19:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "Bayer 04 Leverkusen",
@@ -214,8 +212,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "Eintracht Frankfurt",
@@ -225,8 +222,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "1. FC Union Berlin",
@@ -236,8 +232,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "Borussia Mönchengladbach",
@@ -247,8 +242,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "SV 07 Elversberg",
@@ -258,8 +252,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "FC Schalke 04",
@@ -269,8 +262,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T17:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "FC Augsburg",
@@ -280,8 +272,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-22T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "SV Werder Bremen",
@@ -291,8 +282,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-22T16:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "SV Werder Bremen",
@@ -302,8 +292,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-27T19:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "1. FSV Mainz 05",
@@ -313,8 +302,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "Hamburger SV",
@@ -324,8 +312,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "1. FC Köln",
@@ -335,8 +322,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "SC Paderborn 07",
@@ -346,8 +332,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "VfB Stuttgart",
@@ -357,8 +342,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-28T17:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         },
         {
           "homeTeam": "SC Freiburg",
@@ -368,8 +352,7 @@
           "winner": null,
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-29T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
+          "status": "scheduled"
         }
       ],
       "note": "Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."
@@ -377,42 +360,36 @@
     "basketball": {
       "label": "Basketball",
       "coverage": "unavailable",
-      "source": "",
       "matches": [],
       "note": "No verified events were returned by the configured free providers; no matches or scores are shown."
     },
     "hockey": {
       "label": "Hockey",
       "coverage": "unavailable",
-      "source": "",
       "matches": [],
       "note": "No verified events were returned by the configured free providers; no matches or scores are shown."
     },
     "cricket": {
       "label": "Cricket",
       "coverage": "unavailable",
-      "source": "",
       "matches": [],
       "note": "No CricketData API key is configured; no verified cricket fixtures or scores are shown."
     },
     "tennis": {
       "label": "Tennis",
       "coverage": "unavailable",
-      "source": "",
       "matches": [],
       "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
     },
     "volleyball": {
       "label": "Volleyball",
       "coverage": "unavailable",
-      "source": "",
       "matches": [],
       "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
     },
     "badminton": {
       "label": "Badminton",
       "coverage": "unavailable",
-      "source": "",
       "matches": [],
       "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
     }

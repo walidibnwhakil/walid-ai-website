@@ -57,10 +57,29 @@ def read_events(url,status):
             except (TypeError,ValueError): pass
         out.append({"homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "League match","startTime":start,"status":status,"source":"TheSportsDB"})
     return out
+def read_openliga():
+    try:
+        with urlopen(Request("https://api.openligadb.de/getmatchdata/bl1",headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
+    except Exception:return []
+    out=[]
+    for e in payload[:40]:
+        home,away=clean((e.get("team1") or {}).get("teamName")),clean((e.get("team2") or {}).get("teamName"))
+        start=iso(e.get("matchDateTimeUTC")) or iso(e.get("matchDateTime"))
+        if not home or not away or not start: continue
+        results=e.get("matchResults") or []
+        latest=results[-1] if results else {}
+        hs,as_=latest.get("pointsTeam1"),latest.get("pointsTeam2")
+        finished=bool(e.get("matchIsFinished"))
+        winner=None
+        if finished and hs is not None and as_ is not None:
+            winner=home if hs>as_ else away if as_>hs else "Draw"
+        out.append({"homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"status":"finished" if finished else "scheduled","source":"OpenLigaDB"})
+    return out
 def scores(previous):
     result={}
     for key,(name,next_url,past_url) in SPORTS.items():
         events=read_events(next_url,"scheduled")+read_events(past_url,"finished")
+        if key=="football" and not events: events=read_openliga()
         old_sport=(previous.get("sports") or {}).get(key,{})
         if events:
             result[key]={"label":name,"coverage":"available","source":"TheSportsDB","matches":events,"note":"Verified fixtures/results from TheSportsDB."}

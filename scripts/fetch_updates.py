@@ -45,18 +45,27 @@ def old(kind):
 def read_events(url,status):
     try:
         with urlopen(Request(url,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
-    except Exception:return []
+    except Exception as exc:
+        code=getattr(exc,"code",None)
+        print("Match feed request failed: "+("http_"+str(code) if code else type(exc).__name__),file=sys.stderr)
+        return []
     out=[]
     for e in (payload.get("events") or []):
         home,away,day=clean(e.get("strHomeTeam")),clean(e.get("strAwayTeam")),e.get("dateEvent")
-        start=iso(e.get("strTimestamp")) or iso((day or "")+"T"+(e.get("strTime") or "00:00:00")+"Z")
+        start=iso(e.get("strTimestamp")) or iso((day or "")+"T"+(e.get("strTime") or "")+"Z")
         if not home or not away or not start: continue
         hs,as_=e.get("intHomeScore"),e.get("intAwayScore")
+        provider_status=clean(str(e.get("strStatus") or e.get("strProgress") or "")).lower()
+        if any(word in provider_status for word in ("postponed","suspended")): actual="postponed"
+        elif any(word in provider_status for word in ("cancelled","canceled","abandoned")): actual="cancelled"
+        elif any(word in provider_status for word in ("finished","complete","full time","ft")): actual="finished"
+        elif any(word in provider_status for word in ("in progress","live","half time","1st half","2nd half")): actual="live"
+        else: actual=status
         winner=None
-        if status=="finished" and hs is not None and as_ is not None:
+        if actual=="finished" and hs is not None and as_ is not None:
             try: winner=home if int(hs)>int(as_) else away if int(as_)>int(hs) else "Draw"
             except (TypeError,ValueError): pass
-        out.append({"id":str(e.get("idEvent") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "League match","startTime":start,"status":status,"source":"TheSportsDB"})
+        out.append({"id":str(e.get("idEvent") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "League match","startTime":start,"status":actual,"source":"TheSportsDB"})
     return out
 def read_global_soccer_recent():
     out=[]

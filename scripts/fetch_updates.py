@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-import json,re,sys
+import json,re,sys,os
 from datetime import datetime,timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse,urlencode
 from urllib.request import Request,urlopen
 from xml.etree import ElementTree as ET
 
@@ -127,9 +127,31 @@ def scores(previous):
             result[key]={**old_sport,"coverage":"stale","note":"Provider did not return a fresh response; showing the last verified cache."}
         else:
             result[key]={"label":name,"coverage":"unavailable","source":"","matches":[],"note":"No verified events were returned by the configured free providers; no matches or scores are shown."}
-    for key in ("cricket","tennis","volleyball","badminton"):
+    cricket=read_cricketdata()
+    result["cricket"]={"label":"Cricket","coverage":"available" if cricket else "unavailable","source":"CricketData" if cricket else "","matches":cricket,"note":"Verified fixtures/results from CricketData." if cricket else "No CricketData API key is configured; no verified cricket fixtures or scores are shown."}
+    for key in ("tennis","volleyball","badminton"):
         result[key]={"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No free, stable provider is configured for this sport yet; no matches or scores are shown."}
     return result
+def read_cricketdata():
+    key=os.getenv("CRICKETDATA_API_KEY","").strip()
+    if not key: return []
+    # CricAPI/CricketData documents cricScore with the API key as a query parameter.
+    url="https://api.cricapi.com/v1/cricScore?"+urlencode({"apikey":key})
+    try:
+        with urlopen(Request(url,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
+    except Exception: return []
+    if payload.get("status")!="success" or not isinstance(payload.get("data"),list): return []
+    out=[]
+    for e in payload["data"]:
+        teams=e.get("teams") or []
+        start=e.get("dateTimeGMT")
+        if len(teams)<2 or not start: continue
+        score=e.get("score") or []
+        hs=score[0].get("r") if len(score)>0 and isinstance(score[0],dict) else None
+        aws=score[1].get("r") if len(score)>1 and isinstance(score[1],dict) else None
+        ended=bool(e.get("matchEnded")) or str(e.get("status","")).lower() in ("match ended","completed","finished")
+        out.append({"homeTeam":clean(teams[0]),"awayTeam":clean(teams[1]),"homeScore":hs,"awayScore":aws,"winner":None,"competition":clean(e.get("name")) or clean(e.get("matchType")) or "Cricket match","startTime":start,"status":"finished" if ended else "scheduled","source":"CricketData"})
+    return out[:40]
 def build(kind):
     items=[]; sources=[]; errors=[]
     for name,url in FEEDS[kind]:

@@ -209,11 +209,13 @@ fs.mkdirSync(output, { recursive: true });
         const center = new DOMPoint(32, (1.75 + 80) / 2).matrixTransform(matrix);
         const left = new DOMPoint(3.75, 1.75).matrixTransform(matrix);
         const right = new DOMPoint(60.25, 80).matrixTransform(matrix);
-        const tile = svg.closest(".yard").getBoundingClientRect();
+        const yard = svg.closest(".yard");
+        const tile = (matchMedia("(max-width:620px)").matches?document.querySelector(`.base-${yard.dataset.ludoSeat}`):yard).getBoundingClientRect();
+        const slot = yard.getBoundingClientRect();
         return {
           height: right.y - left.y,
-          centered: Math.abs(center.x - tile.x - tile.width / 2) < .75 &&
-            Math.abs(center.y - tile.y - tile.height / 2) < .75,
+          centered: Math.abs(center.x - slot.x - slot.width / 2) < .75 &&
+            Math.abs(center.y - slot.y - slot.height / 2) < .75,
           contained: left.x >= tile.left - .1 && right.x <= tile.right + .1 &&
             left.y >= tile.top - .1 && right.y <= tile.bottom + .1,
         };

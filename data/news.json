@@ -1,34 +1,198 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-15T00:00:00Z",
+  "updatedAt": "2026-11-15T14:33:21.612353+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Weekend: Ukraine-Russia talks",
-      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_americas/week/2026-11-08",
-      "source": "BBC World Service",
-      "publishedAt": "2026-11-13T21:06:00Z"
+      "title": "Iran targets US military base in Bahrain with drone attack",
+      "url": "https://www.bbc.co.uk/news/articles/cqn4e2py48kwo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T13:42:58+00:00",
+      "category": "Technology"
     },
     {
-      "title": "Weekend: Spain declares first general strike in 14 years",
-      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_americas/week/2026-11-08",
-      "source": "BBC World Service",
-      "publishedAt": "2026-11-13T21:06:00Z"
+      "title": "South Korea's top scorer in tax accountancy exam admits cheating",
+      "url": "https://www.bbc.co.uk/news/articles/ckvg2ezvpe08o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T13:37:45+00:00",
+      "category": "World"
     },
     {
-      "title": "Heavy rain in Gaza floods tens of thousands of tents",
-      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_south_asia/week/2026-11-08",
-      "source": "BBC World Service",
-      "publishedAt": "2026-11-13T21:06:00Z"
+      "title": "SP on remand for message ‘Bangladesh will return to its previous state in December’",
+      "url": "https://en.prothomalo.com/video/f12o6r5glu",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T13:33:04+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Attempt made to harass Nahid Islam at Cambridge University campus",
+      "url": "https://en.prothomalo.com/bangladesh/politics/m6fodvrwnf",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T13:30:09+00:00",
+      "category": "World"
+    },
+    {
+      "title": "TOP SHOTS (15 November 2026)",
+      "url": "https://en.prothomalo.com/photo/m5kjlaiibp",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T13:16:10+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Climate adaptation funding shortfall puts Bangladesh under pressure",
+      "url": "https://en.prothomalo.com/environment/climate-change/sgrpegoon5",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T13:13:07+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Banned AL men stage armed rally in Gopalganj, vandalise structures",
+      "url": "https://en.prothomalo.com/video/xqrg8t67eu",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T12:22:35+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Depression over Bay may intensify into cyclone",
+      "url": "https://en.prothomalo.com/video/743vo0j0ua",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T12:20:27+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Gopalganj DC, SP removed from their posts",
+      "url": "https://en.prothomalo.com/bangladesh/8sq7jqkvhs",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T11:56:58+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Runa Khan accepts the 2026 Ramon Magsaysay Award in Manila",
+      "url": "https://en.prothomalo.com/bangladesh/mi9jruen9q",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T11:37:33+00:00",
+      "category": "World"
+    },
+    {
+      "title": "5 strategies that enable India to achieve remarkable success in reducing poverty",
+      "url": "https://en.prothomalo.com/opinion/op-ed/1pdid98eed",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T11:24:13+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "294 murders a month on average as 2,938 murder cases filed in 10 months",
+      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/qegp0kut41",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T11:19:05+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Three men sentenced to death in Jordan over fatal church mass shooting",
+      "url": "https://www.bbc.co.uk/news/articles/c3rrg9xgqlwpo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T11:06:32+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Bangladesh recover from early blows as Tanzid hits fifty before lunch",
+      "url": "https://en.prothomalo.com/sports/cricket/97eo1lsh3o",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T10:55:32+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Banned Awami League activists stage armed rally, vandalise property in Gopalganj",
+      "url": "https://en.prothomalo.com/bangladesh/local-news/ae51ukice3",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T10:21:37+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Pope Leo speaks of community 'suffering' on visit to remote Andes town",
+      "url": "https://www.bbc.co.uk/news/articles/cr4gnz0lv2vlo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T09:57:25+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Fifth Canadian soldier dies from injuries caused by large fire at military base",
+      "url": "https://www.bbc.co.uk/news/articles/cmrlgn4x2xw8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T09:26:37+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Israel kills Hamas commander in strike on Gaza camp, officials say",
+      "url": "https://www.bbc.co.uk/news/articles/cqrkg4r6mg7xo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T08:17:41+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Copper wire upgrade behind US flight suspension, transport secretary says",
+      "url": "https://www.bbc.co.uk/news/articles/c6wy9lynq4qno?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T07:10:31+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Judge temporarily blocks Trump from closing Washington DC golf course for renovation",
+      "url": "https://www.bbc.co.uk/news/articles/c6j9mn7l14y0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T03:21:04+00:00",
+      "category": "World"
+    },
+    {
+      "title": "US has floated Ukraine ceding Donbas for Nato membership, Zelensky says",
+      "url": "https://www.bbc.co.uk/news/articles/cwvg2l312ylqo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-14T22:37:25+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "New Orleans port files $1m lawsuit over 'miracle on the Mississippi' tanker collision",
+      "url": "https://www.bbc.co.uk/news/articles/cwe89y2r5j20o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-14T22:27:06+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Italy fines Meta €805m over accessing users' photos",
+      "url": "https://www.bbc.co.uk/news/articles/cwn83gxemk35o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-14T18:28:06+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Philippines wins first Eurovision Song Contest Asia",
+      "url": "https://www.bbc.co.uk/news/articles/cqrlgnx9dx6eo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-14T18:17:58+00:00",
+      "category": "World"
     }
   ],
   "sources": [
     {
-      "name": "BBC World Service",
+      "name": "The Daily Star",
+      "url": "https://www.thedailystar.net/rss.xml",
+      "host": "www.thedailystar.net",
+      "ok": false
+    },
+    {
+      "name": "Prothom Alo English",
+      "url": "https://en.prothomalo.com/feed/",
+      "host": "en.prothomalo.com",
+      "ok": true
+    },
+    {
+      "name": "BBC World",
       "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
       "host": "feeds.bbci.co.uk",
       "ok": true
     }
   ],
-  "errors": []
+  "errors": [
+    "The Daily Star: ParseError"
+  ]
 }

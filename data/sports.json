@@ -1,19 +1,175 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-15T00:00:00Z",
+  "updatedAt": "2026-11-15T14:33:21.884996+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Sport Today — latest international sports coverage",
-      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_south_asia/week/2026-11-08",
+      "title": "Branthwaite, Garner and King omitted for Spain game",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cq4gn7014x76o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-13T19:32:00Z"
+      "publishedAt": "2026-11-15T13:15:15+00:00",
+      "category": "Sports"
     },
     {
-      "title": "Sportsworld — live sporting action from around the world",
-      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_south_asia/week/2026-11-01",
+      "title": "Four in a row - Australia win women's rugby league World Cup again",
+      "url": "https://www.bbc.co.uk/sport/rugby-league/videos/c6kgrvpnmdgdo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-08T15:06:00Z"
+      "publishedAt": "2026-11-15T13:02:52+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Dominant Australia defeat New Zealand in Men's World Cup final",
+      "url": "https://www.bbc.co.uk/sport/rugby-league/articles/cm9q8l51pgeqo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T12:24:20+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "McIlroy wins record-equalling eighth European title",
+      "url": "https://www.bbc.co.uk/sport/golf/articles/c6kg7rwmz1g8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T12:14:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Record-breaking Andy Robertson is Scotland’s finest captain",
+      "url": "https://www.theguardian.com/football/2026/nov/15/record-breaking-andy-robertson-is-scotlands-finest-captain",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-15T12:00:16+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Banton pushes case and bowlers sparkle for inconsistent England",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c8n50wgr6vd4o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T11:56:19+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Australia's Sayers 'took sandpaper from field' & rejects Cummins' claims",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c9ly4jm8djy7o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T09:33:33+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Ruthless Australia win record fourth Women's World Cup",
+      "url": "https://www.bbc.co.uk/sport/rugby-league/articles/c50mdzx3j039o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T09:12:00+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Reality dawns after Wales dared to dream",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cvx2xnyxl85ko?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T08:58:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England are favourites against All Blacks, and fearless Wales are an inspiration",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6wy41738nv7o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T08:47:46+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Terry Butcher: ‘I’ve learned to live with the Hand of God goal better’",
+      "url": "https://www.theguardian.com/football/2026/nov/15/terry-butcher-ive-learned-to-live-with-the-hand-of-god-goal-better",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-15T08:00:09+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "AFC Wimbledon, a failed £87m investment bid and the challenge for fan ownership",
+      "url": "https://www.theguardian.com/football/2026/nov/15/afc-wimbledon-a-failed-87m-investment-bid-and-the-challenge-for-fan-ownership",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-15T08:00:09+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "How Spain's humble superstar Simon became world's best keeper",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqvg23nv0jw2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-15T07:29:30+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Nations League roundup: Portugal mauled by Denmark as Norway sink Wales",
+      "url": "https://www.theguardian.com/football/2026/nov/14/clinical-norway-dent-wales-nations-league-top-tier-hopes-with-victory-in-oslo",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T22:23:39+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Declan Rice accepts he had an ‘average World Cup’ as England gear up for Spain showdown",
+      "url": "https://www.theguardian.com/football/2026/nov/14/declan-rice-england-spain-nations-league-world-cup-thomas-tuchel",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T20:30:00+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "De la Fuente adamant there is no racism in Spain despite England reminder to players",
+      "url": "https://www.theguardian.com/football/2026/nov/14/luis-de-la-fuente-spain-england-racism-thomas-tuchel-natiions-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T20:27:02+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Spain test will reveal if Tuchel and England have learned World Cup lessons",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cq2d9l3e313zo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-14T20:22:00+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Here Manchester United go again, taking the Two Ronnies route to hiring a new boss | Jonathan Wilson",
+      "url": "https://www.theguardian.com/football/2026/nov/14/here-manchester-united-go-again-taking-the-two-ronnies-route-to-hiring-a-new-boss",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T20:00:53+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Portugal immortalise Cristiano Ronaldo’s No 7 shirt in tribute to national legend",
+      "url": "https://www.theguardian.com/football/2026/nov/14/portugal-immortalise-cristiano-ronaldos-no-7-shirt-in-tribute-to-national-legend",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T19:13:43+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Highlights: Wales beat New Zealand for first time in 73 years",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/videos/ckdd10y25mm1o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-14T16:35:13+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Chelsea go top of WSL as Sandy Baltimore bullet sees off Manchester City",
+      "url": "https://www.theguardian.com/football/2026/nov/14/chelsea-manchester-city-womens-super-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T15:36:15+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Mauricio Pochettino asked the US to believe in his project. Did he believe in it himself?",
+      "url": "https://www.theguardian.com/football/2026/nov/14/mauricio-pochettino-usmnt-legacy-belief",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T14:06:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Raphinha sees red as Brazil stunned by Japan while Argentina’s post-Messi era starts with defeat",
+      "url": "https://www.theguardian.com/football/2026/nov/14/brazil-argentina-japan-uruguay-wales-norway-portugal-denmark",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T13:07:33+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "De la Fuente feels the strain as Lamine Yamal club v country debate rages in Spain",
+      "url": "https://www.theguardian.com/football/2026/nov/14/lamine-yamal-luis-de-la-fuente-spain-england-club-country",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-14T08:00:40+00:00",
+      "category": "Sports"
     }
   ],
   "sources": [
@@ -22,9 +178,66 @@
       "url": "https://feeds.bbci.co.uk/sport/rss.xml",
       "host": "feeds.bbci.co.uk",
       "ok": true
+    },
+    {
+      "name": "The Guardian Football",
+      "url": "https://www.theguardian.com/football/rss",
+      "host": "www.theguardian.com",
+      "ok": true
     }
   ],
   "errors": [],
-  "scoreSupport": "unavailable",
-  "scoreNote": "No live-score API is configured; these are verified sports headlines only, not live scores."
+  "scoreSupport": "partial",
+  "scoreNote": "Only sports with verified provider responses are shown.",
+  "sports": {
+    "football": {
+      "label": "Football",
+      "coverage": "unavailable",
+      "source": "",
+      "matches": [],
+      "note": "TheSportsDB returned no verified events during the refresh; no matches or scores are shown."
+    },
+    "basketball": {
+      "label": "Basketball",
+      "coverage": "unavailable",
+      "source": "",
+      "matches": [],
+      "note": "TheSportsDB returned no verified events during the refresh; no matches or scores are shown."
+    },
+    "hockey": {
+      "label": "Hockey",
+      "coverage": "unavailable",
+      "source": "",
+      "matches": [],
+      "note": "TheSportsDB returned no verified events during the refresh; no matches or scores are shown."
+    },
+    "cricket": {
+      "label": "Cricket",
+      "coverage": "unavailable",
+      "source": "",
+      "matches": [],
+      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
+    },
+    "tennis": {
+      "label": "Tennis",
+      "coverage": "unavailable",
+      "source": "",
+      "matches": [],
+      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
+    },
+    "volleyball": {
+      "label": "Volleyball",
+      "coverage": "unavailable",
+      "source": "",
+      "matches": [],
+      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
+    },
+    "badminton": {
+      "label": "Badminton",
+      "coverage": "unavailable",
+      "source": "",
+      "matches": [],
+      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
+    }
+  }
 }

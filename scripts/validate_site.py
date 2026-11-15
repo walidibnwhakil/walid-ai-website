@@ -2,10 +2,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 import re
 import sys
-
 ROOT = Path(__file__).resolve().parents[1]
 errors = []
-
 class Parser(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -14,7 +12,6 @@ class Parser(HTMLParser):
         attrs = dict(attrs)
         if tag == "a" and attrs.get("href"):
             self.links.append(attrs["href"])
-
 def check_html(path):
     parser = Parser()
     text = path.read_text(encoding="utf-8")
@@ -37,12 +34,10 @@ def check_html(path):
                     candidate /= "index.html"
                 if not candidate.exists():
                     errors.append(f"{path}: broken local link {href}")
-
 for path in ROOT.rglob("*.html"):
     if any(part in {".git", "node_modules"} for part in path.parts):
         continue
     check_html(path)
-
 def check_page(relative, required_links, required_markers=()):
     path = ROOT / relative
     if not path.exists():
@@ -55,27 +50,23 @@ def check_page(relative, required_links, required_markers=()):
     for marker in required_markers:
         if marker not in text:
             errors.append(f"{relative}: missing structure marker {marker}")
-
 check_page("games/index.html",
            ["/games/riddlex/", "/games/ludo/", "/games/chess/",
             "/games/tic-tac-toe/", "/games/snakes-and-ladders/", "/games/2048/"],
            ['class="games"', "game-title", "game-subtitle", 'name="description"', '"@type":"ItemList"'])
-
 check_page("tools/index.html",
            ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/"],
            ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'name="description"', '"@type":"ItemList"'])
-
 check_page("guides/image-tools.html",
            ["/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
-            "/tools/background-remover/", "/tools/crop-image/", "/tools/image-to-pdf/"],
+            "/tools/background-remover/", "/tools/signature-remover/", "/tools/watermark-remover/"],
            ['name="description"'])
-
-tools_text = (ROOT / "tools/index.html").read_text(encoding="utf-8")
+tools_parser = Parser()
+tools_parser.feed((ROOT / "tools/index.html").read_text(encoding="utf-8"))
 for image_link in ("/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
-                   "/tools/background-remover/", "/tools/crop-image/", "/tools/image-to-pdf/"):
-    if image_link in tools_text:
+                   "/tools/background-remover/", "/tools/signature-remover/", "/tools/watermark-remover/"):
+    if image_link in tools_parser.links:
         errors.append(f"tools/index.html: image tool leaked into PDF-only page: {image_link}")
-
 if errors:
     print("\n".join(f"ERROR: {item}" for item in errors))
     sys.exit(1)

@@ -1,6 +1,6 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-15T14:33:21.884996+00:00",
+  "updatedAt": "2026-11-15T14:37:19.278553+00:00",
   "status": "ok",
   "items": [
     {
@@ -25,7 +25,7 @@
       "category": "Sports"
     },
     {
-      "title": "McIlroy wins record-equalling eighth European title",
+      "title": "McIlroy targets 10 after equalling Montgomerie",
       "url": "https://www.bbc.co.uk/sport/golf/articles/c6kg7rwmz1g8o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-15T12:14:04+00:00",
@@ -192,10 +192,110 @@
   "sports": {
     "football": {
       "label": "Football",
-      "coverage": "unavailable",
-      "source": "",
-      "matches": [],
-      "note": "TheSportsDB returned no verified events during the refresh; no matches or scores are shown."
+      "coverage": "available",
+      "source": "TheSportsDB",
+      "matches": [
+        {
+          "homeTeam": "SV 07 Elversberg",
+          "awayTeam": "SC Freiburg",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-21T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "FC Augsburg",
+          "awayTeam": "1. FSV Mainz 05",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-22T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "FC Bayern München",
+          "awayTeam": "1. FC Köln",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-20T19:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "Bayer 04 Leverkusen",
+          "awayTeam": "SC Paderborn 07",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-21T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "Eintracht Frankfurt",
+          "awayTeam": "TSG Hoffenheim",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-21T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "1. FC Union Berlin",
+          "awayTeam": "RB Leipzig",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-21T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "Borussia Mönchengladbach",
+          "awayTeam": "Borussia Dortmund",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-21T14:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "FC Schalke 04",
+          "awayTeam": "VfB Stuttgart",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-21T17:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        },
+        {
+          "homeTeam": "SV Werder Bremen",
+          "awayTeam": "Hamburger SV",
+          "homeScore": null,
+          "awayScore": null,
+          "winner": null,
+          "competition": "1. Fußball-Bundesliga 2026/2027",
+          "startTime": "2026-11-22T16:30:00Z",
+          "status": "scheduled",
+          "source": "OpenLigaDB"
+        }
+      ],
+      "note": "Verified fixtures/results from TheSportsDB."
     },
     "basketball": {
       "label": "Basketball",

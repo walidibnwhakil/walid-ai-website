@@ -1,8 +1,36 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-15T14:33:21.612353+00:00",
+  "updatedAt": "2026-11-15T14:37:19.212058+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "New Orleans port files $1m lawsuit over 'miracle on the Mississippi' tanker collision",
+      "url": "https://www.bbc.co.uk/news/articles/cwe89y2r5j20o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T14:33:59+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Taliban authorities ban cricket on Kandahar radio",
+      "url": "https://en.prothomalo.com/sports/cricket/7ocruc85j0",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T14:29:26+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Govt monitoring Gopalganj situation, considering action based on developments",
+      "url": "https://en.prothomalo.com/bangladesh/politics/j1ijrega42",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T14:19:35+00:00",
+      "category": "World"
+    },
+    {
+      "title": "HSC supplementary exam: Deadline for form submission extended",
+      "url": "https://en.prothomalo.com/youth/education/m7j1t01wr1",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-15T14:16:53+00:00",
+      "category": "World"
+    },
     {
       "title": "Iran targets US military base in Bahrain with drone attack",
       "url": "https://www.bbc.co.uk/news/articles/cqn4e2py48kwo?at_medium=RSS&at_campaign=rss",
@@ -81,31 +109,10 @@
       "category": "Bangladesh"
     },
     {
-      "title": "294 murders a month on average as 2,938 murder cases filed in 10 months",
-      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/qegp0kut41",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-15T11:19:05+00:00",
-      "category": "World"
-    },
-    {
       "title": "Three men sentenced to death in Jordan over fatal church mass shooting",
       "url": "https://www.bbc.co.uk/news/articles/c3rrg9xgqlwpo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-15T11:06:32+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Bangladesh recover from early blows as Tanzid hits fifty before lunch",
-      "url": "https://en.prothomalo.com/sports/cricket/97eo1lsh3o",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-15T10:55:32+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "Banned Awami League activists stage armed rally, vandalise property in Gopalganj",
-      "url": "https://en.prothomalo.com/bangladesh/local-news/ae51ukice3",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-15T10:21:37+00:00",
       "category": "World"
     },
     {
@@ -149,13 +156,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-14T22:37:25+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "New Orleans port files $1m lawsuit over 'miracle on the Mississippi' tanker collision",
-      "url": "https://www.bbc.co.uk/news/articles/cwe89y2r5j20o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-14T22:27:06+00:00",
-      "category": "World"
     },
     {
       "title": "Italy fines Meta €805m over accessing users' photos",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json,re,sys
+import json,re,sys,os
 from datetime import datetime,timezone,timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -8,6 +8,8 @@ from urllib.request import Request,urlopen
 from xml.etree import ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"data"
 FEEDS={"news":[("The Daily Star","https://www.thedailystar.net/rss.xml"),("Prothom Alo English","https://en.prothomalo.com/feed/"),("BBC World","https://feeds.bbci.co.uk/news/world/rss.xml")],"sports":[("BBC Sport","https://feeds.bbci.co.uk/sport/rss.xml"),("The Guardian Football","https://www.theguardian.com/football/rss")]}
+CRICKETDATA_BASE="https://api.cricketdata.org/v1"
+CRICKETDATA_KEY=os.getenv("CRICKETDATA_API_KEY","").strip()
 SPORTS={"football":("Football","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4328","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4328"),"basketball":("Basketball","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4387","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4387"),"hockey":("Hockey","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4380","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4380")}
 def clean(v): return re.sub(r"\s+"," ",re.sub(r"<[^>]+>","",v or "")).strip()
 def dt(v):
@@ -40,12 +42,34 @@ def read_events(url,status):
   start=e.get("strTimestamp") or e.get("dateEvent")+"T"+(e.get("strTime") or "00:00:00")+"Z"
   out.append({"homeTeam":e["strHomeTeam"],"awayTeam":e["strAwayTeam"],"homeScore":e.get("intHomeScore"),"awayScore":e.get("intAwayScore"),"competition":e.get("strLeague") or "League match","startTime":start+"Z" if not start.endswith("Z") else start,"status":status,"source":"TheSportsDB"})
  return out
+def read_cricketdata():
+ if not CRICKETDATA_KEY: return []
+ # CricketData requires a user-supplied API key; never fall back to scraping.
+ out=[]
+ for endpoint in ("currentMatches","cricScore"):
+  try:
+   req=Request(CRICKETDATA_BASE+"/"+endpoint,headers={"apikey":CRICKETDATA_KEY,"User-Agent":"WalidAI-MatchCache/1.0"})
+   with urlopen(req,timeout=20) as r: payload=json.load(r)
+  except Exception: continue
+  for e in (payload.get("data") or []):
+   teams=e.get("teams") or []
+   if len(teams)<2: continue
+   start=e.get("dateTimeGMT") or e.get("dateTime")
+   if not start: continue
+   score=e.get("score") or []
+   hs=score[0].get("r") if len(score)>0 and isinstance(score[0],dict) else None
+   aws=score[1].get("r") if len(score)>1 and isinstance(score[1],dict) else None
+   status="finished" if e.get("matchEnded") else "scheduled"
+   out.append({"homeTeam":teams[0],"awayTeam":teams[1],"homeScore":hs,"awayScore":aws,"competition":e.get("name") or e.get("matchType") or "Cricket match","startTime":start,"status":status,"source":"CricketData"})
+ return out[:40]
 def scores():
  result={}
  for key,(name,next_url,past_url) in SPORTS.items():
   events=read_events(next_url,"scheduled")+read_events(past_url,"finished")
   result[key]={"label":name,"coverage":"available" if events else "unavailable","source":"TheSportsDB" if events else "","matches":events,"note":"Verified fixtures/results from TheSportsDB." if events else "TheSportsDB returned no verified events for this sport during the refresh."}
- for key in ("cricket","tennis","volleyball","badminton"):
+ cricket=read_cricketdata()
+ result["cricket"]={"label":"Cricket","coverage":"available" if cricket else "unavailable","source":"CricketData" if cricket else "","matches":cricket,"note":"Verified cricket fixtures/results from CricketData." if cricket else "No CricketData API key is configured; no verified cricket fixtures or scores are shown."}
+ for key in ("tennis","volleyball","badminton"):
   result[key]={"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No free, stable provider is configured for this sport yet; no matches or scores are shown."}
  return result
 def build(kind):

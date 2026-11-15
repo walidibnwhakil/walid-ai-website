@@ -109,7 +109,7 @@ def read_openliga():
         winner=None
         if finished and hs is not None and as_ is not None:
             winner=home if hs>as_ else away if as_>hs else "Draw"
-        out.append({"homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"status":"finished" if finished else "scheduled","source":"OpenLigaDB"})
+        out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,"status":"finished" if finished else "scheduled","source":"OpenLigaDB"})
     return out
 def event_key(event):
     """Prefer stable source IDs; fall back to team/time identity for legacy records."""

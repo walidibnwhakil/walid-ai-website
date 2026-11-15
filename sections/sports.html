@@ -5,11 +5,117 @@
 </style></head>
 <body><main><header class="top"><a href="/"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><a class="back" href="/">← Main menu</a></header><section class="hero"><div class="eyebrow">Walid AI match center</div><h1>Follow the game.</h1><p>Choose a sport to see verified upcoming matches and recent results. Kickoff times are shown in Bangladesh time; unsupported coverage is labelled clearly.</p></section><nav id="sportsNav" class="sports-nav" aria-label="Sports"></nav><div class="notice" id="notice">Loading verified sports data…</div><section><h2 class="section-title">Upcoming Matches</h2><div id="upcoming" class="match-list"></div></section><section><h2 class="section-title">Recent Results</h2><div id="recent" class="match-list"></div></section><section class="news"><h2>Sports news</h2><div id="newsGrid" class="news-grid"></div></section><footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a> · <a href="/contact-us.html">Contact Us</a> · <a href="/privacy-policy.html">Privacy Policy</a> · <a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer></main>
 <script>
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",""":"&quot;","'":"&#39;"}[c]));
-const when=v=>v?new Date(v).toLocaleString("en-GB",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Dhaka"}):"Time unavailable";
-const sports=[["football","Football"],["cricket","Cricket"],["tennis","Tennis"],["volleyball","Volleyball"],["basketball","Basketball"],["badminton","Badminton"],["hockey","Hockey"]];
-let data={},selected="football";
-function card(m,result){const score=result&&m.homeScore!=null?esc(m.homeScore)+" – "+esc(m.awayScore):"vs";return "<article class='match'><div class='team'><strong>"+esc(m.homeTeam)+"</strong><span class='competition'>"+esc(m.competition||"Competition")+"</span></div><div class='score'>"+score+"<div class='kickoff'>"+esc(result?when(m.startTime):when(m.startTime))+"</div><div class='status'>"+esc(m.status||"Scheduled")+"</div></div><div class='team'><strong>"+esc(m.awayTeam)+"</strong><span class='source'>"+esc(m.source||"Verified source")+"</span></div></article>"}
-function render(){const s=data.sports?.[selected]||{coverage:"unavailable",matches:[],note:"No verified provider is configured for this sport yet."};document.querySelectorAll(".sport-tab").forEach(b=>b.classList.toggle("active",b.dataset.sport===selected));document.querySelector("#notice").textContent=s.coverage==="available"?"Verified data via "+(s.source||"the scheduled sports feed")+". Refreshed "+when(data.updatedAt)+".":s.note;const up=(s.matches||[]).filter(m=>m.status==="scheduled"),done=(s.matches||[]).filter(m=>m.status==="finished");document.querySelector("#upcoming").innerHTML=up.length?up.map(m=>card(m,false)).join(""):"<div class='empty'>No verified upcoming matches are available for "+esc(sports.find(x=>x[0]===selected)[1])+" right now.</div>";document.querySelector("#recent").innerHTML=done.length?done.map(m=>card(m,true)).join(""):"<div class='empty'>No verified results are available for this sport in the current cache.</div>"}
-fetch("/data/sports.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{data=d;document.querySelector("#sportsNav").innerHTML=sports.map(([id,name])=>"<button class='sport-tab' data-sport='"+id+"'>"+name+"</button>").join("");document.querySelectorAll(".sport-tab").forEach(b=>b.onclick=()=>{selected=b.dataset.sport;render()});render();document.querySelector("#newsGrid").innerHTML=(d.items||[]).slice(0,6).map(i=>"<article class='news-card'><div class='source'>"+esc(i.source)+" · "+when(i.publishedAt)+"</div><h3><a href='"+esc(i.url)+"' target='_blank' rel='noopener noreferrer'>"+esc(i.title)+" ↗</a></h3></article>").join("")||"<p class='empty'>No verified sports headlines are available right now.</p>"}).catch(()=>document.querySelector("#notice").textContent="Sports data is temporarily unavailable. Please try again later.");
-</script></body></html>
+const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+}[char]));
+
+const when = (value) => value
+  ? new Date(value).toLocaleString("en-GB", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "Asia/Dhaka"
+    })
+  : "Time unavailable";
+
+const sports = [
+  ["football", "Football"],
+  ["cricket", "Cricket"],
+  ["tennis", "Tennis"],
+  ["volleyball", "Volleyball"],
+  ["basketball", "Basketball"],
+  ["badminton", "Badminton"],
+  ["hockey", "Hockey"]
+];
+
+let data = { sports: {} };
+let selected = "football";
+
+function renderTabs() {
+  const nav = document.querySelector("#sportsNav");
+  nav.innerHTML = sports.map(([id, name]) =>
+    "<button class='sport-tab' type='button' data-sport='" + id + "'>" + name + "</button>"
+  ).join("");
+  nav.querySelectorAll(".sport-tab").forEach((button) => {
+    button.addEventListener("click", () => {
+      selected = button.dataset.sport;
+      render();
+    });
+  });
+}
+
+function card(match, result) {
+  const score = result && match.homeScore != null
+    ? esc(match.homeScore) + " – " + esc(match.awayScore)
+    : "vs";
+  return "<article class='match'><div class='team'><strong>" +
+    esc(match.homeTeam) + "</strong><span class='competition'>" +
+    esc(match.competition || "Competition") +
+    "</span></div><div class='score'>" + score +
+    "<div class='kickoff'>" + esc(when(match.startTime)) +
+    "</div><div class='status'>" + esc(match.status || "Scheduled") +
+    "</div></div><div class='team'><strong>" +
+    esc(match.awayTeam) + "</strong><span class='source'>" +
+    esc(match.source || "Verified source") + "</span></div></article>";
+}
+
+function render() {
+  const current = data.sports?.[selected] || {
+    coverage: "unavailable",
+    matches: [],
+    note: "No verified provider is configured for this sport yet."
+  };
+  const label = sports.find(([id]) => id === selected)?.[1] || selected;
+  document.querySelectorAll(".sport-tab").forEach((button) => {
+    button.classList.toggle("active", button.dataset.sport === selected);
+  });
+  document.querySelector("#notice").textContent = current.coverage === "available"
+    ? "Verified data via " + (current.source || "the scheduled sports feed") +
+      ". Refreshed " + when(data.updatedAt) + "."
+    : current.note || "Verified data is temporarily unavailable.";
+  const matches = Array.isArray(current.matches) ? current.matches : [];
+  const upcoming = matches.filter((match) => match.status === "scheduled");
+  const recent = matches.filter((match) => match.status === "finished");
+  document.querySelector("#upcoming").innerHTML = upcoming.length
+    ? upcoming.map((match) => card(match, false)).join("")
+    : "<div class='empty'>No verified upcoming matches are available for " +
+      esc(label) + " right now.</div>";
+  document.querySelector("#recent").innerHTML = recent.length
+    ? recent.map((match) => card(match, true)).join("")
+    : "<div class='empty'>No verified results are available for this sport in the current cache.</div>";
+}
+
+function renderNews(items) {
+  const safeItems = Array.isArray(items) ? items : [];
+  document.querySelector("#newsGrid").innerHTML = safeItems.slice(0, 6).map((item) =>
+    "<article class='news-card'><div class='source'>" +
+    esc(item.source) + " · " + when(item.publishedAt) +
+    "</div><h3><a href='" + esc(item.url) +
+    "' target='_blank' rel='noopener noreferrer'>" +
+    esc(item.title) + " ↗</a></h3></article>"
+  ).join("") || "<p class='empty'>No verified sports headlines are available right now.</p>";
+}
+
+renderTabs();
+render();
+fetch("/data/sports.json", { cache: "no-store" })
+  .then((response) => {
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    return response.json();
+  })
+  .then((payload) => {
+    data = payload && typeof payload === "object" ? payload : { sports: {} };
+    render();
+    renderNews(data.items);
+  })
+  .catch((error) => {
+    console.error("Sports data load failed:", error);
+    document.querySelector("#notice").textContent =
+      "Sports data is temporarily unavailable. Showing the category list and honest empty states.";
+    renderNews([]);
+  });
+</script>
+</body></html>

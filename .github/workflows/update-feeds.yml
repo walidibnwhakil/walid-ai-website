@@ -1,5 +1,11 @@
 name: Refresh News and Sports
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/fetch_updates.py"
+      - "tests/validate_updates.py"
+      - ".github/workflows/update-feeds.yml"
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch:

@@ -214,9 +214,17 @@ def read_cricketdata():
         return [], "invalid_response"
     if payload.get("status") != "success":
         # API error text is provider-controlled; only report normalized status/code.
-        code=clean(str(payload.get("status") or payload.get("message") or "unknown"))[:40]
-        print("Cricket feed rejected response: "+code,file=sys.stderr)
-        return [], "rejected"
+        detail=(str(payload.get("status") or "")+" "+str(payload.get("message") or "")).lower()
+        if any(term in detail for term in ("quota","rate limit","limit exceeded","requests exhausted")):
+            reason="quota"
+        elif any(term in detail for term in ("unauthorized","invalid api key","api key invalid","authentication")):
+            reason="rejected_key"
+        elif any(term in detail for term in ("permission","plan does not","not allowed")):
+            reason="permission"
+        else:
+            reason="rejected"
+        print("Cricket feed rejected response: "+reason,file=sys.stderr)
+        return [], reason
     rows=payload.get("data")
     if not isinstance(rows,list):
         print("Cricket feed response invalid: data is not a list.",file=sys.stderr)

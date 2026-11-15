@@ -79,7 +79,7 @@ class SportsBackendTests(unittest.TestCase):
     def test_failed_cricket_refresh_preserves_last_known_good_data(self):
         previous = {"sports": {"cricket": {
             "label": "Cricket", "coverage": "available",
-            "matches": [{"id": "known", "homeTeam": "A", "awayTeam": "B", "startTime": "2026-11-15T00:00:00Z"}]
+            "matches": [{"id": "known", "homeTeam": "A", "awayTeam": "B", "status": "finished", "startTime": "2026-11-15T00:00:00Z"}]
         }}}
         with patch.object(fetch, "read_events", return_value=[]), \
              patch.object(fetch, "read_global_soccer_recent", return_value=[]), \

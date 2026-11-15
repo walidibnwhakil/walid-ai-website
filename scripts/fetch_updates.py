@@ -74,7 +74,7 @@ def read_global_soccer_recent():
             hs,as_=e.get("intHomeScore"),e.get("intAwayScore")
             if hs is None or as_ is None: continue
             winner=home if str(hs).isdigit() and str(as_).isdigit() and int(hs)>int(as_) else away if str(hs).isdigit() and str(as_).isdigit() and int(as_)>int(hs) else "Draw"
-            out.append({"id":str(e.get("idEvent") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "Soccer","startTime":start,"finishedAt":iso(e.get("strTimestamp")),"status":"finished","source":"TheSportsDB"})
+            out.append({"id":str(e.get("idEvent") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "Soccer","startTime":start,"status":"finished","source":"TheSportsDB"})
     seen=set(); unique=[]
     for x in sorted(out,key=lambda m:m["startTime"],reverse=True):
         key=(x["homeTeam"],x["awayTeam"],x["startTime"])
@@ -94,7 +94,6 @@ def read_openliga():
         kickoff=datetime.fromisoformat(start.replace("Z","+00:00"))
         finished=bool(e.get("matchIsFinished"))
         if finished and (now-kickoff).total_seconds() > 72*3600: continue
-        if not finished and (kickoff-now).total_seconds() > 14*86400: continue
         results=e.get("matchResults") or []
         latest=results[-1] if results else {}
         hs,as_=latest.get("pointsTeam1"),latest.get("pointsTeam2")
@@ -205,7 +204,7 @@ def read_cricketdata():
         status="finished" if ended else "live" if live else "scheduled"
         winner=None
         if ended:
-            m=re.search(r"^(.+?)\\s+won by\\b",str(e.get("status") or ""),re.I)
+            m=re.search(r"^(.+?)\s+won by\b",str(e.get("status") or ""),re.I)
             winner=clean(m.group(1)) if m else None
         out.append({
             "id":str(e.get("id") or ""),
@@ -215,7 +214,7 @@ def read_cricketdata():
             "competition":clean(str(e.get("name") or e.get("series_id") or e.get("matchType") or "Cricket match")),
             "matchType":clean(str(e.get("matchType") or "")),
             "overs":first.get("overs"), "startTime":start,
-            "finishedAt":iso(e.get("dateTimeGMT")) if ended else None,
+            "finishedAt":iso(e.get("matchEndedAt") or e.get("endTime")) if ended else None,
             "status":status, "source":"CricketData"
         })
     return out, ("empty" if not out else None)

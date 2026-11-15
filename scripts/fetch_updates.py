@@ -9,6 +9,7 @@ from xml.etree import ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"data"
 FEEDS={"news":[("The Daily Star","https://www.thedailystar.net/rss.xml"),("Prothom Alo English","https://en.prothomalo.com/feed/"),("BBC World","https://feeds.bbci.co.uk/news/world/rss.xml")],"sports":[("BBC Sport","https://feeds.bbci.co.uk/sport/rss.xml"),("The Guardian Football","https://www.theguardian.com/football/rss")]}
+OPENLIGA_SEASON_URL="https://api.openligadb.de/getmatchdata/bl1/2026"
 SPORTS={"football":("Football","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4328","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4328"),"basketball":("Basketball","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4387","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4387"),"hockey":("Hockey","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4380","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4380")}
 
 def clean(v): return re.sub(r"\s+"," ",re.sub(r"<[^>]+>","",v or "")).strip()
@@ -59,17 +60,21 @@ def read_events(url,status):
     return out
 def read_openliga():
     try:
-        with urlopen(Request("https://api.openligadb.de/getmatchdata/bl1",headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
+        with urlopen(Request(OPENLIGA_SEASON_URL,headers={"User-Agent":"WalidAI-MatchCache/1.0"}),timeout=20) as r: payload=json.load(r)
     except Exception:return []
     out=[]
-    for e in payload[:40]:
+    now=datetime.now(timezone.utc)
+    for e in payload if isinstance(payload,list) else []:
         home,away=clean((e.get("team1") or {}).get("teamName")),clean((e.get("team2") or {}).get("teamName"))
         start=iso(e.get("matchDateTimeUTC")) or iso(e.get("matchDateTime"))
         if not home or not away or not start: continue
+        kickoff=datetime.fromisoformat(start.replace("Z","+00:00"))
+        finished=bool(e.get("matchIsFinished"))
+        if finished and (now-kickoff).total_seconds() > 48*3600: continue
+        if not finished and (kickoff-now).total_seconds() > 14*86400: continue
         results=e.get("matchResults") or []
         latest=results[-1] if results else {}
         hs,as_=latest.get("pointsTeam1"),latest.get("pointsTeam2")
-        finished=bool(e.get("matchIsFinished"))
         winner=None
         if finished and hs is not None and as_ is not None:
             winner=home if hs>as_ else away if as_>hs else "Draw"
@@ -79,14 +84,21 @@ def scores(previous):
     result={}
     for key,(name,next_url,past_url) in SPORTS.items():
         events=read_events(next_url,"scheduled")+read_events(past_url,"finished")
-        if key=="football" and not events: events=read_openliga()
+        providers=["TheSportsDB"] if events else []
+        if key=="football":
+            liga=read_openliga()
+            if liga:
+                providers.append("OpenLigaDB")
+                seen={(x["homeTeam"],x["awayTeam"],x["startTime"]) for x in events}
+                events += [x for x in liga if (x["homeTeam"],x["awayTeam"],x["startTime"]) not in seen]
+                events.sort(key=lambda x:x["startTime"])
         old_sport=(previous.get("sports") or {}).get(key,{})
         if events:
-            result[key]={"label":name,"coverage":"available","source":"TheSportsDB","matches":events,"note":"Verified fixtures/results from TheSportsDB."}
+            result[key]={"label":name,"coverage":"available","source":" + ".join(providers),"matches":events,"note":"Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."}
         elif old_sport.get("matches"):
             result[key]={**old_sport,"coverage":"stale","note":"Provider did not return a fresh response; showing the last verified cache."}
         else:
-            result[key]={"label":name,"coverage":"unavailable","source":"","matches":[],"note":"TheSportsDB returned no verified events during the refresh; no matches or scores are shown."}
+            result[key]={"label":name,"coverage":"unavailable","source":"","matches":[],"note":"No verified events were returned by the configured free providers; no matches or scores are shown."}
     for key in ("cricket","tennis","volleyball","badminton"):
         result[key]={"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No free, stable provider is configured for this sport yet; no matches or scores are shown."}
     return result

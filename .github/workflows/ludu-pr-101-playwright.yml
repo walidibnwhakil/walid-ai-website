@@ -38,6 +38,7 @@ jobs:
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/ludu-http.log 2>&1 &
           export CHROMIUM_PATH="$(node -p 'require("playwright").chromium.executablePath()')"
           node --test games/ludo-rules.test.mjs games/ludo/pawn-layout.test.mjs games/ludo/layout.test.cjs games/ludo/sound.test.cjs
+          node tests/ludo-home-pawns.cjs
           node tests/ludo-mobile-fit.cjs
           node tests/ludo-real-gameplay.cjs
           node tests/ludo-pr-101.spec.mjs
@@ -60,5 +61,6 @@ jobs:
             tests/fixtures/ludo-combined/
             tests/fixtures/ludo-readable-gameplay/
             tests/fixtures/ludo-mobile-fit/
+            tests/fixtures/ludo-home-pawns/
             /tmp/ludu-http.log
           if-no-files-found: warn

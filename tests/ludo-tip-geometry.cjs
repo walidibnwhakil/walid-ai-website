@@ -48,7 +48,7 @@ function verify(data,count) {
   const routeCells=data.filter(t=>t.region!=='yard');
   const singleScale=data[0].phone?Math.min(...routeCells.map(({tile})=>tile.width*.9/56.5)):Math.min(...routeCells.map(({tile})=>Math.min(tile.width/64,tile.height/77)));
   const homeCells=data.filter(t=>t.region==='yard');
-  const homeScale=Math.min(...homeCells.flatMap(({tile})=>[tile.width*.9/56.5,tile.height*.9/78.25]))*(data[0].phone?1.1:1);
+  const homeScale=data[0].phone?singleScale:Math.min(...homeCells.flatMap(({tile})=>[tile.width*.9/56.5,tile.height*.9/78.25]));
   for(const {tile,board,phone,pawns,region,base,seat} of data) {
     if(region==='yard') {
       assert.ok(pawns.length<=1,'one pawn per deliberate home slot');
@@ -58,7 +58,7 @@ function verify(data,count) {
     const pair=count===2 && !['yard','finish'].includes(region);
     for(const [i,p] of pawns.entries()) {
       const {tip,bounds:b}=p;
-      assert.ok(tip.x>=tile.left-eps && tip.x<=tile.right+eps && tip.y>=tile.top-eps && tip.y<=tile.bottom+eps,JSON.stringify({region,tile,tip}));
+      if(region!=='yard'||!phone)assert.ok(tip.x>=tile.left-eps && tip.x<=tile.right+eps && tip.y>=tile.top-eps && tip.y<=tile.bottom+eps,JSON.stringify({region,tile,tip}));
       if(count===1 && region!=='yard') assert.ok(b.left>=board.left-eps && b.right<=board.right+eps && b.top>=0,'readable single overhang remains visible');
       else assert.ok(b.left>=board.left-eps && b.right<=board.right+eps && b.top>=board.top-eps && b.bottom<=board.bottom+eps,'painted bounds inside board');
       if(pair) {
@@ -69,7 +69,7 @@ function verify(data,count) {
         assert.ok(Math.abs(p.pathTip.x-x)<eps && Math.abs(p.pathTip.y-cy)<eps,'approved two-pawn path anchor');
         heads.push(p.head);
       } else {
-        if(count!==1 || region==='yard') assert.ok(b.left>=tile.left-eps && b.right<=tile.right+eps && b.top>=tile.top-eps && b.bottom<=tile.bottom+eps,JSON.stringify({region,tile,b}));
+        if((count!==1 || region==='yard')&&!(phone&&region==='yard')) assert.ok(b.left>=tile.left-eps && b.right<=tile.right+eps && b.top>=tile.top-eps && b.bottom<=tile.bottom+eps,JSON.stringify({region,tile,b}));
         if(region==='yard') {
           assert.ok(b.left>=base.left-eps && b.right<=base.right+eps && b.top>=base.top-eps && b.bottom<=base.bottom+eps,'home artwork inside its color base');
           assert.ok(Math.abs(p.scale-homeScale)<.003,JSON.stringify({reason:'deliberate shared home-slot size',p,homeScale,tile,base}));

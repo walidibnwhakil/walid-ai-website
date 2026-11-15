@@ -1,1 +1,34 @@
-{"kind":"news","updatedAt":null,"status":"empty","items":[],"sources":[],"errors":[]}
+{
+  "kind": "news",
+  "updatedAt": "2026-11-15T00:00:00Z",
+  "status": "ok",
+  "items": [
+    {
+      "title": "Weekend: Ukraine-Russia talks",
+      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_americas/week/2026-11-08",
+      "source": "BBC World Service",
+      "publishedAt": "2026-11-13T21:06:00Z"
+    },
+    {
+      "title": "Weekend: Spain declares first general strike in 14 years",
+      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_americas/week/2026-11-08",
+      "source": "BBC World Service",
+      "publishedAt": "2026-11-13T21:06:00Z"
+    },
+    {
+      "title": "Heavy rain in Gaza floods tens of thousands of tents",
+      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_south_asia/week/2026-11-08",
+      "source": "BBC World Service",
+      "publishedAt": "2026-11-13T21:06:00Z"
+    }
+  ],
+  "sources": [
+    {
+      "name": "BBC World Service",
+      "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+      "host": "feeds.bbci.co.uk",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

@@ -118,18 +118,30 @@ def event_key(event):
         clean(event.get("homeTeam")), clean(event.get("awayTeam")), event.get("startTime")
     )
 
-def dedupe_events(events):
-    found={}
-    for event in events:
-        key=event_key(event)
-        if key not in found:
-            found[key]=event
-        else:
-            # Prefer records with scores and useful status/timestamp data.
-            old=found[key]
-            if (event.get("homeScore") is not None or event.get("awayScore") is not None) and old.get("homeScore") is None:
-                found[key]=event
-    return sorted(found.values(),key=lambda x:x.get("startTime") or "")
+def recent_cache_matches(events, cached, now=None):
+    now=now or datetime.now(timezone.utc)
+    cutoff=now.timestamp()-72*3600
+    keep=list(events)
+    for event in cached or []:
+        start=iso(event.get("startTime"))
+        if not start: continue
+        try: start_dt=datetime.fromisoformat(start.replace("Z","+00:00"))
+        except ValueError: continue
+        status=str(event.get("status") or "").lower()
+        if status=="finished":
+            finished=iso(event.get("finishedAt") or event.get("endTime"))
+            try: event_dt=datetime.fromisoformat((finished or start).replace("Z","+00:00"))
+            except ValueError: continue
+            if event_dt.timestamp()<cutoff or event_dt>now: continue
+        elif status=="live":
+            if start_dt>now or start_dt.timestamp()<cutoff: continue
+            # A cached live flag is not proof of current live status after refresh.
+            event={**event,"status":"stale"}
+        elif status in ("scheduled","upcoming"):
+            if start_dt<now: continue
+        else: continue
+        keep.append(event)
+    return dedupe_events(keep)
 
 def scores(previous):
     result={}
@@ -149,7 +161,7 @@ def scores(previous):
         if events:
             result[key]={"label":name,"coverage":"available","source":" + ".join(dict.fromkeys(providers)),"matches":events,"note":"Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."}
         elif old_sport.get("matches"):
-            result[key]={**old_sport,"coverage":"stale","note":"Match information could not be refreshed; showing previously verified information."}
+            result[key]={**old_sport,"coverage":"stale","matches":recent_cache_matches([],old_sport.get("matches",[])),"note":"Match information could not be refreshed; showing previously verified information."}
         else:
             result[key]={"label":name,"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
     cricket, cricket_error=read_cricketdata()
@@ -157,7 +169,7 @@ def scores(previous):
     if cricket:
         result["cricket"]={"label":"Cricket","coverage":"available","source":"","matches":dedupe_events(cricket),"note":"Verified cricket fixtures and scores."}
     elif old_cricket.get("matches"):
-        result["cricket"]={**old_cricket,"coverage":"stale","note":"Cricket information could not be refreshed; showing previously verified information."}
+        result["cricket"]={**old_cricket,"coverage":"stale","matches":recent_cache_matches([],old_cricket.get("matches",[])),"note":"Cricket information could not be refreshed; showing previously verified information."}
     else:
         result["cricket"]={"label":"Cricket","coverage":"unavailable","source":"","matches":[],"note":"No verified cricket information is available right now."}
     for key in ("tennis","volleyball","badminton"):

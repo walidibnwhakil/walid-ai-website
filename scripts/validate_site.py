@@ -23,20 +23,18 @@ def check_html(path):
         parser.close()
     except Exception as exc:
         errors.append(f"{path}: HTML parser error: {exc}")
-    if not re.search(r"<!doctype html>", text, re.I):
-        errors.append(f"{path}: missing doctype")
-    if not re.search(r"<html\b[^>]*\blang=", text, re.I):
-        errors.append(f"{path}: missing html lang attribute")
-    for required in ("<head", "<body", "<title"):
+    for required in ("<!doctype html>", "<html", "<head", "<body", "<title"):
         if required.lower() not in text.lower():
             errors.append(f"{path}: missing {required}")
+    if not re.search(r"<html\b[^>]*\blang=", text, re.I):
+        errors.append(f"{path}: missing html lang attribute")
     for href in parser.links:
         if href.startswith(("/", "./")):
             target = href.split("#", 1)[0].split("?", 1)[0]
             if target.endswith((".html", "/")):
                 candidate = ROOT / target.lstrip("/")
                 if target.endswith("/"):
-                    candidate = candidate / "index.html"
+                    candidate /= "index.html"
                 if not candidate.exists():
                     errors.append(f"{path}: broken local link {href}")
 
@@ -45,7 +43,7 @@ for path in ROOT.rglob("*.html"):
         continue
     check_html(path)
 
-def check_page(relative, required_links, required_markers):
+def check_page(relative, required_links, required_markers=()):
     path = ROOT / relative
     if not path.exists():
         errors.append(f"{relative}: page missing")
@@ -59,13 +57,26 @@ def check_page(relative, required_links, required_markers):
             errors.append(f"{relative}: missing structure marker {marker}")
 
 check_page("games/index.html",
-           ["/games/riddlex/", "/games/ludo/", "/games/chess/", "/games/tic-tac-toe/", "/games/snakes-and-ladders/", "/games/2048/"],
+           ["/games/riddlex/", "/games/ludo/", "/games/chess/",
+            "/games/tic-tac-toe/", "/games/snakes-and-ladders/", "/games/2048/"],
            ['class="games"', "game-title", "game-subtitle", 'name="description"', '"@type":"ItemList"'])
+
 check_page("tools/index.html",
-           ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/", "/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/", "/tools/background-remover/", "/zip.html#tool=create"],
-           ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'data-kind="image"', 'data-kind="archive"', 'name="description"', '"@type":"ItemList"'])
+           ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/"],
+           ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'name="description"', '"@type":"ItemList"'])
+
+check_page("guides/image-tools.html",
+           ["/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
+            "/tools/background-remover/", "/tools/crop-image/", "/tools/image-to-pdf/"],
+           ['name="description"'])
+
+tools_text = (ROOT / "tools/index.html").read_text(encoding="utf-8")
+for image_link in ("/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
+                   "/tools/background-remover/", "/tools/crop-image/", "/tools/image-to-pdf/"):
+    if image_link in tools_text:
+        errors.append(f"tools/index.html: image tool leaked into PDF-only page: {image_link}")
 
 if errors:
     print("\n".join(f"ERROR: {item}" for item in errors))
     sys.exit(1)
-print(f"Validated {len(list(ROOT.rglob('*.html')))} HTML files; key Games/Tools links and structure are present.")
+print(f"Validated {len(list(ROOT.rglob('*.html')))} HTML files; PDF/image separation and key navigation are present.")

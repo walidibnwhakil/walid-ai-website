@@ -1,1 +1,30 @@
-{"kind":"sports","updatedAt":null,"status":"empty","items":[],"sources":[],"errors":[],"scoreSupport":"unavailable","scoreNote":"No live-score API is configured; these are verified sports headlines only, not live scores."}
+{
+  "kind": "sports",
+  "updatedAt": "2026-11-15T00:00:00Z",
+  "status": "ok",
+  "items": [
+    {
+      "title": "Sport Today — latest international sports coverage",
+      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_south_asia/week/2026-11-08",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-13T19:32:00Z"
+    },
+    {
+      "title": "Sportsworld — live sporting action from around the world",
+      "url": "https://wspartners.bbc.com/schedules/bbc_world_service_south_asia/week/2026-11-01",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-08T15:06:00Z"
+    }
+  ],
+  "sources": [
+    {
+      "name": "BBC Sport",
+      "url": "https://feeds.bbci.co.uk/sport/rss.xml",
+      "host": "feeds.bbci.co.uk",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "scoreSupport": "unavailable",
+  "scoreNote": "No live-score API is configured; these are verified sports headlines only, not live scores."
+}

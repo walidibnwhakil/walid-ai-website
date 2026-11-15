@@ -118,6 +118,24 @@ def event_key(event):
         clean(event.get("homeTeam")), clean(event.get("awayTeam")), event.get("startTime")
     )
 
+def event_key(event):
+    identifier=str(event.get("id") or "").strip()
+    return (event.get("source",""),identifier) if identifier else (
+        clean(event.get("homeTeam")), clean(event.get("awayTeam")), event.get("startTime")
+    )
+
+def dedupe_events(events):
+    found={}
+    for event in events:
+        key=event_key(event)
+        if key not in found:
+            found[key]=event
+        else:
+            old=found[key]
+            if (event.get("homeScore") is not None or event.get("awayScore") is not None) and old.get("homeScore") is None:
+                found[key]=event
+    return sorted(found.values(),key=lambda x:x.get("startTime") or "")
+
 def recent_cache_matches(events, cached, now=None):
     now=now or datetime.now(timezone.utc)
     cutoff=now.timestamp()-72*3600

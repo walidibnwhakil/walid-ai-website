@@ -21,7 +21,11 @@ const patterns=[
 (n,v)=>['Tomorrow, '+n+' ___ '+v[5]+'.','will '+v[0],[v[1],v[2],'is '+v[3]],'Future: will + base verb ('+v[0]+').'],
 (n,v)=>[n+' does not ___ '+v[5]+'.',v[0],[v[1],v[2],v[3]],'After does not, use the base form ('+v[0]+').'],
 (n,v)=>['Does '+n+' ___ '+v[5]+' every day?',v[0],[v[1],v[2],v[3]],'After does, use the base form ('+v[0]+').'],
-(n,v)=>['At 6 p.m. yesterday, '+n+' ___ '+v[5]+'.','was '+v[3],[v[1],v[2],'has '+v[4]],'Past continuous: was + '+v[3]+'.']
+(n,v)=>['At 6 p.m. yesterday, '+n+' ___ '+v[5]+'.','was '+v[3],[v[1],v[2],'has '+v[4]],'Past continuous: was + '+v[3]+'.'],
+(n,v)=>['Did '+n+' ___ '+v[5]+' yesterday?',v[0],[v[1],v[2],v[3]],'After did, use the base form '+v[0]+'.'],
+(n,v)=>['Tomorrow, '+n+' will not ___ '+v[5]+'.',v[0],[v[1],v[2],v[3]],'After will not, use the base form '+v[0]+'.'],
+(n,v)=>['Last week, '+n+' did not ___ '+v[5]+'.',v[0],[v[1],v[2],v[3]],'After did not, use the base form '+v[0]+'.'],
+(n,v)=>['While we were waiting, '+n+' was ___ '+v[5]+'.',v[3],[v[0],v[1],v[2]],'Past continuous after was requires the -ing form '+v[3]+'.']
 ];
 const PER_GRADE=patterns.length*names.length*verbs.length;
 function make(grade,index){
@@ -29,7 +33,7 @@ function make(grade,index){
  const name=names[Math.floor(rem/verbs.length)],v=verbs[rem%verbs.length];
  const [q,correct,wrong,why]=patterns[p](name,v);
  const options=wrong.slice(),pos=(index+grade)%4;options.splice(pos,0,correct);
- return {id:'grammar-practice-'+grade+'-'+index,grade,subject:'ইংরেজি',q,options,answer:pos,why,topic:['Present simple','Past simple','Present continuous','Present perfect','Future simple','Negative sentences','Questions','Past continuous'][p],practiceGenerated:true};
+ return {id:'grammar-practice-'+grade+'-'+index,grade,subject:'ইংরেজি',q,options,answer:pos,why,topic:['Present simple','Past simple','Present continuous','Present perfect','Future simple','Negative sentences','Questions','Past continuous','Past questions','Future negative','Past negative','Past continuous forms'][p],practiceGenerated:true};
 }
 function audit(){
  let total=0,errors=[],unique=new Set();

@@ -46,8 +46,18 @@ def _read_configured(event):
         for row in rows:
             if not isinstance(row, dict):
                 continue
-            required = ("id", "homeTeam", "awayTeam", "startTime", "status")
+            # Team-v-team is optional: athletics, swimming, and medal tables are
+            # individual competitions/results and have no home/away sides.
+            required = ("id", "startTime", "status")
             if not all(row.get(key) for key in required):
+                continue
+            has_competition_shape = bool(
+                row.get("homeTeam") and row.get("awayTeam")
+                or row.get("competition") or row.get("eventName")
+                or isinstance(row.get("results"), list)
+                or isinstance(row.get("medals"), (dict, list))
+            )
+            if not has_competition_shape:
                 continue
             item = dict(row)
             item["source"] = url

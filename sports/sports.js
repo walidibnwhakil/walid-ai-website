@@ -5,23 +5,29 @@
   const validDate = (value) => { const time = value ? Date.parse(value) : NaN; return Number.isFinite(time) ? time : null; };
   const timeLabel = (value) => value ? new Date(value).toLocaleString("en-GB",{timeZone:"Asia/Dhaka",dateStyle:"medium",timeStyle:"short"}) : "Time to be announced";
   const countryCodes = {Germany:"DE",England:"GB",Spain:"ES",Italy:"IT",France:"FR",India:"IN",Pakistan:"PK",Bangladesh:"BD",Nepal:"NP",Australia:"AU",Canada:"CA",Japan:"JP",China:"CN",Namibia:"NA",Rwanda:"RW",Uganda:"UG","United States of America":"US","Sri Lanka":"LK",Ireland:"IE","Papua New Guinea":"PG",Scotland:"GB",Netherlands:"NL",Thailand:"TH",Zimbabwe:"ZW",Afghanistan:"AF","South Africa":"ZA","New Zealand":"NZ","Falkland Islands":"FK","Costa Rica":"CR","West Indies":"JM"};
+  // Resolve flags per team, never from the opposing team or competition.
   function inferredCountry(match, side) {
-    if (match[side+"Country"]) return match[side+"Country"];
-    const text = [match.competition,match.homeTeam,match.awayTeam].join(" ").toLowerCase();
-    const clues = [["nepal","Nepal"],["bangladesh","Bangladesh"],["india","India"],["vijay hazare","India"],["pakistan","Pakistan"],["australia","Australia"],["south africa","South Africa"],["sri lanka","Sri Lanka"],["england","England"],["new zealand","New Zealand"],["afghanistan","Afghanistan"],["zimbabwe","Zimbabwe"],["west indies","West Indies"],["falkland","Falkland Islands"]];
-    return (clues.find(([needle])=>text.includes(needle))||[null,""])[1];
+    const team=String(match[side+"Team"]||"").trim();
+    const explicit=String(match[side+"Country"]||"").trim();
+    const names=Object.keys(countryCodes).sort((a,b)=>b.length-a.length);
+    const normalized=team.toLowerCase();
+    const matchName=names.find(name=>new RegExp("(^|[^a-z])"+name.toLowerCase().replace(/[.*+?^$\{\}()|[\]\\]/g,"\\$&")+"(?=$|[^a-z])","i").test(normalized));
+    return matchName|| (names.includes(explicit)?explicit:"");
   }
   function flag(country) {
     const code=countryCodes[country]||"";
     return code ? [...code].map(char=>String.fromCodePoint(127397+char.charCodeAt(0))).join("") : "";
   }
   function logo(match, side, compact=false) {
-    const url=match[side+"Logo"], country=inferredCountry(match,side), emoji=flag(country);
+    const country=inferredCountry(match,side), emoji=flag(country);
     const name=String(match[side+"Team"]||"Team");
-    const alt=esc(name), size=compact?"mini-mark":"team-mark";
+    const size=compact?"mini-mark":"team-mark";
     const fallback=esc(name.split(/\s+/).map(part=>part[0]||"").slice(0,2).join("").toUpperCase());
-    const image=url ? "<img src='"+esc(url)+"' alt='"+alt+" logo' loading='lazy' referrerpolicy='no-referrer' onerror='this.remove()'>" : "<span aria-hidden='true'>"+fallback+"</span>";
-    return "<span class='"+size+"'>"+image+(emoji?"<span class='country-flag' aria-label='"+esc(country)+"' title='"+esc(country)+"'>"+emoji+"</span>":"")+"</span>";
+    // National sides display their own flag prominently; club sides keep verified crests.
+    const isNational=Boolean(country);
+    const url=!isNational?match[side+"Logo"]:null;
+    const image=isNational?"<span class='primary-flag' role='img' aria-label='"+esc(country)+" flag'>"+emoji+"</span>":url?"<img src='"+esc(url)+"' alt='"+esc(name)+" logo' loading='lazy' referrerpolicy='no-referrer' onerror='this.remove()'>":"<span aria-hidden='true'>"+fallback+"</span>";
+    return "<span class='"+size+"'>"+image+"</span>";
   }
   function statusOf(match) {
     const status=String(match.status||"").toLowerCase().replace(/[- ]+/g,"_");
@@ -75,22 +81,36 @@
     const updated=validDate(data.updatedAt), node=document.querySelector("#feedUpdated");
     if(node) node.textContent=updated?"Scores and fixtures checked "+timeLabel(data.updatedAt)+" (Bangladesh time)":"Scores and fixtures are temporarily unavailable.";
   }
-  function inningsHtml(match) {
-    if(!Array.isArray(match.innings)||!match.innings.length) return "";
-    const rows=match.innings.map(inn=>{
-      const figures=[inn.runs,inn.wickets==null?null:inn.wickets].filter(v=>v!=null).join("/");
-      return figures?"<div class='innings-line'><span>"+esc(inn.team||"Innings")+"</span><strong>"+esc(figures)+(inn.overs==null?"":" · "+esc(inn.overs)+" ov")+"</strong></div>":"";
-    }).filter(Boolean).join("");
-    return rows?"<div class='innings'>"+rows+"</div>":"";
+  function inningsFor(match, side) {
+    const name=String(match[side+"Team"]||"").trim().toLowerCase();
+    return (Array.isArray(match.innings)?match.innings:[]).find(inn=>{
+      const team=String(inn.team||"").toLowerCase();
+      return team===name || team.startsWith(name+" inning") || team.startsWith(name+" innings");
+    })||null;
+  }
+  function inningsScore(inn) {
+    if(!inn||inn.runs==null)return "";
+    return String(inn.runs)+(inn.wickets==null?"":"/"+inn.wickets);
   }
   function matchRow(match,sport,kind) {
-    const status=statusOf(match), middle=status==="live"?"<span class='live-label'>● LIVE</span> "+score(match):score(match);
-    const secondary=kind==="schedule"?(validDate(match.startTime)?timeLabel(match.startTime):"Time TBA"):esc(match.matchType||match.format||(sport==="cricket"?"Cricket score":"Full-time"));
-    const date=timeLabel(match.finishedAt||match.endTime||match.startTime), winner=match.winner?" · "+esc(match.winner)+" won":"";
-    return "<article class='match-row'><div class='match-row-team'>"+logo(match,"home",true)+"<span class='match-row-name'>"+esc(match.homeTeam)+"</span></div>"+
-      "<div class='match-row-center'><div class='match-score'>"+middle+"</div><div class='match-meta'>"+secondary+"</div></div>"+
-      "<div class='match-row-team away'><span class='match-row-name'>"+esc(match.awayTeam)+"</span>"+logo(match,"away",true)+"</div>"+inningsHtml(match)+
-      "<div class='match-info'><span>"+esc(match.competition||"Competition")+"</span><span>·</span><span>"+esc(date)+"</span>"+winner+"</div></article>";
+    const status=statusOf(match), cricket=sport==="cricket", scheduled=kind==="schedule";
+    const homeInnings=cricket?inningsFor(match,"home"):null, awayInnings=cricket?inningsFor(match,"away"):null;
+    const homeScore=cricket?(inningsScore(homeInnings)||match.homeScore):match.homeScore;
+    const awayScore=cricket?(inningsScore(awayInnings)||match.awayScore):match.awayScore;
+    const team=(side,figures,inn)=>{
+      const name=esc(match[side+"Team"]);
+      const overs=cricket&&inn?.overs!=null?"<span class='score-overs'>"+esc(inn.overs)+" overs</span>":"";
+      return "<div class='scorecard-team'>"+logo(match,side,true)+"<span class='scorecard-name'>"+name+"</span>"+(!scheduled&&figures!=null?"<strong class='scorecard-figures'>"+esc(figures)+"</strong>"+overs:"")+"</div>";
+    };
+    const meta=esc(match.competition||"Match")+(match.matchType||match.format?" · "+esc(match.matchType||match.format):"");
+    const when=esc(timeLabel(match.finishedAt||match.endTime||match.startTime));
+    const winner=String(match.winner||"").trim();
+    const winnerIsTeam=[match.homeTeam,match.awayTeam].some(name=>String(name).toLowerCase()===winner.toLowerCase());
+    // Do not claim a winner when feed scores contradict the result.
+    const result=kind==="result"&&winnerIsTeam?"<div class='scorecard-result'>"+esc(winner)+" won</div>":"";
+    return "<article class='match-row scorecard'><div class='scorecard-top'><span>"+meta+"</span><span class='scorecard-status"+(status==="live"?" is-live":"")+"'>"+(status==="live"?"● LIVE":scheduled?"Upcoming":"Completed")+"</span></div>"+
+      "<div class='scorecard-board'>"+team("home",homeScore,homeInnings)+"<div class='scorecard-vs'>"+(scheduled?"VS":cricket?"VS":score(match))+"</div>"+team("away",awayScore,awayInnings)+"</div>"+
+      result+"<div class='scorecard-date'>"+when+"</div></article>";
   }
   let scheduleLimit=10;
   function renderDetail(data) {
@@ -101,8 +121,9 @@
     const schedule=matches.filter(m=>statusOf(m)==="scheduled"&&(validDate(m.startTime)===null||validDate(m.startTime)>=Date.now())).sort((a,b)=>(validDate(a.startTime)||Number.MAX_SAFE_INTEGER)-(validDate(b.startTime)||Number.MAX_SAFE_INTEGER));
     const updated=validDate(data.updatedAt), note=current.note||(current.coverage==="available"?"Scores and fixtures are supplied by the verified match feed.":"Match feed is temporarily unavailable.");
     document.querySelector("#feedStatus").textContent=note+(updated?" Last checked "+timeLabel(data.updatedAt)+" (Bangladesh time).":"");
-    document.querySelector("#liveSection").hidden=false;
+    document.querySelector("#liveSection").hidden=!live.length;
     document.querySelector("#liveMatches").innerHTML=live.length?live.map(m=>matchRow(m,sport,"live")).join(""):"<div class='empty-state'>No live "+(sport==="football"?"football":"cricket")+" match is available in the verified feed right now.</div>";
+    document.querySelector("#recentResults").closest(".match-section").hidden=!results.length;
     document.querySelector("#recentResults").innerHTML=results.length?results.map(m=>matchRow(m,sport,"result")).join(""):"<div class='empty-state'>No verified completed "+(sport==="football"?"football":"cricket")+" results are available in the current feed.</div>";
     const shown=schedule.slice(0,scheduleLimit), scheduleEl=document.querySelector("#scheduleMatches");
     scheduleEl.innerHTML=shown.length?shown.map(m=>matchRow(m,sport,"schedule")).join("")+(schedule.length>scheduleLimit?"<button class='load-more' type='button' id='loadMore'>Show more matches</button>":""):"<div class='empty-state'>No verified upcoming matches are listed right now.</div>";

@@ -6,7 +6,17 @@ from pathlib import Path
 from urllib.parse import urlparse,urlencode
 from urllib.request import Request,urlopen
 from xml.etree import ElementTree as ET
-from seasonal_providers import EVENTS as SEASONAL_EVENTS, load as load_seasonal
+# Support both normal script execution and importlib-based CI tests.
+try:
+    from seasonal_providers import EVENTS as SEASONAL_EVENTS, load as load_seasonal
+except ModuleNotFoundError:
+    import importlib.util
+    _provider_path = Path(__file__).with_name("seasonal_providers.py")
+    _provider_spec = importlib.util.spec_from_file_location("seasonal_providers", _provider_path)
+    seasonal_providers = importlib.util.module_from_spec(_provider_spec)
+    _provider_spec.loader.exec_module(seasonal_providers)
+    SEASONAL_EVENTS = seasonal_providers.EVENTS
+    load_seasonal = seasonal_providers.load
 
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"data"
 FEEDS={"news":[("The Daily Star","https://www.thedailystar.net/rss.xml"),("Prothom Alo English","https://en.prothomalo.com/feed/"),("BBC World","https://feeds.bbci.co.uk/news/world/rss.xml")],"sports":[("BBC Sport","https://feeds.bbci.co.uk/sport/rss.xml"),("The Guardian Football","https://www.theguardian.com/football/rss")]}

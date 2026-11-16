@@ -39,7 +39,45 @@ const vocabulary=[
 ['conservation','protecting resources from waste or damage','using resources carelessly','selling all resources','closing every school']
 ];
 const vocabularyQuestions=passages.length*4;
-const perGrade=passages.length*templates.length+vocabularyQuestions;
+const skillPrompts=[
+{topic:'Information transfer',ask:'Which entry correctly completes a fact file for the initiative?',field:'place',label:'Location'},
+{topic:'Information transfer',ask:'Which entry correctly records the day of the activity?',field:'day',label:'Day'},
+{topic:'Information transfer',ask:'Which entry correctly records the helper or instructor?',field:'helpers',label:'Helper'},
+{topic:'Information transfer',ask:'Which entry correctly records the main goal?',field:'activity',label:'Goal'},
+{topic:'Matching information',ask:'Which pair correctly matches the initiative with its location?',field:'place',label:'Location'},
+{topic:'Matching information',ask:'Which pair correctly matches the initiative with its helper?',field:'helpers',label:'Helper'},
+{topic:'Matching information',ask:'Which pair correctly matches the initiative with its day?',field:'day',label:'Day'},
+{topic:'Matching information',ask:'Which pair correctly matches the initiative with its resource?',field:'resource',label:'Resource'}
+];
+const skillCount=passages.length*skillPrompts.length;
+function skillQuestion(grade,index){
+ const passageIndex=Math.floor(index/skillPrompts.length),type=index%skillPrompts.length,p=passages[passageIndex],spec=skillPrompts[type];
+ const correct=type<4?spec.label+': '+p[spec.field]:p.title+' — '+p[spec.field];
+ const alternatives=passages.map((other,j)=>({j,value:type<4?spec.label+': '+other[spec.field]:p.title+' — '+other[spec.field]})).filter(x=>x.j!==passageIndex&&x.value!==correct);
+ const opts=[correct],offset=(grade+index)%alternatives.length;
+ for(let i=0;opts.length<4&&i<alternatives.length;i++){const v=alternatives[(offset+i)%alternatives.length].value;if(!opts.includes(v))opts.push(v)}
+ const pos=(grade+index)%4;opts.shift();opts.splice(pos,0,correct);
+ return {id:'first-paper-skill-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Read the passage: '+p.text+'\\n\\n'+spec.ask,options:opts,answer:pos,why:'Correct '+spec.label.toLowerCase()+': '+p[spec.field]+'.',topic:spec.topic,passageTitle:p.title,originalPassage:true};
+}
+const sequencing=[
+['The students prepared the soil.','They planted the seeds.','They watered the garden.','The plants began to grow.'],
+['The volunteers checked the weather.','They warned nearby families.','The families moved to a safe place.','The volunteers distributed dry food.'],
+['The teacher chose a story.','The students read the story.','They discussed its main idea.','They wrote a short summary.'],
+['The mechanic inspected the bicycle.','He repaired the brakes.','He tested the bicycle.','He returned it to the student.'],
+['The team collected plastic waste.','They separated recyclable items.','They placed the items in labelled bags.','A recycling service collected the bags.'],
+['The nurse welcomed the patient.','She measured the patient’s temperature.','She recorded the result.','She explained the next step.'],
+['The learners switched on the computer.','They opened the typing program.','They completed a practice task.','They saved their work.'],
+['The children dug small holes.','They placed saplings in the holes.','They covered the roots with soil.','They watered the saplings.']
+];
+function sequenceQuestion(grade,index){
+ const steps=sequencing[Math.floor(index/4)],step=index%4;
+ const correct=steps[step],wrong=steps.filter((_,i)=>i!==step);
+ const pos=(index+grade)%4,options=wrong.slice();options.splice(pos,0,correct);
+ const prompt=step===0?'Which event happened first?':step===3?'Which event happened last?':'Which event happened at position '+(step+1)+'?';
+ return {id:'first-paper-sequence-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Put these events in their logical order: '+[steps[2],steps[0],steps[3],steps[1]].join(' / ')+'\\n\\n'+prompt,options,answer:pos,why:'Logical order: '+steps.join(' → '),topic:'Rearranging events',originalPassage:true};
+}
+const baseCount=passages.length*templates.length+vocabularyQuestions;
+const perGrade=baseCount+skillCount+sequencing.length*4;
 function vocabQuestion(grade,index){const passageIndex=Math.floor(index/4),kind=index%4,v=vocabulary[passageIndex],p=passages[passageIndex];let q,correct,wrong,why;
 if(kind===0){q='In the passage, what does the word "'+v[0]+'" mean?';correct=v[1];wrong=v.slice(2);why='In this context, '+v[0]+' means '+v[1]+'.'}
 else if(kind===1){q='Which word from the passage matches this meaning: "'+v[1]+'"?';correct=v[0];wrong=vocabulary.filter((_,i)=>i!==passageIndex).slice((passageIndex*3)%12,(passageIndex*3)%12+3).map(x=>x[0]);why='The matching word is '+v[0]+'.'}
@@ -49,7 +87,7 @@ const opts=[correct,...wrong],pos=(index+grade)%4;opts.splice(0,1);opts.splice(p
 return {id:'first-paper-vocabulary-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Read the passage: '+p.text+'\\n\\n'+q,options:opts,answer:pos,why,topic:kind<2?'Vocabulary in context':'Reading details',passageTitle:p.title,originalPassage:true};
 }
 
-function make(grade,index){if(index>=passages.length*templates.length)return vocabQuestion(grade,index-passages.length*templates.length);const p=passages[Math.floor(index/templates.length)],type=index%templates.length,[question,correct]=templates[type](p);const opts=optionsFor(correct,index+grade,type);return {id:'first-paper-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Read the passage: '+p.text+'\n\n'+question,options:opts.options,answer:opts.answer,why:'The passage states: '+correct+'.',topic:'Reading comprehension',passageTitle:p.title,originalPassage:true}}
+function make(grade,index){if(index>=baseCount+skillCount)return sequenceQuestion(grade,index-baseCount-skillCount);if(index>=baseCount)return skillQuestion(grade,index-baseCount);if(index>=passages.length*templates.length)return vocabQuestion(grade,index-passages.length*templates.length);const p=passages[Math.floor(index/templates.length)],type=index%templates.length,[question,correct]=templates[type](p);const opts=optionsFor(correct,index+grade,type);return {id:'first-paper-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Read the passage: '+p.text+'\n\n'+question,options:opts.options,answer:opts.answer,why:'The passage states: '+correct+'.',topic:'Reading comprehension',passageTitle:p.title,originalPassage:true}}
 function create(grade,set,count,excluded){if(!Number.isInteger(grade)||grade<6||grade>12||count<=0)return [];const out=[],seen=new Set((excluded||[]).map(q=>q.q));for(let i=0;i<perGrade&&out.length<count;i++){const index=((set-1)*Math.max(1,count)+i)%perGrade,q=make(grade,index);if(!seen.has(q.q)){out.push(q);seen.add(q.q)}}return out}
 function audit(){const seen=new Set(),errors=[];for(let g=6;g<=12;g++)for(let i=0;i<perGrade;i++){const q=make(g,i),key=g+'|'+q.q;if(seen.has(key)||new Set(q.options).size!==4||q.options[q.answer]===undefined)errors.push(q.id);seen.add(key)}return {total:7*perGrade,unique:seen.size,errors,perGrade}}
 window.WalidEnglishFirstPaper={create,audit,perGrade};

@@ -65,7 +65,7 @@ def read_events(url,status):
         if actual=="finished" and hs is not None and as_ is not None:
             try: winner=home if int(hs)>int(as_) else away if int(as_)>int(hs) else "Draw"
             except (TypeError,ValueError): pass
-        out.append({"id":str(e.get("idEvent") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "League match","startTime":start,"status":actual,"source":"TheSportsDB"})
+        out.append({"id":str(e.get("idEvent") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "League match","startTime":start,"status":actual,"source":"TheSportsDB","country":clean(e.get("strCountry")) or None})
     return out
 def read_global_soccer_recent():
     out=[]
@@ -109,7 +109,7 @@ def read_openliga():
         winner=None
         if finished and hs is not None and as_ is not None:
             winner=home if hs>as_ else away if as_>hs else "Draw"
-        out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,"status":"finished" if finished else "scheduled","source":"OpenLigaDB"})
+        out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,"status":"finished" if finished else "scheduled","source":"OpenLigaDB","country":"Germany"})
     return out
 def event_key(event):
     """Use source plus team/time identity so ID-less duplicates collapse too."""

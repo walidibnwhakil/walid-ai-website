@@ -29,5 +29,26 @@ class ProviderTests(unittest.TestCase):
         self.assertEqual(active["olympics"]["matches"][0]["source"], "https://official.example/events")
         self.assertFalse(outside["olympics"]["sourceHealth"])
 
+    def test_individual_competition_with_medals_is_valid(self):
+        payload = {"events": [{
+            "id": "ath-100m-final",
+            "eventName": "Women's 100m Final",
+            "competition": "Athletics",
+            "startTime": "2028-07-20T10:00:00Z",
+            "status": "finished",
+            "results": [{"rank": 1, "athlete": "A"}],
+            "medals": {"gold": "A", "silver": "B", "bronze": "C"}
+        }]}
+        class Response:
+            def __enter__(self): return self
+            def __exit__(self, *_): return False
+            def read(self): return json.dumps(payload).encode()
+        with patch.dict(os.environ, {"OLYMPICS_EVENTS_URL": "https://official.example/results"}, clear=True), \
+             patch.object(providers, "urlopen", return_value=Response()):
+            result = providers.load(now=datetime(2028, 7, 20, tzinfo=timezone.utc))
+        event = result["olympics"]["matches"][0]
+        self.assertEqual(event["eventName"], "Women's 100m Final")
+        self.assertEqual(event["medals"]["gold"], "A")
+
 if __name__ == "__main__":
     unittest.main()

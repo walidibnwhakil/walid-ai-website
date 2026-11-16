@@ -163,6 +163,7 @@ function render() {
     const bTime = validDate(b.finishedAt || b.endTime || b.startTime);
     return bTime - aTime;
   });
+  const limitedRecent = recent.slice(0, 3);
   document.querySelector("#upcoming").innerHTML = upcoming.length
     ? upcoming.map(card).join("")
     : "<div class='empty'>No verified upcoming matches are available for " + esc(label) + " right now.</div>";

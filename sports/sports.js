@@ -7,13 +7,14 @@
   const countryCodes = {Germany:"DE",England:"GB",Spain:"ES",Italy:"IT",France:"FR",India:"IN",Pakistan:"PK",Bangladesh:"BD",Nepal:"NP",Australia:"AU",Canada:"CA",Japan:"JP",China:"CN",Namibia:"NA",Rwanda:"RW",Uganda:"UG","United States of America":"US","Sri Lanka":"LK",Ireland:"IE","Papua New Guinea":"PG",Scotland:"GB",Netherlands:"NL",Thailand:"TH",Zimbabwe:"ZW",Afghanistan:"AF","South Africa":"ZA","New Zealand":"NZ","Falkland Islands":"FK","Costa Rica":"CR","West Indies":"JM"};
   // A country's league does not make its clubs national teams.
   function nationalCountry(match,side) {
-    const name=String(match[side+"Team"]||"").trim();
-    const names=Object.keys(countryCodes).sort((a,b)=>b.length-a.length);
-    const matchName=names.find(country=>{
-      const prefix=country.toLowerCase(), lower=name.toLowerCase();
-      return lower===prefix || lower.startsWith(prefix+" ") && /^(women|men|u\\d{2}|under[- ]?\\d{2}|a|b|xi|national|academy|emerging|seniors|juniors|development|legends)(?:\\b|$)/i.test(name.slice(country.length).trim());
-    });
-    return matchName||"";
+    const name=String(match[side+"Team"]||"").trim().toLowerCase();
+    const suffixes=[""," women"," men"," a"," b"," xi"," national"," emerging"," seniors"," juniors"," legends"];
+    const countries=Object.keys(countryCodes).sort((a,b)=>b.length-a.length);
+    return countries.find(country=>{
+      const prefix=country.toLowerCase();
+      return suffixes.some(s=>name===prefix+s)||
+        name.startsWith(prefix+" u")&&/^u[0-9]{2}$/.test(name.slice(prefix.length+1));
+    })||"";
   }
   function flag(country) {
     const code=countryCodes[country]||"";
@@ -23,7 +24,7 @@
     const name=String(match[side+"Team"]||"Team"), country=nationalCountry(match,side);
     const url=!country?String(match[side+"Logo"]||""):"";
     const size=compact?"mini-mark":"team-mark";
-    const initials=esc(name.split(/\\s+/).map(p=>p[0]||"").slice(0,2).join("").toUpperCase());
+    const initials=esc(name.split(/\s+/).map(p=>p[0]||"").slice(0,2).join("").toUpperCase());
     const fallback="<span class='logo-fallback' aria-hidden='true'>"+initials+"</span>";
     const content=country?"<span class='primary-flag' role='img' aria-label='"+esc(country)+" flag'>"+flag(country)+"</span>":url?"<img src='"+esc(url)+"' alt='"+esc(name)+" crest' loading='lazy' referrerpolicy='no-referrer' onerror='this.hidden=true;this.nextElementSibling.hidden=false'>"+ "<span class='logo-fallback' aria-hidden='true' hidden>"+initials+"</span>":fallback;
     return "<span class='"+size+"'>"+content+"</span>";

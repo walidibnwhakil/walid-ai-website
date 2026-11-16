@@ -127,7 +127,7 @@ def read_openliga():
         winner=None
         if finished and hs is not None and as_ is not None:
             winner=home if hs>as_ else away if as_>hs else "Draw"
-        out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,"status":"finished" if finished else "scheduled","source":"OpenLigaDB", "homeCountry":"Germany", "awayCountry":"Germany"})
+        out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,"status":"finished" if finished else "scheduled","source":"OpenLigaDB", "homeCountry":"Germany", "awayCountry":"Germany", "homeLogo":clean((e.get("team1") or {}).get("teamIconUrl")) or None, "awayLogo":clean((e.get("team2") or {}).get("teamIconUrl")) or None})
     return out
 def event_key(event):
     """Use source plus team/time identity so ID-less duplicates collapse too."""

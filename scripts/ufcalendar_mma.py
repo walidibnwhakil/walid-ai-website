@@ -24,18 +24,12 @@ CACHE_PATH = Path(os.environ.get("UF_CALENDAR_MMA_CACHE", "data/ufcalendar-mma-c
 
 
 def empty_feed(note: str) -> dict:
-    return {
-        "label": "MMA",
-        "coverage": "disabled",
-        "source": "UFCalendar",
-        "sourceHealth": False,
-        "matches": [],
-        "note": note,
-    }
+    return {"label": "MMA", "coverage": "disabled", "source": "UFCalendar",
+            "sourceHealth": False, "matches": [], "note": note}
 
 
 def _request_json(key: str) -> dict:
-    query = urllib.parse.urlencode({"org": ",".join(PROMOTIONS), "status": "upcoming", "limit": 100})
+    query = urllib.parse.urlencode({"status": "upcoming", "limit": 100})
     request = urllib.request.Request(
         f"{API_URL}?{query}",
         headers={"Authorization": f"Bearer {key}", "Accept": "application/json"},
@@ -47,9 +41,9 @@ def _request_json(key: str) -> dict:
 def _normalize_event(event: dict) -> dict | None:
     event_id = event.get("id") or event.get("slug")
     starts_at = event.get("starts_at") or event.get("start_time")
-    if not event_id or not starts_at:
+    promotion = str(event.get("promotion") or event.get("org") or "").lower()
+    if not event_id or not starts_at or promotion not in PROMOTIONS:
         return None
-    fights = event.get("fights") or event.get("card") or []
     return {
         "id": str(event_id),
         "homeTeam": event.get("main_event") or event.get("title") or "MMA event",
@@ -60,7 +54,7 @@ def _normalize_event(event: dict) -> dict | None:
         "status": "finished" if event.get("result") or event.get("completed_at") else "scheduled",
         "source": "UFCalendar",
         "providerEventId": str(event_id),
-        "fights": fights,
+        "fights": event.get("fights") or event.get("card") or [],
     }
 
 
@@ -78,19 +72,15 @@ def fetch_mma_feed(now: float | None = None) -> dict:
     try:
         payload = _request_json(key)
         raw_events = payload.get("data", payload) if isinstance(payload, dict) else []
-        normalized = []
-        seen = set()
+        normalized, seen = [], set()
         for event in raw_events if isinstance(raw_events, list) else []:
             item = _normalize_event(event)
             if item and item["id"] not in seen:
                 seen.add(item["id"])
                 normalized.append(item)
         feed = {
-            "label": "MMA",
-            "coverage": "available",
-            "source": "UFCalendar",
-            "sourceHealth": True,
-            "matches": normalized,
+            "label": "MMA", "coverage": "available", "source": "UFCalendar",
+            "sourceHealth": True, "matches": normalized,
             "note": "Verified UFCalendar event data. Results are not guaranteed to be live.",
             "updatedAt": datetime.now(timezone.utc).isoformat(),
         }

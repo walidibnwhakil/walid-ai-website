@@ -91,33 +91,29 @@
     return inn?.runs==null?null:String(inn.runs)+(inn.wickets==null?"":"/"+inn.wickets);
   }
   function cricketFigures(match) {
-    const home=inningsFor(match,"home"),away=inningsFor(match,"away");
     const innings=Array.isArray(match.innings)?match.innings:[];
-    // A malformed label sometimes combines both names. Never assign that
-    // innings to either side merely because its text contains both names.
-    const ambiguous=innings.some(i=>String(i.team||"").includes(","));
-    const values=innings.map(i=>Number(i.runs)).filter(Number.isFinite);
-    const winner=String(match.winner||"").trim().toLowerCase();
-    const hName=String(match.homeTeam||"").toLowerCase(),aName=String(match.awayTeam||"").toLowerCase();
-    const winnerKnown=winner===hName||winner===aName;
-    // The provider's homeScore/awayScore can be reversed relative to innings.
-    // Prefer unambiguous team-labelled innings. Otherwise do not guess.
+    const home=inningsFor(match,"home"),away=inningsFor(match,"away");
     const h=inningsScore(home),a=inningsScore(away);
-    const reliable=Boolean(home&&away&&!ambiguous&&winnerKnown&&Number.isFinite(Number(home.runs))&&Number.isFinite(Number(away.runs)));
-    const homeRuns=home?.runs,awayRuns=away?.runs;
-    const winningSide=winner===hName?"home":winner===aName?"away":null;
+    const homeName=String(match.homeTeam||"").trim().toLowerCase();
+    const awayName=String(match.awayTeam||"").trim().toLowerCase();
+    const winner=String(match.winner||"").trim().toLowerCase();
+    const winningSide=winner===homeName?"home":winner===awayName?"away":null;
+    const complete=innings.length===2&&home&&away&&home!==away&&
+      innings.every(i=>!String(i.team||"").includes(","))&&
+      [home,away].every(i=>Number.isInteger(i.runs)&&i.runs>=0&&
+        Number.isInteger(i.wickets)&&i.wickets>=0&&i.wickets<=10&&
+        Number.isFinite(Number(i.overs))&&Number(i.overs)>=0);
+    const runsAgree=complete&&
+      [Number(match.homeScore),Number(match.awayScore)].every(Number.isFinite)&&
+      [home.runs,away.runs].every(n=>[Number(match.homeScore),Number(match.awayScore)].includes(n));
+    const win=winningSide==="home"?home:away,lose=winningSide==="home"?away:home;
+    const winIndex=innings.indexOf(win),loseIndex=innings.indexOf(lose);
+    const reliable=Boolean(complete&&runsAgree&&winningSide&&win.runs>lose.runs);
     let margin="";
-    if(reliable&&homeRuns!==awayRuns) {
-      const winning=winningSide==="home"?home:away;
-      const losing=winningSide==="home"?away:home;
-      if(Number(winning.runs)>Number(losing.runs)) {
-        // A chasing team wins by remaining wickets only when innings order is known.
-        const winIndex=innings.indexOf(winning),loseIndex=innings.indexOf(losing);
-        if(winIndex>loseIndex && Number.isFinite(Number(winning.wickets)) && Number(winning.wickets)<=10) margin="won by "+(10-Number(winning.wickets))+" wickets";
-        else if(winIndex<loseIndex) margin="won by "+(Number(winning.runs)-Number(losing.runs))+" runs";
-      }
-    }
-    return {home,away,homeScore:h,awayScore:a,reliable,margin,winner:winningSide?match[winningSide+"Team"]:""};
+    if(reliable&&winIndex>loseIndex&&win.wickets<10) margin="won by "+(10-win.wickets)+" wickets";
+    else if(reliable&&winIndex<loseIndex) margin="won by "+(win.runs-lose.runs)+" runs";
+    return {home,away,homeScore:complete?h:null,awayScore:complete?a:null,
+      reliable,margin,winner:winningSide?match[winningSide+"Team"]:""};
   }
   function matchRow(match,sport,kind) {
     const status=statusOf(match),cricket=sport==="cricket",scheduled=kind==="schedule";
@@ -144,7 +140,7 @@
     const sport=document.body.dataset.sportDetail; if(!sport) return;
     const current=data?.sports?.[sport]||{}, matches=dedupe(current.matches);
     const live=matches.filter(m=>statusOf(m)==="live").sort((a,b)=>matchTime(a)-matchTime(b));
-    const results=matches.filter(m=>statusOf(m)==="finished").sort((a,b)=>matchTime(b)-matchTime(a)).slice(0,3);
+    const results=matches.filter(m=>statusOf(m)==="finished"&&(sport!=="cricket"||cricketFigures(m).reliable)).sort((a,b)=>matchTime(b)-matchTime(a)).slice(0,3);
     const schedule=matches.filter(m=>statusOf(m)==="scheduled"&&(validDate(m.startTime)===null||validDate(m.startTime)>=Date.now())).sort((a,b)=>(validDate(a.startTime)||Number.MAX_SAFE_INTEGER)-(validDate(b.startTime)||Number.MAX_SAFE_INTEGER));
     const updated=validDate(data.updatedAt), note=current.note||(current.coverage==="available"?"Scores and fixtures are supplied by the verified match feed.":"Match feed is temporarily unavailable.");
     document.querySelector("#feedStatus").textContent=note+(updated?" Last checked "+timeLabel(data.updatedAt)+" (Bangladesh time).":"");

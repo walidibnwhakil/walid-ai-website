@@ -167,8 +167,8 @@ function render() {
   document.querySelector("#upcoming").innerHTML = upcoming.length
     ? upcoming.map(card).join("")
     : "<div class='empty'>No verified upcoming matches are available for " + esc(label) + " right now.</div>";
-  document.querySelector("#recent").innerHTML = recent.length
-    ? recent.map(card).join("")
+  document.querySelector("#recent").innerHTML = limitedRecent.length
+    ? limitedRecent.map(card).join("")
     : "<div class='empty'>No verified recent scores are available for this sport right now.</div>";
 }
 

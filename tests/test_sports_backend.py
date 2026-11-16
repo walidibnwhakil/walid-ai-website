@@ -77,6 +77,15 @@ class SportsBackendTests(unittest.TestCase):
         self.assertEqual(len(result), 2)
         self.assertEqual(next(x for x in result if x.get("id") == "x")["homeScore"], 1)
 
+    def test_deduplicates_id_and_idless_copy_of_same_event(self):
+        rows = [
+            {"id": "source-id", "source": "feed", "homeTeam": "A", "awayTeam": "B", "startTime": "2026-11-20T12:00:00Z"},
+            {"source": "feed", "homeTeam": "A", "awayTeam": "B", "startTime": "2026-11-20T12:00:00Z", "homeScore": 2, "awayScore": 1}
+        ]
+        result = fetch.dedupe_events(rows)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["homeScore"], 2)
+
     def test_failed_cricket_refresh_preserves_last_known_good_data(self):
         previous = {"sports": {"cricket": {
             "label": "Cricket", "coverage": "available",

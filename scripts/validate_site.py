@@ -58,7 +58,7 @@ check_page("games/index.html",
 check_page("tools/index.html",
            ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/"],
            ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'name="description"', '"@type":"ItemList"'])
-check_page("guides/image-tools.html",
+check_page("guides/image-tools/index.html",
            ["/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
             "/tools/background-remover/", "/tools/signature-remover/", "/tools/watermark-remover/"],
            ['name="description"'])

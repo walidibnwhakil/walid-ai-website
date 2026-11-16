@@ -15,9 +15,22 @@ const when = (value) => value
     })
   : "Time unavailable";
 
-const sports = [
-  ["football", "Football"], ["cricket", "Cricket"]
-];
+const alwaysVisibleSports = [["football", "Football"], ["cricket", "Cricket"]];
+let sports = alwaysVisibleSports.slice();
+function activeSeasonalSports(payload, now = Date.now()) {
+  return Object.entries(payload?.seasonal || {}).filter(([, event]) => {
+    const start = validDate(event.officialStart);
+    const end = validDate(event.officialEnd);
+    return Boolean(event.sourceHealth) && Array.isArray(event.matches) && event.matches.length > 0 &&
+      start !== null && end !== null && now >= start && now <= end;
+  }).map(([id, event]) => [id, event.label || id]);
+}
+function syncSportsTabs() {
+  const seasonal = activeSeasonalSports(data);
+  sports = alwaysVisibleSports.concat(seasonal);
+  if (!sports.some(([id]) => id === selected)) selected = "football";
+  renderTabs();
+}
 const CACHE_REFRESH_MS = 5 * 60 * 1000;
 const RECENT_WINDOW_MS = 72 * 60 * 60 * 1000;
 let data = { sports: {} };
@@ -170,6 +183,7 @@ async function refreshData() {
     const payload = await response.json();
     if (payload && typeof payload === "object") {
       data = payload;
+      syncSportsTabs();
       render();
       renderNews(data.items);
     }
@@ -184,7 +198,7 @@ async function refreshData() {
   }
 }
 
-renderTabs();
+syncSportsTabs();
 render();
 refreshData();
 window.setInterval(refreshData, CACHE_REFRESH_MS);

@@ -20,8 +20,36 @@ const templates=[
 (p)=>['What kind of initiative does the passage describe?',p.kind],
 (p)=>['Which title best matches the passage?',p.title]
 ];
-const perGrade=passages.length*templates.length;
-function make(grade,index){const p=passages[Math.floor(index/templates.length)],type=index%templates.length,[question,correct]=templates[type](p);const opts=optionsFor(correct,index+grade,type);return {id:'first-paper-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Read the passage: '+p.text+'\n\n'+question,options:opts.options,answer:opts.answer,why:'The passage states: '+correct+'.',topic:'Reading comprehension',passageTitle:p.title,originalPassage:true}}
+const vocabulary=[
+['community','a group of people living in the same area','a type of vehicle','a single building','a kind of weather'],
+['compost','decayed organic material used to improve soil','a computer program','a metal tool','a river crossing'],
+['preparedness','being ready for possible events','forgetting a task','losing a document','winning a prize'],
+['mechanic','a person who repairs machines','a person who writes novels','a person who studies stars','a person who grows rice'],
+['reusable','able to be used again','designed to break easily','made only of paper','available for one hour'],
+['remote','far from major towns or centres','extremely crowded','very expensive','recently painted'],
+['instructor','a person who teaches or trains','a person who sells tickets','a person who drives buses','a person who builds bridges'],
+['sapling','a young tree','a mature fish','a large mountain','a deep lake'],
+['technician','a person skilled in technical work','a person who sells vegetables','a person who writes poems','a person who plays football'],
+['exchange','to give something and receive something in return','to destroy something','to hide something','to forget something'],
+['recycling','processing used materials so they can be used again','burning all rubbish','throwing things into rivers','making more waste'],
+['athletes','people who take part in sports','people who sell books','people who teach music','people who repair roads'],
+['crossings','places where people can cross roads safely','places to grow crops','places to store books','places to repair bicycles'],
+['varieties','different types of the same general kind','a single fixed shape','the absence of choice','a kind of measurement'],
+['exhibition','a public display of artworks or objects','a private examination','a road closure','a football practice'],
+['conservation','protecting resources from waste or damage','using resources carelessly','selling all resources','closing every school']
+];
+const vocabularyQuestions=passages.length*4;
+const perGrade=passages.length*templates.length+vocabularyQuestions;
+function vocabQuestion(grade,index){const passageIndex=Math.floor(index/4),kind=index%4,v=vocabulary[passageIndex],p=passages[passageIndex];let q,correct,wrong,why;
+if(kind===0){q='In the passage, what does the word "'+v[0]+'" mean?';correct=v[1];wrong=v.slice(2);why='In this context, '+v[0]+' means '+v[1]+'.'}
+else if(kind===1){q='Which word from the passage matches this meaning: "'+v[1]+'"?';correct=v[0];wrong=vocabulary.filter((_,i)=>i!==passageIndex).slice((passageIndex*3)%12,(passageIndex*3)%12+3).map(x=>x[0]);why='The matching word is '+v[0]+'.'}
+else if(kind===2){q='Which statement is supported by the passage?';correct=p.activity;wrong=distractorsByType[3].slice(0,3);why='The passage describes the goal or activity: '+p.activity+'.'}
+else{q='Which item or resource is mentioned in the passage?';correct=p.resource;wrong=distractorsByType[4].slice(0,3);why='The passage mentions '+p.resource+'.'}
+const opts=[correct,...wrong],pos=(index+grade)%4;opts.splice(0,1);opts.splice(pos,0,correct);
+return {id:'first-paper-vocabulary-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Read the passage: '+p.text+'\\n\\n'+q,options:opts,answer:pos,why,topic:kind<2?'Vocabulary in context':'Reading details',passageTitle:p.title,originalPassage:true};
+}
+
+function make(grade,index){if(index>=passages.length*templates.length)return vocabQuestion(grade,index-passages.length*templates.length);const p=passages[Math.floor(index/templates.length)],type=index%templates.length,[question,correct]=templates[type](p);const opts=optionsFor(correct,index+grade,type);return {id:'first-paper-'+grade+'-'+index,grade,subject:'ইংরেজি ১ম পত্র',q:'Read the passage: '+p.text+'\n\n'+question,options:opts.options,answer:opts.answer,why:'The passage states: '+correct+'.',topic:'Reading comprehension',passageTitle:p.title,originalPassage:true}}
 function create(grade,set,count,excluded){if(!Number.isInteger(grade)||grade<6||grade>12||count<=0)return [];const out=[],seen=new Set((excluded||[]).map(q=>q.q));for(let i=0;i<perGrade&&out.length<count;i++){const index=((set-1)*Math.max(1,count)+i)%perGrade,q=make(grade,index);if(!seen.has(q.q)){out.push(q);seen.add(q.q)}}return out}
 function audit(){const seen=new Set(),errors=[];for(let g=6;g<=12;g++)for(let i=0;i<perGrade;i++){const q=make(g,i),key=g+'|'+q.q;if(seen.has(key)||new Set(q.options).size!==4||q.options[q.answer]===undefined)errors.push(q.id);seen.add(key)}return {total:7*perGrade,unique:seen.size,errors,perGrade}}
 window.WalidEnglishFirstPaper={create,audit,perGrade};

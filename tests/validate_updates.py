@@ -14,7 +14,7 @@ for kind in ("news","sports"):
             assert entry["coverage"] in {"available","stale","unavailable"}
             assert isinstance(entry.get("matches"),list)
             for match in entry["matches"]:
-                assert match["homeTeam"] and match["awayTeam"] and match["status"] in {"scheduled","finished"}
+                assert match["homeTeam"] and match["awayTeam"] and match["status"] in {"scheduled","live","in_progress","finished","postponed","cancelled"}
                 datetime.fromisoformat(match["startTime"].replace("Z","+00:00"))
                 if match["status"]=="finished" and match["homeScore"] is not None and match["awayScore"] is not None:
                     assert match["winner"] in {match["homeTeam"],match["awayTeam"],"Draw"}

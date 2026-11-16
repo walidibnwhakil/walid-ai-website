@@ -2,6 +2,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 import re
 import sys
+import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 errors = []
 class Parser(HTMLParser):
@@ -71,3 +72,5 @@ if errors:
     print("\n".join(f"ERROR: {item}" for item in errors))
     sys.exit(1)
 print(f"Validated {len(list(ROOT.rglob('*.html')))} HTML files; PDF/image separation and key navigation are present.")
+
+subprocess.run([sys.executable, str(ROOT / "tests" / "test_sports_backend.py")], cwd=ROOT, check=True)

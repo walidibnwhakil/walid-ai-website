@@ -1,0 +1,57 @@
+# Current-head provider and backend verification
+name: Sports provider verification (read-only)
+on:
+  push:
+    branches:
+      - feat/sports-rolling-72h-scores
+    paths:
+      - ".github/workflows/sports-provider-verify.yml"
+      - "scripts/fetch_updates.py"
+      - "tests/test_sports_backend.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run sports backend regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_sports*.py' -v
+      - name: Verify live provider responses without changing cache
+        shell: bash
+        env:
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from scripts import fetch_updates as f
+          key_present=bool(os.getenv("CRICKETDATA_API_KEY","").strip())
+          print("CricketData secret configured:", key_present)
+          for sport,(label,next_url,past_url) in f.SPORTS.items():
+              upcoming=f.read_events(next_url,"scheduled")
+              results=f.read_events(past_url,"finished")
+              print(f"{sport}: upcoming={len(upcoming)}, recent={len(results)}")
+          print("football: global_recent=",len(f.read_global_soccer_recent()))
+          print("football: openliga=",len(f.read_openliga()))
+          cricket,reason=f.read_cricketdata()
+          print("cricket: matches=",len(cricket),"diagnostic=",reason)
+          print("cricket: scheduled=",sum(x.get("status")=="scheduled" for x in cricket),
+                "live=",sum(x.get("status")=="live" for x in cricket),
+                "finished=",sum(x.get("status")=="finished" for x in cricket),
+                "with_innings=",sum(bool(x.get("innings")) for x in cricket))
+          if not key_present or reason:
+              raise SystemExit("Cricket provider verification incomplete; see sanitized diagnostic above")
+          PY
+      - name: Confirm no tracked files changed
+        if: always()
+        shell: bash
+        run: |
+          git diff --exit-code -- data/news.json data/sports.json

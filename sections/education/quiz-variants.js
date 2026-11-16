@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 function make(grade,set,index){
- const key=(set-1)*100+index, a=7+(key%89),b=3+(Math.floor(key/89)%67), kind=grade<=8?index%4:grade<=10?index%3:index%3;
+ const key=(set-1)*100+index, a=7+(key%97),b=3+(Math.floor(key/97)%67), kind=grade<=8?index%4:grade<=10?index%3:index%3;
  let q,answer,why,subject='গণিত';
  if(grade<=8){
   if(kind===0){answer=a+b;q=a+' + '+b+' = কত?';why=a+' ও '+b+' যোগ করলে '+answer+' হয়।'}

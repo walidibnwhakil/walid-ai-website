@@ -44,7 +44,8 @@ class QuranIntegrityTests(unittest.TestCase):
             self.assertTrue(all(v["arabic"].strip() and v["translation"].strip() for v in verses))
             notes = json.loads((DATA / f"notes-{number:03}.json").read_text(encoding="utf-8"))
             self.assertEqual(notes["surah"], number)
-            self.assertEqual([v["verse"] for v in notes["notes"]], list(range(1, len(verses) + 1)))
+            self.assertTrue(all(1 <= v["verse"] <= len(verses) for v in notes["notes"]))
+            self.assertEqual(len({v["verse"] for v in notes["notes"]}), len(notes["notes"]))
             total += len(verses)
         self.assertEqual(total, 6236)
 

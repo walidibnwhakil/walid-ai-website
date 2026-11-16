@@ -57,7 +57,8 @@ function matchStatus(match) {
   if (["finished", "final", "completed"].includes(status)) return "Finished";
   if (status === "postponed") return "Postponed";
   if (status === "cancelled" || status === "canceled") return "Cancelled";
-  return "Upcoming";
+  const start = validDate(match.startTime);
+  return start !== null && start < Date.now() ? "Awaiting update" : "Upcoming";
 }
 
 function scoreText(match) {
@@ -111,9 +112,9 @@ function validDate(value) {
 
 function formatCountdown(value) {
   const remaining = validDate(value) - Date.now();
-  if (!Number.isFinite(remaining) || remaining <= 0) return "LIVE";
+  if (!Number.isFinite(remaining) || remaining <= 0) return "";
   const total = Math.floor(remaining / 1000), days = Math.floor(total / 86400), hours = Math.floor((total % 86400) / 3600), mins = Math.floor((total % 3600) / 60), secs = total % 60;
-  return (days ? days + "d " : "") + String(hours).padStart(2, "0") + ":" + String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+  return [days, hours, mins, secs].map((part) => String(part).padStart(2, "0")).join(":");
 }
 function renderFeatured() {
   const grid = document.querySelector("#featureGrid");
@@ -128,14 +129,19 @@ function renderFeatured() {
   const mark = (match, side) => {
     const logo = side === "home" ? match.homeLogo : match.awayLogo;
     const team = side === "home" ? match.homeTeam : match.awayTeam;
+    const homeCountry = String(match.homeCountry || "").trim();
+    const awayCountry = String(match.awayCountry || "").trim();
+    const international = homeCountry && awayCountry && homeCountry !== awayCountry;
+    if (international) return "<span class='team-mark flag-mark' role='img' aria-label='" + esc(side === "home" ? homeCountry : awayCountry) + " flag'>" + teamFlag(side === "home" ? homeCountry : awayCountry).replace(/^<span[^>]*>|<\/span>$/g, "") + "</span>";
     return logo ? "<img class='team-mark crest' src='" + esc(logo) + "' alt='" + esc(team) + " crest' loading='lazy' referrerpolicy='no-referrer'>" : "<span class='team-mark' aria-hidden='true'>" + initials(team) + "</span>";
   };
   grid.innerHTML = ["football", "cricket"].map((sport) => {
     const matches = Array.isArray(data.sports?.[sport]?.matches) ? data.sports[sport].matches : [];
-    const selected = matches.filter((match) => validDate(match.startTime) !== null && ["Upcoming", "LIVE"].includes(matchStatus(match))).sort((a, b) => priority(b, sport) - priority(a, sport) || validDate(a.startTime) - validDate(b.startTime))[0];
+    const selected = matches.filter((match) => validDate(match.startTime) !== null && ["Upcoming", "Awaiting update", "LIVE"].includes(matchStatus(match))).sort((a, b) => priority(b, sport) - priority(a, sport) || validDate(a.startTime) - validDate(b.startTime))[0];
     if (!selected) return "<article class='feature-card feature-empty'><div class='feature-kicker'>" + sport + "</div><p>No verified featured match is available right now.</p><a class='feature-action' href='/sections/sports/?sport=" + sport + "'>View All Matches</a></article>";
-    const live = matchStatus(selected) === "LIVE";
-    return "<article class='feature-card'><div class='feature-head'><span class='feature-kicker'>" + sport + "</span><span class='feature-competition'>" + esc(selected.competition || "Competition") + "</span></div><div class='feature-teams'><div class='feature-team'>" + mark(selected, "home") + "<strong>" + esc(selected.homeTeam) + "</strong></div><span class='feature-vs'>VS</span><div class='feature-team'>" + mark(selected, "away") + "<strong>" + esc(selected.awayTeam) + "</strong></div></div><div class='feature-meta'><span>" + (live ? "<strong>LIVE</strong>" : "Upcoming") + "</span><span>" + esc(when(selected.startTime)) + (live ? "" : "<span class='countdown' data-start='" + esc(selected.startTime) + "'>" + formatCountdown(selected.startTime) + "</span>") + "</span></div><a class='feature-action' href='/sections/sports/?sport=" + sport + "'>View All Matches</a></article>";
+    const selectedStatus = matchStatus(selected);
+    const live = selectedStatus === "LIVE";
+    return "<article class='feature-card'><div class='feature-head'><span class='feature-kicker'>" + sport + "</span><span class='feature-competition'>" + esc(selected.competition || "Competition") + "</span></div><div class='feature-teams'><div class='feature-team'>" + mark(selected, "home") + "<strong>" + esc(selected.homeTeam) + "</strong></div><span class='feature-vs'>VS</span><div class='feature-team'>" + mark(selected, "away") + "<strong>" + esc(selected.awayTeam) + "</strong></div></div><div class='feature-meta'><span>" + (live ? "<strong>LIVE</strong>" : selectedStatus) + "</span><span>" + esc(when(selected.startTime)) + (live ? "" : "<span class='countdown' data-start='" + esc(selected.startTime) + "'>" + formatCountdown(selected.startTime) + "</span>") + "</span></div><a class='feature-action' href='/sections/sports/?sport=" + sport + "'>View All Matches</a></article>";
   }).join("");
 }
 
@@ -173,7 +179,7 @@ function render() {
   });
   const upcoming = matches.filter((match) => {
     const start = validDate(match.startTime);
-    return matchStatus(match) === "Upcoming" && start !== null && start >= now;
+    return ["Upcoming", "Awaiting update", "LIVE"].includes(matchStatus(match)) && start !== null;
   }).sort((a, b) => validDate(a.startTime) - validDate(b.startTime));
   const recent = matches.filter((match) => {
     const status = matchStatus(match);

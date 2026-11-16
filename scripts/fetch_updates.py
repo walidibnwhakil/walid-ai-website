@@ -11,6 +11,24 @@ ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"data"
 FEEDS={"news":[("The Daily Star","https://www.thedailystar.net/rss.xml"),("Prothom Alo English","https://en.prothomalo.com/feed/"),("BBC World","https://feeds.bbci.co.uk/news/world/rss.xml")],"sports":[("BBC Sport","https://feeds.bbci.co.uk/sport/rss.xml"),("The Guardian Football","https://www.theguardian.com/football/rss")]}
 OPENLIGA_SEASON_URL="https://api.openligadb.de/getmatchdata/bl1/2026"
 SPORTS={"football":("Football","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4328","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4328")}
+SEASONAL_EVENTS={
+    "olympics":{"label":"Olympics","officialStart":"2028-07-14T00:00:00Z","officialEnd":"2028-07-30T23:59:59Z","sourceHealth":False,"source":"No verified free event feed configured"},
+    "commonwealth":{"label":"Commonwealth Games","officialStart":"2026-07-23T00:00:00Z","officialEnd":"2026-08-02T23:59:59Z","sourceHealth":False,"source":"No verified free event feed configured"},
+}
+def seasonal_visible(event, now=None):
+    now=now or datetime.now(timezone.utc)
+    start=datetime.fromisoformat(event["officialStart"].replace("Z","+00:00"))
+    end=datetime.fromisoformat(event["officialEnd"].replace("Z","+00:00"))
+    return bool(event.get("sourceHealth")) and start <= now <= end and bool(event.get("matches"))
+def seasonal_payload(previous):
+    old=previous.get("seasonal") or {}
+    result={}
+    for key,base in SEASONAL_EVENTS.items():
+        prior=old.get(key,{})
+        result[key]={**base,"coverage":"dormant","matches":[],"note":"This event section stays hidden until its official competition window is active and a verified event feed is healthy."}
+        if prior.get("sourceHealth") and prior.get("matches"):
+            result[key].update({"sourceHealth":True,"coverage":"available","matches":prior["matches"],"note":"Verified event data."})
+    return result
 
 def clean(v): return re.sub(r"\s+"," ",re.sub(r"<[^>]+>","",v or "")).strip()
 def iso(v):
@@ -283,7 +301,7 @@ def build(kind):
         if x["url"] not in seen: seen.add(x["url"]); unique.append(x)
     previous=old(kind); final=unique[:24] or previous.get("items",[])[:24]
     payload={"kind":kind,"updatedAt":datetime.now(timezone.utc).isoformat(),"status":"ok" if unique else ("stale" if final else "error"),"items":final,"sources":sources,"errors":errors}
-    if kind=="sports": payload.update({"scoreSupport":"partial","scoreNote":"Only sports with verified provider responses are shown.","sports":scores(previous)})
+    if kind=="sports": payload.update({"scoreSupport":"partial","scoreNote":"Only sports with verified provider responses are shown.","sports":scores(previous),"seasonal":seasonal_payload(previous)})
     DATA.mkdir(exist_ok=True); (DATA/(kind+".json")).write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n")
     return bool(unique) or bool(final)
 if __name__=="__main__":

@@ -16,6 +16,6 @@ Arabic names, transliteration, English meaning, revelation place and ayah counts
 
 ## Content display
 
-The Islamic section does not place advertisements beside the Quran text. Bengali pronunciation is pending a properly licensed and reviewed source; none is generated automatically. Hadith text is not included in this release.
+The Islamic section does not place advertisements beside the Quran text or Bengali translation. Bengali pronunciation is pending a properly licensed and reviewed source; none is generated automatically. No separate hadith collection or independently authored hadith claims are included. QuranEnc's licensed translator notes may quote or cite narrations; those notes are reproduced unchanged, and this site does not independently grade their authenticity.
 
 The structured files in this folder were prepared from `risan/quran-json` commit `6523a9ad3b73bb7e8cb3a9cdf0ea774b8bab3123` (version 4.0.0). Its CC BY-SA 4.0 notice is included as `QURAN-JSON-LICENSE.txt`; per-source notices and restrictions above remain in force. `provenance.json` records original-source hashes and checksums for each local surah and note file.

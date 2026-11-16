@@ -54,6 +54,7 @@ class SportsBackendTests(unittest.TestCase):
         self.assertIsNone(error)
         self.assertEqual(matches[0]["status"], "finished")
         self.assertEqual(matches[0]["id"], "match-1")
+        self.assertEqual(matches[0]["source"], "CricketData")
         self.assertEqual(matches[0]["innings"][2], {
             "team": "India 2nd Innings", "runs": 100, "wickets": 4, "overs": 32
         })

@@ -9,6 +9,14 @@
 <title>PDF tools | Walid AI</title>
 <link rel="stylesheet" href="/tools/pdf-browser/studio.css">
 <link rel="stylesheet" href="/walid-legal.css">
+<style>
+/* Embedded PDF tool iframes must not render a second site footer. The parent
+   tool page owns the single legitimate footer below its article. */
+html[data-embedded] .legal-footer{display:none!important}
+</style>
+<script>
+if(new URLSearchParams(location.search).has('embedded'))document.documentElement.dataset.embedded='true';
+</script>
 </head>
 <body>
 <div class="file-drop" id="drop">

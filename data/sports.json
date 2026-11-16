@@ -1,13 +1,97 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-16T03:53:09.912314+00:00",
+  "updatedAt": "2026-11-16T12:25:25.071331+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Much still to do on F1 diversity - Hamilton",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/c52e8kpnje42o?at_medium=RSS&at_campaign=rss",
+      "title": "Vinicius says Arsenal interest has affected Real form",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmqx584jwwpvo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-16T00:04:45+00:00",
+      "publishedAt": "2026-11-16T12:01:16+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Belgium's record men's scorer Lukaku retires from internationals",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cwlymxr0ge8zo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T11:40:20+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Republic of Ireland have plenty of promise but are unable to shake the self-sabotage",
+      "url": "https://www.theguardian.com/football/2026/nov/16/republic-of-ireland-heimir-hallgrimsson-nations-league-kosovo",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-16T11:30:56+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Klopp says Infantino worse than Blatter",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cjr4gr2k41dxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T11:27:08+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "French football head Philippe Diallo is shock contender to fight Infantino for Fifa job",
+      "url": "https://www.theguardian.com/football/2026/nov/16/philippe-diallo-fifa-gianni-infantino-president-french-football-federation",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-16T11:20:03+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Camara to race again for Haas in Las Vegas",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/c804w7nxr61zo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T08:35:56+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Burnham urges caution on scrapping 3pm TV blackout",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c6jre22p3941o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T08:18:33+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'We know we can do it' - Farrell eyes Springbok scalp",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6x2ey1r444lo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T08:03:22+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "European football body’s plan to go global leaves Fifa on tenterhooks",
+      "url": "https://www.theguardian.com/football/2026/nov/16/fifa-waits-european-football-clubs-plan-global",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-16T08:00:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Vote for the best men's European striker this century",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmpw45kx90npo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T07:59:20+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "49ers stun Cowboys, Chiefs and Bengals impress - NFL week 10",
+      "url": "https://www.bbc.co.uk/sport/american-football/articles/cmjre22gz0wwo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T07:33:19+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Is Scotland's system limiting Gannon-Doak's threat?",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c64gnpvdld40o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T07:09:40+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Formula 1's one-race wonders",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/cqp9dr4kedd3o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T06:53:18+00:00",
       "category": "Sports"
     },
     {
@@ -32,69 +116,6 @@
       "category": "Sports"
     },
     {
-      "title": "Teenager Andreeva caps stunning week with WTA Finals title",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/c61740145y7wo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T23:18:38+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "First win for Duncan after 12 years & 222 attempts",
-      "url": "https://www.bbc.co.uk/sport/golf/articles/cq39gn9zy4v9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T23:13:54+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Greaves out of Grand Slam despite win over Zonneveld",
-      "url": "https://www.bbc.co.uk/sport/darts/articles/cxlylvy2m5lqo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T22:54:50+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "London City earn point in thrilling draw against Arsenal",
-      "url": "https://www.bbc.co.uk/sport/football/videos/cqy7rd2e400jo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T22:06:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "England fend off fiery Spain fightback after Anderson’s red to top Nations League group",
-      "url": "https://www.theguardian.com/football/2026/nov/15/spain-england-nations-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-15T21:56:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Townsend hails Scotland's defence in Australia 'arm wrestle'",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6vg25x1zqrro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T20:53:34+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "London City's 'bravery' paying off in top three pursuit",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c6y49gzjgew5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T20:03:08+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Ronaldinho, 46, makes comeback for Ravenna",
-      "url": "https://www.bbc.co.uk/sport/football/articles/ckregz4g823xo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T19:31:48+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Red Brawl New York: Fighting and six red cards mar ‘friendly’ v Club América",
-      "url": "https://www.theguardian.com/football/2026/nov/15/red-bulls-club-america-brawl-friendly",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-15T19:29:41+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Ronaldinho makes debut for Italian side Ravenna after 11-year hiatus in playing career",
       "url": "https://www.theguardian.com/football/2026/nov/15/ronaldinho-debut-italian-side-ravenna-after-11-year-hiatus-playing-career",
       "source": "The Guardian Football",
@@ -106,20 +127,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/15/arsenal-london-city-lionesses-womens-super-league-wsl-match-report",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-15T18:53:08+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Triumph or flop? The Rugby League World Cup that split opinion",
-      "url": "https://www.bbc.co.uk/sport/rugby-league/articles/cwdr1dl21l1vo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T15:07:06+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Tearful McIlroy dedicates record-equalling win to ill dad",
-      "url": "https://www.bbc.co.uk/sport/golf/articles/c6kg7rwmz1g8o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-15T12:14:04+00:00",
       "category": "Sports"
     },
     {
@@ -144,13 +151,6 @@
       "category": "Sports"
     },
     {
-      "title": "Nations League roundup: Portugal mauled by Denmark as Norway sink Wales",
-      "url": "https://www.theguardian.com/football/2026/nov/14/clinical-norway-dent-wales-nations-league-top-tier-hopes-with-victory-in-oslo",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-14T22:23:39+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Here Manchester United go again, taking the Two Ronnies route to hiring a new boss | Jonathan Wilson",
       "url": "https://www.theguardian.com/football/2026/nov/14/here-manchester-united-go-again-taking-the-two-ronnies-route-to-hiring-a-new-boss",
       "source": "The Guardian Football",
@@ -165,10 +165,10 @@
       "category": "Sports"
     },
     {
-      "title": "Mauricio Pochettino asked the US to believe in his project. Did he believe in it himself?",
-      "url": "https://www.theguardian.com/football/2026/nov/14/mauricio-pochettino-usmnt-legacy-belief",
+      "title": "Sign up for the Football Daily newsletter: our free football email",
+      "url": "https://www.theguardian.com/info/2022/nov/14/football-daily-email-sign-up",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-14T14:06:37+00:00",
+      "publishedAt": "2022-11-14T09:05:50+00:00",
       "category": "Sports"
     }
   ],

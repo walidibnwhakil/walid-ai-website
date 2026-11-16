@@ -1,10 +1,143 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-16T03:53:09.509582+00:00",
+  "updatedAt": "2026-11-16T12:25:24.792825+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Mexican drug lord Miguel Angel Felix Gallardo dies age 80",
+      "title": "Elon Musk joins 'Bring Jensen Back' campaign to reinstate the ex-Nvidia boss",
+      "url": "https://www.bbc.co.uk/news/articles/cry49plv8v3go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T12:20:49+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Five EU countries expected to announce migrant deportation centre in Rwanda",
+      "url": "https://www.bbc.co.uk/news/articles/cw987343352go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T11:55:57+00:00",
+      "category": "World"
+    },
+    {
+      "title": "China’s proposed economic corridor: What it means for Bangladesh",
+      "url": "https://en.prothomalo.com/bangladesh/4g642f69uc",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T11:50:29+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Where is the state in Khulna, actually?",
+      "url": "https://en.prothomalo.com/opinion/op-ed/7mq8ppwtx3",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T11:33:05+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Klopp says Infantino worse than Blatter",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cjr4gr2k41dxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T11:27:08+00:00",
+      "category": "World"
+    },
+    {
+      "title": "A river, 5 boats and thousands of spectators: Women’s boat race in Khulna",
+      "url": "https://en.prothomalo.com/video/hqn4qx427w",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T11:20:03+00:00",
+      "category": "World"
+    },
+    {
+      "title": "A hotelier talks about the art of hospitality and his passion for art",
+      "url": "https://en.prothomalo.com/lifestyle/l371alum05",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T11:13:49+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Yemeni forces retreat to defend port city from Houthis",
+      "url": "https://www.bbc.co.uk/news/articles/cqvg2xgyvnjpo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T11:09:38+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Glenn Close, Ridley Scott receive honorary Oscars in career firsts",
+      "url": "https://en.prothomalo.com/entertainment/movies/fxljcr23gq",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T11:06:37+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Two mass shootings in South Africa leave 17 dead",
+      "url": "https://www.bbc.co.uk/news/articles/c8y5x3n4kywpo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T10:57:48+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Nominee for savings certificate, bank account not necessarily owner, what legal heirs should do",
+      "url": "https://en.prothomalo.com/business/local/ss4e32t4rm",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T10:57:12+00:00",
+      "category": "World"
+    },
+    {
+      "title": "This proves they have no presence outside Gopalganj: Information Minister",
+      "url": "https://en.prothomalo.com/bangladesh/politics/jl07ganzkx",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T10:33:17+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Local govt elections: Voting in 1,026 union parishads in first phase",
+      "url": "https://en.prothomalo.com/bangladesh/j3vye8fsj1",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T10:13:12+00:00",
+      "category": "World"
+    },
+    {
+      "title": "BGB patrols Gopalganj with armoured vehicles and body-worn cameras",
+      "url": "https://en.prothomalo.com/bangladesh/local-news/4je99mp912",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T10:08:37+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Ton-up Litton, lower order power Bangladesh to 400, pile pressure on South Africa",
+      "url": "https://en.prothomalo.com/sports/cricket/ganp5g0tpe",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T09:54:20+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Visiting the parliament from the village, Meherin and Shimana set higher goals",
+      "url": "https://en.prothomalo.com/youth/education/b59mg6iitw",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T09:41:45+00:00",
+      "category": "World"
+    },
+    {
+      "title": "From patient-centered care to physician-enabled patient care",
+      "url": "https://en.prothomalo.com/opinion/kmsocrmfsg",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T09:21:29+00:00",
+      "category": "World"
+    },
+    {
+      "title": "UK and allies call on Israel to allow rapid humanitarian access to Gaza",
+      "url": "https://www.bbc.co.uk/news/articles/cwm2mllj1pp8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T08:56:04+00:00",
+      "category": "World"
+    },
+    {
+      "title": "US basketball player arrested with 34kg of cannabis at Nigerian airport",
+      "url": "https://www.bbc.co.uk/news/articles/cj93rggenq4xo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T07:24:45+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Mexican drug lord Miguel Ángel Félix Gallardo dies age 80",
       "url": "https://www.bbc.co.uk/news/articles/c51k9nkwrndxo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-16T03:21:56+00:00",
@@ -18,94 +151,24 @@
       "category": "World"
     },
     {
-      "title": "Yemeni forces' retreat leaves Houthis in control of key Red Sea waterway",
-      "url": "https://www.bbc.co.uk/news/articles/cqvg2xgyvnjpo?at_medium=RSS&at_campaign=rss",
+      "title": "Clothing factories shut in Bangladesh as workers strike over pay",
+      "url": "https://www.bbc.co.uk/news/articles/cx5y1pzr9604o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-16T03:08:31+00:00",
-      "category": "World"
-    },
-    {
-      "title": "‘Bangladesh will return to its previous state in December’ — arrested SP sent messages to AL leaders",
-      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/d1lldqlehs",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-16T03:08:02+00:00",
+      "publishedAt": "2026-11-16T01:05:44+00:00",
       "category": "Bangladesh"
     },
     {
-      "title": "Foreign, and CHT Affairs ministries fail to spend a single taka in 4 months",
-      "url": "https://en.prothomalo.com/bangladesh/rh7hxpnxfh",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-16T03:07:50+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Aroma of new rice brings festive spirit of Nabanna",
-      "url": "https://en.prothomalo.com/photo/i50je4agsj",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-16T03:07:30+00:00",
+      "title": "Teenager Andreeva caps stunning week with WTA Finals title",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/c61740145y7wo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T23:18:38+00:00",
       "category": "World"
-    },
-    {
-      "title": "Suspected China spy linked to Nvidia's ex-boss left in 2025, Megaspeed says",
-      "url": "https://www.bbc.co.uk/news/articles/cmdx1vpprk9vo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T01:47:57+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Steering failure preceded New Orleans cruise ship collision, says NTSB",
-      "url": "https://www.bbc.co.uk/news/articles/c65y131w1534o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T22:57:27+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Police ban protests near 10 schools and five universities in Paris",
-      "url": "https://www.bbc.co.uk/news/articles/cqm2j0jvep4eo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T22:28:54+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Canada bars Russia from Junior World Championships",
-      "url": "https://www.bbc.co.uk/sport/ice-hockey/articles/cqkgm0jgv4mdo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T22:01:16+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Prince Harry praises war veterans on surprise visit to Ukraine",
-      "url": "https://www.bbc.co.uk/news/articles/c60evn992jq8o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T22:00:13+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Czechs rally against plan to switch funding of public media",
-      "url": "https://www.bbc.co.uk/news/articles/cm8e0knr7604o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T21:03:40+00:00",
-      "category": "Technology"
     },
     {
       "title": "Zelensky urges US and Musk to lift Starlink restrictions and be on 'right side of history'",
       "url": "https://www.bbc.co.uk/news/articles/c6m25zg88k45o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-15T19:32:39+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Pope Leo rides in helicopter cockpit during Peru trip",
-      "url": "https://www.bbc.co.uk/news/videos/c6pw4rl00lrjo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T18:38:11+00:00",
-      "category": "World"
-    },
-    {
-      "title": "South Korea's top scorer in tax accountancy exam admits cheating",
-      "url": "https://www.bbc.co.uk/news/articles/ckvg2ezvpe08o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T13:37:45+00:00",
       "category": "World"
     }
   ],

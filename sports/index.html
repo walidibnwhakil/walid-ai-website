@@ -1,35 +1,216 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Verified football and cricket fixtures from Walid AI.">
-<title>Sports — Walid AI</title><link rel="canonical" href="https://walid-ai.com/sports/"><link rel="stylesheet" href="/walid-legal.css">
-<style>
-:root{--ink:#17231d;--muted:#6b776f;--line:#dfe8e1;--accent:#146c54;--gold:#d66b29;--paper:#fbfcfa}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}main{width:min(1160px,calc(100% - 32px));margin:auto;padding:24px 0 64px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px}.logo{width:132px;height:44px;object-fit:contain}.back,.action{display:inline-flex;align-items:center;border:1px solid #c9d9ce;border-radius:999px;padding:9px 15px;text-decoration:none;font-weight:700;color:var(--ink);background:#fff}.hero{padding:60px 0 30px}.eyebrow,.kicker{color:var(--accent);font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.hero h1{margin:8px 0 12px;font:400 clamp(2.7rem,7vw,5.8rem)/.98 Georgia,serif;letter-spacing:-.06em}.hero p{max-width:680px;color:var(--muted);font-size:1.05rem}.category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.category-card{position:relative;display:flex;min-height:390px;flex-direction:column;justify-content:space-between;overflow:hidden;border:1px solid var(--line);border-radius:30px;padding:30px;background:linear-gradient(145deg,#fff 0%,#eff8f2 100%);box-shadow:0 22px 50px rgba(21,53,37,.1);text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s}.category-card:hover,.category-card:focus-visible{transform:translateY(-4px);box-shadow:0 28px 60px rgba(21,53,37,.16)}.category-card.cricket{background:linear-gradient(145deg,#fff 0%,#f5f0e7 100%)}.category-title{font:400 clamp(2.2rem,4vw,4rem)/1 Georgia,serif;margin:8px 0}.category-copy{max-width:340px;color:var(--muted)}.featured{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin:22px 0 16px}.featured-team{text-align:center;min-width:0}.featured-mark{display:grid;place-items:center;width:78px;height:78px;margin:0 auto 10px;border-radius:50%;border:1px solid #d7e2d9;background:#fff;color:var(--accent);font-weight:800;font-size:1.2rem;object-fit:contain}.featured-mark.crest{padding:10px}.featured-team strong{display:block;font-size:.98rem;line-height:1.2}.featured-vs{font:700 1.15rem Georgia,serif;color:var(--gold)}.countdown{display:block;margin-top:5px;text-align:center;font:700 clamp(1.35rem,3vw,2rem)/1 Georgia,serif;font-variant-numeric:tabular-nums}.category-icon{font-size:5rem;line-height:1;opacity:.9;align-self:flex-end}.category-footer{display:flex;justify-content:space-between;align-items:center;margin-top:20px}.arrow{font-size:1.5rem}.detail{display:none}.detail.show{display:block}.landing.hidden{display:none}.detail-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:56px 0 24px}.detail-head h1{margin:7px 0 0;font:400 clamp(2.3rem,6vw,4.5rem)/1 Georgia,serif;letter-spacing:-.05em}.detail-actions{display:flex;gap:8px}.notice{padding:14px 17px;border-left:4px solid var(--gold);background:#fff7ef;color:#704426;margin:0 0 28px}.section-title{margin:30px 0 12px;font:400 1.65rem Georgia,serif}.match-list{display:grid;gap:12px}.match{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:20px;border:1px solid var(--line);border-radius:16px;background:#fff}.team:last-child{text-align:right}.team strong{display:block;font-size:1.04rem}.meta,.status{display:block;color:var(--muted);font-size:.82rem}.score{text-align:center;font-weight:800;font-size:1.2rem}.live{color:#b33a2d}.empty{padding:22px;border:1px dashed #cbd9ce;color:var(--muted);background:#fff}.footer{margin-top:48px;color:var(--muted)}@media(max-width:700px){main{width:min(100% - 22px,600px)}.category-grid{grid-template-columns:1fr}.category-card{min-height:300px;padding:24px}.detail-head{align-items:flex-start;flex-direction:column;margin-top:38px}.match{grid-template-columns:1fr;gap:8px}.team,.team:last-child{text-align:left}.score{text-align:left}.top .logo{width:112px;height:38px}}
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Verified sports fixtures and results from Walid AI."><title>Sports — Walid AI</title><link rel="canonical" href="https://walid-ai.com/sports/"><link rel="stylesheet" href="/walid-legal.css"><style>
+:root{--ink:#17231d;--muted:#69766e;--line:#e4eae5;--accent:#146c54;--orange:#d66b29}*{box-sizing:border-box}body{margin:0;color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif;background:#fbfcfa}main{width:min(1180px,calc(100% - 32px));margin:auto;padding:24px 0 60px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px}.top .logo{width:132px;height:44px;max-width:132px;object-fit:contain;display:block}.back{padding:8px 14px;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:.9rem}.hero{padding:54px 0 24px}.eyebrow{color:var(--accent);font-size:.78rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase}.hero h1{margin:8px 0;font:400 clamp(2.4rem,6vw,4.6rem)/1.05 Georgia,serif;letter-spacing:-.05em}.hero p{max-width:740px;color:var(--muted);font-size:1.05rem}.sports-nav{display:flex;gap:8px;overflow:auto;padding:4px 0 16px;scrollbar-width:thin}.sport-tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 17px;font:inherit;cursor:pointer;white-space:nowrap}.sport-tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}.notice{padding:15px 18px;border-left:4px solid var(--orange);background:#fff7ef;color:#704426;margin:12px 0 28px}.section-title{margin:30px 0 12px;font:400 1.7rem Georgia,serif}.match-list{display:grid;gap:12px}.match{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:20px;border:1px solid var(--line);background:#fff;border-radius:14px}.team:last-child{text-align:right}.team strong{display:block;font-size:1.05rem}.competition,.kickoff,.status,.source{color:var(--muted);font-size:.82rem}.team-flag{font-size:1rem;margin-left:4px;white-space:nowrap}.score{text-align:center;font-size:1.3rem;font-weight:700;white-space:nowrap}.empty{padding:22px;border:1px dashed #ccd9d0;color:var(--muted);background:#fff}.news{margin-top:42px}.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.news-card{padding:17px;border:1px solid var(--line);background:#fff}.news-card h3{margin:7px 0;font-size:1.1rem}.legal-footer{margin-top:36px;color:var(--muted)}@media(max-width:650px){main{width:min(100% - 22px,600px)}.top{align-items:flex-start}.top .logo{width:112px;height:38px;max-width:112px}.match{grid-template-columns:1fr;gap:8px}.team,.team:last-child{text-align:left}.score{text-align:left}.news-grid{grid-template-columns:1fr}}
+/* Sports card refinement */
+.hero .eyebrow{display:none}.hero h1{font-size:clamp(2.4rem,6vw,4.6rem)}
+.match{grid-template-columns:minmax(0,1fr) minmax(150px,190px) minmax(0,1fr);gap:20px;padding:22px;border-radius:16px;box-shadow:0 5px 18px rgba(23,35,29,.04)}
+.team{min-width:0}.team strong{display:flex;align-items:center;gap:8px;line-height:1.3;overflow-wrap:anywhere}.team:last-child strong{justify-content:flex-end}.team-flag{font-size:1.6rem;line-height:1}.competition{display:block;line-height:1.4;overflow-wrap:anywhere}.score{min-width:0}.score-main{font-size:1.45rem;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}.score-meta{margin-top:4px;color:var(--muted);font-size:.78rem}.score-breakdown{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;display:grid;gap:7px;color:var(--muted);font-size:.86rem}.innings-row{display:flex;justify-content:space-between;gap:18px;min-width:0}.innings-row span:first-child{overflow-wrap:anywhere}.innings-row strong{white-space:nowrap;color:var(--ink);font-variant-numeric:tabular-nums}.match-foot{grid-column:1/-1;border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.82rem}@media(max-width:650px){.match{grid-template-columns:minmax(0,1fr) minmax(100px,118px) minmax(0,1fr);gap:10px;padding:16px 12px}.team strong{font-size:.96rem}.team-flag{font-size:1.35rem}.score-main{font-size:1.18rem}.innings-row{gap:8px;font-size:.8rem}}
 </style></head>
-<body><main>
-<header class="top"><a href="/"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><a class="back" href="/">← Main menu</a></header>
-<section id="landing" class="landing"><div class="hero"><div class="eyebrow">Walid AI</div><h1>Sports</h1></div><div id="categories" class="category-grid"></div></section>
-<section id="detail" class="detail"><div class="detail-head"><div><div class="eyebrow">Walid AI match center</div><h1 id="detailTitle"></h1></div><div class="detail-actions"><a class="back" href="/sports/">← Sports</a></div></div><div id="notice" class="notice">Loading verified sports data…</div><section id="recentSection"><h2 class="section-title">Latest results</h2><div id="recent" class="match-list"></div></section><section><h2 class="section-title">Live & upcoming</h2><div id="upcoming" class="match-list"></div></section></section>
-<footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us/">About Us</a><span aria-hidden="true">·</span><a href="/contact-us/">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy/">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service/">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
-</main>
+<body><main><header class="top"><a href="/"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><a class="back" href="/">← Main menu</a></header><section class="hero"><div class="eyebrow">Walid AI match center</div><h1>Follow the game.</h1><p>See upcoming matches in date and time order, with the next match first. All times are shown in Bangladesh time; final scores appear when available.</p></section><nav id="sportsNav" class="sports-nav" aria-label="Sports"></nav><div class="notice" id="notice">Loading verified sports data…</div><section><h2 class="section-title">Recent Scores (Last 3 Days)</h2><div id="recent" class="match-list"></div></section><section><h2 class="section-title" id="upcomingTitle">Upcoming Matches</h2><div id="upcoming" class="match-list"></div></section><section class="news"><h2>Sports news</h2><div id="newsGrid" class="news-grid"></div></section><footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us/">About Us</a> · <a href="/contact-us/">Contact Us</a> · <a href="/privacy-policy/">Privacy Policy</a> · <a href="/terms-of-service/">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer></main>
 <script>
-const esc=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const date=v=>{const n=v?Date.parse(v):NaN;return Number.isFinite(n)?n:null};
-const when=v=>v?new Date(v).toLocaleString("en-GB",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Dhaka"}):"Time unavailable";
-const names={football:"Football",cricket:"Cricket"};
-const flagCodes={Germany:"DE",England:"GB",Spain:"ES",Italy:"IT",France:"FR",India:"IN",Pakistan:"PK",Bangladesh:"BD",Nepal:"NP",Australia:"AU",Canada:"CA",Japan:"JP",China:"CN","South Africa":"ZA","New Zealand":"NZ","Sri Lanka":"LK",Ireland:"IE",Scotland:"GB",Netherlands:"NL",Namibia:"NA",Rwanda:"RW",Uganda:"UG",Thailand:"TH","United States":"US","United States of America":"US"};
-function flag(country){const code=flagCodes[String(country||"").trim()];return code?[...code].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join(""):""}
-function countdown(value){const n=date(value);if(n===null)return"";let s=Math.floor((n-Date.now())/1000);if(s<=0)return"";const d=Math.floor(s/86400);s%=86400;const h=Math.floor(s/3600);s%=3600;const m=Math.floor(s/60);s%=60;const two=x=>String(x).padStart(2,"0");return d?d+" Days "+two(h)+":"+two(m)+":"+two(s):two(h)+":"+two(m)+":"+two(s)}
-function status(m){const s=String(m.status||"").toLowerCase();if(["live","in_progress","in progress"].includes(s))return"LIVE";if(["finished","final","completed"].includes(s))return"Finished";if(["postponed","cancelled","canceled"].includes(s))return s==="postponed"?"Postponed":"Cancelled";return date(m.startTime)!==null&&date(m.startTime)<Date.now()?"Awaiting update":"Upcoming"}
-function valid(m){const a=String(m.homeTeam||"").trim(),b=String(m.awayTeam||"").trim();return a&&b&&!/^(tbc|tbd|unknown)$/i.test(a)&&!/^(tbc|tbd|unknown)$/i.test(b)&&date(m.startTime)!==null}
-function dedupe(list){const seen=new Set();return (Array.isArray(list)?list:[]).filter(m=>{const key=String(m.id||[m.homeTeam,m.awayTeam,m.startTime]);return valid(m)&&!seen.has(key)&&seen.add(key)})}
-function priority(m,s){const t=(m.homeTeam+" "+m.awayTeam+" "+(m.competition||"")).toLowerCase();return (/world cup|champions league|premier league|bundesliga|asia cup|test/.test(t)?40:0)+(/bayern|dortmund|arsenal|barcelona|real madrid|manchester|india|pakistan|bangladesh|australia|england/.test(t)?25:0)+(s==="cricket"&&/bangladesh|india|pakistan/.test(t)?25:0)}
-function crest(m,side){const team=side==="home"?m.homeTeam:m.awayTeam,country=side==="home"?m.homeCountry:m.awayCountry,logo=side==="home"?m.homeLogo:m.awayLogo;const lc=String(team||"").toLowerCase(),cc=String(country||"").toLowerCase();const international=country&&((lc===cc)||lc.includes(cc)||/international|world cup|euro|copa|nations|t20i|test match/.test(String(m.competition||"").toLowerCase()));if(international&&flag(country))return "<span class='featured-mark' role='img' aria-label='"+esc(country)+" flag'>"+flag(country)+"</span>";const initials=String(team||"").split(/\\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase();let safeLogo="";try{const u=new URL(String(logo||""));if(u.protocol==="https:"&&["openligadb.de","openligadb.com","upload.wikimedia.org","assets.dfb.de"].some(host=>u.hostname===host||u.hostname.endsWith("."+host)))safeLogo=u.href}catch(_e){}if(safeLogo)return "<img class='featured-mark crest' src='"+esc(safeLogo)+"' alt='"+esc(team)+" crest' loading='lazy' referrerpolicy='no-referrer'>";return "<span class='featured-mark' aria-hidden='true'>"+esc(initials)+"</span>"}
-function score(m,s){if(s==="cricket"&&Array.isArray(m.innings)&&m.innings.length)return m.innings.map(i=>{const x=[i.runs,i.wickets==null?null:i.wickets].filter(v=>v!=null).join("/");return (i.team||"")+": "+x+(i.overs!=null?" ("+i.overs+" ov)":"")}).join(" · ");return m.homeScore==null||m.awayScore==null?"vs":m.homeScore+" – "+m.awayScore}
-function card(m,s){const st=status(m),live=st==="LIVE";return "<article class='match'><div class='team'><strong>"+esc(m.homeTeam)+" "+flag(m.homeCountry)+"</strong><span class='meta'>"+esc(m.competition||"Competition")+"</span></div><div class='score "+(live?"live":"")+"'>"+(live?"LIVE · ":"")+esc(score(m,s))+"<span class='meta'>"+esc(when(st==="Finished"?(m.finishedAt||m.endTime||m.startTime):m.startTime))+"</span><span class='status'>"+esc(st)+"</span></div><div class='team'><strong>"+esc(m.awayTeam)+" "+flag(m.awayCountry)+"</strong><span class='meta'>Verified provider data</span></div></article>"}
-function renderLanding(data){document.querySelector("#categories").innerHTML=["football","cricket"].map(s=>{const matches=dedupe(data.sports?.[s]?.matches),pick=matches.filter(m=>["Upcoming","LIVE","Awaiting update"].includes(status(m))).sort((a,b)=>priority(b,s)-priority(a,s)||date(a.startTime)-date(b.startTime))[0];const featured=pick?"<div class='featured'><div class='featured-team'>"+crest(pick,"home")+"<strong>"+esc(pick.homeTeam)+"</strong></div><div class='featured-vs'>VS</div><div class='featured-team'>"+crest(pick,"away")+"<strong>"+esc(pick.awayTeam)+"</strong></div></div><div class='countdown' data-kickoff='"+esc(pick.startTime)+"'>"+(status(pick)==="LIVE"?"LIVE":countdown(pick.startTime)||"Awaiting update")+"</div>":"<div class='feature-empty'>No verified featured fixture available.</div>";return "<a class='category-card "+s+"' href='/sports/?sport="+s+"'><div><div class='kicker'>"+s+"</div><h2 class='category-title'>"+names[s]+"</h2><p class='category-copy'>Verified featured matchup</p>"+featured+"</div><div class='category-footer'><span>View all matches</span><span class='arrow'>↗</span></div></a>"}).join("");setInterval(()=>document.querySelectorAll('.countdown[data-kickoff]').forEach(el=>{const v=countdown(el.dataset.kickoff);if(v)el.textContent=v}),1000)}
-function renderDetail(data,s){const current=data.sports?.[s]||{},matches=dedupe(current.matches),recent=matches.filter(m=>status(m)==="Finished").sort((a,b)=>date(b.finishedAt||b.endTime||b.startTime)-date(a.finishedAt||a.endTime||a.startTime)).slice(0,3),upcoming=matches.filter(m=>["Upcoming","LIVE","Awaiting update"].includes(status(m))).sort((a,b)=>date(a.startTime)-date(b.startTime));document.querySelector("#detailTitle").textContent=names[s];document.querySelector("#notice").textContent=(current.note||"Verified sport feed.")+(data.updatedAt?" Last checked "+when(data.updatedAt)+".":"");document.querySelector("#recentSection").hidden=!recent.length;document.querySelector("#recent").innerHTML=recent.length?recent.map(m=>card(m,s)).join(""):"";document.querySelector("#upcoming").innerHTML=upcoming.length?upcoming.map(m=>card(m,s)).join(""):"<div class='empty'>No verified upcoming matches are available right now.</div>"}
-async function load(){try{const r=await fetch("/data/sports.json",{cache:"no-store"});if(!r.ok)throw Error(r.status);const data=await r.json();const s=new URLSearchParams(location.search).get("sport");if(names[s]){document.querySelector("#landing").classList.add("hidden");document.querySelector("#detail").classList.add("show");renderDetail(data,s)}else renderLanding(data)}catch(e){document.querySelector("#categories").innerHTML="<div class='empty'>Sports information is temporarily unavailable.</div>"}}
-load();
-</script></body></html>
+const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[char]));
+
+const when = (value) => value
+  ? new Date(value).toLocaleString("en-GB", {
+      dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Dhaka"
+    })
+  : "Time unavailable";
+
+const alwaysVisibleSports = [["football", "Football"], ["cricket", "Cricket"]];
+let sports = alwaysVisibleSports.slice();
+function activeSeasonalSports(payload, now = Date.now()) {
+  return Object.entries(payload?.seasonal || {}).filter(([, event]) => {
+    const start = validDate(event.officialStart);
+    const end = validDate(event.officialEnd);
+    return Boolean(event.sourceHealth) && Array.isArray(event.matches) && event.matches.length > 0 &&
+      start !== null && end !== null && now >= start && now <= end;
+  }).map(([id, event]) => [id, event.label || id]);
+}
+function syncSportsTabs() {
+  const seasonal = activeSeasonalSports(data);
+  sports = alwaysVisibleSports.concat(seasonal);
+  if (!sports.some(([id]) => id === selected)) selected = "football";
+  renderTabs();
+}
+const CACHE_REFRESH_MS = 5 * 60 * 1000;
+const RECENT_WINDOW_MS = 72 * 60 * 60 * 1000;
+let data = { sports: {} };
+let selected = new URLSearchParams(location.search).get("sport") || "football";
+let refreshInFlight = false;
+document.querySelector(".hero h1").textContent = "Sports";
+document.querySelector(".hero p").textContent = "Stay close to the action with live scores, recent results, and upcoming fixtures from your favorite sports.";
+
+function renderTabs() {
+  const nav = document.querySelector("#sportsNav");
+  nav.innerHTML = sports.map(([id, name]) =>
+    "<button class='sport-tab' type='button' data-sport='" + id + "' aria-pressed='" + (id === selected) + "'>" + name + "</button>"
+  ).join("");
+  nav.querySelectorAll(".sport-tab").forEach((button) => {
+    button.addEventListener("click", () => {
+      selected = button.dataset.sport;
+      render();
+    });
+  });
+}
+
+function matchStatus(match) {
+  const status = String(match.status || "").toLowerCase();
+  if (["live", "in_progress", "in progress"].includes(status)) return "LIVE";
+  if (["finished", "final", "completed"].includes(status)) return "Finished";
+  if (status === "postponed") return "Postponed";
+  if (status === "cancelled" || status === "canceled") return "Cancelled";
+  return "Upcoming";
+}
+
+function scoreText(match) {
+  if (match.homeScore == null || match.awayScore == null) return "vs";
+  return esc(match.homeScore) + " – " + esc(match.awayScore);
+}
+
+function countdown(value) {
+  const remaining = Math.max(0, (validDate(value) || 0) - Date.now());
+  const total = Math.floor(remaining / 1000);
+  const days = Math.floor(total / 86400);
+  const hours = Math.floor((total % 86400) / 3600).toString().padStart(2, "0");
+  const minutes = Math.floor((total % 3600) / 60).toString().padStart(2, "0");
+  const seconds = (total % 60).toString().padStart(2, "0");
+  return days ? days + " days " + hours + ":" + minutes + ":" + seconds : hours + ":" + minutes + ":" + seconds;
+}
+
+function teamFlag(country, team) {
+  const codes = { Germany: "DE", England: "GB", Spain: "ES", Italy: "IT", France: "FR", India: "IN", Pakistan: "PK", Bangladesh: "BD", Nepal: "NP", Australia: "AU", Canada: "CA", Japan: "JP", China: "CN", Namibia: "NA", Rwanda: "RW", Uganda: "UG", "United States of America": "US", "Sri Lanka": "LK", Ireland: "IE", "Papua New Guinea": "PG", Scotland: "GB", Netherlands: "NL", Thailand: "TH" };
+  const raw = String(country || team || "").replace(/\s+Women$/i, "").trim();
+  const code = codes[raw] || "";
+  if (!code) return "";
+  return "<span class='team-flag' title='" + esc(country) + "' aria-label='" + esc(country) + "'>" + [...code].map((char) => String.fromCodePoint(127397 + char.charCodeAt(0))).join("") + "</span>";
+}
+
+function card(match) {
+  const status = matchStatus(match);
+  const live = status === "LIVE";
+  const stamp = status === "Finished"
+    ? (match.finishedAt || match.endTime || match.startTime)
+    : match.startTime;
+  const cricket = selected === "cricket";
+  const innings = cricket && Array.isArray(match.innings) ? match.innings : [];
+  const breakdown = innings.map((inn) => {
+    const score = [inn.runs, inn.wickets == null ? null : inn.wickets].filter(x => x != null).join("/");
+    const overs = inn.overs == null ? "" : " " + esc(inn.overs) + " ov";
+    return score ? "<div class='innings-row'><span>" + esc(inn.team || "Innings") + "</span><strong>" + esc(score) + overs + "</strong></div>" : "";
+  }).filter(Boolean).join("");
+  const score = scoreText(match);
+  return "<article class='match'><div class='team'><strong>" + esc(match.homeTeam) + " " + teamFlag(match.homeCountry, match.homeTeam) + "</strong></div>" +
+    "<div class='score'><div class='score-main'>" + (live ? "<span class='live-badge'>LIVE </span>" : "") + score + "</div><div class='score-meta'>" + (status === "Upcoming" ? countdown(match.startTime) : esc(match.matchType || match.format || "Score")) + "</div></div>" +
+    "<div class='team'><strong>" + teamFlag(match.awayCountry, match.awayTeam) + " " + esc(match.awayTeam) + "</strong></div>" +
+    (cricket && breakdown ? "<div class='score-breakdown'>" + breakdown + "</div>" : "") +
+    "<div class='match-foot'><span>" + esc(match.competition || "Competition") + "</span><span>·</span><span>" + esc(when(stamp)) + "</span><span>·</span><span>" + esc(status) + (match.winner ? " · " + esc(match.winner) + " won" : "") + "</span></div></article>";
+}
+
+function validDate(value) {
+  const parsed = value ? Date.parse(value) : NaN;
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function render() {
+  const current = data.sports?.[selected] || {
+    coverage: "unavailable", matches: [],
+    note: "Match schedule is currently unavailable for this sport."
+  };
+  const label = sports.find(([id]) => id === selected)?.[1] || selected;
+  document.querySelectorAll(".sport-tab").forEach((button) => {
+    button.classList.toggle("active", button.dataset.sport === selected);
+    button.setAttribute("aria-pressed", String(button.dataset.sport === selected));
+  });
+  const updatedAt = validDate(data.updatedAt);
+  const provider = current.source ? " Provider: " + current.source + "." : "";
+  document.querySelector("#notice").textContent = updatedAt
+    ? "Match information last updated " + when(data.updatedAt) + "." + provider + " Coverage reflects the verified provider feed; it is not a guarantee of every competition."
+    : "Match information is temporarily unavailable.";
+  if (current.note && current.coverage !== "available") {
+    document.querySelector("#notice").textContent = current.note + (updatedAt ? " Last checked " + when(data.updatedAt) + "." : "") + provider;
+  }
+  const now = Date.now();
+  const rawMatches = Array.isArray(current.matches) ? current.matches : [];
+  const matches = [];
+  const seenMatches = new Set();
+  rawMatches.forEach((match) => {
+    const home = String(match.homeTeam || "").trim().toLowerCase();
+    const away = String(match.awayTeam || "").trim().toLowerCase();
+    if (!home || !away || (home === "tbc" && away === "tbc")) return;
+    const start = String(match.startTime || "");
+    const key = match.id ? String(match.id) : [home, away, start].join("|");
+    if (seenMatches.has(key)) return;
+    seenMatches.add(key);
+    matches.push(match);
+  });
+  const upcoming = matches.filter((match) => {
+    const start = validDate(match.startTime);
+    return matchStatus(match) === "Upcoming" && start !== null && start >= now;
+  }).sort((a, b) => validDate(a.startTime) - validDate(b.startTime));
+  const recent = matches.filter((match) => {
+    const status = matchStatus(match);
+    const start = validDate(match.startTime);
+    if (status === "LIVE") return start !== null && start <= now && now - start <= RECENT_WINDOW_MS;
+    if (status !== "Finished") return false;
+    const completed = validDate(match.finishedAt || match.endTime);
+    const eventTime = completed ?? start;
+    return eventTime !== null && eventTime <= now && now - eventTime <= RECENT_WINDOW_MS;
+  }).sort((a, b) => {
+    const aTime = validDate(a.finishedAt || a.endTime || a.startTime);
+    const bTime = validDate(b.finishedAt || b.endTime || b.startTime);
+    return bTime - aTime;
+  });
+  document.querySelector("#upcoming").innerHTML = upcoming.length
+    ? upcoming.map(card).join("")
+    : "<div class='empty'>No verified upcoming matches are available for " + esc(label) + " right now.</div>";
+  document.querySelector("#recent").innerHTML = recent.length
+    ? recent.map(card).join("")
+    : "<div class='empty'>No verified recent scores are available for this sport right now.</div>";
+}
+
+function renderNews(items) {
+  const safeItems = Array.isArray(items) ? items : [];
+  document.querySelector("#newsGrid").innerHTML = safeItems.slice(0, 6).map((item) =>
+    "<article class='news-card'><div class='source'>" + esc(item.source) + " · " + when(item.publishedAt) +
+    "</div><h3><a href='" + esc(item.url) + "' target='_blank' rel='noopener noreferrer'>" +
+    esc(item.title) + " ↗</a></h3></article>"
+  ).join("") || "<p class='empty'>No verified sports headlines are available right now.</p>";
+}
+
+async function refreshData() {
+  if (refreshInFlight || document.hidden) return;
+  refreshInFlight = true;
+  try {
+    const response = await fetch("/data/sports.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const payload = await response.json();
+    if (payload && typeof payload === "object") {
+      data = payload;
+      syncSportsTabs();
+      render();
+      renderNews(data.items);
+    }
+  } catch (error) {
+    console.error("Sports data load failed:", error);
+    if (!validDate(data.updatedAt)) {
+      document.querySelector("#notice").textContent = "Sports information is temporarily unavailable.";
+      renderNews([]);
+    }
+  } finally {
+    refreshInFlight = false;
+  }
+}
+
+syncSportsTabs();
+render();
+refreshData();
+window.setInterval(refreshData, CACHE_REFRESH_MS);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) refreshData();
+});
+</script>
+</body></html>
+

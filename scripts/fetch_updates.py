@@ -175,11 +175,11 @@ def scores(previous):
         elif old_sport.get("matches"):
             result[key]={**old_sport,"coverage":"stale","matches":recent_cache_matches([],old_sport.get("matches",[])),"note":"Match information could not be refreshed; showing previously verified information."}
         else:
-            result[key]={"label":name,"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
+            result[key]={"label":name,"coverage":"unavailable","source":"TheSportsDB","matches":[],"note":"TheSportsDB returned no verified events for this refresh; no matches or scores are shown."}
     cricket, cricket_error=read_cricketdata()
     old_cricket=old_sports.get("cricket",{})
     if cricket:
-        result["cricket"]={"label":"Cricket","coverage":"available","source":"","matches":recent_cache_matches(cricket,old_cricket.get("matches",[])),"note":"Verified cricket fixtures and scores."}
+        result["cricket"]={"label":"Cricket","coverage":"available","source":"CricketData","matches":recent_cache_matches(cricket,old_cricket.get("matches",[])),"note":"Verified cricket fixtures and scores."}
     elif old_cricket.get("matches"):
         result["cricket"]={**old_cricket,"coverage":"stale","matches":recent_cache_matches([],old_cricket.get("matches",[])),"note":"Cricket information could not be refreshed; showing previously verified information."}
     else:

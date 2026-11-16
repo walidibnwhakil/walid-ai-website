@@ -5,29 +5,28 @@
   const validDate = (value) => { const time = value ? Date.parse(value) : NaN; return Number.isFinite(time) ? time : null; };
   const timeLabel = (value) => value ? new Date(value).toLocaleString("en-GB",{timeZone:"Asia/Dhaka",dateStyle:"medium",timeStyle:"short"}) : "Time to be announced";
   const countryCodes = {Germany:"DE",England:"GB",Spain:"ES",Italy:"IT",France:"FR",India:"IN",Pakistan:"PK",Bangladesh:"BD",Nepal:"NP",Australia:"AU",Canada:"CA",Japan:"JP",China:"CN",Namibia:"NA",Rwanda:"RW",Uganda:"UG","United States of America":"US","Sri Lanka":"LK",Ireland:"IE","Papua New Guinea":"PG",Scotland:"GB",Netherlands:"NL",Thailand:"TH",Zimbabwe:"ZW",Afghanistan:"AF","South Africa":"ZA","New Zealand":"NZ","Falkland Islands":"FK","Costa Rica":"CR","West Indies":"JM"};
-  // Resolve flags per team, never from the opposing team or competition.
-  function inferredCountry(match, side) {
-    const team=String(match[side+"Team"]||"").trim();
-    const explicit=String(match[side+"Country"]||"").trim();
+  // A country's league does not make its clubs national teams.
+  function nationalCountry(match,side) {
+    const name=String(match[side+"Team"]||"").trim();
     const names=Object.keys(countryCodes).sort((a,b)=>b.length-a.length);
-    const normalized=team.toLowerCase();
-    const matchName=names.find(name=>new RegExp("(^|[^a-z])"+name.toLowerCase().replace(/[.*+?^$\{\}()|[\]\\]/g,"\\$&")+"(?=$|[^a-z])","i").test(normalized));
-    return matchName|| (names.includes(explicit)?explicit:"");
+    const matchName=names.find(country=>{
+      const prefix=country.toLowerCase(), lower=name.toLowerCase();
+      return lower===prefix || lower.startsWith(prefix+" ") && /^(women|men|u\\d{2}|under[- ]?\\d{2}|a|b|xi|national|academy|emerging|seniors|juniors|development|legends)(?:\\b|$)/i.test(name.slice(country.length).trim());
+    });
+    return matchName||"";
   }
   function flag(country) {
     const code=countryCodes[country]||"";
-    return code ? [...code].map(char=>String.fromCodePoint(127397+char.charCodeAt(0))).join("") : "";
+    return code?[...code].map(char=>String.fromCodePoint(127397+char.charCodeAt(0))).join(""):"";
   }
-  function logo(match, side, compact=false) {
-    const country=inferredCountry(match,side), emoji=flag(country);
-    const name=String(match[side+"Team"]||"Team");
+  function logo(match,side,compact=false) {
+    const name=String(match[side+"Team"]||"Team"), country=nationalCountry(match,side);
+    const url=!country?String(match[side+"Logo"]||""):"";
     const size=compact?"mini-mark":"team-mark";
-    const fallback=esc(name.split(/\s+/).map(part=>part[0]||"").slice(0,2).join("").toUpperCase());
-    // National sides display their own flag prominently; club sides keep verified crests.
-    const isNational=Boolean(country);
-    const url=!isNational?match[side+"Logo"]:null;
-    const image=isNational?"<span class='primary-flag' role='img' aria-label='"+esc(country)+" flag'>"+emoji+"</span>":url?"<img src='"+esc(url)+"' alt='"+esc(name)+" logo' loading='lazy' referrerpolicy='no-referrer' onerror='this.remove()'>":"<span aria-hidden='true'>"+fallback+"</span>";
-    return "<span class='"+size+"'>"+image+"</span>";
+    const initials=esc(name.split(/\\s+/).map(p=>p[0]||"").slice(0,2).join("").toUpperCase());
+    const fallback="<span class='logo-fallback' aria-hidden='true'>"+initials+"</span>";
+    const content=country?"<span class='primary-flag' role='img' aria-label='"+esc(country)+" flag'>"+flag(country)+"</span>":url?"<img src='"+esc(url)+"' alt='"+esc(name)+" crest' loading='lazy' referrerpolicy='no-referrer' onerror='this.hidden=true;this.nextElementSibling.hidden=false'>"+ "<span class='logo-fallback' aria-hidden='true' hidden>"+initials+"</span>":fallback;
+    return "<span class='"+size+"'>"+content+"</span>";
   }
   function statusOf(match) {
     const status=String(match.status||"").toLowerCase().replace(/[- ]+/g,"_");
@@ -81,36 +80,64 @@
     const updated=validDate(data.updatedAt), node=document.querySelector("#feedUpdated");
     if(node) node.textContent=updated?"Scores and fixtures checked "+timeLabel(data.updatedAt)+" (Bangladesh time)":"Scores and fixtures are temporarily unavailable.";
   }
-  function inningsFor(match, side) {
-    const name=String(match[side+"Team"]||"").trim().toLowerCase();
+  function inningsFor(match,side) {
+    const team=String(match[side+"Team"]||"").trim().toLowerCase();
     return (Array.isArray(match.innings)?match.innings:[]).find(inn=>{
-      const team=String(inn.team||"").toLowerCase();
-      return team===name || team.startsWith(name+" inning") || team.startsWith(name+" innings");
+      const label=String(inn.team||"").trim().toLowerCase();
+      return label===team || label.startsWith(team+" inning") || label.startsWith(team+" innings");
     })||null;
   }
   function inningsScore(inn) {
-    if(!inn||inn.runs==null)return "";
-    return String(inn.runs)+(inn.wickets==null?"":"/"+inn.wickets);
+    return inn?.runs==null?null:String(inn.runs)+(inn.wickets==null?"":"/"+inn.wickets);
+  }
+  function cricketFigures(match) {
+    const home=inningsFor(match,"home"),away=inningsFor(match,"away");
+    const innings=Array.isArray(match.innings)?match.innings:[];
+    // A malformed label sometimes combines both names. Never assign that
+    // innings to either side merely because its text contains both names.
+    const ambiguous=innings.some(i=>String(i.team||"").includes(","));
+    const values=innings.map(i=>Number(i.runs)).filter(Number.isFinite);
+    const winner=String(match.winner||"").trim().toLowerCase();
+    const hName=String(match.homeTeam||"").toLowerCase(),aName=String(match.awayTeam||"").toLowerCase();
+    const winnerKnown=winner===hName||winner===aName;
+    // The provider's homeScore/awayScore can be reversed relative to innings.
+    // Prefer unambiguous team-labelled innings. Otherwise do not guess.
+    const h=inningsScore(home),a=inningsScore(away);
+    const reliable=Boolean(home&&away&&!ambiguous&&winnerKnown);
+    const homeRuns=home?.runs,awayRuns=away?.runs;
+    const winningSide=winner===hName?"home":winner===aName?"away":null;
+    let margin="";
+    if(reliable&&homeRuns!==awayRuns) {
+      const winning=winningSide==="home"?home:away;
+      const losing=winningSide==="home"?away:home;
+      if(Number(winning.runs)>Number(losing.runs)) {
+        // A chasing team wins by remaining wickets only when innings order is known.
+        const winIndex=innings.indexOf(winning),loseIndex=innings.indexOf(losing);
+        if(winIndex>loseIndex && Number.isFinite(Number(winning.wickets)) && Number(winning.wickets)<=10) margin="won by "+(10-Number(winning.wickets))+" wickets";
+        else if(winIndex<loseIndex) margin="won by "+(Number(winning.runs)-Number(losing.runs))+" runs";
+      }
+    }
+    return {home,away,homeScore:h,awayScore:a,reliable,margin,winner:winningSide?match[winningSide+"Team"]:""};
   }
   function matchRow(match,sport,kind) {
-    const status=statusOf(match), cricket=sport==="cricket", scheduled=kind==="schedule";
-    const homeInnings=cricket?inningsFor(match,"home"):null, awayInnings=cricket?inningsFor(match,"away"):null;
-    const homeScore=cricket?(inningsScore(homeInnings)||match.homeScore):match.homeScore;
-    const awayScore=cricket?(inningsScore(awayInnings)||match.awayScore):match.awayScore;
-    const team=(side,figures,inn)=>{
+    const status=statusOf(match),cricket=sport==="cricket",scheduled=kind==="schedule";
+    const figures=cricket?cricketFigures(match):null;
+    const hScore=cricket?figures.homeScore:match.homeScore,aScore=cricket?figures.awayScore:match.awayScore;
+    const team=(side,scoreValue,inn)=>{
       const name=esc(match[side+"Team"]);
       const overs=cricket&&inn?.overs!=null?"<span class='score-overs'>"+esc(inn.overs)+" overs</span>":"";
-      return "<div class='scorecard-team'>"+logo(match,side,true)+"<span class='scorecard-name'>"+name+"</span>"+(!scheduled&&figures!=null?"<strong class='scorecard-figures'>"+esc(figures)+"</strong>"+overs:"")+"</div>";
+      return "<div class='scorecard-team'>"+logo(match,side,true)+"<span class='scorecard-name'>"+name+"</span>"+(!scheduled&&scoreValue!=null?"<strong class='scorecard-figures'>"+esc(scoreValue)+"</strong>"+overs:"")+"</div>";
     };
     const meta=esc(match.competition||"Match")+(match.matchType||match.format?" · "+esc(match.matchType||match.format):"");
     const when=esc(timeLabel(match.finishedAt||match.endTime||match.startTime));
     const winner=String(match.winner||"").trim();
-    const winnerIsTeam=[match.homeTeam,match.awayTeam].some(name=>String(name).toLowerCase()===winner.toLowerCase());
-    // Do not claim a winner when feed scores contradict the result.
-    const result=kind==="result"&&winnerIsTeam?"<div class='scorecard-result'>"+esc(winner)+" won</div>":"";
+    const validWinner=[match.homeTeam,match.awayTeam].some(n=>String(n).toLowerCase()===winner.toLowerCase());
+    const result=kind==="result"&&cricket&&figures.reliable&&figures.margin?"<div class='scorecard-result'>"+esc(figures.winner+" "+figures.margin)+"</div>":kind==="result"&&!cricket&&validWinner?"<div class='scorecard-result'>"+esc(winner)+" won</div>":"";
+    const extra=cricket&&match.playerOfMatch?"<div class='scorecard-extra'>Player of the Match: "+esc(match.playerOfMatch)+"</div>":"";
+    const scorers=!cricket&&Array.isArray(match.goalScorers)&&match.goalScorers.length?"<div class='scorecard-extra'>"+esc(match.goalScorers.join(" · "))+"</div>":"";
     return "<article class='match-row scorecard'><div class='scorecard-top'><span>"+meta+"</span><span class='scorecard-status"+(status==="live"?" is-live":"")+"'>"+(status==="live"?"● LIVE":scheduled?"Upcoming":"Completed")+"</span></div>"+
-      "<div class='scorecard-board'>"+team("home",homeScore,homeInnings)+"<div class='scorecard-vs'>"+(scheduled?"VS":cricket?"VS":score(match))+"</div>"+team("away",awayScore,awayInnings)+"</div>"+
-      result+"<div class='scorecard-date'>"+when+"</div></article>";
+      "<div class='scorecard-board'>"+team("home",hScore,figures?.home)+"<div class='scorecard-vs'>"+(scheduled?"VS":cricket?"VS":score(match))+"</div>"+team("away",aScore,figures?.away)+"</div>"+
+      result+extra+scorers+"<div class='scorecard-date'>"+when+"</div></article>";
   }
   let scheduleLimit=10;
   function renderDetail(data) {

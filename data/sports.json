@@ -3123,20 +3123,6 @@
       ],
       "note": "Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."
     },
-    "basketball": {
-      "label": "Basketball",
-      "coverage": "unavailable",
-      "source": "TheSportsDB",
-      "matches": [],
-      "note": "TheSportsDB returned no verified events for this refresh; no matches or scores are shown."
-    },
-    "hockey": {
-      "label": "Hockey",
-      "coverage": "unavailable",
-      "source": "TheSportsDB",
-      "matches": [],
-      "note": "TheSportsDB returned no verified events for this refresh; no matches or scores are shown."
-    },
     "cricket": {
       "label": "Cricket",
       "coverage": "available",
@@ -3704,27 +3690,6 @@
         }
       ],
       "note": "Verified cricket fixtures and scores."
-    },
-    "tennis": {
-      "label": "Tennis",
-      "coverage": "unavailable",
-      "source": "",
-      "matches": [],
-      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
-    },
-    "volleyball": {
-      "label": "Volleyball",
-      "coverage": "unavailable",
-      "source": "",
-      "matches": [],
-      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
-    },
-    "badminton": {
-      "label": "Badminton",
-      "coverage": "unavailable",
-      "source": "",
-      "matches": [],
-      "note": "No free, stable provider is configured for this sport yet; no matches or scores are shown."
     }
   }
 }

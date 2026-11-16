@@ -1,6 +1,6 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-16T02:42:26.109373+00:00",
+  "updatedAt": "2026-11-16T03:20:27.601647+00:00",
   "status": "ok",
   "items": [
     {
@@ -206,7 +206,9 @@
           "startTime": "2026-11-20T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83238",
@@ -219,7 +221,9 @@
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83239",
@@ -232,7 +236,9 @@
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83241",
@@ -245,7 +251,9 @@
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83242",
@@ -258,7 +266,9 @@
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83245",
@@ -271,7 +281,9 @@
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83244",
@@ -284,7 +296,9 @@
           "startTime": "2026-11-21T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83240",
@@ -297,7 +311,9 @@
           "startTime": "2026-11-22T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83243",
@@ -310,7 +326,9 @@
           "startTime": "2026-11-22T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83253",
@@ -323,7 +341,9 @@
           "startTime": "2026-11-27T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83250",
@@ -336,7 +356,9 @@
           "startTime": "2026-11-28T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83251",
@@ -349,7 +371,9 @@
           "startTime": "2026-11-28T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83252",
@@ -362,7 +386,9 @@
           "startTime": "2026-11-28T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83254",
@@ -375,7 +401,9 @@
           "startTime": "2026-11-28T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83247",
@@ -388,7 +416,9 @@
           "startTime": "2026-11-28T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83249",
@@ -401,7 +431,9 @@
           "startTime": "2026-11-29T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83248",
@@ -414,7 +446,9 @@
           "startTime": "2026-11-29T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83246",
@@ -427,7 +461,9 @@
           "startTime": "2026-11-29T18:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83255",
@@ -440,7 +476,9 @@
           "startTime": "2026-12-04T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83256",
@@ -453,7 +491,9 @@
           "startTime": "2026-12-05T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83257",
@@ -466,7 +506,9 @@
           "startTime": "2026-12-05T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83258",
@@ -479,7 +521,9 @@
           "startTime": "2026-12-05T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83260",
@@ -492,7 +536,9 @@
           "startTime": "2026-12-05T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83261",
@@ -505,7 +551,9 @@
           "startTime": "2026-12-05T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83259",
@@ -518,7 +566,9 @@
           "startTime": "2026-12-05T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83262",
@@ -531,7 +581,9 @@
           "startTime": "2026-12-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83263",
@@ -544,7 +596,9 @@
           "startTime": "2026-12-06T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83269",
@@ -557,7 +611,9 @@
           "startTime": "2026-12-11T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83264",
@@ -570,7 +626,9 @@
           "startTime": "2026-12-12T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83265",
@@ -583,7 +641,9 @@
           "startTime": "2026-12-12T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83270",
@@ -596,7 +656,9 @@
           "startTime": "2026-12-12T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83272",
@@ -609,7 +671,9 @@
           "startTime": "2026-12-12T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83268",
@@ -622,7 +686,9 @@
           "startTime": "2026-12-12T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83267",
@@ -635,7 +701,9 @@
           "startTime": "2026-12-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83266",
@@ -648,7 +716,9 @@
           "startTime": "2026-12-13T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83271",
@@ -661,7 +731,9 @@
           "startTime": "2026-12-13T18:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83273",
@@ -674,7 +746,9 @@
           "startTime": "2026-12-18T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83275",
@@ -687,7 +761,9 @@
           "startTime": "2026-12-19T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83277",
@@ -700,7 +776,9 @@
           "startTime": "2026-12-19T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83278",
@@ -713,7 +791,9 @@
           "startTime": "2026-12-19T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83281",
@@ -726,7 +806,9 @@
           "startTime": "2026-12-19T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83274",
@@ -739,7 +821,9 @@
           "startTime": "2026-12-19T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83276",
@@ -752,7 +836,9 @@
           "startTime": "2026-12-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83279",
@@ -765,7 +851,9 @@
           "startTime": "2026-12-20T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83280",
@@ -778,7 +866,9 @@
           "startTime": "2026-12-20T18:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83282",
@@ -791,7 +881,9 @@
           "startTime": "2027-01-08T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83283",
@@ -804,7 +896,9 @@
           "startTime": "2027-01-09T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83284",
@@ -817,7 +911,9 @@
           "startTime": "2027-01-09T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83285",
@@ -830,7 +926,9 @@
           "startTime": "2027-01-09T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83288",
@@ -843,7 +941,9 @@
           "startTime": "2027-01-09T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83290",
@@ -856,7 +956,9 @@
           "startTime": "2027-01-09T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83286",
@@ -869,7 +971,9 @@
           "startTime": "2027-01-09T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83289",
@@ -882,7 +986,9 @@
           "startTime": "2027-01-10T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83287",
@@ -895,7 +1001,9 @@
           "startTime": "2027-01-10T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83292",
@@ -908,7 +1016,9 @@
           "startTime": "2027-01-12T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83294",
@@ -921,7 +1031,9 @@
           "startTime": "2027-01-12T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83295",
@@ -934,7 +1046,9 @@
           "startTime": "2027-01-12T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83297",
@@ -947,7 +1061,9 @@
           "startTime": "2027-01-12T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83299",
@@ -960,7 +1076,9 @@
           "startTime": "2027-01-13T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83291",
@@ -973,7 +1091,9 @@
           "startTime": "2027-01-13T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83293",
@@ -986,7 +1106,9 @@
           "startTime": "2027-01-13T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83296",
@@ -999,7 +1121,9 @@
           "startTime": "2027-01-13T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83298",
@@ -1012,7 +1136,9 @@
           "startTime": "2027-01-13T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83301",
@@ -1025,7 +1151,9 @@
           "startTime": "2027-01-15T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83300",
@@ -1038,7 +1166,9 @@
           "startTime": "2027-01-16T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83302",
@@ -1051,7 +1181,9 @@
           "startTime": "2027-01-16T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83305",
@@ -1064,7 +1196,9 @@
           "startTime": "2027-01-16T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83306",
@@ -1077,7 +1211,9 @@
           "startTime": "2027-01-16T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83308",
@@ -1090,7 +1226,9 @@
           "startTime": "2027-01-16T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83304",
@@ -1103,7 +1241,9 @@
           "startTime": "2027-01-16T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83307",
@@ -1116,7 +1256,9 @@
           "startTime": "2027-01-17T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83303",
@@ -1129,7 +1271,9 @@
           "startTime": "2027-01-17T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83315",
@@ -1142,7 +1286,9 @@
           "startTime": "2027-01-22T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83309",
@@ -1155,7 +1301,9 @@
           "startTime": "2027-01-23T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83313",
@@ -1168,7 +1316,9 @@
           "startTime": "2027-01-23T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83316",
@@ -1181,7 +1331,9 @@
           "startTime": "2027-01-23T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83317",
@@ -1194,7 +1346,9 @@
           "startTime": "2027-01-23T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83314",
@@ -1207,7 +1361,9 @@
           "startTime": "2027-01-23T17:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83312",
@@ -1220,7 +1376,9 @@
           "startTime": "2027-01-24T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83311",
@@ -1233,7 +1391,9 @@
           "startTime": "2027-01-24T16:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83310",
@@ -1246,7 +1406,9 @@
           "startTime": "2027-01-24T18:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83318",
@@ -1259,7 +1421,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83319",
@@ -1272,7 +1436,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83320",
@@ -1285,7 +1451,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83321",
@@ -1298,7 +1466,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83322",
@@ -1311,7 +1481,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83323",
@@ -1324,7 +1496,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83324",
@@ -1337,7 +1511,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83325",
@@ -1350,7 +1526,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83326",
@@ -1363,7 +1541,9 @@
           "startTime": "2027-01-30T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83327",
@@ -1376,7 +1556,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83328",
@@ -1389,7 +1571,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83329",
@@ -1402,7 +1586,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83330",
@@ -1415,7 +1601,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83331",
@@ -1428,7 +1616,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83332",
@@ -1441,7 +1631,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83333",
@@ -1454,7 +1646,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83334",
@@ -1467,7 +1661,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83335",
@@ -1480,7 +1676,9 @@
           "startTime": "2027-02-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83336",
@@ -1493,7 +1691,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83337",
@@ -1506,7 +1706,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83338",
@@ -1519,7 +1721,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83339",
@@ -1532,7 +1736,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83340",
@@ -1545,7 +1751,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83341",
@@ -1558,7 +1766,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83342",
@@ -1571,7 +1781,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83343",
@@ -1584,7 +1796,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83344",
@@ -1597,7 +1811,9 @@
           "startTime": "2027-02-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83345",
@@ -1610,7 +1826,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83346",
@@ -1623,7 +1841,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83347",
@@ -1636,7 +1856,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83348",
@@ -1649,7 +1871,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83349",
@@ -1662,7 +1886,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83350",
@@ -1675,7 +1901,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83351",
@@ -1688,7 +1916,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83352",
@@ -1701,7 +1931,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83353",
@@ -1714,7 +1946,9 @@
           "startTime": "2027-02-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83354",
@@ -1727,7 +1961,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83355",
@@ -1740,7 +1976,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83356",
@@ -1753,7 +1991,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83357",
@@ -1766,7 +2006,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83358",
@@ -1779,7 +2021,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83359",
@@ -1792,7 +2036,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83360",
@@ -1805,7 +2051,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83361",
@@ -1818,7 +2066,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83362",
@@ -1831,7 +2081,9 @@
           "startTime": "2027-02-27T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83363",
@@ -1844,7 +2096,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83364",
@@ -1857,7 +2111,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83365",
@@ -1870,7 +2126,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83366",
@@ -1883,7 +2141,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83367",
@@ -1896,7 +2156,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83368",
@@ -1909,7 +2171,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83369",
@@ -1922,7 +2186,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83370",
@@ -1935,7 +2201,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83371",
@@ -1948,7 +2216,9 @@
           "startTime": "2027-03-02T19:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83372",
@@ -1961,7 +2231,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83373",
@@ -1974,7 +2246,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83374",
@@ -1987,7 +2261,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83375",
@@ -2000,7 +2276,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83376",
@@ -2013,7 +2291,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83377",
@@ -2026,7 +2306,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83378",
@@ -2039,7 +2321,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83379",
@@ -2052,7 +2336,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83380",
@@ -2065,7 +2351,9 @@
           "startTime": "2027-03-06T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83381",
@@ -2078,7 +2366,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83382",
@@ -2091,7 +2381,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83383",
@@ -2104,7 +2396,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83384",
@@ -2117,7 +2411,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83385",
@@ -2130,7 +2426,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83386",
@@ -2143,7 +2441,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83387",
@@ -2156,7 +2456,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83388",
@@ -2169,7 +2471,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83389",
@@ -2182,7 +2486,9 @@
           "startTime": "2027-03-13T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83390",
@@ -2195,7 +2501,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83391",
@@ -2208,7 +2516,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83392",
@@ -2221,7 +2531,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83393",
@@ -2234,7 +2546,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83394",
@@ -2247,7 +2561,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83395",
@@ -2260,7 +2576,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83396",
@@ -2273,7 +2591,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83397",
@@ -2286,7 +2606,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83398",
@@ -2299,7 +2621,9 @@
           "startTime": "2027-03-20T14:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83399",
@@ -2312,7 +2636,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83400",
@@ -2325,7 +2651,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83401",
@@ -2338,7 +2666,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83402",
@@ -2351,7 +2681,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83403",
@@ -2364,7 +2696,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83404",
@@ -2377,7 +2711,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83405",
@@ -2390,7 +2726,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83406",
@@ -2403,7 +2741,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83407",
@@ -2416,7 +2756,9 @@
           "startTime": "2027-04-03T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83408",
@@ -2429,7 +2771,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83409",
@@ -2442,7 +2786,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83410",
@@ -2455,7 +2801,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83411",
@@ -2468,7 +2816,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83412",
@@ -2481,7 +2831,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83413",
@@ -2494,7 +2846,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83414",
@@ -2507,7 +2861,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83415",
@@ -2520,7 +2876,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83416",
@@ -2533,7 +2891,9 @@
           "startTime": "2027-04-10T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83417",
@@ -2546,7 +2906,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83418",
@@ -2559,7 +2921,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83419",
@@ -2572,7 +2936,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83420",
@@ -2585,7 +2951,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83421",
@@ -2598,7 +2966,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83422",
@@ -2611,7 +2981,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83423",
@@ -2624,7 +2996,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83424",
@@ -2637,7 +3011,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83425",
@@ -2650,7 +3026,9 @@
           "startTime": "2027-04-17T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83426",
@@ -2663,7 +3041,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83427",
@@ -2676,7 +3056,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83428",
@@ -2689,7 +3071,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83429",
@@ -2702,7 +3086,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83430",
@@ -2715,7 +3101,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83431",
@@ -2728,7 +3116,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83432",
@@ -2741,7 +3131,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83433",
@@ -2754,7 +3146,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83434",
@@ -2767,7 +3161,9 @@
           "startTime": "2027-04-24T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83435",
@@ -2780,7 +3176,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83436",
@@ -2793,7 +3191,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83437",
@@ -2806,7 +3206,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83438",
@@ -2819,7 +3221,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83439",
@@ -2832,7 +3236,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83440",
@@ -2845,7 +3251,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83441",
@@ -2858,7 +3266,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83442",
@@ -2871,7 +3281,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83443",
@@ -2884,7 +3296,9 @@
           "startTime": "2027-05-08T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83444",
@@ -2897,7 +3311,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83445",
@@ -2910,7 +3326,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83446",
@@ -2923,7 +3341,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83447",
@@ -2936,7 +3356,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83448",
@@ -2949,7 +3371,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83449",
@@ -2962,7 +3386,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83450",
@@ -2975,7 +3401,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83451",
@@ -2988,7 +3416,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83452",
@@ -3001,7 +3431,9 @@
           "startTime": "2027-05-15T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83453",
@@ -3014,7 +3446,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83454",
@@ -3027,7 +3461,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83455",
@@ -3040,7 +3476,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83456",
@@ -3053,7 +3491,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83457",
@@ -3066,7 +3506,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83458",
@@ -3079,7 +3521,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83459",
@@ -3092,7 +3536,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83460",
@@ -3105,7 +3551,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         },
         {
           "id": "83461",
@@ -3118,7 +3566,9 @@
           "startTime": "2027-05-22T13:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
-          "source": "OpenLigaDB"
+          "source": "OpenLigaDB",
+          "homeCountry": "Germany",
+          "awayCountry": "Germany"
         }
       ],
       "note": "Verified fixtures and recent results; times are stored in UTC and rendered in Bangladesh time."

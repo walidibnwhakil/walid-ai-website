@@ -81,7 +81,7 @@ function card(match) {
     scoreText(match) + cricketLine +
     "<div class='kickoff'>" + esc(when(stamp)) +
     "</div><div class='status'>" + esc(status) +
-    (match.winner ? " · " + esc(match.winner) + " won" : "") + "</div></div><div class='team'>" +
+    (match.winner ? " · " + esc(match.winner) + " won" : "") + (match.source ? " · " + esc(match.source) : "") + "</div></div><div class='team'>" +
     "<strong>" + esc(match.awayTeam) + "</strong><span class='source'>Match information</span></div></article>";
 }
 
@@ -101,9 +101,13 @@ function render() {
     button.setAttribute("aria-pressed", String(button.dataset.sport === selected));
   });
   const updatedAt = validDate(data.updatedAt);
+  const provider = current.source ? " Provider: " + current.source + "." : "";
   document.querySelector("#notice").textContent = updatedAt
-    ? "Match information last updated " + when(data.updatedAt) + "."
+    ? "Match information last updated " + when(data.updatedAt) + "." + provider
     : "Match information is temporarily unavailable.";
+  if (current.note && current.coverage !== "available") {
+    document.querySelector("#notice").textContent = current.note + (updatedAt ? " Last checked " + when(data.updatedAt) + "." : "") + provider;
+  }
   const now = Date.now();
   const matches = Array.isArray(current.matches) ? current.matches : [];
   const upcoming = matches.filter((match) => {

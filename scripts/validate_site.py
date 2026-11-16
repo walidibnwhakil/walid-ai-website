@@ -55,7 +55,7 @@ check_page("games/index.html",
            ["/games/riddlex/", "/games/ludo/", "/games/chess/",
             "/games/tic-tac-toe/", "/games/snakes-and-ladders/", "/games/2048/"],
            ['class="games"', "game-title", "game-subtitle", 'name="description"', '"@type":"ItemList"'])
-check_page("tools/index.html",
+check_page("pdf/index.html",
            ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/"],
            ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'name="description"', '"@type":"ItemList"'])
 check_page("guides/image-tools/index.html",
@@ -63,11 +63,11 @@ check_page("guides/image-tools/index.html",
             "/tools/background-remover/", "/tools/signature-remover/", "/tools/watermark-remover/"],
            ['name="description"'])
 tools_parser = Parser()
-tools_parser.feed((ROOT / "tools/index.html").read_text(encoding="utf-8"))
+tools_parser.feed((ROOT / "pdf/index.html").read_text(encoding="utf-8"))
 for image_link in ("/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
                    "/tools/background-remover/", "/tools/signature-remover/", "/tools/watermark-remover/"):
     if image_link in tools_parser.links:
-        errors.append(f"tools/index.html: image tool leaked into PDF-only page: {image_link}")
+        errors.append(f"pdf/index.html: image tool leaked into PDF-only page: {image_link}")
 if errors:
     print("\n".join(f"ERROR: {item}" for item in errors))
     sys.exit(1)

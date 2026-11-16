@@ -1,8 +1,15 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-16T02:10:50.954602+00:00",
+  "updatedAt": "2026-11-16T02:30:28.410045+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Australian MP who lost both legs in alleged car attack discharged from hospital",
+      "url": "https://www.bbc.co.uk/news/articles/cmpqr9j81888o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T01:53:19+00:00",
+      "category": "World"
+    },
     {
       "title": "Suspected China spy linked to Nvidia's ex-boss left in 2025, Megaspeed says",
       "url": "https://www.bbc.co.uk/news/articles/cmdx1vpprk9vo?at_medium=RSS&at_campaign=rss",
@@ -16,13 +23,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-16T01:05:44+00:00",
       "category": "Bangladesh"
-    },
-    {
-      "title": "Thousands of US flights still cancelled or delayed two days after grounding of planes nationwide",
-      "url": "https://www.bbc.co.uk/news/articles/cw1mdlv0k2r4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T00:03:29+00:00",
-      "category": "World"
     },
     {
       "title": "Mexican drug lord Miguel Angel Felix Gallardo dies age 80",
@@ -46,6 +46,13 @@
       "category": "World"
     },
     {
+      "title": "Prince Harry praises war veterans on surprise visit to Ukraine",
+      "url": "https://www.bbc.co.uk/news/articles/c60evn992jq8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T22:00:13+00:00",
+      "category": "Technology"
+    },
+    {
       "title": "Czechs rally against plan to switch funding of public media",
       "url": "https://www.bbc.co.uk/news/articles/cm8e0knr7604o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -65,13 +72,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-15T18:38:11+00:00",
       "category": "World"
-    },
-    {
-      "title": "Iran targets US military base in Bahrain with drone attack",
-      "url": "https://www.bbc.co.uk/news/articles/cqn4e2py48kwo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T13:42:58+00:00",
-      "category": "Technology"
     },
     {
       "title": "South Korea's top scorer in tax accountancy exam admits cheating",

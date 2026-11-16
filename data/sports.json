@@ -1,6 +1,6 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-16T02:10:51.068609+00:00",
+  "updatedAt": "2026-11-16T02:30:28.542736+00:00",
   "status": "ok",
   "items": [
     {
@@ -209,17 +209,6 @@
           "source": "OpenLigaDB"
         },
         {
-          "homeTeam": "FC Bayern München",
-          "awayTeam": "1. FC Köln",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-20T19:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
           "id": "83238",
           "homeTeam": "Bayer 04 Leverkusen",
           "awayTeam": "SC Paderborn 07",
@@ -285,61 +274,6 @@
           "source": "OpenLigaDB"
         },
         {
-          "homeTeam": "Bayer 04 Leverkusen",
-          "awayTeam": "SC Paderborn 07",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "Eintracht Frankfurt",
-          "awayTeam": "TSG Hoffenheim",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "1. FC Union Berlin",
-          "awayTeam": "RB Leipzig",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "Borussia Mönchengladbach",
-          "awayTeam": "Borussia Dortmund",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "SV 07 Elversberg",
-          "awayTeam": "SC Freiburg",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-21T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
           "id": "83244",
           "homeTeam": "FC Schalke 04",
           "awayTeam": "VfB Stuttgart",
@@ -349,17 +283,6 @@
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T17:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "FC Schalke 04",
-          "awayTeam": "VfB Stuttgart",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-21T17:30:00Z",
           "status": "scheduled",
           "source": "OpenLigaDB"
         },
@@ -377,17 +300,6 @@
           "source": "OpenLigaDB"
         },
         {
-          "homeTeam": "FC Augsburg",
-          "awayTeam": "1. FSV Mainz 05",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-22T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
           "id": "83243",
           "homeTeam": "SV Werder Bremen",
           "awayTeam": "Hamburger SV",
@@ -401,17 +313,6 @@
           "source": "OpenLigaDB"
         },
         {
-          "homeTeam": "SV Werder Bremen",
-          "awayTeam": "Hamburger SV",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-22T16:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
           "id": "83253",
           "homeTeam": "SV Werder Bremen",
           "awayTeam": "Borussia Mönchengladbach",
@@ -421,17 +322,6 @@
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-27T19:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "SV Werder Bremen",
-          "awayTeam": "Borussia Mönchengladbach",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-27T19:30:00Z",
           "status": "scheduled",
           "source": "OpenLigaDB"
         },
@@ -488,50 +378,6 @@
           "source": "OpenLigaDB"
         },
         {
-          "homeTeam": "1. FSV Mainz 05",
-          "awayTeam": "1. FC Union Berlin",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "Hamburger SV",
-          "awayTeam": "FC Bayern München",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "1. FC Köln",
-          "awayTeam": "SV 07 Elversberg",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "SC Paderborn 07",
-          "awayTeam": "FC Schalke 04",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-28T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
           "id": "83247",
           "homeTeam": "VfB Stuttgart",
           "awayTeam": "Eintracht Frankfurt",
@@ -541,17 +387,6 @@
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-28T17:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "VfB Stuttgart",
-          "awayTeam": "Eintracht Frankfurt",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-28T17:30:00Z",
           "status": "scheduled",
           "source": "OpenLigaDB"
         },
@@ -569,17 +404,6 @@
           "source": "OpenLigaDB"
         },
         {
-          "homeTeam": "SC Freiburg",
-          "awayTeam": "RB Leipzig",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-29T14:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
           "id": "83248",
           "homeTeam": "TSG Hoffenheim",
           "awayTeam": "FC Augsburg",
@@ -593,17 +417,6 @@
           "source": "OpenLigaDB"
         },
         {
-          "homeTeam": "TSG Hoffenheim",
-          "awayTeam": "FC Augsburg",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-29T16:30:00Z",
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
           "id": "83246",
           "homeTeam": "Borussia Dortmund",
           "awayTeam": "Bayer 04 Leverkusen",
@@ -613,17 +426,6 @@
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-29T18:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
-          "source": "OpenLigaDB"
-        },
-        {
-          "homeTeam": "Borussia Dortmund",
-          "awayTeam": "Bayer 04 Leverkusen",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
-          "competition": "1. Fußball-Bundesliga 2026/2027",
-          "startTime": "2026-11-29T18:30:00Z",
           "status": "scheduled",
           "source": "OpenLigaDB"
         },
@@ -3837,22 +3639,6 @@
           "source": "CricketData"
         },
         {
-          "id": "5ba51260-11ec-4b6d-8486-75ddef88b685",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, 1st Quarter-Final (A1 v C2), Vijay Hazare Trophy Elite 2026-27",
-          "matchType": "odi",
-          "overs": null,
-          "startTime": "2027-01-02T03:30:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
           "id": "1e7fcb1c-1a02-487f-bf5c-85f56bb67024",
           "homeTeam": "Tbc",
           "awayTeam": "Tbc",
@@ -3861,22 +3647,6 @@
           "innings": [],
           "winner": null,
           "competition": "Tbc vs Tbc, 3rd Quarter-Final (C1 v A2), Vijay Hazare Trophy Elite 2026-27",
-          "matchType": "odi",
-          "overs": null,
-          "startTime": "2027-01-03T03:30:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "5bc0e55a-c1a2-4aa1-aef3-9f23f3976c99",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, 4th Quarter-Final (D1 v B2), Vijay Hazare Trophy Elite 2026-27",
           "matchType": "odi",
           "overs": null,
           "startTime": "2027-01-03T03:30:00Z",

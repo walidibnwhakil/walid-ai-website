@@ -3,7 +3,7 @@
 'use strict';
 const names=['Rafi','Mina','Sadia','Karim','Nila','Arif','Tania','Hasan','Rina','Imran','Farah','Nabil','Mitu','Sohan','Joya','Sami','Lima','Rifat','Nadia','Tuhin'];
 const verbs=[
-['read','reads','read','reading','read','a storybook'],
+['visit','visits','visited','visiting','visited','the library'],
 ['write','writes','wrote','writing','written','a letter'],
 ['draw','draws','drew','drawing','drawn','a picture'],
 ['make','makes','made','making','made','a paper boat'],

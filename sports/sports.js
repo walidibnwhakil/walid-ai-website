@@ -8,7 +8,7 @@
   function inferredCountry(match, side) {
     if (match[side+"Country"]) return match[side+"Country"];
     const text = [match.competition,match.homeTeam,match.awayTeam].join(" ").toLowerCase();
-    const clues = [["nepal","Nepal"],["bangladesh","Bangladesh"],["india","India"],["pakistan","Pakistan"],["australia","Australia"],["south africa","South Africa"],["sri lanka","Sri Lanka"],["england","England"],["new zealand","New Zealand"],["afghanistan","Afghanistan"],["zimbabwe","Zimbabwe"],["west indies","West Indies"],["falkland","Falkland Islands"]];
+    const clues = [["nepal","Nepal"],["bangladesh","Bangladesh"],["india","India"],["vijay hazare","India"],["pakistan","Pakistan"],["australia","Australia"],["south africa","South Africa"],["sri lanka","Sri Lanka"],["england","England"],["new zealand","New Zealand"],["afghanistan","Afghanistan"],["zimbabwe","Zimbabwe"],["west indies","West Indies"],["falkland","Falkland Islands"]];
     return (clues.find(([needle])=>text.includes(needle))||[null,""])[1];
   }
   function flag(country) {
@@ -35,6 +35,7 @@
     const seen=new Set();
     return (Array.isArray(matches)?matches:[]).filter(match=>{
       if(!match||!match.homeTeam||!match.awayTeam) return false;
+      if([match.homeTeam,match.awayTeam].some(team=>/^(?:tbc|tbd|to be confirmed|unknown)$/i.test(String(team).trim()))) return false;
       const key=String(match.id||[match.homeTeam,match.awayTeam,match.startTime].join("|")).toLowerCase();
       if(seen.has(key)) return false;
       seen.add(key); return true;

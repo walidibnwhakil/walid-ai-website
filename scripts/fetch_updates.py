@@ -10,7 +10,7 @@ from xml.etree import ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/"data"
 FEEDS={"news":[("The Daily Star","https://www.thedailystar.net/rss.xml"),("Prothom Alo English","https://en.prothomalo.com/feed/"),("BBC World","https://feeds.bbci.co.uk/news/world/rss.xml")],"sports":[("BBC Sport","https://feeds.bbci.co.uk/sport/rss.xml"),("The Guardian Football","https://www.theguardian.com/football/rss")]}
 OPENLIGA_SEASON_URL="https://api.openligadb.de/getmatchdata/bl1/2026"
-SPORTS={"football":("Football","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4328","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4328"),"basketball":("Basketball","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4387","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4387"),"hockey":("Hockey","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4380","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4380")}
+SPORTS={"football":("Football","https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4328","https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=4328")}
 
 def clean(v): return re.sub(r"\s+"," ",re.sub(r"<[^>]+>","",v or "")).strip()
 def iso(v):
@@ -188,8 +188,6 @@ def scores(previous):
         result["cricket"]={**old_cricket,"coverage":"stale","matches":recent_cache_matches([],old_cricket.get("matches",[])),"note":"Cricket information could not be refreshed; showing previously verified information."}
     else:
         result["cricket"]={"label":"Cricket","coverage":"unavailable","source":"","matches":[],"note":"No verified cricket information is available right now."}
-    for key in ("tennis","volleyball","badminton"):
-        result[key]=old_sports.get(key) or {"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
     for entry in result.values():
         # Keep provider provenance in the cache so each displayed event remains auditable.
         for match in entry.get("matches",[]):

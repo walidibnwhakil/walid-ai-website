@@ -26,6 +26,9 @@ class Response:
 
 
 class SportsBackendTests(unittest.TestCase):
+    def test_only_supported_sports_are_published(self):
+        self.assertEqual(set(fetch.SPORTS), {"football"})
+
     def test_event_feed_has_no_arbitrary_forty_match_cap_and_keeps_ids(self):
         events = [{
             "idEvent": str(i), "strHomeTeam": "Home " + str(i), "strAwayTeam": "Away",

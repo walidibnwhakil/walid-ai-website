@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160" role="img" aria-labelledby="title desc">
+<title id="title">Open Quran</title><desc id="desc">An open green book on a gold stand</desc>
+<defs><linearGradient id="page" x2="0" y2="1"><stop stop-color="#fffdf7"/><stop offset="1" stop-color="#f3e6c8"/></linearGradient><linearGradient id="cover" x2="0" y2="1"><stop stop-color="#247650"/><stop offset="1" stop-color="#12452f"/></linearGradient></defs>
+<path d="M38 116 108 132l12-7 12 7 70-16-4 18-66 14-12-7-12 7-66-14z" fill="#c49a45" stroke="#846425" stroke-width="3" stroke-linejoin="round"/>
+<path d="M45 106q32-21 67 1l8 18q-35-21-70 0zM195 106q-32-21-67 1l-8 18q35-21 70 0z" fill="url(#cover)" stroke="#123d2e" stroke-width="4" stroke-linejoin="round"/>
+<path d="M51 102q30-19 60 1v17q-30-18-60 1zM189 102q-30-19-60 1v17q30-18 60 1z" fill="url(#page)" stroke="#c5a966" stroke-width="2" stroke-linejoin="round"/>
+<path d="M120 104v31M62 107q22-10 41 0M62 114q21-9 39 0M178 107q-22-10-41 0M178 114q-21-9-39 0" fill="none" stroke="#bc9a57" stroke-width="2" stroke-linecap="round"/>
+<path d="M120 26c-3 11-11 18-22 20 11 2 19 9 22 20 3-11 11-18 22-20-11-2-19-9-22-20z" fill="#d5a945"/><circle cx="120" cy="70" r="4" fill="#247650"/>
+<circle cx="70" cy="48" r="3" fill="#d5a945"/><circle cx="170" cy="48" r="3" fill="#d5a945"/>
+</svg>

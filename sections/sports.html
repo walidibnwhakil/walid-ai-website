@@ -103,13 +103,25 @@ function render() {
   const updatedAt = validDate(data.updatedAt);
   const provider = current.source ? " Provider: " + current.source + "." : "";
   document.querySelector("#notice").textContent = updatedAt
-    ? "Match information last updated " + when(data.updatedAt) + "." + provider
+    ? "Match information last updated " + when(data.updatedAt) + "." + provider + " Coverage reflects the verified provider feed; it is not a guarantee of every competition."
     : "Match information is temporarily unavailable.";
   if (current.note && current.coverage !== "available") {
     document.querySelector("#notice").textContent = current.note + (updatedAt ? " Last checked " + when(data.updatedAt) + "." : "") + provider;
   }
   const now = Date.now();
-  const matches = Array.isArray(current.matches) ? current.matches : [];
+  const rawMatches = Array.isArray(current.matches) ? current.matches : [];
+  const matches = [];
+  const seenMatches = new Set();
+  rawMatches.forEach((match) => {
+    const home = String(match.homeTeam || "").trim().toLowerCase();
+    const away = String(match.awayTeam || "").trim().toLowerCase();
+    if (!home || !away || (home === "tbc" && away === "tbc")) return;
+    const start = String(match.startTime || "");
+    const key = match.id ? String(match.id) : [home, away, start].join("|");
+    if (seenMatches.has(key)) return;
+    seenMatches.add(key);
+    matches.push(match);
+  });
   const upcoming = matches.filter((match) => {
     const start = validDate(match.startTime);
     return matchStatus(match) === "Upcoming" && start !== null && start >= now;

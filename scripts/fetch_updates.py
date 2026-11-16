@@ -112,11 +112,15 @@ def read_openliga():
         out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,"status":"finished" if finished else "scheduled","source":"OpenLigaDB"})
     return out
 def event_key(event):
-    """Prefer stable source IDs; fall back to team/time identity for legacy records."""
+    """Use source plus team/time identity so ID-less duplicates collapse too."""
+    source=str(event.get("source") or "").strip()
+    home=clean(event.get("homeTeam")).casefold()
+    away=clean(event.get("awayTeam")).casefold()
+    start=str(event.get("startTime") or "").strip()
+    if home and away and start:
+        return (source, home, away, start)
     identifier=str(event.get("id") or "").strip()
-    return (event.get("source",""),identifier) if identifier else (
-        clean(event.get("homeTeam")), clean(event.get("awayTeam")), event.get("startTime")
-    )
+    return (source, identifier)
 
 def dedupe_events(events):
     found={}

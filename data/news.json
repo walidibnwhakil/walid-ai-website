@@ -1,8 +1,15 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-16T03:20:27.405932+00:00",
+  "updatedAt": "2026-11-16T03:53:09.509582+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Mexican drug lord Miguel Angel Felix Gallardo dies age 80",
+      "url": "https://www.bbc.co.uk/news/articles/c51k9nkwrndxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T03:21:56+00:00",
+      "category": "World"
+    },
     {
       "title": "Australian MP 'full of gratitude' upon leaving hospital after alleged car attack",
       "url": "https://www.bbc.co.uk/news/articles/cmpqr9j81888o?at_medium=RSS&at_campaign=rss",
@@ -18,17 +25,31 @@
       "category": "World"
     },
     {
+      "title": "‘Bangladesh will return to its previous state in December’ — arrested SP sent messages to AL leaders",
+      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/d1lldqlehs",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T03:08:02+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Foreign, and CHT Affairs ministries fail to spend a single taka in 4 months",
+      "url": "https://en.prothomalo.com/bangladesh/rh7hxpnxfh",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T03:07:50+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Aroma of new rice brings festive spirit of Nabanna",
+      "url": "https://en.prothomalo.com/photo/i50je4agsj",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T03:07:30+00:00",
+      "category": "World"
+    },
+    {
       "title": "Suspected China spy linked to Nvidia's ex-boss left in 2025, Megaspeed says",
       "url": "https://www.bbc.co.uk/news/articles/cmdx1vpprk9vo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-16T01:47:57+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Mexican drug lord Miguel Angel Felix Gallardo dies age 80",
-      "url": "https://www.bbc.co.uk/news/articles/c51k9nkwrndxo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T23:52:10+00:00",
       "category": "World"
     },
     {
@@ -43,6 +64,13 @@
       "url": "https://www.bbc.co.uk/news/articles/cqm2j0jvep4eo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-15T22:28:54+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Canada bars Russia from Junior World Championships",
+      "url": "https://www.bbc.co.uk/sport/ice-hockey/articles/cqkgm0jgv4mdo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-15T22:01:16+00:00",
       "category": "World"
     },
     {
@@ -79,13 +107,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-15T13:37:45+00:00",
       "category": "World"
-    },
-    {
-      "title": "Three men sentenced to death in Jordan over fatal church mass shooting",
-      "url": "https://www.bbc.co.uk/news/articles/c3rrg9xgqlwpo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T11:06:32+00:00",
-      "category": "World"
     }
   ],
   "sources": [
@@ -99,7 +120,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": false
+      "ok": true
     },
     {
       "name": "BBC World",

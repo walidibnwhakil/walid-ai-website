@@ -1,6 +1,6 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-16T03:20:27.601647+00:00",
+  "updatedAt": "2026-11-16T03:53:09.912314+00:00",
   "status": "ok",
   "items": [
     {
@@ -4140,6 +4140,28 @@
         }
       ],
       "note": "Verified cricket fixtures and scores."
+    }
+  },
+  "seasonal": {
+    "olympics": {
+      "label": "Olympics",
+      "officialStart": "2028-07-14T00:00:00Z",
+      "officialEnd": "2028-07-30T23:59:59Z",
+      "sourceHealth": false,
+      "source": "No verified free event feed configured",
+      "coverage": "dormant",
+      "matches": [],
+      "note": "This event section stays hidden until its official competition window is active and a verified event feed is healthy."
+    },
+    "commonwealth": {
+      "label": "Commonwealth Games",
+      "officialStart": "2026-07-23T00:00:00Z",
+      "officialEnd": "2026-08-02T23:59:59Z",
+      "sourceHealth": false,
+      "source": "No verified free event feed configured",
+      "coverage": "dormant",
+      "matches": [],
+      "note": "This event section stays hidden until its official competition window is active and a verified event feed is healthy."
     }
   }
 }

@@ -1,8 +1,36 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-16T12:25:24.792825+00:00",
+  "updatedAt": "2026-11-16T12:57:37.246905+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Five EU countries expected to announce migrant deportation centre in Rwanda",
+      "url": "https://www.bbc.co.uk/news/articles/cw987343352go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T12:54:44+00:00",
+      "category": "World"
+    },
+    {
+      "title": "\"India has not formally set any conditions for returning Sheikh Hasina\"",
+      "url": "https://en.prothomalo.com/bangladesh/politics/aohb5q6jkf",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T12:52:59+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Ashes of exiled Nobel Laureate Miguel Ángel Asturias returned to Guatemala",
+      "url": "https://www.bbc.co.uk/news/articles/cvde1klewg88o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T12:42:14+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Man sentenced over 'horrific' attempted murder of three children",
+      "url": "https://www.bbc.co.uk/news/articles/cr0qj0nzwj34o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T12:27:15+00:00",
+      "category": "World"
+    },
     {
       "title": "Elon Musk joins 'Bring Jensen Back' campaign to reinstate the ex-Nvidia boss",
       "url": "https://www.bbc.co.uk/news/articles/cry49plv8v3go?at_medium=RSS&at_campaign=rss",
@@ -11,11 +39,25 @@
       "category": "Technology"
     },
     {
-      "title": "Five EU countries expected to announce migrant deportation centre in Rwanda",
-      "url": "https://www.bbc.co.uk/news/articles/cw987343352go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T11:55:57+00:00",
+      "title": "Why RMG workers’ wage board meeting suddenly postponed",
+      "url": "https://en.prothomalo.com/business/local/dmzjoagf9o",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T12:13:25+00:00",
       "category": "World"
+    },
+    {
+      "title": "Marico Bangladesh announces \"Over The Wall\" Season 5 winners",
+      "url": "https://en.prothomalo.com/corporate/z2lu42tb0c",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T12:10:54+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Jamaat prepares for future maintaining pressure on govt",
+      "url": "https://en.prothomalo.com/bangladesh/politics/m9b2c1qaxl",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-16T12:02:54+00:00",
+      "category": "Technology"
     },
     {
       "title": "China’s proposed economic corridor: What it means for Bangladesh",
@@ -95,34 +137,6 @@
       "category": "World"
     },
     {
-      "title": "BGB patrols Gopalganj with armoured vehicles and body-worn cameras",
-      "url": "https://en.prothomalo.com/bangladesh/local-news/4je99mp912",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-16T10:08:37+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Ton-up Litton, lower order power Bangladesh to 400, pile pressure on South Africa",
-      "url": "https://en.prothomalo.com/sports/cricket/ganp5g0tpe",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-16T09:54:20+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "Visiting the parliament from the village, Meherin and Shimana set higher goals",
-      "url": "https://en.prothomalo.com/youth/education/b59mg6iitw",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-16T09:41:45+00:00",
-      "category": "World"
-    },
-    {
-      "title": "From patient-centered care to physician-enabled patient care",
-      "url": "https://en.prothomalo.com/opinion/kmsocrmfsg",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-16T09:21:29+00:00",
-      "category": "World"
-    },
-    {
       "title": "UK and allies call on Israel to allow rapid humanitarian access to Gaza",
       "url": "https://www.bbc.co.uk/news/articles/cwm2mllj1pp8o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -156,20 +170,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-16T01:05:44+00:00",
       "category": "Bangladesh"
-    },
-    {
-      "title": "Teenager Andreeva caps stunning week with WTA Finals title",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/c61740145y7wo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T23:18:38+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Zelensky urges US and Musk to lift Starlink restrictions and be on 'right side of history'",
-      "url": "https://www.bbc.co.uk/news/articles/c6m25zg88k45o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-15T19:32:39+00:00",
-      "category": "World"
     }
   ],
   "sources": [

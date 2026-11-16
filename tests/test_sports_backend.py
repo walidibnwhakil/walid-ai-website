@@ -29,6 +29,21 @@ class SportsBackendTests(unittest.TestCase):
     def test_only_supported_sports_are_published(self):
         self.assertEqual(set(fetch.SPORTS), {"football"})
 
+    def test_seasonal_sections_are_hidden_outside_window_without_verified_data(self):
+        dormant = fetch.seasonal_payload({})
+        now = fetch.datetime(2026, 11, 16, tzinfo=fetch.timezone.utc)
+        self.assertFalse(fetch.seasonal_visible(dormant["olympics"], now))
+        self.assertFalse(fetch.seasonal_visible(dormant["commonwealth"], now))
+
+    def test_seasonal_section_requires_active_window_health_and_data(self):
+        now = fetch.datetime(2028, 7, 20, tzinfo=fetch.timezone.utc)
+        event = {**fetch.SEASONAL_EVENTS["olympics"], "sourceHealth": True,
+                 "matches": [{"id": "verified-event"}]}
+        self.assertTrue(fetch.seasonal_visible(event, now))
+        self.assertFalse(fetch.seasonal_visible({**event, "sourceHealth": False}, now))
+        self.assertFalse(fetch.seasonal_visible({**event, "matches": []}, now))
+        self.assertFalse(fetch.seasonal_visible(event, fetch.datetime(2028, 8, 1, tzinfo=fetch.timezone.utc)))
+
     def test_event_feed_has_no_arbitrary_forty_match_cap_and_keeps_ids(self):
         events = [{
             "idEvent": str(i), "strHomeTeam": "Home " + str(i), "strAwayTeam": "Away",

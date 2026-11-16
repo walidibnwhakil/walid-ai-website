@@ -118,12 +118,6 @@ def event_key(event):
         clean(event.get("homeTeam")), clean(event.get("awayTeam")), event.get("startTime")
     )
 
-def event_key(event):
-    identifier=str(event.get("id") or "").strip()
-    return (event.get("source",""),identifier) if identifier else (
-        clean(event.get("homeTeam")), clean(event.get("awayTeam")), event.get("startTime")
-    )
-
 def dedupe_events(events):
     found={}
     for event in events:
@@ -193,9 +187,9 @@ def scores(previous):
     for key in ("tennis","volleyball","badminton"):
         result[key]=old_sports.get(key) or {"label":key.title(),"coverage":"unavailable","source":"","matches":[],"note":"No verified match information is available right now."}
     for entry in result.values():
-        entry.pop("source",None)
+        # Keep provider provenance in the cache so each displayed event remains auditable.
         for match in entry.get("matches",[]):
-            match.pop("source",None)
+            match.setdefault("source","unknown")
     return result
 def read_cricketdata():
     """Combine scheduled match listings and score feed; never log the credential."""

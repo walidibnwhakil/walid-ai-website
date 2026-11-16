@@ -12,6 +12,26 @@
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font:16px/1.55:"Times New Roman",Times,serif;color:var(--ink);background:#fff}
 body{isolation:isolate}body:before{content:"";position:fixed;z-index:-1;inset:0 auto auto 50%;width:min(78vw,760px);aspect-ratio:1;transform:translate(-50%,-25%);background:url("/walid-ai-approved-flower.png") center/contain no-repeat;opacity:.06;animation:spin 10s linear infinite;pointer-events:none}
 @keyframes spin{to{rotate:360deg}}a{color:inherit}.shell{width:min(1120px,100%);margin:auto;padding:24px 22px 44px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.logo{width:132px;height:44px;object-fit:contain}.top-link{padding:9px 15px;border:1px solid var(--line);border-radius:999px;text-decoration:none;background:#fff}.hero{text-align:center;padding:58px 0 34px}.hero h1{margin:10px 0 8px;font-size:clamp(2rem,5vw,3.3rem);font-weight:400;letter-spacing:-.04em}.hero p{margin:0 auto;color:var(--muted);max-width:620px}.menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.card{display:flex;flex-direction:column;min-height:168px;padding:22px;border:1px solid var(--line);border-radius:18px;background:#ffffffd9;box-shadow:0 12px 35px #183b250b;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.card:hover{transform:translateY(-3px);border-color:#9fc9b0;box-shadow:0 16px 40px #183b2517}.icon{font-size:1.8rem}.card h2{margin:10px 0 4px;font-size:1.23rem;font-weight:600}.card p{margin:0;color:var(--muted);font-size:.95rem}.card .arrow{margin-top:auto;color:var(--accent);font-weight:600}.empty{cursor:default;background:var(--mint)}.empty:hover{transform:none;box-shadow:0 12px 35px #183b250b;border-color:var(--line)}footer{text-align:center;margin-top:34px;color:var(--muted);font-size:.9rem}footer a{color:var(--accent);text-decoration:none}@media(max-width:760px){.menu{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding-top:42px}}@media(max-width:480px){.shell{padding:16px 13px 30px}.menu{grid-template-columns:1fr}.card{min-height:142px}.hero{padding:38px 0 27px}.top-link{font-size:.92rem;padding:8px 12px}}
+
+/* Responsive design alignment: shared across the main sections. */
+:root{--walid-page-max:1180px;--walid-gutter:clamp(13px,3vw,32px)}
+body{overflow-x:hidden}
+main,.shell{width:min(var(--walid-page-max),calc(100% - (var(--walid-gutter) * 2)));margin-inline:auto}
+.logo{max-width:100%;height:auto}
+button,a{ -webkit-tap-highlight-color:transparent }
+@media (max-width:760px){
+  main,.shell{width:min(100% - 24px,600px)}
+  .top,.masthead{gap:14px;flex-wrap:wrap}
+  .back,.top-link{white-space:nowrap}
+}
+@media (max-width:430px){
+  main,.shell{width:calc(100% - 24px)}
+  .logo{width:min(125px,42vw)}
+  .back,.top-link{font-size:.86rem;padding:8px 11px}
+  .hero{padding-top:34px}
+  .hero h1,.title{font-size:clamp(2.15rem,13vw,3.1rem)}
+}
+@media (min-width:1280px){main,.shell{width:min(var(--walid-page-max),calc(100% - 64px))}}
 </style><link rel="stylesheet" href="/walid-legal.css">
 </head>
 <body><main class="shell">

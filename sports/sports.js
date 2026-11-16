@@ -66,7 +66,7 @@
     if(!match) return "<article class='featured-card'><div class='featured-top'><span class='sport-tag'><span class='sport-icon'>"+icon+"</span>"+label+"</span><span class='status-pill'>Feed check</span></div><div class='featured-empty'>No verified "+label.toLowerCase()+" fixture is available right now.</div><div class='featured-footer'><span class='featured-time'>Scores and fixtures update automatically</span><a class='view-matches' href='"+target+"'>View All Matches <span aria-hidden='true'>→</span></a></div></article>";
     const status=statusOf(match), live=status==="live", upcoming=status==="scheduled"&&validDate(match.startTime)!==null&&validDate(match.startTime)>=Date.now();
     const badge=live?"<span class='status-pill live'><i class='status-dot'></i>Live now</span>":"<span class='status-pill'>"+(upcoming?"Next match":"Latest result")+"</span>";
-    const center=live||status==="finished"?"<div class='versus'><span class='versus-score'>"+score(match)+"</span></div>":"<div class='versus'><span class='versus-mark'>VS</span><span class='countdown' data-countdown='"+esc(match.startTime)+"'>"+countdown(match.startTime)+"</span></div>";
+    const center=live||status==="finished"?"<div class='versus'><span class='versus-score'>"+(id==="cricket"?"VS":score(match))+"</span></div>":"<div class='versus'><span class='versus-mark'>VS</span><span class='countdown' data-countdown='"+esc(match.startTime)+"'>"+countdown(match.startTime)+"</span></div>";
     const description=live?"In progress":status==="finished"?"Final score":upcoming?timeLabel(match.startTime):"Schedule to be announced";
     return "<article class='featured-card'><div class='featured-top'><span class='sport-tag'><span class='sport-icon'>"+icon+"</span>"+label+"</span>"+badge+"</div>"+
       "<div class='featured-comp'>"+esc(match.competition||match.matchType||match.format||"Match centre")+"</div>"+
@@ -103,7 +103,7 @@
     // The provider's homeScore/awayScore can be reversed relative to innings.
     // Prefer unambiguous team-labelled innings. Otherwise do not guess.
     const h=inningsScore(home),a=inningsScore(away);
-    const reliable=Boolean(home&&away&&!ambiguous&&winnerKnown);
+    const reliable=Boolean(home&&away&&!ambiguous&&winnerKnown&&Number.isFinite(Number(home.runs))&&Number.isFinite(Number(away.runs)));
     const homeRuns=home?.runs,awayRuns=away?.runs;
     const winningSide=winner===hName?"home":winner===aName?"away":null;
     let margin="";

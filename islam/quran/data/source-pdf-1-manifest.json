@@ -1,0 +1,24 @@
+{
+  "sourceFile": "1.pdf",
+  "sha256": "e439fd999c04b7d9b0bcb514543a180d7e23b8ddf5428b66d7c8b4078fe7dc34",
+  "pageCount": 36,
+  "visualVerification": {
+    "pagesInspected": [1, 2, 3, 4, 5, 34, 35, 36],
+    "titlePageExtent": "১–৩০ পারা (cover claim; not treated as content extent)",
+    "contentExtent": {
+      "surah": [
+        {"number": 1, "name": "আল-ফাতিহা", "ayahStart": 1, "ayahEnd": 7, "count": 7},
+        {"number": 2, "name": "আল-বাকারা", "ayahStart": 1, "ayahEnd": 141, "count": 141}
+      ],
+      "totalCanonicalAyahs": 148,
+      "gapsWithinExtent": []
+    }
+  },
+  "integrationStatus": "source-staged-transcription-pending",
+  "publicationGuard": "Do not replace existing QuranEnc translation or publish PDF-derived Bengali translation/pronunciation until every ayah's Arabic, Bengali meaning, and Bengali phonetic text has been manually transcribed from the scanned pages and aligned to the canonical (surah, ayah) key.",
+  "notes": [
+    "The PDF is scanned image content; no text layer was used as authority.",
+    "The cover's 1–30 para claim is not evidence that this 36-page file contains the full Quran.",
+    "The final scanned content ends at Al-Baqarah 2:141; no later ayahs are present in this file."
+  ]
+}

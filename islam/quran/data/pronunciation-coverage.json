@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "updated": "2026-11-17",
+  "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated.",
+  "verified": {
+    "surah": 1,
+    "verses": 7
+  },
+  "pending": {
+    "surahs": 113,
+    "verses": 6229
+  },
+  "source": "Walid AI review of quran.gov.bd pronunciation; government source is linked for uncovered verses."
+}

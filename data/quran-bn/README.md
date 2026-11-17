@@ -7,3 +7,5 @@ Batches currently include Al-Fatihah (1:1-1:7) and Al-Baqarah (2:1-2:16), 23 aya
 Only `review_status: scholar_reviewed` may be considered for publication. All current records are `unreviewed_draft` and `publishable: false`. Transliteration is a reader aid, not tajwid instruction; madd, ghunnah, qalqalah, assimilation, waqf/ibtida and articulation require expert review. Every batch must pass the validator before review.
 
 CI runs the draft validator and pytest coverage on the pull request before any review or publication decision.
+
+The validator treats Arabic combining marks as valid source text and checks for non-empty Arabic instead of rejecting canonical Quranic diacritics.

@@ -712,3 +712,11 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 #verses>.ayah.basmala{display:flex!important;text-align:center!important;align-items:stretch!important}
 #verses>.ayah.basmala>.arabic{text-align:center!important;direction:rtl!important}
 #verses>.ayah.basmala>.pronunciation,#verses>.ayah.basmala>.translation{text-align:center!important}
+
+/* Content-sized ayah cards: no fixed whitespace for short verses. */
+#verses{align-items:stretch!important;grid-auto-rows:auto!important}
+#verses>.ayah:not(.basmala){display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-content:normal!important;align-items:stretch!important;min-height:0!important;height:max-content!important;max-height:none!important;grid-template-rows:none!important;grid-auto-rows:auto!important;row-gap:8px!important;padding:14px 18px!important}
+#verses>.ayah:not(.basmala)>.ayah-number{flex:0 0 auto!important;width:36px!important;height:36px!important;min-height:0!important;margin:0!important}
+#verses>.ayah:not(.basmala)>.arabic{flex:0 0 auto!important;min-height:0!important;height:auto!important;line-height:1.65!important;margin:0!important;padding:0!important}
+#verses>.ayah:not(.basmala)>.pronunciation,#verses>.ayah:not(.basmala)>.translation{flex:0 0 auto!important;min-height:0!important;height:auto!important;line-height:1.6!important;margin:0!important;padding:0!important}
+#verses .pronunciation::before{content:none!important}

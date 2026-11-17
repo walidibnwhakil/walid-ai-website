@@ -1,0 +1,35 @@
+name: Refresh Bismillah reader across 114 surahs
+on:
+  push:
+    paths:
+      - .github/workflows/refresh-bismillah-reader-once.yml
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh script references on all surah pages
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          pages=sorted(Path('islam/quran').glob('*/index.html'))
+          assert len(pages)==114,len(pages)
+          for page in pages:
+              before=page.read_text(encoding='utf-8')
+              after=re.sub(r'(/islam/quran/reader\.js)(?:\?[^"]*)?',r'\1?v=a0879e23',before)
+              assert after.count('reader.js?v=a0879e23')==1,page
+              page.write_text(after,encoding='utf-8')
+          print('Verified all 114 surah pages')
+          PY
+      - name: Commit reader cache refresh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add islam/quran/*/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh Bismillah reader for all 114 Quran pages"
+            git push
+          fi

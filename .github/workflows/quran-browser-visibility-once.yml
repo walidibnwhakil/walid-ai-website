@@ -36,7 +36,8 @@ jobs:
               page.removeAllListeners('pageerror');
               page.on('pageerror',e=>errors.push(e.message));
               await page.goto('http://127.0.0.1:8765/islam/quran/'+slug+'/',{waitUntil:'domcontentloaded',timeout:20000});
-              await page.waitForFunction(()=>document.querySelectorAll('#verses>.ayah:not(.basmala)').length>0,{timeout:15000});
+              try {await page.waitForFunction(()=>document.querySelectorAll('#verses>.ayah:not(.basmala)').length>0,null,{timeout:12000});}
+              catch(e){const state=await page.evaluate(()=>({surah:document.body.dataset.surah,status:document.querySelector('#load-status')?.textContent,script:[...document.scripts].map(x=>x.src),cards:document.querySelectorAll('#verses>.ayah').length}));throw Error('READER TIMEOUT '+JSON.stringify({slug,state,errors})+' '+e.message)}
               const result=await page.evaluate(()=>{
                 const n=Number(document.body.dataset.surah);
                 const cards=[...document.querySelectorAll('#verses>.ayah:not(.basmala)')];

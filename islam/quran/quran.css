@@ -182,3 +182,18 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
   .source-footer{margin-left:-18px;margin-right:-18px;}
 }
 @media(max-width:899px){.walid-topbar{display:block}.info-strip,.design-tabs{display:none}}
+
+
+/* Final reference alignment: stronger hero illustration cues, full-width density, and clean verse medallions. */
+@media (min-width:900px){
+  .surah-head{min-height:230px!important;padding:38px 150px!important;background:radial-gradient(ellipse at 16% 66%,rgba(212,179,88,.28),transparent 17%),radial-gradient(ellipse at 82% 50%,rgba(0,35,26,.34),transparent 23%),linear-gradient(115deg,#0b3f2e 0%,#17694b 48%,#063729 100%)!important;}
+  .surah-head:before{content:'🏮  📖';left:52px;top:50%;transform:translateY(-50%);font-size:3.3rem;letter-spacing:-.3rem;filter:drop-shadow(0 3px 3px #0006);}
+  .surah-head:after{content:'سُورَةُ الْفَاتِحَة';right:48px;bottom:50%;transform:translateY(50%);font-family:'Noto Naskh Arabic','Amiri',serif;font-size:2.15rem;letter-spacing:.04em;color:#f5d77a;opacity:1;}
+  .surah-head h1{font-size:3.8rem!important;font-family:'Noto Sans Bengali',system-ui,sans-serif!important;}
+  .surah-head:global{border-image:linear-gradient(90deg,#e3bd58,#fff0ad,#c29a3e) 1;}
+  .design-tabs a{min-width:205px;padding:14px 22px;font-size:1.02rem;}.design-tabs{gap:12px;}
+  .info-strip{padding:16px 34px;gap:74px;font-size:1.02rem;}
+  .reading-tools{padding:15px 24px!important;font-size:1rem;}.reading-tools:before{content:'প্রদর্শন:';font-size:1.12rem;font-weight:800;color:#174f3a;margin-right:6px;}
+  .quran-sidebar{background:linear-gradient(180deg,#fffdf8,#fbf7ea);}.quran-sidebar h2{font-size:1.35rem;}.quran-sidebar .side-list{max-height:430px;}
+  .ayah{min-height:180px;padding:28px 34px 24px!important;}.ayah-number{left:26px;top:38px;width:58px;height:58px;font-size:1.35rem!important;background:radial-gradient(circle,#fff9e7 55%,#f0d684 56%,#fff3bd 67%,#caa85b 68%,#fff9e7 72%);}.arabic{padding-left:98px!important;font-size:3.05rem!important;line-height:1.7!important;}.pronunciation,.translation,.ayah-note-toggle{margin-left:98px!important;}.pronunciation{padding:10px 16px!important;font-size:1.05rem!important;}.translation{font-size:1.1rem!important;}
+}

@@ -1,21 +1,140 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-16T23:12:19.954260+00:00",
+  "updatedAt": "2026-11-17T06:30:11.848897+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Why Awami League activists protesting only against NCP leaders in UK?",
+      "url": "https://en.prothomalo.com/bangladesh/politics/n3k38psujx",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T06:10:03+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Ukraine accuses Russia of targeting rescue operation after 'double-tap' strike kills 72",
+      "url": "https://www.bbc.co.uk/news/articles/c30rk8x5g80qo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T05:59:01+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Two major Kyiv bridges hit in Russian attack, mayor says",
+      "url": "https://www.bbc.co.uk/news/articles/cw772jk4rvmxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T05:57:38+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Democrats eye first Black US House speaker in leadership vote",
+      "url": "https://en.prothomalo.com/international/americas/vftfhdv4v4",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T05:51:29+00:00",
+      "category": "World"
+    },
+    {
+      "title": "$7.6b in annual debt repayment pressure",
+      "url": "https://en.prothomalo.com/business/local/8lbwnub4yt",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T05:30:31+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Unplanned bridges killing rivers and waterways",
+      "url": "https://en.prothomalo.com/video/r2ayie7k1q",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T04:55:14+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Robert Pattinson to be new James Bond",
+      "url": "https://en.prothomalo.com/entertainment/movies/dwggjfjfx0",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T04:18:58+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Former Dhaka South mayor Sayeed Khokon arrested in Baridhara",
+      "url": "https://en.prothomalo.com/bangladesh/48redaxx8m",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T04:09:08+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Pori Moni’s drug case: Indictment hearing scheduled for today",
+      "url": "https://en.prothomalo.com/entertainment/movies/cxd6oodbxd",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T04:04:54+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Dhaka ranked world’s most polluted city today as air quality turns hazardous",
+      "url": "https://en.prothomalo.com/environment/pollution/gtgcjq82cq",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T04:00:03+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Awami league-NCP supporters clash after Nahid Islam’s reception in London, 5 injured",
+      "url": "https://en.prothomalo.com/bangladesh/politics/2k4i0h177w",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T03:54:39+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Police on alert over fears of major sabotage in December",
+      "url": "https://en.prothomalo.com/bangladesh/politics/0oya51sasf",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T03:47:57+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Bangladesh welcomes eligibility for DFC financing",
+      "url": "https://en.prothomalo.com/bangladesh/dw0owvcbsa",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T03:18:28+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "DFC opens door to US investment in Bangladesh’s development projects",
+      "url": "https://en.prothomalo.com/bangladesh/8swrf1l8ur",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T03:07:48+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Vance says he will decide 'sometime next year' about 2028 US presidential run",
+      "url": "https://www.bbc.co.uk/news/articles/cwkgr9m41engo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T03:07:23+00:00",
+      "category": "World"
+    },
     {
       "title": "Nvidia dismisses 'Bring Jensen Back' campaign as Trump backs effort to reinstate ex CEO",
       "url": "https://www.bbc.co.uk/news/articles/cry49plv8v3go?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-16T22:21:27+00:00",
+      "publishedAt": "2026-11-17T02:37:53+00:00",
       "category": "Technology"
     },
     {
-      "title": "Houthi rebel advance in Yemen may further destabilise global economy",
-      "url": "https://www.bbc.co.uk/news/articles/cmy97qperq9eo?at_medium=RSS&at_campaign=rss",
+      "title": "Imran Khan seeks urgent medical care fearing he 'may not return alive'",
+      "url": "https://www.bbc.co.uk/news/articles/cr894xq5yeyko?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-16T21:40:07+00:00",
+      "publishedAt": "2026-11-17T01:26:01+00:00",
       "category": "World"
+    },
+    {
+      "title": "Five EU countries announce migrant deportation centre in Rwanda",
+      "url": "https://www.bbc.co.uk/news/articles/cw987343352go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T23:20:45+00:00",
+      "category": "World"
+    },
+    {
+      "title": "California sues OpenAI over Hugging Face attack",
+      "url": "https://www.bbc.co.uk/news/articles/c6wy4xv2mxglo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-16T23:12:24+00:00",
+      "category": "Technology"
     },
     {
       "title": "Forensic expert says his analysis of autopsy photos suggests Epstein was killed",
@@ -32,38 +151,10 @@
       "category": "World"
     },
     {
-      "title": "When will we see Robert Pattinson as Bond in cinemas?",
-      "url": "https://www.bbc.co.uk/news/videos/cmd91xjd9zk2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T17:18:54+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Five EU countries announce migrant deportation centre in Rwanda",
-      "url": "https://www.bbc.co.uk/news/articles/cw987343352go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T16:27:24+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Landmark Crimea bridge hit as Russia reports biggest Ukrainian drone attack of war",
-      "url": "https://www.bbc.co.uk/news/articles/ckx27v6dpjz0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T14:58:12+00:00",
-      "category": "Technology"
-    },
-    {
       "title": "Raye, Rosalía and Dolly Parton recognised in Grammy nominations",
       "url": "https://www.bbc.co.uk/news/articles/cq9vwkggpx73o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-16T14:48:55+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Estonia to close Russia border crossings after attempted drone factory arson attack",
-      "url": "https://www.bbc.co.uk/news/articles/cqp83nk673reo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T14:22:36+00:00",
       "category": "World"
     },
     {
@@ -72,13 +163,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-16T13:40:56+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Ashes of exiled Nobel Laureate Miguel Ángel Asturias returned to Guatemala",
-      "url": "https://www.bbc.co.uk/news/articles/cvde1klewg88o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T12:42:14+00:00",
-      "category": "World"
     },
     {
       "title": "Two mass shootings in South Africa leave 17 dead",
@@ -99,7 +183,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": false
+      "ok": true
     },
     {
       "name": "BBC World",

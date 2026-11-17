@@ -1,8 +1,50 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-16T23:12:21.185658+00:00",
+  "updatedAt": "2026-11-17T06:30:12.212352+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Why always him? The rise and fall of Balotelli",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cvgxvg4v981o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T06:15:43+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Fifa accused of climate ‘record of failure’ due to Aramco deal and tournament expansion",
+      "url": "https://www.theguardian.com/football/2026/nov/17/fifa-accused-climate-record-failure-aramco-deal-tournament-expansion",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T06:00:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "What's the story with Scotland boss Pocognoli - is it time to go?",
+      "url": "https://www.bbc.co.uk/sport/football/articles/crgqx1zz94d4o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T00:19:58+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Swansea braced to lose Vítor Matos as Strasbourg seek to replace Hugo Oliveira",
+      "url": "https://www.theguardian.com/football/2026/nov/16/swansea-city-head-coach-vitor-matos-strasbourg-chelsea-sister-club-ligue-1",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-16T23:32:23+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'Is that not match-fixing?' - Erasmus questions officiating",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ck0jx1dnd38go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-16T23:14:48+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Pochettino: I’d tell Guardiola to ‘take it’ if he’s offered US coaching job",
+      "url": "https://www.theguardian.com/football/2026/nov/16/mauricio-pochettino-pep-guardiola-usmnt-manchester-united",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-16T23:01:52+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Littler hits triple-bull, but Price checkout doesn't add up",
       "url": "https://www.bbc.co.uk/sport/darts/articles/cwkgr9m0d0e5o?at_medium=RSS&at_campaign=rss",
@@ -18,10 +60,10 @@
       "category": "Sports"
     },
     {
-      "title": "Man Utd to resurrect Hall interest - Tuesday's gossip",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c6d91x7nz85jo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T22:06:32+00:00",
+      "title": "Nations League: Wirtz doubles up as Germany rout Netherlands to top group",
+      "url": "https://www.theguardian.com/football/2026/nov/16/nations-league-roundup-germany-netherlands-greece-serbia",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-16T22:33:26+00:00",
       "category": "Sports"
     },
     {
@@ -43,20 +85,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/16/thomas-tuchel-england-must-learn-lessons-history-seville-gareth-southgate",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-16T20:02:09+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Robertson eclipses Dalglish to become Scotland's most capped man",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cjp3v5r9enp1o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T19:43:33+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Mauricio Pochettino sends coaches to Manchester to help prepare for United job",
-      "url": "https://www.theguardian.com/football/2026/nov/16/mauricio-pochettino-assistants-manchester-united-usmnt",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T18:29:04+00:00",
       "category": "Sports"
     },
     {
@@ -102,31 +130,10 @@
       "category": "Sports"
     },
     {
-      "title": "Do good club managers necessarily make good international managers? | Jonathan Wilson",
-      "url": "https://www.theguardian.com/global/2026/nov/16/mauricio-pochettino-usmnt-replacement-coach",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T16:14:29+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Alcaraz 'best I've felt' in statement start at ATP Finals",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/ckvg294x5yzqo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T15:43:54+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "French football head Philippe Diallo to fight Infantino for Fifa presidency",
       "url": "https://www.theguardian.com/football/2026/nov/16/philippe-diallo-fifa-gianni-infantino-president-french-football-federation",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-16T15:27:30+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Prendergast cited and could miss South Africa game",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c3pw42zrp4peo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T14:31:37+00:00",
       "category": "Sports"
     },
     {
@@ -137,24 +144,10 @@
       "category": "Sports"
     },
     {
-      "title": "Union of European Clubs escalates fight for football influence with formal complaint",
-      "url": "https://www.theguardian.com/football/2026/nov/16/union-of-european-clubs-complaint-european-commission-uefa-european-football-clubs",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T14:02:53+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Has Trafford replaced Pickford as England No 1?",
       "url": "https://www.bbc.co.uk/sport/football/articles/cmvg2r752ykzo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-16T13:01:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "A long wait, some magic and that smile: Ronaldinho savours Ravenna debut at 46",
-      "url": "https://www.theguardian.com/football/2026/nov/16/ronaldinho-ravenna-debut-serie-c-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T12:49:11+00:00",
       "category": "Sports"
     },
     {

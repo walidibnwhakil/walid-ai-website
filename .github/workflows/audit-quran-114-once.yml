@@ -35,7 +35,7 @@ jobs:
           for page in pages:
               html=page.read_text()
               assert 'reader.js' in html and 'quran.css' in html,page
-              assert 'data-surah=' in html,page
+              assert 'data-surah=' in html or 'document.body.dataset.surah=' in html,page
           js=(base/'reader.js').read_text()
           assert 'versesEl.replaceChildren(fragment)' in js
           assert "card.append(num,arabic,pronunciation,translation,noteButton)" in js

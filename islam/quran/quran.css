@@ -686,3 +686,15 @@ body:has(.quran-reading-grid) .ayah.basmala .arabic{display:block!important;text
 body:has(.quran-reading-grid) .ayah-note,body:has(.quran-reading-grid) .ayah-note-toggle{display:none!important}
 @media(max-width:899px){body:has(.quran-reading-grid) .quran-reading-grid{grid-template-columns:minmax(0,1fr)!important}body:has(.quran-reading-grid) .quran-sidebar{display:none!important}body:has(.quran-reading-grid) .surah-head{min-height:155px!important;padding:24px 80px 24px 115px!important}body:has(.quran-reading-grid) .surah-head .hero-arabic{display:none!important}body:has(.quran-reading-grid) .surah-head .hero-art{width:40%!important;opacity:.65!important}body:has(.quran-reading-grid) .ayah:not(.basmala){grid-template-columns:52px minmax(0,1fr)!important;padding:14px!important;gap:8px!important}body:has(.quran-reading-grid) .ayah-number{width:38px!important;height:38px!important;font-size:1rem!important}}
 @media(max-width:480px){body:has(.quran-reading-grid) .surah-head{padding:22px 16px 22px 86px!important}body:has(.quran-reading-grid) .surah-head h1{font-size:1.5rem!important}}
+
+/* Mobile Quran Mushaf paging: desktop full-surah layout stays intact. */
+@media(max-width:899px){
+  body:has(.mushaf-verses) #verses[hidden]{display:none!important}
+  .mushaf-verses{display:grid!important;gap:14px!important;min-width:0!important}
+  .mushaf-verses .ayah{min-width:0!important;overflow:visible!important}
+  .mushaf-surah-heading{margin:6px 0 2px;padding:14px 12px;border:1px solid #d8b45d;border-radius:12px;background:#fff8e8;color:#17523e;text-align:center;font-size:1.35rem}
+  .mushaf-pager{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;margin:18px 0 24px}
+  .mushaf-pager a{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:42px;padding:8px 11px;border:1px solid #d7bd7c;border-radius:9px;background:#fffaf0;color:#18523d;text-decoration:none;font-weight:700}
+  .mushaf-pager a.current{background:#116b4d;color:white;border-color:#116b4d}
+  .mushaf-page-caption{flex-basis:100%;text-align:center;color:#53665b;font-size:.9rem;margin-top:4px}
+}

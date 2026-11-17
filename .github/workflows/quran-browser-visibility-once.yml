@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.56.1-noble
-    timeout-minutes: 30
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,11 +22,15 @@ jobs:
       - name: Test every surah in real mobile browser
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/quran-http.log 2>&1 &
+          sleep 1
+          curl -fsS -I http://127.0.0.1:8765/islam/quran/al-baqarah/
           node <<'JS'
           const {chromium}=require('playwright');
           const fs=require('fs'),path=require('path');
           (async()=>{
+            console.log('START browser verification');
             const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            console.log('BROWSER launched');
             const page=await browser.newPage({viewport:{width:360,height:800},deviceScaleFactor:2,isMobile:true,hasTouch:true});
             const dirs=fs.readdirSync('islam/quran',{withFileTypes:true}).filter(d=>d.isDirectory()&&fs.existsSync(path.join('islam/quran',d.name,'index.html'))).map(d=>d.name).sort();
             if(dirs.length!==114)throw Error('Expected 114 pages; found '+dirs.length);
@@ -35,8 +39,9 @@ jobs:
               const errors=[];
               page.removeAllListeners('pageerror');
               page.on('pageerror',e=>errors.push(e.message));
-              await page.goto('http://127.0.0.1:8765/islam/quran/'+slug+'/',{waitUntil:'domcontentloaded',timeout:20000});
-              try {await page.waitForFunction(()=>document.querySelectorAll('#verses>.ayah:not(.basmala)').length>0,null,{timeout:12000});}
+              console.log('CHECK',slug);
+              await page.goto('http://127.0.0.1:8765/islam/quran/'+slug+'/',{waitUntil:'commit',timeout:10000});
+              try {await page.waitForFunction(()=>document.querySelectorAll('#verses>.ayah:not(.basmala)').length>0,null,{timeout:6000});}
               catch(e){const state=await page.evaluate(()=>({surah:document.body.dataset.surah,status:document.querySelector('#load-status')?.textContent,script:[...document.scripts].map(x=>x.src),cards:document.querySelectorAll('#verses>.ayah').length}));throw Error('READER TIMEOUT '+JSON.stringify({slug,state,errors})+' '+e.message)}
               const result=await page.evaluate(()=>{
                 const n=Number(document.body.dataset.surah);

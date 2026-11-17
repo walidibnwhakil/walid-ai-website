@@ -181,6 +181,17 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
   .verses{gap:14px!important;}.ayah{padding:24px 28px 20px!important;border-radius:19px!important;}.arabic{font-size:2.65rem!important;min-height:82px;}.pronunciation{font-size:1rem!important;}.translation{font-size:1.03rem!important;}
   .source-footer{margin-left:-18px;margin-right:-18px;}
 }
+
+/* Banner-only correction: reserve a clean centered title zone like the supplied reference. */
+@media (min-width:900px){
+  .surah-head{padding-left:80px!important;padding-right:190px!important;min-height:206px!important;border-radius:34px 22px 34px 22px!important;}
+  .hero-art{width:39%!important;background-size:118% auto!important;background-position:left bottom!important;}
+  .surah-head h1{font-size:3.35rem!important;max-width:640px;margin:0 auto!important;white-space:nowrap;}
+  .surah-head .subtitle{max-width:520px;margin:4px auto 0!important;}
+  .hero-arabic{position:absolute;right:42px;top:50%;transform:translateY(-36%);z-index:2;color:#f4d477;font-family:"Noto Naskh Arabic","Amiri",serif;font-size:2.2rem;white-space:nowrap;text-shadow:0 1px 0 #7e5d1a;}
+  .hero-arabic:before,.hero-arabic:after{content:"";position:absolute;left:50%;width:86px;height:2px;background:#e5c35f;transform:translateX(-50%);}
+  .hero-arabic:before{top:-18px;}.hero-arabic:after{bottom:-18px;}
+}
 @media(max-width:899px){.walid-topbar{display:block}.info-strip,.design-tabs{display:none}}
 
 

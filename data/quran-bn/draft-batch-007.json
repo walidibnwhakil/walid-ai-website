@@ -1,0 +1,132 @@
+[
+  {
+    "surah": 2,
+    "ayah": 71,
+    "arabic": "قال إنه يقول إنها بقرة لا ذلول تثير الأرض ولا تسقي الحرث مسلمة لا شية فيها قالوا الآن جئت بالحق فذبحوها وما كادوا يفعلون",
+    "bengali_translation": "তিনি বললেন, ‘তিনি বলেন, এটি এমন গাভি যা জমি চাষে অভ্যস্ত নয় এবং ক্ষেত সেচ দেয় না; সুস্থ, তাতে কোনো দাগ নেই।’ তারা বলল, ‘এখন তুমি সত্য বিবরণ এনেছ।’ অতঃপর তারা সেটি জবাই করল, যদিও তারা তা করতে যাচ্ছিল না।",
+    "bengali_transliteration": "কালা ইন্নাহু ইয়াকুলু ইন্নাহা বাকারা লা জালুলুন তুসিরুল আরদা ওয়ালা তাসকিল হারসা মুসাল্লামাতুন লা শিয়াতা ফিহা কালুল আলানা জিত্তা বিল হাক্কি ফাজাবাহুহা ওয়া মা কাডু ইয়াফআলুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 72,
+    "arabic": "وإذ قتلتم نفسا فادارأتم فيها والله مخرج ما كنتم تكتمون",
+    "bengali_translation": "আর যখন তোমরা একজনকে হত্যা করে এ বিষয়ে পরস্পর দোষারোপ করছিলে—আল্লাহ তা প্রকাশ করবেন যা তোমরা গোপন করছিলে।",
+    "bengali_transliteration": "ওয়া ইজ কাতালতুম নাফসান ফাদ্দারা'তুম ফিহা ওয়াল্লাহু মুখরিজুম মা কুনতুম তাকতুমুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 73,
+    "arabic": "فقلنا اضربوه ببعضها كذلك يحيي الله الموتى ويريكم آياته لعلكم تعقلون",
+    "bengali_translation": "তখন আমরা বললাম, ‘গাভিটির একটি অংশ দিয়ে তাকে আঘাত করো।’ এভাবেই আল্লাহ মৃতদের জীবিত করেন এবং তোমাদের তাঁর নিদর্শন দেখান, যাতে তোমরা বুঝতে পারো।",
+    "bengali_transliteration": "ফাকুলনা ইদরিবুহু বিআদলিহা কাজালিকা ইউহইল্লাহুল মাওতা ওয়া ইউরিকুম আয়াতিহি লাআল্লাকুম তাকিলুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 74,
+    "arabic": "ثم قست قلوبكم من بعد ذلك فهي كالحجارة أو أشد قسوة وإن من الحجارة لما يتفجر منه الأنهار وإن منها لما يشقق فيخرج منه الماء وإن منها لما يهبط من خشية الله وما الله بغافل عما تعملون",
+    "bengali_translation": "এরপরও তোমাদের অন্তর কঠিন হয়ে গেল—পাথরের মতো, বরং তার চেয়েও কঠিন। অথচ কিছু পাথর থেকে নদী প্রবাহিত হয়, কিছু ফেটে পানি বের হয়, আর কিছু আল্লাহর ভয়ে নত হয়। তোমরা যা করো আল্লাহ সে বিষয়ে অসচেতন নন।",
+    "bengali_transliteration": "সুম্মা কাসাত কুলুবুকুম মিন বাদি জালিকা ফাহিয়া কালহিজারাতি আও আশাদ্দু কাসওয়াতান ওয়া ইন্না মিনাল হিজারাতি লামা ইয়াতাফাজ্জারু মিনহুল আনহার",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 75,
+    "arabic": "أفتطمعون أن يؤمنوا لكم وقد كان فريق منهم يسمعون كلام الله ثم يحرفونه من بعد ما عقلوه وهم يعلمون",
+    "bengali_translation": "তোমরা কি আশা কর যে তারা তোমাদের কথা মেনে ঈমান আনবে? তাদের একদল আল্লাহর বাণী শুনত, বুঝে নেওয়ার পর জেনেশুনে তা বিকৃত করত।",
+    "bengali_transliteration": "আফাতাতমাউন আন ইউমিনু লাকুম ওয়া কাদ কানা ফারিকুম মিনহুম ইয়াসমাউন কালামাল্লাহি সুম্মা ইউহাররিফুনাহু মিন বাদি মা আকালুহু ওয়াহুম ইয়ালামুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 76,
+    "arabic": "وإذا لقوا الذين آمنوا قالوا آمنا وإذا خلا بعضهم إلى بعض قالوا أتحدثونهم بما فتح الله عليكم ليحاجوكم به عند ربكم أفلا تعقلون",
+    "bengali_translation": "তারা মুমিনদের সঙ্গে মিলিত হলে বলে, ‘আমরা ঈমান এনেছি।’ আর একে অন্যের সঙ্গে একান্তে হলে বলে, ‘আল্লাহ তোমাদের যে জ্ঞান দিয়েছেন তা কি তাদের জানিয়ে দিচ্ছ? তাহলে তারা তোমাদের প্রতিপালকের কাছে তা দিয়ে তোমাদের বিরুদ্ধে যুক্তি দেবে—তোমরা কি বোঝ না?’",
+    "bengali_transliteration": "ওয়া ইজা লাকুল্লাজিনা আমানু কালু আমান্না ওয়া ইজা খালা বাদুহুম ইলা বাদিন কালু আতুহাদ্দিসুনাহুম বিমা ফাতাহাল্লাহু আলাইকুম লিউহাজ্জুকুম বিহি ইন্দা রাব্বিকুম আফালা তাকিলুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 77,
+    "arabic": "أولا يعلمون أن الله يعلم ما يسرون وما يعلنون",
+    "bengali_translation": "তারা কি জানে না যে, তারা যা গোপন করে এবং যা প্রকাশ করে—আল্লাহ সবই জানেন?",
+    "bengali_transliteration": "আওয়ালা ইয়ালামুনা আন্নাল্লাহা ইয়ালামু মা ইউসিররুনা ওয়া মা ইউলিনুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 78,
+    "arabic": "ومنهم أميون لا يعلمون الكتاب إلا أماني وإن هم إلا يظنون",
+    "bengali_translation": "তাদের মধ্যে কিছু নিরক্ষর লোক আছে, যারা কেবল কল্পনা ছাড়া কিতাব সম্পর্কে জানে না; তারা শুধু অনুমান করে।",
+    "bengali_transliteration": "ওয়া মিনহুম উম্মিয়ুনা লা ইয়ালামুনাল কিতাবা ইল্লা আমানিয়্যা ওয়া ইন হুম ইল্লা ইয়াজুনুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 79,
+    "arabic": "فويل للذين يكتبون الكتاب بأيديهم ثم يقولون هذا من عند الله ليشتروا به ثمنا قليلا فويل لهم مما كتبت أيديهم وويل لهم مما يكسبون",
+    "bengali_translation": "অতএব দুর্ভোগ তাদের জন্য যারা নিজেদের হাতে কিতাব লিখে তারপর বলে, ‘এটি আল্লাহর কাছ থেকে’—যাতে সামান্য মূল্য অর্জন করতে পারে। তাদের হাত যা লিখেছে তার জন্যও দুর্ভোগ, তারা যা উপার্জন করে তার জন্যও দুর্ভোগ।",
+    "bengali_transliteration": "ফাওয়াইলুল লিল্লাজিনা ইয়াকতুবুনাল কিতাবা বিআইদিহিম সুম্মা ইয়াকুলুনা হাজা মিন ইন্দিল্লাহি লিয়াশতারু বিহি সামানান কালিলা ফাওয়াইলুল্লাহুম মিম্মা কাতাবাত আইদিহিম",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 80,
+    "arabic": "وقالوا لن تمسنا النار إلا أياما معدودة قل أتخذتم عند الله عهدا فلن يخلف الله عهده أم تقولون على الله ما لا تعلمون",
+    "bengali_translation": "তারা বলে, ‘গোনা কয়েক দিন ছাড়া আগুন আমাদের স্পর্শ করবে না।’ বলো, ‘তোমরা কি আল্লাহর কাছ থেকে কোনো অঙ্গীকার নিয়েছ? আল্লাহ তাঁর অঙ্গীকার ভঙ্গ করবেন না। নাকি তোমরা আল্লাহ সম্পর্কে এমন কথা বলছ যা তোমরা জানো না?’",
+    "bengali_transliteration": "ওয়া কালু লান তামাসসানান নারু ইল্লা আইয়ামান মাদুদাতিন কুল আততাখাজতুম ইন্দাল্লাহি আহদান ফালাই ইউখলিফাল্লাহু আহদাহু আম তাকুলুনা আলাল্লাহি মা লা তালামুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Arabic orthography/source alignment, syntax, historical context, Bengali wording and recitation details require qualified scholarly review; transliteration is a reader aid, not tajwid instruction."
+    ],
+    "composition_note": "Independently authored Arabic-based Bengali draft; not copied from a publisher translation or recitation."
+  }
+]

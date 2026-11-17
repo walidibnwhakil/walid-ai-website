@@ -14,3 +14,27 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
 
 /* Quran reading surface: cream paper, green ink, and restrained verse ornaments. */
 .surah-head{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,253,248,.96),rgba(242,248,241,.94))}.surah-head h1{font-family:"Noto Sans Bengali",system-ui,sans-serif;color:#174f3a;letter-spacing:-.02em}.surah-head .subtitle{font-size:1.08rem}.surah-head::after{content:'۞';position:absolute;inset:auto 24px 8px auto;color:#caa85b;font-size:4rem;opacity:.22;line-height:1}.ayah{background:rgba(255,253,248,.94);border-color:#e5dcc7}.ayah-number{display:flex;align-items:center;gap:9px;color:#806b37}.ayah-number::before{content:'۞';display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;border:1px solid #caa85b;border-radius:50%;color:#a8873f;font-size:.9rem;line-height:1}.ayah-number::after{content:'';flex:0 1 44px;height:1px;background:#dccb9f}.pronunciation{font-size:1.1rem;line-height:1.8;background:#fbf8ef;border-left-color:#caa85b}.translation{color:#334d42}.context,.reading-tools{background:rgba(255,253,248,.9)}
+
+
+/* Final desktop Quran reading composition. Keep the shared Walid AI chrome untouched. */
+@media (min-width: 900px){
+  .shell{width:min(1120px,100%);padding:28px 38px 56px}
+  .breadcrumbs{max-width:920px;margin-inline:auto;width:100%}
+  .surah-head{max-width:920px;margin:30px auto 24px;width:100%;padding:42px 56px;text-align:center}
+  .surah-head h1{font-size:3.15rem;letter-spacing:-.035em}
+  .surah-head .subtitle{font-size:1.2rem}
+  .surah-head::after{right:38px;bottom:12px;font-size:5rem}
+  .reading-tools{max-width:920px;margin:0 auto 26px;width:100%;padding:18px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  .reading-tools .pronunciation-status{flex:1 1 100%;margin:0;padding:11px 14px}
+  .control{margin:0 18px 0 0}
+  .verses{max-width:920px;margin:0 auto;gap:18px;width:100%}
+  .ayah{padding:30px 38px;border-radius:20px;box-shadow:0 8px 24px #153c270b}
+  .ayah-number{font-size:1rem;margin-bottom:16px}
+  .ayah-number::before{width:2rem;height:2rem}
+  .arabic{font-size:2.85rem;line-height:2.2;padding-left:12%;}
+  .pronunciation{max-width:78ch;margin:20px 0 0;font-size:1.16rem}
+  .translation{max-width:78ch;margin-top:18px;padding-top:16px;font-size:1.12rem;line-height:1.95}
+  .ayah-note-toggle{margin-top:16px}
+  .context{max-width:920px;margin:26px auto;width:100%;padding:24px 30px}
+  .surah-pager{max-width:920px;margin:26px auto;width:100%}
+}

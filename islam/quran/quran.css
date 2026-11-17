@@ -676,3 +676,8 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
  .surah-head .hero-arabic{position:relative!important;display:block!important;top:auto!important;right:auto!important;left:auto!important;bottom:auto!important;transform:none!important;width:100%!important;font-size:clamp(1.4rem,5vw,2rem)!important;line-height:1.6!important;text-align:center!important;white-space:normal!important}
  .surah-head .hero-art{opacity:.12!important}
 }
+
+/* Remove the highlighted source callout box; keep translation control usable. */
+.reading-tools .pronunciation-status{display:none!important}
+.reading-tools{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 0!important;min-height:0!important;border-radius:0!important}
+.reading-tools:before{display:none!important}

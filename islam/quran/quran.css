@@ -200,3 +200,32 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
 
 
 @media (min-width:900px){.surah-head{position:relative;overflow:hidden!important;padding-left:250px!important;padding-right:250px!important;background:linear-gradient(110deg,#082e24 0%,#0b4a36 45%,#06362a 100%)!important}.surah-head:before,.surah-head:after{display:none!important}.hero-art{position:absolute;inset:auto auto 0 0;width:46%;height:100%;pointer-events:none;z-index:0}.hero-art svg{width:100%;height:100%;display:block}.surah-head>*:not(.hero-art){position:relative;z-index:1}.surah-head h1{font-size:3.55rem!important;text-shadow:0 3px 1px #06251b}.surah-head .subtitle{font-size:1.15rem!important}.surah-head:focus-within{outline:0}}
+
+/* Use the finished banner artwork as the hero illustration; HTML remains responsible for all text. */
+@media (min-width:900px){
+  .surah-head{
+    border:3px solid #d1aa4d!important;
+    border-radius:34px 34px 28px 28px!important;
+    box-shadow:0 0 0 5px #d8b76633,0 12px 26px #123d2a2b,inset 0 0 0 2px #f2d98766!important;
+    background:linear-gradient(110deg,#083d2d 0%,#0d523a 48%,#073729 100%)!important;
+  }
+  .hero-art{
+    width:58%;
+    height:100%;
+    background:url('/assets/quran-banner-ornament.png') left bottom/contain no-repeat;
+    filter:saturate(.96) contrast(1.03);
+  }
+  .hero-art svg{display:none!important}
+  .surah-head:after{
+    content:'۞';
+    display:block!important;
+    position:absolute;
+    right:46px;
+    bottom:50%;
+    transform:translateY(50%);
+    color:#f3d477;
+    font-family:'Noto Naskh Arabic','Amiri',serif;
+    font-size:3.8rem;
+    opacity:.9;
+  }
+}

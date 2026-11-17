@@ -769,3 +769,87 @@ body:has(.quran-reading-grid) .ayah-note,body:has(.quran-reading-grid) .ayah-not
  body:has(.quran-reading-grid) .surah-head .hero-art{width:99px!important}
  body:has(.quran-reading-grid) .surah-head h1{font-size:1.2rem!important}
 }
+
+/* Mobile: show full surah, keep elegant Quran banner and readable compact ayat. */
+@media(max-width:899px){
+ body:has(.quran-reading-grid) .shell{padding:10px 12px 26px!important;box-sizing:border-box!important}
+ body:has(.quran-reading-grid) .surah-head{
+   min-height:150px!important;max-height:none!important;width:100%!important;
+   padding:18px 14px 18px 45%!important;box-sizing:border-box!important;
+   border:3px solid #cda44c!important;border-radius:24px!important;clip-path:none!important;
+   background:linear-gradient(115deg,#073b2d,#07533d 60%,#05382a)!important;
+   box-shadow:inset 0 0 0 3px #f1d784,0 5px 16px #153b2826!important;
+   display:flex!important;align-items:center!important;justify-content:center!important;
+ }
+ body:has(.quran-reading-grid) .surah-head .hero-art{
+   position:absolute!important;left:0!important;top:0!important;bottom:0!important;
+   width:46%!important;height:100%!important;z-index:1!important;opacity:1!important;
+   background-image:url("/assets/quran-banner-ornament.png")!important;
+   background-position:left bottom!important;background-size:auto 100%!important;
+   background-repeat:no-repeat!important;pointer-events:none!important;
+ }
+ body:has(.quran-reading-grid) .surah-head h1{
+   z-index:3!important;position:relative!important;white-space:normal!important;
+   font-size:clamp(1.18rem,5vw,1.65rem)!important;line-height:1.45!important;
+   margin:0!important;letter-spacing:0!important;text-align:center!important;
+   text-shadow:0 2px 3px #03291f!important;
+ }
+ body:has(.quran-reading-grid) .surah-head .hero-arabic{display:none!important}
+ body:has(.quran-reading-grid) .quran-reading-grid{margin:15px auto!important}
+ body:has(.quran-reading-grid) .reading-tools{min-height:0!important;padding:10px 12px!important;margin:0 0 12px!important;border-radius:12px!important}
+ body:has(.quran-reading-grid) .reading-tools::before{font-size:.88rem!important}
+ body:has(.quran-reading-grid) .reading-tools .control{font-size:.9rem!important}
+ body:has(.quran-reading-grid) #verses{display:grid!important;gap:12px!important}
+ body:has(.quran-reading-grid) #verses .ayah:not(.basmala){
+   display:grid!important;grid-template-columns:36px minmax(0,1fr)!important;
+   gap:7px 9px!important;padding:13px 11px!important;min-height:0!important;
+   border:1.5px solid #cba44c!important;border-radius:14px!important;
+   background:#fffbf3!important;clip-path:none!important;
+ }
+ body:has(.quran-reading-grid) #verses .ayah-number{
+   width:32px!important;height:32px!important;min-width:32px!important;
+   margin:5px 0 0!important;font-size:.85rem!important;
+   grid-column:1!important;grid-row:1/span 3!important;
+ }
+ body:has(.quran-reading-grid) #verses .ayah .arabic{
+   grid-column:2!important;display:block!important;
+   font-size:clamp(1.5rem,5.8vw,1.95rem)!important;line-height:1.95!important;
+   min-height:0!important;margin:0!important;padding:0!important;text-align:right!important;
+ }
+ body:has(.quran-reading-grid) #verses .ayah .pronunciation{
+   grid-column:2!important;margin:0!important;padding:7px 9px!important;
+   font-size:.87rem!important;line-height:1.7!important;background:#fff1d5!important;
+ }
+ body:has(.quran-reading-grid) #verses .ayah .translation{
+   grid-column:2!important;margin:0!important;padding:5px 2px!important;
+   font-size:.9rem!important;line-height:1.75!important;background:transparent!important;
+ }
+ body:has(.quran-reading-grid) .mushaf-verses,body:has(.quran-reading-grid) .mushaf-pager{display:none!important}
+}
+@media(max-width:390px){
+ body:has(.quran-reading-grid) .surah-head{min-height:134px!important;padding-left:44%!important}
+ body:has(.quran-reading-grid) .surah-head h1{font-size:1.13rem!important}
+}
+
+/* Reader visual recovery: keep real verses above all legacy decorative overlays. */
+body:has(.quran-reading-grid) #verses{position:relative!important;z-index:2!important;visibility:visible!important;opacity:1!important;content-visibility:visible!important}
+body:has(.quran-reading-grid) #verses:not([hidden]){display:grid!important}
+body:has(.quran-reading-grid) .ayah:not(.basmala){position:relative!important;isolation:isolate!important;overflow:visible!important;clip-path:none!important;background:#fffaf0!important;border:2px solid #d3ae58!important;border-radius:17px!important;box-shadow:0 3px 12px #6b51201a!important}
+body:has(.quran-reading-grid) .ayah:not(.basmala)::before,body:has(.quran-reading-grid) .ayah:not(.basmala)::after{display:none!important;content:none!important}
+body:has(.quran-reading-grid) .ayah:not(.basmala)>*{position:relative!important;z-index:2!important;opacity:1!important;visibility:visible!important}
+body:has(.quran-reading-grid) .ayah .arabic{color:#064c37!important;opacity:1!important;visibility:visible!important}
+body:has(.quran-reading-grid) .ayah .translation{color:#1d4033!important;opacity:1!important;visibility:visible!important}
+body:has(.quran-reading-grid) .ayah .pronunciation{color:#493b23!important;opacity:1!important;visibility:visible!important}
+body:has(.quran-reading-grid) #load-status:not([hidden]){display:block!important;color:#9b2c22!important;padding:12px!important}
+@media(min-width:900px){
+ body:has(.quran-reading-grid) .surah-head{min-height:200px!important;padding:38px 240px 38px 270px!important}
+ body:has(.quran-reading-grid) .surah-head .hero-art{width:34%!important;background-size:auto 100%!important}
+ body:has(.quran-reading-grid) .surah-head .hero-arabic{display:block!important;right:28px!important}
+ body:has(.quran-reading-grid) .ayah:not(.basmala){display:grid!important;grid-template-columns:95px minmax(0,1fr)!important;padding:22px 28px!important;gap:8px 16px!important}
+ body:has(.quran-reading-grid) .ayah .arabic{font-size:2.2rem!important;line-height:1.8!important}
+}
+@media(max-width:899px){
+ body:has(.quran-reading-grid) .ayah:not(.basmala){display:grid!important;grid-template-columns:34px minmax(0,1fr)!important;padding:12px!important;gap:7px!important}
+ body:has(.quran-reading-grid) .ayah .arabic{font-size:clamp(1.45rem,5.5vw,1.85rem)!important;line-height:1.9!important}
+ body:has(.quran-reading-grid) .ayah .pronunciation,body:has(.quran-reading-grid) .ayah .translation{font-size:.89rem!important;line-height:1.7!important}
+}

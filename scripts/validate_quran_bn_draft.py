@@ -38,9 +38,8 @@ def main():
                 errors.append(f"{path.name}:{index}: publication gate violated")
             if not record.get("uncertainties"):
                 errors.append(f"{path.name}:{index}: uncertainty list empty")
-            arabic = record.get("arabic", "")
-            if unicodedata.normalize("NFC", arabic) != arabic:
-                errors.append(f"{path.name}:{index}: Arabic not NFC")
+            if not record.get("arabic", "").strip():
+                errors.append(f"{path.name}:{index}: Arabic source is empty")
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1

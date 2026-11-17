@@ -39,6 +39,26 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
   .surah-pager{max-width:920px;margin:26px auto;width:100%}
 }
 
+@media (min-width:900px){
+  .quran-sidebar .side-list{display:flex!important;flex-direction:column!important;gap:4px!important;max-height:none!important;overflow:visible!important;padding:10px 0 16px!important;}
+  .quran-sidebar .side-list>a:not(.side-all){display:flex!important;align-items:center!important;gap:12px!important;min-height:66px!important;padding:8px 14px!important;border-radius:12px!important;color:#172d25!important;text-decoration:none!important;}
+  .quran-sidebar .side-list>a.current{background:#116b4d!important;color:#fff!important;box-shadow:0 5px 12px #0e5a4028!important;}
+  .quran-sidebar .side-num{width:38px!important;height:38px!important;display:grid!important;place-items:center!important;border:1px solid #d6a632!important;border-radius:50%!important;flex:0 0 38px!important;font-family:"Noto Sans Bengali",sans-serif!important;font-size:1.05rem!important;}
+  .quran-sidebar .side-copy{display:grid!important;gap:2px!important;min-width:0!important;}
+  .quran-sidebar .side-copy strong{font-family:"Noto Serif Bengali",serif!important;font-size:1.05rem!important;line-height:1.25!important;}
+  .quran-sidebar .side-copy small{font-size:.78rem!important;line-height:1.25!important;color:#456357!important;white-space:nowrap!important;}
+  .quran-sidebar a.current .side-num{border-color:#f3d278!important;background:#0b5b42!important;color:#fff!important;}
+  .quran-sidebar a.current .side-copy small{color:#e9f5e9!important;}
+  .quran-sidebar .side-all{display:flex!important;justify-content:space-between!important;align-items:center!important;margin:12px 14px 0!important;padding:13px 18px!important;border:1px solid #d4a536!important;border-radius:24px!important;color:#145d45!important;font-family:"Noto Serif Bengali",serif!important;font-weight:700!important;text-decoration:none!important;background:#fffaf0!important;}
+  .quran-sidebar .side-all span{font-size:1.35rem!important;line-height:1!important;}
+  .surah-head{height:220px!important;min-height:220px!important;border-radius:30px!important;background:linear-gradient(90deg,#093e2d 0%,#07543d 52%,#06422f 100%)!important;overflow:hidden!important;}
+  .hero-art{left:0!important;bottom:0!important;width:39%!important;height:100%!important;background-size:auto 100%!important;background-position:left bottom!important;z-index:1!important;}
+  .surah-head h1{position:relative!important;z-index:3!important;max-width:680px!important;font-size:3.2rem!important;white-space:nowrap!important;margin:0 auto!important;}
+  .surah-head .subtitle{position:relative!important;z-index:3!important;margin:4px auto 0!important;}
+  .hero-arabic{right:42px!important;top:50%!important;transform:translateY(-50%)!important;font-size:2.65rem!important;z-index:4!important;}
+  .surah-head:after{content:""!important;display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;height:14px!important;background:linear-gradient(180deg,#f6dc8b,#b67f1e 55%,#f5d98a)!important;z-index:5!important;opacity:1!important;}
+}
+
 /* Final lock: eliminate earlier banner pseudo layers and keep the reference composition deterministic. */
 @media (min-width:900px){
   .surah-head{
@@ -394,4 +414,24 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
 @media (min-width:900px){
   .surah-head:after{content:""!important;right:0!important;top:auto!important;bottom:0!important;width:100%!important;height:16px!important;background:linear-gradient(180deg,#f1d27b,#b27d1d 55%,#f5d98a)!important;transform:none!important;opacity:1!important;}
   .surah-head:before{content:""!important;display:block!important;position:absolute!important;inset:0!important;width:auto!important;height:auto!important;background:radial-gradient(ellipse at 85% 45%,#143e2c77,transparent 32%)!important;opacity:1!important;pointer-events:none!important;}
+}
+
+@media (min-width:900px){
+  .quran-sidebar .side-list{display:flex!important;flex-direction:column!important;gap:4px!important;max-height:none!important;overflow:visible!important;padding:10px 0 16px!important;}
+  .quran-sidebar .side-list>a:not(.side-all){display:flex!important;align-items:center!important;gap:12px!important;min-height:66px!important;padding:8px 14px!important;border-radius:12px!important;color:#172d25!important;text-decoration:none!important;}
+  .quran-sidebar .side-list>a.current{background:#116b4d!important;color:#fff!important;box-shadow:0 5px 12px #0e5a4028!important;}
+  .quran-sidebar .side-num{width:38px!important;height:38px!important;display:grid!important;place-items:center!important;border:1px solid #d6a632!important;border-radius:50%!important;flex:0 0 38px!important;font-family:"Noto Sans Bengali",sans-serif!important;font-size:1.05rem!important;}
+  .quran-sidebar .side-copy{display:grid!important;gap:2px!important;min-width:0!important;}
+  .quran-sidebar .side-copy strong{font-family:"Noto Serif Bengali",serif!important;font-size:1.05rem!important;line-height:1.25!important;}
+  .quran-sidebar .side-copy small{font-size:.78rem!important;line-height:1.25!important;color:#456357!important;white-space:nowrap!important;}
+  .quran-sidebar a.current .side-num{border-color:#f3d278!important;background:#0b5b42!important;color:#fff!important;}
+  .quran-sidebar a.current .side-copy small{color:#e9f5e9!important;}
+  .quran-sidebar .side-all{display:flex!important;justify-content:space-between!important;align-items:center!important;margin:12px 14px 0!important;padding:13px 18px!important;border:1px solid #d4a536!important;border-radius:24px!important;color:#145d45!important;font-family:"Noto Serif Bengali",serif!important;font-weight:700!important;text-decoration:none!important;background:#fffaf0!important;}
+  .quran-sidebar .side-all span{font-size:1.35rem!important;line-height:1!important;}
+  .surah-head{height:220px!important;min-height:220px!important;border-radius:30px!important;background:linear-gradient(90deg,#093e2d 0%,#07543d 52%,#06422f 100%)!important;overflow:hidden!important;}
+  .hero-art{left:0!important;bottom:0!important;width:39%!important;height:100%!important;background-size:auto 100%!important;background-position:left bottom!important;z-index:1!important;}
+  .surah-head h1{position:relative!important;z-index:3!important;max-width:680px!important;font-size:3.2rem!important;white-space:nowrap!important;margin:0 auto!important;}
+  .surah-head .subtitle{position:relative!important;z-index:3!important;margin:4px auto 0!important;}
+  .hero-arabic{right:42px!important;top:50%!important;transform:translateY(-50%)!important;font-size:2.65rem!important;z-index:4!important;}
+  .surah-head:after{content:""!important;display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;height:14px!important;background:linear-gradient(180deg,#f6dc8b,#b67f1e 55%,#f5d98a)!important;z-index:5!important;opacity:1!important;}
 }

@@ -4,7 +4,7 @@
 .surah-pager{display:flex;justify-content:space-between;gap:12px;margin:20px 0}.surah-step{display:grid;gap:3px;flex:1;min-width:0;padding:12px 15px;border:1px solid var(--line);border-radius:13px;background:#fff;text-decoration:none}.surah-step span{color:var(--muted);font-size:.9rem}.surah-step strong{overflow-wrap:anywhere}.surah-step.align-end{text-align:right}.surah-step.disabled{background:#f2f5f2;color:#78867e}.surah-step.disabled strong{color:#536a60}@media(max-width:420px){.surah-pager{gap:8px}.surah-step{padding:10px;font-size:.9rem}}
 
 /* Shared Walid AI site chrome: reuse the established logo, flower and footer treatment. */
-@import url("/walid-branding.css");
+body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50%;top:50%;width:min(68vw,760px);height:auto;aspect-ratio:1;transform:translate(-50%,-50%);background:url("/walid-ai-approved-flower.png") center/contain no-repeat;opacity:.04;pointer-events:none;filter:drop-shadow(0 8px 18px #8a641f30) saturate(1.08);animation:walid-approved-flower-turn 10s linear infinite}@keyframes walid-approved-flower-turn{from{rotate:0deg}to{rotate:360deg}}
 .shell::before{content:"";display:block;width:132px;height:44px;margin:0 auto 8px;background:url("/walid-ai-approved-logo.png") center/contain no-repeat;}
 .source-footer{font-family:"Times New Roman",Times,serif;text-align:center;margin-top:48px;padding:18px 20px 16px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:13px;line-height:1.6;background:transparent;}
 .source-footer::after{content:"© 2026 Walid AI. All rights reserved.";display:block;margin-top:4px;}

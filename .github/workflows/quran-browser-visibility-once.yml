@@ -3,6 +3,8 @@ on:
   push:
     paths:
       - .github/workflows/quran-browser-visibility-once.yml
+      - islam/quran/reader.js
+      - islam/quran/verses-stable.js
 permissions:
   contents: read
 jobs:

@@ -1,0 +1,41 @@
+name: Refresh fixed Quran reader assets on all pages
+on:
+  push:
+    paths:
+      - .github/workflows/refresh-quran-visible-once.yml
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh all 114 surah pages
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          pages=sorted(Path('islam/quran').glob('*/index.html'))
+          assert len(pages)==114,len(pages)
+          for p in pages:
+              s=p.read_text()
+              s=re.sub(r'/islam/quran/reader\.js(?:\?[^"]*)?', '/islam/quran/reader.js?v=d72b1eee',s)
+              s=re.sub(r'/islam/quran/verses-stable\.js(?:\?[^"]*)?', '/islam/quran/verses-stable.js?v=08c885b2',s)
+              s=re.sub(r'/islam/quran/quran\.css(?:\?[^"]*)?', '/islam/quran/quran.css?v=207a9c09',s)
+              assert s.count('reader.js?v=d72b1eee')==1,p
+              assert s.count('verses-stable.js?v=08c885b2')==1,p
+              assert s.count('quran.css?v=207a9c09')==1,p
+              p.write_text(s)
+          print('All 114 Quran pages refreshed')
+          PY
+          node --check islam/quran/reader.js
+          node --check islam/quran/verses-stable.js
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add islam/quran/*/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh fixed Arabic Quran reader on 114 pages"
+            git push
+          fi

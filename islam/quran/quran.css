@@ -686,3 +686,16 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 .surah-head .banner-meaning{position:relative!important;z-index:5!important;margin:0!important;text-align:center!important;font-size:clamp(.9rem,2.6vw,1.1rem)!important;line-height:1.45!important;color:#81671d!important}
 @media(max-width:899px){.surah-head{flex-direction:column!important}.surah-head .banner-meaning{width:100%!important}}
 @media(min-width:900px){.surah-head .banner-meaning{flex:0 0 100%!important;color:#f5dc8b!important}.surah-head{flex-wrap:wrap!important;row-gap:0!important}}
+
+
+/* Quran verse visibility repair: prevent blank cards and clipped long verses. */
+#verses .ayah:not(.basmala){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important;clip-path:none!important;padding:20px 22px!important;contain:none!important}
+#verses .ayah:not(.basmala)>.ayah-number{position:relative!important;inset:auto!important;display:flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;align-self:flex-start!important;grid-area:auto!important;margin:0 0 4px!important}
+#verses .ayah:not(.basmala)>.arabic{position:relative!important;display:block!important;grid-area:auto!important;align-self:stretch!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:0!important;margin:0!important;text-align:right!important;direction:rtl!important;white-space:normal!important;word-break:normal!important;line-height:1.95!important}
+#verses .ayah:not(.basmala)>.translation,#verses .ayah:not(.basmala)>.pronunciation{position:relative!important;display:block!important;grid-area:auto!important;align-self:stretch!important;height:auto!important;max-height:none!important;overflow:visible!important;white-space:normal!important;margin:0!important;padding:4px 0!important;line-height:1.85!important}
+#verses .ayah:not(.basmala)>.pronunciation:empty{display:none!important}
+#verses .ayah:not(.basmala)>[hidden]{display:none!important}
+#verses .ayah:not(.basmala)>.ayah-note-toggle{grid-area:auto!important;align-self:flex-start!important;margin:4px 0!important}
+#verses .ayah:not(.basmala)>.ayah-note{grid-area:auto!important;align-self:stretch!important}
+#verses .ayah:not(.basmala)::before{display:none!important}
+@media(max-width:600px){#verses .ayah:not(.basmala){padding:18px 16px!important}#verses .ayah:not(.basmala)>.arabic{font-size:clamp(1.65rem,6vw,2.2rem)!important}}

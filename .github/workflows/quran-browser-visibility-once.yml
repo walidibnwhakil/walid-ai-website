@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.56.1-noble
-    timeout-minutes: 18
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,6 +32,10 @@ jobs:
             const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
             console.log('BROWSER launched');
             const page=await browser.newPage({viewport:{width:360,height:800},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+            page.setDefaultTimeout(8000);
+            page.setDefaultNavigationTimeout(8000);
+            page.on('requestfailed',r=>console.log('REQUEST FAILED',r.url(),r.failure()?.errorText));
+            page.on('console',m=>{if(m.type()==='error')console.log('CONSOLE ERROR',m.text())});
             const dirs=fs.readdirSync('islam/quran',{withFileTypes:true}).filter(d=>d.isDirectory()&&fs.existsSync(path.join('islam/quran',d.name,'index.html'))).map(d=>d.name).sort();
             if(dirs.length!==114)throw Error('Expected 114 pages; found '+dirs.length);
             let total=0;
@@ -40,7 +44,9 @@ jobs:
               page.removeAllListeners('pageerror');
               page.on('pageerror',e=>errors.push(e.message));
               console.log('CHECK',slug);
-              await page.goto('http://127.0.0.1:8765/islam/quran/'+slug+'/',{waitUntil:'commit',timeout:10000});
+              console.log('NAVIGATE',slug);
+              await Promise.race([page.goto('http://127.0.0.1:8765/islam/quran/'+slug+'/',{waitUntil:'domcontentloaded',timeout:8000}),new Promise((_,reject)=>setTimeout(()=>reject(Error('NAVIGATION WATCHDOG '+slug)),12000))]);
+              console.log('NAVIGATED',slug);
               try {await page.waitForFunction(()=>document.querySelectorAll('#verses>.ayah:not(.basmala)').length>0,null,{timeout:6000});}
               catch(e){const state=await page.evaluate(()=>({surah:document.body.dataset.surah,status:document.querySelector('#load-status')?.textContent,script:[...document.scripts].map(x=>x.src),cards:document.querySelectorAll('#verses>.ayah').length}));throw Error('READER TIMEOUT '+JSON.stringify({slug,state,errors})+' '+e.message)}
               const result=await page.evaluate(()=>{

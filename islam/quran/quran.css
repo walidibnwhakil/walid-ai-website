@@ -159,3 +159,26 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
   .ayah-note-toggle{margin-left:78px;margin-top:10px;}.surah-pager{grid-column:2;max-width:none;margin:14px 0!important;}.source-footer{margin-left:-28px;margin-right:-28px;}
 }
 @media (max-width: 899px){.walid-nav{display:none}.quran-sidebar{display:none}.quran-main{display:block}}
+
+
+/* Reference-match pass: align the desktop reading shell with the supplied composition. */
+@media (min-width:900px){
+  .shell{width:min(1210px,100%);padding:0 18px 48px;}
+  .walid-topbar{height:74px;margin:0 -18px;padding:0 42px;display:flex;align-items:center;gap:26px;border-bottom:1px solid #e7dcc0;background:rgba(255,255,255,.97);box-shadow:0 2px 8px #8e74230f;}
+  .walid-topbar>.brand-link{display:flex;align-items:center;flex:none}.walid-topbar .islam-brand{margin:0!important;width:156px!important;height:52px!important;}
+  .walid-topbar .walid-nav{height:auto;margin:0;padding:0;border:0;box-shadow:none;background:transparent;gap:24px;flex:1;}
+  .walid-topbar .walid-nav a{font-size:1rem;}.walid-topbar .walid-nav a.active{padding:10px 20px;}
+  .breadcrumbs{max-width:1140px;margin:24px auto 14px;padding:0;}
+  .surah-head{max-width:1140px;min-height:212px;margin:0 auto 16px!important;padding:34px 80px!important;border-radius:30px!important;}
+  .surah-head h1{font-size:3.35rem!important;line-height:1.18!important;}.surah-head:before{left:44px;top:42%;content:'☾';font-size:3rem}.surah-head:after{right:44px;bottom:42%;content:'۞';font-size:3.5rem}
+  .surah-head .subtitle{font-size:1.2rem!important;}
+  .design-tabs{max-width:1140px;margin:0 auto 12px;display:flex;gap:12px;}.design-tabs a{min-width:180px;text-align:center;padding:12px 20px;border:1px solid #e4cf95;border-radius:12px;background:#fff7e5;color:#3b3321;text-decoration:none;font-weight:700}.design-tabs a.active{background:#17694b;color:#fff;border-color:#17694b;box-shadow:0 5px 12px #17694b2b;}
+  .info-strip{max-width:1140px;margin:0 auto 16px;padding:14px 26px;display:flex;align-items:center;gap:58px;border:1px solid #eee4cf;border-radius:14px;background:#fffdf8;color:#302e26;font-weight:600;}.info-strip span{display:inline-flex;gap:9px;align-items:center}.info-strip b{color:#ad8428;font-size:1.35rem;}
+  .quran-reading-grid{max-width:1140px;grid-template-columns:258px minmax(0,1fr);gap:18px;}
+  .quran-sidebar{padding:16px 10px;border-radius:14px;}.quran-sidebar h2{padding:0 8px 12px;margin:0;border-bottom:1px solid #eee4cf;}.quran-sidebar a{padding:8px 9px;font-size:.9rem;}.quran-sidebar .side-list{max-height:430px;overflow:hidden;}
+  .quran-main>.context{display:none;}
+  .reading-tools{margin:0 0 16px!important;padding:13px 18px!important;min-height:56px;}.reading-tools .pronunciation-status{display:none;}
+  .verses{gap:14px!important;}.ayah{padding:24px 28px 20px!important;border-radius:19px!important;}.arabic{font-size:2.65rem!important;min-height:82px;}.pronunciation{font-size:1rem!important;}.translation{font-size:1.03rem!important;}
+  .source-footer{margin-left:-18px;margin-right:-18px;}
+}
+@media(max-width:899px){.walid-topbar{display:block}.info-strip,.design-tabs{display:none}}

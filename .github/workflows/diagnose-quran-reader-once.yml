@@ -1,0 +1,13 @@
+name: Diagnose Quran reader JavaScript
+on:
+  push:
+    paths:
+      - .github/workflows/diagnose-quran-reader-once.yml
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check islam/quran/reader.js

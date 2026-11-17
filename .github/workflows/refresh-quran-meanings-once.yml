@@ -1,0 +1,35 @@
+name: Refresh Quran surah meanings
+on:
+  push:
+    paths:
+      - .github/workflows/refresh-quran-meanings-once.yml
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh reader script cache for all 114 surahs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          pages=sorted(Path('islam/quran').glob('*/index.html'))
+          assert len(pages)==114,len(pages)
+          for path in pages:
+              old=path.read_text(encoding='utf-8')
+              new=re.sub(r'(/islam/quran/reader\.js)(?:\?[^"]*)?',r'\1?v=bf2fb959',old)
+              assert new.count('reader.js?v=bf2fb959')==1,path
+              path.write_text(new,encoding='utf-8')
+          print('All 114 surahs updated')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add islam/quran/*/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Load surah name meanings across all 114 pages"
+            git push
+          fi

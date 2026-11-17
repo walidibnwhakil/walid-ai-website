@@ -9,3 +9,5 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
 @media(max-width:650px){.islam-brand{width:112px!important;height:38px!important;max-width:112px!important;margin-bottom:12px}.source-footer{margin-top:auto;padding:16px 14px}.source-footer nav{gap:6px}}
 
 .ayah-note-toggle{margin-top:10px;padding:6px 10px;border:1px solid #b8cdbd;border-radius:8px;background:#f4f8f4;color:var(--green);font:inherit;font-size:.9rem;cursor:pointer}.ayah-note-toggle:hover,.ayah-note-toggle:focus-visible{background:#e8f2e9;outline:2px solid #b4d4bd;outline-offset:1px}
+
+.pronunciation{margin:14px 0 0;padding:10px 12px;border-left:3px solid var(--gold);background:#fbf8ef;color:#5c4b25;font-size:1.02rem}.pronunciation::before{content:'বাংলা উচ্চারণ: ';font-weight:700;color:#6a5830}

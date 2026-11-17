@@ -1,0 +1,59 @@
+{
+  "translation": {
+    "provider": "QuranEnc.com",
+    "key": "bengali_zakaria",
+    "translator": "Dr. Abu Bakr Muhammad Zakaria",
+    "version": "1.1.1",
+    "published": "2021-05-22",
+    "source": "https://quranenc.com/en/browse/bengali_zakaria",
+    "terms": "https://quranenc.com/en/home/about/terms",
+    "reuseNotes": [
+      "Reproduced without modifying, adding to, or deleting translation content.",
+      "Publisher, source, version, and transcript information must remain identified.",
+      "Refresh against the latest QuranEnc version before future bulk updates."
+    ]
+  },
+  "arabic": {
+    "provider": "Quranpedia/QPC Hafs",
+    "source": "https://quranpedia.net/",
+    "bundledFile": "reading.json",
+    "note": "Canonical Arabic is kept separate from the Bengali translation."
+  },
+  "pronunciation": {
+    "status": "partial-verse-data",
+    "provider": "Bangladesh Ministry of Religious Affairs Quran Digital",
+    "source": "https://quran.gov.bd/",
+    "verifiedVerses": [
+      {
+        "surah": 1,
+        "ayahStart": 1,
+        "ayahEnd": 7,
+        "count": 7
+      }
+    ],
+    "note": "The first seven Al-Fatihah pronunciations are bundled in Bengali script and reviewed against the Arabic verses and the Ministry's Bengali transliteration presentation. Remaining verses stay explicitly unfilled until independently reviewed; no automatic Latin-to-Bengali conversion is used."
+  },
+  "verifiedExtent": [
+    {
+      "surah": 1,
+      "ayahStart": 1,
+      "ayahEnd": 7,
+      "count": 7,
+      "data": "surah-001.json"
+    },
+    {
+      "surah": 2,
+      "ayahStart": 1,
+      "ayahEnd": 141,
+      "count": 141,
+      "data": "surah-002.json"
+    }
+  ],
+  "verification": {
+    "canonicalAyahs": 148,
+    "arabicAndTranslationPresent": true,
+    "sequenceChecked": true,
+    "pronunciationAyahs": 7,
+    "checkedAgainst": "main branch data files on 2026-11-17"
+  }
+}

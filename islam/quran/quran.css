@@ -583,3 +583,9 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
   .design-tabs a.active:after{content:"";position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid var(--quran-green)}
 }
 
+/* The Quran page header should keep only the original Walid AI logo. */
+@media (min-width:900px){
+  .walid-topbar{justify-content:flex-start!important}
+  .walid-topbar .walid-nav{display:none!important}
+}
+

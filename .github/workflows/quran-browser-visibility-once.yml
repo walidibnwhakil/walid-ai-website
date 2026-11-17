@@ -1,0 +1,58 @@
+name: Quran browser visibility 114 surahs
+on:
+  push:
+    paths:
+      - .github/workflows/quran-browser-visibility-once.yml
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium test runtime
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test every surah in real mobile browser
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/quran-http.log 2>&1 &
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const fs=require('fs'),path=require('path');
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            const page=await browser.newPage({viewport:{width:360,height:800},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+            const dirs=fs.readdirSync('islam/quran',{withFileTypes:true}).filter(d=>d.isDirectory()&&fs.existsSync(path.join('islam/quran',d.name,'index.html'))).map(d=>d.name).sort();
+            if(dirs.length!==114)throw Error('Expected 114 pages; found '+dirs.length);
+            let total=0;
+            for(const slug of dirs){
+              const errors=[];
+              page.removeAllListeners('pageerror');
+              page.on('pageerror',e=>errors.push(e.message));
+              await page.goto('http://127.0.0.1:8765/islam/quran/'+slug+'/',{waitUntil:'domcontentloaded',timeout:20000});
+              await page.waitForFunction(()=>document.querySelectorAll('#verses>.ayah:not(.basmala)').length>0,{timeout:15000});
+              const result=await page.evaluate(()=>{
+                const n=Number(document.body.dataset.surah);
+                const cards=[...document.querySelectorAll('#verses>.ayah:not(.basmala)')];
+                const all=cards.map(c=>{
+                  const a=c.querySelector('.arabic'),r=a?.getBoundingClientRect(),style=a&&getComputedStyle(a);
+                  return {text:a?.textContent?.trim(),visible:!!r&&r.height>0&&r.width>0&&style.display!=='none'&&style.visibility!=='hidden'&&Number(style.opacity)>0};
+                });
+                const b=document.querySelector('#verses>.basmala .arabic');
+                return {n,count:cards.length,arabic:all.every(x=>x.text&&x.visible),basmala:!!b&&!!b.textContent.trim()&&b.getBoundingClientRect().height>0};
+              });
+              const expected=JSON.parse(fs.readFileSync('islam/quran/data/surah-'+String(result.n).padStart(3,'0')+'.json')).verses.length;
+              if(result.count!==expected||!result.arabic||(result.n!==1&&result.n!==9&&!result.basmala))throw Error(JSON.stringify({slug,result,expected,errors}));
+              total+=result.count;
+              console.log('PASS',slug,result.count,'Arabic verses',result.basmala?'Bismillah':'');
+            }
+            if(total!==6236)throw Error('Total verses '+total);
+            console.log('PASS ALL 114 SURAHS, 6236 VISIBLE ARABIC VERSES, BASMALA WHERE APPLICABLE');
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS

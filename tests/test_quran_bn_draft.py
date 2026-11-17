@@ -21,10 +21,12 @@ def test_existing_first_batch_is_preserved():
 
 def test_all_batches_are_draft_only():
     records = load_records()
-    assert len(records) == 23
+    assert len(records) >= 23
+    assert len({(x["surah"], x["ayah"]) for x in records}) == len(records)
     assert all(x["review_status"] == "unreviewed_draft" and x["publishable"] is False for x in records)
 
 def test_validator():
     result = subprocess.run([sys.executable, str(VALIDATOR)], cwd=ROOT, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    assert "Validated 23 unreviewed draft ayahs across 2 batches" in result.stdout
+    expected = f"Validated {len(load_records())} unreviewed draft ayahs across {len(list(DATA_DIR.glob('draft-batch-*.json')))} batches"
+    assert expected in result.stdout

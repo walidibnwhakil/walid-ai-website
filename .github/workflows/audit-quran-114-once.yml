@@ -1,0 +1,45 @@
+name: Audit all 114 Quran surah pages
+on:
+  push:
+    paths:
+      - .github/workflows/audit-quran-114-once.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify all 114 surah data and reader markup
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          base=Path('islam/quran')
+          pages=sorted(base.glob('*/index.html'))
+          assert len(pages)==114, f'Expected 114 pages, found {len(pages)}'
+          metadata=json.loads((base/'data/metadata.json').read_text())
+          assert len(metadata)==114
+          total=0
+          for n in range(1,115):
+              data=json.loads((base/'data'/f'surah-{n:03}.json').read_text())
+              verses=data['verses']
+              assert data['surah']==n
+              assert len(verses)==metadata[n-1]['verseCount'],(n,len(verses))
+              for idx,verse in enumerate(verses,1):
+                  assert verse['verse']==idx,(n,idx)
+                  assert isinstance(verse.get('arabic'),str) and verse['arabic'].strip(),(n,idx,'arabic')
+                  assert isinstance(verse.get('translation'),str) and verse['translation'].strip(),(n,idx,'translation')
+              total+=len(verses)
+          assert total==6236,total
+          for page in pages:
+              html=page.read_text()
+              assert 'reader.js' in html and 'quran.css' in html,page
+              assert 'data-surah=' in html,page
+          js=(base/'reader.js').read_text()
+          assert 'versesEl.replaceChildren(fragment)' in js
+          assert "card.append(num,arabic,pronunciation,translation,noteButton)" in js
+          css=(base/'quran.css').read_text()
+          assert '#verses .ayah:not(.basmala)>.arabic' in css
+          print(f'PASS: {len(pages)} pages, 114 JSON datasets, {total} verses with Arabic and Bengali translations, shared reader and visibility CSS')
+          PY

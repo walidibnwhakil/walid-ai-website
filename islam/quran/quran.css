@@ -57,6 +57,13 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
   .surah-head .subtitle{position:relative!important;z-index:3!important;margin:4px auto 0!important;}
   .hero-arabic{right:42px!important;top:50%!important;transform:translateY(-50%)!important;font-size:2.65rem!important;z-index:4!important;}
   .surah-head:after{content:""!important;display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;height:14px!important;background:linear-gradient(180deg,#f6dc8b,#b67f1e 55%,#f5d98a)!important;z-index:5!important;opacity:1!important;}
+  .ayah{position:relative!important;display:grid!important;grid-template-columns:112px minmax(0,1fr)!important;column-gap:24px!important;min-height:206px!important;padding:22px 30px 22px 24px!important;border:2px solid #d4a332!important;border-radius:22px!important;background:linear-gradient(135deg,#fffdf7,#fff8e8)!important;box-shadow:0 4px 14px #8b66151a!important;overflow:hidden!important;}
+  .ayah:before{content:""!important;position:absolute!important;left:112px!important;top:32px!important;bottom:32px!important;width:3px!important;background:#d7a62f!important;}
+  .ayah-number{grid-column:1!important;grid-row:1 / span 3!important;align-self:start!important;justify-self:center!important;width:68px!important;height:68px!important;margin-top:20px!important;display:grid!important;place-items:center!important;border:3px solid #d5a62f!important;border-radius:50%!important;color:#145a42!important;background:#fff7dc!important;font-family:"Noto Serif Bengali",serif!important;font-size:1.55rem!important;box-shadow:0 0 0 7px #fff8e3,0 0 0 9px #c99527!important;}
+  .ayah .arabic{grid-column:2!important;grid-row:1!important;margin:0!important;text-align:center!important;font-size:2.5rem!important;line-height:1.7!important;}
+  .ayah .pronunciation,.ayah .translation{grid-column:2!important;margin-top:10px!important;padding:9px 14px!important;border:0!important;border-radius:10px!important;background:#fff0cf!important;font-size:1rem!important;}
+  .ayah .translation{background:transparent!important;padding:0 14px!important;margin-top:2px!important;color:#1b3f31!important;}
+  .ayah .ayah-note{grid-column:2!important;}
 }
 
 /* Final lock: eliminate earlier banner pseudo layers and keep the reference composition deterministic. */
@@ -434,4 +441,14 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
   .surah-head .subtitle{position:relative!important;z-index:3!important;margin:4px auto 0!important;}
   .hero-arabic{right:42px!important;top:50%!important;transform:translateY(-50%)!important;font-size:2.65rem!important;z-index:4!important;}
   .surah-head:after{content:""!important;display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;height:14px!important;background:linear-gradient(180deg,#f6dc8b,#b67f1e 55%,#f5d98a)!important;z-index:5!important;opacity:1!important;}
+}
+
+@media (min-width:900px){
+  .ayah{position:relative!important;display:grid!important;grid-template-columns:112px minmax(0,1fr)!important;column-gap:24px!important;min-height:206px!important;padding:22px 30px 22px 24px!important;border:2px solid #d4a332!important;border-radius:22px!important;background:linear-gradient(135deg,#fffdf7,#fff8e8)!important;box-shadow:0 4px 14px #8b66151a!important;overflow:hidden!important;}
+  .ayah:before{content:""!important;position:absolute!important;left:112px!important;top:32px!important;bottom:32px!important;width:3px!important;background:#d7a62f!important;}
+  .ayah-number{grid-column:1!important;grid-row:1 / span 3!important;align-self:start!important;justify-self:center!important;width:68px!important;height:68px!important;margin-top:20px!important;display:grid!important;place-items:center!important;border:3px solid #d5a62f!important;border-radius:50%!important;color:#145a42!important;background:#fff7dc!important;font-family:"Noto Serif Bengali",serif!important;font-size:1.55rem!important;box-shadow:0 0 0 7px #fff8e3,0 0 0 9px #c99527!important;}
+  .ayah .arabic{grid-column:2!important;grid-row:1!important;margin:0!important;text-align:center!important;font-size:2.5rem!important;line-height:1.7!important;}
+  .ayah .pronunciation,.ayah .translation{grid-column:2!important;margin-top:10px!important;padding:9px 14px!important;border:0!important;border-radius:10px!important;background:#fff0cf!important;font-size:1rem!important;}
+  .ayah .translation{background:transparent!important;padding:0 14px!important;margin-top:2px!important;color:#1b3f31!important;}
+  .ayah .ayah-note{grid-column:2!important;}
 }

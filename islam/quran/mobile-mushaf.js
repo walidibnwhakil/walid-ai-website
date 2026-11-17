@@ -17,7 +17,7 @@ const current=Number.isInteger(requested)&&requested>=1&&requested<=604?requeste
 const bn=x=>String(x).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[Number(d)]);
 const container=document.createElement('section');container.id='mushaf-verses';container.className='verses mushaf-verses';container.setAttribute('aria-label','মুসহাফের পৃষ্ঠা');
 const pager=document.createElement('nav');pager.className='mushaf-pager';pager.setAttribute('aria-label','কুরআনের পৃষ্ঠা পরিবর্তন');
-verses.after(container,pager);verses.hidden=true;
+verses.after(container,pager);verses.hidden=true;container.textContent='পৃষ্ঠা লোড হচ্ছে…';
 const urlForPage=p=>{const s=surahForId(starts[p-1]);const slug=meta[s-1][1];return '/islam/quran/'+slug+'/?page='+p};
 function pageLink(p,label,active=false){const a=document.createElement('a');a.href=urlForPage(p);a.textContent=label;a.className=active?'current':'';if(active)a.setAttribute('aria-current','page');return a}
 function buildPager(){pager.replaceChildren();if(current>1)pager.append(pageLink(current-1,'‹ আগের'));const first=Math.max(1,Math.min(current-2,600));for(let p=first;p<=Math.min(604,first+4);p++)pager.append(pageLink(p,bn(p),p===current));if(current<604)pager.append(pageLink(current+1,'পরের ›'));const info=document.createElement('span');info.className='mushaf-page-caption';info.textContent='পৃষ্ঠা '+bn(current)+' / ৬০৪';pager.append(info)}

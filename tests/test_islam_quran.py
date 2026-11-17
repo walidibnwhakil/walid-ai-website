@@ -139,6 +139,21 @@ class QuranIntegrityTests(unittest.TestCase):
         for surah in self.surahs:
             self.assertIn(f'https://walid-ai.com/islam/quran/{surah["slug"]}/', urls)
 
+    def test_shared_branding_has_semantic_chrome_on_every_islam_page(self):
+        pages = [QURAN / "index.html", ROOT / "islam" / "index.html", ROOT / "islam" / "stories" / "index.html"]
+        pages.extend(QURAN / s["slug"] / "index.html" for s in self.surahs)
+        css = (QURAN / "quran.css").read_text(encoding="utf-8")
+        self.assertIn("opacity:.04", css)
+        self.assertIn("10s linear infinite", css)
+        self.assertNotIn("source-footer::after", css)
+        self.assertNotIn(".shell::before", css)
+        for page in pages:
+            text = page.read_text(encoding="utf-8")
+            self.assertIn('class="islam-brand"', text, page)
+            for href in ("/about-us/", "/contact-us/", "/privacy-policy/", "/terms-of-service/"):
+                self.assertIn(f'href="{href}"', text, page)
+            self.assertIn('class="copyright"', text, page)
+
 
 if __name__ == "__main__":
     unittest.main()

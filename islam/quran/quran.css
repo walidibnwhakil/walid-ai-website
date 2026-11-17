@@ -681,3 +681,8 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 .reading-tools .pronunciation-status{display:none!important}
 .reading-tools{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 0!important;min-height:0!important;border-radius:0!important}
 .reading-tools:before{display:none!important}
+
+/* Surah meaning belongs inside the banner. */
+.surah-head .banner-meaning{position:relative!important;z-index:5!important;margin:0!important;text-align:center!important;font-size:clamp(.9rem,2.6vw,1.1rem)!important;line-height:1.45!important;color:#81671d!important}
+@media(max-width:899px){.surah-head{flex-direction:column!important}.surah-head .banner-meaning{width:100%!important}}
+@media(min-width:900px){.surah-head .banner-meaning{flex:0 0 100%!important;color:#f5dc8b!important}.surah-head{flex-wrap:wrap!important;row-gap:0!important}}

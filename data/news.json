@@ -1,175 +1,133 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-17T06:30:11.848897+00:00",
+  "updatedAt": "2026-11-17T17:22:27.654485+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Why Awami League activists protesting only against NCP leaders in UK?",
-      "url": "https://en.prothomalo.com/bangladesh/politics/n3k38psujx",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T06:10:03+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Ukraine accuses Russia of targeting rescue operation after 'double-tap' strike kills 72",
-      "url": "https://www.bbc.co.uk/news/articles/c30rk8x5g80qo?at_medium=RSS&at_campaign=rss",
+      "title": "Jensen Huang pushes Nvidia comeback after board rejects pressure to reinstate ex-boss",
+      "url": "https://www.bbc.co.uk/news/articles/cwx2en2vrxmdo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T05:59:01+00:00",
-      "category": "Technology"
+      "publishedAt": "2026-11-17T17:19:56+00:00",
+      "category": "World"
     },
     {
-      "title": "Two major Kyiv bridges hit in Russian attack, mayor says",
+      "title": "US loses measles elimination status after 26 years amid record case numbers",
+      "url": "https://www.bbc.co.uk/news/articles/c977p71jx0xxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T17:10:03+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Putin's Crimean Bridge partly collapses as Zelensky hails 'unprecedented' attack by Ukraine",
       "url": "https://www.bbc.co.uk/news/articles/cw772jk4rvmxo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T05:57:38+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Democrats eye first Black US House speaker in leadership vote",
-      "url": "https://en.prothomalo.com/international/americas/vftfhdv4v4",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T05:51:29+00:00",
-      "category": "World"
-    },
-    {
-      "title": "$7.6b in annual debt repayment pressure",
-      "url": "https://en.prothomalo.com/business/local/8lbwnub4yt",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T05:30:31+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Unplanned bridges killing rivers and waterways",
-      "url": "https://en.prothomalo.com/video/r2ayie7k1q",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T04:55:14+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Robert Pattinson to be new James Bond",
-      "url": "https://en.prothomalo.com/entertainment/movies/dwggjfjfx0",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T04:18:58+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Former Dhaka South mayor Sayeed Khokon arrested in Baridhara",
-      "url": "https://en.prothomalo.com/bangladesh/48redaxx8m",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T04:09:08+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "Pori Moni’s drug case: Indictment hearing scheduled for today",
-      "url": "https://en.prothomalo.com/entertainment/movies/cxd6oodbxd",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T04:04:54+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Dhaka ranked world’s most polluted city today as air quality turns hazardous",
-      "url": "https://en.prothomalo.com/environment/pollution/gtgcjq82cq",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T04:00:03+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "Awami league-NCP supporters clash after Nahid Islam’s reception in London, 5 injured",
-      "url": "https://en.prothomalo.com/bangladesh/politics/2k4i0h177w",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T03:54:39+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Police on alert over fears of major sabotage in December",
-      "url": "https://en.prothomalo.com/bangladesh/politics/0oya51sasf",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T03:47:57+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Bangladesh welcomes eligibility for DFC financing",
-      "url": "https://en.prothomalo.com/bangladesh/dw0owvcbsa",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T03:18:28+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "DFC opens door to US investment in Bangladesh’s development projects",
-      "url": "https://en.prothomalo.com/bangladesh/8swrf1l8ur",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T03:07:48+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "Vance says he will decide 'sometime next year' about 2028 US presidential run",
-      "url": "https://www.bbc.co.uk/news/articles/cwkgr9m41engo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T03:07:23+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Nvidia dismisses 'Bring Jensen Back' campaign as Trump backs effort to reinstate ex CEO",
-      "url": "https://www.bbc.co.uk/news/articles/cry49plv8v3go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T02:37:53+00:00",
+      "publishedAt": "2026-11-17T16:56:38+00:00",
       "category": "Technology"
     },
     {
-      "title": "Imran Khan seeks urgent medical care fearing he 'may not return alive'",
-      "url": "https://www.bbc.co.uk/news/articles/cr894xq5yeyko?at_medium=RSS&at_campaign=rss",
+      "title": "Trump says US taking 'very seriously' any Iranian plot against Washington",
+      "url": "https://www.bbc.co.uk/news/articles/cq808vzd3nnpo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T01:26:01+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Five EU countries announce migrant deportation centre in Rwanda",
-      "url": "https://www.bbc.co.uk/news/articles/cw987343352go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T23:20:45+00:00",
-      "category": "World"
-    },
-    {
-      "title": "California sues OpenAI over Hugging Face attack",
-      "url": "https://www.bbc.co.uk/news/articles/c6wy4xv2mxglo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T23:12:24+00:00",
+      "publishedAt": "2026-11-17T16:42:11+00:00",
       "category": "Technology"
     },
     {
-      "title": "Forensic expert says his analysis of autopsy photos suggests Epstein was killed",
-      "url": "https://www.bbc.co.uk/news/articles/c5n4exg1kkmyo?at_medium=RSS&at_campaign=rss",
+      "title": "UK sanctions firms over Israeli West Bank settlements",
+      "url": "https://www.bbc.co.uk/news/articles/cvglr977x3z0o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-16T20:33:57+00:00",
+      "publishedAt": "2026-11-17T15:59:47+00:00",
       "category": "World"
     },
     {
-      "title": "Lindsay Clancy to face retrial next year for deaths of her three children",
-      "url": "https://www.bbc.co.uk/news/articles/cw5y1v8de35go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T19:30:30+00:00",
+      "title": "Men of Awami League, whose activities banned, set Tungipara police station on fire",
+      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/pfoahan1mk",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T15:57:14+00:00",
       "category": "World"
     },
     {
-      "title": "Raye, Rosalía and Dolly Parton recognised in Grammy nominations",
-      "url": "https://www.bbc.co.uk/news/articles/cq9vwkggpx73o?at_medium=RSS&at_campaign=rss",
+      "title": "BBC reports from Kyiv bridge hit by Russian attack",
+      "url": "https://www.bbc.co.uk/news/videos/cmlywvww3pzlo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-16T14:48:55+00:00",
+      "publishedAt": "2026-11-17T15:54:15+00:00",
       "category": "World"
     },
     {
-      "title": "Gérard Depardieu drops appeal against sexual assault conviction",
-      "url": "https://www.bbc.co.uk/news/articles/cm20vexye1d0o?at_medium=RSS&at_campaign=rss",
+      "title": "How the attack on Crimean Bridge unfolded",
+      "url": "https://www.bbc.co.uk/news/articles/crz9dgz28zwdo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-16T13:40:56+00:00",
+      "publishedAt": "2026-11-17T15:38:10+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Palestinian woman, 72, shot dead by Israeli settlers in West Bank, health ministry says",
+      "url": "https://www.bbc.co.uk/news/articles/cqrlg377638yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T15:36:11+00:00",
+      "category": "World"
+    },
+    {
+      "title": "South Africa collapse after Bavuma injury on 3rd day of Bangladesh Test",
+      "url": "https://en.prothomalo.com/sports/cricket/q1n7omg366",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T15:23:47+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "UCBD launches Industry Impact Lab marking 5th foundation day",
+      "url": "https://en.prothomalo.com/youth/education/zalfa7pf0x",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T15:22:50+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Carney eyes 'other options' for embattled Canadian auto sector on China trip",
+      "url": "https://www.bbc.co.uk/news/articles/cq98xlz09ye0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T15:17:49+00:00",
+      "category": "World"
+    },
+    {
+      "title": "49 vehicles set on fire, cocktail bombs explode at 59 locations in 10 days",
+      "url": "https://en.prothomalo.com/bangladesh/politics/c0ugspvnu9",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T14:41:21+00:00",
       "category": "Technology"
     },
     {
-      "title": "Two mass shootings in South Africa leave 17 dead",
-      "url": "https://www.bbc.co.uk/news/articles/c8y5x3n4kywpo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-16T10:57:48+00:00",
+      "title": "Sayeed Khokon placed on 7-day remand in July murder case",
+      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/sagbg78j73",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T14:27:20+00:00",
       "category": "World"
+    },
+    {
+      "title": "Trump lands in Asia ahead of talks with Russian and Chinese presidents",
+      "url": "https://www.bbc.co.uk/news/articles/crq5vlxxx32no?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T12:54:32+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Second Padma Bridge to take Y-shape, link three districts, where will the second Jamuna Bridge be built?",
+      "url": "https://en.prothomalo.com/bangladesh/f9vz5dfx47",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-17T12:40:51+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Nvidia partner Megaspeed being investigated by US government over chip exports",
+      "url": "https://www.bbc.co.uk/news/articles/cmn504nq5033o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T11:17:32+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Indian woman gang-raped while pregnant in 2002 'heartbroken' after two perpetrators bailed",
+      "url": "https://www.bbc.co.uk/news/articles/cr868wd2qg18o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T09:27:44+00:00",
+      "category": "Bangladesh"
     }
   ],
   "sources": [

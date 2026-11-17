@@ -1,8 +1,155 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-17T06:30:12.212352+00:00",
+  "updatedAt": "2026-11-17T17:22:27.859646+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Ramsay-Peaty headlines as revived ISL wary not to overstretch",
+      "url": "https://www.bbc.co.uk/sport/swimming/articles/ck1wvzryg015o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T17:17:18+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Pocognoli’s aspiration for how Scotland must play is in danger of becoming unworkable",
+      "url": "https://www.theguardian.com/football/2026/nov/17/sebastien-pocognoli-scotland-nations-league-switzerland",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T16:59:54+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "South Africa head coach Erasmus banned for six matches",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cj752w5q7z90o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T16:09:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Woods set to return next month after two years out",
+      "url": "https://www.bbc.co.uk/sport/golf/articles/cm93080ep703o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T15:54:36+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Wayne Rooney says he contemplated taking own life during playing career",
+      "url": "https://www.theguardian.com/football/2026/nov/17/wayne-rooney-contemplated-taking-own-life-during-playing-career-mental-health",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T15:52:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "FA wants to host Nations League finals in England",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c5742x4xldmpo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T15:51:30+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Peter Storey, Arsenal Double winner and England international, dies aged 81",
+      "url": "https://www.theguardian.com/football/2026/nov/17/peter-storey-arsenal-england-dies-aged-81",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T15:46:45+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Football Daily | Jürgen Klopp hard-launches his Germany rebuilding project in style",
+      "url": "https://www.theguardian.com/football/2026/nov/17/jurgen-klopp-germany-project-football-daily-newsletter",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T15:23:15+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Hutchinson ruled out for season after celebration injury",
+      "url": "https://www.bbc.co.uk/sport/american-football/articles/ck8798yvq0x0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T15:08:23+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Reliving the drama: England and Argentina stars watch 1986 classic with fresh eyes",
+      "url": "https://www.theguardian.com/football/2026/nov/17/reliving-the-drama-england-and-argentina-stars-watch-1986-classic-with-fresh-eyes",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T15:00:16+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Rooney says he considered taking his own life at Man Utd",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cx1l0n3v003eo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T14:09:19+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "DeChambeau joins DP World Tour after LIV Golf collapse",
+      "url": "https://www.bbc.co.uk/sport/golf/articles/c5vg27yzm9exo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T13:44:17+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Bethell to have more surgery and miss South Africa tour",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c893rgz2946yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T13:18:58+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Wiegman cites young talent as key to new England deal after calling up Goodwin",
+      "url": "https://www.theguardian.com/football/2026/nov/17/sarina-wiegman-england-young-talent-contract-isobel-goodwin-squad",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T13:09:09+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Janine van Wyk: ‘Our rooms were empty … no mattresses, no lightbulbs and not a drop of water’",
+      "url": "https://www.theguardian.com/football/2026/nov/17/janine-van-wyck-south-africa-wafcon-book-extract-moving-the-goalposts-newsletter",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T11:57:35+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "London City's Goodwin gets first England call-up",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cr9d7pw90x14o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T11:06:33+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Blackburn boss Mowbray steps back over health issues",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c6dx190nkvl4o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T10:40:41+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Will Infantino feel he's already won as Fifa challengers are revealed?",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c8wy53z3ygypo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T10:32:07+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Max Dowman shines in England colours and sends another record tumbling",
+      "url": "https://www.theguardian.com/football/2026/nov/17/max-dowman-england-under-21s-record-jude-bellingham",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T10:13:45+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Declan Rice agrees new Arsenal contract making him club’s joint highest-paid player",
+      "url": "https://www.theguardian.com/football/2026/nov/17/declan-rice-new-arsenal-contract-jurrien-timber",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T09:19:34+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "‘He wants to change lives’: the story behind Bukayo Saka’s Sócrates award",
+      "url": "https://www.theguardian.com/football/2026/nov/17/he-wants-to-change-lives-the-story-behind-bukayo-sakas-socrates-award",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T08:00:09+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Why always him? The rise and fall of Balotelli",
       "url": "https://www.bbc.co.uk/sport/football/articles/cvgxvg4v981o?at_medium=RSS&at_campaign=rss",
@@ -11,150 +158,10 @@
       "category": "Sports"
     },
     {
-      "title": "Fifa accused of climate ‘record of failure’ due to Aramco deal and tournament expansion",
-      "url": "https://www.theguardian.com/football/2026/nov/17/fifa-accused-climate-record-failure-aramco-deal-tournament-expansion",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T06:00:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "What's the story with Scotland boss Pocognoli - is it time to go?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/crgqx1zz94d4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-17T00:19:58+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Swansea braced to lose Vítor Matos as Strasbourg seek to replace Hugo Oliveira",
-      "url": "https://www.theguardian.com/football/2026/nov/16/swansea-city-head-coach-vitor-matos-strasbourg-chelsea-sister-club-ligue-1",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T23:32:23+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'Is that not match-fixing?' - Erasmus questions officiating",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ck0jx1dnd38go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T23:14:48+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Pochettino: I’d tell Guardiola to ‘take it’ if he’s offered US coaching job",
-      "url": "https://www.theguardian.com/football/2026/nov/16/mauricio-pochettino-pep-guardiola-usmnt-manchester-united",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T23:01:52+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Littler hits triple-bull, but Price checkout doesn't add up",
-      "url": "https://www.bbc.co.uk/sport/darts/articles/cwkgr9m0d0e5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T22:54:37+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Pocognoli wants patience but Scotland 'don't have time' says Robertson",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cwnv432qy0l1o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T22:36:26+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Nations League: Wirtz doubles up as Germany rout Netherlands to top group",
-      "url": "https://www.theguardian.com/football/2026/nov/16/nations-league-roundup-germany-netherlands-greece-serbia",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T22:33:26+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Switzerland roll over sorry Scotland to increase the pressure on Pocognoli",
-      "url": "https://www.theguardian.com/football/2026/nov/16/switzerland-scotland-nations-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T21:53:32+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Portugal boss responds to criticism from Ronaldo's mum",
-      "url": "https://www.bbc.co.uk/sport/football/articles/ck87984g3x1po?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T21:08:06+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Tuchel and England must learn lessons of history, Seville and Southgateism | Barney Ronay",
       "url": "https://www.theguardian.com/football/2026/nov/16/thomas-tuchel-england-must-learn-lessons-history-seville-gareth-southgate",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-16T20:02:09+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Five-try Joseph set to start for England against All Blacks",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cmx20pnd853po?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T18:19:42+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Spain in pain as historic run ends but De la Fuente feels best is yet to come",
-      "url": "https://www.theguardian.com/football/2026/nov/16/luis-de-la-fuente-spain-england-nations-league",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T17:48:38+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "How Frank can restore reputation and save Crystal Palace",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmge3y2qjlyro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T17:46:16+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Beckham firm sues after fragrance found for sale in discount store",
-      "url": "https://www.theguardian.com/football/2026/nov/16/david-beckham-fragrance-sale-poundland-bargain-bin-gas-station",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T17:35:59+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "The Botham hiding in plain sight - Wales' unlikely hero",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cm9q87xdxyz2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T17:07:02+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Thomas Frank confirmed as Crystal Palace manager after Pierre Sage’s sacking",
-      "url": "https://www.theguardian.com/football/2026/nov/16/thomas-frank-confirmed-crystal-palace-manager-pierre-sage",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T17:03:14+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "French football head Philippe Diallo to fight Infantino for Fifa presidency",
-      "url": "https://www.theguardian.com/football/2026/nov/16/philippe-diallo-fifa-gianni-infantino-president-french-football-federation",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T15:27:30+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Ratcliffe's Ineos settles £180m boat claim with Ainslie",
-      "url": "https://www.bbc.co.uk/sport/sailing/articles/cwg5r2q5dz3zo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T14:28:00+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Has Trafford replaced Pickford as England No 1?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmvg2r752ykzo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-16T13:01:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "WSL talking points: Chelsea’s gamble pays off and have Arsenal lost fear factor?",
-      "url": "https://www.theguardian.com/football/2026/nov/16/wsl-talking-points-chelseas-gamble-pays-off-and-have-arsenal-lost-fear-factor",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T12:30:57+00:00",
       "category": "Sports"
     },
     {

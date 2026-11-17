@@ -11,6 +11,7 @@ import argparse, json, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 BATCH_SIZE = 25
 REQUIRED = {"surah", "ayah", "arabic", "bengali_translation", "bengali_transliteration", "uncertainties"}
 

@@ -1,0 +1,158 @@
+[
+  {
+    "surah": 1,
+    "ayah": 1,
+    "arabic": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    "bengali_translation": "পরম করুণাময়, অতি দয়ালু আল্লাহর নামে।",
+    "bengali_transliteration": "বিসমিল্লাহির রাহমানির রাহিম",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Basmalah counting and tajwid require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 1,
+    "ayah": 2,
+    "arabic": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+    "bengali_translation": "সমস্ত প্রশংসা আল্লাহর, যিনি সকল জগতের প্রতিপালক।",
+    "bengali_transliteration": "আলহামদু লিল্লাহি রাব্বিল আলামিন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "‘আলামিন’ এর ব্যাপ্তি ও বাংলা রূপ requires review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 1,
+    "ayah": 3,
+    "arabic": "الرَّحْمَٰنِ الرَّحِيمِ",
+    "bengali_translation": "তিনি পরম করুণাময়, অতি দয়ালু।",
+    "bengali_transliteration": "আররাহমানির রাহিম",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Assimilation and emphatic articulation require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 1,
+    "ayah": 4,
+    "arabic": "مَالِكِ يَوْمِ الدِّينِ",
+    "bengali_translation": "বিচার-প্রতিফল দিবসের অধিপতি।",
+    "bengali_transliteration": "মালিকি ইয়াওমিদ্দিন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Qira'at variation in مالك/مَلِك requires review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 1,
+    "ayah": 5,
+    "arabic": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+    "bengali_translation": "আমরা কেবল তোমারই ইবাদত করি, এবং কেবল তোমারই সাহায্য চাই।",
+    "bengali_transliteration": "ইয়্যাকা নাবুদু ওয়া ইয়্যাকা নাস্তাঈন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Theological register choices require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 1,
+    "ayah": 6,
+    "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+    "bengali_translation": "আমাদের সরল পথে পরিচালিত করো—",
+    "bengali_transliteration": "ইহদিনাস সিরাতাল মুস্তাকিম",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Imperative nuance and সিরাত/পথ balance require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 1,
+    "ayah": 7,
+    "arabic": "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+    "bengali_translation": "তাদের পথ, যাদের প্রতি তুমি অনুগ্রহ করেছ; তাদের নয়, যারা ক্রোধের পাত্র হয়েছে, আর নয় পথভ্রষ্টদের।",
+    "bengali_transliteration": "সিরাতাল্লাজিনা আনআমতা আলাইহিম গইরিল মাগদুবি আলাইহিম ওয়ালাদ্দাল্লিন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Clause scope, final contrasts and recitation require expert review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 2,
+    "ayah": 1,
+    "arabic": "الم",
+    "bengali_translation": "আলিফ-লাম-মীম।",
+    "bengali_transliteration": "আলিফ লাম মীম",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Disjoint-letter pronunciation and restraint require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 2,
+    "ayah": 2,
+    "arabic": "ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِلْمُتَّقِينَ",
+    "bengali_translation": "এ সেই কিতাব, যাতে কোনো সন্দেহ নেই; মুত্তাকিদের জন্য এটি পথনির্দেশ।",
+    "bengali_transliteration": "যালিকাল কিতাবু লা রাইবা ফিহি হুদাল্লিল মুত্তাকিন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Demonstrative force and grammar require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 2,
+    "ayah": 3,
+    "arabic": "الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ وَيُقِيمُونَ الصَّلَاةَ وَمِمَّا رَزَقْنَاهُمْ يُنْفِقُونَ",
+    "bengali_translation": "যারা অদৃশ্যে বিশ্বাস রাখে, সালাত কায়েম করে, এবং আমরা তাদের যে রিজিক দিয়েছি তা থেকে ব্যয় করে।",
+    "bengali_transliteration": "আল্লাজিনা ইউমিনুনা বিলগাইবি ওয়ায়ুকিমুনাস সালাতা ওয়ামিম্মা রাযাকনাহুম ইউনফিকুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Terminology register requires review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 2,
+    "ayah": 4,
+    "arabic": "وَالَّذِينَ يُؤْمِنُونَ بِمَا أُنْزِلَ إِلَيْكَ وَمَا أُنْزِلَ مِنْ قَبْلِكَ وَبِالْآخِرَةِ هُمْ يُوقِنُونَ",
+    "bengali_translation": "আর যারা তোমার প্রতি যা নাজিল হয়েছে এবং তোমার আগে যা নাজিল হয়েছে তাতে বিশ্বাস করে; আর আখিরাত সম্পর্কে তারা দৃঢ়নিশ্চিত।",
+    "bengali_transliteration": "ওয়াল্লাজিনা ইউমিনুনা বিমা উনযিলা ইলাইকা ওয়ামা উনযিলা মিন কাবলিকা ওয়াবিল আখিরাতি হুম ইউকিনুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Tense and sentence linkage require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  },
+  {
+    "surah": 2,
+    "ayah": 5,
+    "arabic": "أُولَٰئِكَ عَلَىٰ هُدًى مِنْ رَبِّهِمْ وَأُولَٰئِكَ هُمُ الْمُفْلِحُونَ",
+    "bengali_translation": "তারাই তাদের প্রতিপালকের পক্ষ থেকে পথনির্দেশের ওপর আছে, আর তারাই সফলকাম।",
+    "bengali_transliteration": "উলাইকা আলা হুদাম মির রাব্বিহিম ওয়া উলাইকা হুমুল মুফলিহুন",
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "uncertainties": [
+      "Elliptical construction and rendering require review."
+    ],
+    "composition_note": "Direct Arabic reading; Bengali wording composed for this dataset."
+  }
+]

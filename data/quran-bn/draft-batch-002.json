@@ -1,0 +1,145 @@
+[
+  {
+    "surah": 2,
+    "ayah": 6,
+    "arabic": "إِنَّ الَّذِينَ كَفَرُوا سَوَاءٌ عَلَيْهِمْ أَأَنْذَرْتَهُمْ أَمْ لَمْ تُنْذِرْهُمْ لَا يُؤْمِنُونَ",
+    "bengali_translation": "নিশ্চয় যারা অবিশ্বাস করেছে—তুমি তাদের সতর্ক করো বা না করো, তাদের কাছে উভয়ই সমান; তারা বিশ্বাস করবে না।",
+    "bengali_transliteration": "ইন্নাল্লাজিনা কাফারু সাওয়াউন আলাইহিম আআনজারতাহুম আম লামতুনজিরহুম লা ইউমিনুন",
+    "uncertainties": [
+      "প্রথম বাক্যের জোর ও প্রশ্নরীতির পাঠভেদ-সংবেদনশীলতা পর্যালোচনা প্রয়োজন।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 7,
+    "arabic": "خَتَمَ اللَّهُ عَلَىٰ قُلُوبِهِمْ وَعَلَىٰ سَمْعِهِمْ وَعَلَىٰ أَبْصَارِهِمْ غِشَاوَةٌ وَلَهُمْ عَذَابٌ عَظِيمٌ",
+    "bengali_translation": "আল্লাহ তাদের হৃদয় ও শ্রবণশক্তির ওপর মোহর এঁটে দিয়েছেন; তাদের দৃষ্টির ওপর আছে আবরণ, আর তাদের জন্য রয়েছে মহাশাস্তি।",
+    "bengali_transliteration": "খাতামাল্লাহু আলা কুলুবিহিম ওয়া আলা সামইহিম ওয়া আলা আবসারিহিম গিশাওয়াতুন ওয়ালাহুম আজাবুন আজিম",
+    "uncertainties": [
+      "‘মোহর’ ও ‘আবরণ’ রূপক-ব্যাখ্যা; ই‘রাব ও বিরতি বিশেষজ্ঞ যাচাই চান।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 8,
+    "arabic": "وَمِنَ النَّاسِ مَنْ يَقُولُ آمَنَّا بِاللَّهِ وَبِالْيَوْمِ الْآخِرِ وَمَا هُمْ بِمُؤْمِنِينَ",
+    "bengali_translation": "মানুষের মধ্যে কেউ কেউ বলে, ‘আমরা আল্লাহ ও শেষ দিবসে বিশ্বাস করেছি’; অথচ তারা বিশ্বাসী নয়।",
+    "bengali_transliteration": "ওয়া মিনান্নাসি মান ইয়াকুলু আমান্না বিল্লাহি ওয়া বিলইয়াওমিল আখিরি ওয়া মা হুম বিমুমিনিন",
+    "uncertainties": [
+      "‘শেষ দিবস’ ও ‘বিশ্বাসী নয়’—শব্দার্থের পরিসর এবং জোর নির্দেশক গঠন যাচাই প্রয়োজন।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 9,
+    "arabic": "يُخَادِعُونَ اللَّهَ وَالَّذِينَ آمَنُوا وَمَا يَخْدَعُونَ إِلَّا أَنْفُسَهُمْ وَمَا يَشْعُرُونَ",
+    "bengali_translation": "তারা আল্লাহ ও বিশ্বাসীদের সঙ্গে প্রতারণা করতে চায়; কিন্তু তারা নিজেদের ছাড়া আর কাউকে প্রতারিত করে না, অথচ তা টের পায় না।",
+    "bengali_transliteration": "ইউখাদিউনাল্লাহা ওয়াল্লাজিনা আমানু ওয়া মা ইয়াখদাউন ইল্লা আনফুসাহুম ওয়া মা ইয়াশউরুন",
+    "uncertainties": [
+      "ক্রিয়ার পারস্পরিক/উদ্দেশ্যগত অর্থ এবং ‘চায়’ যোগের যথার্থতা বিশেষজ্ঞ যাচাই চান।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 10,
+    "arabic": "فِي قُلُوبِهِمْ مَرَضٌ فَزَادَهُمُ اللَّهُ مَرَضًا وَلَهُمْ عَذَابٌ أَلِيمٌ بِمَا كَانُوا يَكْذِبُونَ",
+    "bengali_translation": "তাদের হৃদয়ে ব্যাধি আছে; ফলে আল্লাহ তাদের ব্যাধি বাড়িয়ে দিয়েছেন। আর মিথ্যা বলা তাদের কারণে তাদের জন্য রয়েছে যন্ত্রণাদায়ক শাস্তি।",
+    "bengali_transliteration": "ফি কুলুবিহিম মারাদুন ফাজাদাহুমুল্লাহু মারাদা ওয়ালাহুম আজাবুন আলিমুম বিমা কানু ইয়াকজিবুন",
+    "uncertainties": [
+      "শেষ অংশের কারণ-সম্পর্ক ও ‘ব্যাধি’ রূপক-প্রয়োগ যাচাই প্রয়োজন; বাংলা বাক্যটি খসড়া।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 11,
+    "arabic": "وَإِذَا قِيلَ لَهُمْ لَا تُفْسِدُوا فِي الْأَرْضِ قَالُوا إِنَّمَا نَحْنُ مُصْلِحُونَ",
+    "bengali_translation": "যখন তাদের বলা হয়, ‘পৃথিবীতে বিপর্যয় সৃষ্টি করো না’, তারা বলে, ‘আমরাই তো সংশোধনকারী।’",
+    "bengali_transliteration": "ওয়া ইজা কিলা লাহুম লা তুফসিদু ফিল আরদি কালু ইন্নামা নাহনু মুসলিহুন",
+    "uncertainties": [
+      "‘ফাসাদ’ ও ‘ইসলাহ’-এর নৈতিক/সামাজিক পরিসর এবং বহুবচন রূপ যাচাই প্রয়োজন।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 12,
+    "arabic": "أَلَا إِنَّهُمْ هُمُ الْمُفْسِدُونَ وَلَٰكِنْ لَا يَشْعُرُونَ",
+    "bengali_translation": "সাবধান, তারাই বিপর্যয় সৃষ্টিকারী; কিন্তু তারা উপলব্ধি করে না।",
+    "bengali_transliteration": "আলা ইন্নাহুম হুমুল মুফসিদুন ওয়ালাকিন লা ইয়াশউরুন",
+    "uncertainties": [
+      "জোরপ্রকাশক ‘আলা’ এবং ‘ইয়াশউরুন’-এর অনুভব/উপলব্ধি-নুয়ান্স যাচাই প্রয়োজন।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 13,
+    "arabic": "وَإِذَا قِيلَ لَهُمْ آمِنُوا كَمَا آمَنَ النَّاسُ قَالُوا أَنُؤْمِنُ كَمَا آمَنَ السُّفَهَاءُ أَلَا إِنَّهُمْ هُمُ السُّفَهَاءُ وَلَٰكِنْ لَا يَعْلَمُونَ",
+    "bengali_translation": "যখন তাদের বলা হয়, ‘মানুষ যেমন বিশ্বাস করেছে, তেমন বিশ্বাস করো’, তারা বলে, ‘আমরা কি নির্বোধেরা যেমন বিশ্বাস করেছে তেমন বিশ্বাস করব?’ জেনে রেখো, নির্বোধ তারাই; কিন্তু তারা জানে না।",
+    "bengali_transliteration": "ওয়া ইজা কিলা লাহুম আমিনু কামা আমানান্নাসু কালু আনুমিনু কামা আমানাস সুফাহাউ আলা ইন্নাহুম হুমুস সুফাহাউ ওয়ালাকিন লা ইয়ালামুন",
+    "uncertainties": [
+      "‘মানুষ’ ও ‘নির্বোধ’ শব্দের প্রসঙ্গগত পরিসর এবং উদ্ধৃতির বিরতি বিশেষজ্ঞ যাচাই চান।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 14,
+    "arabic": "وَإِذَا لَقُوا الَّذِينَ آمَنُوا قَالُوا آمَنَّا وَإِذَا خَلَوْا إِلَىٰ شَيَاطِينِهِمْ قَالُوا إِنَّا مَعَكُمْ إِنَّمَا نَحْنُ مُسْتَهْزِئُونَ",
+    "bengali_translation": "বিশ্বাসীদের সঙ্গে দেখা হলে তারা বলে, ‘আমরা বিশ্বাস করেছি’; আর নিজেদের শয়তানদের কাছে একান্তে গেলে বলে, ‘আমরা তোমাদের সঙ্গেই আছি; আমরা তো শুধু ঠাট্টা করছি।’",
+    "bengali_transliteration": "ওয়া ইজা লাকুল্লাজিনা আমানু কালু আমান্না ওয়া ইজা খালাও ইলা শায়াতিনিহিম কালু ইন্না মাআকুম ইন্নামা নাহনু মুস্তাহজিউন",
+    "uncertainties": [
+      "‘শয়তান’ দ্বারা নেতা/প্ররোচক বোঝানো হয় কি না এবং ‘খালাও’-এর নুয়ান্স যাচাই প্রয়োজন।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 15,
+    "arabic": "اللَّهُ يَسْتَهْزِئُ بِهِمْ وَيَمُدُّهُمْ فِي طُغْيَانِهِمْ يَعْمَهُونَ",
+    "bengali_translation": "আল্লাহ তাদের সেই উপহাসের প্রতিফল দেন এবং তাদের অবাধ্যতার মধ্যে অবকাশ দেন—তারা দিশাহারা হয়ে ঘুরে বেড়ায়।",
+    "bengali_transliteration": "আল্লাহু ইয়াস্তাহজিউ বিহিম ওয়া ইয়ামুদ্দুহুম ফি তুগইয়ানিহিম ইয়ামাহুন",
+    "uncertainties": [
+      "ঐশী প্রতিফল বোঝাতে ক্রিয়ার বাংলা রূপটি ব্যাখ্যামূলক; আকিদাগত ভাষা বিশেষজ্ঞ যাচাই চান।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  },
+  {
+    "surah": 2,
+    "ayah": 16,
+    "arabic": "أُولَٰئِكَ الَّذِينَ اشْتَرَوُا الضَّلَالَةَ بِالْهُدَىٰ فَمَا رَبِحَتْ تِجَارَتُهُمْ وَمَا كَانُوا مُهْتَدِينَ",
+    "bengali_translation": "তারাই তারা, যারা পথনির্দেশের বদলে ভ্রান্তি কিনেছে; তাদের বাণিজ্য লাভজনক হয়নি এবং তারা সঠিক পথে ছিল না।",
+    "bengali_transliteration": "উলাইকাল্লাজিনাশতারাউদ্দালালাতা বিলহুদা ফামা রাবিহাত তিজারাতুহুম ওয়া মা কানু মুহতাদিন",
+    "uncertainties": [
+      "‘কেনাবেচা’ রূপকের ক্রিয়া-সম্মতি ও ‘মুহতাদিন’-এর কালগত নুয়ান্স যাচাই প্রয়োজন।"
+    ],
+    "review_status": "unreviewed_draft",
+    "publishable": false,
+    "composition_note": "Arabic-based independent Bengali draft; not copied from a publisher translation or recitation."
+  }
+]

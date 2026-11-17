@@ -80,6 +80,12 @@ body{isolation:isolate}body::before{content:"";position:fixed;z-index:-1;left:50
 }
 
 @media (min-width:900px){
+  .surah-head{background:radial-gradient(circle at 1.5% 18%,transparent 0 19px,#c29532 20px 22px,transparent 23px),radial-gradient(circle at 98.5% 18%,transparent 0 19px,#c29532 20px 22px,transparent 23px),radial-gradient(circle at 1.5% 82%,transparent 0 19px,#c29532 20px 22px,transparent 23px),radial-gradient(circle at 98.5% 82%,transparent 0 19px,#c29532 20px 22px,transparent 23px),linear-gradient(115deg,#063b2b,#07543d 48%,#063b2d)!important;}
+  .surah-head h1{font-size:3.35rem!important;text-shadow:0 3px 1px #06251b!important;}
+  .hero-arabic{font-size:2.75rem!important;color:#f3d477!important;text-shadow:0 2px 0 #6f4d16!important;}
+}
+
+@media (min-width:900px){
   .surah-head{height:220px!important;min-height:220px!important;margin:24px 0 18px!important;padding:28px 210px 34px 175px!important;border:3px solid #bd8c27!important;border-radius:34px 24px 34px 24px!important;background:linear-gradient(115deg,#063b2b 0%,#07543d 48%,#063b2d 100%)!important;box-shadow:inset 0 0 0 3px #ead17b,inset 0 0 0 7px #4c732c,0 10px 26px #163a251f!important;}
   .surah-head:before{content:""!important;position:absolute!important;inset:9px!important;display:block!important;width:auto!important;height:auto!important;border:1px solid #e7c96a!important;border-radius:27px 18px 27px 18px!important;background:radial-gradient(ellipse at 12% 50%,#b9913430,transparent 23%),radial-gradient(ellipse at 88% 50%,#082c201f,transparent 30%)!important;pointer-events:none!important;z-index:0!important;}
   .surah-head:after{content:""!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:auto!important;height:15px!important;border-top:2px solid #f4d989!important;background:linear-gradient(180deg,#f0d27b,#a8751d 55%,#f3d787)!important;z-index:5!important;opacity:1!important;}

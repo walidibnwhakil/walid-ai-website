@@ -3,7 +3,9 @@
   "updated": "2026-11-19",
   "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated. User-approved conventions: preserve the Arabic ayah, use readable Bengali phonetic spelling, and end each line with Bengali danda (।). Bengali transliteration is a reading aid, not tajwid instruction.",
   "verified": {
-    "complete_surahs": [1],
+    "complete_surahs": [
+      1
+    ],
     "complete_surah_count": 1,
     "verses": 9,
     "coverage": [
@@ -30,7 +32,23 @@
     "verses": 6227,
     "surahs_without_complete_coverage": 113,
     "fully_pending_surahs": 112,
-    "partially_reviewed_surahs": [2]
+    "partially_reviewed_surahs": [
+      2
+    ]
   },
-  "source": "Arabic ayah text in the repository; verified coverage is based only on recorded review and explicit user confirmation. Bangladesh government pronunciation source remains linked for uncovered verses."
+  "source": "Arabic ayah text in the repository; verified coverage is based only on recorded review and explicit user confirmation. Bangladesh government pronunciation source remains linked for uncovered verses.",
+  "transliteration_policy_reference": {
+    "title": "বাংলায় আল-কুরআনের অনুবাদ ও প্রতিবর্ণায়ন নীতিমালা",
+    "url": "https://quran.gov.bd/common/doc/Nitimala-Final.pdf",
+    "use": "Reference for Bengali phonetic conventions and review flags; do not copy the portal's per-ayah transliteration text.",
+    "review_sensitive": [
+      "Arabic letters without exact Bengali equivalents",
+      "vowel marks and tanwin",
+      "shadda",
+      "madd",
+      "ghunnah",
+      "waqf",
+      "hamzat al-wasl"
+    ]
+  }
 }

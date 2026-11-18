@@ -720,3 +720,9 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 #verses>.ayah:not(.basmala)>.arabic{flex:0 0 auto!important;min-height:0!important;height:auto!important;line-height:1.65!important;margin:0!important;padding:0!important}
 #verses>.ayah:not(.basmala)>.pronunciation,#verses>.ayah:not(.basmala)>.translation{flex:0 0 auto!important;min-height:0!important;height:auto!important;line-height:1.6!important;margin:0!important;padding:0!important}
 #verses .pronunciation::before{content:none!important}
+
+
+/* Approved Quran banner artwork: exact supplied emerald/gold reference image. */
+.surah-head .hero-art{background-image:url("/assets/quran-banner-approved.png")!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;opacity:1!important;}
+@media(max-width:899px){.surah-head{min-height:180px!important;padding:18px 14px!important;background-image:url("/assets/quran-banner-approved.png")!important;background-position:center!important;background-size:cover!important;}.surah-head .hero-art{opacity:.28!important;background-size:cover!important;}.surah-head #surah-title,.surah-head .hero-arabic,.surah-head .banner-meaning{color:#fff8dc!important;text-shadow:0 2px 3px #06291dcc!important;}}
+@media(min-width:900px){.surah-head{height:260px!important;min-height:260px!important;background-image:url("/assets/quran-banner-approved.png")!important;background-position:center!important;background-size:cover!important;}.surah-head .hero-art{display:none!important;}.surah-head #surah-title{color:#fff!important;text-shadow:0 3px 3px #06291dcc!important;}.surah-head .hero-arabic{color:#f4d477!important;text-shadow:0 2px 3px #06291dcc!important;}}

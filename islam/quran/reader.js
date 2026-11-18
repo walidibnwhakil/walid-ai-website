@@ -40,17 +40,37 @@
   const pronunciationStatus = document.createElement('p');
   pronunciationStatus.className = 'pronunciation-availability';
   pronunciationStatus.setAttribute('role', 'status');
-  pronunciationStatus.textContent = 'বাংলা উচ্চারণের যাচাইকৃত ও অনুমোদিত ডেটা বর্তমানে উপলভ্য নয়।';
+  pronunciationStatus.textContent = 'সরকারি উৎস থেকে বাংলা উচ্চারণ লোড হচ্ছে…';
   pronunciationStatus.hidden = true;
   tools.append(pronunciationStatus);
+  const pronunciationCredit = document.createElement('p');
+  pronunciationCredit.className = 'pronunciation-credit';
+  pronunciationCredit.hidden = true;
+  const sourceLink = document.createElement('a');
+  sourceLink.href = 'https://www.quran.gov.bd/';
+  sourceLink.target = '_blank';
+  sourceLink.rel = 'noopener noreferrer';
+  sourceLink.textContent = 'Islamic Foundation Bangladesh · Quran.gov.bd';
+  pronunciationCredit.append('উচ্চারণের উৎস: ', sourceLink);
+  tools.append(pronunciationCredit);
+
   function refreshPronunciation() {
-    const items = [...verses.querySelectorAll('.pronunciation[data-verified="true"],.basmala-pronunciation')];
-    for (const node of verses.querySelectorAll('.pronunciation,.basmala-pronunciation')) {
-      node.hidden = !pronunciation.checked || (node.classList.contains('pronunciation') && node.dataset.verified !== 'true');
-    }
-    pronunciationStatus.hidden = !pronunciation.checked || items.length > 0;
+    const images = [...verses.querySelectorAll('img.pronunciation')];
+    const loaded = images.filter(image => image.dataset.verified === 'true').length;
+    const pending = images.filter(image => image.dataset.loading === 'true').length;
+    const failed = images.filter(image => image.dataset.error === 'true').length;
+    for (const image of images) image.hidden = !pronunciation.checked || image.dataset.verified !== 'true';
+    pronunciationCredit.hidden = !pronunciation.checked;
+    pronunciationStatus.hidden = !pronunciation.checked || (pending === 0 && failed === 0 && loaded > 0);
+    if (!pronunciation.checked) return;
+    if (pending > 0) pronunciationStatus.textContent = 'বাংলা উচ্চারণ লোড হচ্ছে…';
+    else if (failed > 0) pronunciationStatus.textContent = 'কিছু আয়াতের উচ্চারণ উৎস থেকে লোড হয়নি। নেটওয়ার্ক সংযোগ পরীক্ষা করে আবার checkbox চালু করুন।';
+    else if (loaded === 0) pronunciationStatus.textContent = 'উচ্চারণের উৎসে এখন সংযোগ করা যাচ্ছে না।';
   }
   pronunciation.addEventListener('change', refreshPronunciation);
+  verses.addEventListener('load', refreshPronunciation, true);
+  verses.addEventListener('error', refreshPronunciation, true);
+  verses.addEventListener('quran-pronunciation-update', refreshPronunciation);
   new MutationObserver(refreshPronunciation).observe(verses, {childList: true});
 
   const tabDefs = [

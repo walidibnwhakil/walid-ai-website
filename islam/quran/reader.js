@@ -61,7 +61,7 @@
     const failed = images.filter(image => image.dataset.error === 'true').length;
     for (const image of images) image.hidden = !pronunciation.checked || image.dataset.verified !== 'true';
     pronunciationCredit.hidden = !pronunciation.checked;
-    pronunciationStatus.hidden = !pronunciation.checked || (pending === 0 && failed === 0 && loaded > 0);
+    pronunciationStatus.hidden = !pronunciation.checked || (failed === 0 && loaded > 0);
     if (!pronunciation.checked) return;
     if (pending > 0) pronunciationStatus.textContent = 'বাংলা উচ্চারণ লোড হচ্ছে…';
     else if (failed > 0) pronunciationStatus.textContent = 'কিছু আয়াতের উচ্চারণ উৎস থেকে লোড হয়নি। নেটওয়ার্ক সংযোগ পরীক্ষা করে আবার checkbox চালু করুন।';

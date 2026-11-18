@@ -1,28 +1,43 @@
-# Semantic audit record: Surahs 6–114 (continuation)
+# Quran Bengali semantic-audit coverage ledger
 
 Date: 2026-11-18
+Repository: walidibnwhakil/walid-ai-website
+Baseline: commit 7397e4820b42054d0cb6f1b9a2f386725e2fd291
 
-This record documents only the verses changed in this pass. It is not a claim of complete scholarly validation of Surahs 6–114.
+## Purpose
 
-## Corrections
+This ledger separates machine-verifiable data integrity from substantive Arabic-to-Bengali meaning review. Presence of Arabic and Bengali strings is not semantic certification.
 
-- Surah 6:10 — corrected the sentence so the thing surrounding the mockers is the consequence they mocked, rather than implying that the messengers themselves were surrounded.
-- Surah 6:14 — corrected “প্রথম ... যারা ইসলাম গ্রহণ করেছে” to “প্রথম মুসলিম”, preserving the first-person predicate in **أَوَّلَ مَنْ أَسْلَمَ**.
-- Surah 15:59 — corrected “লূতের পরিবারের বিরুদ্ধে নয়” to “লূতের পরিবার ছাড়া”, preserving the exception in **إِلَّا آلَ لُوطٍ**.
-- Surah 113:4 — removed the unsupported narrowing “সমস্ত নারীদের”; the Arabic **النَّفَّاثَاتِ فِي الْعُقَدِ** describes those who blow on knots, without requiring the Bengali translation to add “all women”.
+## Current coverage
 
-Arabic text, verse numbering, pronunciation fields, JSON structure, Surahs 1–5, and unrelated features were not changed.
-
-## Scope and remaining work
-
-The above four verses were individually checked and changed. Spot checks were also performed on Surahs 6–15 and 105–114 without finding additional changes meeting the high-confidence semantic-error threshold in this pass. Surahs 16–104 still require a verse-by-verse semantic audit; therefore the project must not describe Surahs 6–114 as fully validated.
-
-## Coverage ledger (2026-11-18 continuation)
-
-| Surahs | Verse records present | Arabic/translation fields present | Semantic status |
+| Surahs | Verse records | Structural checks | Semantic status |
 |---|---:|---|---|
-| 16–20 | 582 | Yes for all 582 records | Not yet certified verse-by-verse |
-| 21–104 | — | — | Pending substantive audit |
-| 105–114 | — | — | Earlier spot-check only; not certified complete |
+| 1–5 | Existing prior audit | Prior audit retained | Audited in prior work |
+| 6–15 | Existing prior audit | Prior audit retained | Spot checks plus 4 high-confidence corrections; not complete |
+| 16–20 | 582 | All records have contiguous verse numbers, non-empty Arabic, and non-empty Bengali translation | Structural only; not semantically certified |
+| 21–104 | 3,753 | All records have contiguous verse numbers, non-empty Arabic, and non-empty Bengali translation | Pending verse-by-verse semantic review |
+| 105–114 | 196 | All records have contiguous verse numbers, non-empty Arabic, and non-empty Bengali translation | Earlier spot checks only; not complete |
 
-The 16–20 batch was retrieved from the main branch and checked for record completeness and paired Arabic/translation fields. This ledger entry is intentionally not counted as scholarly semantic validation. No Quran-data JSON was changed in this continuation because no correction was established from a complete verse-by-verse comparison of this batch. Surahs 21–104 remain an explicit gap and must not be described as audited.
+The 16–114 range contains 4,531 records in this repository snapshot. The 16–104 range contains 4,335 records only when counted through Surah 104; the table above reports Surahs 21–104 as 3,753 and Surahs 16–20 as 582.
+
+## Corrections already documented
+
+- 6:10 — corrected the grammatical role of the consequence surrounding the mockers.
+- 6:14 — restored the first-person predicate in **أَوَّلَ مَنْ أَسْلَمَ** (“the first Muslim”).
+- 15:59 — restored the exception in **إِلَّا آلَ لُوطٍ** (“except the family of Lot”).
+- 113:4 — removed the unsupported narrowing “all women” from **النَّفَّاثَاتِ فِي الْعُقَدِ**.
+
+## Verification performed in this continuation
+
+For Surahs 16–114, each JSON file on the main branch was parsed and checked for:
+
+1. the expected Surah file and JSON object;
+2. contiguous verse numbering beginning at 1;
+3. a non-empty Arabic field for every record;
+4. a non-empty Bengali translation field for every record.
+
+No Arabic, translation, pronunciation, or website-design field was changed by these structural checks.
+
+## Required independent review
+
+A complete scholarly assurance claim still requires a qualified Quran/Arabic scholar to review every verse against the Arabic text and reputable tafsir/translation sources, with disputed interpretive choices explicitly recorded. Structural checks and language-model review are useful triage, but are not a substitute for that independent review. Until that review is completed, the project must not label Surahs 6–114 as fully semantically validated.

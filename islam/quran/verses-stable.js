@@ -15,6 +15,7 @@ const requestPronunciation=()=>{
   const surah=image.dataset.sourceSurah,ayah=image.dataset.sourceAyah;
   image.src=pronunciationBase+surah+'/'+surah+'-'+ayah+'.png';
  });
+ announcePronunciation();
 };
 pronunciationToggle?.addEventListener('change',()=>{if(pronunciationToggle.checked)requestPronunciation()});
 const makePronunciation=(ayah,alt)=>{

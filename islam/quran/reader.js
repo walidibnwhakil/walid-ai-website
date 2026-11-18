@@ -96,18 +96,6 @@
     copy(documentFragment.body.firstElementChild, wrap);
     parent.append(wrap);
   }
-  function sourceCredit(parent) {
-    const foot = document.createElement('p');
-    foot.className = 'quran-source-credit';
-    foot.append(document.createTextNode('উৎস-নোট: '));
-    const link = document.createElement('a');
-    link.href = 'https://quranenc.com/en/browse/bengali_zakaria';
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = 'QuranEnc — আবূ বকর যাকারিয়া';
-    foot.append(link);
-    parent.append(foot);
-  }
   function getNotes() {
     if (!notesPromise) notesPromise = fetchJSON('data/notes-' + String(n).padStart(3, '0') + '.json')
       .then(data => {
@@ -159,7 +147,7 @@
         const excerpt = sourceExcerpt(notes, key === 'virtue' ? /ফযীলত|ফজিলত|ফজীলত/ : /নাযিল|নাজিল|নুযুল|অবতীর্ণ/);
         if (excerpt) {
           noteText(panel, excerpt);
-          sourceCredit(panel);
+
           simpleParagraph(panel, 'উৎস-নোটে উল্লেখিত বর্ণনাগুলোর সনদ এখানে আলাদাভাবে যাচাই করা হয়নি।', 'quran-source-credit');
         } else {
           simpleParagraph(panel, key === 'virtue' ? 'এই সূরার নির্দিষ্ট ফযীলত সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।' : 'এই সূরার নাজিলের বিস্তারিত ইতিহাস সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।');
@@ -179,7 +167,7 @@
         if (first) {
           const virtueHeading = first.text.search(/<b[^>]*>[^<]*(?:ফযীলত|ফজিলত|ফজীলত)[^<]*<\/b>/i);
           noteText(panel, virtueHeading > 0 ? first.text.slice(0, virtueHeading) : first.text);
-          sourceCredit(panel);
+
         }
         else simpleParagraph(panel, 'এই সূরার অতিরিক্ত পরিচিতিমূলক উৎস-নোট পাওয়া যায়নি।');
       }).catch(() => {
@@ -196,7 +184,7 @@
           simpleParagraph(panel, 'এই সূরার জন্য যাচাইকৃত উৎস-নোট পাওয়া যায়নি।');
           return;
         }
-        sourceCredit(panel);
+
         const verseByNumber = new Map([...verses.querySelectorAll('.ayah[data-verse]')].map(card => [Number(card.dataset.verse), card]));
         for (const note of notes) {
           const entry = document.createElement('article');
@@ -219,7 +207,7 @@
           noteText(entry, note.text);
           panel.append(entry);
         }
-        sourceCredit(panel);
+
       }).catch(() => {
         if (sectionVersion === version) loading.textContent = 'ব্যাখ্যা-নোট এখন লোড করা যাচ্ছে না।';
       });

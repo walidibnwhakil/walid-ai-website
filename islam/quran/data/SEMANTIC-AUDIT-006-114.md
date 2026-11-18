@@ -16,3 +16,13 @@ Arabic text, verse numbering, pronunciation fields, JSON structure, Surahs 1–5
 ## Scope and remaining work
 
 The above four verses were individually checked and changed. Spot checks were also performed on Surahs 6–15 and 105–114 without finding additional changes meeting the high-confidence semantic-error threshold in this pass. Surahs 16–104 still require a verse-by-verse semantic audit; therefore the project must not describe Surahs 6–114 as fully validated.
+
+## Coverage ledger (2026-11-18 continuation)
+
+| Surahs | Verse records present | Arabic/translation fields present | Semantic status |
+|---|---:|---|---|
+| 16–20 | 582 | Yes for all 582 records | Not yet certified verse-by-verse |
+| 21–104 | — | — | Pending substantive audit |
+| 105–114 | — | — | Earlier spot-check only; not certified complete |
+
+The 16–20 batch was retrieved from the main branch and checked for record completeness and paired Arabic/translation fields. This ledger entry is intentionally not counted as scholarly semantic validation. No Quran-data JSON was changed in this continuation because no correction was established from a complete verse-by-verse comparison of this batch. Surahs 21–104 remain an explicit gap and must not be described as audited.

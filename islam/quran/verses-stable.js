@@ -19,14 +19,14 @@ const requestPronunciation=()=>{
 pronunciationToggle?.addEventListener('change',()=>{if(pronunciationToggle.checked)requestPronunciation()});
 const makePronunciation=(ayah,alt)=>{
  const image=document.createElement('img');
- image.className='pronunciation';
+ image.className='pronunciation pronunciation-image';
  image.alt=alt;
  image.loading='lazy';
  image.decoding='async';
  image.hidden=true;
  image.dataset.sourceSurah=String(n);
  image.dataset.sourceAyah=String(ayah);
- image.style.display='block';
+ 
  image.style.maxWidth='100%';
  image.style.height='auto';
  image.style.margin='10px auto 0';

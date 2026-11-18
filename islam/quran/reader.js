@@ -42,10 +42,20 @@
   pronunciationNote.textContent = 'বাংলা উচ্চারণটি সহায়ক পাঠ; শুদ্ধ তিলাওয়াতের বিকল্প নয়।';
   pronunciationNote.hidden = true;
   tools.append(pronunciationNote);
+  const pronunciationStatus = document.createElement('p');
+  pronunciationStatus.className = 'pronunciation-availability';
+  pronunciationStatus.setAttribute('role', 'status');
+  pronunciationStatus.textContent = 'শুধু যাচাইকৃত আয়াতের উচ্চারণ দেখানো হয়; বাকি আয়াতগুলো যাচাইাধীন।';
+  pronunciationStatus.hidden = true;
+  tools.append(pronunciationStatus);
 
   function refreshPronunciation() {
-    for (const node of verses.querySelectorAll('.pronunciation,.basmala-pronunciation')) node.hidden = !pronunciation.checked;
+    const verified = verses.querySelectorAll('.pronunciation[data-verified="true"]');
+    for (const node of verses.querySelectorAll('.pronunciation,.basmala-pronunciation')) {
+      node.hidden = !pronunciation.checked || (node.classList.contains('pronunciation') && node.dataset.verified !== 'true');
+    }
     pronunciationNote.hidden = !pronunciation.checked;
+    pronunciationStatus.hidden = !pronunciation.checked || verified.length > 0;
   }
   pronunciation.addEventListener('change', refreshPronunciation);
   new MutationObserver(refreshPronunciation).observe(verses, {childList: true});

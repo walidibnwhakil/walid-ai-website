@@ -745,3 +745,11 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 .surah-head .hero-arabic{grid-column:2!important;grid-row:2!important;justify-self:center!important;width:100%!important;font-size:clamp(2rem,4vw,3.4rem)!important;}
 .surah-head .banner-meaning{grid-column:1 / -1!important;grid-row:3!important;justify-self:center!important;margin:0!important;font-size:clamp(1rem,2vw,1.25rem)!important;}
 @media(max-width:899px){.surah-head{display:flex!important;flex-direction:column!important;gap:5px!important;padding:20px 14px!important}.surah-head .banner-meta{order:0!important;font-size:.8rem!important;padding:5px 14px!important}.surah-head #surah-title{order:1!important;font-size:clamp(1.6rem,7vw,2.4rem)!important}.surah-head .hero-arabic{order:2!important;font-size:clamp(1.8rem,7vw,2.6rem)!important}.surah-head .banner-meaning{order:3!important;font-size:.9rem!important}}
+
+/* Exact approved banner composition. */
+.surah-head{grid-template-columns:minmax(0,1fr) minmax(230px,.72fr)!important;grid-template-rows:auto 1fr auto!important;}
+.surah-head #surah-title{grid-column:1 / -1!important;grid-row:2!important;justify-self:center!important;text-align:center!important;}
+.surah-head .hero-arabic{grid-column:2!important;grid-row:2!important;justify-self:center!important;}
+.surah-head .hero-arabic:before,.surah-head .hero-arabic:after{content:"";display:block!important;width:150px!important;height:2px!important;margin:8px auto!important;background:linear-gradient(90deg,transparent,#f4d477,transparent)!important;opacity:1!important;}
+.surah-head .banner-meaning{grid-column:1 / -1!important;grid-row:3!important;text-align:center!important;color:#f5dc8b!important;}
+@media(max-width:899px){.surah-head{display:flex!important}.surah-head #surah-title,.surah-head .hero-arabic,.surah-head .banner-meaning{width:100%!important}.surah-head .hero-arabic:before,.surah-head .hero-arabic:after{width:120px!important}}

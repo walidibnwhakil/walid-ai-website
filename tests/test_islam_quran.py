@@ -166,10 +166,26 @@ class QuranIntegrityTests(unittest.TestCase):
         for surah, bn in zip(self.surahs, bengali):
             page = (QURAN / surah["slug"] / "index.html").read_text(encoding="utf-8")
             self.assertIn('id="surah-title"', page, surah["slug"])
-            self.assertIn('id="surah-subtitle"', page, surah["slug"])
-            self.assertIn('class="eyebrow"', page, surah["slug"])
+            self.assertIn('class="banner-meta"', page, surah["slug"])
+            self.assertIn('class="banner-meaning"', page, surah["slug"])
             self.assertIn('src="/islam/quran/reader.js"', page, surah["slug"])
             self.assertTrue(bn["title"].strip() and bn["meaning"].strip())
+
+    def test_every_rendered_banner_has_bengali_contract(self):
+        """Static rendered-banner contract: no transliteration is shipped in the hero."""
+        bengali = {row["number"]: row for row in json.loads((DATA / "bengali-metadata.json").read_text(encoding="utf-8"))}
+        metadata = {row["number"]: row for row in self.surahs}
+        for number in range(1, 115):
+            page = (QURAN / metadata[number]["slug"] / "index.html").read_text(encoding="utf-8")
+            banner = re.search(r'<header class="surah-head">(.*?)</header>', page, re.S)
+            self.assertIsNotNone(banner, number)
+            hero = banner.group(1)
+            self.assertRegex(hero, r'class="banner-meta">সূরা [০-৯]+ · (?:মাক্কি|মাদানি) · [০-৯]+ আয়াত', number)
+            self.assertIn(f'সূরা {bengali[number]["title"]}', hero, number)
+            self.assertIn(f'class="hero-arabic"', hero, number)
+            self.assertIn(metadata[number]["arabicName"], hero, number)
+            self.assertIn(f'class="banner-meaning">{bengali[number]["meaning"]}', hero, number)
+            self.assertNotIn(metadata[number]["transliteration"], hero, number)
 
 
 if __name__ == "__main__":

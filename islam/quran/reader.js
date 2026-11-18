@@ -44,9 +44,9 @@
   pronunciationStatus.hidden = true;
   tools.append(pronunciationStatus);
   function refreshPronunciation() {
-    const items = [...verses.querySelectorAll('.pronunciation[data-verified="true"]')];
-    for (const node of verses.querySelectorAll('.pronunciation')) {
-      node.hidden = !pronunciation.checked || node.dataset.verified !== 'true';
+    const items = [...verses.querySelectorAll('.pronunciation[data-verified="true"],.basmala-pronunciation')];
+    for (const node of verses.querySelectorAll('.pronunciation,.basmala-pronunciation')) {
+      node.hidden = !pronunciation.checked || (node.classList.contains('pronunciation') && node.dataset.verified !== 'true');
     }
     pronunciationStatus.hidden = !pronunciation.checked || items.length > 0;
   }

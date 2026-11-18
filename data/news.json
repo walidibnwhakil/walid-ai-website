@@ -1,14 +1,119 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-18T00:31:00.398465+00:00",
+  "updatedAt": "2026-11-18T09:43:15.451365+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Nvidia says it won't reinstate Huang as firm reports bumper results",
+      "title": "Ghana's new $60m presidential jet sparks public outrage",
+      "url": "https://www.bbc.co.uk/news/articles/ck792dez8dp3o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-18T09:27:51+00:00",
+      "category": "World"
+    },
+    {
+      "title": "RMG factory owners have 'no money,' workers can’t afford food, what’s the solution?",
+      "url": "https://en.prothomalo.com/opinion/op-ed/ko8szq4brd",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T09:20:40+00:00",
+      "category": "World"
+    },
+    {
+      "title": "CPD proposes Tk 18,578–Tk 24,204 wage range for garment workers",
+      "url": "https://en.prothomalo.com/bangladesh/ird6i3696y",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T08:26:21+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Rise Above All 10X set to take place on 27 November at KIB",
+      "url": "https://en.prothomalo.com/corporate/r784jqv17n",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T08:24:15+00:00",
+      "category": "World"
+    },
+    {
+      "title": "HC suspends admission tests at all public universities until 31 December",
+      "url": "https://en.prothomalo.com/youth/education/ydpeggpu8j",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T07:54:15+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Police vehicle set on fire, bomb-like object recovered on highway in Gazipur",
+      "url": "https://en.prothomalo.com/bangladesh/lhwyo75bdm",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T07:49:00+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Philippines police ask prosecutors to charge Thomas Markle over child sex abuse material",
+      "url": "https://www.bbc.co.uk/news/articles/ckg5ry8m49ggo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-18T07:48:18+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Inside Mirpur’s Benarasi Palli, where artisans weave tradition into a saree",
+      "url": "https://en.prothomalo.com/photo/3z26wq49wv",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T07:45:23+00:00",
+      "category": "World"
+    },
+    {
+      "title": "5 of travel vlogger Nadir’s favourite dishes from around the world",
+      "url": "https://en.prothomalo.com/lifestyle/k2y3s5wi3p",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T07:36:02+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Democrats win Alaska Senate race two weeks after midterms counting began",
+      "url": "https://www.bbc.co.uk/news/articles/cqev3v2ygzlvo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-18T07:00:25+00:00",
+      "category": "World"
+    },
+    {
+      "title": "2 buses torched in Pirojpur, helper found dead inside one",
+      "url": "https://en.prothomalo.com/bangladesh/local-news/iamudq3vov",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T06:52:11+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Govt calls bribery ‘gifts’, extortion ‘settlements’: Hasnat Abdullah",
+      "url": "https://en.prothomalo.com/bangladesh/parliament/84xmyaprrs",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T06:44:41+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Garment workers block Dhaka–Mymensingh highway; 39 factories shut",
+      "url": "https://en.prothomalo.com/bangladesh/local-news/wpgzy9y8iu",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-18T05:57:41+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Rubio says US not 'under systemic attack' after series of tech outages",
+      "url": "https://www.bbc.co.uk/news/articles/crkgvxxwpwz2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-18T04:57:06+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Nvidia says it won't reinstate Huang as it reports soaring sales",
       "url": "https://www.bbc.co.uk/news/articles/cm2kl50vkwkdo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-18T00:28:01+00:00",
+      "publishedAt": "2026-11-18T01:18:18+00:00",
       "category": "World"
+    },
+    {
+      "title": "As Trump and Xi meet, China's AI dreams face an unexpected hurdle: the Nvidia spy scandal",
+      "url": "https://www.bbc.co.uk/news/articles/c5vg23g92rj4o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T23:02:12+00:00",
+      "category": "Technology"
     },
     {
       "title": "American soldier arrested by UK police on suspicion of spying taken into US military custody",
@@ -18,25 +123,11 @@
       "category": "World"
     },
     {
-      "title": "Thomas Markle charged over child sex abuse material in Philippines",
-      "url": "https://www.bbc.co.uk/news/articles/ckg5ry8m49ggo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T22:44:15+00:00",
-      "category": "World"
-    },
-    {
       "title": "Putin's Crimean Bridge partly collapses as Zelensky hails 'unprecedented' attack by Ukraine",
       "url": "https://www.bbc.co.uk/news/articles/cw772jk4rvmxo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-17T21:24:35+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Russian military plane crashes, killing all 19 on board",
-      "url": "https://www.bbc.co.uk/news/articles/cw8085rykkmgo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T21:06:11+00:00",
-      "category": "World"
     },
     {
       "title": "US loses measles elimination status after 26 years amid record case numbers",
@@ -53,13 +144,6 @@
       "category": "World"
     },
     {
-      "title": "Trump in Asia ahead of talks with Russian and Chinese presidents",
-      "url": "https://www.bbc.co.uk/news/articles/crq5vlxxx32no?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T20:25:46+00:00",
-      "category": "World"
-    },
-    {
       "title": "William and Kate celebrate Earthshot Prize winners in Mumbai",
       "url": "https://www.bbc.co.uk/news/articles/cqlykve012d1o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -72,20 +156,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-17T17:19:57+00:00",
       "category": "World"
-    },
-    {
-      "title": "How the attack on Crimean Bridge unfolded",
-      "url": "https://www.bbc.co.uk/news/articles/crz9dgz28zwdo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T15:38:10+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Indian woman gang-raped while pregnant in 2002 'heartbroken' after two perpetrators bailed",
-      "url": "https://www.bbc.co.uk/news/articles/cr868wd2qg18o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T09:27:44+00:00",
-      "category": "Bangladesh"
     }
   ],
   "sources": [
@@ -99,7 +169,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": false
+      "ok": true
     },
     {
       "name": "BBC World",

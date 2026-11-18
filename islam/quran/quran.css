@@ -919,3 +919,7 @@ body.quran-reader-page #verses>.ayah.fatiha-basmala>.basmala-pronunciation{
 body.quran-reader-page #verses>.ayah.fatiha-basmala>.translation{
   margin:0!important;text-align:center!important;
 }
+
+/* Hidden must override the centered basmala display declarations. */
+body.quran-reader-page .basmala-pronunciation[hidden],
+body.quran-reader-page .basmala-meaning[hidden]{display:none!important}

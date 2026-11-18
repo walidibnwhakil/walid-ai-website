@@ -939,7 +939,7 @@ body.quran-reader-page .basmala-meaning[hidden]{display:none!important}
   box-shadow:none!important;
   object-fit:contain;
 }
-#verses .pronunciation-image[hidden]{
+#verses .ayah .pronunciation-image[hidden]{
   display:none!important;
 }
 body.quran-reader-page .pronunciation-credit{

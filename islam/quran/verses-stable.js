@@ -13,7 +13,7 @@ const requestPronunciation=()=>{
   image.addEventListener('load',()=>{delete image.dataset.loading;delete image.dataset.error;if(image.naturalWidth>0)image.dataset.verified='true';else image.dataset.error='true';announcePronunciation()},{once:true});
   image.addEventListener('error',()=>{delete image.dataset.loading;image.dataset.error='true';announcePronunciation()},{once:true});
   const surah=image.dataset.sourceSurah,ayah=image.dataset.sourceAyah;
-  image.src=pronunciationBase+surah+'/'+surah+'-'+ayah+'.png?retry='+Date.now();
+  image.src=pronunciationBase+surah+'/'+surah+'-'+ayah+'.png';
  });
 };
 pronunciationToggle?.addEventListener('change',()=>{if(pronunciationToggle.checked)requestPronunciation()});
@@ -23,6 +23,7 @@ const makePronunciation=(ayah,alt)=>{
  image.alt=alt;
  image.loading='lazy';
  image.decoding='async';
+ image.referrerPolicy='no-referrer';
  image.hidden=true;
  image.dataset.sourceSurah=String(n);
  image.dataset.sourceAyah=String(ayah);

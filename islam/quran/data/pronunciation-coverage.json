@@ -7,7 +7,7 @@
       1
     ],
     "complete_surah_count": 1,
-    "verses": 96,
+    "verses": 106,
     "coverage": [
       {
         "surah": 1,
@@ -16,8 +16,8 @@
       },
       {
         "surah": 2,
-        "verses": "2-90",
-        "basis": "2:2-3 confirmed/corrected by the user; 2:4-90 reviewed and corrected against repository Arabic text and the Bangladesh government transliteration reference, independently worded."
+        "verses": "2-100",
+        "basis": "2:2-3 confirmed/corrected by the user; 2:4-100 reviewed and corrected against repository Arabic text and the Bangladesh government transliteration reference, independently worded."
       }
     ],
     "note": "Only explicitly confirmed or individually rechecked ayahs are counted here."
@@ -26,10 +26,10 @@
     "branch": "feat/quran-bangla-pronunciation-text",
     "surahs": 114,
     "verses": 6236,
-    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 6140 await review."
+    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 6130 await review."
   },
   "pending": {
-    "verses": 6140,
+    "verses": 6130,
     "surahs_without_complete_coverage": 113,
     "fully_pending_surahs": 112,
     "partially_reviewed_surahs": [
@@ -99,6 +99,12 @@
       "verses": "81-90",
       "status": "reviewed_and_corrected",
       "commit": "d9cc77e98b67c2f75592fd1a7d7324c2e6b93adb"
+    },
+    {
+      "surah": 2,
+      "verses": "91-100",
+      "status": "reviewed_and_corrected",
+      "commit": "4d9466bd6dd190510981600a261a93b64dda25d7"
     }
   ],
   "uncertain_ayahs": []

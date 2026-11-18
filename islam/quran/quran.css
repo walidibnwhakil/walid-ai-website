@@ -759,3 +759,7 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 .surah-head .hero-arabic:before,.surah-head .hero-arabic:after{width:190px!important;margin:5px auto!important;}
 .surah-head .banner-meaning{grid-column:1 / -1!important;grid-row:3!important;transform:translateY(-22px)!important;z-index:4!important;}
 @media(max-width:899px){.surah-head .hero-arabic{transform:translate(0,-4px)!important}.surah-head .banner-meaning{transform:translateY(-10px)!important}}
+
+
+/* Keep the Bengali banner subtitle aligned with the approved composition. */
+.surah-head .subtitle{transform:translateY(-4px)}

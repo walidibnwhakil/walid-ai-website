@@ -763,3 +763,20 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 
 /* Keep the Bengali banner subtitle aligned with the approved composition. */
 .surah-head .subtitle{transform:translateY(-4px)}
+
+/* Quran approved tabbed reader layout */
+.quran-section-tabs{display:flex;gap:0;flex-wrap:wrap;margin:0 auto;border-bottom:1px solid var(--line);max-width:1120px}
+.quran-tab{border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);padding:12px 16px;font:inherit;cursor:pointer}
+.quran-tab[aria-selected="true"]{border-bottom-color:var(--gold);color:var(--green);font-weight:700}
+.quran-section-panel{max-width:1120px;margin:0 auto;width:100%}
+.quran-section-panel>h2{font-size:1.35rem;margin:20px 0 10px}
+.section-note{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0;background:var(--paper)}
+.section-note h3{margin:0 0 6px;font-size:1rem}
+.quran-sidebar{display:block;width:100%;margin:0 auto 16px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,253,248,.94)}
+.quran-sidebar h2{font-size:1.15rem;margin:0 0 8px}
+.quran-sidebar .side-list{display:flex;gap:4px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:thin}
+.quran-sidebar .side-list>a{display:flex;align-items:center;gap:7px;flex:0 0 auto;padding:6px 9px;border-radius:9px;text-decoration:none;color:var(--ink)}
+.quran-sidebar .side-list>a.current{background:var(--green);color:white}
+.quran-sidebar .side-num{font-weight:700}.quran-sidebar .side-copy small{display:block;font-size:.72rem;opacity:.8}
+@media(min-width:900px){.shell{display:grid;grid-template-columns:240px minmax(0,1fr);column-gap:18px}.shell>.islam-brand,.shell>.breadcrumbs,.shell>.surah-head,.shell>.quran-section-tabs,.shell>.quran-section-panel,.shell>.surah-pager,.shell>.source-footer{grid-column:2}.quran-sidebar{grid-column:1;grid-row:3 / span 4;position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);margin:0}.quran-sidebar .side-list{display:flex;flex-direction:column;max-height:calc(100vh - 105px);overflow-y:auto;overflow-x:hidden}.quran-sidebar .side-list>a{min-height:44px}.quran-sidebar .side-list>a.current{box-shadow:0 4px 10px #0e5a4028}.quran-tab{padding-inline:14px}}
+@media(max-width:899px){.quran-sidebar{order:3}.quran-section-tabs{order:4}.quran-section-panel{order:5}}

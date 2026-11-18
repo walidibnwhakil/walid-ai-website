@@ -6,9 +6,9 @@ The verse text is reproduced verbatim from the QPC Hafs (King Fahd Complex for P
 
 The source snapshot was obtained from `risan/quran-json` (version 4.0.0, CC BY-SA 4.0), which documents and checks the upstream source licence. The extracted text values remain governed by the source-specific terms above. See <https://github.com/risan/quran-json> and <https://github.com/risan/quran-json/blob/main/LICENSE.txt>.
 
-## Bengali translation and translator notes
+## Bengali translation
 
-বাংলা অনুবাদ: ড. আবূ বকর মুহাম্মাদ যাকারিয়া (Abu Bakr Zakaria), QuranEnc.com, edition `bengali_zakaria`, version 1.1.1. Official source: <https://quranenc.com/bn/browse/bengali_zakaria/>. The original verse translation and footnote text are retained verbatim. QuranEnc’s reuse conditions require no changes to the translation, clear publisher/source credit, edition version, preservation of transcript/source information, reporting translation notes to QuranEnc, updates to later editions, and no inappropriate advertisements alongside the translation. Terms: <https://quranenc.com/en/home/api>.
+বাংলা অনুবাদ: মাওলানা মুহিউদ্দীন খান (Muhiuddin Khan), machine-readable edition `quran-json@3.1.2` (`dist/chapters/bn/{1..114}.json`). The source page <https://al-quran.kaizar.us/sources> declares this edition as Muhiuddin Khan, with provenance `quran-json (Risan Bagja Pradana)` and translations from <https://tanzil.net/>; declared licence: <https://creativecommons.org/licenses/by-sa/4.0/> CC BY-SA 4.0. Source files were fetched verbatim; no translation text, punctuation, or notes were invented or paraphrased. All 114 chapter files were checked: 6,236 verses total. The reader checks source counts and renders the source `translation` string unchanged. Separate attribution page: <https://walid-ai.com/islam/quran/credits/>.
 
 ## Surah metadata
 

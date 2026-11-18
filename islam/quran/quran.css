@@ -864,3 +864,23 @@ body.quran-reader-page .quran-explanation .quran-source-note{line-height:1.9}
 body.quran-reader-page .quran-section-tabs{max-width:none!important;width:100%!important}
 body.quran-reader-page .quran-section-panel{max-width:none!important}
 body.quran-reader-page .quran-section-panel>h2{margin-top:8px!important}
+
+
+/* Correct the revelation tab's large vertical displacement: the 114-surah
+   sidebar must not contribute intrinsic height to the banner/tab grid rows. */
+@media(min-width:900px){
+  body.quran-reader-page .shell{position:relative!important;align-content:start!important;grid-template-rows:repeat(5,max-content) minmax(0,1fr)!important}
+  body.quran-reader-page .shell>.quran-sidebar{
+    position:absolute!important;grid-column:1!important;grid-row:auto!important;
+    top:76px!important;left:0!important;width:240px!important;
+    height:min(760px,calc(100dvh - 100px))!important;
+    max-height:calc(100dvh - 100px)!important;
+    min-height:0!important;overflow:hidden!important;
+  }
+  body.quran-reader-page .shell>.quran-sidebar .side-list{
+    max-height:calc(100dvh - 185px)!important;overflow-y:auto!important;
+  }
+  body.quran-reader-page .shell>.surah-head{margin-bottom:0!important}
+  body.quran-reader-page .shell>.quran-section-tabs{margin-top:0!important;margin-bottom:0!important}
+  body.quran-reader-page .shell>.quran-section-panel{margin-top:0!important;align-self:start!important}
+}

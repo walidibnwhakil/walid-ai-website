@@ -154,6 +154,23 @@ class QuranIntegrityTests(unittest.TestCase):
                 self.assertIn(f'href="{href}"', text, page)
             self.assertIn('class="copyright"', text, page)
 
+    def test_bengali_banner_runtime_updates_every_surah_dom(self):
+        """Guard the actual page contract: JS must run and populate Bengali banner fields."""
+        bengali = json.loads((DATA / "bengali-metadata.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(bengali), 114)
+        self.assertEqual({row["number"] for row in bengali}, set(range(1, 115)))
+        self.assertTrue(all(re.search(r"[\\u0980-\\u09ff]", row["title"] + row["meaning"]) for row in bengali))
+        reader = (QURAN / "reader.js").read_text(encoding="utf-8")
+        self.assertIn("bengali-metadata.json", reader)
+        self.assertRegex(reader, r"updateHeader\\(\\);\\s*$")
+        for surah, bn in zip(self.surahs, bengali):
+            page = (QURAN / surah["slug"] / "index.html").read_text(encoding="utf-8")
+            self.assertIn('id="surah-title"', page, surah["slug"])
+            self.assertIn('id="surah-subtitle"', page, surah["slug"])
+            self.assertIn('class="eyebrow"', page, surah["slug"])
+            self.assertIn('src="/islam/quran/reader.js"', page, surah["slug"])
+            self.assertTrue(bn["title"].strip() and bn["meaning"].strip())
+
 
 if __name__ == "__main__":
     unittest.main()

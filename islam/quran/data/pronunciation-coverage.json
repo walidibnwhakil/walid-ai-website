@@ -1,14 +1,36 @@
 {
-  "version": 1,
-  "updated": "2026-11-17",
-  "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated.",
+  "version": 2,
+  "updated": "2026-11-19",
+  "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated. User-approved conventions: preserve the Arabic ayah, use readable Bengali phonetic spelling, and end each line with Bengali danda (।). Bengali transliteration is a reading aid, not tajwid instruction.",
   "verified": {
-    "surah": 1,
-    "verses": 7
+    "complete_surahs": [1],
+    "complete_surah_count": 1,
+    "verses": 9,
+    "coverage": [
+      {
+        "surah": 1,
+        "verses": "1-7",
+        "basis": "Previously reviewed coverage recorded in version 1."
+      },
+      {
+        "surah": 2,
+        "verses": "2-3",
+        "basis": "User confirmed 2:2 and supplied/corrected 2:3 in the prior Work conversation."
+      }
+    ],
+    "note": "Only these nine ayahs are counted as reviewed. No other draft line is treated as checked by inference."
+  },
+  "draft_candidates": {
+    "branch": "feat/quran-bangla-pronunciation-text",
+    "surahs": 114,
+    "verses": 6236,
+    "status": "Text fields exist for every ayah; the remaining 6227 are unreviewed candidates, not verified pronunciation."
   },
   "pending": {
-    "surahs": 113,
-    "verses": 6229
+    "verses": 6227,
+    "surahs_without_complete_coverage": 113,
+    "fully_pending_surahs": 112,
+    "partially_reviewed_surahs": [2]
   },
-  "source": "Walid AI review of quran.gov.bd pronunciation; government source is linked for uncovered verses."
+  "source": "Arabic ayah text in the repository; verified coverage is based only on recorded review and explicit user confirmation. Bangladesh government pronunciation source remains linked for uncovered verses."
 }

@@ -61,6 +61,28 @@ jobs:
                 const b=document.querySelector('#verses>.basmala .arabic');
                 return {n,count:cards.length,arabic:all.every(x=>x.text&&x.visible),basmala:!!b&&!!b.textContent.trim()&&b.getBoundingClientRect().height>0};
               });
+              await page.waitForFunction(()=>document.querySelectorAll('.quran-sidebar .side-list a').length===114,null,{timeout:6000});
+              const reader=await page.evaluate(()=>({
+                tabLabels:[...document.querySelectorAll('.quran-tab')].map(t=>t.textContent.trim()),
+                sidebarLinks:document.querySelectorAll('.quran-sidebar .side-list a').length,
+                selected:document.querySelector('.quran-tab[aria-selected="true"]')?.textContent.trim(),
+                arabicOnly:![...document.querySelectorAll('#verses .translation')].some(x=>!x.hidden),
+                translationOff:document.querySelector('#show-translation')?.checked===false,
+                pronunciationOff:document.querySelector('#show-pronunciation')?.checked===false,
+                oldNotesRemoved:!document.querySelector('#show-notes')
+              }));
+              if(JSON.stringify(reader.tabLabels)!==JSON.stringify(['সূরা','সূরা পরিচিতি','ফযীলত','নাজিলের ইতিহাস','ব্যাখ্যা'])||
+                reader.sidebarLinks!==114||reader.selected!=='সূরা'||!reader.arabicOnly||
+                !reader.translationOff||!reader.pronunciationOff||!reader.oldNotesRemoved)throw Error('READER CONTROLS '+JSON.stringify({slug,reader,errors}));
+              if(result.n===3){
+                await page.locator('#show-translation').check();
+                if(await page.locator('#verses .translation:not([hidden])').count()<1)throw Error('Bengali meaning toggle did not reveal translations');
+                await page.locator('[data-section="intro"]').click();
+                if(!await page.locator('.quran-section-panel h2').getByText('সূরা পরিচিতি').count())throw Error('Introduction tab not visible');
+                await page.locator('[data-section="surah"]').click();
+                if(await page.locator('#verses>.ayah:not(.basmala)').count()!==200)throw Error('Returning to Surah tab lost verses');
+                await page.screenshot({path:'quran-reader-mobile.png'});
+              }
               const expected=JSON.parse(fs.readFileSync('islam/quran/data/surah-'+String(result.n).padStart(3,'0')+'.json')).verses.length;
               if(result.count!==expected||!result.arabic||(result.n!==1&&result.n!==9&&!result.basmala))throw Error(JSON.stringify({slug,result,expected,errors}));
               total+=result.count;
@@ -68,6 +90,28 @@ jobs:
             }
             if(total!==6236)throw Error('Total verses '+total);
             console.log('PASS ALL 114 SURAHS, 6236 VISIBLE ARABIC VERSES, BASMALA WHERE APPLICABLE');
+            const desktop=await browser.newPage({viewport:{width:1366,height:900}});
+            await desktop.goto('http://127.0.0.1:8765/islam/quran/aal-i-imraan/',{waitUntil:'domcontentloaded'});
+            await desktop.waitForFunction(()=>document.querySelectorAll('.quran-sidebar .side-list a').length===114 && document.querySelectorAll('#verses>.ayah:not(.basmala)').length===200);
+            const layout=await desktop.evaluate(()=>{
+              const sidebar=document.querySelector('.quran-sidebar'),banner=document.querySelector('.surah-head'),list=document.querySelector('.quran-sidebar .side-list'),tabs=document.querySelector('.quran-section-tabs');
+              return {sidebarLeft:sidebar.getBoundingClientRect().left,bannerLeft:banner.getBoundingClientRect().left,
+                listScrolls:list.scrollHeight>list.clientHeight,overflowY:getComputedStyle(list).overflowY,
+                gap:tabs.getBoundingClientRect().top-banner.getBoundingClientRect().bottom};
+            });
+            if(layout.sidebarLeft>=layout.bannerLeft||!layout.listScrolls||layout.overflowY!=='auto'||layout.gap>25)throw Error('DESKTOP LAYOUT '+JSON.stringify(layout));
+            await desktop.screenshot({path:'quran-reader-desktop.png'});
+            await desktop.close();
             await browser.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           JS
+
+      - name: Upload reader screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quran-reader-screenshots
+          path: |
+            quran-reader-mobile.png
+            quran-reader-desktop.png
+          if-no-files-found: ignore

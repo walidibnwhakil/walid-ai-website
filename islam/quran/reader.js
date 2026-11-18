@@ -117,6 +117,21 @@
     return notesPromise;
   }
 
+  function sourceExcerpt(notes, matcher) {
+    for (const note of notes) {
+      const headings = [...note.text.matchAll(/<b[^>]*>[\s\S]*?<\/b>/gi)];
+      for (let index = 0; index < headings.length; index++) {
+        const heading = headings[index][0].replace(/<[^>]*>/g, '').trim();
+        if (!matcher.test(heading)) continue;
+        const start = headings[index].index;
+        const end = index + 1 < headings.length ? headings[index + 1].index : note.text.length;
+        const excerpt = note.text.slice(start, end);
+        if (excerpt.replace(/<[^>]*>/g, '').trim().length > heading.length + 8) return excerpt;
+      }
+    }
+    return '';
+  }
+
   function showSection(key) {
     activeSection = key;
     const version = ++sectionVersion;
@@ -135,13 +150,23 @@
     const heading = document.createElement('h2');
     heading.textContent = tabDefs.find(item => item[0] === key)[1];
     panel.append(heading);
-    if (key === 'virtue') {
-      simpleParagraph(panel, 'এই সূরার বিশেষ ফযীলত সম্পর্কে আলাদাভাবে যাচাইকৃত তথ্য বর্তমানে উপলভ্য নয়। আয়াতের ব্যাখ্যা দেখতে ব্যাখ্যা বিভাগে যান।');
-      return;
-    }
-    if (key === 'revelation') {
-      if (surahMeta) simpleParagraph(panel, 'নাজিলের স্থানভিত্তিক পরিচয়: ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + ' সূরা।');
-      simpleParagraph(panel, 'নাজিলের বিস্তারিত ইতিহাস সম্পর্কে স্বতন্ত্রভাবে যাচাইকৃত তথ্য বর্তমানে উপলভ্য নয়।');
+    if (key === 'virtue' || key === 'revelation') {
+      if (key === 'revelation' && surahMeta) simpleParagraph(panel, 'নাজিলের স্থানভিত্তিক পরিচয়: ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + ' সূরা।');
+      const loading = simpleParagraph(panel, 'এই বিষয়ের উৎস-নোট লোড হচ্ছে…');
+      getNotes().then(notes => {
+        if (sectionVersion !== version) return;
+        loading.remove();
+        const excerpt = sourceExcerpt(notes, key === 'virtue' ? /ফযীলত|ফজিলত|ফজীলত/ : /নাযিল|নাজিল|নুযুল|অবতীর্ণ/);
+        if (excerpt) {
+          noteText(panel, excerpt);
+          sourceCredit(panel);
+          simpleParagraph(panel, 'উৎস-নোটে উল্লেখিত বর্ণনাগুলোর সনদ এখানে আলাদাভাবে যাচাই করা হয়নি।', 'quran-source-credit');
+        } else {
+          simpleParagraph(panel, key === 'virtue' ? 'এই সূরার নির্দিষ্ট ফযীলত সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।' : 'এই সূরার নাজিলের বিস্তারিত ইতিহাস সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।');
+        }
+      }).catch(() => {
+        if (sectionVersion === version) loading.textContent = 'এই বিষয়ের উৎস-নোট এখন লোড করা যাচ্ছে না।';
+      });
       return;
     }
     if (key === 'intro') {
@@ -151,7 +176,11 @@
         if (sectionVersion !== version) return;
         loading.remove();
         const first = notes.find(note => note.verse === 1 && /সূরা|নামকরণ|নাযিল|নাজিল/.test(note.text.slice(0,500)));
-        if (first) { noteText(panel, first.text); sourceCredit(panel); }
+        if (first) {
+          const virtueHeading = first.text.search(/<b[^>]*>[^<]*(?:ফযীলত|ফজিলত|ফজীলত)[^<]*<\/b>/i);
+          noteText(panel, virtueHeading > 0 ? first.text.slice(0, virtueHeading) : first.text);
+          sourceCredit(panel);
+        }
         else simpleParagraph(panel, 'এই সূরার অতিরিক্ত পরিচিতিমূলক উৎস-নোট পাওয়া যায়নি।');
       }).catch(() => {
         if (sectionVersion === version) loading.textContent = 'সূরার পরিচিতিমূলক উৎস-নোট এখন লোড করা যাচ্ছে না।';

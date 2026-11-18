@@ -726,3 +726,10 @@ body,button,input{font-family:"SolaimanLipi","Noto Sans Bengali",system-ui,sans-
 .surah-head .hero-art{background-image:url("/assets/quran-banner-approved.png")!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;opacity:1!important;}
 @media(max-width:899px){.surah-head{min-height:180px!important;padding:18px 14px!important;background-image:url("/assets/quran-banner-approved.png")!important;background-position:center!important;background-size:cover!important;}.surah-head .hero-art{opacity:.28!important;background-size:cover!important;}.surah-head #surah-title,.surah-head .hero-arabic,.surah-head .banner-meaning{color:#fff8dc!important;text-shadow:0 2px 3px #06291dcc!important;}}
 @media(min-width:900px){.surah-head{height:260px!important;min-height:260px!important;background-image:url("/assets/quran-banner-approved.png")!important;background-position:center!important;background-size:cover!important;}.surah-head .hero-art{display:none!important;}.surah-head #surah-title{color:#fff!important;text-shadow:0 3px 3px #06291dcc!important;}.surah-head .hero-arabic{color:#f4d477!important;text-shadow:0 2px 3px #06291dcc!important;}}
+
+
+/* Final exact-banner lock: render the supplied artwork as the complete hero. */
+.surah-head{height:clamp(140px,33.333vw,380px)!important;min-height:0!important;padding:0!important;display:block!important;clip-path:none!important;border:0!important;border-radius:0!important;background-color:#06422f!important;background-image:url("/assets/quran-banner-approved.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:100% 100%!important;box-shadow:none!important;}
+.surah-head::before,.surah-head::after{display:none!important;content:none!important;}
+.surah-head .hero-art{display:none!important;}
+.surah-head #surah-title,.surah-head .hero-arabic,.surah-head .banner-meaning{display:none!important;}

@@ -7,7 +7,7 @@
       1
     ],
     "complete_surah_count": 1,
-    "verses": 286,
+    "verses": 291,
     "coverage": [
       {
         "surah": 1,
@@ -48,6 +48,11 @@
         "surah": 2,
         "verses": "271-280",
         "basis": "Rechecked against repository Arabic text and Bangladesh government Quran transliteration source; independently phrased in project Bengali style."
+      },
+      {
+        "surah": 2,
+        "verses": "281, 283-286",
+        "basis": "Rechecked against repository Arabic text and Bangladesh government Quran transliteration source; independently phrased in project Bengali style. Verse 282 remains pending."
       }
     ],
     "note": "Only explicitly confirmed or individually rechecked ayahs are counted here."
@@ -56,10 +61,10 @@
     "branch": "feat/quran-bangla-pronunciation-text",
     "surahs": 114,
     "verses": 6236,
-    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5950 await review."
+    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5945 await review."
   },
   "pending": {
-    "verses": 5950,
+    "verses": 5945,
     "surahs_without_complete_coverage": 113,
     "fully_pending_surahs": 112,
     "partially_reviewed_surahs": [
@@ -243,7 +248,19 @@
       "verses": "271-280",
       "status": "reviewed_and_corrected",
       "commit": "451b2749dddd2f4a53d3e10598ed16208b2bb7f5"
+    },
+    {
+      "surah": 2,
+      "verses": "281, 283-286",
+      "status": "reviewed_and_corrected",
+      "commit": "2d140d82161d61a7e89d1b2e11abd137a778f2fe"
     }
   ],
-  "uncertain_ayahs": []
+  "uncertain_ayahs": [
+    {
+      "surah": 2,
+      "ayah": 282,
+      "reason": "The verse is exceptionally long and the government reference's printed transliteration extraction was incomplete; left its draft unchanged and unverified for user review."
+    }
+  ]
 }

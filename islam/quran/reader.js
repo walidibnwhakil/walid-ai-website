@@ -148,7 +148,7 @@
         if (excerpt) {
           noteText(panel, excerpt);
 
-          simpleParagraph(panel, 'উৎস-নোটে উল্লেখিত বর্ণনাগুলোর সনদ এখানে আলাদাভাবে যাচাই করা হয়নি।', 'quran-source-credit');
+
         } else {
           simpleParagraph(panel, key === 'virtue' ? 'এই সূরার নির্দিষ্ট ফযীলত সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।' : 'এই সূরার নাজিলের বিস্তারিত ইতিহাস সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।');
         }

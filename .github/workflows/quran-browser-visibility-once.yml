@@ -38,7 +38,7 @@ jobs:
             page.setDefaultNavigationTimeout(8000);
             page.on('requestfailed',r=>console.log('REQUEST FAILED',r.url(),r.failure()?.errorText));
             page.on('console',m=>{if(m.type()==='error')console.log('CONSOLE ERROR',m.text())});
-            const dirs=fs.readdirSync('islam/quran',{withFileTypes:true}).filter(d=>d.isDirectory()&&fs.existsSync(path.join('islam/quran',d.name,'index.html'))).map(d=>d.name).sort();
+            const dirs=fs.readdirSync('islam/quran',{withFileTypes:true}).filter(d=>d.isDirectory()&&d.name!=='credits'&&fs.existsSync(path.join('islam/quran',d.name,'index.html'))).map(d=>d.name).sort();
             if(dirs.length!==114)throw Error('Expected 114 pages; found '+dirs.length);
             let total=0;
             for(const slug of dirs){

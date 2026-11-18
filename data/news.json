@@ -1,55 +1,76 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-17T17:22:27.654485+00:00",
+  "updatedAt": "2026-11-18T00:31:00.398465+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Jensen Huang pushes Nvidia comeback after board rejects pressure to reinstate ex-boss",
-      "url": "https://www.bbc.co.uk/news/articles/cwx2en2vrxmdo?at_medium=RSS&at_campaign=rss",
+      "title": "Nvidia says it won't reinstate Huang as firm reports bumper results",
+      "url": "https://www.bbc.co.uk/news/articles/cm2kl50vkwkdo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T17:19:56+00:00",
+      "publishedAt": "2026-11-18T00:28:01+00:00",
       "category": "World"
     },
     {
-      "title": "US loses measles elimination status after 26 years amid record case numbers",
-      "url": "https://www.bbc.co.uk/news/articles/c977p71jx0xxo?at_medium=RSS&at_campaign=rss",
+      "title": "American soldier arrested by UK police on suspicion of spying taken into US military custody",
+      "url": "https://www.bbc.co.uk/news/articles/c6x284ez38vdo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T17:10:03+00:00",
+      "publishedAt": "2026-11-17T22:46:30+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Thomas Markle charged over child sex abuse material in Philippines",
+      "url": "https://www.bbc.co.uk/news/articles/ckg5ry8m49ggo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T22:44:15+00:00",
       "category": "World"
     },
     {
       "title": "Putin's Crimean Bridge partly collapses as Zelensky hails 'unprecedented' attack by Ukraine",
       "url": "https://www.bbc.co.uk/news/articles/cw772jk4rvmxo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T16:56:38+00:00",
+      "publishedAt": "2026-11-17T21:24:35+00:00",
       "category": "Technology"
     },
     {
-      "title": "Trump says US taking 'very seriously' any Iranian plot against Washington",
-      "url": "https://www.bbc.co.uk/news/articles/cq808vzd3nnpo?at_medium=RSS&at_campaign=rss",
+      "title": "Russian military plane crashes, killing all 19 on board",
+      "url": "https://www.bbc.co.uk/news/articles/cw8085rykkmgo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T16:42:11+00:00",
+      "publishedAt": "2026-11-17T21:06:11+00:00",
+      "category": "World"
+    },
+    {
+      "title": "US loses measles elimination status after 26 years amid record case numbers",
+      "url": "https://www.bbc.co.uk/news/articles/c977p71jx0xxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T21:04:00+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Palestinian woman, 72, shot dead by Israeli settlers in West Bank, health ministry says",
+      "url": "https://www.bbc.co.uk/news/articles/cqrlg377638yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T20:30:20+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Trump in Asia ahead of talks with Russian and Chinese presidents",
+      "url": "https://www.bbc.co.uk/news/articles/crq5vlxxx32no?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T20:25:46+00:00",
+      "category": "World"
+    },
+    {
+      "title": "William and Kate celebrate Earthshot Prize winners in Mumbai",
+      "url": "https://www.bbc.co.uk/news/articles/cqlykve012d1o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-17T18:20:36+00:00",
       "category": "Technology"
     },
     {
-      "title": "UK sanctions firms over Israeli West Bank settlements",
-      "url": "https://www.bbc.co.uk/news/articles/cvglr977x3z0o?at_medium=RSS&at_campaign=rss",
+      "title": "'It was really scary': Mother describes sheltering during Russia strikes on Kyiv bridge",
+      "url": "https://www.bbc.co.uk/news/articles/cq7825234lgmo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-17T15:59:47+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Men of Awami League, whose activities banned, set Tungipara police station on fire",
-      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/pfoahan1mk",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T15:57:14+00:00",
-      "category": "World"
-    },
-    {
-      "title": "BBC reports from Kyiv bridge hit by Russian attack",
-      "url": "https://www.bbc.co.uk/news/videos/cmlywvww3pzlo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T15:54:15+00:00",
+      "publishedAt": "2026-11-17T17:19:57+00:00",
       "category": "World"
     },
     {
@@ -57,69 +78,6 @@
       "url": "https://www.bbc.co.uk/news/articles/crz9dgz28zwdo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-17T15:38:10+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Palestinian woman, 72, shot dead by Israeli settlers in West Bank, health ministry says",
-      "url": "https://www.bbc.co.uk/news/articles/cqrlg377638yo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T15:36:11+00:00",
-      "category": "World"
-    },
-    {
-      "title": "South Africa collapse after Bavuma injury on 3rd day of Bangladesh Test",
-      "url": "https://en.prothomalo.com/sports/cricket/q1n7omg366",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T15:23:47+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "UCBD launches Industry Impact Lab marking 5th foundation day",
-      "url": "https://en.prothomalo.com/youth/education/zalfa7pf0x",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T15:22:50+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Carney eyes 'other options' for embattled Canadian auto sector on China trip",
-      "url": "https://www.bbc.co.uk/news/articles/cq98xlz09ye0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T15:17:49+00:00",
-      "category": "World"
-    },
-    {
-      "title": "49 vehicles set on fire, cocktail bombs explode at 59 locations in 10 days",
-      "url": "https://en.prothomalo.com/bangladesh/politics/c0ugspvnu9",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T14:41:21+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Sayeed Khokon placed on 7-day remand in July murder case",
-      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/sagbg78j73",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T14:27:20+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Trump lands in Asia ahead of talks with Russian and Chinese presidents",
-      "url": "https://www.bbc.co.uk/news/articles/crq5vlxxx32no?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T12:54:32+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Second Padma Bridge to take Y-shape, link three districts, where will the second Jamuna Bridge be built?",
-      "url": "https://en.prothomalo.com/bangladesh/f9vz5dfx47",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-17T12:40:51+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Nvidia partner Megaspeed being investigated by US government over chip exports",
-      "url": "https://www.bbc.co.uk/news/articles/cmn504nq5033o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-17T11:17:32+00:00",
       "category": "World"
     },
     {
@@ -141,7 +99,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": true
+      "ok": false
     },
     {
       "name": "BBC World",

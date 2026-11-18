@@ -1,13 +1,90 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-17T17:22:27.859646+00:00",
+  "updatedAt": "2026-11-18T00:31:02.629159+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Ramsay-Peaty headlines as revived ISL wary not to overstretch",
-      "url": "https://www.bbc.co.uk/sport/swimming/articles/ck1wvzryg015o?at_medium=RSS&at_campaign=rss",
+      "title": "Belief and bench help Northern Ireland scale new heights as promotion secured",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cwp9dxr80p3po?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-17T17:17:18+00:00",
+      "publishedAt": "2026-11-17T23:49:31+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Bellamy convinced of Wales credentials despite defeat by Portugal",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmn507wn6gg3o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T23:37:45+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Nations League roundup: Devenny’s divine strike lifts Northern Ireland to top tier",
+      "url": "https://www.theguardian.com/football/2026/nov/17/nations-league-northern-ireland-hungary-norway-denmark",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T23:35:42+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Humphries and Van Gerwen into Grand Slam knockouts",
+      "url": "https://www.bbc.co.uk/sport/darts/articles/c6jd7el8d9kyo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T22:57:02+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Liverpool lead Chelsea in Camara race - Wednesday's gossip",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cvx2xwx604y0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T22:25:16+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Portugal’s new No 7 Forbs channels Ronaldo for winner as Wales are denied",
+      "url": "https://www.theguardian.com/football/2026/nov/17/wales-portugal-nations-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T22:14:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "‘The game is in danger’: PFA head Maheta Molango on Fifa, Infantino and football’s future",
+      "url": "https://www.theguardian.com/football/2026/nov/17/pfa-maheta-molango-interview-fifa-gianni-infantino-interview",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T20:00:20+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "JJ Gabriel confirms Manchester United exit: ‘You gave me moments I will always treasure’",
+      "url": "https://www.theguardian.com/football/2026/nov/17/jj-gabriel-confirms-manchester-united-exit-video",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T19:50:48+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England's Atkinson set for All Blacks dream date",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6rrg0l2gz5jo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T18:12:46+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Arsenal Double winner Storey dies aged 81",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c63eg3ekxnpyo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-17T17:33:41+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "‘I’m entering to win’: Philippe Diallo launches campaign to topple Gianni Infantino",
+      "url": "https://www.theguardian.com/football/2026/nov/17/im-entering-to-win-philippe-diallo-launches-campaign-to-topple-gianni-infantino",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T17:18:18+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Wayne Rooney says he contemplated taking own life during playing career",
+      "url": "https://www.theguardian.com/football/2026/nov/17/wayne-rooney-contemplated-taking-own-life-during-playing-career-mental-health",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-17T17:13:23+00:00",
       "category": "Sports"
     },
     {
@@ -32,13 +109,6 @@
       "category": "Sports"
     },
     {
-      "title": "Wayne Rooney says he contemplated taking own life during playing career",
-      "url": "https://www.theguardian.com/football/2026/nov/17/wayne-rooney-contemplated-taking-own-life-during-playing-career-mental-health",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T15:52:32+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "FA wants to host Nations League finals in England",
       "url": "https://www.bbc.co.uk/sport/football/articles/c5742x4xldmpo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
@@ -50,20 +120,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/17/peter-storey-arsenal-england-dies-aged-81",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-17T15:46:45+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Football Daily | Jürgen Klopp hard-launches his Germany rebuilding project in style",
-      "url": "https://www.theguardian.com/football/2026/nov/17/jurgen-klopp-germany-project-football-daily-newsletter",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T15:23:15+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Hutchinson ruled out for season after celebration injury",
-      "url": "https://www.bbc.co.uk/sport/american-football/articles/ck8798yvq0x0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-17T15:08:23+00:00",
       "category": "Sports"
     },
     {
@@ -88,24 +144,10 @@
       "category": "Sports"
     },
     {
-      "title": "Bethell to have more surgery and miss South Africa tour",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c893rgz2946yo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-17T13:18:58+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Wiegman cites young talent as key to new England deal after calling up Goodwin",
       "url": "https://www.theguardian.com/football/2026/nov/17/sarina-wiegman-england-young-talent-contract-isobel-goodwin-squad",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-17T13:09:09+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Janine van Wyk: ‘Our rooms were empty … no mattresses, no lightbulbs and not a drop of water’",
-      "url": "https://www.theguardian.com/football/2026/nov/17/janine-van-wyck-south-africa-wafcon-book-extract-moving-the-goalposts-newsletter",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T11:57:35+00:00",
       "category": "Sports"
     },
     {
@@ -116,52 +158,10 @@
       "category": "Sports"
     },
     {
-      "title": "Blackburn boss Mowbray steps back over health issues",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c6dx190nkvl4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-17T10:40:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Will Infantino feel he's already won as Fifa challengers are revealed?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c8wy53z3ygypo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-17T10:32:07+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Max Dowman shines in England colours and sends another record tumbling",
       "url": "https://www.theguardian.com/football/2026/nov/17/max-dowman-england-under-21s-record-jude-bellingham",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-17T10:13:45+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Declan Rice agrees new Arsenal contract making him club’s joint highest-paid player",
-      "url": "https://www.theguardian.com/football/2026/nov/17/declan-rice-new-arsenal-contract-jurrien-timber",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T09:19:34+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "‘He wants to change lives’: the story behind Bukayo Saka’s Sócrates award",
-      "url": "https://www.theguardian.com/football/2026/nov/17/he-wants-to-change-lives-the-story-behind-bukayo-sakas-socrates-award",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T08:00:09+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Why always him? The rise and fall of Balotelli",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cvgxvg4v981o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-17T06:15:43+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Tuchel and England must learn lessons of history, Seville and Southgateism | Barney Ronay",
-      "url": "https://www.theguardian.com/football/2026/nov/16/thomas-tuchel-england-must-learn-lessons-history-seville-gareth-southgate",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-16T20:02:09+00:00",
       "category": "Sports"
     },
     {

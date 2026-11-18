@@ -59,7 +59,10 @@
     const loaded = images.filter(image => image.dataset.verified === 'true').length;
     const pending = images.filter(image => image.dataset.loading === 'true').length;
     const failed = images.filter(image => image.dataset.error === 'true').length;
-    for (const image of images) image.hidden = !pronunciation.checked || image.dataset.verified !== 'true';
+    for (const image of images) {
+      image.hidden = !pronunciation.checked || image.dataset.error === 'true';
+      image.style.visibility = image.dataset.verified === 'true' ? 'visible' : 'hidden';
+    }
     pronunciationCredit.hidden = !pronunciation.checked;
     pronunciationStatus.hidden = !pronunciation.checked || (failed === 0 && loaded > 0);
     if (!pronunciation.checked) return;

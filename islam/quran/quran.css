@@ -816,3 +816,11 @@ body.quran-reader-page .quran-sidebar .side-list>a.current{background:#0a563e!im
   body.quran-reader-page .quran-tab{flex:0 0 auto!important;padding:10px!important;font-size:.95rem!important}
   body.quran-reader-page .quran-section-panel .reading-tools{padding-top:8px!important}
 }
+
+/* Continuous explanation layout: keep each verse identifiable without collapsed controls. */
+body.quran-reader-page .quran-section-panel{margin-top:0!important;padding-top:0!important}
+body.quran-reader-page .quran-section-panel>h2{margin-top:10px!important}
+body.quran-reader-page .quran-explanation{padding:14px 16px;margin:12px 0;background:var(--paper)}
+body.quran-reader-page .quran-explanation h3{margin:0 0 8px;color:var(--green);font-size:1.05rem}
+body.quran-reader-page .explanation-verse{padding:8px 0 12px;border-bottom:1px solid var(--line);margin-bottom:10px;font-size:1.35rem;line-height:2}
+body.quran-reader-page .quran-explanation .quran-source-note{line-height:1.9}

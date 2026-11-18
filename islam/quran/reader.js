@@ -197,33 +197,29 @@
           return;
         }
         sourceCredit(panel);
-        let shown = 0;
-        const batch = 25;
-        const more = document.createElement('button');
-        more.type = 'button';
-        more.className = 'quran-more-notes';
-        more.textContent = 'আরও ব্যাখ্যা দেখুন';
-        const addNext = () => {
-          for (const note of notes.slice(shown, shown + batch)) {
-            const entry = document.createElement('details');
-            entry.className = 'section-note';
-            const summary = document.createElement('summary');
-            summary.textContent = 'আয়াত ' + digits(note.verse) + ' — ব্যাখ্যা দেখুন';
-            entry.append(summary);
-            entry.addEventListener('toggle', () => {
-              if (entry.open && !entry.dataset.loaded) {
-                noteText(entry, note.text);
-                entry.dataset.loaded = 'true';
-              }
-            });
-            panel.insertBefore(entry, more.isConnected ? more : null);
+        const verseByNumber = new Map([...verses.querySelectorAll('.ayah[data-verse]')].map(card => [Number(card.dataset.verse), card]));
+        for (const note of notes) {
+          const entry = document.createElement('article');
+          entry.className = 'section-note quran-explanation';
+          const heading = document.createElement('h3');
+          heading.textContent = 'আয়াত ' + digits(note.verse);
+          entry.append(heading);
+          const verse = verseByNumber.get(note.verse);
+          if (verse) {
+            const arabic = verse.querySelector('.arabic');
+            if (arabic) {
+              const arabicCopy = document.createElement('div');
+              arabicCopy.className = 'arabic explanation-verse';
+              arabicCopy.lang = 'ar';
+              arabicCopy.dir = 'rtl';
+              arabicCopy.textContent = arabic.textContent;
+              entry.append(arabicCopy);
+            }
           }
-          shown += batch;
-          more.hidden = shown >= notes.length;
-        };
-        more.addEventListener('click', addNext);
-        panel.append(more);
-        addNext();
+          noteText(entry, note.text);
+          panel.append(entry);
+        }
+        sourceCredit(panel);
       }).catch(() => {
         if (sectionVersion === version) loading.textContent = 'ব্যাখ্যা-নোট এখন লোড করা যাচ্ছে না।';
       });

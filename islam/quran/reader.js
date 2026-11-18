@@ -1,7 +1,288 @@
-(()=>{const n=Number(document.body.dataset.surah);const pronunciationEl=document.querySelector('.pronunciation-status');if(pronunciationEl){pronunciationEl.insertAdjacentHTML('afterbegin','বাংলা অর্থ: <a href="https://quranenc.com/en/browse/bengali_zakaria" target="_blank" rel="noopener">QuranEnc.com — আবূ বকর যাকারিয়া (v1.1.1)</a> · ');};const root='/islam/quran/',status=document.querySelector('#load-status'),versesEl=document.querySelector('#verses'),noteEl=document.querySelector('#chapter-note'),showTranslation=document.querySelector('#show-translation'),showNotes=document.querySelector('#show-notes')||Object.assign(document.createElement('input'),{type:'checkbox',checked:false})||Object.assign(document.createElement('input'),{type:'checkbox',checked:false});if(!Number.isInteger(n)||n<1||n>114){status.textContent='সূরার নম্বর সঠিক নয়।';return}const digits=x=>String(x).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[Number(d)]);function cleanTranslation(text){return String(text||'').replace(/\s*\[\s*[0-9০-৯]+\s*\]/g,'').replace(/\s{2,}/g,' ').trim()}function appendSanitized(parent,html){const doc=new DOMParser().parseFromString(`<div>${html||''}</div>`,'text/html');const allowed=new Set(['B','STRONG','I','EM','BR','SUP','SUB']);function copy(from,to){for(const node of from.childNodes){if(node.nodeType===Node.TEXT_NODE){to.append(document.createTextNode(node.nodeValue||''));continue}if(node.nodeType!==Node.ELEMENT_NODE)continue;if(allowed.has(node.tagName)){const el=document.createElement(node.tagName.toLowerCase());to.append(el);copy(node,el)}else copy(node,to)}}copy(doc.body.firstElementChild,parent)}let rows=[],chapterNotes=null;const footnoteDetails=new Map();function renderNotes(){if(!chapterNotes)return;for(const card of versesEl.querySelectorAll('.ayah')){const verse=Number(card.dataset.verse);const note=chapterNotes.get(verse);const button=card.querySelector('.ayah-note-toggle');if(!note||!note.trim()){if(button)button.hidden=true;continue}let details=footnoteDetails.get(verse);if(!details){details=document.createElement('div');details.className='ayah-note';details.id=`ayah-note-${n}-${verse}`;details.hidden=true;appendSanitized(details,note);card.append(details);footnoteDetails.set(verse,details)}if(button){button.hidden=false;button.setAttribute('aria-controls',details.id)}details.hidden=!showNotes.checked}}
-async function getNotes(){if(chapterNotes)return chapterNotes;const r=await fetch(`${root}data/notes-${String(n).padStart(3,'0')}.json`);if(!r.ok)throw Error('notes unavailable');const d=await r.json();if(d.surah!==n||!Array.isArray(d.notes)||d.notes.some(v=>!Number.isInteger(v.verse)||v.verse<1||v.verse>rows.length||typeof v.text!=='string'))throw Error('notes mismatch');const mapped=new Map(d.notes.map(v=>[v.verse,v.text]));if(mapped.size!==d.notes.length)throw Error('duplicate note reference');chapterNotes=mapped;return chapterNotes}
-async function updateHeader(){try{const [r,b]=await Promise.all([fetch(`${root}data/metadata.json`),fetch(`${root}data/bengali-metadata.json`)]);if(!r.ok||!b.ok)throw Error('metadata unavailable');const list=await r.json(),bnList=await b.json();const meta=list.find(s=>s.number===n),bnMeta=bnList.find(s=>s.number===n);if(!meta||!bnMeta)return;const title=document.querySelector('#surah-title'),subtitle=document.querySelector('#surah-subtitle'),eyebrow=document.querySelector('.eyebrow'),metaEl=document.querySelector('.banner-meta'),meaning=document.querySelector('.banner-meaning'),banner=document.querySelector('.surah-head');if(title)title.textContent=`সূরা ${bnMeta.title}`;if(subtitle)subtitle.textContent=`${meta.arabicName} · ${bnMeta.meaning}`;if(eyebrow)eyebrow.textContent=`সূরা ${digits(n)} · ${meta.revelation==='meccan'?'মাক্কি':'মাদানি'} · ${digits(meta.verseCount)} আয়াত`;if(metaEl)metaEl.textContent=`সূরা ${digits(n)} · ${meta.revelation==='meccan'?'মাক্কি':'মাদানি'} · ${digits(meta.verseCount)} আয়াত`;if(meaning)meaning.textContent=bnMeta.meaning;if(banner){let arabic=banner.querySelector('.hero-arabic');if(!arabic){arabic=document.createElement('div');arabic.className='hero-arabic';arabic.lang='ar';arabic.dir='rtl';banner.append(arabic)}arabic.textContent=meta.arabicName}}catch{}}updateHeader();
+/* Quran Reader: shared navigation and section controls for all 114 surahs. */
+(() => {
+  'use strict';
+  const n = Number(document.body.dataset.surah);
+  const head = document.querySelector('.surah-head');
+  const verses = document.getElementById('verses');
+  const tools = document.querySelector('.reading-tools');
+  const context = document.getElementById('surah-context');
+  if (!Number.isInteger(n) || n < 1 || n > 114 || !head || !verses || !tools) return;
 
-(()=>{'use strict';const root='/islam/quran/',head=document.querySelector('.surah-head'),context=document.querySelector('#surah-context'),tools=document.querySelector('.reading-tools'),verses=document.querySelector('#verses');if(!head||!verses)return;const bn=s=>String(s).replace(/[0-9]/g,d=>'০১২৩৪৫৬৭৮৯'[Number(d)]),tabs=[['surah','সূরা'],['intro','সূরা পরিচিতি'],['virtue','ফযীলত'],['revelation','নাজিলের ইতিহাস'],['explain','ব্যাখ্যা']],nav=document.createElement('nav'),panel=document.createElement('section');nav.className='quran-section-tabs';panel.className='quran-section-panel';nav.setAttribute('aria-label','সূরা বিষয় নির্বাচন');panel.setAttribute('aria-live','polite');const introText=context?.querySelector('#chapter-note')?.textContent?.trim()||'এই সূরার পরিচিতির তথ্য বর্তমানে উপলভ্য নয়।';const makePanel=key=>{panel.replaceChildren();if(key==='surah'){panel.append(verses);if(tools)panel.append(tools);return}const h=document.createElement('h2');h.textContent=tabs.find(t=>t[0]===key)[1];panel.append(h);if(key==='explain'&&typeof getNotes==='function'){const p=document.createElement('p');p.textContent='ব্যাখ্যা-নোট লোড হচ্ছে…';panel.append(p);getNotes().then(notes=>{p.remove();if(!notes.size){const e=document.createElement('p');e.className='empty-state';e.textContent='এই সূরার জন্য যাচাইকৃত ব্যাখ্যা-নোট নেই।';panel.append(e);return}for(const [verse,note] of notes){const a=document.createElement('article');a.className='section-note';const t=document.createElement('h3');t.textContent='আয়াত '+bn(verse);const b=document.createElement('p');b.textContent=note;a.append(t,b);panel.append(a)}}).catch(()=>{p.textContent='যাচাইকৃত ব্যাখ্যা-নোট বর্তমানে লোড করা যায়নি。'});return}const p=document.createElement('p');p.textContent=key==='intro'||key==='virtue'||key==='revelation'?introText:'এই অংশের যাচাইকৃত তথ্য বর্তমানে উপলভ্য নয়।';panel.append(p)};tabs.forEach(([key,label],i)=>{const b=document.createElement('button');b.type='button';b.className='quran-tab';b.textContent=label;b.setAttribute('aria-selected',String(i===0));b.addEventListener('click',()=>{nav.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected','false'));b.setAttribute('aria-selected','true');makePanel(key)});nav.append(b)});context?.remove();head.after(nav,panel);makePanel('surah');const side=document.createElement('aside');side.className='quran-sidebar';side.innerHTML='<h2>সব সূরা</h2><div class="side-list" role="navigation" aria-label="১১৪টি সূরা"></div>';const list=side.querySelector('.side-list');head.parentElement.insertBefore(side,head);Promise.all([fetch(root+'data/metadata.json'),fetch(root+'data/bengali-metadata.json')]).then(async([a,b])=>{const [meta,bnmeta]=await Promise.all([a.json(),b.json()]);meta.forEach(s=>{const bnrow=bnmeta.find(x=>x.number===s.number)||{};const link=document.createElement('a');link.href=root+s.slug+'/';link.className=s.number===n?'current':'';link.innerHTML='<span class="side-num">'+bn(s.number)+'</span><span class="side-copy"><strong>'+String(bnrow.title||s.transliteration)+'</strong><small>'+String(s.arabicName||'')+'</small></span>';list.append(link)})}).catch(()=>{list.textContent='সূরার তালিকা লোড করা যায়নি।'});const st=document.querySelector('#show-translation');if(st)st.checked=false;const ps=document.querySelector('.pronunciation-status');if(ps&&!document.querySelector('.pronunciation[data-verified]'))ps.textContent='বাংলা উচ্চারণ: যাচাইকৃত লাইসেন্সকৃত ডেটা বর্তমানে উপলভ্য নয়।'})();
+  document.body.classList.add('quran-reader-page');
+  const base = '/islam/quran/';
+  const digits = value => String(value).replace(/[0-9]/g, digit => '০১২৩৪৫৬৭৮৯'[Number(digit)]);
+  const fetchJSON = async path => {
+    const response = await fetch(base + path);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.json();
+  };
+  let surahMeta = null;
+  let bengaliMeta = null;
+  let notesPromise = null;
+  let sectionVersion = 0;
+  let activeSection = 'surah';
 
-(()=>{'use strict';const tools=document.querySelector('.reading-tools'),root=document.querySelector('#verses');if(!tools||!root)return;const old=document.querySelector('#show-notes');old?.closest('label')?.remove();const label=document.createElement('label');label.className='control';const input=document.createElement('input');input.type='checkbox';input.id='show-pronunciation';input.checked=false;label.append(input,' বাংলা উচ্চারণ');tools.append(label);input.addEventListener('change',()=>root.querySelectorAll('.pronunciation').forEach(el=>{if(!el.dataset.verified)el.hidden=true;else el.hidden=!input.checked}));root.querySelectorAll('.pronunciation').forEach(el=>{el.hidden=true})})();
+  const status = document.getElementById('load-status');
+  if (status) status.textContent = 'আরবি আয়াত লোড হচ্ছে…';
+  const translation = document.getElementById('show-translation');
+  if (translation) translation.checked = false;
+  const oldNotes = document.getElementById('show-notes');
+  if (oldNotes) oldNotes.closest('label')?.remove();
+
+  const pronunciationLabel = document.createElement('label');
+  pronunciationLabel.className = 'control';
+  const pronunciation = document.createElement('input');
+  pronunciation.type = 'checkbox';
+  pronunciation.id = 'show-pronunciation';
+  pronunciation.checked = false;
+  pronunciationLabel.append(pronunciation, ' বাংলা উচ্চারণ');
+  tools.append(pronunciationLabel);
+  const pronunciationStatus = document.createElement('p');
+  pronunciationStatus.className = 'pronunciation-availability';
+  pronunciationStatus.setAttribute('role', 'status');
+  pronunciationStatus.textContent = 'বাংলা উচ্চারণের যাচাইকৃত ও অনুমোদিত ডেটা বর্তমানে উপলভ্য নয়।';
+  pronunciationStatus.hidden = true;
+  tools.append(pronunciationStatus);
+  function refreshPronunciation() {
+    const items = [...verses.querySelectorAll('.pronunciation[data-verified="true"]')];
+    for (const node of verses.querySelectorAll('.pronunciation')) {
+      node.hidden = !pronunciation.checked || node.dataset.verified !== 'true';
+    }
+    pronunciationStatus.hidden = !pronunciation.checked || items.length > 0;
+  }
+  pronunciation.addEventListener('change', refreshPronunciation);
+  new MutationObserver(refreshPronunciation).observe(verses, {childList: true});
+
+  const tabDefs = [
+    ['surah', 'সূরা'],
+    ['intro', 'সূরা পরিচিতি'],
+    ['virtue', 'ফযীলত'],
+    ['revelation', 'নাজিলের ইতিহাস'],
+    ['explain', 'ব্যাখ্যা']
+  ];
+  const nav = document.createElement('nav');
+  nav.className = 'quran-section-tabs';
+  nav.setAttribute('aria-label', 'সূরার বিভাগ');
+  nav.setAttribute('role', 'tablist');
+  const panel = document.createElement('section');
+  panel.className = 'quran-section-panel';
+  panel.id = 'quran-tab-content';
+  panel.setAttribute('role', 'tabpanel');
+
+  const simpleParagraph = (parent, value, className = '') => {
+    const p = document.createElement('p');
+    if (className) p.className = className;
+    p.textContent = value;
+    parent.append(p);
+    return p;
+  };
+  function noteText(parent, html) {
+    // Notes originate in the checked-in source data; allow only text formatting.
+    const documentFragment = new DOMParser().parseFromString('<div>' + String(html || '') + '</div>', 'text/html');
+    const supported = new Set(['B','STRONG','I','EM','SUP','SUB','BR','P','UL','OL','LI']);
+    const copy = (from, to) => {
+      for (const child of from.childNodes) {
+        if (child.nodeType === 3) { to.append(document.createTextNode(child.nodeValue || '')); continue; }
+        if (child.nodeType !== 1) continue;
+        if (supported.has(child.tagName)) {
+          const safe = document.createElement(child.tagName.toLowerCase());
+          to.append(safe);
+          if (child.tagName !== 'BR') copy(child, safe);
+        } else copy(child, to);
+      }
+    };
+    const wrap = document.createElement('div');
+    wrap.className = 'quran-source-note';
+    copy(documentFragment.body.firstElementChild, wrap);
+    parent.append(wrap);
+  }
+  function sourceCredit(parent) {
+    const foot = document.createElement('p');
+    foot.className = 'quran-source-credit';
+    foot.append(document.createTextNode('উৎস-নোট: '));
+    const link = document.createElement('a');
+    link.href = 'https://quranenc.com/en/browse/bengali_zakaria';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'QuranEnc — আবূ বকর যাকারিয়া';
+    foot.append(link);
+    parent.append(foot);
+  }
+  function getNotes() {
+    if (!notesPromise) notesPromise = fetchJSON('data/notes-' + String(n).padStart(3, '0') + '.json')
+      .then(data => {
+        if (data.surah !== n || !Array.isArray(data.notes)) throw new Error('Invalid source notes');
+        return data.notes.filter(item => Number.isInteger(item.verse) && item.verse > 0 && typeof item.text === 'string');
+      });
+    return notesPromise;
+  }
+
+  function showSection(key) {
+    activeSection = key;
+    const version = ++sectionVersion;
+    for (const button of nav.querySelectorAll('[role="tab"]')) {
+      const selected = button.dataset.section === key;
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      if (selected) panel.setAttribute('aria-labelledby', button.id);
+    }
+    panel.replaceChildren();
+    if (key === 'surah') {
+      panel.append(tools, verses);
+      refreshPronunciation();
+      return;
+    }
+    const heading = document.createElement('h2');
+    heading.textContent = tabDefs.find(item => item[0] === key)[1];
+    panel.append(heading);
+    if (key === 'virtue') {
+      simpleParagraph(panel, 'এই সূরার বিশেষ ফযীলত সম্পর্কে আলাদাভাবে যাচাইকৃত তথ্য বর্তমানে উপলভ্য নয়। আয়াতের ব্যাখ্যা দেখতে ব্যাখ্যা বিভাগে যান।');
+      return;
+    }
+    if (key === 'revelation') {
+      if (surahMeta) simpleParagraph(panel, 'নাজিলের স্থানভিত্তিক পরিচয়: ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + ' সূরা।');
+      simpleParagraph(panel, 'নাজিলের বিস্তারিত ইতিহাস সম্পর্কে স্বতন্ত্রভাবে যাচাইকৃত তথ্য বর্তমানে উপলভ্য নয়।');
+      return;
+    }
+    if (key === 'intro') {
+      if (surahMeta) simpleParagraph(panel, 'সূরা ' + (bengaliMeta?.title || surahMeta.transliteration) + ' — কুরআনের ' + digits(n) + ' নম্বর সূরা; ' + digits(surahMeta.verseCount) + 'টি আয়াত; ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + '।');
+      const loading = simpleParagraph(panel, 'সূরা-সংক্রান্ত উৎস-নোট লোড হচ্ছে…');
+      getNotes().then(notes => {
+        if (sectionVersion !== version) return;
+        loading.remove();
+        const first = notes.find(note => note.verse === 1 && /সূরা|নামকরণ|নাযিল|নাজিল/.test(note.text.slice(0,500)));
+        if (first) { noteText(panel, first.text); sourceCredit(panel); }
+        else simpleParagraph(panel, 'এই সূরার অতিরিক্ত পরিচিতিমূলক উৎস-নোট পাওয়া যায়নি।');
+      }).catch(() => {
+        if (sectionVersion === version) loading.textContent = 'সূরার পরিচিতিমূলক উৎস-নোট এখন লোড করা যাচ্ছে না।';
+      });
+      return;
+    }
+    if (key === 'explain') {
+      const loading = simpleParagraph(panel, 'আয়াতের ব্যাখ্যা-নোট লোড হচ্ছে…');
+      getNotes().then(notes => {
+        if (sectionVersion !== version) return;
+        loading.remove();
+        if (notes.length === 0) {
+          simpleParagraph(panel, 'এই সূরার জন্য যাচাইকৃত উৎস-নোট পাওয়া যায়নি।');
+          return;
+        }
+        sourceCredit(panel);
+        let shown = 0;
+        const batch = 25;
+        const more = document.createElement('button');
+        more.type = 'button';
+        more.className = 'quran-more-notes';
+        more.textContent = 'আরও ব্যাখ্যা দেখুন';
+        const addNext = () => {
+          for (const note of notes.slice(shown, shown + batch)) {
+            const entry = document.createElement('details');
+            entry.className = 'section-note';
+            const summary = document.createElement('summary');
+            summary.textContent = 'আয়াত ' + digits(note.verse) + ' — ব্যাখ্যা দেখুন';
+            entry.append(summary);
+            entry.addEventListener('toggle', () => {
+              if (entry.open && !entry.dataset.loaded) {
+                noteText(entry, note.text);
+                entry.dataset.loaded = 'true';
+              }
+            });
+            panel.insertBefore(entry, more.isConnected ? more : null);
+          }
+          shown += batch;
+          more.hidden = shown >= notes.length;
+        };
+        more.addEventListener('click', addNext);
+        panel.append(more);
+        addNext();
+      }).catch(() => {
+        if (sectionVersion === version) loading.textContent = 'ব্যাখ্যা-নোট এখন লোড করা যাচ্ছে না।';
+      });
+    }
+  }
+
+  tabDefs.forEach(([key, label], index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'quran-tab';
+    button.id = 'quran-tab-' + key;
+    button.dataset.section = key;
+    button.setAttribute('role', 'tab');
+    button.setAttribute('aria-controls', panel.id);
+    button.setAttribute('aria-selected', String(index === 0));
+    button.textContent = label;
+    button.addEventListener('click', () => showSection(key));
+    nav.append(button);
+  });
+  nav.addEventListener('keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    const buttons = [...nav.querySelectorAll('[role="tab"]')];
+    const current = buttons.indexOf(document.activeElement);
+    if (current < 0) return;
+    event.preventDefault();
+    const next = buttons[(current + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length];
+    next.focus();
+    showSection(next.dataset.section);
+  });
+
+  const sidebar = document.createElement('aside');
+  sidebar.className = 'quran-sidebar';
+  const sidebarTitle = document.createElement('h2');
+  sidebarTitle.textContent = 'সব সূরা';
+  const sidebarList = document.createElement('div');
+  sidebarList.className = 'side-list';
+  sidebarList.setAttribute('role', 'navigation');
+  sidebarList.setAttribute('aria-label', '১১৪টি সূরা');
+  sidebar.append(sidebarTitle, sidebarList);
+  context?.remove();
+  head.after(sidebar, nav, panel);
+  showSection('surah');
+
+  Promise.all([fetchJSON('data/metadata.json'), fetchJSON('data/bengali-metadata.json')]).then(([all, allBangla]) => {
+    if (!Array.isArray(all) || !Array.isArray(allBangla) || all.length !== 114 || allBangla.length !== 114) throw new Error('Incomplete surah metadata');
+    const names = new Map(allBangla.map(info => [info.number, info]));
+    surahMeta = all.find(info => info.number === n);
+    bengaliMeta = names.get(n);
+    if (surahMeta && bengaliMeta) {
+      const title = document.getElementById('surah-title');
+      if (title) title.textContent = 'সূরা ' + bengaliMeta.title;
+      const bannerMeta = head.querySelector('.banner-meta');
+      if (bannerMeta) bannerMeta.textContent = 'সূরা ' + digits(n) + ' · ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + ' · ' + digits(surahMeta.verseCount) + ' আয়াত';
+      const arabic = head.querySelector('.hero-arabic');
+      if (arabic) arabic.textContent = surahMeta.arabicName;
+      const meaning = head.querySelector('.banner-meaning');
+      if (meaning) meaning.textContent = bengaliMeta.meaning;
+    }
+    const fragment = document.createDocumentFragment();
+    all.forEach(item => {
+      const localized = names.get(item.number);
+      const link = document.createElement('a');
+      link.href = base + item.slug + '/';
+      if (item.number === n) {
+        link.className = 'current';
+        link.setAttribute('aria-current', 'page');
+      }
+      const number = document.createElement('span');
+      number.className = 'side-num';
+      number.textContent = digits(item.number);
+      const copy = document.createElement('span');
+      copy.className = 'side-copy';
+      const name = document.createElement('strong');
+      name.textContent = localized?.title || item.transliteration;
+      const arabic = document.createElement('small');
+      arabic.lang = 'ar';
+      arabic.dir = 'rtl';
+      arabic.textContent = item.arabicName;
+      copy.append(name, arabic);
+      link.append(number, copy);
+      fragment.append(link);
+    });
+    sidebarList.replaceChildren(fragment);
+    const current = sidebarList.querySelector('.current');
+    if (current && sidebarList.scrollHeight > sidebarList.clientHeight) {
+      sidebarList.scrollTop = Math.max(0, current.offsetTop - sidebarList.offsetTop - 70);
+    }
+  }).catch(() => {
+    sidebarList.textContent = 'সূরার তালিকা লোড করা যায়নি।';
+  });
+})();

@@ -7,36 +7,36 @@
       1
     ],
     "complete_surah_count": 1,
-    "verses": 9,
+    "verses": 26,
     "coverage": [
       {
         "surah": 1,
         "verses": "1-7",
-        "basis": "Previously reviewed coverage recorded in version 1."
+        "basis": "Previously reviewed coverage recorded in the project."
       },
       {
         "surah": 2,
-        "verses": "2-3",
-        "basis": "User confirmed 2:2 and supplied/corrected 2:3 in the prior Work conversation."
+        "verses": "2-20",
+        "basis": "2:2-3 confirmed/corrected by the user; 2:4-20 checked against the Arabic and the Bangladesh government transliteration reference, independently worded."
       }
     ],
-    "note": "Only these nine ayahs are counted as reviewed. No other draft line is treated as checked by inference."
+    "note": "Only explicitly confirmed or individually rechecked ayahs are counted here."
   },
   "draft_candidates": {
     "branch": "feat/quran-bangla-pronunciation-text",
     "surahs": 114,
     "verses": 6236,
-    "status": "Text fields exist for every ayah; the remaining 6227 are unreviewed candidates, not verified pronunciation."
+    "status": "All fields exist; only coverage entries marked above count as reviewed. The rest remain hidden pending review."
   },
   "pending": {
-    "verses": 6227,
+    "verses": 6210,
     "surahs_without_complete_coverage": 113,
     "fully_pending_surahs": 112,
     "partially_reviewed_surahs": [
       2
     ]
   },
-  "source": "Arabic ayah text in the repository; verified coverage is based only on recorded review and explicit user confirmation. Bangladesh government pronunciation source remains linked for uncovered verses.",
+  "source": "Repository Arabic text is the base. quran.gov.bd Bengali transliteration policy/reference is used for review, not copied into the site.",
   "transliteration_policy_reference": {
     "title": "বাংলায় আল-কুরআনের অনুবাদ ও প্রতিবর্ণায়ন নীতিমালা",
     "url": "https://quran.gov.bd/common/doc/Nitimala-Final.pdf",
@@ -50,5 +50,14 @@
       "waqf",
       "hamzat al-wasl"
     ]
-  }
+  },
+  "reviewed_batches": [
+    {
+      "surah": 2,
+      "verses": "4-20",
+      "status": "reviewed_and_corrected",
+      "commit": "c222409ad2b512ea838b8e9cd9347adfa8c3e8f2"
+    }
+  ],
+  "uncertain_ayahs": []
 }

@@ -1,0 +1,22 @@
+name: Quran pronunciation source integrity
+
+on:
+  pull_request:
+    paths:
+      - "islam/quran/data/surah-0[5-8]*.json"
+      - "tests/test_islam_quran.py"
+      - ".github/workflows/quran-pronunciation-integrity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quran-source-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch main-branch Quran source baseline
+        run: git fetch --no-tags --depth=1 origin main
+      - name: Check Quran 50–89 source fidelity, completeness, and verse-final waqf
+        run: python3 tests/test_quran_pronunciation_050_089.py

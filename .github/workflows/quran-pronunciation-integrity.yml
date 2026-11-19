@@ -16,5 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check Quran source, transliteration annotations, routes and hashes
-        run: python3 tests/test_islam_quran.py
+      - name: Fetch main-branch Quran source baseline
+        run: git fetch --no-tags --depth=1 origin main
+      - name: Check Quran 50–89 source fidelity, completeness, and verse-final waqf
+        run: python3 tests/test_quran_pronunciation_050_089.py

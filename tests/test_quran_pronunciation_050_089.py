@@ -45,6 +45,13 @@ class QuranPronunciationDrafts(unittest.TestCase):
                         ending.endswith("ন্"),
                         f"{number}:{index}: fathatan is not dropped at verse-final waqf"
                     )
+                # Waqf on fathatan (including the unprinted alif after hamza)
+                # changes -an into long -aa, except on ta marbuta (stops as h).
+                if re.search(r"[ࣰً][اىٰ]?$", last_arabic) and not re.search(r"ة[ࣰً]$", last_arabic):
+                    self.assertTrue(
+                        ending.endswith(("া", "আ")),
+                        f"{number}:{index}: missing madd al-iwad long-aa"
+                    )
                 if last_arabic.endswith(("ى", "ىٰ")):
                     self.assertTrue(
                         ending.endswith(("া", "আ")),

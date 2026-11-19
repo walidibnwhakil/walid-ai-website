@@ -7,7 +7,7 @@
       1
     ],
     "complete_surah_count": 1,
-    "verses": 344,
+    "verses": 345,
     "coverage": [
       {
         "surah": 1,
@@ -93,6 +93,11 @@
         "surah": 4,
         "verses": "1-4",
         "basis": "Compared Arabic ayah text word-by-word with Quran.com An-Nisa 4:1–4 and normalized Bengali phonetic renderings."
+      },
+      {
+        "surah": 4,
+        "verses": "5",
+        "basis": "Arabic text checked at Quran.com An-Nisa 4:5; Bengali phonetic rendering reviewed against the Arabic words."
       }
     ],
     "note": "Only explicitly confirmed or individually rechecked ayahs are counted here."
@@ -101,10 +106,10 @@
     "branch": "feat/quran-bangla-pronunciation-text",
     "surahs": 114,
     "verses": 6236,
-    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5892 await review."
+    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5891 await review."
   },
   "pending": {
-    "verses": 5892,
+    "verses": 5891,
     "surahs_without_complete_coverage": 113,
     "fully_pending_surahs": 111,
     "partially_reviewed_surahs": [
@@ -331,6 +336,12 @@
       "verses": "1-4",
       "status": "reviewed_and_corrected",
       "commit": "51c572083be2e015dde100c065961b30f500a1cc"
+    },
+    {
+      "surah": 4,
+      "verses": "5",
+      "status": "reviewed_and_corrected",
+      "commit": "b70fd493946563682f46f5479dd2eb721d61e1e4"
     }
   ],
   "uncertain_ayahs": [

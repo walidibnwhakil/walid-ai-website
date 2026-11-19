@@ -1,13 +1,132 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-19T01:42:40.965830+00:00",
+  "updatedAt": "2026-11-19T09:51:55.379204+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Crimean Bridge attacked again, Russian official says",
+      "title": "BNP MP Selimuzzaman's house in Gopalganj torched",
+      "url": "https://en.prothomalo.com/bangladesh/local-news/k234a4auo1",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T09:25:59+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Survivors of Uganda's deadly landslide seek justice at the UN",
+      "url": "https://www.bbc.co.uk/news/articles/c920xgxp5785o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T09:21:54+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Dozens missing after boat carrying 100 migrants sinks off Senegal's coast",
+      "url": "https://www.bbc.co.uk/news/articles/c58j484089ewo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T09:02:52+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Activities-banned Awami League holds protest march in Gopalganj with machetes, hockey sticks",
+      "url": "https://en.prothomalo.com/bangladesh/r3n1g5iome",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T08:54:44+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Leader of Opposition advises PM to hold dialogue with political parties",
+      "url": "https://en.prothomalo.com/bangladesh/politics/bleiqktry6",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T08:32:36+00:00",
+      "category": "World"
+    },
+    {
+      "title": "From 2017 crackdown to UN court, a decade of the Rohingya crisis",
+      "url": "https://en.prothomalo.com/international/2gppwqwxuv",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T08:12:08+00:00",
+      "category": "World"
+    },
+    {
+      "title": "City Bank promotes youth entrepreneurship through Bangladesh Bank’s UDYOG initiative in Munshiganj",
+      "url": "https://en.prothomalo.com/corporate/21wihd5cni",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T08:09:54+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "US, China can help end Ukraine war, Trump tells Xi before trilateral with Putin",
+      "url": "https://en.prothomalo.com/international/6nuivuci4k",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T08:07:36+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "The silent tax of illiquidity: Why secondary market depth matters",
+      "url": "https://en.prothomalo.com/opinion/op-ed/dva10w7f68",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T07:54:54+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Riyadh skyscraper damaged as Saudi reports new Houthi attacks",
+      "url": "https://en.prothomalo.com/international/middle-east/ex9lyjk3fj",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T07:51:03+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Mideast crisis ‘largest threat’ to energy security ever: IEA",
+      "url": "https://en.prothomalo.com/international/middle-east/nb2utr8svu",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T07:44:09+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Crimean Bridge attacked again, Russia says",
       "url": "https://www.bbc.co.uk/news/articles/cm879dqn3e1jo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-19T01:05:03+00:00",
+      "publishedAt": "2026-11-19T07:32:06+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "20 factories in Gazipur, Savar declare holiday amid workers’ unrest, over 50 closed",
+      "url": "https://en.prothomalo.com/bangladesh/yzmt739avb",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T07:32:03+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Allegations of concealing toll collection information",
+      "url": "https://en.prothomalo.com/bangladesh/r38p2falaf",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T07:21:30+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Banned Chhatra League holds procession with machetes, oars near BNP MP’s house in Chattogram",
+      "url": "https://en.prothomalo.com/bangladesh/4ulev1te6l",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T07:04:14+00:00",
+      "category": "World"
+    },
+    {
+      "title": "This is a remarkable diplomatic moment for China's Xi - but it comes with pitfalls",
+      "url": "https://www.bbc.co.uk/news/articles/cr9d75we51j1o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T04:42:52+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Elon Musk says record $446m spending on US midterms was 'pretty foolish'",
+      "url": "https://www.bbc.co.uk/news/articles/cm9q8j2z3gg8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T02:59:06+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Anthropic valued at $1.5 trillion ahead of AI giant's stock market debut",
+      "url": "https://www.bbc.co.uk/news/articles/c6742m39xgzxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T02:20:15+00:00",
       "category": "Technology"
     },
     {
@@ -18,25 +137,11 @@
       "category": "Technology"
     },
     {
-      "title": "Claude-maker Anthropic poised for more than $1.4tn stock market debut",
-      "url": "https://www.bbc.co.uk/news/articles/c6742m39xgzxo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T23:44:27+00:00",
-      "category": "World"
-    },
-    {
       "title": "Russian arrested for spying on US defence company Palantir over Ukraine support",
       "url": "https://www.bbc.co.uk/news/articles/cq20xg80ly47o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-18T23:28:03+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Myanmar faces historic genocide verdict at UN court over Rohingya massacres",
-      "url": "https://www.bbc.co.uk/news/articles/c5m2l90ez144o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T23:04:06+00:00",
-      "category": "Bangladesh"
     },
     {
       "title": "Israeli military launches rare ground operation in Gaza beyond Yellow Line",
@@ -60,32 +165,11 @@
       "category": "Technology"
     },
     {
-      "title": "'The drones don't fly here' - BBC reports from Ukraine's new front line",
-      "url": "https://www.bbc.co.uk/news/articles/c32l507ev4v4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T17:00:04+00:00",
-      "category": "Technology"
-    },
-    {
       "title": "Parents jailed for torture and death of four-year-old girl found along French motorway in 1987",
       "url": "https://www.bbc.co.uk/news/articles/c6lyw490z14jo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-18T15:39:57+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Kuwait says it repelled first Iranian attack in two months after US strikes island",
-      "url": "https://www.bbc.co.uk/news/articles/cw4gn9jeqjq7o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T13:04:48+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Ghana's new $60m presidential jet sparks public outrage",
-      "url": "https://www.bbc.co.uk/news/articles/ck792dez8dp3o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T09:27:51+00:00",
-      "category": "World"
     }
   ],
   "sources": [
@@ -99,7 +183,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": false
+      "ok": true
     },
     {
       "name": "BBC World",

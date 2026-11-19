@@ -1,13 +1,83 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-19T01:42:41.260346+00:00",
+  "updatedAt": "2026-11-19T09:51:55.561784+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Man Utd pursuing Como's Paz - Thursday's gossip",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cxnv4q2qnvjvo?at_medium=RSS&at_campaign=rss",
+      "title": "Wainwright and Adams back for Wales against Australia",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6wy97v7j0g3o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-18T22:34:05+00:00",
+      "publishedAt": "2026-11-19T09:05:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Could England fears lead to fewer overseas players in PWR?",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cxnv43verrddo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T08:58:34+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Maine Road offer non-league haven to fans of scandal-hit Manchester City",
+      "url": "https://www.theguardian.com/football/2026/nov/19/manchester-city-guilty-verdict-premier-league-charges-maine-road-non-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T08:00:21+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Weekly sports quiz: When did England last beat the world champions?",
+      "url": "https://www.bbc.co.uk/sport/articles/c6pw4xnjrzydo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T07:54:27+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "How Premier League's big six keep getting richer",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c6x28e93zv3jo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T07:38:22+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "From Forest fringes to Glasner's go-to guy - the rise of McAtee",
+      "url": "https://www.bbc.co.uk/sport/football/articles/ck98z842gp11o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T07:14:11+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Verstappen 'trusts' F1 over Middle East decision",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/c6n0l14rjlw4o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T07:11:36+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "No trust problem with Ferrari team - Hamilton",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/cr8683z1wdp2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T06:56:13+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "UK firms owed thousands as Saudi-backed LIV paid golfers millions",
+      "url": "https://www.bbc.co.uk/sport/golf/articles/cw7vpv793n24o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T06:37:40+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Vote for the first BBC Men's Footballer of the Year",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c61wrqr7l1d8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T06:30:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Tennis the saviour for player who tried to take own life before Wimbledon",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/cm5y18p5v12yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T06:17:35+00:00",
       "category": "Sports"
     },
     {
@@ -32,20 +102,6 @@
       "category": "Sports"
     },
     {
-      "title": "Ukrainian FA to blame for failed drugs test - Mudryk",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cr930l71z5ejo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T21:22:18+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "FA explored legal challenge to Infantino staying on",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cm3eg1w4ypz5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T20:55:01+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "‘An honour’: Pochettino up for challenge of leading Manchester United revival",
       "url": "https://www.theguardian.com/football/2026/nov/18/mauricio-pochettino-arrives-manchester-united-head-coach-premier-league",
       "source": "The Guardian Football",
@@ -67,52 +123,10 @@
       "category": "Sports"
     },
     {
-      "title": "Mauricio Pochettino’s USMNT time will be remembered fondly, but it wasn’t transformational",
-      "url": "https://www.theguardian.com/football/2026/nov/18/pochettino-usmnt-manchester-united",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T18:00:04+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Zverev to defend himself against fresh lawsuit",
       "url": "https://www.bbc.co.uk/sport/tennis/articles/c60rkq9kweego?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-18T16:27:24+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "The sandpaper plot - who was there, who said what?",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/cqwy41w3zydgo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T16:13:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "The tightest survival scrap for years? Why it's not too early to worry",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cj3vgp36z063o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T16:09:55+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Alcaraz continues winning run despite injury concern",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/cmdx1erlpqkxo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T16:01:47+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Divide and conquer - now maverick Erasmus plans online watchalong",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cmvg28v20xy0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T15:02:01+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Joint-record six referee errors in last Premier League weekend",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c69q8jy924y4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T12:38:38+00:00",
       "category": "Sports"
     },
     {
@@ -127,13 +141,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/18/omar-sowunmi-bromley-footballer-model-kanye-west",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-18T12:00:59+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Duckett ton & impressive bowlers give England series win",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c6vg28end00xo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T11:24:26+00:00",
       "category": "Sports"
     },
     {
@@ -155,13 +162,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/18/premier-league-teams-full-backs-opta-analyst",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-18T08:00:35+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Josh Kerr: The making of the man behind the shades",
-      "url": "https://www.bbc.co.uk/sport/athletics/articles/cwe8506v754yo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T07:18:18+00:00",
       "category": "Sports"
     },
     {

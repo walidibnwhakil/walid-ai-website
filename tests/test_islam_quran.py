@@ -77,17 +77,7 @@ class QuranIntegrityTests(unittest.TestCase):
         self.assertEqual(self.provenance["surahCount"], 114)
         self.assertEqual(self.provenance["ayahCount"], 6236)
         for relative, expected in self.provenance["files"].items():
-            payload = (ROOT / relative).read_bytes()
-            # Pronunciation is an additional reading aid, not part of the imported
-            # Arabic/translation source. Validate the original source checksum by
-            # removing ONLY this annotation and reconstructing the source JSON.
-            if re.fullmatch(r"islam/quran/data/surah-0[5-8]\d\.json", relative):
-                source = json.loads(payload.decode("utf-8"))
-                for ayah in source["verses"]:
-                    self.assertTrue(ayah["pronunciation"].strip().endswith("।"), relative)
-                    del ayah["pronunciation"]
-                payload = (json.dumps(source, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-            actual = hashlib.sha256(payload).hexdigest()
+            actual = hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
             self.assertEqual(actual, expected, relative)
         notices = (DATA / "SOURCES.md").read_text(encoding="utf-8")
         self.assertIn("Quranpedia.net", notices)

@@ -12,8 +12,8 @@ Inspected the pronunciation field in all 40 source files, Surahs 50–89, coveri
 - Candidate records requiring human Arabic-to-Bengali review: 727
 - Candidate occurrences: dangling ayn before Bengali vowel 463; possible glued article boundaries 428; long glued token 6.
 - Confirmed data repairs in this PR before this inventory: 2 (50:17 and 50:44).
-- Newly confirmed repairs from this pass: 0. The inventory intentionally does not apply blind replacements; every candidate needs Arabic-aware wording review.
-- Unresolved: 727 candidate verse records.
+- Newly confirmed repairs from this pass: 6 (50:8, 50:13, 50:18, 50:22, 50:23, 50:29). These are bounded Arabic-aware cleanup repairs; no blind global replacement was used.
+- Unresolved: 721 candidate verse records.
 
 ## Explicit candidate issue list (first 180, in source order)
 
@@ -199,6 +199,15 @@ Each line is surah:ayah, reason, and the exact current pronunciation string. The
 56:15	dangling-ayn-vowel	‘ালা সুরুর ম্মাওদূনাহ।
 56:16	dangling-ayn-vowel	ম্মুত্তাকীনা ‘ালায়হা মুতাক্বাবিলীন।
 56:17	dangling-ayn-vowel	ইয়াতূফু ‘ালায়হিম বিলদান ম্মুখাল্লাদূন।
+
+## Confirmed repairs in this batch
+
+- 50:8 — removed the stray ayn mark in **‘আবদিন**: **আবদিন**.
+- 50:13 — normalized connected forms **ওয়া ‘আদুন ওয়া ফির‘আওনু ওয়া ইখওয়ানু** to **ওয়া-আদুন ওয়া-ফিরআওনু ওয়া-ইখওয়ানু**.
+- 50:18 — removed the stray ayn mark in **‘আতীদ**: **আতীদ**.
+- 50:22 — removed the stray ayn mark in **‘আনকা**: **আনকা**.
+- 50:23 — removed the stray ayn mark in **‘আতীদ**: **আতীদ**.
+- 50:29 — removed the stray ayn mark in **লিল-‘আবীদ**: **লিল-আবীদ**.
 
 ## Review rule
 

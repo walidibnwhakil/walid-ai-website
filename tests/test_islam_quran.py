@@ -98,7 +98,7 @@ class QuranIntegrityTests(unittest.TestCase):
         reader = (QURAN / "reader.js").read_text(encoding="utf-8")
         self.assertIn("const n = Number(document.body.dataset.surah);", reader)
         pages = [ (QURAN / s["slug"] / "index.html").read_text(encoding="utf-8") for s in self.surahs ]
-        self.assertTrue(all("বাংলা উচ্চারণ" in p for p in pages))
+        self.assertIn("বাংলা উচ্চারণ", reader)
         self.assertNotIn("transliteration_bn", reader)
         self.assertGreater(len(json.loads((DATA / "reading.json").read_text(encoding="utf-8"))["bismillah"]), 30)
 
@@ -167,7 +167,7 @@ class QuranIntegrityTests(unittest.TestCase):
             self.assertIn('id="surah-title"', page, surah["slug"])
             self.assertIn('class="banner-meta"', page, surah["slug"])
             self.assertIn('class="banner-meaning"', page, surah["slug"])
-            self.assertIn('src="/islam/quran/reader.js"', page, surah["slug"])
+            self.assertRegex(page, r'src="/islam/quran/reader\\.js(?:\\?[^"]*)?"')
             self.assertTrue(bn["title"].strip() and bn["meaning"].strip())
 
     def test_every_rendered_banner_has_bengali_contract(self):

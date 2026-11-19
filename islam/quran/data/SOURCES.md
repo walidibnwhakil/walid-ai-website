@@ -10,7 +10,7 @@ The source snapshot was obtained from `risan/quran-json` (version 4.0.0, CC BY-S
 
 বাংলা অনুবাদ: মাওলানা মুহিউদ্দীন খান (Muhiuddin Khan), machine-readable edition `quran-json@3.1.2` (`dist/chapters/bn/{1..114}.json`). The source page <https://al-quran.kaizar.us/sources> declares this edition as Muhiuddin Khan, with provenance `quran-json (Risan Bagja Pradana)` and translations from <https://tanzil.net/>; declared licence: <https://creativecommons.org/licenses/by-sa/4.0/> CC BY-SA 4.0. Source files were fetched verbatim; no translation text, punctuation, or notes were invented or paraphrased. All 114 chapter files were checked: 6,236 verses total. The reader checks source counts and renders the source `translation` string unchanged. Separate attribution page: <https://walid-ai.com/islam/quran/credits/>.
 
-QuranEnc edition identifier: `bengali_zakaria` (version 1.1.1) is retained in the provenance record for the licensed translator notes.
+QuranEnc translator: Abu Bakr Zakaria; edition identifier: `bengali_zakaria` (version 1.1.1) is retained in the provenance record for the licensed translator notes.
 
 ## Surah metadata
 

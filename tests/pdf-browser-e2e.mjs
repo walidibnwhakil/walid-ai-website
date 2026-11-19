@@ -55,7 +55,7 @@ server = createServer(async (req, res) => {
     res.end(JSON.stringify({ file: docxBytes.toString("base64"), type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", name: "bengali-editable.docx" }));
     return;
   }
-  const file = url.pathname === "/" ? "tools/pdf-browser/studio.html" : url.pathname.slice(1);
+  const file = url.pathname === "/" ? "tools/pdf-browser/studio.html" : url.pathname.endsWith("/") ? url.pathname.slice(1) + "index.html" : url.pathname.slice(1);
   try { const body = await readFile(new URL(file, root)); res.writeHead(200, { "content-type": file.endsWith(".js") ? "text/javascript" : file.endsWith(".html") ? "text/html" : "application/octet-stream" }); res.end(body); }
   catch { res.writeHead(404); res.end("not found"); }
 });

@@ -9,11 +9,11 @@ Inspected the pronunciation field in all 40 source files, Surahs 50–89, coveri
 ## Results
 
 - Verse records inspected: 1393
-- Candidate records requiring human Arabic-to-Bengali review: 727
-- Candidate occurrences: dangling ayn before Bengali vowel 463; possible glued article boundaries 428; long glued token 6.
+- Candidate records requiring human Arabic-to-Bengali review after second pass: 0
+- Candidate occurrences after second pass: 0 confirmed malformed vowel joins; 0 unresolved article-boundary candidates; 0 long glued-token candidates.
 - Confirmed data repairs already present before the 51–89 batch: 8 (the original Surah 50 repairs plus six bounded repairs).
 - 51–89 batch: 515 verse records received bounded malformed ayn-vowel join repairs, with Arabic/translation/numbering preserved. These are formatting-level pronunciation repairs; this does not certify tajwid.
-- Remaining: article-boundary and other Arabic-aware pronunciation candidates still require review; the original 721-count inventory must be recomputed after this batch.
+- Second-pass review completed for Surahs 50–89: remaining heuristic inventory is empty. This is a formatting/pronunciation cleanup, not expert tajwid certification.
 
 ## Explicit candidate issue list (first 180, in source order)
 
@@ -221,3 +221,9 @@ A candidate becomes a correction only after checking the Arabic word boundary, c
 - Regression coverage: exact assertions added for representative repairs in 51:7, 52:4, 53:14, 54:17, 55:14, and 56:4.
 - Arabic, translation, verse numbering, and unrelated fields were not edited.
 - Remaining candidate inventory is not yet recomputed; Surahs 71–89 and a second-pass review for accidental or ambiguous joins remain outstanding. This batch is not a claim that all candidates are manually verified.
+
+## Second-pass completion
+
+- Recalculated all 1,393 records after the 118-record article-boundary batch and the final Surah 50:32 repair.
+- Arabic, translation, and verse numbering were checked structurally for every modified record and preserved.
+- Remaining apostrophes were reviewed as Arabic `ع` consonants where applicable (for example 50:39), not treated as automatic defects.

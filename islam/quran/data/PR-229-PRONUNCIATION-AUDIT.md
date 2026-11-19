@@ -212,3 +212,12 @@ Each line is surah:ayah, reason, and the exact current pronunciation string. The
 ## Review rule
 
 A candidate becomes a correction only after checking the Arabic word boundary, connected recitation, Bengali readability, and waqf/final form. Arabic, translation, verse numbering, and unrelated fields must remain unchanged. Regression tests should assert exact corrected phrases for confirmed repairs and lint only structural hazards; lint must not be described as proving pronunciation accuracy for every verse.
+
+
+## Continued Arabic-aware boundary batch (2026-11-19)
+
+- Surahs 51–60: 206 verse records received targeted article-boundary repairs after checking the source Arabic for Arabic definite-article markers; non-article forms such as আল্লাহ and আলায়হি were excluded.
+- Surahs 61–70: 116 verse records received the same targeted repair.
+- Regression coverage: exact assertions added for representative repairs in 51:7, 52:4, 53:14, 54:17, 55:14, and 56:4.
+- Arabic, translation, verse numbering, and unrelated fields were not edited.
+- Remaining candidate inventory is not yet recomputed; Surahs 71–89 and a second-pass review for accidental or ambiguous joins remain outstanding. This batch is not a claim that all candidates are manually verified.

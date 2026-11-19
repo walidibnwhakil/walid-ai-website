@@ -11,9 +11,9 @@ Inspected the pronunciation field in all 40 source files, Surahs 50–89, coveri
 - Verse records inspected: 1393
 - Candidate records requiring human Arabic-to-Bengali review: 727
 - Candidate occurrences: dangling ayn before Bengali vowel 463; possible glued article boundaries 428; long glued token 6.
-- Confirmed data repairs in this PR before this inventory: 2 (50:17 and 50:44).
-- Newly confirmed repairs from this pass: 6 (50:8, 50:13, 50:18, 50:22, 50:23, 50:29). These are bounded Arabic-aware cleanup repairs; no blind global replacement was used.
-- Unresolved: 721 candidate verse records.
+- Confirmed data repairs already present before the 51–89 batch: 8 (the original Surah 50 repairs plus six bounded repairs).
+- 51–89 batch: 515 verse records received bounded malformed ayn-vowel join repairs, with Arabic/translation/numbering preserved. These are formatting-level pronunciation repairs; this does not certify tajwid.
+- Remaining: article-boundary and other Arabic-aware pronunciation candidates still require review; the original 721-count inventory must be recomputed after this batch.
 
 ## Explicit candidate issue list (first 180, in source order)
 

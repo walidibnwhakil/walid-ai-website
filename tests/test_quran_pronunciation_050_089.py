@@ -13,6 +13,22 @@ DATA = ROOT / "islam" / "quran" / "data"
 
 
 class QuranPronunciationDrafts(unittest.TestCase):
+    def test_concrete_connected_recitation_repairs(self):
+        data = {item["verse"]: item["pronunciation"] for item in json.loads(
+            (DATA / "surah-050.json").read_text(encoding="utf-8")
+        )["verses"]}
+        self.assertEqual(
+            data[17],
+            "ইয্ ইয়াতালাক্কাল মুতালাক্কিয়ানি আনিল ইয়ামীন ওয়া আনিশ্ শিমালি ক্বাঈদ।",
+        )
+        self.assertEqual(
+            data[44],
+            "ইয়াওমা তাশাক্কাকুল আরদু আনহুম সিরা‘আন। যালিকা হাশরুন ‘আলাইনা ইয়াসীর।",
+        )
+        self.assertNotIn("‘ানি", data[17])
+        self.assertNotIn("আলমুতালাক্ব্ক্বীনি", data[17])
+        self.assertNotIn("আলআরদু", data[44])
+
     def test_coverage_and_unmodified_arabic_translation(self):
         ayat = 0
         for number in range(50, 90):

@@ -27,7 +27,8 @@ class QuranPronunciationDrafts(unittest.TestCase):
                              list(range(1, len(base["verses"]) + 1)))
             for index, (verse, original) in enumerate(zip(current["verses"], base["verses"]), 1):
                 stripped = {key: value for key, value in verse.items() if key != "pronunciation"}
-                self.assertEqual(stripped, original, f"{number}:{index}: Quran source changed")
+                original_stripped = {key: value for key, value in original.items() if key != "pronunciation"}
+                self.assertEqual(stripped, original_stripped, f"{number}:{index}: Quran source changed")
                 text = verse.get("pronunciation")
                 self.assertIsInstance(text, str, f"{number}:{index}")
                 self.assertTrue(text.strip() and text.endswith("।"), f"{number}:{index}")

@@ -1,13 +1,118 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-19T12:28:58.942617+00:00",
+  "updatedAt": "2026-11-19T18:51:09.641172+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Summer signings join Lionel Messi among MLS’s top earners: Takeaways from the league’s salary release",
+      "url": "https://www.theguardian.com/football/2026/nov/19/mls-salary-release-lionel-messi-spent-per-point",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T18:01:17+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Shelton moves closer to ATP Finals last-four spot",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/c64gne03ykjro?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T16:18:50+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Struggling Blackpool sack Evatt on his birthday",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm4g1rzjj4v2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T16:12:14+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Premier League clubs vote through new rules to increase legal protection for board",
+      "url": "https://www.theguardian.com/football/2026/nov/19/premier-league-vote-new-rules-financial-indemnity-lawsuits",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T16:03:07+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Fifa sparks tension with demand for tax-free status in UK for Women’s World Cup",
+      "url": "https://www.theguardian.com/football/2026/nov/19/fifa-demand-tax-free-status-in-uk-womens-world-cup-2035-government",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T16:00:06+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Football Daily | Football’s political gamers face off at Fifa with the real-life final boss",
+      "url": "https://www.theguardian.com/football/2026/nov/19/football-daily-fifa-presidential-election",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T15:42:09+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Nicholls sets record for jump winners by British trainer",
+      "url": "https://www.bbc.co.uk/sport/horse-racing/articles/cr2klg0qwy98o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T15:19:28+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Culture, defence, Fernandes - Pochettino's priorities at Man Utd",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cxlylzyg38l8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T15:05:21+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Cummins' Australia captaincy at a crossroads - Agnew",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c94gnev3kj4vo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T14:57:42+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Furbank leads returning England trio for All Blacks visit",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ckdd1y064y0go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T14:18:36+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Ireland hooker Sheehan named at number eight for Springboks game",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cm4gnpgn3z1wo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T13:59:31+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Premier League clubs to cover legal costs if Man City sponsors sue",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqy4jvdw7jdlo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T13:29:42+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Mauricio Pochettino calls for Manchester United to show no fear against Liverpool",
+      "url": "https://www.theguardian.com/football/2026/nov/19/manchester-united-mauricio-pochettino-liverpool-anfield-no-fear",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T12:38:05+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Danny Kelly loved football and never forgot the absurdity of earning a living talking about it | Max Rushden",
+      "url": "https://www.theguardian.com/football/2026/nov/19/danny-kelly-death-football-radio",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T12:28:40+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Gonzalo García: ‘I love Craven Cottage – the fans can reach out and touch you’",
       "url": "https://www.theguardian.com/football/2026/nov/19/gonzalo-garcia-fulham-spain-premier-leaue-interview",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-19T12:16:42+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Washington Spirit v Kansas City Current: where the NWSL Championship will be won and lost",
+      "url": "https://www.theguardian.com/football/2026/nov/19/nwsl-championship-washington-spirit-kc-current-moving-the-goalposts",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T11:40:20+00:00",
       "category": "Sports"
     },
     {
@@ -18,38 +123,10 @@
       "category": "Sports"
     },
     {
-      "title": "Race for the Fifa presidency: lineup revealed to challenge Gianni Infantino",
-      "url": "https://www.theguardian.com/football/2026/nov/19/fifa-president-election-philippe-diallo-kozo-tashima-challenge-gianni-infantino",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T10:56:21+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'I'm very healthy' - Kompany to return to dugout after health scare",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cm0rkzwgn0lro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T10:32:30+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Eight-year ban for player who threw rock that hit assistant referee",
       "url": "https://www.bbc.co.uk/sport/football/articles/cqlyk9yzkz2no?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T10:20:58+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Five return for Wales' World Cup play-off final",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c620535y8zpjo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T10:00:07+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Wainwright and Adams back for Wales against Australia",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6wy97v7j0g3o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T09:05:24+00:00",
       "category": "Sports"
     },
     {
@@ -60,31 +137,10 @@
       "category": "Sports"
     },
     {
-      "title": "Weekly sports quiz: When did England last beat the men's world champions?",
-      "url": "https://www.bbc.co.uk/sport/articles/c6pw4xnjrzydo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T07:54:27+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "How Premier League's big six keep getting richer",
       "url": "https://www.bbc.co.uk/sport/football/articles/c6x28e93zv3jo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T07:38:22+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "From Forest fringes to Glasner's go-to guy - the rise of McAtee",
-      "url": "https://www.bbc.co.uk/sport/football/articles/ck98z842gp11o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T07:14:11+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "No trust problem with Ferrari team - Hamilton",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/cr8683z1wdp2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T06:56:13+00:00",
       "category": "Sports"
     },
     {
@@ -102,66 +158,10 @@
       "category": "Sports"
     },
     {
-      "title": "Tennis the saviour for player who tried to take own life before Wimbledon",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/cm5y18p5v12yo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T06:17:35+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Littler shocked by brilliant Wattimena at Grand Slam",
-      "url": "https://www.bbc.co.uk/sport/darts/articles/crlyenxw18d7o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T22:33:32+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Manchester United’s infamous 1974 relegation is a warning from history",
       "url": "https://www.theguardian.com/football/2026/nov/18/manchester-united-infamous-1974-relegation-is-a-warning-from-history",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-18T22:30:10+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Veerle Buurman scrambles late WCL winner to push blunt Chelsea past PSG",
-      "url": "https://www.theguardian.com/football/2026/nov/18/chelsea-paris-saint-germain-womens-champions-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T22:06:45+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Leicester part ways with BC Game after sponsor’s partnership with porn actor",
-      "url": "https://www.theguardian.com/football/2026/nov/18/leicester-city-bc-game-porn-star-eva-elfie-sponsorship",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T19:01:59+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Emma Hayes to assist in US Soccer hiring process for next USMNT coach",
-      "url": "https://www.theguardian.com/football/2026/nov/18/emma-hayes-usmnt-head-coach-hiring-process",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T18:44:26+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Netflix, Fox and the $2bn bid for the 2030 World Cup that could reshape live sports",
-      "url": "https://www.theguardian.com/football/2026/nov/18/netflix-fox-2030-world-cup-television-rights",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T12:01:00+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Jack Grealish recalls a golden age of mavericks – but football has moved on",
-      "url": "https://www.theguardian.com/football/2026/nov/18/jack-grealish-recalls-a-golden-age-of-mavericks-but-football-has-moved-on",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T08:00:36+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Overlap, underlap or sit back? How Premier League teams use their full-backs",
-      "url": "https://www.theguardian.com/football/2026/nov/18/premier-league-teams-full-backs-opta-analyst",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T08:00:35+00:00",
       "category": "Sports"
     },
     {

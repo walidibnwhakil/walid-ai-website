@@ -159,7 +159,7 @@ class QuranIntegrityTests(unittest.TestCase):
         bengali = json.loads((DATA / "bengali-metadata.json").read_text(encoding="utf-8"))
         self.assertEqual(len(bengali), 114)
         self.assertEqual({row["number"] for row in bengali}, set(range(1, 115)))
-        self.assertTrue(all(re.search(r"[\\u0980-\\u09ff]", row["title"] + row["meaning"]) for row in bengali))
+        self.assertTrue(all(re.search(r"[\u0980-\u09ff]", row["title"] + row["meaning"]) for row in bengali))
         reader = (QURAN / "reader.js").read_text(encoding="utf-8")
         self.assertIn("bengali-metadata.json", reader)
         self.assertRegex(reader, r"updateHeader\\(\\);\\s*$")

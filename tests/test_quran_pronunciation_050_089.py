@@ -40,6 +40,11 @@ class QuranPronunciationDrafts(unittest.TestCase):
                 # At a verse boundary, alif maqsurah retains its long ā.
                 # A prior generator silently omitted this vowel in 68 verses.
                 ending = text.removesuffix("।").strip()
+                if re.search(r"[ࣰً]", last_arabic):
+                    self.assertFalse(
+                        ending.endswith("ন্"),
+                        f"{number}:{index}: fathatan is not dropped at verse-final waqf"
+                    )
                 if last_arabic.endswith(("ى", "ىٰ")):
                     self.assertTrue(
                         ending.endswith(("া", "আ")),

@@ -4,10 +4,24 @@
   "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated. User-approved conventions: preserve the Arabic ayah, use readable Bengali phonetic spelling, and end each line with Bengali danda (।). Bengali transliteration is a reading aid, not tajwid instruction.",
   "verified": {
     "complete_surahs": [
-      1
+      1,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114
     ],
-    "complete_surah_count": 1,
-    "verses": 376,
+    "complete_surah_count": 15,
+    "verses": 424,
     "coverage": [
       {
         "surah": 1,
@@ -118,27 +132,73 @@
         "surah": 104,
         "verses": "1-9",
         "basis": "Arabic ayahs and Bengali pronunciations individually compared with the per-ayah Bengali-script text on Sehri.bd Surah Al-Humazah (https://sehri.bd/urd/quran/al-humazah/). Text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 105,
+        "verses": "1-5",
+        "basis": "Arabic ayahs compared verse by verse with Bengali-script pronunciations in Bangladesh Class 5 Islam and Naitik Shikkha textbook PDF (https://www.contestbn.com.bd/uploads/article/4212bdb8281089aef7654f218f7f9def.pdf); checked against repository Arabic. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 106,
+        "verses": "1-4",
+        "basis": "Arabic ayahs compared with Bengali-script pronunciations in Bangladesh Class 5 Islam and Naitik Shikkha textbook PDF (same source URL); checked against repository Arabic, resolving connected-word/waqf spelling independently. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 107,
+        "verses": "1-7",
+        "basis": "Compared against Bengali pronunciation lines printed alongside Arabic in Bangladesh Class 5 Islam textbook PDF (https://www.contestbn.com.bd/uploads/article/4212bdb8281089aef7654f218f7f9def.pdf) and government Chittagong portal textbook PDF (https://file-chittagong.portal.gov.bd/media/39dcb672-e11c-404f-a348-f2ff72fe4977/uploaded-files/5-Religion-Islam.pdf); checked verse segmentation against repository Arabic. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 108,
+        "verses": "1-3",
+        "basis": "Compared with Bengali-script ayah pronunciations on Sehri.bd (https://sehri.bd/ban/quran/al-kawthar/) and Arabic/Bengali textbook text (https://file-chittagong.portal.gov.bd/media/39dcb672-e11c-404f-a348-f2ff72fe4977/uploaded-files/5-Religion-Islam.pdf); normalized spelling against repository Arabic. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 109,
+        "verses": "1-6",
+        "basis": "Compared with Arabic and Bengali pronunciation in Bangladesh government Chittagong portal Islam textbook PDF (https://file-chittagong.portal.gov.bd/media/39dcb672-e11c-404f-a348-f2ff72fe4977/uploaded-files/5-Religion-Islam.pdf), cross-checked with Ajker Patrika (https://www.ajkerpatrika.com/islam/ajp14t8yym3dh); checked each ayah against repository Arabic. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 110,
+        "verses": "1-3",
+        "basis": "Compared ayah-by-ayah with Bengali-script text on Sehri.bd Surah An-Nasr (https://sehri.bd/urd/quran/an-nasr/); checked against repository Arabic. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 111,
+        "verses": "1-5",
+        "basis": "Compared verse-by-verse with Bengali-script text on Sehri.bd Surah Al-Masad (https://sehri.bd/urd/quran/al-masad/) and checked against repository Arabic. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 112,
+        "verses": "1-4",
+        "basis": "Compared with Bengali-script text on Sehri.bd Surah Al-Ikhlas (https://sehri.bd/urd/quran/al-ikhlas/); checked each line against repository Arabic. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 113,
+        "verses": "1-5",
+        "basis": "Compared with Bengali-script ayah text on Sehri.bd Surah Al-Falaq (https://sehri.bd/ban/quran/al-falaq/); corrected spelling to match Arabic and the source. Written-text comparison only; no audio recitation review."
+      },
+      {
+        "surah": 114,
+        "verses": "1-6",
+        "basis": "Compared ayah-by-ayah with Bengali-script text on Sehri.bd Surah An-Nas (https://sehri.bd/urd/quran/an-nas/); checked the Bengali wording directly against repository Arabic, especially connected lām/nūn forms. Written-text comparison only; no audio recitation review."
       }
     ],
-    "note": "Only explicitly confirmed or individually rechecked ayahs are counted here. This project-level status reflects written source comparison and does not imply audio recitation/tajwid review."
+    "note": "Only explicitly confirmed or individually rechecked ayahs are counted here. Status reflects written-source comparison against Arabic and does not imply audio recitation or tajwid review."
   },
   "draft_candidates": {
     "branch": "feat/quran-bangla-pronunciation-text",
     "surahs": 114,
     "verses": 6236,
-    "status": "All 6236 text fields remain stored; reviewed coverage above is shown. The remaining 5860 await review."
+    "status": "All 6236 text fields remain stored; reviewed coverage above is shown. The remaining 5812 await review."
   },
   "pending": {
-    "verses": 5860,
-    "surahs_without_complete_coverage": 113,
-    "fully_pending_surahs": 121,
+    "verses": 5812,
+    "surahs_without_complete_coverage": 99,
+    "fully_pending_surahs": 97,
     "partially_reviewed_surahs": [
       2,
-      3,
-      101,
-      102,
-      103,
-      104
+      3
     ]
   },
   "source": "Repository Arabic text is the base. quran.gov.bd Bengali transliteration policy/reference is used for review, not copied into the site.",

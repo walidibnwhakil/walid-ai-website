@@ -13,6 +13,38 @@ DATA = ROOT / "islam" / "quran" / "data"
 
 
 class QuranPronunciationDrafts(unittest.TestCase):
+    def test_concrete_connected_recitation_repairs(self):
+        data = {item["verse"]: item["pronunciation"] for item in json.loads(
+            (DATA / "surah-050.json").read_text(encoding="utf-8")
+        )["verses"]}
+        self.assertEqual(
+            data[17],
+            "ইয্ ইয়াতালাক্কাল মুতালাক্কিয়ানি আনিল ইয়ামীন ওয়া আনিশ্ শিমালি ক্বাঈদ।",
+        )
+        self.assertEqual(
+            data[44],
+            "ইয়াওমা তাশাক্কাকুল আরদু আনহুম সিরা‘আন। যালিকা হাশরুন ‘আলাইনা ইয়াসীর।",
+        )
+        self.assertNotIn("‘ানি", data[17])
+        self.assertNotIn("আলমুতালাক্ব্ক্বীনি", data[17])
+        self.assertNotIn("আলআরদু", data[44])
+        self.assertEqual(data[8], "তাবসিরাত ওয়া যিকরা লিকুল্লি ‘আবদিন মুনীব।")
+        self.assertEqual(data[13], "ওয়া-আদুন ওয়া-ফিরআওনু ওয়া-ইখওয়ানু লূত।")
+        self.assertEqual(data[18], "মা ইয়ালফিযু মিন ক্বাওলিন ইল্লা লাদাইহি রাকীবুন আতীদ।")
+        self.assertEqual(data[22], "লাক্বাদ কুনতা ফী গাফলাতিন মিন হাযা ফাকাশাফনা আনকা গিতাআকা ফাবাসারুকাল-ইয়াওমা হাদীদ।")
+        self.assertEqual(data[23], "ওয়া ক্বালা ক্বারীনুহু হাযা মা লাদাইয়া আতীদ।")
+        self.assertEqual(data[29], "মা ইউবাদ্দালুল-ক্বাওলু লাদাইয়া ওয়া মা আনা বিজাল্লামিল-লিল-আবীদ।")
+        self.assertEqual(data[4], "ক্বাদ আলিমনা মা তানক্বুসু আল-আরদু মিনহুম ওয়া ‘ইনদানা কিতাবুন্ হাফীজ।")
+        self.assertEqual(data[7], "ওয়াল-আরদা মাদাদনাহা ওয়া আলক্বায়না ফীহা রাওয়াসী ওয়া আনবাতনা ফীহা মিন কুল্লি যাওজিন বাহীজ।")
+        self.assertEqual(data[8], "তাবসিরাত ওয়া যিকরা লিকুল্লি ‘আবদিন মুনীব।")
+        # Representative regressions from the 51–89 batch: malformed ayn-vowel
+        # joins are repaired without changing Arabic, translation, or numbering.
+        for number, verses in ((51, [9, 13, 25]), (68, [6, 13]), (89, [6, 13, 18])):
+            source = json.loads((DATA / f"surah-{number:03}.json").read_text(encoding="utf-8"))
+            by_verse = {item["verse"]: item["pronunciation"] for item in source["verses"]}
+            for verse in verses:
+                self.assertNotRegex(by_verse[verse], r"‘[ািুেো]")
+
     def test_coverage_and_unmodified_arabic_translation(self):
         ayat = 0
         for number in range(50, 90):
@@ -27,7 +59,8 @@ class QuranPronunciationDrafts(unittest.TestCase):
                              list(range(1, len(base["verses"]) + 1)))
             for index, (verse, original) in enumerate(zip(current["verses"], base["verses"]), 1):
                 stripped = {key: value for key, value in verse.items() if key != "pronunciation"}
-                self.assertEqual(stripped, original, f"{number}:{index}: Quran source changed")
+                original_source = {key: value for key, value in original.items() if key != "pronunciation"}
+                self.assertEqual(stripped, original_source, f"{number}:{index}: Quran source changed")
                 text = verse.get("pronunciation")
                 self.assertIsInstance(text, str, f"{number}:{index}")
                 self.assertTrue(text.strip() and text.endswith("।"), f"{number}:{index}")
@@ -68,3 +101,17 @@ class QuranPronunciationDrafts(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_article_boundary_repairs_surahs_51_to_60():
+    expected = {
+        (51, 7): "ওয়াস-সামাঈ যাতি আল-হুবুক।",
+        (52, 4): "ওয়ালবায়তি আল-মা‘মূর।",
+        (53, 14): "ইনদা সিদরাতি আল-মুনতাহা।",
+        (54, 17): "ওয়ালাক্বাদ ইয়াস্সারনা আল-কুরআনা লিলয্যিকরি ফাহাল মিন ম্মুদ্দাকির।",
+        (55, 14): "খালাক্বা আল-ইনসানা মিন সালসাল কালফাখ্খার।",
+        (56, 4): "ইযা রুজ্জাতি আল-আরদু রাজ্জা।",
+    }
+    for (surah, verse), phrase in expected.items():
+        record = next(v for v in load_surah(surah)["verses"] if v["verse"] == verse)
+        assert record["pronunciation"] == phrase

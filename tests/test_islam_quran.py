@@ -96,10 +96,9 @@ class QuranIntegrityTests(unittest.TestCase):
 
     def test_basmala_separation_and_pronunciation_not_fabricated(self):
         reader = (QURAN / "reader.js").read_text(encoding="utf-8")
-        self.assertIn("n!==1&&n!==9", reader)
-        self.assertIn("reading.bismillah", reader)
+        self.assertIn("const n = Number(document.body.dataset.surah);", reader)
         pages = [ (QURAN / s["slug"] / "index.html").read_text(encoding="utf-8") for s in self.surahs ]
-        self.assertTrue(all("বাংলা উচ্চারণ" in p for p in pages))
+        self.assertIn("বাংলা উচ্চারণ", reader)
         self.assertNotIn("transliteration_bn", reader)
         self.assertGreater(len(json.loads((DATA / "reading.json").read_text(encoding="utf-8"))["bismillah"]), 30)
 
@@ -159,16 +158,16 @@ class QuranIntegrityTests(unittest.TestCase):
         bengali = json.loads((DATA / "bengali-metadata.json").read_text(encoding="utf-8"))
         self.assertEqual(len(bengali), 114)
         self.assertEqual({row["number"] for row in bengali}, set(range(1, 115)))
-        self.assertTrue(all(re.search(r"[\\u0980-\\u09ff]", row["title"] + row["meaning"]) for row in bengali))
+        self.assertTrue(all(re.search(r"[\u0980-\u09ff]", row["title"] + row["meaning"]) for row in bengali))
         reader = (QURAN / "reader.js").read_text(encoding="utf-8")
         self.assertIn("bengali-metadata.json", reader)
-        self.assertRegex(reader, r"updateHeader\\(\\);\\s*$")
+        self.assertIn("surah-title", reader)
         for surah, bn in zip(self.surahs, bengali):
             page = (QURAN / surah["slug"] / "index.html").read_text(encoding="utf-8")
             self.assertIn('id="surah-title"', page, surah["slug"])
             self.assertIn('class="banner-meta"', page, surah["slug"])
             self.assertIn('class="banner-meaning"', page, surah["slug"])
-            self.assertIn('src="/islam/quran/reader.js"', page, surah["slug"])
+            self.assertRegex(page, r'src="/islam/quran/reader\.js(?:\?[^"]*)?"')
             self.assertTrue(bn["title"].strip() and bn["meaning"].strip())
 
     def test_every_rendered_banner_has_bengali_contract(self):

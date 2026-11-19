@@ -37,6 +37,19 @@ class QuranPronunciationDrafts(unittest.TestCase):
                         re.search(r"(?:উন্|ইন্)\u0964$", text),
                         f"{number}:{index}: verse-final tanwin contradicts waqf"
                     )
+                # At a verse boundary, alif maqsurah retains its long ā.
+                # A prior generator silently omitted this vowel in 68 verses.
+                ending = text.removesuffix("।").strip()
+                if last_arabic.endswith(("ى", "ىٰ")):
+                    self.assertTrue(
+                        ending.endswith(("া", "আ")),
+                        f"{number}:{index}: lost final alif-maqsurah long-aa"
+                    )
+                if re.search(r"ة[ࣰًࣱٌࣲٍَُِ]?$", last_arabic):
+                    self.assertTrue(
+                        ending.endswith(("হ", "া")),
+                        f"{number}:{index}: ta marbuta has wrong waqf ending"
+                    )
                 ayat += 1
         self.assertEqual(ayat, 1393)
 

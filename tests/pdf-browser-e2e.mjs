@@ -113,8 +113,8 @@ const compressed = await download(compress, "#download"); assert.equal(compresse
 
 const word = await context.newPage();
 mark("open pdf-to-word");
-await word.goto("http://127.0.0.1:" + port + "/tools/pdf-to-word/index.html", { waitUntil: "domcontentloaded", timeout: 15000 });
-const frame = word.frameLocator('iframe[title="PDF to Word tool"]');
+await word.goto("http://127.0.0.1:" + port + "/tool-workspace/?tool=pdf-to-word&embedded=1&standalone=1", { waitUntil: "domcontentloaded", timeout: 15000 });
+const frame = word;
 mark("build Bengali PDF fixture"); const wordInput = await withTimeout(pdfFixture(word, 1, true), 30000, "Bengali PDF fixture");
 await frame.locator("#pdfFiles").waitFor({ state: "attached", timeout: 30000 });
 await frame.locator("#pdfFiles").setInputFiles({ name: "bengali-source.pdf", mimeType: "application/pdf", buffer: Buffer.from(wordInput) });

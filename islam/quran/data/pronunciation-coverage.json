@@ -7,7 +7,7 @@
       1
     ],
     "complete_surah_count": 1,
-    "verses": 424,
+    "verses": 345,
     "coverage": [
       {
         "surah": 1,
@@ -98,81 +98,6 @@
         "surah": 4,
         "verses": "5",
         "basis": "Arabic text checked at Quran.com An-Nisa 4:5; Bengali phonetic rendering reviewed against the Arabic words."
-      },
-      {
-        "surah": 101,
-        "verses": "1-11",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 102,
-        "verses": "1-8",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 103,
-        "verses": "1-3",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 104,
-        "verses": "1-9",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 105,
-        "verses": "1-5",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 106,
-        "verses": "1-4",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 107,
-        "verses": "1-7",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 108,
-        "verses": "1-3",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 109,
-        "verses": "1-6",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 110,
-        "verses": "1-3",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 111,
-        "verses": "1-5",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 112,
-        "verses": "1-4",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 113,
-        "verses": "1-5",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 114,
-        "verses": "1-6",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
-      },
-      {
-        "surah": 114,
-        "verses": "6",
-        "basis": "Revised against the repository's verified Arabic text and cross-checked with the available open Arabic/Bengali-text examples; spelling normalized to the project's Bengali style."
       }
     ],
     "note": "Only explicitly confirmed or individually rechecked ayahs are counted here."
@@ -181,12 +106,12 @@
     "branch": "feat/quran-bangla-pronunciation-text",
     "surahs": 114,
     "verses": 6236,
-    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5812 await review."
+    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5891 await review."
   },
   "pending": {
-    "verses": 5812,
+    "verses": 5891,
     "surahs_without_complete_coverage": 113,
-    "fully_pending_surahs": 111,
+    "fully_pending_surahs": 125,
     "partially_reviewed_surahs": [
       2,
       3
@@ -417,96 +342,6 @@
       "verses": "5",
       "status": "reviewed_and_corrected",
       "commit": "b70fd493946563682f46f5479dd2eb721d61e1e4"
-    },
-    {
-      "surah": 101,
-      "verses": "1-11",
-      "status": "reviewed_and_corrected",
-      "commit": "224e49d9109bc8182e0a06b32d325632dd809805"
-    },
-    {
-      "surah": 102,
-      "verses": "1-8",
-      "status": "reviewed_and_corrected",
-      "commit": "bd6f33be923dd8225dc2b2fc1273fab754ac1659"
-    },
-    {
-      "surah": 103,
-      "verses": "1-3",
-      "status": "reviewed_and_corrected",
-      "commit": "538cbd8d3d3c7d591c192885d49182c772c784d4"
-    },
-    {
-      "surah": 104,
-      "verses": "1-9",
-      "status": "reviewed_and_corrected",
-      "commit": "801d7af373aceaea64f6b1cc5cbcb64350e873e3"
-    },
-    {
-      "surah": 105,
-      "verses": "1-5",
-      "status": "reviewed_and_corrected",
-      "commit": "abfe1ae4488a3f4dbca582c732a8048306bf4ca2"
-    },
-    {
-      "surah": 106,
-      "verses": "1-4",
-      "status": "reviewed_and_corrected",
-      "commit": "4bc242dfda67386b02a22026bd497197f58499a8"
-    },
-    {
-      "surah": 107,
-      "verses": "1-7",
-      "status": "reviewed_and_corrected",
-      "commit": "3e09a6eb32b8b53f0fac424cb6fd739d7a6eb6c6"
-    },
-    {
-      "surah": 108,
-      "verses": "1-3",
-      "status": "reviewed_and_corrected",
-      "commit": "c1e01a4030f27398e9cf4712166302a03ba3e94c"
-    },
-    {
-      "surah": 109,
-      "verses": "1-6",
-      "status": "reviewed_and_corrected",
-      "commit": "a307fa07107ab74063c08424788e9905f094ba6b"
-    },
-    {
-      "surah": 110,
-      "verses": "1-3",
-      "status": "reviewed_and_corrected",
-      "commit": "e00f2e9c807bced81b2cceec8f31720ae65c974f"
-    },
-    {
-      "surah": 111,
-      "verses": "1-5",
-      "status": "reviewed_and_corrected",
-      "commit": "0e5ae378cc8c52f6845fa977de8fbebe5297279e"
-    },
-    {
-      "surah": 112,
-      "verses": "1-4",
-      "status": "reviewed_and_corrected",
-      "commit": "5c75e8af7f59c12a59353043a81b308bbf938402"
-    },
-    {
-      "surah": 113,
-      "verses": "1-5",
-      "status": "reviewed_and_corrected",
-      "commit": "2bc784a6cf33ef6b6bf00fdc0b0fd515e765a1e6"
-    },
-    {
-      "surah": 114,
-      "verses": "1-6",
-      "status": "reviewed_and_corrected",
-      "commit": "f55e34ca7a4b9cf1de8653c43d0baa7e5d684102"
-    },
-    {
-      "surah": 114,
-      "verses": "6",
-      "status": "reviewed_and_corrected",
-      "commit": "9c9abfb5116fcdec832a5d109fce5741b81256ce"
     }
   ],
   "uncertain_ayahs": [
@@ -529,6 +364,76 @@
       "surah": 3,
       "ayah": 51,
       "reason": "Previous draft wording not verified against the government transliteration reference."
+    },
+    {
+      "surah": 101,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 102,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 103,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 104,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 105,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 106,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 107,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 108,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 109,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 110,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 111,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 112,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 113,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
+    },
+    {
+      "surah": 114,
+      "ayahs": "all",
+      "reason": "Added by earlier work after Arabic-to-Bengali drafting, without confirmed recitation review or a sufficiently matched authoritative text source. Not counted as verified."
     }
   ]
 }

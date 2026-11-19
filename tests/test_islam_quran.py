@@ -167,7 +167,7 @@ class QuranIntegrityTests(unittest.TestCase):
             self.assertIn('id="surah-title"', page, surah["slug"])
             self.assertIn('class="banner-meta"', page, surah["slug"])
             self.assertIn('class="banner-meaning"', page, surah["slug"])
-            self.assertRegex(page, r'src="/islam/quran/reader\\.js(?:\\?[^"]*)?"')
+            self.assertRegex(page, r'src="/islam/quran/reader\.js(?:\\?[^"]*)?"')
             self.assertTrue(bn["title"].strip() and bn["meaning"].strip())
 
     def test_every_rendered_banner_has_bengali_contract(self):

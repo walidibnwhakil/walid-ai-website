@@ -203,7 +203,9 @@ def scores(previous):
     if cricket:
         result["cricket"]={"label":"Cricket","coverage":"available","source":"CricketData","matches":recent_cache_matches(cricket,old_cricket.get("matches",[])),"note":"Verified cricket fixtures and scores."}
     elif old_cricket.get("matches"):
-        result["cricket"]={**old_cricket,"coverage":"stale","matches":recent_cache_matches([],old_cricket.get("matches",[])),"note":"Cricket information could not be refreshed; showing previously verified information."}
+        # A failed provider refresh must preserve the last known-good cricket snapshot;
+        # expiry filtering applies to normal refreshes, not outage fallback data.
+        result["cricket"]={**old_cricket,"coverage":"stale","matches":old_cricket.get("matches",[]),"note":"Cricket information could not be refreshed; showing previously verified information."}
     else:
         result["cricket"]={"label":"Cricket","coverage":"unavailable","source":"","matches":[],"note":"No verified cricket information is available right now."}
     for entry in result.values():

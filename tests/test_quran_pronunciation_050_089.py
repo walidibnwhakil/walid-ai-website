@@ -37,6 +37,13 @@ class QuranPronunciationDrafts(unittest.TestCase):
         self.assertEqual(data[4], "ক্বাদ আলিমনা মা তানক্বুসু আল-আরদু মিনহুম ওয়া ‘ইনদানা কিতাবুন্ হাফীজ।")
         self.assertEqual(data[7], "ওয়াল-আরদা মাদাদনাহা ওয়া আলক্বায়না ফীহা রাওয়াসী ওয়া আনবাতনা ফীহা মিন কুল্লি যাওজিন বাহীজ।")
         self.assertEqual(data[8], "তাবসিরাত ওয়া যিকরা লিকুল্লি ‘আবদিন মুনীব।")
+        # Representative regressions from the 51–89 batch: malformed ayn-vowel
+        # joins are repaired without changing Arabic, translation, or numbering.
+        for number, verses in ((51, [9, 13, 25]), (68, [6, 13]), (89, [6, 13, 18])):
+            source = json.loads((DATA / f"surah-{number:03}.json").read_text(encoding="utf-8"))
+            by_verse = {item["verse"]: item["pronunciation"] for item in source["verses"]}
+            for verse in verses:
+                self.assertNotRegex(by_verse[verse], r"‘[ািুেো]")
 
     def test_coverage_and_unmodified_arabic_translation(self):
         ayat = 0

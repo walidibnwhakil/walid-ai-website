@@ -1,8 +1,71 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-18T18:38:58.731595+00:00",
+  "updatedAt": "2026-11-19T01:42:41.260346+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Man Utd pursuing Como's Paz - Thursday's gossip",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cxnv4q2qnvjvo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-18T22:34:05+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Littler shocked by brilliant Wattimena at Grand Slam",
+      "url": "https://www.bbc.co.uk/sport/darts/articles/crlyenxw18d7o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-18T22:33:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Manchester United’s infamous 1974 relegation is a warning from history",
+      "url": "https://www.theguardian.com/football/2026/nov/18/manchester-united-infamous-1974-relegation-is-a-warning-from-history",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-18T22:30:10+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Veerle Buurman scrambles late WCL winner to push blunt Chelsea past PSG",
+      "url": "https://www.theguardian.com/football/2026/nov/18/chelsea-paris-saint-germain-womens-champions-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-18T22:06:45+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Ukrainian FA to blame for failed drugs test - Mudryk",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cr930l71z5ejo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-18T21:22:18+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "FA explored legal challenge to Infantino staying on",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm3eg1w4ypz5o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-18T20:55:01+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "‘An honour’: Pochettino up for challenge of leading Manchester United revival",
+      "url": "https://www.theguardian.com/football/2026/nov/18/mauricio-pochettino-arrives-manchester-united-head-coach-premier-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-18T19:58:26+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Leicester part ways with BC Game after sponsor’s partnership with porn actor",
+      "url": "https://www.theguardian.com/football/2026/nov/18/leicester-city-bc-game-porn-star-eva-elfie-sponsorship",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-18T19:01:59+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Emma Hayes to assist in US Soccer hiring process for next USMNT coach",
+      "url": "https://www.theguardian.com/football/2026/nov/18/emma-hayes-usmnt-head-coach-hiring-process",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-18T18:44:26+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Mauricio Pochettino’s USMNT time will be remembered fondly, but it wasn’t transformational",
       "url": "https://www.theguardian.com/football/2026/nov/18/pochettino-usmnt-manchester-united",
@@ -36,20 +99,6 @@
       "url": "https://www.bbc.co.uk/sport/tennis/articles/cmdx1erlpqkxo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-18T16:01:47+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "USWNT squad: Emma Hayes names veteran group for Concacaf championship and World Cup qualifier",
-      "url": "https://www.theguardian.com/football/2026/nov/18/uswnt-squad-concacaf-w-championship-world-cup-qualifier",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T16:00:05+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Football Daily | From Cincinnati to Manchester: Pochettino in a hurry to paint town red",
-      "url": "https://www.theguardian.com/football/2026/nov/18/cincinnati-manchester-united-pochettino-football-daily-newsletter",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T15:16:44+00:00",
       "category": "Sports"
     },
     {
@@ -88,24 +137,10 @@
       "category": "Sports"
     },
     {
-      "title": "Explosive Bancroft sandpaper claims heap pressure on Cummins",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/cmqlqdevgl9ro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T11:12:46+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Fifa’s World Cup TV rights documents indicate hydration breaks to stay in 2030",
       "url": "https://www.theguardian.com/football/2026/nov/18/fifa-hydration-breaks-2030-world-cup-tv-right-documents",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-18T09:29:03+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Swing when you’re winning? Biggest leaps across Fifa’s football rankings | The Knowledge",
-      "url": "https://www.theguardian.com/football/2026/nov/18/biggest-leaps-across-fifa-football-rankings-the-knowledge",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T08:00:36+00:00",
       "category": "Sports"
     },
     {
@@ -123,45 +158,10 @@
       "category": "Sports"
     },
     {
-      "title": "Cowboy boots, cocktails and casinos - how do three US grands prix compare?",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/c6d91xl13pggo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T07:50:26+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Josh Kerr: The making of the man behind the shades",
       "url": "https://www.bbc.co.uk/sport/athletics/articles/cwe8506v754yo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-18T07:18:18+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "From one of Ajax's future stars to quitting football for music",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmly053x643ro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T07:02:42+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "The 3pm football blackout: Outdated or still relevant in 2026?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cwvg2mxkd4x8o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T06:27:11+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Wayne Rooney says he contemplated taking own life during playing career",
-      "url": "https://www.theguardian.com/football/2026/nov/17/wayne-rooney-contemplated-taking-own-life-during-playing-career-mental-health",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T17:13:23+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Janine van Wyk: ‘Our rooms were empty … no mattresses, no lightbulbs and not a drop of water’",
-      "url": "https://www.theguardian.com/football/2026/nov/17/janine-van-wyck-south-africa-wafcon-book-extract-moving-the-goalposts-newsletter",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-17T11:57:35+00:00",
       "category": "Sports"
     },
     {

@@ -1,35 +1,56 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-18T18:38:58.357910+00:00",
+  "updatedAt": "2026-11-19T01:42:40.965830+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "William and Kate reflect on 'enduring' UK-India ties with Modi",
-      "url": "https://www.bbc.co.uk/news/articles/cq62ped2ypy4o?at_medium=RSS&at_campaign=rss",
+      "title": "Crimean Bridge attacked again, Russian official says",
+      "url": "https://www.bbc.co.uk/news/articles/cm879dqn3e1jo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-18T17:51:47+00:00",
+      "publishedAt": "2026-11-19T01:05:03+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Van Gogh painting sells for record $190.4m after row over its Nazi history",
+      "url": "https://www.bbc.co.uk/news/articles/c5dj1dkwzvzwo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T00:49:19+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Claude-maker Anthropic poised for more than $1.4tn stock market debut",
+      "url": "https://www.bbc.co.uk/news/articles/c6742m39xgzxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-18T23:44:27+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Russian arrested for spying on US defence company Palantir over Ukraine support",
+      "url": "https://www.bbc.co.uk/news/articles/cq20xg80ly47o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-18T23:28:03+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Myanmar faces historic genocide verdict at UN court over Rohingya massacres",
+      "url": "https://www.bbc.co.uk/news/articles/c5m2l90ez144o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-18T23:04:06+00:00",
       "category": "Bangladesh"
     },
     {
-      "title": "Grand Theft Auto 6 is a masterpiece, say critics",
-      "url": "https://www.bbc.co.uk/news/articles/cw8r75xm8v4po?at_medium=RSS&at_campaign=rss",
+      "title": "Israeli military launches rare ground operation in Gaza beyond Yellow Line",
+      "url": "https://www.bbc.co.uk/news/articles/cw8r7510degno?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-18T17:34:25+00:00",
+      "publishedAt": "2026-11-18T22:34:56+00:00",
       "category": "World"
     },
     {
-      "title": "Democrats nominate Hakeem Jeffries to be US Speaker of the House",
-      "url": "https://www.bbc.co.uk/news/articles/cmy49873dn95o?at_medium=RSS&at_campaign=rss",
+      "title": "William and Kate meet PM Modi as they wrap up India tour",
+      "url": "https://www.bbc.co.uk/news/articles/cq62ped2ypy4o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-18T17:34:23+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Fascist forces are exploiting divisions in unity: Opposition leader tells parliament",
-      "url": "https://en.prothomalo.com/bangladesh/politics/amwkg3lmx6",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-18T17:11:45+00:00",
-      "category": "World"
+      "publishedAt": "2026-11-18T20:07:08+00:00",
+      "category": "Bangladesh"
     },
     {
       "title": "Inside the old gas pipeline where Ukraine is fighting an underground war with Russia",
@@ -46,34 +67,6 @@
       "category": "Technology"
     },
     {
-      "title": "Julio Iglesias facing court investigation over alleged sexual offences",
-      "url": "https://www.bbc.co.uk/news/articles/c6x284pnn4e2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T16:33:16+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Das breaks record but South Africa take command",
-      "url": "https://en.prothomalo.com/sports/cricket/u04dzir0b2",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-18T16:29:12+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Awami League is a terrorist group, we want to crush them before they rise again: PM",
-      "url": "https://en.prothomalo.com/bangladesh/qc1ckyghkt",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-18T16:21:57+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Trump shakes hands with Putin and Xi ahead of historic talks in China",
-      "url": "https://www.bbc.co.uk/news/articles/ck9d75x5wwwwo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T16:10:44+00:00",
-      "category": "World"
-    },
-    {
       "title": "Parents jailed for torture and death of four-year-old girl found along French motorway in 1987",
       "url": "https://www.bbc.co.uk/news/articles/c6lyw490z14jo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -81,53 +74,11 @@
       "category": "Technology"
     },
     {
-      "title": "Banned BCL activists attack hospital, stage armed march in Gopalganj",
-      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/ko19dlpn7y",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-18T15:36:24+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Govt working to cap migration cost for Malaysia at Tk 200,000: PM",
-      "url": "https://en.prothomalo.com/bangladesh/py3w49ayq7",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-18T15:14:55+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Pakistan eye series win after Sri Lanka slump in second Test",
-      "url": "https://en.prothomalo.com/sports/cricket/0nhl851ymq",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-18T14:55:58+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "London Tea Exchange launches ‘Sylhet Tea’ brand with Portugal’s royal family",
-      "url": "https://en.prothomalo.com/bangladesh/city/udyinyzyrv",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-18T14:21:57+00:00",
-      "category": "World"
-    },
-    {
       "title": "Kuwait says it repelled first Iranian attack in two months after US strikes island",
       "url": "https://www.bbc.co.uk/news/articles/cw4gn9jeqjq7o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-18T13:04:48+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Bancroft sandpaper claims heap pressure on Cummins",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/cmqlqdevgl9ro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T11:12:46+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Democrats win Alaska Senate race two weeks after midterms counting began",
-      "url": "https://www.bbc.co.uk/news/articles/cqev3v2ygzlvo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T10:23:57+00:00",
-      "category": "World"
     },
     {
       "title": "Ghana's new $60m presidential jet sparks public outrage",
@@ -148,7 +99,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": true
+      "ok": false
     },
     {
       "name": "BBC World",

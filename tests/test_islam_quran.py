@@ -96,7 +96,7 @@ class QuranIntegrityTests(unittest.TestCase):
 
     def test_basmala_separation_and_pronunciation_not_fabricated(self):
         reader = (QURAN / "reader.js").read_text(encoding="utf-8")
-        self.assertRegex(reader, r"Number\(document\\.body\\.dataset\\.surah\)")
+        self.assertIn("const n = Number(document.body.dataset.surah);", reader)
         self.assertIn("reading.bismillah", reader)
         pages = [ (QURAN / s["slug"] / "index.html").read_text(encoding="utf-8") for s in self.surahs ]
         self.assertTrue(all("বাংলা উচ্চারণ" in p for p in pages))

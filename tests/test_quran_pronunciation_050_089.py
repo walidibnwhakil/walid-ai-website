@@ -28,7 +28,7 @@ class QuranPronunciationDrafts(unittest.TestCase):
         self.assertNotIn("‘ানি", data[17])
         self.assertNotIn("আলমুতালাক্ব্ক্বীনি", data[17])
         self.assertNotIn("আলআরদু", data[44])
-        self.assertEqual(data[8], "তাবসিরাত ওয়া যিকরা লিকুল্লি আবদিন মুনীব।")
+        self.assertEqual(data[8], "তাবসিরাত ওয়া যিকরা লিকুল্লি ‘আবদিন মুনীব।")
         self.assertEqual(data[13], "ওয়া-আদুন ওয়া-ফিরআওনু ওয়া-ইখওয়ানু লূত।")
         self.assertEqual(data[18], "মা ইয়ালফিযু মিন ক্বাওলিন ইল্লা লাদাইহি রাকীবুন আতীদ।")
         self.assertEqual(data[22], "লাক্বাদ কুনতা ফী গাফলাতিন মিন হাযা ফাকাশাফনা আনকা গিতাআকা ফাবাসারুকাল-ইয়াওমা হাদীদ।")

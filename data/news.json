@@ -1,8 +1,78 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-19T09:51:55.379204+00:00",
+  "updatedAt": "2026-11-19T12:28:58.765508+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Trump, Xi, Putin issue 'peace declaration' after summit",
+      "url": "https://en.prothomalo.com/international/verftbzksv",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T12:10:59+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Anthropic valued at $1.5 trillion as IPO raises record $81 billion",
+      "url": "https://en.prothomalo.com/corporate/global/ql4k7h6w6p",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T11:55:45+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Train services suspended in Gopalganj and adjoining routes",
+      "url": "https://en.prothomalo.com/bangladesh/local-news/a7k4cs0biy",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T11:11:46+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "South Africa beat Bangladesh by 9 wickets in Johannesburg",
+      "url": "https://en.prothomalo.com/sports/cricket/uc7pshvfmc",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T11:10:00+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Israeli military completes ground operation in Gaza beyond Yellow Line",
+      "url": "https://www.bbc.co.uk/news/articles/cw8r7510degno?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T11:07:37+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Myanmar forces killed 'thousands of Rohingya', says top UN court",
+      "url": "https://en.prothomalo.com/international/asia/yf3pwyjkrd",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T11:02:52+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Anthropic raises $81bn in record-breaking stock market debut",
+      "url": "https://www.bbc.co.uk/news/articles/c6742m39xgzxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T10:48:04+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Activities-banned Awami League activists set fire to another police station",
+      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/dgk8u987of",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T10:41:47+00:00",
+      "category": "World"
+    },
+    {
+      "title": "'It's a dream come true' – South African DJ celebrates featuring in GTA 6",
+      "url": "https://www.bbc.co.uk/news/articles/crx20q3qy0vxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-19T10:32:10+00:00",
+      "category": "World"
+    },
+    {
+      "title": "BNP leader killed in Narail: 'Bring my brother back alive,' sister pleads",
+      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/1xfrv8ixli",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-19T10:26:12+00:00",
+      "category": "Technology"
+    },
     {
       "title": "BNP MP Selimuzzaman's house in Gopalganj torched",
       "url": "https://en.prothomalo.com/bangladesh/local-news/k234a4auo1",
@@ -39,74 +109,11 @@
       "category": "World"
     },
     {
-      "title": "From 2017 crackdown to UN court, a decade of the Rohingya crisis",
-      "url": "https://en.prothomalo.com/international/2gppwqwxuv",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T08:12:08+00:00",
-      "category": "World"
-    },
-    {
-      "title": "City Bank promotes youth entrepreneurship through Bangladesh Bank’s UDYOG initiative in Munshiganj",
-      "url": "https://en.prothomalo.com/corporate/21wihd5cni",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T08:09:54+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "US, China can help end Ukraine war, Trump tells Xi before trilateral with Putin",
-      "url": "https://en.prothomalo.com/international/6nuivuci4k",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T08:07:36+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "The silent tax of illiquidity: Why secondary market depth matters",
-      "url": "https://en.prothomalo.com/opinion/op-ed/dva10w7f68",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T07:54:54+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Riyadh skyscraper damaged as Saudi reports new Houthi attacks",
-      "url": "https://en.prothomalo.com/international/middle-east/ex9lyjk3fj",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T07:51:03+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Mideast crisis ‘largest threat’ to energy security ever: IEA",
-      "url": "https://en.prothomalo.com/international/middle-east/nb2utr8svu",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T07:44:09+00:00",
-      "category": "World"
-    },
-    {
       "title": "Crimean Bridge attacked again, Russia says",
       "url": "https://www.bbc.co.uk/news/articles/cm879dqn3e1jo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-19T07:32:06+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "20 factories in Gazipur, Savar declare holiday amid workers’ unrest, over 50 closed",
-      "url": "https://en.prothomalo.com/bangladesh/yzmt739avb",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T07:32:03+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Allegations of concealing toll collection information",
-      "url": "https://en.prothomalo.com/bangladesh/r38p2falaf",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T07:21:30+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Banned Chhatra League holds procession with machetes, oars near BNP MP’s house in Chattogram",
-      "url": "https://en.prothomalo.com/bangladesh/4ulev1te6l",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-19T07:04:14+00:00",
-      "category": "World"
     },
     {
       "title": "This is a remarkable diplomatic moment for China's Xi - but it comes with pitfalls",
@@ -123,13 +130,6 @@
       "category": "World"
     },
     {
-      "title": "Anthropic valued at $1.5 trillion ahead of AI giant's stock market debut",
-      "url": "https://www.bbc.co.uk/news/articles/c6742m39xgzxo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-19T02:20:15+00:00",
-      "category": "Technology"
-    },
-    {
       "title": "Van Gogh painting sells for record $190.4m after row over its Nazi history",
       "url": "https://www.bbc.co.uk/news/articles/c5dj1dkwzvzwo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -142,20 +142,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-18T23:28:03+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Israeli military launches rare ground operation in Gaza beyond Yellow Line",
-      "url": "https://www.bbc.co.uk/news/articles/cw8r7510degno?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T22:34:56+00:00",
-      "category": "World"
-    },
-    {
-      "title": "William and Kate meet PM Modi as they wrap up India tour",
-      "url": "https://www.bbc.co.uk/news/articles/cq62ped2ypy4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-18T20:07:08+00:00",
-      "category": "Bangladesh"
     },
     {
       "title": "Inside the old gas pipeline where Ukraine is fighting an underground war with Russia",

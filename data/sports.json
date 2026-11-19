@@ -1,20 +1,55 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-19T09:51:55.561784+00:00",
+  "updatedAt": "2026-11-19T12:28:58.942617+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Gonzalo García: ‘I love Craven Cottage – the fans can reach out and touch you’",
+      "url": "https://www.theguardian.com/football/2026/nov/19/gonzalo-garcia-fulham-spain-premier-leaue-interview",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T12:16:42+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Inside women’s football’s difficult rise in Syria: ‘A joy that everyone in the country needed’",
+      "url": "https://www.theguardian.com/football/2026/nov/19/syria-womens-football",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T11:00:26+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Race for the Fifa presidency: lineup revealed to challenge Gianni Infantino",
+      "url": "https://www.theguardian.com/football/2026/nov/19/fifa-president-election-philippe-diallo-kozo-tashima-challenge-gianni-infantino",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T10:56:21+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'I'm very healthy' - Kompany to return to dugout after health scare",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm0rkzwgn0lro?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T10:32:30+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Eight-year ban for player who threw rock that hit assistant referee",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqlyk9yzkz2no?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T10:20:58+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Five return for Wales' World Cup play-off final",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c620535y8zpjo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T10:00:07+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Wainwright and Adams back for Wales against Australia",
       "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6wy97v7j0g3o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T09:05:24+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Could England fears lead to fewer overseas players in PWR?",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cxnv43verrddo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T08:58:34+00:00",
       "category": "Sports"
     },
     {
@@ -25,7 +60,7 @@
       "category": "Sports"
     },
     {
-      "title": "Weekly sports quiz: When did England last beat the world champions?",
+      "title": "Weekly sports quiz: When did England last beat the men's world champions?",
       "url": "https://www.bbc.co.uk/sport/articles/c6pw4xnjrzydo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T07:54:27+00:00",
@@ -43,13 +78,6 @@
       "url": "https://www.bbc.co.uk/sport/football/articles/ck98z842gp11o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T07:14:11+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Verstappen 'trusts' F1 over Middle East decision",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/c6n0l14rjlw4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T07:11:36+00:00",
       "category": "Sports"
     },
     {
@@ -102,13 +130,6 @@
       "category": "Sports"
     },
     {
-      "title": "‘An honour’: Pochettino up for challenge of leading Manchester United revival",
-      "url": "https://www.theguardian.com/football/2026/nov/18/mauricio-pochettino-arrives-manchester-united-head-coach-premier-league",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T19:58:26+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Leicester part ways with BC Game after sponsor’s partnership with porn actor",
       "url": "https://www.theguardian.com/football/2026/nov/18/leicester-city-bc-game-porn-star-eva-elfie-sponsorship",
       "source": "The Guardian Football",
@@ -123,31 +144,10 @@
       "category": "Sports"
     },
     {
-      "title": "Zverev to defend himself against fresh lawsuit",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/c60rkq9kweego?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-18T16:27:24+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Netflix, Fox and the $2bn bid for the 2030 World Cup that could reshape live sports",
       "url": "https://www.theguardian.com/football/2026/nov/18/netflix-fox-2030-world-cup-television-rights",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-18T12:01:00+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "‘When I walked for Burberry I met Kanye West’: the two lives of Bromley footballer Omar Sowunmi",
-      "url": "https://www.theguardian.com/football/2026/nov/18/omar-sowunmi-bromley-footballer-model-kanye-west",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T12:00:59+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Fifa’s World Cup TV rights documents indicate hydration breaks to stay in 2030",
-      "url": "https://www.theguardian.com/football/2026/nov/18/fifa-hydration-breaks-2030-world-cup-tv-right-documents",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T09:29:03+00:00",
       "category": "Sports"
     },
     {
@@ -4418,23 +4418,7 @@
           "overs": null,
           "startTime": "2026-11-19T10:45:00Z",
           "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "5a550de1-4b29-4109-bee2-7415416929a1",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, Qualifier 2, Nepal Premier League 2026",
-          "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-19T10:45:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
+          "status": "live",
           "source": "CricketData"
         },
         {

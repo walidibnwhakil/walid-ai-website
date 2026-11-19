@@ -28,6 +28,9 @@ class QuranPronunciationDrafts(unittest.TestCase):
         self.assertNotIn("‘ানি", data[17])
         self.assertNotIn("আলমুতালাক্ব্ক্বীনি", data[17])
         self.assertNotIn("আলআরদু", data[44])
+        self.assertEqual(data[4], "ক্বাদ আলিমনা মা তানক্বুসু আল-আরদু মিনহুম ওয়া ‘ইনদানা কিতাবুন্ হাফীজ।")
+        self.assertEqual(data[7], "ওয়াল-আরদা মাদাদনাহা ওয়া আলক্বায়না ফীহা রাওয়াসী ওয়া আনবাতনা ফীহা মিন কুল্লি যাওজিন বাহীজ।")
+        self.assertEqual(data[8], "তাবসিরাত ওয়া যিকরা লিকুল্লি ‘আবদিন মুনীব।")
 
     def test_coverage_and_unmodified_arabic_translation(self):
         ayat = 0

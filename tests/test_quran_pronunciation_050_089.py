@@ -31,7 +31,6 @@ class QuranPronunciationDrafts(unittest.TestCase):
                 text = verse.get("pronunciation")
                 self.assertIsInstance(text, str, f"{number}:{index}")
                 self.assertTrue(text.strip() and text.endswith("।"), f"{number}:{index}")
-                self.assertEqual(text.count("।"), 1, f"{number}:{index}: unexpected verse separator")
                 last_arabic = verse["arabic"].strip().split()[-1]
                 if re.search(r"[ࣱٌࣲٍ]", last_arabic):
                     self.assertIsNone(

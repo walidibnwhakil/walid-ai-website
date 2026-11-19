@@ -923,3 +923,16 @@ body.quran-reader-page #verses>.ayah.fatiha-basmala>.translation{
 /* Hidden must override the centered basmala display declarations. */
 body.quran-reader-page .basmala-pronunciation[hidden],
 body.quran-reader-page .basmala-meaning[hidden]{display:none!important}
+
+
+
+/* Pronunciation is selectable text and follows the existing verse rhythm. */
+body.quran-reader-page #verses .pronunciation{
+  max-width:78ch;margin:10px 0 0;padding:0!important;border:0!important;
+  border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  color:#4e554d;font-size:1rem;line-height:1.7
+}
+body.quran-reader-page #verses .pronunciation[hidden],
+body.quran-reader-page .pronunciation-note[hidden]{display:none!important}
+body.quran-reader-page .pronunciation-note{flex:1 1 100%;margin:0;font-size:.84rem;color:#657065}
+@media(max-width:700px){body.quran-reader-page #verses .pronunciation{font-size:.96rem;line-height:1.7}}

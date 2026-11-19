@@ -37,18 +37,25 @@
   pronunciation.checked = false;
   pronunciationLabel.append(pronunciation, ' বাংলা উচ্চারণ');
   tools.append(pronunciationLabel);
+  const pronunciationNote = document.createElement('p');
+  pronunciationNote.className = 'pronunciation-note';
+  pronunciationNote.textContent = 'বাংলা উচ্চারণটি সহায়ক পাঠ; শুদ্ধ তিলাওয়াতের বিকল্প নয়।';
+  pronunciationNote.hidden = true;
+  tools.append(pronunciationNote);
   const pronunciationStatus = document.createElement('p');
   pronunciationStatus.className = 'pronunciation-availability';
   pronunciationStatus.setAttribute('role', 'status');
-  pronunciationStatus.textContent = 'বাংলা উচ্চারণের যাচাইকৃত ও অনুমোদিত ডেটা বর্তমানে উপলভ্য নয়।';
+  pronunciationStatus.textContent = 'শুধু যাচাইকৃত আয়াতের উচ্চারণ দেখানো হয়; বাকি আয়াতগুলো যাচাইাধীন।';
   pronunciationStatus.hidden = true;
   tools.append(pronunciationStatus);
+
   function refreshPronunciation() {
-    const items = [...verses.querySelectorAll('.pronunciation[data-verified="true"],.basmala-pronunciation')];
+    const verified = verses.querySelectorAll('.pronunciation[data-verified="true"]');
     for (const node of verses.querySelectorAll('.pronunciation,.basmala-pronunciation')) {
       node.hidden = !pronunciation.checked || (node.classList.contains('pronunciation') && node.dataset.verified !== 'true');
     }
-    pronunciationStatus.hidden = !pronunciation.checked || items.length > 0;
+    pronunciationNote.hidden = !pronunciation.checked;
+    pronunciationStatus.hidden = !pronunciation.checked || verified.length > 0;
   }
   pronunciation.addEventListener('change', refreshPronunciation);
   new MutationObserver(refreshPronunciation).observe(verses, {childList: true});

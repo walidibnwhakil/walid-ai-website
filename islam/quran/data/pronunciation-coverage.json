@@ -7,7 +7,7 @@
       1
     ],
     "complete_surah_count": 1,
-    "verses": 340,
+    "verses": 344,
     "coverage": [
       {
         "surah": 1,
@@ -88,6 +88,11 @@
         "surah": 3,
         "verses": "41-48",
         "basis": "Checked word by word against the repository Arabic and the corresponding Quran.com Arabic ayahs (https://quran.com/ali-imran/41 through /48), using the project Bengali spelling and the linked transliteration policy as guidance."
+      },
+      {
+        "surah": 4,
+        "verses": "1-4",
+        "basis": "Compared Arabic ayah text word-by-word with Quran.com An-Nisa 4:1–4 and normalized Bengali phonetic renderings."
       }
     ],
     "note": "Only explicitly confirmed or individually rechecked ayahs are counted here."
@@ -96,10 +101,10 @@
     "branch": "feat/quran-bangla-pronunciation-text",
     "surahs": 114,
     "verses": 6236,
-    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5896 await review."
+    "status": "All 6236 text fields remain stored; only the reviewed coverage above is shown. The remaining 5892 await review."
   },
   "pending": {
-    "verses": 5896,
+    "verses": 5892,
     "surahs_without_complete_coverage": 113,
     "fully_pending_surahs": 111,
     "partially_reviewed_surahs": [
@@ -320,6 +325,12 @@
       "verses": "41-48",
       "status": "reviewed_and_corrected",
       "commit": "4ad53847f34aa88d134a4919efae0fa2dddafe5c"
+    },
+    {
+      "surah": 4,
+      "verses": "1-4",
+      "status": "reviewed_and_corrected",
+      "commit": "51c572083be2e015dde100c065961b30f500a1cc"
     }
   ],
   "uncertain_ayahs": [

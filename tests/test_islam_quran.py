@@ -81,12 +81,12 @@ class QuranIntegrityTests(unittest.TestCase):
             # Pronunciation is an additional reading aid, not part of the imported
             # Arabic/translation source. Validate the original source checksum by
             # removing ONLY this annotation and reconstructing the source JSON.
-            if re.fullmatch(r"islam/quran/data/surah-0[5-8]\\d\\.json", relative):
+            if re.fullmatch(r"islam/quran/data/surah-0[5-8]\d\.json", relative):
                 source = json.loads(payload.decode("utf-8"))
                 for ayah in source["verses"]:
                     self.assertTrue(ayah["pronunciation"].strip().endswith("।"), relative)
                     del ayah["pronunciation"]
-                payload = (json.dumps(source, ensure_ascii=False, indent=2) + "\\n").encode("utf-8")
+                payload = (json.dumps(source, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
             actual = hashlib.sha256(payload).hexdigest()
             self.assertEqual(actual, expected, relative)
         notices = (DATA / "SOURCES.md").read_text(encoding="utf-8")

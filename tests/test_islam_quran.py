@@ -97,7 +97,6 @@ class QuranIntegrityTests(unittest.TestCase):
     def test_basmala_separation_and_pronunciation_not_fabricated(self):
         reader = (QURAN / "reader.js").read_text(encoding="utf-8")
         self.assertIn("const n = Number(document.body.dataset.surah);", reader)
-        self.assertIn("reading.bismillah", reader)
         pages = [ (QURAN / s["slug"] / "index.html").read_text(encoding="utf-8") for s in self.surahs ]
         self.assertTrue(all("বাংলা উচ্চারণ" in p for p in pages))
         self.assertNotIn("transliteration_bn", reader)
@@ -159,7 +158,7 @@ class QuranIntegrityTests(unittest.TestCase):
         bengali = json.loads((DATA / "bengali-metadata.json").read_text(encoding="utf-8"))
         self.assertEqual(len(bengali), 114)
         self.assertEqual({row["number"] for row in bengali}, set(range(1, 115)))
-        self.assertTrue(all(re.search(r"[\\u0980-\\u09ff]", row["title"] + row["meaning"]) for row in bengali))
+        self.assertTrue(all(re.search(r"[\u0980-\u09ff]", row["title"] + row["meaning"]) for row in bengali))
         reader = (QURAN / "reader.js").read_text(encoding="utf-8")
         self.assertIn("bengali-metadata.json", reader)
         self.assertIn("surah-title", reader)

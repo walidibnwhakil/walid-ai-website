@@ -7,8 +7,2922 @@
     "total": 4623,
     "reviewed": 110,
     "draft": 4513,
-    "flagged": 4565,
+    "flagged": 176,
     "priority": 176
   },
-  "queue": []
+  "queue": [
+    {
+      "surah": 2,
+      "verse": 111,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 18,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 112,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 113,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 31,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 114,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 115,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 116,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 117,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 118,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 25,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 119,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 120,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 31,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 121,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 122,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 11,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 123,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 20,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 124,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 21,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 125,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 24,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 126,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 32,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 127,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 128,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 129,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 130,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 18,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 131,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 9,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 132,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 133,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 29,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 134,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 135,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 136,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 31,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 137,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 20,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 138,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 11,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 139,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 140,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 141,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 142,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 22,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 143,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 47,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 144,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 34,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 145,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 34,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 146,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 147,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah"
+      ],
+      "arabicTokens": 7,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 148,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 19,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 149,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 150,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "waqf"
+      ],
+      "arabicTokens": 31,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 151,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 18,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 152,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 6,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 153,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 10,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 154,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 13,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 155,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 156,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 10,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 157,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 10,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 158,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 26,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 159,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 20,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 160,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 11,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 161,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 13,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 162,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd"
+      ],
+      "arabicTokens": 9,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 163,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 10,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 164,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd"
+      ],
+      "arabicTokens": 43,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 165,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 34,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 166,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 167,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 23,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 168,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 18,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 169,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 11,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 170,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 23,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 171,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 19,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 172,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 173,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 25,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 174,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 175,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 11,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 176,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 177,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 52,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 178,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 39,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 179,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 8,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 180,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 181,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 182,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 183,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 184,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 36,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 185,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 45,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 186,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 187,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 65,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 188,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 18,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 189,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 28,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 190,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 13,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 191,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 25,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 192,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs"
+      ],
+      "arabicTokens": 6,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 193,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 194,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 23,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 195,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 196,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 76,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 197,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 198,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 199,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "waqf"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 200,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 25,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 201,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 202,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 8,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 203,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 204,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 205,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 206,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "waqf"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 207,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 11,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 208,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 209,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 12,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 210,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 211,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 21,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 212,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 20,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 213,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 49,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 214,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 215,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 22,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 216,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 217,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 58,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 218,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 219,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 220,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 221,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 39,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 222,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 28,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 223,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 224,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 225,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 226,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 227,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 7,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 228,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 43,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 229,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 47,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 230,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 231,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 48,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 232,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 33,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 233,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 65,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 234,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 235,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 49,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 236,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 26,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 237,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 35,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 238,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 8,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 239,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 240,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 241,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 6,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 242,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd"
+      ],
+      "arabicTokens": 7,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 243,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 29,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 244,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 9,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 245,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 19,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 246,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 56,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 247,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 44,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 248,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 30,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 249,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 61,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 250,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 251,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 252,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 9,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 253,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 55,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 254,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 22,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 255,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 51,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 256,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 24,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 257,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 24,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 258,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 43,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 259,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 69,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 260,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 41,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 261,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 25,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 262,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 26,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 263,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 13,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 264,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 39,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 265,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 29,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 266,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 35,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 267,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 29,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 268,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 14,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 269,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 18,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 270,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 271,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 20,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 272,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 29,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 273,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 32,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 274,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 18,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 275,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 45,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 276,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 11,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 277,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 19,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 278,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd"
+      ],
+      "arabicTokens": 13,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 279,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 17,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 280,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 15,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 281,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 16,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 282,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 131,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 283,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 36,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 284,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 28,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 285,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 27,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    },
+    {
+      "surah": 2,
+      "verse": 286,
+      "status": "draft",
+      "flags": [
+        "missing-pronunciation",
+        "no-bengali-token",
+        "possible-token-loss",
+        "shaddah",
+        "vowel-signs",
+        "madd",
+        "waqf"
+      ],
+      "arabicTokens": 50,
+      "phoneticTokens": 0,
+      "action": "human-review"
+    }
+  ]
 }

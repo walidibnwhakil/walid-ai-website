@@ -99,20 +99,31 @@ function fillTexturedRegion(raw,width,height,rect,plane){
     }
     let choice=null,best=Infinity;
     const cx=cell.x+cell.w/2,cy=cell.y+cell.h/2;
-    for(const donor of donors){
-      const sx=donor.x-Math.floor(cell.w/2),sy=donor.y-Math.floor(cell.h/2);
-      if(sx-pad<0||sy-pad<0||sx+cell.w+pad>=width||sy+cell.h+pad>=height)continue;
-      if(sx-pad<rect.x+rect.w&&sx+cell.w+pad>rect.x&&sy-pad<rect.y+rect.h&&sy+cell.h+pad>rect.y)continue;
+    function evaluate(sx,sy){
+      if(sx-pad<0||sy-pad<0||sx+cell.w+pad>=width||sy+cell.h+pad>=height)return Infinity;
+      if(sx-pad<rect.x+rect.w&&sx+cell.w+pad>rect.x&&sy-pad<rect.y+rect.h&&sy+cell.h+pad>rect.y)return Infinity;
       let error=0,compares=0;
-      // Match the clean/previously rebuilt perimeter, not the overlaid name itself.
       for(const point of samples){
         const a=point.target,b=index(sx+point.dx,sy+point.dy,width);
         for(let c=0;c<3;c++){const diff=output[a+c]-raw[b+c];error+=diff*diff;compares++;}
       }
       const base=index(sx+Math.floor(cell.w/2),sy+Math.floor(cell.h/2),width);
       for(let c=0;c<3;c++){const d=raw[base+c]-plane.color(cx,cy,c);error+=d*d*.20;}
-      const scored=error/Math.max(1,compares)+Math.hypot(sx-cell.x,sy-cell.y)*.012;
-      if(scored<best){best=scored;choice={x:sx,y:sy};}
+      return error/Math.max(1,compares)+Math.hypot(sx-cell.x,sy-cell.y)*.012;
+    }
+    for(const donor of donors){
+      const sx=donor.x-Math.floor(cell.w/2),sy=donor.y-Math.floor(cell.h/2);
+      const score=evaluate(sx,sy);
+      if(score<best){best=score;choice={x:sx,y:sy};}
+    }
+    // Refine a coarse donor position to the nearest matching texture phase.
+    // This avoids visible seams in repeating patterns and text over stripes.
+    if(choice){
+      const coarse=choice;
+      for(let dy=-5;dy<=5;dy++)for(let dx=-5;dx<=5;dx++){
+        const sx=coarse.x+dx,sy=coarse.y+dy,score=evaluate(sx,sy);
+        if(score<best){best=score;choice={x:sx,y:sy};}
+      }
     }
     if(!choice)throw Error('Could not repair this area. Try a smaller selection.');
     // Match donor brightness to the existing border, without blurring its texture.

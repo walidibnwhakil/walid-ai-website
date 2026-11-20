@@ -5,30 +5,30 @@
   "verified": {
     "surah": 3,
     "ayahStart": 1,
-    "ayahEnd": 12,
-    "verses": 11,
-    "notes": "Surah 3:7 remains unreviewed; 11 is total reviewed in Surah 3, not a contiguous range."
+    "ayahEnd": 30,
+    "verses": 30,
+    "notes": "Only Surah 3:1-30 are marked reviewed within current scope; remaining handwritten text is draft."
   },
   "pending": {
     "scope": "Surahs 2–49",
-    "verses": 4612
+    "verses": 4593
   },
   "source": "Original Arabic and Bengali translations from existing source records; manually authored Bengali-script draft pronunciation is not certified.",
   "audit": {
     "scope": "Surahs 2–49",
     "recordsInScope": 4623,
-    "recordsReviewed": 11,
-    "recordsCorrected": 11,
+    "recordsReviewed": 30,
+    "recordsCorrected": 30,
     "draftGenerated": 4011,
-    "unresolved": 4612,
-    "method": "Readable Bengali pronunciation drafts have been written for every verse of Surah 3 and Surahs 41–49, totaling 612 verses (11 previously reviewed and 601 newly authored drafts). All remain subject to per-ayah linguistic correction. Older malformed machine text remains for 4011 verses in Surahs 2 and 4–40.",
+    "unresolved": 4593,
+    "method": "Surah 3:1-30 checked against Arabic; remaining 475 handwritten verse drafts and 4118 machine-generated records still require Arabic-aligned review.",
     "automatedScan": {
       "flaggedPriorityRecords": null,
       "queue": "islam/quran/data/pronunciation-review-queue.json",
       "lastReportedHeuristicFlagsBeforeManualRevisions": 4417
     },
     "flaggedPriorityRecords": null,
-    "handAuthoredDraftVerses": 601,
+    "handAuthoredDraftVerses": 475,
     "machineGeneratedPending": 4011,
     "completedDraftSurahs": [
       3,
@@ -45,7 +45,7 @@
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 4612,
-    "method": "601 new manual Bengali drafts awaiting Arabic recitation review; 4011 old machine-derived strings awaiting replacement."
+    "verses": 4593,
+    "method": "475 handwritten Bengali pronunciation drafts awaiting review, plus 4118 legacy machine-derived pronunciations."
   }
 }

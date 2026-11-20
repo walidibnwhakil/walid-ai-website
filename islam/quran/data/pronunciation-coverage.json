@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updated": "2026-11-20",
-  "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated.",
+  "policy": "Only independently reviewed Bengali-script pronunciation is published as verified; generated drafts remain explicitly unverified and are not treated as corrections.",
   "verified": {
     "surah": 2,
     "ayahStart": 1,
@@ -9,23 +9,24 @@
     "verses": 110
   },
   "pending": {
-    "surahs": 0,
-    "verses": 0
+    "scope": "Surahs 2–49",
+    "verses": 4403
   },
-  "source": "Prior reviewed Bengali pronunciation against quran.gov.bd conventions; remaining entries are independently generated drafts and are not represented as fully manually verified.",
+  "source": "Verified records were reviewed against Arabic and Bengali pronunciation conventions; generated draft entries are retained only as unverified drafts and are not represented as fully manually verified.",
   "audit": {
     "scope": "Surahs 2–49",
-    "recordsReviewed": 4513,
+    "recordsInScope": 4513,
+    "recordsReviewed": 110,
     "recordsCorrected": 110,
     "draftGenerated": 4403,
-    "unresolved": 0,
-    "method": "Prior reviewed records retained; remaining records generated as explicitly labeled draft and checked for Arabic/verse alignment, pronunciation presence, and numbering preservation",
-    "lastBatch": {
-      "surah": 49,
-      "ayahStart": 1,
-      "ayahEnd": 18,
-      "verses": 18,
-      "method": "Arabic-aligned draft generation"
+    "unresolved": 4403,
+    "method": "Only the verified range was independently reviewed. Remaining records have structural Arabic/verse alignment checks but no human pronunciation review and no tajwid certification.",
+    "lastVerifiedBatch": {
+      "surah": 2,
+      "ayahStart": 75,
+      "ayahEnd": 110,
+      "verses": 36,
+      "method": "Independent Arabic-aligned Bengali pronunciation review"
     }
   },
   "draft": {

@@ -54,3 +54,26 @@ a{color:var(--green)}
 @media(max-width:880px){.others-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.others-shell{padding-inline:18px}}
 @media(max-width:620px){.others-shell{padding:12px 13px 28px}.others-brand img{width:112px}.others-hero{padding:20px 16px;margin-bottom:16px}.others-grid{grid-template-columns:1fr;gap:12px}.others-card{padding:14px;gap:13px}.others-card-icon{flex-basis:54px;width:54px;height:54px;font-size:1.75rem}.others-chapter{padding:0 2px 22px}.others-chapter p{text-align:justify;line-height:1.85}.others-toc{padding:15px 17px}.legal-footer{font-size:.95rem}}
 @media(prefers-reduced-motion:reduce){body::before{animation:none}.others-card{transition:none}}
+
+/* Book reader: always-available chapter sidebar, hidden until requested. */
+.others-toc-trigger{position:fixed;z-index:110;right:max(18px,calc((100vw - 1140px)/2 + 22px));bottom:24px;display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border:1px solid #b8d1bc;border-radius:999px;background:#fffefa;color:#15573e;box-shadow:0 7px 24px #0b302323;font:700 1rem/1.3 "SolaimanLipi","Noto Sans Bengali",sans-serif;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.others-toc-trigger:hover{background:#eff8f1;transform:translateY(-2px)}
+.others-toc-trigger:focus-visible,.others-toc-close:focus-visible{outline:3px solid #b89650;outline-offset:3px}
+.others-toc-trigger-icon{font:700 1.1rem/1 system-ui,sans-serif}
+.others-toc-dialog{position:fixed;inset:0 0 0 auto;margin:0;padding:0;width:min(410px,92vw);height:100vh;height:100dvh;max-width:none;max-height:none;overflow:hidden;border:0;border-left:1px solid #d4e3d7;border-radius:0;background:#fffefa;color:var(--ink);box-shadow:-12px 0 40px #122b2429}
+.others-toc-dialog[open]{display:flex;flex-direction:column}
+.others-toc-dialog::backdrop{background:rgba(9,25,20,.44)}
+.others-toc-dialog-head{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:19px 20px;border-bottom:1px solid #dce7dd;background:#f5faf6}
+.others-toc-dialog-head strong{font-size:1.17rem;line-height:1.4}
+.others-toc-close{width:38px;height:38px;display:grid;place-items:center;flex-shrink:0;border:1px solid #cfdccf;border-radius:50%;background:white;color:#1a4735;font:1.4rem/1 system-ui,sans-serif;cursor:pointer}
+.others-toc-dialog .others-toc{flex:1;min-height:0;margin:0;border:0;border-radius:0;background:transparent;padding:13px 16px 26px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.others-toc-dialog .others-toc h2{font-weight:500;font-size:.89rem;margin:0 0 12px;color:#607667}
+.others-toc-dialog .others-toc ol{padding:0;margin:0;list-style:none;counter-reset:toc-index}
+.others-toc-dialog .others-toc li{counter-increment:toc-index;margin:0}
+.others-toc-dialog .others-toc a{display:flex;align-items:baseline;gap:12px;padding:10px 8px;border-bottom:1px solid #edf0e9;color:#234536;font-size:.98rem;line-height:1.5;text-decoration:none;overflow-wrap:break-word}
+.others-toc-dialog .others-toc a::before{content:counter(toc-index,decimal-leading-zero);color:#968052;font:600 .79rem/1.6 system-ui,sans-serif;flex-shrink:0}
+.others-toc-dialog .others-toc a:hover,.others-toc-dialog .others-toc a:focus-visible{background:#f0f8f0;color:#09653f;border-radius:6px;outline-offset:0}
+.others-toc-dialog .others-toc a[aria-current="location"]{background:#eff7f0;color:#075536;font-weight:700;border-radius:6px}
+body.others-toc-open{overflow:hidden}
+@media(max-width:620px){.others-toc-trigger{right:13px;bottom:16px;padding:10px 14px;font-size:.92rem}.others-toc-dialog{width:min(380px,92vw)}.others-toc-dialog-head{padding:15px 16px}.others-toc-dialog .others-toc{padding:12px 13px 20px}.others-toc-dialog .others-toc a{padding:12px 8px}}
+@media(prefers-reduced-motion:reduce){.others-toc-trigger{transition:none}}

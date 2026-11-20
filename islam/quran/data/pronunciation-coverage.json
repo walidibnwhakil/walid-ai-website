@@ -4,31 +4,23 @@
   "policy": "Mechanical Bengali drafts must not be marked reviewed or verified. Pronunciation requires independent verse-by-verse review against Arabic before publication.",
   "verified": {
     "scope": "Surahs 2–49",
-    "verses": 505,
-    "reviewedSurahs": [
-      3,
-      43,
-      44,
-      45,
-      46,
-      47,
-      48,
-      49
-    ]
+    "verses": 11,
+    "reviewedSurahs": [],
+    "notes": "11 individually reviewed ayahs Surah 3:1–6 and 8–12; none of the 2–49 surahs as a whole independently reviewed."
   },
   "pending": {
     "scope": "Surahs 2–49",
-    "verses": 4118
+    "verses": 4612
   },
   "source": "Original Arabic and Bengali translations from existing source records; manually authored Bengali-script draft pronunciation is not certified.",
   "audit": {
     "scope": "Surahs 2–49",
     "recordsInScope": 4623,
-    "recordsReviewed": 505,
-    "recordsCorrected": 505,
+    "recordsReviewed": 11,
+    "recordsCorrected": 11,
     "draftGenerated": 3851,
-    "unresolved": 4118,
-    "method": "All verses of Surah 3 and Surahs 39–49 now carry hand-written readable Bengali pronunciation entries, 772 verses total, 11 previously reviewed and 761 new drafts. 3851 old mechanically generated verses remain across Surah 2 and Surahs 4–38. Arabic/translation/verse unchanged in rewritten surahs; no phonetic certification claimed.",
+    "unresolved": 4612,
+    "method": "11 individually reviewed ayahs in Surah 3. All verses in Surah 3 and Surahs 39–49 (772 verse entries total) have readable handwritten Bengali pronunciation; 761 of those remain DRAFT pending independent phonetic review. Another 3851 old machine-generated records remain. No complete Surah has been marked independently reviewed.",
     "automatedScan": {
       "flaggedPriorityRecords": null,
       "queue": "islam/quran/data/pronunciation-review-queue.json",
@@ -51,20 +43,11 @@
       48,
       49
     ],
-    "completedReviewedSurahs": [
-      3,
-      43,
-      44,
-      45,
-      46,
-      47,
-      48,
-      49
-    ]
+    "completedReviewedSurahs": []
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 4118,
+    "verses": 4612,
     "method": "761 handwritten Bengali drafts pending phonetic review, 3851 older machine-generated strings pending replacement."
   }
 }

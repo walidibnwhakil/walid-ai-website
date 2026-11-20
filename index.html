@@ -3,29 +3,118 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f4f8f4">
-<meta name="description" content="Walid AI home dashboard — chat, tools, games, learning and more.">
+<meta name="description" content="Explore AI Chat, PDF and image tools, games, education, Islamic resources, sports, and stories with Walid AI.">
 <link rel="canonical" href="https://walid-ai.com/"><link rel="icon" href="/favicon.ico">
 <title>Walid AI — Home</title>
 <style>
-:root{color-scheme:light;--ink:#111;--muted:#202020;--paper:#fff;--green:#118b28;--line:#d9dedb}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font:16px/1.28:"Times New Roman",Times,serif;color:var(--ink);background:#fff}
-body{isolation:isolate}body:before{content:"";position:fixed;z-index:-1;inset:0 auto auto 50%;width:min(78vw,760px);aspect-ratio:1;transform:translate(-50%,-25%);background:url("/walid-ai-approved-flower.png") center/contain no-repeat;opacity:.06;animation:spin 10s linear infinite;pointer-events:none}@keyframes spin{to{rotate:360deg}}
-a{color:inherit}.shell{width:min(1360px,100%);margin:auto;padding:12px 40px 34px}.logo{width:140px;height:auto;object-fit:contain;display:block}.hero{text-align:center;padding:18px 0 25px}.hero .logo{margin:0 auto 14px}.hero h1{margin:0 0 8px;font-size:clamp(2.25rem,5vw,4rem);font-weight:700;letter-spacing:-.03em}.hero h1::first-letter{}.hero p{margin:0 auto;color:#171717;font-size:clamp(1.05rem,2vw,1.42rem);max-width:850px}.floral-rule{display:flex;align-items:center;justify-content:center;gap:14px;margin:22px auto 0}.floral-rule span{width:125px;height:4px;background:#16b82a}.floral-rule img{width:42px;height:42px;object-fit:contain}
-.menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;max-width:1240px;margin:0 auto}.card{position:relative;display:grid;grid-template-columns:128px 1fr;grid-template-rows:auto 1fr auto;column-gap:20px;min-height:146px;padding:17px 24px;border:2px solid var(--accent);border-radius:24px;background:linear-gradient(145deg,var(--bg) 0%,#fff 65%,var(--wash) 100%);box-shadow:0 10px 20px #2a393015;overflow:hidden;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease}.card:after{content:"";position:absolute;right:-18px;bottom:-38px;width:190px;height:82px;border-top:14px solid var(--accent);border-radius:50%;transform:rotate(-12deg);opacity:.55}.card:hover{transform:translateY(-3px);box-shadow:0 14px 28px #2a393025}.card-image{grid-row:1/4;width:128px;height:110px;object-fit:contain;align-self:center;border-right:2px solid color-mix(in srgb,var(--accent) 45%,transparent);padding-right:20px;filter:drop-shadow(0 8px 8px #2070a633)}.card h2{margin:0 0 4px;font-size:clamp(1.25rem,1.65vw,1.62rem);font-weight:700}.card p{margin:0;font-size:1.05rem;max-width:320px}.card .arrow{margin-top:8px;color:var(--green);font-size:1.18rem;font-weight:700}.blue{--accent:#39a9ff;--bg:#f1f9ff;--wash:#bfe5ff}.pink{--accent:#ff54ac;--bg:#fff1f8;--wash:#ffd3ed}.purple{--accent:#a452ee;--bg:#faf2ff;--wash:#e8c8ff}.yellow{--accent:#f2aa12;--bg:#fffaf0;--wash:#ffe09a}.green{--accent:#75c945;--bg:#f3ffed;--wash:#c4f49a}.cyan{--accent:#19c9df;--bg:#effcff;--wash:#b7f5fb}.lime{--accent:#45bd1b;--bg:#f2ffe9;--wash:#c6fb9b}.empty{cursor:default}.empty:hover{transform:none;box-shadow:0 10px 20px #2a393015}
-footer{text-align:center;margin:36px 0 0;padding-top:12px;border-top:1px solid #cfd5d2;color:#5d6676;font-size:1.05rem}footer nav{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}footer a{text-decoration:none}footer p{margin:16px 0 0}@media(max-width:950px){.shell{padding-inline:20px}.menu{gap:14px}.card{grid-template-columns:78px 1fr;padding:14px 16px;column-gap:12px}.card-image{width:78px;height:84px;padding-right:12px}.card p{font-size:.94rem}.logo{width:125px}}@media(max-width:650px){.shell{padding:10px 13px 26px}.logo{width:115px}.hero{padding:15px 0 20px}.floral-rule span{width:70px}.menu{grid-template-columns:1fr;gap:13px}.card{min-height:126px;grid-template-columns:80px 1fr}.card h2{font-size:1.35rem}.card p{font-size:1rem}.card-image{width:80px;height:80px}footer{margin-top:28px;font-size:.95rem}}
+:root{color-scheme:light;--ink:#202a28;--muted:#52625e;--paper:#fff;--green:#146d54;--line:#dfe7e2}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font:16px/1.45 "Times New Roman",Times,serif;color:var(--ink);background:#fff}
+body{isolation:isolate}
+body::before{content:"";position:fixed;z-index:-1;inset:0 auto auto 50%;width:min(78vw,760px);aspect-ratio:1;transform:translate(-50%,-25%);background:url("/walid-ai-approved-flower.png") center/contain no-repeat;opacity:.06;animation:spin 10s linear infinite;pointer-events:none}
+@keyframes spin{to{rotate:360deg}}
+a{color:inherit}
+.shell{width:min(1360px,100%);margin:auto;padding:12px 40px 34px}
+.logo{width:140px;height:auto;object-fit:contain;display:block}
+.hero{text-align:center;padding:20px 0 27px}
+.hero .logo{margin:0 auto 14px}
+.hero h1{margin:0 0 10px;font-size:clamp(2.25rem,5vw,4rem);font-weight:700;line-height:1.15;letter-spacing:-.035em}
+.hero h1 span{color:#165b9b}
+.hero p{margin:0 auto;max-width:760px;color:#465750;font-size:clamp(1.05rem,1.9vw,1.28rem);line-height:1.5}
+.floral-rule{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px auto 0}
+.floral-rule span{width:90px;height:1px;background:linear-gradient(90deg,transparent,#86bca5)}
+.floral-rule span:last-child{transform:scaleX(-1)}
+.floral-rule img{width:35px;height:35px;object-fit:contain}
+.menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px;max-width:1240px;margin:0 auto}
+.card{
+  --accent:#356d94;--tint:#f2f8fc;--rim:#dce8f0;
+  position:relative;display:grid;grid-template-columns:104px minmax(0,1fr);grid-template-rows:auto 1fr auto;
+  column-gap:17px;min-width:0;min-height:180px;padding:19px 20px;
+  border:1px solid var(--rim);border-radius:20px;
+  background:linear-gradient(125deg,var(--tint),#fff 73%);
+  box-shadow:0 5px 18px rgba(32,62,48,.055);
+  color:var(--ink);text-decoration:none;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 25px rgba(25,55,45,.11);border-color:var(--accent)}
+.card:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.card-visual{
+  grid-row:1/4;align-self:center;justify-self:center;
+  width:88px;height:88px;display:grid;place-items:center;
+  color:var(--accent);border:1px solid var(--rim);border-radius:23px;
+  background:linear-gradient(150deg,#fff 4%,var(--tint) 92%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 5px 15px rgba(37,67,54,.065);
+  transition:transform .18s ease
+}
+.card:hover .card-visual{transform:translateY(-2px)}
+.card-icon{width:51px;height:51px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.card h2{margin:0 0 8px;font-size:clamp(1.26rem,1.65vw,1.56rem);font-weight:700;line-height:1.22;letter-spacing:-.015em}
+.card p{margin:0;color:#53615d;font-size:1rem;line-height:1.45;overflow-wrap:break-word}
+.card .arrow{display:inline-flex;align-items:center;gap:7px;margin-top:12px;color:var(--accent);font-size:.98rem;font-weight:700;line-height:1.2}
+.card .arrow::after{content:"→";font-size:1.15em;line-height:1}
+.blue{--accent:#326d99;--tint:#f0f7fc;--rim:#d9e9f2}
+.rose{--accent:#a54f71;--tint:#fff3f7;--rim:#f2dee7}
+.violet{--accent:#725b9e;--tint:#f6f3fc;--rim:#e6dff2}
+.amber{--accent:#98702d;--tint:#fff9ec;--rim:#f0e5c9}
+.sage{--accent:#347862;--tint:#f0f8f4;--rim:#d8e9df}
+.teal{--accent:#287d82;--tint:#f0faf9;--rim:#d5eaea}
+.olive{--accent:#577b42;--tint:#f4f9ef;--rim:#dfebd5}
+.plum{--accent:#825d81;--tint:#faf3f9;--rim:#ecdfec}
+footer{text-align:center;margin:35px 0 0;padding-top:12px;border-top:1px solid #cfd5d2;color:#5d6676;font-size:1.05rem}
+footer nav{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+footer a{text-decoration:none}
+footer p{margin:16px 0 0}
+@media(max-width:950px){
+  .shell{padding-inline:20px}
+  .menu{gap:14px}
+  .card{grid-template-columns:75px minmax(0,1fr);gap:12px;padding:15px;min-height:181px}
+  .card-visual{width:70px;height:70px;border-radius:19px}
+  .card-icon{width:41px;height:41px}
+  .card p{font-size:.94rem}
+  .logo{width:125px}
+}
+@media(max-width:650px){
+  .shell{padding:12px 12px 26px}
+  .hero{padding:12px 0 20px}
+  .hero .logo{width:150px;margin-bottom:13px}
+  .hero h1{font-size:clamp(22px,5.75vw,30px);letter-spacing:-.045em;white-space:nowrap;line-height:1.15;margin-bottom:9px}
+  .hero p{font-size:14px;line-height:1.45;max-width:340px}
+  .floral-rule{margin-top:15px;gap:11px}
+  .floral-rule span{width:63px}
+  .floral-rule img{width:30px;height:30px}
+  .menu{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;min-height:229px;min-width:0;padding:17px 10px 15px;border-radius:17px}
+  .card-visual{flex:none;width:68px;height:68px;border-radius:19px;margin:0 auto 12px}
+  .card-icon{width:40px;height:40px}
+  .card h2{font-size:16.5px;line-height:1.2;margin-bottom:8px;overflow-wrap:break-word}
+  .card p{font-size:13.2px;line-height:1.4;text-align:center;max-width:100%;overflow-wrap:break-word}
+  .card .arrow{align-self:center;justify-content:center;gap:5px;margin-top:auto;padding-top:12px;font-size:13.3px;line-height:1.25}
+  footer{margin-top:27px;font-size:.95rem}
+}
+@media(max-width:360px){
+  .shell{padding-inline:10px}
+  .menu{gap:9px}
+  .card{padding:15px 8px 13px;min-height:231px}
+  .card-visual{width:62px;height:62px;margin-bottom:11px}
+  .card-icon{width:37px;height:37px}
+  .card h2{font-size:15.7px}
+  .card p{font-size:12.7px}
+  .card .arrow{font-size:12.7px}
+}
+@media(prefers-reduced-motion:reduce){body::before{animation:none}.card,.card-visual{transition:none}}
 </style><link rel="stylesheet" href="/walid-legal.css">
 </head>
 <body><main class="shell">
-<section class="hero"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"><h1>Welcome to <span style="color:#0f55e8">Walid AI</span></h1><p>Choose a space to get started. Chat, create, learn, play, and find useful tools in one place.</p><div class="floral-rule" aria-hidden="true"><span></span><img src="/walid-ai-approved-flower.png" alt=""><span></span></div></section>
+<section class="hero"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"><h1>Welcome to <span>Walid AI</span></h1><p>A refined space to think, create, learn, and explore—with practical tools for everyday life.</p><div class="floral-rule" aria-hidden="true"><span></span><img src="/walid-ai-approved-flower.png" alt=""><span></span></div></section>
 <nav class="menu" aria-label="Main menu">
-<a class="card blue" href="/chat/"><img class="card-image" src="/assets/homepage/ai-chat.png" alt=""><h2>AI Chat</h2><p>Ask questions in English or Bangla with the existing Walid AI chat.</p><span class="arrow">Open chat →</span></a>
-<a class="card pink" href="/pdf/"><img class="card-image" src="/assets/homepage/pdf-tools.png" alt=""><h2>PDF Tools</h2><p>Merge, split, compress, sign, convert, and organize PDF files.</p><span class="arrow">Open PDF tools →</span></a>
-<a class="card purple" href="/image/"><img class="card-image" src="/assets/homepage/image-tools.png" alt=""><h2>Image Tools</h2><p>Resize, convert, compress, remove backgrounds, and work with images.</p><span class="arrow">Explore image tools →</span></a>
-<a class="card yellow" href="/games/"><img class="card-image" src="/assets/homepage/games.png" alt=""><h2>Games</h2><p>Play the existing browser games, including puzzles and classic favorites.</p><span class="arrow">Open games →</span></a>
-<a class="card blue" href="/sections/education/"><img class="card-image" src="/assets/homepage/education.png" alt=""><h2>Education</h2><p>Study support, explainers, and learning resources for curious minds.</p><span class="arrow">Open section →</span></a>
-<a class="card purple" href="/islam/"><img class="card-image" src="/assets/homepage/al-quran.svg" alt=""><h2>Al-Quran &amp; Islam</h2><p>Read the Quran and explore Islamic stories with source references.</p><span class="arrow">Open section →</span></a>
-<a class="card lime" href="/sports/"><img class="card-image" src="/assets/homepage/sports.png" alt=""><h2>Sports</h2><p>Sports coverage and updates will live here as this section grows.</p><span class="arrow">Open section →</span></a>
-<a class="card cyan" href="/others/"><img class="card-image" src="/assets/homepage/others-books.svg" alt=""><h2>Others</h2><p>Explore classic folklore, famous tales, and world history in Bangla.</p><span class="arrow">Open library →</span></a>
+<a class="card blue" href="/chat/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M12 14h40a7 7 0 0 1 7 7v18a7 7 0 0 1-7 7H28l-13 8v-8h-3a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z" transform="translate(0 -1) scale(.96)"/><path d="m32 20 2.8 7.2L42 30l-7.2 2.8L32 40l-2.8-7.2L22 30l7.2-2.8L32 20Z"/><path d="M15 29h3m28 0h3"/></svg></span><h2>AI Chat</h2><p>Get clear answers, develop ideas, and write with confidence in Bangla or English.</p><span class="arrow">Start chatting</span></a>
+<a class="card rose" href="/pdf/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M19 10h20l9 9v32a4 4 0 0 1-4 4H19a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4Z"/><path d="M39 10v10h9M24 29h16M24 36h16M24 43h11"/><path d="M20 4h20" opacity=".4"/></svg></span><h2>PDF Tools</h2><p>Merge, convert, edit, and organize PDF documents in one convenient workspace.</p><span class="arrow">Manage PDFs</span></a>
+<a class="card violet" href="/image/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="11" width="48" height="42" rx="6"/><circle cx="24" cy="24" r="4.5"/><path d="m12 45 13-13 9 9 8-9 11 13"/><path d="M18 6h28" opacity=".4"/></svg></span><h2>Image Tools</h2><p>Resize, compress, convert, and refine images with straightforward editing tools.</p><span class="arrow">Edit images</span></a>
+<a class="card amber" href="/games/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M19 24h26a11 11 0 0 1 10.6 8.1l4.2 15.4c1.6 6-4.5 10.6-9.9 7.5l-9.4-6H23.5l-9.4 6c-5.4 3.1-11.5-1.5-9.9-7.5l4.2-15.4A11 11 0 0 1 19 24Z"/><path d="M17 36h13m-6.5-6.5v13M43 33h.1M49 39h.1"/><path d="M31 24V14h9" opacity=".65"/></svg></span><h2>Games</h2><p>Enjoy puzzles, strategy challenges, and classic games directly in your browser.</p><span class="arrow">Play games</span></a>
+<a class="card sage" href="/sections/education/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M31.5 52c-7-4.5-15-5.3-24-4.8V16c10-.5 18.4 1 24 5.2V52Zm1 0c7-4.5 15-5.3 24-4.8V16c-10-.5-18.4 1-24 5.2V52Z"/><path d="M32 21v31M15 26h10m-10 7h10m13-7h10m-10 7h10"/><path d="M12 10h40" opacity=".45"/></svg></span><h2>Education</h2><p>Practice MCQs, review study notes, and strengthen your understanding of key subjects.</p><span class="arrow">Start learning</span></a>
+<a class="card teal" href="/islam/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M31.5 53c-7.8-5.3-16-5.6-24-4.8V22c10.5-1.5 18.5 1.5 24 5.3V53Zm1 0c7.8-5.3 16-5.6 24-4.8V22c-10.5-1.5-18.5 1.5-24 5.3V53Z"/><path d="M32 27v26"/><path d="M41.5 7.5a10 10 0 1 0 11 12.7A11 11 0 0 1 41.5 7.5Z"/><path d="M15 33h10m14 0h10" opacity=".6"/></svg></span><h2>Al-Quran & Islam</h2><p>Read the Quran, explore supplications, and discover Islamic history and teachings.</p><span class="arrow">Explore Islam</span></a>
+<a class="card olive" href="/sports/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="24"/><path d="m32 19 12.5 9-4.7 14.4H24.2L19.5 28 32 19Z"/><path d="M32 8v11M55 22l-10.5 6M46.8 49l-7-6.6M17.2 49l7-6.6M9 22l10.5 6"/><path d="m26.5 10 5.5-2 5.5 2M10 37l-1-6M54 37l1-6" opacity=".6"/></svg></span><h2>Sports</h2><p>Follow football and cricket fixtures, recent results, and live match updates.</p><span class="arrow">View matches</span></a>
+<a class="card plum" href="/others/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="14" width="13" height="38" rx="2"/><rect x="25" y="10" width="14" height="42" rx="2"/><path d="m43 16 10-2 7 37-10 2-7-37Z"/><path d="M13 23h7M13 43h7M29 20h6M29 43h6M48 25l8-2M51 43l7-2"/></svg></span><h2>Others</h2><p>Discover Bangla stories, classic literature, and captivating episodes from world history.</p><span class="arrow">Browse stories</span></a>
 </nav><footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us/">About Us</a><span aria-hidden="true">·</span><a href="/contact-us/">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy/">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service/">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </main></body></html>
 

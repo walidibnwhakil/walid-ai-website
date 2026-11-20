@@ -41,6 +41,8 @@ async function pageFor(slug,selector){
   assert.ok(!p.url().includes('/404'),'Unexpected 404 page');
   const f=p.frameLocator('iframe.tool-frame');
   await f.locator(selector).waitFor({state:'attached',timeout:35000});
+  // Let the site's delayed standalone recovery initializer complete before selecting files.
+  await p.waitForTimeout(800);
   return {p,f};
 }
 async function studio(slug){

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112" fill="none" role="img" aria-label="Ramadan crescent and lantern">
+<title>Ramadan crescent and lantern</title>
+<defs><radialGradient id="bg" cx="0" cy="0" r="1" gradientTransform="translate(42 27) rotate(55) scale(103)"><stop stop-color="#27785B"/><stop offset="1" stop-color="#073F32"/></radialGradient></defs>
+<circle cx="56" cy="56" r="54" fill="url(#bg)" stroke="#CDA953" stroke-width="3"/>
+<circle cx="56" cy="56" r="48" stroke="#EBD48C" stroke-opacity=".7" stroke-width="1"/>
+<path d="M71 17A20 20 0 1 0 85 49A23 23 0 1 1 71 17Z" fill="#F6D68D"/>
+<path d="M88 22L90 27L95 29L90 31L88 36L86 31L81 29L86 27Z" fill="#FCE9A8"/>
+<path d="M56 37V48M51 35Q56 30 61 35M48 48H64" stroke="#E8C987" stroke-width="3" stroke-linecap="round"/>
+<path d="M46 49L66 49L74 62L68 84L44 84L38 62Z" fill="#D7AC5A" stroke="#FBE1A1" stroke-width="2.7" stroke-linejoin="round"/>
+<path d="M48 54H64L68 63L64 78H48L44 63Z" fill="#256B53" stroke="#F4D48C" stroke-width="1.5"/>
+<path d="M56 55V78M44 64H68M49 55L45 63L49 78M63 55L67 63L63 78" stroke="#F0D18C" stroke-width="1.3"/>
+<path d="M55 58L57 58L59 68L56 73L53 68Z" fill="#FFE8A7" opacity=".9"/>
+<path d="M49 85H63L67 90H45Z" fill="#E8BD73" stroke="#FBE2A2" stroke-width="1.8"/>
+<path d="M56 90V97" stroke="#D5AF6C" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M23 43L25 48L30 50L25 52L23 57L21 52L16 50L21 48Z" fill="#F9E6B1"/>
+</svg>

@@ -91,3 +91,22 @@ body[data-sport-detail="football"] .scorecard-team .mini-mark img{
     height:55px;
   }
 }
+
+
+/* Football and Cricket section headings: free-standing sport icon, no tile or outline. */
+body[data-sport-detail="football"] .detail-hero .sport-title-logo,
+body[data-sport-detail="cricket"] .detail-hero .sport-title-logo{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+  font-size:clamp(2.2rem,5vw,3rem);
+  line-height:1;
+  padding:0;
+  border:0;
+  border-radius:0;
+  outline:0;
+  background:transparent;
+  box-shadow:none;
+}

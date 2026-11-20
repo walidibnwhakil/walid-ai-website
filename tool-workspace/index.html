@@ -46,7 +46,7 @@ body.checker-preview #canvas{background-color:#e7e9ee;background-image:linear-gr
 <a class="tool-card" href="tools/compress-image/" data-tool="image-compress" data-kind="image" data-title="Compress Image" data-description="Reduce image file size while keeping useful quality."><span class="tool-mark">IMG</span><span class="tool-name">Compress Image</span><span class="tool-desc">Reduce image file size while keeping useful quality.</span></a>
 <a class="tool-card" href="tools/convert-image/" data-tool="image-convert" data-kind="image" data-title="Convert Image" data-description="Convert between JPG, PNG and WebP formats."><span class="tool-mark">JPG</span><span class="tool-name">Convert Image</span><span class="tool-desc">Convert between JPG, PNG and WebP formats.</span></a>
 <a class="tool-card" href="tools/background-remover/" data-tool="background-remove" data-kind="image" data-title="Remove Background" data-description="Remove a photo background and save a transparent PNG."><span class="tool-mark">BG</span><span class="tool-name">Remove Background</span><span class="tool-desc">Remove a photo background and save a transparent PNG.</span></a><a class="tool-card" href="tools/signature-remover/" data-tool="signature-remove" data-kind="image" data-title="Remove Signature Background" data-description="Make the paper behind a signature transparent."><span class="tool-mark">PNG</span><span class="tool-name">Remove Signature Background</span><span class="tool-desc">Make the paper behind a signature transparent.</span></a>
-<a class="tool-card" href="tools/watermark-remover/" data-tool="watermark-remove" data-kind="image" data-title="Remove Watermark" data-description="Select a small watermark area to fill it using nearby pixels."><span class="tool-mark">WM</span><span class="tool-name">Remove Watermark</span><span class="tool-desc">Select a small watermark area to fill it using nearby pixels.</span></a>
+<a class="tool-card" href="tools/watermark-remover/" data-tool="watermark-remove" data-kind="image" data-title="Remove Watermark" data-description="Remove a small mark from your image."><span class="tool-mark">WM</span><span class="tool-name">Remove Watermark</span><span class="tool-desc">Remove a small mark from your image.</span></a>
 </section>
 <div class="ad-wrap" id="adWrap"><span class="sponsored" id="sponsoredLabel" hidden>Sponsored</span><div id="adTools"></div></div>
 <section class="workspace" id="workspace" hidden><div class="workspace-head"><div><h2 id="workTitle"></h2><p class="muted" id="workHint"></p></div><button class="close" id="closeWorkspace" aria-label="Close">×</button></div>
@@ -129,7 +129,7 @@ async function ocrPdfToDocx(file,onProgress) {
 }
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],grid=$('#toolGrid'),workspace=$('#workspace'),status=$('#status');let activeTool=null,imageCanvas=$('#canvas'),ctx=imageCanvas.getContext('2d',{willReadFrequently:true}),original=null,pickedColor=null,pickedPoint=null,selection=null,dragStart=null,imageBaseName='walid-image';
 function walidDownloadName(filename){const name=String(filename||'file');return name.startsWith('Walid AI_')?name:'Walid AI_'+name}
-const messages={choosePdf:'Choose a PDF file first.',onePdf:'Choose one PDF for this tool.',twoPdfs:'Choose at least two PDF files to merge.',tooLarge:'The total file size must be under 20 MB.',working:'Working…',done:'Done.',chooseImage:'Choose an image first.',chooseColor:'Select the paper color in the image first.',chooseArea:'Select a small area in the image first.',areaTooLarge:'Select a smaller area for best results.',badSize:'Enter a width and height between 1 and 10,000 pixels.',imageReady:'',colorPicked:'Background color selected.',restored:'Original image restored.',backgroundDone:'Background removed.',markDone:'Selected area filled using nearby pixels.',sizeDone:'Image resized.',imageError:'The image could not be opened.',fileError:'The file could not be processed. Please try another file.'};
+const messages={choosePdf:'Choose a PDF file first.',onePdf:'Choose one PDF for this tool.',twoPdfs:'Choose at least two PDF files to merge.',tooLarge:'The total file size must be under 20 MB.',working:'Working…',done:'Done.',chooseImage:'Choose an image first.',chooseColor:'Select the paper color in the image first.',chooseArea:'Select a small area in the image first.',areaTooLarge:'Select a smaller area for best results.',badSize:'Enter a width and height between 1 and 10,000 pixels.',imageReady:'',colorPicked:'Background color selected.',restored:'Original image restored.',backgroundDone:'Background removed.',markDone:'Selected area updated.',sizeDone:'Image resized.',imageError:'The image could not be opened.',fileError:'The file could not be processed. Please try another file.'};
 function setStatus(key){status.textContent=Object.prototype.hasOwnProperty.call(messages,key)?messages[key]:key}function syncCheckerPreview(){document.body.classList.toggle('checker-preview',activeTool==='background-remove'&&!imageCanvas.hidden)}function notifyEditor(active){if(window.parent!==window)new URLSearchParams(location.search).has("embedded")&&window.parent.postMessage({type:"walid-tool-editor-state",active},location.origin)}
 $$('.filter').forEach(button=>button.addEventListener('click',()=>{$$('.filter').forEach(item=>item.classList.toggle('active',item===button));const filter=button.dataset.filter;$$('.tool-card').forEach(card=>card.hidden=filter!=='all'&&card.dataset.kind!==filter)}));
 function hideWorkspace(){if(document.body.classList.contains('tool-mode')){location.href='/tools/';return}workspace.hidden=true;activeTool=null}
@@ -167,9 +167,9 @@ function updateFormatControls(){
   $('#qualityWrap').hidden=isPng&&!pngCompression;
   $('#qualityValue').textContent=quality.value+'%';
   $('#formatNote').textContent=pngCompression
-    ? 'PNG quality adjusts the color palette to try to reduce file size; lower settings may change colors. Results show the exact savings.'
-    : isPng?'PNG preserves transparency. Lossless quality is automatic.'
-    : 'JPG uses a white background for transparency. Lower quality usually creates a smaller file.';
+    ? 'Lower quality may slightly change colors. Check the result before downloading.'
+    : isPng?'PNG keeps transparent areas.'
+    : 'JPG turns transparent areas white. Lower quality can make the file smaller.';
 }
 imageFormat.addEventListener('change',updateFormatControls);
 quality.addEventListener('input',updateFormatControls);
@@ -187,7 +187,7 @@ $('#height').addEventListener('input',()=>syncDimensions('height'));
 imageFile.onchange=()=>{let files=[...imageFile.files];if(imageFile.dataset.append==='1'&&activeTool==='image-convert'){files=[...(window._walidSelectedImages||[]),...files];delete imageFile.dataset.append;const transfer=new DataTransfer();files.forEach(file=>transfer.items.add(file));imageFile.files=transfer.files}if(activeTool==='image-convert'&&files.length>10){imageFile.value='';window._walidSelectedImages=[];setStatus('Choose up to 10 images per batch.');$('#runImage').disabled=true;return}window._walidSelectedImages=files;const file=files[0];if(!file)return;$('#imageFileName').textContent=activeTool==='image-convert'?files.length+' image'+(files.length===1?'':'s')+' selected':file.name;const fileList=$('#imageFileList');fileList.replaceChildren();if(activeTool==='image-convert'){files.forEach(item=>{const row=document.createElement('div'),name=document.createElement('strong'),size=document.createElement('small');row.className='picked-file';name.textContent=item.name;size.textContent=(item.size/1048576).toFixed(2)+' MB';row.append(name,size);fileList.append(row)});fileList.hidden=false}else fileList.hidden=true;$('#imageSelectedSummary').hidden=false;$('#runImage').hidden=false;document.body.classList.add('file-selected');notifyEditor(true);syncCheckerPreview();imageBaseName=file.name.replace(/\.[^.]+$/,'').replace(/[^\p{L}\p{N}_-]+/gu,'-')||'walid-image';const url=URL.createObjectURL(file),image=new Image();image.onload=()=>{
   const maxPixels=mobileBgDevice&&activeTool==='background-remove'?15_000_000:25_000_000;
   if(image.naturalWidth*image.naturalHeight>maxPixels){
-    setStatus('This photo is too large for safe browser editing. Choose a smaller photo.');
+    setStatus('This photo is too large. Choose a smaller photo.');
     URL.revokeObjectURL(url);return;
   }
   const longSide=mobileBgDevice&&activeTool==='background-remove'?1024:Infinity;
@@ -288,7 +288,7 @@ $('#runImage').onclick=async()=>{
         const loaded=await new Promise((resolve,reject)=>{
           const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(Error(messages.imageError));img.src=url
         }).finally(()=>URL.revokeObjectURL(url));
-        if(loaded.naturalWidth*loaded.naturalHeight>25000000)throw Error('Image '+(index+1)+' exceeds the 25-megapixel browser limit.');
+        if(loaded.naturalWidth*loaded.naturalHeight>25000000)throw Error('Image '+(index+1)+' is too large. Choose a smaller image.');
         const canvas=document.createElement('canvas');canvas.width=loaded.naturalWidth;canvas.height=loaded.naturalHeight;
         const c=canvas.getContext('2d');if(type==='image/jpeg'){c.fillStyle='#fff';c.fillRect(0,0,canvas.width,canvas.height)}c.drawImage(loaded,0,0);
         const blob=await encodeCanvas(canvas,type,q);
@@ -332,7 +332,7 @@ $('#runImage').onclick=async()=>{
     }else if(activeTool==='image-resize'){
       const width=Number($('#width').value),height=Number($('#height').value);
       if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width>10000||height>10000)throw Error(messages.badSize);
-      if(width*height>25000000)throw Error('The new dimensions exceed 25 megapixels. Please choose a smaller size.');
+      if(width*height>25000000)throw Error('The new dimensions are too large. Choose a smaller size.');
       const resized=document.createElement('canvas');resized.width=width;resized.height=height;
       const context=resized.getContext('2d');context.imageSmoothingEnabled=true;context.imageSmoothingQuality='high';
       if(type==='image/jpeg'){context.fillStyle='#fff';context.fillRect(0,0,width,height)}
@@ -343,9 +343,9 @@ $('#runImage').onclick=async()=>{
       const compressionCanvas=type==='image/png'?quantizePngCanvas(imageCanvas,Number(quality.value)):imageCanvas;
       let blob=await encodeCanvas(compressionCanvas,type,q),note='';
       if(blob.size>=file.size&&file.type===type){
-        blob=file;note='The original was already smaller than the new encoding. The original file was preserved so no extra bytes or quality are lost.';
+        blob=file;note='This image was already small, so we kept the original file.';
       } else if(type==='image/png'&&Number(quality.value)<100){
-        note='PNG uses reduced color precision to improve compression. Inspect the preview before downloading.';
+        note='Some colors may look different. Check the result before downloading.';
       }
       await recordImage(blob,file,compressionCanvas,original,note);
     }else {

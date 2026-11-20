@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - "tools/pdf-browser/**"
+      - "tool-workspace/index.html"
       - "tools/pdf-to-word/**"
       - "fonts/NotoSansBengali-Regular.ttf"
       - "tests/fixtures/bengali-mixed*"
       - "tests/ocr-language-contract.mjs"
       - "tests/pdf-bengali-export-contract.mjs"
       - "tests/pdf-browser-e2e.mjs"
+      - "tests/pdf-word-structure-e2e.mjs"
       - "tests/tesseract-benchmark.mjs"
       - "tests/pdf-tool-regression-contract.mjs"
       - ".github/workflows/pdf-ocr-contract.yml"
@@ -22,14 +24,14 @@ permissions:
 jobs:
   pdf-e2e:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - name: Install browser test dependencies
         run: |
-          npm install --no-save playwright@1.56.1 jszip@3.10.1
+          npm install --no-save playwright@1.56.1 jszip@3.10.1 pdf-lib@1.17.1
           npx playwright install chromium
       - name: Install OCR engine and Bengali language data
         run: |
@@ -48,6 +50,7 @@ jobs:
       - run: node tests/pdf-bengali-export-contract.mjs
       - run: node tests/pdf-tool-regression-contract.mjs
       - run: node tests/pdf-browser-e2e.mjs
+      - run: node tests/pdf-word-structure-e2e.mjs
       - id: tesseract
         name: Run Tesseract ground-truth benchmark
         run: node tests/tesseract-benchmark.mjs

@@ -233,8 +233,9 @@ function renderAnnotations() {
   const page = currentPage();
   for (const ann of page?.annotations || []) {
     const el = document.createElement("div");
-    const kind = ann.type === "ink" ? "ink" : ann.type === "highlight" ? "highlight" : ann.type === "note" ? "note" : ann.type === "text" ? "text" : "image";
+    const kind = ann.type === "ink" ? "ink" : ann.type === "highlight" ? "highlight" : ann.type === "note" ? "note" : ann.type === "text" ? "text" : ann.type === "cover" ? "cover" : "image";
     el.className = "ann ann-" + kind;
+    if (ann.kind === "replacement") el.classList.add("ann-replacement");
     if (ann.id === state.selectedId) el.classList.add("selected");
     el.style.left = (ann.x / view.width) * 100 + "%";
     el.style.top = (ann.y / view.height) * 100 + "%";
@@ -252,6 +253,8 @@ function renderAnnotations() {
         ann.h = Math.max(ann.fontSize * 1.4, (ann.type === "note" ? 16 : 4) + lines.length * ann.fontSize * 1.35);
         el.style.height = (ann.h / view.height) * 100 + "%";
       });
+    } else if (ann.type === "cover") {
+      el.title = "Covered area. Remove this box to reveal the original content.";
     } else if (ann.type === "image") {
       const img = document.createElement("img");
       img.alt = "";
@@ -387,7 +390,87 @@ async function renderPage() {
   $("pageLabel").textContent = (state.index + 1) + " / " + state.pages.length;
   $("pageBar").hidden = false;
   renderAnnotations();
+  await renderEditableTextHits(pdfPage, view, token);
   notifyEditor(true);
+}
+
+async function renderEditableTextHits(pdfPage, view, token) {
+  if (tool !== "edit" || state.editTool !== "replace") return;
+  const textContent = await pdfPage.getTextContent();
+  if (token !== state.renderToken) return;
+  const overlay = $("overlay");
+  const textItems=textContent.items.filter(item=>item.str?.trim());
+  const sourceItems=textItems.length?textItems:(currentPage()?.ocrSpans||[]);
+  for (const item of sourceItems) {
+    if (!item.str?.trim() || (!item.ocr && !Number.isFinite(item.transform?.[4]))) continue;
+    const size = item.ocr ? item.size : Math.max(8, Math.hypot(item.transform[0], item.transform[1]) || item.height || 12);
+    let box;
+    if (item.ocr) box={...item.box};
+    else {
+      const x = item.transform[4], baseline = item.transform[5];
+      const r = view.convertToViewportRectangle([x, baseline - size * .24, x + Math.max(8, item.width || size), baseline + size * .92]);
+      box={x:Math.max(0,Math.min(r[0],r[2])),y:Math.max(0,Math.min(r[1],r[3])),w:Math.abs(r[2]-r[0]),h:Math.abs(r[3]-r[1])};
+    }
+    if (box.w < 3 || box.h < 3 || box.x >= view.width || box.y >= view.height) continue;
+    const replaced = currentPage()?.annotations.some(a => a.kind === "replacement" && a.originalRect && Math.abs(a.originalRect.x-box.x)<4 && Math.abs(a.originalRect.y-box.y)<4);
+    if (replaced) continue;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "source-text-hit";
+    button.title = "Edit: " + item.str.slice(0,100);
+    button.setAttribute("aria-label","Edit text: "+item.str.slice(0,90));
+    button.style.left = (box.x/view.width*100)+"%";
+    button.style.top = (box.y/view.height*100)+"%";
+    button.style.width = (Math.max(8,box.w)/view.width*100)+"%";
+    button.style.height = (Math.max(9,box.h)/view.height*100)+"%";
+    button.addEventListener("click", () => {
+      const ann = addAnnotation({
+        kind: "replacement", type: "text", text: item.str, fontSize: Math.min(96,size),
+        color: $("textColor").value, x:box.x,y:box.y,
+        w:Math.max(42,box.w+10),h:Math.max(size*1.4,box.h), originalRect: {...box}
+      });
+      setStatus("Edit the selected text, then download. The old PDF content may remain underneath unless permanent removal is selected.");
+      $("overlay").querySelector(".ann.selected")?.focus();
+    });
+    overlay.append(button);
+  }
+}
+
+
+async function recognizeEditPageText() {
+  if (tool !== "edit" || !state.doc || !state.pages.length) {
+    setStatus("Choose a PDF first.");
+    return;
+  }
+  const info=currentPage();
+  const {pdfPage,view}=await viewportFor(info,1);
+  const scale=Math.min(2.7,2200/Math.max(view.width,view.height));
+  const viewport=pdfPage.getViewport({scale,rotation:totalRotation(info)});
+  const canvas=document.createElement("canvas");
+  canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+  const ctx=canvas.getContext("2d");
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+  setStatus("Recognizing scanned text on the selected page…");
+  await pdfPage.render({canvasContext:ctx,viewport}).promise;
+  const {createWorker}=await import("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm");
+  const worker=await createWorker("ben+eng");
+  let result;
+  try{result=await worker.recognize(canvas);}
+  finally{await worker.terminate();}
+  info.ocrSpans=(result.data.words||[]).filter(word=>word.text?.trim()).map(word=>{
+    const box={
+      x:word.bbox.x0/scale,y:word.bbox.y0/scale,
+      w:(word.bbox.x1-word.bbox.x0)/scale,h:(word.bbox.y1-word.bbox.y0)/scale
+    };
+    return {ocr:true,str:word.text.trim(),box,size:Math.max(10,box.h)};
+  });
+  if(!info.ocrSpans.length){
+    setStatus("No words were recognized. Use Cover area and Add text manually.");
+    return;
+  }
+  markEditTool("replace");
+  await renderPage();
+  setStatus("Recognized "+info.ocrSpans.length+" word(s). Select a highlighted word to edit it; OCR may contain spelling errors.");
 }
 
 function boundsOf(points) {
@@ -404,7 +487,7 @@ function boundsOf(points) {
 function onOverlayPointerDown(event) {
   if (!state.view || event.target !== $("overlay")) return;
   const point = pointerPos(event);
-  if (state.editTool === "select" || tool === "sign") {
+  if (state.editTool === "select" || state.editTool === "replace" || tool === "sign") {
     state.selectedId = null;
     renderAnnotations();
     return;
@@ -434,7 +517,7 @@ function onOverlayPointerDown(event) {
     placePendingImage(point);
     return;
   }
-  if (state.editTool === "highlight" || state.editTool === "ink") {
+  if (state.editTool === "highlight" || state.editTool === "cover" || state.editTool === "ink") {
     state.drag = { kind: state.editTool, start: point, points: [point] };
     $("stage").setPointerCapture?.(event.pointerId);
   }
@@ -458,7 +541,7 @@ function onPointerMove(event) {
     drag.ann.w = Math.max(12, drag.w + (point.x - drag.x));
     drag.ann.h = Math.max(12, drag.h + (point.y - drag.y));
     renderAnnotations();
-  } else if (drag.kind === "highlight") {
+  } else if (drag.kind === "highlight" || drag.kind === "cover") {
     let ghost = $("overlay").querySelector(".ghost");
     if (!ghost) {
       ghost = document.createElement("div");
@@ -492,13 +575,13 @@ function onPointerUp(event) {
   const drag = state.drag;
   if (!drag) return;
   state.drag = null;
-  if (drag.kind === "highlight") {
+  if (drag.kind === "highlight" || drag.kind === "cover") {
     const point = pointerPos(event);
     const x = Math.min(drag.start.x, point.x);
     const y = Math.min(drag.start.y, point.y);
     const w = Math.abs(point.x - drag.start.x);
     const h = Math.abs(point.y - drag.start.y);
-    if (w > 4 && h > 4) addAnnotation({ type: "highlight", x, y, w, h });
+    if (w > 4 && h > 4) addAnnotation({ type: drag.kind, kind: drag.kind === "cover" ? "replacement-cover" : undefined, x, y, w, h });
     else renderAnnotations();
   } else if (drag.kind === "ink" && drag.points.length > 1) {
     addAnnotation({
@@ -574,6 +657,7 @@ async function rotateBy(delta) {
   if (!page) return;
   const old = await viewportFor(page, 1);
   page.rotation = ((page.rotation || 0) + delta + 360) % 360;
+  page.ocrSpans = null;
   const next = await viewportFor(page, 1);
   await retargetPage(page, old.view, next.view);
   if (tool !== "organize") await renderPage();
@@ -649,6 +733,16 @@ async function drawTextAnnotation(pdfDoc, page, view, ann) {
 }
 
 async function drawAnnotation(pdfDoc, page, view, ann, rotation) {
+  if (ann.type === "cover") {
+    const box = visualRectToPdf(view, ann.x, ann.y, ann.w, ann.h);
+    page.drawRectangle({ x:box.left,y:box.bottom,width:box.width,height:box.height,color:rgb(1,1,1) });
+    return;
+  }
+  if (ann.kind === "replacement" && ann.originalRect) {
+    const rect = ann.originalRect;
+    const box = visualRectToPdf(view, rect.x-1, rect.y-1, rect.w+2, rect.h+2);
+    page.drawRectangle({ x:box.left,y:box.bottom,width:box.width,height:box.height,color:rgb(1,1,1) });
+  }
   if ((ann.type === "text" || ann.type === "note") && !String(ann.text || "").trim()) return;
   if (ann.type === "highlight") {
     const box = visualRectToPdf(view, ann.x, ann.y, ann.w, ann.h);
@@ -712,13 +806,32 @@ async function buildEditedPdf() {
   const src = await PDFDocument.load(state.bytes.slice(0), state.password ? { password: state.password } : {});
   const out = await PDFDocument.create();
   for (const info of state.pages) {
-    const [copied] = await out.copyPages(src, [info.sourceIndex]);
-    const page = out.addPage(copied);
-    const rotation = totalRotation(info);
-    page.setRotation(degrees(rotation));
-    if (!info.annotations.length) continue;
-    const { view } = await viewportFor(info, 1);
-    for (const ann of info.annotations) await drawAnnotation(out, page, view, ann, rotation);
+    const securityMode = tool === "edit" && $("flattenReplacements")?.checked && info.annotations.some(ann => ann.kind === "replacement" || ann.kind === "replacement-cover");
+    let page, rotation=totalRotation(info), view;
+    if (securityMode) {
+      // Rebuild just this page as a flat image so covered original strings/images
+      // cannot be extracted from hidden underlying PDF content.
+      const original = await viewportFor(info,1);
+      view = original.view;
+      const scale = Math.min(2.2, 2300/Math.max(view.width,view.height));
+      const renderView = original.pdfPage.getViewport({scale,rotation});
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.ceil(renderView.width);canvas.height=Math.ceil(renderView.height);
+      const ctx=canvas.getContext("2d");
+      ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+      await original.pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
+      const jpg=await out.embedJpg(new Uint8Array(await (await canvasBlob(canvas,"image/jpeg",.94)).arrayBuffer()));
+      page=out.addPage([view.width,view.height]);
+      page.drawImage(jpg,{x:0,y:0,width:view.width,height:view.height});
+      view={width:view.width,height:view.height,convertToPdfPoint:(x,y)=>[x,view.height-y]};
+      rotation=0;
+    }else{
+      const [copied]=await out.copyPages(src,[info.sourceIndex]);
+      page=out.addPage(copied);
+      page.setRotation(degrees(rotation));
+      if(info.annotations.length)({view}=await viewportFor(info,1));
+    }
+    for(const ann of info.annotations)await drawAnnotation(out,page,view,ann,rotation);
   }
   return out.save();
 }
@@ -1082,88 +1195,136 @@ async function compressPdf() {
   }
   const choice = $("compressQuality").value;
   const preset = choice === "small" ? { scale: 0.9, quality: 0.42 } : choice === "clear" ? { scale: 1.6, quality: 0.78 } : { scale: 1.15, quality: 0.58 };
-  setStatus("Resampling pages…");
-  const doc = await PDFDocument.create();
-  for (let index = 0; index < state.pages.length; index += 1) {
-    const info = state.pages[index];
-    const { pdfPage, view } = await viewportFor(info, 1);
-    const scale = Math.min(preset.scale, 1800 / Math.max(view.width, view.height));
-    const renderView = pdfPage.getViewport({ scale, rotation: totalRotation(info) });
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(renderView.width);
-    canvas.height = Math.ceil(renderView.height);
-    const context = canvas.getContext("2d");
-    context.fillStyle = "#fff";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    await pdfPage.render({ canvasContext: context, viewport: renderView }).promise;
-    const jpg = await doc.embedJpg(new Uint8Array(await (await canvasBlob(canvas, "image/jpeg", preset.quality)).arrayBuffer()));
-    doc.addPage([view.width, view.height]).drawImage(jpg, { x: 0, y: 0, width: view.width, height: view.height });
-    setStatus("Resampling page " + (index + 1) + " of " + state.pages.length + "…");
+  setStatus("Checking text and images before compressing…");
+  let containsText=false;
+  for (let i=0;i<state.pages.length;i++) {
+    const page=await state.doc.getPage(state.pages[i].sourceIndex+1);
+    const text=await page.getTextContent();
+    if(text.items.some(item=>String(item.str||"").trim().length>2)){containsText=true;break;}
   }
-  const bytes = await doc.save();
-  downloadBlob(new Blob([bytes], { type: "application/pdf" }), baseName() + "-compressed.pdf");
-  const smaller = bytes.length < state.bytes.length;
-  setStatus("Original " + formatSize(state.bytes.length) + ". Download " + formatSize(bytes.length) + "." + (smaller ? "" : " The new file is not smaller. Keep the original if you need the smaller one."));
+  let bytes;
+  if (containsText) {
+    // Never destroy selectable text for the sake of smaller JPEG page pictures.
+    // Object-stream packing is lossless; a larger result is never forced on users.
+    try{
+      const parsed=await PDFDocument.load(state.bytes.slice(0));
+      bytes=await parsed.save({useObjectStreams:true,objectsPerTick:20});
+    }catch(error){
+      console.warn("Lossless PDF repack unavailable:",error);
+      bytes=state.bytes;
+    }
+    if(bytes.length>=state.bytes.length)bytes=state.bytes;
+    downloadBlob(new Blob([bytes],{type:"application/pdf"}),baseName()+"-compressed.pdf");
+    setStatus(bytes.length<state.bytes.length
+      ? "Lossless compression complete: "+formatSize(state.bytes.length)+" → "+formatSize(bytes.length)+". Text remains selectable."
+      : "No safe size reduction was available. Original PDF downloaded unchanged; its text stays selectable.");
+    return;
+  }
+  setStatus("Resampling image-only pages…");
+  const doc=await PDFDocument.create();
+  for(let index=0;index<state.pages.length;index++){
+    const info=state.pages[index];
+    const {pdfPage,view}=await viewportFor(info,1);
+    const scale=Math.min(preset.scale,1800/Math.max(view.width,view.height));
+    const renderView=pdfPage.getViewport({scale,rotation:totalRotation(info)});
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.ceil(renderView.width);canvas.height=Math.ceil(renderView.height);
+    const ctx=canvas.getContext("2d");
+    ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+    await pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
+    const jpg=await doc.embedJpg(new Uint8Array(await (await canvasBlob(canvas,"image/jpeg",preset.quality)).arrayBuffer()));
+    doc.addPage([view.width,view.height]).drawImage(jpg,{x:0,y:0,width:view.width,height:view.height});
+    setStatus("Compressing image-only page "+(index+1)+" of "+state.pages.length+"…");
+  }
+  bytes=await doc.save();
+  if(bytes.length>=state.bytes.length)bytes=state.bytes;
+  downloadBlob(new Blob([bytes],{type:"application/pdf"}),baseName()+"-compressed.pdf");
+  setStatus(bytes.length===state.bytes.length
+    ? "The original was already smaller. Downloaded it unchanged."
+    : "Compressed "+formatSize(state.bytes.length)+" → "+formatSize(bytes.length)+".");
 }
-
+function updateOcrDownload(text) {
+  const link=$("downloadText");
+  if(link.href)URL.revokeObjectURL(link.href);
+  const value=String(text||"");
+  link.href=URL.createObjectURL(new Blob([value],{type:"text/plain;charset=utf-8"}));
+  link.download=walidName(baseName()+"-bengali.txt");
+  link.textContent="Download "+link.download;
+  link.hidden=!value.trim();
+}
 async function runOcr() {
-  if (!state.doc && !state.images.length) {
+  if(!state.doc && !state.images.length){
     setStatus("Choose a PDF or an image first.");
     return;
   }
-  $("ocrField").hidden = false;
-  $("ocrOutput").value = "";
-  setStatus("Loading Bengali OCR…");
-  const tesseractModule = await import("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.esm.min.js");
-  const tesseract = tesseractModule.createWorker ? tesseractModule : tesseractModule.default;
+  $("ocrField").hidden=false;
+  $("ocrOutput").value="";
+  updateOcrDownload("");
+  const total=state.doc?state.pages.length:state.images.length;
+  if(total>30){
+    setStatus("To prevent browser crashes, process up to 30 pages or images per batch. Use Split PDF for larger files.");
+    return;
+  }
   let worker;
-  try {
-    worker = await tesseract.createWorker("ben+eng", 1, {
-      logger: (message) => {
-        if (!message?.status) return;
-        const progress = typeof message.progress === "number" ? " " + Math.round(message.progress * 100) + "%" : "";
-        setStatus(message.status + progress);
-      }
-    });
-    const parts = [];
-    if (state.doc) {
-      const total = Math.min(state.pages.length, 10);
-      for (let index = 0; index < total; index += 1) {
-        setStatus("Reading page " + (index + 1) + " of " + total + "…");
-        const { pdfPage, view } = await viewportFor(state.pages[index], 1);
-        const renderView = pdfPage.getViewport({
-          scale: Math.min(2, 1600 / Math.max(view.width, view.height)),
-          rotation: totalRotation(state.pages[index])
+  const getWorker=async()=>{
+    if(worker)return worker;
+    setStatus("Loading Bengali and English OCR…");
+    const tesseractModule=await import("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.esm.min.js");
+    const tesseract=tesseractModule.createWorker?tesseractModule:tesseractModule.default;
+    worker=await tesseract.createWorker("ben+eng",1,{logger:message=>{
+      if(!message?.status)return;
+      const progress=typeof message.progress==="number"?" "+Math.round(message.progress*100)+"%":"";
+      setStatus(message.status+progress);
+    }});
+    return worker;
+  };
+  const sections=[];
+  try{
+    if(state.doc){
+      for(let index=0;index<total;index++){
+        setStatus("Reading page "+(index+1)+" of "+total+"…");
+        const {pdfPage,view}=await viewportFor(state.pages[index],1);
+        const textContent=await pdfPage.getTextContent();
+        const selectable=textContent.items.map(item=>String(item.str||"")).filter(Boolean).join(" ").trim();
+        if(selectable.replace(/\s/g,"").length>12) {
+          sections.push("Page "+(index+1)+"\n"+selectable);
+          continue;
+        }
+        const renderView=pdfPage.getViewport({
+          scale:Math.min(2.7,2200/Math.max(view.width,view.height)),
+          rotation:totalRotation(state.pages[index])
         });
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.ceil(renderView.width);
-        canvas.height = Math.ceil(renderView.height);
-        await pdfPage.render({ canvasContext: canvas.getContext("2d"), viewport: renderView }).promise;
-        const result = await worker.recognize(canvas);
-        parts.push("Page " + (index + 1) + "\n" + (result.data.text || "").trim());
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.ceil(renderView.width);canvas.height=Math.ceil(renderView.height);
+        const ctx=canvas.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+        await pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
+        const worker=await getWorker();
+        const result=await worker.recognize(canvas);
+        sections.push("Page "+(index+1)+"\n"+(result.data.text||"").trim());
       }
-      if (state.pages.length > 10) parts.push("Stopped after 10 pages.");
-    } else {
-      for (let index = 0; index < state.images.length; index += 1) {
-        setStatus("Reading image " + (index + 1) + " of " + state.images.length + "…");
-        const result = await worker.recognize(new Blob([state.images[index].bytes], { type: state.images[index].mime }));
-        parts.push((state.images[index].name || "Image " + (index + 1)) + "\n" + (result.data.text || "").trim());
+    }else{
+      for(let index=0;index<total;index++){
+        setStatus("Reading image "+(index+1)+" of "+total+"…");
+        const img=state.images[index];
+        const bitmap=await createImageBitmap(new Blob([img.bytes],{type:img.mime}));
+        const scale=Math.min(2,2600/Math.max(bitmap.width,bitmap.height));
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.ceil(bitmap.width*scale);
+        canvas.height=Math.ceil(bitmap.height*scale);
+        const ctx=canvas.getContext("2d");
+        ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close?.();
+        const worker=await getWorker();
+        const result=await worker.recognize(canvas);
+        sections.push((img.name||"Image "+(index+1))+"\n"+(result.data.text||"").trim());
       }
     }
-    const text = parts.join("\n\n").trim();
-    $("ocrOutput").value = text || "No Bengali text was found.";
-    const link = $("downloadText");
-    if (link.href) URL.revokeObjectURL(link.href);
-    link.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-    link.download = walidName(baseName() + "-bengali.txt");
-    link.textContent = "Download " + link.download;
-    link.hidden = !text;
-    setStatus(text ? "Done." : "No Bengali text was found.");
-  } finally {
-    await worker?.terminate();
-  }
+    const text=sections.join("\n\n").trim();
+    $("ocrOutput").value=text;
+    updateOcrDownload(text);
+    setStatus(text?"Text extracted. Review and correct mistakes in the text box before downloading.":"No readable text was found.");
+  }finally{await worker?.terminate();}
 }
-
 function cropSignature() {
   const pad = $("signPad");
   const context = pad.getContext("2d", { willReadFrequently: true });
@@ -1357,10 +1518,12 @@ function bindDrop(zone, input) {
 }
 
 function markEditTool(name) {
+  const changed = state.editTool !== name;
   state.editTool = name;
   document.querySelectorAll("[data-edit]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.edit === name));
   });
+  if (changed && tool === "edit" && state.doc && state.view) renderPage().catch(error=>setStatus(error.message));
 }
 
 async function busy(button, job) {
@@ -1447,6 +1610,8 @@ document.addEventListener("keydown", (event) => {
 });
 bindDrop($("drop"), $("file"));
 bindSignPad();
+$("recognizeEditText").addEventListener("click",()=>busy($("recognizeEditText"),recognizeEditPageText));
+$("ocrOutput").addEventListener("input",()=>updateOcrDownload($("ocrOutput").value));
 for (const [id, job] of [
   ["saveEdit", () => saveEdited("-edited")],
   ["saveOrganize", () => saveEdited("-organized")],

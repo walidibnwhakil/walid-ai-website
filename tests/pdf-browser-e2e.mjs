@@ -55,8 +55,8 @@ server = createServer(async (req, res) => {
     res.end(JSON.stringify({ file: docxBytes.toString("base64"), type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", name: "bengali-editable.docx" }));
     return;
   }
-  const file = url.pathname === "/" ? "tools/pdf-browser/studio.html" : url.pathname.slice(1);
-  try { const body = await readFile(new URL(file, root)); res.writeHead(200, { "content-type": file.endsWith(".js") ? "text/javascript" : file.endsWith(".html") ? "text/html" : "application/octet-stream" }); res.end(body); }
+  const file = url.pathname === "/" ? "tools/pdf-browser/studio.html" : url.pathname === "/tool-workspace/" ? "tool-workspace/index.html" : url.pathname.slice(1);
+  try { const body = await readFile(new URL(file, root)); res.writeHead(200, { "content-type": file.endsWith(".js") || file.endsWith(".mjs") ? "text/javascript" : file.endsWith(".html") ? "text/html" : file.endsWith(".css") ? "text/css" : file.endsWith(".png") ? "image/png" : "application/octet-stream" }); res.end(body); }
   catch { res.writeHead(404); res.end("not found"); }
 });
 server.listen(0, "127.0.0.1"); await withTimeout(once(server, "listening"), 10000, "server startup");
@@ -108,7 +108,7 @@ await compress.setInputFiles("#file", { name: "compress-me.pdf", mimeType: "appl
 await compress.locator("#panelCompress").waitFor({ state: "visible" });
 await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("2 pages ready"));
 await compress.locator("#applyCompress").click();
-await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("Download"));
+await compress.locator("#download").waitFor({state:"visible",timeout:20000});
 const compressed = await download(compress, "#download"); assert.equal(compressed[0], 37); assert.equal((await withTimeout(inspect(compressed), 15000, "compressed PDF inspection")).length, 2);
 
 const word = await context.newPage();

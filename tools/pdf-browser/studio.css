@@ -211,3 +211,35 @@ textarea.ocr-text { min-height: 220px; resize: vertical; font-family: "Noto Sans
   .layout { grid-template-columns: 1fr; }
   .select-file { height: 68px; }
 }
+
+
+/* Editable PDF content selection and visual replacement */
+.source-text-hit {
+  position:absolute;
+  z-index:3;
+  border:1px dashed rgba(0,106,78,.65);
+  background:rgba(0,106,78,.08);
+  border-radius:2px;
+  cursor:text;
+  padding:0;
+  color:transparent;
+  outline-offset:2px;
+}
+.source-text-hit:hover,.source-text-hit:focus-visible{
+  border-color:#006a4e;
+  background:rgba(0,106,78,.2);
+  outline:2px solid #006a4e;
+}
+.ann-replacement {
+  background:#fff;
+  outline:1px dashed #006a4e;
+  padding:0 2px;
+}
+.ann-cover { background:#fff; border:1px dashed #9da5a4; }
+.secure-choice{align-items:flex-start;gap:8px;font-size:.9rem;}
+.secure-choice input{flex:none;margin-top:5px;}
+#replaceWarning{font-size:.85rem;}
+@media (max-width:700px){
+  .source-text-hit{min-height:12px;}
+  .tool-row .tool-btn{flex:1 1 auto;}
+}

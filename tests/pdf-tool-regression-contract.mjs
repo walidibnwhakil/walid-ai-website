@@ -39,7 +39,7 @@ const contracts = [
   [/doc\.addPage\(/, "image-to-PDF must create one page per image"],
   [/imagePageSize/, "image-to-PDF page sizing must remain configurable"],
   [/createWorker\(["']ben\+eng["']/, "OCR must use Bengali plus English"],
-  [/Math\.min\(state\.pages\.length, 10\)/, "PDF OCR must keep its first-ten-page safety bound"],
+  [/total>30/, "PDF OCR must keep a 30-page batch safety bound"],
   [/embedPng\(/, "raster fallback must remain available for annotations"]
 ];
 for (const [pattern, message] of contracts) assert.match(source, pattern, message);

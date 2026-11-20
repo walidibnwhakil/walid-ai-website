@@ -66,6 +66,62 @@ function chooseDonors(raw,width,height,rect,limit=240){
   for(let i=0;i<limit;i++)sampled.push(donors[Math.floor(i*(donors.length-1)/Math.max(1,limit-1))]);
   return sampled;
 }
+function tryWholePatch(raw,width,height,rect){
+  // When a clean nearby region repeats the texture, use it as one intact piece
+  // rather than many small tiles. This preserves stripes, text backgrounds, and edges.
+  const {x,y,w,h}=rect;
+  const area=(width-w)*(height-h);
+  if(area<=0)return null;
+  const step=Math.max(2,Math.floor(Math.sqrt(area/6500)));
+  const sampleX=Math.max(1,Math.floor(w/28)),sampleY=Math.max(1,Math.floor(h/22));
+  const samples=[];
+  for(let xx=0;xx<w;xx+=sampleX){
+    if(y>0)samples.push([xx,-1]);
+    if(y+h<height)samples.push([xx,h]);
+  }
+  for(let yy=0;yy<h;yy+=sampleY){
+    if(x>0)samples.push([-1,yy]);
+    if(x+w<width)samples.push([w,yy]);
+  }
+  if(samples.length<12)return null;
+  function score(px,py){
+    if(px<1||py<1||px+w>=width-1||py+h>=height-1)return Infinity;
+    if(px<x+w+2&&px+w>x-2&&py<y+h+2&&py+h>y-2)return Infinity;
+    let err=0;
+    for(const [ox,oy] of samples){
+      const a=index(x+ox,y+oy,width),b=index(px+ox,py+oy,width);
+      for(let c=0;c<3;c++){const d=raw[a+c]-raw[b+c];err+=d*d;}
+    }
+    return err/(samples.length*3);
+  }
+  const winners=[];
+  for(let py=1;py+h<height-1;py+=step){
+    for(let px=1;px+w<width-1;px+=step){
+      const value=score(px,py);
+      if(!Number.isFinite(value))continue;
+      if(winners.length<6||value<winners[winners.length-1].score){
+        winners.push({x:px,y:py,score:value});
+        winners.sort((a,b)=>a.score-b.score);
+        if(winners.length>6)winners.pop();
+      }
+    }
+  }
+  if(!winners.length)return null;
+  let best=winners[0];
+  // Search exact pixel alignment around coarse candidates.
+  for(const candidate of winners)for(let dy=-step-2;dy<=step+2;dy++)
+    for(let dx=-step-2;dx<=step+2;dx++){
+      const px=candidate.x+dx,py=candidate.y+dy,value=score(px,py);
+      if(value<best.score)best={x:px,y:py,score:value};
+    }
+  if(best.score>145)return null;
+  const output=new Uint8ClampedArray(raw);
+  for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
+    const dest=index(x+xx,y+yy,width),src=index(best.x+xx,best.y+yy,width);
+    for(let c=0;c<4;c++)output[dest+c]=raw[src+c];
+  }
+  return output;
+}
 function fillTexturedRegion(raw,width,height,rect,plane){
   const output=new Uint8ClampedArray(raw);
   const xEnd=rect.x+rect.w,yEnd=rect.y+rect.h;
@@ -169,6 +225,8 @@ export function repairSelectedArea(source,width,height,selection){
     source.set(output);
     return {x:rect.x,y:rect.y,w:rect.w,h:rect.h,method:'clean'};
   }
+  const whole=tryWholePatch(source,width,height,rect);
+  if(whole){source.set(whole);return {x:rect.x,y:rect.y,w:rect.w,h:rect.h,method:'matching texture'}}
   const textured=fillTexturedRegion(source,width,height,rect,plane);
   source.set(textured);
   return {x:rect.x,y:rect.y,w:rect.w,h:rect.h,method:'texture'};

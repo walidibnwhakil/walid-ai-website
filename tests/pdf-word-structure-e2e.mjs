@@ -116,12 +116,15 @@ try {
   await comp.locator("#download").waitFor({state:"visible"});
   const compressed=await download(comp,"#download");
   assert.ok(compressed.length<=small.length,"Text compression must never enlarge PDF");
-  const pdfjs=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
-  pdfjs.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
-  const parsed=await pdfjs.getDocument({data:Uint8Array.from(compressed)}).promise;
-  const extracted=(await (await parsed.getPage(1)).getTextContent()).items.map(i=>i.str).join(" ");
+  const extracted=await comp.evaluate(async bytes=>{
+    const pdfjs=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+    const parsed=await pdfjs.getDocument({data:Uint8Array.from(bytes)}).promise;
+    const extracted=(await (await parsed.getPage(1)).getTextContent()).items.map(i=>i.str).join(" ");
+    await parsed.destroy();
+    return extracted;
+  },Array.from(compressed));
   assert.match(extracted,/SEARCHABLE CONTENT/,"Compression must preserve selectable text");
-  await parsed.destroy();
   console.log("RICH_E2E COMPRESS_PASS",JSON.stringify({original:small.length,output:compressed.length,textSelectable:true}));
   await edit.close();await comp.close();
   assert.equal(errors.length,0,errors.join("\n"));

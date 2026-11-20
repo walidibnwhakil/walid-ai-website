@@ -58,14 +58,23 @@ check_page("games/index.html",
 check_page("pdf/index.html",
            ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/"],
            ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'name="description"', '"@type":"ItemList"'])
-check_page("guides/image-tools/index.html",
-           ["/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
-            "/tools/background-remover/", "/tools/signature-remover/", "/tools/watermark-remover/"],
+image_tool_slugs = (
+    "resize-image", "compress-image", "convert-image",
+    "background-remover", "signature-remover", "watermark-remover",
+)
+image_tool_links = [f"/image/{slug}/" for slug in image_tool_slugs]
+check_page("image/index.html", image_tool_links,
+           ['class="grid"', 'class="tool"', 'name="description"'])
+check_page("guides/image-tools/index.html", image_tool_links,
            ['name="description"'])
+for slug in image_tool_slugs:
+    check_page(f"image/{slug}/index.html", ["/image/"],
+               ['rel="canonical"', 'name="description"'])
+    check_page(f"tools/{slug}/index.html", [f"/image/{slug}/"],
+               ['http-equiv="refresh"'])
 tools_parser = Parser()
 tools_parser.feed((ROOT / "pdf/index.html").read_text(encoding="utf-8"))
-for image_link in ("/tools/resize-image/", "/tools/compress-image/", "/tools/convert-image/",
-                   "/tools/background-remover/", "/tools/signature-remover/", "/tools/watermark-remover/"):
+for image_link in [*image_tool_links, *(f"/tools/{slug}/" for slug in image_tool_slugs)]:
     if image_link in tools_parser.links:
         errors.append(f"pdf/index.html: image tool leaked into PDF-only page: {image_link}")
 if errors:

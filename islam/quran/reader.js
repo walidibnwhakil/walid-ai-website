@@ -351,7 +351,10 @@
       arabic.lang = 'ar';
       arabic.dir = 'rtl';
       arabic.textContent = item.arabicName;
-      copy.append(name, arabic);
+      const ayahCount = document.createElement('small');
+      ayahCount.className = 'side-ayah-count';
+      ayahCount.textContent = 'আয়াত: ' + digits(item.verseCount);
+      copy.append(name, arabic, ayahCount);
       link.append(number, copy);
       fragment.append(link);
     });

@@ -51,7 +51,7 @@ async function isEmptyCutout(blob){
     let opaque=0;
     for(let p=3;p<alpha.length;p+=4)if(alpha[p]>127)opaque++;
     const coverage=opaque/(alpha.length/4);
-    return coverage<0.025||coverage>0.975;
+    return coverage<0.025||coverage>0.95;
   }finally{image.close()}
 }
 function showError(message){empty.hidden=false;errorText.textContent=message||errorText.textContent;title.textContent='Result unavailable'}

@@ -92,13 +92,13 @@
       $('prayer-warning-description').textContent='আনুমানিক সময় · শেষ হতে '+displayDuration(prohibited.end-now)+' বাকি';
     }
     let title,caption,end;
-    if(now<t.Fajr){title='এশার ওয়াক্ত';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
-    else if(now<t.Sunrise){title='ফজরের ওয়াক্ত';caption='সূর্যোদয় হতে বাকি';end=t.Sunrise;}
+    if(now<t.Fajr){title='এশা';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
+    else if(now<t.Sunrise){title='ফজর';caption='সূর্যোদয় হতে বাকি';end=t.Sunrise;}
     else if(now<t.Dhuhr){title='এখন ফরজ নামাজের ওয়াক্ত নয়';caption='যোহর শুরু হতে বাকি';end=t.Dhuhr;}
-    else if(now<t.Asr){title='যোহরের ওয়াক্ত';caption='আসর শুরু হতে বাকি';end=t.Asr;}
-    else if(now<t.Maghrib){title='আসরের ওয়াক্ত';caption='মাগরিব শুরু হতে বাকি';end=t.Maghrib;}
-    else if(now<t.Isha){title='মাগরিবের ওয়াক্ত';caption='এশা শুরু হতে বাকি';end=t.Isha;}
-    else {title='এশার ওয়াক্ত';caption='পরবর্তী ফজর শুরু হতে বাকি';end=tm.Fajr;}
+    else if(now<t.Asr){title='যোহর';caption='আসর শুরু হতে বাকি';end=t.Asr;}
+    else if(now<t.Maghrib){title='আসর';caption='মাগরিব শুরু হতে বাকি';end=t.Maghrib;}
+    else if(now<t.Isha){title='মাগরিব';caption='এশা শুরু হতে বাকি';end=t.Isha;}
+    else {title='এশা';caption='পরবর্তী ফজর শুরু হতে বাকি';end=tm.Fajr;}
     $('prayer-current').textContent=title;
     $('prayer-countdown-caption').textContent=caption;
     $('prayer-countdown').textContent=displayDuration(end-now);

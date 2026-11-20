@@ -38,7 +38,7 @@ jobs:
               }}})
             }));
             await page.goto('http://127.0.0.1:8765/islam/',{waitUntil:'domcontentloaded'});
-            await page.waitForFunction(()=>document.querySelector('#prayer-current')?.textContent==='যোহরের ওয়াক্ত');
+            await page.waitForFunction(()=>document.querySelector('#prayer-current')?.textContent==='যোহর');
             if(await page.locator('#prayer-countdown').textContent()!=='০২:৩০:০০')throw Error('Unexpected Dhuhr countdown');
             if(await page.locator('#prayer-divisions').isVisible())throw Error('Division menu must be hidden');
             await page.locator('#prayer-location').click();
@@ -63,7 +63,7 @@ jobs:
               }}})
             }));
             await night.goto('http://127.0.0.1:8765/islam/',{waitUntil:'domcontentloaded'});
-            await night.waitForFunction(()=>document.querySelector('#prayer-current')?.textContent==='এশার ওয়াক্ত');
+            await night.waitForFunction(()=>document.querySelector('#prayer-current')?.textContent==='এশা');
             if(await night.locator('.prayer-footnote').count())throw Error('Unwanted footnote remains');
             if(!await night.locator('.prayer-spark svg linearGradient').count())throw Error('Premium crescent missing');
             if(!await night.locator('link[href*="solaiman-lipi/font.css"]').count())throw Error('SolaimanLipi stylesheet missing');

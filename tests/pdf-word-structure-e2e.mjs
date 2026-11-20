@@ -94,7 +94,8 @@ try {
   const scanImage=await scanDoc.embedPng(scanPng);
   const scannedPage=scanDoc.addPage([595,842]);
   scannedPage.drawImage(scanImage,{x:40,y:650,width:520,height:85});
-  const scanOut=await docx(await convert(Buffer.from(await scanDoc.save()),"scanned-bengali.pdf"));
+  const scanPdfBytes=Buffer.from(await scanDoc.save());
+  const scanOut=await docx(await convert(scanPdfBytes,"scanned-bengali.pdf"));
   assert.match(scanOut.xml,/[\u0980-\u09ff]/,"Scanned Bengali page must create editable text runs");
   assert.match(scanOut.xml,/<w:t\b/);
   console.log("RICH_E2E SCANNED_BENGALI_WORD_PASS");
@@ -174,6 +175,22 @@ try {
   },Array.from(secured));
   assert.doesNotMatch(secureText,/REPORT TITLE/,"Secure edit must remove original text, not merely cover it");
   console.log("RICH_E2E SECURE_EDIT_PASS",{bytes:secured.length,originalTextRemoved:true});
+
+
+  const scannedEditor=await toolPage("edit",scanPdfBytes);
+  await scannedEditor.locator("#pageLabel").filter({hasText:"1 / 1"}).waitFor({state:"visible"});
+  await scannedEditor.locator("#recognizeEditText").click();
+  await scannedEditor.locator(".source-text-hit").first().waitFor({state:"visible",timeout:50000});
+  const hitsCount=await scannedEditor.locator(".source-text-hit").count();
+  assert.ok(hitsCount>0,"Scanned Bengali page must yield clickable OCR text hits");
+  await scannedEditor.locator(".source-text-hit").first().click();
+  await scannedEditor.locator(".ann-replacement.selected").fill("সংশোধিত");
+  await scannedEditor.locator("#flattenReplacements").check();
+  await scannedEditor.locator("#saveEdit").click();
+  await scannedEditor.locator("#download").waitFor({state:"visible",timeout:30000});
+  const editedScan=await download(scannedEditor,"#download");
+  assert.equal((await PDFDocument.load(editedScan)).getPageCount(),1);
+  console.log("RICH_E2E SCANNED_EDIT_OCR_PASS",{words:hitsCount,bytes:editedScan.length});
 
   const organize=await toolPage("organize");
   await organize.locator("#organizeGrid .page-card").first().waitFor({state:"visible"});

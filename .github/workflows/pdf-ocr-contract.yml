@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "tools/pdf-browser/**"
+      - "pdf/index.html"
+      - "tools/*/index.html"
+      - "tests/pdf-copy-audit.mjs"
       - "tool-workspace/index.html"
       - "tools/pdf-to-word/**"
       - "fonts/NotoSansBengali-Regular.ttf"
@@ -49,6 +52,7 @@ jobs:
       - run: node tests/ocr-language-contract.mjs
       - run: node tests/pdf-bengali-export-contract.mjs
       - run: node tests/pdf-tool-regression-contract.mjs
+      - run: node tests/pdf-copy-audit.mjs
       - run: node tests/pdf-browser-e2e.mjs
       - run: node tests/pdf-word-structure-e2e.mjs
       - id: tesseract

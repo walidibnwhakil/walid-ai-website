@@ -55,7 +55,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="submitPassword">Open PDF</button>
       </div>
       <div id="panelEdit" hidden>
-        <p class="hint">Edit existing text by selecting <strong>Edit text</strong> and clicking a highlighted line. Type directly in the replacement box. Use Cover area to hide or replace a picture, then Image to insert a new one. Bengali text added to PDFs stays selectable when the embedded font is available; otherwise a raster fallback is used. The file stays in your browser.</p>
+        <p class="hint">Choose <strong>Edit text</strong> and select a highlighted line to make changes. To replace a picture, cover the area and add a new image.</p>
         <div class="tool-row" id="editTools">
           <button class="minor tool-btn" type="button" data-edit="replace">Edit text</button>
           <button class="minor tool-btn" type="button" data-edit="cover">Cover area</button>
@@ -66,8 +66,8 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
           <button class="minor tool-btn" type="button" data-edit="note">Note</button>
           <button class="minor tool-btn" type="button" data-edit="select">Select</button>
         </div>
-        <button class="minor" type="button" id="recognizeEditText">Recognize text on a scanned page (OCR)</button>
-        <p class="hint">For scanned pages, recognize text first, then choose Edit text and select the highlighted words. Check every OCR result before exporting.</p>
+        <button class="minor" type="button" id="recognizeEditText">Read text from scanned page</button>
+        <p class="hint">For scanned PDFs, select <strong>Read text from scanned page</strong> first. Review the recognized words before editing.</p>
         <div class="option-row">
           <label class="field">Size <input id="fontSize" type="number" min="8" max="96" value="22"></label>
           <label class="field">Color <input id="textColor" type="color" value="#14241f"></label>
@@ -77,7 +77,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
           <label class="field">Ink width <input id="inkWidth" type="number" min="1" max="16" value="2"></label>
         </div>
         <label class="choice secure-choice"><input id="flattenReplacements" type="checkbox"> Permanently remove covered content (flattens edited pages; other text on those pages will no longer be selectable)</label>
-        <p class="hint" id="replaceWarning">Without permanent removal, original PDF text or pictures may remain recoverable behind the visual replacement. Do not use visual covering to hide secrets.</p>
+        <p class="hint" id="replaceWarning">Covering content only hides it from view. Select permanent removal if you need to delete the original content. Other text on the affected page will no longer be selectable.</p>
         <input id="placeImage" type="file" accept="image/png,image/jpeg,image/webp" hidden>
         <div class="tool-row">
           <button class="minor" type="button" id="rotateLeft">Rotate left</button>
@@ -89,11 +89,11 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="saveEdit">Download PDF</button>
       </div>
       <div id="panelOrganize" hidden>
-        <p class="hint">Drag pages to reorder them. Rotate or delete a page, then download. The file stays in this browser.</p>
+        <p class="hint">Drag pages to change their order, or use the controls to rotate and remove pages.</p>
         <button class="action" type="button" id="saveOrganize">Download PDF</button>
       </div>
       <div id="panelNumbers" hidden>
-        <p class="hint">Page numbers are drawn on the pages in this browser.</p>
+        <p class="hint">Choose the numbering style, position, and starting number.</p>
         <label class="field">Position
           <select id="numberPosition">
             <option value="bottom-center">Bottom center</option>
@@ -110,7 +110,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="applyNumbers">Add page numbers</button>
       </div>
       <div id="panelWatermark" hidden>
-        <p class="hint">The watermark is drawn in this browser. Bengali uses Noto Sans Bengali.</p>
+        <p class="hint">Enter your watermark text, then adjust the appearance.</p>
         <label class="field">Text <input id="watermarkText" type="text" value="Walid AI" maxlength="80"></label>
         <label class="field">Opacity <input id="watermarkOpacity" type="range" min="5" max="60" value="18"></label>
         <label class="field">Angle <input id="watermarkAngle" type="number" min="-180" max="180" value="-32"></label>
@@ -118,7 +118,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="applyWatermark">Add watermark</button>
       </div>
       <div id="panelSign" hidden>
-        <p class="hint">Draw a signature, place it, then drag it on the page. You can also use an image.</p>
+        <p class="hint">Draw or upload a signature, place it on your document, and download the signed PDF.</p>
         <canvas class="sign-pad" id="signPad" width="560" height="160"></canvas>
         <div class="tool-row">
           <button class="minor" type="button" id="clearSign">Clear</button>
@@ -130,7 +130,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="saveSign">Download PDF</button>
       </div>
       <div id="panelProtect" hidden>
-        <p class="hint">Lock asks for a password to open the PDF. Unlock removes that password. There is no separate owner password.</p>
+        <p class="hint">Choose <strong>Lock</strong> to protect your PDF, or <strong>Unlock</strong> to remove its current password.</p>
         <div class="choice">
           <label class="choice"><input type="radio" name="protectMode" value="lock" checked> Lock</label>
           <label class="choice"><input type="radio" name="protectMode" value="unlock"> Unlock</label>
@@ -152,7 +152,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="applyImages">Create PDF</button>
       </div>
       <div id="panelCompress" hidden>
-        <p class="hint">Searchable text is preserved when present. Image-only PDFs can be downsampled. If compression makes a file larger, the original file is returned instead.</p>
+        <p class="hint">Compress your PDF while keeping selectable text when possible. If the file cannot be made smaller, your original is returned.</p>
         <label class="field">Quality
           <select id="compressQuality">
             <option value="small">Smaller file</option>
@@ -163,7 +163,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="applyCompress">Compress PDF</button>
       </div>
       <div id="panelOcr" hidden>
-        <p class="hint">Bengali and English text is extracted from the PDF when available, otherwise read with OCR (<code>ben+eng</code>) up to 30 pages. OCR can make mistakes: review and correct the text before downloading. Files stay in your browser.</p>
+        <p class="hint">Extract Bengali and English text from a PDF or image. Check and correct the result before downloading. Supports up to 30 pages or images at a time.</p>
         <button class="action" type="button" id="applyOcr">Read Bengali text</button>
         <a class="download" id="downloadText" hidden>Download text</a>
       </div>

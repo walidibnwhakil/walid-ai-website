@@ -17,51 +17,61 @@ h1{font-size:clamp(30px,4vw,44px);font-weight:500;margin:8px 0}.muted{color:#667
 .compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .compare figure{margin:0;min-width:0}.compare figcaption{font:700 .78rem/1.5 Arial,sans-serif;color:#587167;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px}
 .preview{height:260px;display:grid;place-items:center;border-radius:12px;border:1px solid #dce5e1;overflow:hidden;background-color:#f7faf9;background-image:linear-gradient(45deg,#e4ede9 25%,transparent 25%),linear-gradient(-45deg,#e4ede9 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e4ede9 75%),linear-gradient(-45deg,transparent 75%,#e4ede9 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
-.preview img{width:100%;height:100%;object-fit:contain}.facts{display:flex;gap:8px 18px;flex-wrap:wrap;margin:16px 0;color:#485f54}.facts span{padding:5px 10px;border:1px solid #e0e8e4;border-radius:20px;background:#f7faf9;font-size:.9rem}
-.note{color:#57645f;font-size:.93rem;margin:4px 0 16px}.download{display:inline-flex;text-align:center;justify-content:center;min-width:180px;padding:11px 22px;border:0;border-radius:10px;background:#006a4e;color:#fff;text-decoration:none;font-weight:700}.download:hover,.download:focus-visible{background:#004f3a}
+.preview img{width:100%;height:100%;object-fit:contain}.download{display:inline-flex;text-align:center;justify-content:center;min-width:180px;padding:11px 22px;border:0;border-radius:10px;background:#006a4e;color:#fff;text-decoration:none;font-weight:700}.download:hover,.download:focus-visible{background:#004f3a}
 .legal-footer{margin-top:44px}@media(max-width:650px){.compare{grid-template-columns:1fr}.preview{height:210px}.result{padding:14px}.download{width:100%}.shell{padding:18px 14px 48px}.top img{width:112px;height:38px}}
 @media(prefers-reduced-motion:reduce){.shell:before{animation:none}}
 </style></head>
 <body><main class="shell"><header class="top"><a href="/"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a><a class="back" id="editMore" href="/image/">Image Tools</a></header>
-<section class="intro"><p class="eyebrow">Image processing finished</p><h1 id="title">Your image is ready</h1><p class="muted summary" id="summary">Preview the result, then download it.</p></section>
+<section class="intro"><h1 id="title">Your image is ready</h1></section>
 <section id="empty" hidden><h2>Result unavailable</h2><p id="errorText">Your browser could not find this result. Reopen the image tool and try again.</p><a class="download" href="/image/">Return to Image Tools</a></section>
 <section class="results" id="results" aria-live="polite"></section>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us/">About Us</a><span aria-hidden="true">·</span><a href="/contact-us/">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy/">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service/">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </main>
 <script type="module">
 import { readResult } from './store.js';
-const title=document.querySelector('#title'),summary=document.querySelector('#summary'),holder=document.querySelector('#results');
+const title=document.querySelector('#title'),holder=document.querySelector('#results');
 const empty=document.querySelector('#empty'),errorText=document.querySelector('#errorText'),editMore=document.querySelector('#editMore');
 const urls=[];
 const titles={'image-resize':'Resized image','image-compress':'Compressed image','image-convert':'Converted image','background-remove':'Background removed','signature-remove':'Signature background removed','watermark-remove':'Selected area edited'};
 const routes={'image-resize':'resize-image','image-compress':'compress-image','image-convert':'convert-image','background-remove':'background-remover','signature-remove':'signature-remover','watermark-remove':'watermark-remover'};
-function size(bytes){return bytes>=1048576?(bytes/1048576).toFixed(2)+' MB':(bytes/1024).toFixed(1)+' KB'}
 function node(tag,cls,value){const element=document.createElement(tag);if(cls)element.className=cls;if(value!==undefined)element.textContent=value;return element}
 function preview(item,label,blob){const figure=node('figure');figure.append(node('figcaption','',label));const box=node('div','preview');if(blob instanceof Blob){const img=document.createElement('img');const url=URL.createObjectURL(blob);urls.push(url);img.src=url;img.alt=label+' preview of '+item.name;img.loading='lazy';box.append(img)}else box.append(node('span','muted','Preview unavailable'));figure.append(box);return figure}
-function showError(message){empty.hidden=false;errorText.textContent=message||errorText.textContent;title.textContent='Result unavailable';summary.textContent='No image has been downloaded.'}
+async function isEmptyCutout(blob){
+  // Validate older browser-saved results as well as new results.
+  if(typeof createImageBitmap!=='function')return false;
+  const image=await createImageBitmap(blob);
+  try{
+    const scale=Math.min(1,320/Math.max(image.width,image.height));
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(image.width*scale));
+    canvas.height=Math.max(1,Math.round(image.height*scale));
+    const context=canvas.getContext('2d',{willReadFrequently:true});
+    context.drawImage(image,0,0,canvas.width,canvas.height);
+    const alpha=context.getImageData(0,0,canvas.width,canvas.height).data;
+    let opaque=0;
+    for(let p=3;p<alpha.length;p+=4)if(alpha[p]>127)opaque++;
+    const coverage=opaque/(alpha.length/4);
+    return coverage<0.025||coverage>0.975;
+  }finally{image.close()}
+}
+function showError(message){empty.hidden=false;errorText.textContent=message||errorText.textContent;title.textContent='Result unavailable'}
 try {
  const id=new URLSearchParams(location.search).get('id');
  const job=await readResult(id);
  if(!job||!Array.isArray(job.items)||!job.items.length)throw Error('The result is missing or has expired. Please process the image again.');
- title.textContent=(titles[job.tool]||'Image processed')+(job.items.length>1?'s':'');
- summary.textContent=job.items.length+' image'+(job.items.length>1?'s':'')+' processed in your browser. Review the before and after previews, then download.';
+ title.textContent=job.items.length>1?'Your images are ready':'Your image is ready';
+ if(job.tool==='background-remove'){
+   for(const item of job.items){
+     if(!(item.blob instanceof Blob)||await isEmptyCutout(item.blob))
+       throw Error('This image did not separate properly. Please try another photo.');
+   }
+ }
  if(routes[job.tool])editMore.href='/tools/'+routes[job.tool]+'/';
  for(const [index,item] of job.items.entries()){
   if(!(item.blob instanceof Blob))continue;
-  const card=node('article','result'),head=node('div','result-head'),heading=node('h2','',item.name||('Image '+(index+1)));
-  head.append(heading);card.append(head);
+  const card=node('article','result');
+  if(job.items.length>1){const head=node('div','result-head');head.append(node('h2','','Image '+(index+1)));card.append(head)}
   const compare=node('div','compare');compare.append(preview(item,'Before',item.beforeBlob),preview(item,'After',item.blob));card.append(compare);
-  const facts=node('div','facts');
-  facts.append(node('span','', 'Original: '+size(item.originalSize||0)));
-  facts.append(node('span','', 'Result: '+size(item.blob.size)));
-  const formats={'image/png':'PNG','image/jpeg':'JPG','image/webp':'WebP'};
-  if(item.originalType||item.blob.type)facts.append(node('span','','Format: '+(formats[item.originalType]||'Image')+' → '+(formats[item.blob.type]||'Image')));
-  if(item.originalWidth&&item.originalHeight)facts.append(node('span','','Before: '+item.originalWidth+' × '+item.originalHeight+' px'));
-  if(item.width&&item.height)facts.append(node('span','','After: '+item.width+' × '+item.height+' px'));
-  const delta=(item.originalSize||0)-item.blob.size;
-  if(item.originalSize&&job.tool==='image-compress')facts.append(node('span','',delta>0?'Saved '+(delta/item.originalSize*100).toFixed(1)+'%':delta===0?'Size unchanged':'Size increased '+Math.abs(delta/item.originalSize*100).toFixed(1)+'%'));
-  card.append(facts);
-  if(item.note)card.append(node('p','note',item.note));
   const link=node('a','download','Download image');link.href=URL.createObjectURL(item.blob);urls.push(link.href);link.download=item.name||'Walid AI_image.png';card.append(link);holder.append(card);
  }
  if(!holder.children.length)throw Error('The edited image is not available.');

@@ -1,14 +1,54 @@
 {
   "version": 1,
-  "updated": "2026-11-17",
-  "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated.",
+  "updated": "2026-11-20",
+  "policy": "Mechanical Bengali drafts must not be marked reviewed or verified. Pronunciation requires independent verse-by-verse review against Arabic before publication.",
   "verified": {
-    "surah": 1,
-    "verses": 7
+    "scope": "Surahs 2–49",
+    "verses": 11,
+    "reviewedSurahs": [],
+    "notes": "Surah 3:1–6 and 8–12 independently reviewed earlier; no whole surah confirmed reviewed."
   },
   "pending": {
-    "surahs": 113,
-    "verses": 6229
+    "scope": "Surahs 2–49",
+    "verses": 4612
   },
-  "source": "Walid AI review of quran.gov.bd pronunciation; government source is linked for uncovered verses."
+  "source": "Original Arabic and Bengali translations from existing source records; manually authored Bengali-script draft pronunciation is not certified.",
+  "audit": {
+    "scope": "Surahs 2–49",
+    "recordsInScope": 4623,
+    "recordsReviewed": 11,
+    "recordsCorrected": 11,
+    "draftGenerated": 3763,
+    "unresolved": 4612,
+    "method": "Surah 3 and Surahs 38–49 rewritten as legible Bengali pronunciation strings for all their 860 verses: 11 previously reviewed, 849 handwritten drafts pending further validation. 3763 old machine records in Surahs 2 and 4–37 remain uncorrected.",
+    "automatedScan": {
+      "flaggedPriorityRecords": null,
+      "queue": "islam/quran/data/pronunciation-review-queue.json",
+      "lastReportedHeuristicFlagsBeforeManualRevisions": 4417
+    },
+    "flaggedPriorityRecords": null,
+    "handAuthoredDraftVerses": 849,
+    "machineGeneratedPending": 3763,
+    "completedDraftSurahs": [
+      3,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49
+    ],
+    "completedReviewedSurahs": []
+  },
+  "draft": {
+    "scope": "Surahs 2–49",
+    "verses": 4612,
+    "method": "849 handwritten draft verses and 3763 old mechanically generated verses, not individually independently reviewed."
+  }
 }

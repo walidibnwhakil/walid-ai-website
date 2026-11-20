@@ -102,6 +102,11 @@ class QuranIntegrityTests(unittest.TestCase):
         self.assertNotIn("transliteration_bn", reader)
         self.assertGreater(len(json.loads((DATA / "reading.json").read_text(encoding="utf-8"))["bismillah"]), 30)
 
+    def test_unreviewed_pronunciation_is_not_displayed(self):
+        renderer = (QURAN / "verses-stable.js").read_text(encoding="utf-8")
+        self.assertIn("v.pronunciationStatus==='reviewed'", renderer)
+        self.assertNotIn("p.dataset.verified='true'", renderer)
+
     def test_story_coverage_and_quran_references(self):
         stories = json.loads((ROOT / "islam" / "stories" / "stories.json").read_text(encoding="utf-8"))
         self.assertGreaterEqual(len(stories), 30)

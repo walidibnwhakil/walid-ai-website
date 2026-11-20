@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "generatedBy": "scripts/quran-pronunciation-verify.mjs",
+  "humanReviewRequired": true,
+  "tajwidCertified": false,
+  "totals": {
+    "total": 4623,
+    "reviewed": 505,
+    "draft": 4118,
+    "flagged": null,
+    "priority": null
+  },
+  "queue": [],
+  "reviewNote": "505 individually source-checked records (Surah 3 and Surahs 43–49); 4118 in-scope pronunciation records not yet reviewed. Historical 4417 flagged pattern count is obsolete and not a linguistic verification count. Detailed priority queue requires regenerated analysis."
+}

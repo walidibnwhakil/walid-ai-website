@@ -45,7 +45,7 @@ function cutout(original,width,height,rawMask){
       result[offset]=original[offset];result[offset+1]=original[offset+1];result[offset+2]=original[offset+2];
       const alpha=bound(normalized*255,0,255);
       result[offset+3]=Math.round(original[offset+3]*alpha/255);
-      if(x%3===0&&y%3===0){samples++;if(result[offset+3]>127)opaque++}
+      samples++;if(result[offset+3]>127)opaque++;
     }
   }
   const coverage=opaque/Math.max(1,samples);

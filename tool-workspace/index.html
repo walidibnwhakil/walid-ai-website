@@ -275,6 +275,13 @@ async function downloadCanvas(type,qualityValue,note=''){
   await recordImage(blob,imageFile.files[0],imageCanvas,original,note);
   return blob;
 }
+function friendlyImageError(error){
+  const message=String(error?.message||'');
+  if(/storage|quota/i.test(message))return 'Not enough device storage. Free some space and try again.';
+  // Only display helpful, approved error messages; never expose library or model errors.
+  const safe=/^(Choose an image|Select a small area|Select a smaller area|The background was not removed|Could not remove the background|Background removal cancelled|This image is too large|The new dimensions are too large|Image \d+ is too large|This is taking too long|Could not start|The subject could not be separated|The image could not be processed|The image could not be opened|Could not prepare the image|This feature is unavailable|Please finish the current image|This browser cannot export)/;
+  return safe.test(message)?message:messages.fileError;
+}
 $('#runImage').onclick=async()=>{
   if(!imageFile.files?.length){setStatus('chooseImage');return}
   const button=$('#runImage'),type=imageFormat.value,file=imageFile.files[0],q=Number(quality.value)/100;
@@ -355,7 +362,7 @@ $('#runImage').onclick=async()=>{
     await finishImageResults();
   }catch(error){
     window.WalidUsage?.tool('tool_error',activeTool);
-    status.textContent=error?.message||messages.fileError;
+    status.textContent=friendlyImageError(error);
   }finally{button.disabled=false;cancelBgWork=null;$('#cancelBg').hidden=true}
 };
 $('#resetImage').onclick=()=>{if(cancelBgWork)cancelBgWork();$('#cancelBg').hidden=true;document.body.classList.remove('checker-preview');imageFile.value='';delete imageFile.dataset.append;original=null;pickedColor=null;selection=null;dragStart=null;imageCanvas.hidden=true;imageCanvas.width=0;imageCanvas.height=0;$('#imageFileName').textContent='';$('#imageSelectedSummary').hidden=true;$('#imageFileList').replaceChildren();$('#imageFileList').hidden=true;$('#runImage').disabled=true;$('#runImage').hidden=true;$('#pagesLabel').hidden=true;$('#sizeFields').hidden=activeTool!=='image-resize';$('#formatFields').hidden=!['image-resize','image-compress','image-convert'].includes(activeTool);$('#backgroundFields').hidden=activeTool!=='signature-remove';$('#watermarkFields').hidden=activeTool!=='watermark-remove';$('#batchNote').hidden=activeTool!=='image-convert';document.body.classList.remove('file-selected');notifyEditor(false);setStatus('')};

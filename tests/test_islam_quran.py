@@ -103,22 +103,23 @@ class QuranIntegrityTests(unittest.TestCase):
         self.assertGreater(len(json.loads((DATA / "reading.json").read_text(encoding="utf-8"))["bismillah"]), 30)
 
     def test_reviewed_bengali_pronunciation_is_a_separate_optional_dataset(self):
-        """Publishing pronunciation must not modify canonical imported Quran JSON."""
-        separate = DATA / "pronunciation-003.json"
-        data = json.loads(separate.read_text(encoding="utf-8"))
-        original = json.loads((DATA / "surah-003.json").read_text(encoding="utf-8"))
-        self.assertEqual(data["surah"], 3)
-        self.assertEqual(len(data["verses"]), len(original["verses"]))
-        self.assertEqual(len(data["verses"]), 200)
-        self.assertEqual([v["verse"] for v in data["verses"]], list(range(1, 201)))
-        for verse in data["verses"]:
-            text = verse["pronunciation"]
-            self.assertRegex(text, r"[\u0980-\u09ff]")
-            self.assertTrue(text.endswith("।"), verse["verse"])
-            self.assertNotRegex(text, r"আান|ইিল|ওাআ|আল্াযিই|ররাব্বি")
-            self.assertNotRegex(text, r"[\u09be-\u09cc][\u09be-\u09cc]")
+        """Published ayahs must not modify canonical imported Quran JSON."""
+        published = [3, 43, 44, 45, 46, 47, 48, 49]
+        self.assertEqual(sum((200, 89, 59, 37, 35, 38, 29, 18)), 505)
+        for surah in published:
+            data = json.loads((DATA / f"pronunciation-{surah:03}.json").read_text(encoding="utf-8"))
+            original = json.loads((DATA / f"surah-{surah:03}.json").read_text(encoding="utf-8"))
+            self.assertEqual(data["surah"], surah)
+            self.assertEqual(len(data["verses"]), len(original["verses"]))
+            self.assertEqual([v["verse"] for v in data["verses"]], list(range(1, len(original["verses"]) + 1)))
+            for verse in data["verses"]:
+                text = verse["pronunciation"]
+                self.assertRegex(text, r"[\u0980-\u09ff]")
+                self.assertTrue(text.endswith("।"), (surah, verse["verse"]))
+                self.assertNotRegex(text, r"আান|ইিল|ওাআ|আল্াযিই|ররাব্বি")
+                self.assertNotRegex(text, r"[\u09be-\u09cc][\u09be-\u09cc]")
         renderer = (QURAN / "verses-stable.js").read_text(encoding="utf-8")
-        self.assertIn("approvedPronunciationSurahs=new Set([3])", renderer)
+        self.assertIn("approvedPronunciationSurahs=new Set([3,43,44,45,46,47,48,49])", renderer)
         self.assertIn("attachPronunciation", renderer)
 
     def test_story_coverage_and_quran_references(self):

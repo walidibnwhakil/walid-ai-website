@@ -12,7 +12,7 @@ export async function removeMobileBackground(source,target,{onStatus=()=>{}}={})
  if(activeWorker)throw Error('A background-removal job is already running.');
  const context=source.getContext('2d',{willReadFrequently:true});
  const data=context.getImageData(0,0,source.width,source.height);
- const worker=new Worker('/tools/background-remover/mobile-worker.js?v=20261120-1',{type:'module'});
+ const worker=new Worker('/tools/background-remover/mobile-worker.js?v=20261120-3',{type:'module'});
  activeWorker=worker;
  try{
   return await new Promise((resolve,reject)=>{

@@ -18,19 +18,20 @@
     "recordsInScope": 4623,
     "recordsReviewed": 200,
     "recordsCorrected": 200,
-    "draftGenerated": 4011,
+    "draftGenerated": 3926,
     "unresolved": 4423,
-    "method": "Surah 3:1-200 Bengali drafts individually compared to Arabic, with detected errors amended. 305 handwritten drafts in Surahs 43-49 remain unreviewed; 4118 earlier mechanical records remain.",
+    "method": "Surahs 3 and 40-49 have new legible Bengali pronunciation entries for every ayah: 697 verses, consisting of 11 earlier reviewed and 686 newly written drafts. All 3926 other in-scope verses still have older machine-generated text. Arabic/translation/verse numbering unchanged for rewritten surahs; phonetic certification not claimed.",
     "automatedScan": {
       "flaggedPriorityRecords": null,
       "queue": "islam/quran/data/pronunciation-review-queue.json",
       "lastReportedHeuristicFlagsBeforeManualRevisions": 4417
     },
     "flaggedPriorityRecords": null,
-    "handAuthoredDraftVerses": 305,
-    "machineGeneratedPending": 4011,
+    "handAuthoredDraftVerses": 686,
+    "machineGeneratedPending": 3926,
     "completedDraftSurahs": [
       3,
+      40,
       41,
       42,
       43,
@@ -45,6 +46,6 @@
   "draft": {
     "scope": "Surahs 2–49",
     "verses": 4423,
-    "method": "305 handmade Bengali drafts + 4118 old machine-derived records, pending Arabic comparison."
+    "method": "686 hand-authored pronunciation drafts awaiting phonetic review, 3926 machine-generated strings pending replacement."
   }
 }

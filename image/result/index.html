@@ -54,7 +54,7 @@ async function isEmptyCutout(blob){
     return coverage<0.025||coverage>0.95;
   }finally{image.close()}
 }
-function showError(message){empty.hidden=false;errorText.textContent=message||errorText.textContent;title.textContent='Result unavailable'}
+function showError(message){const safe=/^(The result is missing or has expired|The edited image is not available|This image did not separate properly)/.test(String(message||''));empty.hidden=false;errorText.textContent=safe?message:'Could not open this result. Please process your image again.';title.textContent='Result unavailable'}
 try {
  const id=new URLSearchParams(location.search).get('id');
  const job=await readResult(id);

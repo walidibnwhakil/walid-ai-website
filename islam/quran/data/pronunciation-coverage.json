@@ -15,9 +15,9 @@
   "source": "Prior reviewed Bengali pronunciation against quran.gov.bd conventions; remaining entries are independently generated drafts and are not represented as fully manually verified.",
   "audit": {
     "scope": "Surahs 2–49",
-    "recordsReviewed": 6229,
+    "recordsReviewed": 4513,
     "recordsCorrected": 110,
-    "draftGenerated": 6119,
+    "draftGenerated": 4403,
     "unresolved": 0,
     "method": "Prior reviewed records retained; remaining records generated as explicitly labeled draft and checked for Arabic/verse alignment, pronunciation presence, and numbering preservation",
     "lastBatch": {
@@ -30,7 +30,7 @@
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 6119,
+    "verses": 4403,
     "method": "Arabic-character-aligned Bengali phonetic draft; automated structural/readback checked, not human-reviewed"
   }
 }

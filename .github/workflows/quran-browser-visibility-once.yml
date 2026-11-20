@@ -74,6 +74,20 @@ jobs:
               if(JSON.stringify(reader.tabLabels)!==JSON.stringify(['সূরা','সূরা পরিচিতি','ফযীলত','নাজিলের ইতিহাস','ব্যাখ্যা'])||
                 reader.sidebarLinks!==114||reader.selected!=='সূরা'||!reader.arabicOnly||
                 !reader.translationOff||!reader.pronunciationOff||!reader.oldNotesRemoved)throw Error('READER CONTROLS '+JSON.stringify({slug,reader,errors}));
+              // Verify Bengali reading aids are actually rendered and do not contain broken glyphs.
+              await page.locator('#show-pronunciation').check();
+              const pronunciationCheck=await page.evaluate(()=>{
+                const cards=[...document.querySelectorAll('#verses>.ayah:not(.basmala)')];
+                const aids=cards.map(card=>card.querySelector('.pronunciation'));
+                return {
+                  visible:aids.filter(a=>a&&!a.hidden&&a.getBoundingClientRect().height>0).length,
+                  malformed:aids.filter(a=>a&&/[\uFFFD\u25CC\u25EF\u09F0\u09F1]|\u09CD[\u09BE-\u09CC]|[‘’][\u09BE-\u09CC]/u.test(a.textContent)).length,
+                  missing:aids.filter(a=>!a||!a.textContent.trim()).length
+                };
+              });
+              if(pronunciationCheck.visible!==result.count||pronunciationCheck.malformed||pronunciationCheck.missing)
+                throw Error('BENGALI PRONUNCIATION DISPLAY '+JSON.stringify({slug,pronunciationCheck,expected:result.count}));
+              await page.locator('#show-pronunciation').uncheck();
               if(result.n===3){
                 await page.locator('#show-translation').check();
                 if(await page.locator('#verses .translation:not([hidden])').count()<1)throw Error('Bengali meaning toggle did not reveal translations');

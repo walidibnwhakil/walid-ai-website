@@ -55,8 +55,8 @@ server = createServer(async (req, res) => {
     res.end(JSON.stringify({ file: docxBytes.toString("base64"), type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", name: "bengali-editable.docx" }));
     return;
   }
-  const file = url.pathname === "/" ? "tools/pdf-browser/studio.html" : url.pathname.slice(1);
-  try { const body = await readFile(new URL(file, root)); res.writeHead(200, { "content-type": file.endsWith(".js") ? "text/javascript" : file.endsWith(".html") ? "text/html" : "application/octet-stream" }); res.end(body); }
+  const file = url.pathname === "/" ? "tools/pdf-browser/studio.html" : url.pathname === "/tool-workspace/" ? "tool-workspace/index.html" : url.pathname.slice(1);
+  try { const body = await readFile(new URL(file, root)); res.writeHead(200, { "content-type": file.endsWith(".js") || file.endsWith(".mjs") ? "text/javascript" : file.endsWith(".html") ? "text/html" : file.endsWith(".css") ? "text/css" : file.endsWith(".png") ? "image/png" : "application/octet-stream" }); res.end(body); }
   catch { res.writeHead(404); res.end("not found"); }
 });
 server.listen(0, "127.0.0.1"); await withTimeout(once(server, "listening"), 10000, "server startup");

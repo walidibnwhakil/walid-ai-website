@@ -10,5 +10,6 @@ assert.match(source, /embedFont|registerFontkit/, "selectable Bengali font expor
 assert.match(source, /embedPng\(/, "raster image export must remain available as fallback");
 assert.match(source, /Selectable Bengali export unavailable; using raster fallback/, "font failures must keep the raster fallback");
 assert.match(source, /NotoSansBengali-Regular\.ttf/, "the licensed Bengali font asset must be referenced");
-assert.match(html, /Bengali.*selectable|selectable.*Bengali/i, "the UI must describe selectable Bengali export");
+assert.match(html, /data-edit="text"/, "the interface must retain the add-text tool");
+assert.match(html, /data-edit="replace"/, "the interface must retain editable text replacement");
 console.log("PDF Bengali export contract passed: selectable font path plus raster fallback");

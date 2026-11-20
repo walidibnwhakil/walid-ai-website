@@ -5,22 +5,23 @@
   "verified": {
     "surah": 3,
     "ayahStart": 1,
-    "ayahEnd": 3,
-    "verses": 3
+    "ayahEnd": 12,
+    "verses": 11,
+    "notes": "Surah 3:7 remains unreviewed; 11 is total reviewed in Surah 3, not a contiguous range."
   },
   "pending": {
     "scope": "Surahs 2–49",
-    "verses": 4620
+    "verses": 4612
   },
   "source": "Arabic-derived machine drafts awaiting independent proofreading; original Arabic, translations and verse numbers are unchanged.",
   "audit": {
     "scope": "Surahs 2–49",
     "recordsInScope": 4623,
-    "recordsReviewed": 3,
-    "recordsCorrected": 3,
+    "recordsReviewed": 11,
+    "recordsCorrected": 11,
     "draftGenerated": 4623,
-    "unresolved": 4620,
-    "method": "Three opening verses of Surah 3 were checked against their canonical Arabic and corrected manually; all other records remain draft pending verse-level review.",
+    "unresolved": 4612,
+    "method": "Surah 3:1-6 and 8-12 corrected against Arabic; Surah 3:7 and remaining verses await independent review.",
     "automatedScan": {
       "flaggedPriorityRecords": 4417,
       "queue": "islam/quran/data/pronunciation-review-queue.json"
@@ -29,7 +30,7 @@
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 4620,
+    "verses": 4612,
     "method": "Pronunciation candidates generated mechanically; not verified or approved for publication."
   }
 }

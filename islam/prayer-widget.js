@@ -72,7 +72,7 @@
       const json=await response.json();
       if(json.code!==200||!json.data?.timings)throw Error('Invalid response');
       const t=json.data.timings;
-      return Object.fromEntries(['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'].map(k=>[k,dhakaTimestamp(day,t[k])]));
+      return Object.fromEntries(['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Sunset','Isha'].map(k=>[k,dhakaTimestamp(day,t[k])]));
     } finally {clearTimeout(timeout);}
   }
   async function load() {
@@ -98,17 +98,23 @@
     if(!schedule)return;
     if(dhakaDay(new Date())!==schedule.day){schedule=null;load();return;}
     const now=Date.now(),t=schedule.today,tm=schedule.tomorrow;
-    // Only the three widely noted solar prohibition windows. Approximate
-    // boundaries; do not present these estimates as binding religious rulings.
+    // The Hanafi prohibited periods are related to the sun's position, not
+    // three identical fixed prayer intervals. Use the API's solar events.
+    // Sunrise / sunset margins are conservative twenty-minute approximations.
+    // Zenith follows the midpoint of sunrise and sunset, capped at Dhuhr.
+    const minute=60000;
+    const sunset=Number.isFinite(t.Sunset)?t.Sunset:t.Maghrib;
+    const solarNoon=(t.Sunrise+sunset)/2;
+    const middayEnd=Math.min(t.Dhuhr,solarNoon+5*minute);
     const prohibited=[
-      {start:t.Sunrise,end:t.Sunrise+15*60000,title:'সূর্যোদয়ের নিষিদ্ধ সময়'},
-      {start:t.Dhuhr-10*60000,end:t.Dhuhr,title:'মধ্যাহ্নের নিষিদ্ধ সময়'},
-      {start:t.Maghrib-15*60000,end:t.Maghrib,title:'সূর্যাস্তের নিষিদ্ধ সময়'}
-    ].find(x=>now>=x.start&&now<x.end);
+      {start:t.Sunrise,end:t.Sunrise+20*minute,title:'সূর্যোদয়ের নিষিদ্ধ সময়'},
+      {start:solarNoon-5*minute,end:middayEnd,title:'মধ্যাহ্নের নিষিদ্ধ সময়'},
+      {start:sunset-20*minute,end:sunset,title:'সূর্যাস্তের নিষিদ্ধ সময়'}
+    ].find(x=>x.end>x.start&&now>=x.start&&now<x.end);
     warning.hidden=!prohibited;
     if(prohibited){
       $('prayer-warning-title').textContent=prohibited.title;
-      $('prayer-warning-description').textContent='আনুমানিক সময় · শেষ হতে '+displayDuration(prohibited.end-now)+' বাকি';
+      $('prayer-warning-description').textContent='শেষ হতে '+displayDuration(prohibited.end-now)+' বাকি';
     }
     let title,caption,end,phase;
     if(now<t.Fajr){phase='isha';title='এশা';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
@@ -118,7 +124,7 @@
     else if(now<t.Maghrib){phase='asr';title='আসর';caption='মাগরিব শুরু হতে বাকি';end=t.Maghrib;}
     else if(now<t.Isha){phase='maghrib';title='মাগরিব';caption='এশা শুরু হতে বাকি';end=t.Isha;}
     else {phase='isha';title='এশা';caption='পরবর্তী ফজর শুরু হতে বাকি';end=tm.Fajr;}
-    showPrayerIcon(prohibited && now >= t.Maghrib-15*60000 ? 'maghrib' : phase);
+    showPrayerIcon(prohibited && prohibited.title==='সূর্যাস্তের নিষিদ্ধ সময়' ? 'maghrib' : phase);
     $('prayer-current').textContent=title;
     $('prayer-countdown-caption').textContent=caption;
     $('prayer-countdown').textContent=displayDuration(end-now);

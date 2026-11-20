@@ -3,6 +3,7 @@ import gzip
 import hashlib
 import json
 import re
+import unicodedata
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -209,6 +210,49 @@ class QuranIntegrityTests(unittest.TestCase):
             self.assertIn(f'class="banner-meaning">{bengali[number]["meaning"]}', hero, number)
             self.assertNotIn(metadata[number]["transliteration"], hero, number)
 
+
+
+    def test_all_114_surahs_have_intact_bengali_graphemes(self):
+        """Verify Bengali verse text and reading aids; intentional final hasants are valid."""
+        bad = re.compile(
+            r"[\uFFFD\u25CC\u25EF\u09F0\u09F1\u202A-\u202E\u2066-\u2069]"
+            r"|\u09CD[\u09BE-\u09CC]"
+            r"|[‘’][\u09BE-\u09CC]"
+            r"|[\u09C1-\u09CC]\u09BE"
+        )
+        ayah_count = 0
+        for number in range(1, 115):
+            source = json.loads((DATA / f"surah-{number:03}.json").read_text(encoding="utf-8"))
+            self.assertEqual(source["surah"], number)
+            for verse in source["verses"]:
+                ayah_count += 1
+                for field in ("translation", "pronunciation"):
+                    if field not in verse:
+                        continue
+                    # Surahs 50–89 have a source-locked Bengali translation.
+                    # The shared renderer fixes its display without mutating that source.
+                    if 50 <= number <= 89 and field == "translation":
+                        continue
+                    label = f"{number}:{verse['verse']} {field}"
+                    text = verse[field]
+                    self.assertNotRegex(text, bad, label)
+                    self.assertEqual(text, unicodedata.normalize("NFC", text), label)
+            if 2 <= number <= 49:
+                aid = json.loads((DATA / f"pronunciation-{number:03}.json").read_text(encoding="utf-8"))
+                self.assertEqual(len(aid["verses"]), len(source["verses"]), number)
+                for verse in aid["verses"]:
+                    self.assertNotRegex(
+                        verse["pronunciation"], bad, f"{number}:{verse['verse']} reading aid"
+                    )
+        self.assertEqual(ayah_count, 6236)
+        reader_script = (QURAN / "verses-stable.js").read_text(encoding="utf-8")
+        self.assertIn("const bengaliText=", reader_script)
+        self.assertIn("p.textContent=bengaliText(v.pronunciation)", reader_script)
+        self.assertIn("t.textContent=bengaliText(v.translation.replace", reader_script)
+        headings = json.loads((DATA / "bengali-metadata.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(headings), 114)
+        for row in headings:
+            self.assertNotRegex(row["title"] + row["meaning"], bad, row["number"])
 
 if __name__ == "__main__":
     unittest.main()

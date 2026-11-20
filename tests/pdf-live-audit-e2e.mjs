@@ -66,6 +66,7 @@ async function workspacePdf(slug,inputs,opts={}){
   const {p,f}=await pageFor(slug,'#pdfFiles');
   try{
     await f.locator('#pdfFiles').setInputFiles(inputs);
+    await f.locator('#runPdf').waitFor({state:'visible',timeout:15000});
     if(opts.pages)await f.locator('#pages').fill(opts.pages);
     await f.locator('#runPdf').click();
     const out=await saveDownload(p,f,'#pdfDownload',opts.timeout||100000);
@@ -112,6 +113,7 @@ await test('Compress PDF / valid output and original page count',async()=>{
   const {p,f}=await studio('compress-pdf');
   try{
     await uploadStudio(f,inputA,'alpha.pdf');await f.locator('#panelCompress').waitFor({state:'visible'});
+    await f.locator('#status').filter({hasText:'pages ready.'}).waitFor({state:'visible',timeout:30000});
     await f.locator('#compressQuality').selectOption('small');await f.locator('#applyCompress').click();
     const out=await saveDownload(p,f);
     return {filename:out.name,originalBytes:inputA.length,...await checkPdf(out.bytes,3),actuallySmaller:out.bytes.length<inputA.length};
@@ -273,6 +275,7 @@ await test('Compress PDF / actual large image-heavy PDF / size reduction',async(
   try{
     await uploadStudio(f,rasterInput,'image-heavy.pdf');
     await f.locator('#panelCompress').waitFor({state:'visible'});
+    await f.locator('#status').filter({hasText:'page ready.'}).waitFor({state:'visible',timeout:30000});
     await f.locator('#compressQuality').selectOption('small');
     await f.locator('#applyCompress').click();
     const out=await saveDownload(p,f);

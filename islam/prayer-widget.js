@@ -92,7 +92,7 @@
       $('prayer-warning-description').textContent='আনুমানিক সময় · শেষ হতে '+displayDuration(prohibited.end-now)+' বাকি';
     }
     let title,caption,end;
-    if(now<t.Fajr){title='এশার পরবর্তী রাত';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
+    if(now<t.Fajr){title='এশার ওয়াক্ত';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
     else if(now<t.Sunrise){title='ফজরের ওয়াক্ত';caption='সূর্যোদয় হতে বাকি';end=t.Sunrise;}
     else if(now<t.Dhuhr){title='এখন ফরজ নামাজের ওয়াক্ত নয়';caption='যোহর শুরু হতে বাকি';end=t.Dhuhr;}
     else if(now<t.Asr){title='যোহরের ওয়াক্ত';caption='আসর শুরু হতে বাকি';end=t.Asr;}

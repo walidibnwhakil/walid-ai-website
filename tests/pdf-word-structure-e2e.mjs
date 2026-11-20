@@ -126,6 +126,101 @@ try {
   },Array.from(compressed));
   assert.match(extracted,/SEARCHABLE CONTENT/,"Compression must preserve selectable text");
   console.log("RICH_E2E COMPRESS_PASS",JSON.stringify({original:small.length,output:compressed.length,textSelectable:true}));
+
+  const opened=[];
+  async function toolPage(tool,pdf=fixture){
+    const p=await context.newPage();opened.push(p);
+    await p.goto(base+"/tools/pdf-browser/studio.html?tool="+tool,{waitUntil:"domcontentloaded"});
+    await p.locator("#file").setInputFiles({name:"audit.pdf",mimeType:"application/pdf",buffer:pdf});
+    await p.locator("#work").waitFor({state:"visible"});
+    return p;
+  }
+  const secure=await toolPage("edit");
+  await secure.locator("#pageLabel").filter({hasText:"1 / 2"}).waitFor({state:"visible"});
+  await secure.locator('[data-edit="replace"]').click();
+  await secure.locator(".source-text-hit").first().waitFor({state:"visible",timeout:15000});
+  await secure.locator(".source-text-hit").first().click();
+  await secure.locator(".ann-replacement.selected").fill("SECURE NEW TITLE");
+  await secure.locator("#flattenReplacements").check();
+  await secure.locator("#saveEdit").click();
+  await secure.locator("#download").waitFor({state:"visible",timeout:30000});
+  const secured=await download(secure,"#download");
+  assert.equal((await PDFDocument.load(secured)).getPageCount(),2);
+  const secureText=await secure.evaluate(async bytes=>{
+    const pdfjs=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+    const pdf=await pdfjs.getDocument({data:Uint8Array.from(bytes)}).promise;
+    const text=(await (await pdf.getPage(1)).getTextContent()).items.map(i=>i.str).join(" ");
+    await pdf.destroy();return text;
+  },Array.from(secured));
+  assert.doesNotMatch(secureText,/REPORT TITLE/,"Secure edit must remove original text, not merely cover it");
+  console.log("RICH_E2E SECURE_EDIT_PASS",{bytes:secured.length,originalTextRemoved:true});
+
+  const organize=await toolPage("organize");
+  await organize.locator("#organizeGrid .page-card").first().waitFor({state:"visible"});
+  await organize.locator("#organizeGrid .page-card").first().getByRole("button",{name:"Right"}).click();
+  await organize.locator("#saveOrganize").click();
+  const organized=await download(organize,"#download");
+  assert.equal((await PDFDocument.load(organized)).getPage(0).getRotation().angle,90);
+  console.log("RICH_E2E ORGANIZE_PASS");
+
+  const num=await toolPage("numbers");
+  await num.locator("#numberStart").fill("7");
+  await num.locator("#numberBengali").check();
+  await num.locator("#applyNumbers").click();
+  const numbered=await download(num,"#download");
+  assert.equal((await PDFDocument.load(numbered)).getPageCount(),2);
+  console.log("RICH_E2E NUMBERS_PASS");
+
+  const water=await toolPage("watermark");
+  await water.locator("#watermarkText").fill("WALID TEST");
+  await water.locator("#applyWatermark").click();
+  const watermarked=await download(water,"#download");
+  assert.equal((await PDFDocument.load(watermarked)).getPageCount(),2);
+  console.log("RICH_E2E WATERMARK_PASS");
+
+  const sign=await toolPage("sign");
+  await sign.locator("#pageLabel").filter({hasText:"1 / 2"}).waitFor({state:"visible"});
+  const rect=await sign.locator("#signPad").boundingBox();
+  assert.ok(rect);
+  await sign.mouse.move(rect.x+30,rect.y+40);
+  await sign.mouse.down();await sign.mouse.move(rect.x+100,rect.y+80,{steps:6});
+  await sign.mouse.up();
+  await sign.locator("#placeSign").click();
+  await sign.locator("#saveSign").click();
+  const signed=await download(sign,"#download");
+  assert.equal((await PDFDocument.load(signed)).getPageCount(),2);
+  console.log("RICH_E2E SIGN_PASS");
+
+  const protect=await toolPage("protect");
+  await protect.locator("#protectPassword").fill("AuditPass123");
+  await protect.locator("#protectConfirm").fill("AuditPass123");
+  await protect.locator("#applyProtect").click();
+  const locked=await download(protect,"#download");
+  let failedWithoutPassword=false;
+  try{await PDFDocument.load(locked);}catch{failedWithoutPassword=true;}
+  assert.ok(failedWithoutPassword,"Password must be required to open protected PDF");
+  const unlock=await toolPage("protect",locked);
+  await unlock.locator('input[name="protectMode"][value="unlock"]').check();
+  await unlock.locator("#protectPassword").fill("AuditPass123");
+  await unlock.locator("#applyProtect").click();
+  const unlocked=await download(unlock,"#download");
+  assert.equal((await PDFDocument.load(unlocked)).getPageCount(),2);
+  console.log("RICH_E2E PROTECT_UNLOCK_PASS");
+
+  const pngInput=await readFile("tests/fixtures/bengali-mixed.png");
+  const ocr=await context.newPage();opened.push(ocr);
+  await ocr.goto(base+"/tools/pdf-browser/studio.html?tool=ocr",{waitUntil:"domcontentloaded"});
+  await ocr.locator("#file").setInputFiles({name:"bengali.png",mimeType:"image/png",buffer:pngInput});
+  await ocr.locator("#applyOcr").click();
+  await ocr.locator("#downloadText").waitFor({state:"visible",timeout:90000});
+  await ocr.locator("#ocrOutput").fill("বাংলা সংশোধিত পরীক্ষা 123");
+  const corrected=await download(ocr,"#downloadText");
+  assert.equal(corrected.toString("utf8"),"বাংলা সংশোধিত পরীক্ষা 123");
+  console.log("RICH_E2E OCR_CORRECTION_PASS");
+
+  for(const p of opened)await p.close();
+
   await edit.close();await comp.close();
   assert.equal(errors.length,0,errors.join("\n"));
   console.log("RICH_E2E SUCCESS");

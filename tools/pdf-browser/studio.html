@@ -55,7 +55,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="submitPassword">Open PDF</button>
       </div>
       <div id="panelEdit" hidden>
-        <p class="hint">Edit existing text by selecting <strong>Edit text</strong> and clicking a highlighted line. Type directly in the replacement box. Use Cover area to hide or replace a picture, then Image to insert a new one. The file stays in your browser.</p>
+        <p class="hint">Edit existing text by selecting <strong>Edit text</strong> and clicking a highlighted line. Type directly in the replacement box. Use Cover area to hide or replace a picture, then Image to insert a new one. Bengali text added to PDFs stays selectable when the embedded font is available; otherwise a raster fallback is used. The file stays in your browser.</p>
         <div class="tool-row" id="editTools">
           <button class="minor tool-btn" type="button" data-edit="replace">Edit text</button>
           <button class="minor tool-btn" type="button" data-edit="cover">Cover area</button>

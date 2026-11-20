@@ -1,8 +1,85 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-20T01:38:37.498958+00:00",
+  "updatedAt": "2026-11-20T09:39:11.389145+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Pochettino’s first United training session leaked on drone footage; Premier League returns – football live",
+      "url": "https://www.theguardian.com/football/live/2026/nov/20/weekend-football-countdown-live-news-updates",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T09:15:38+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Refereeing will never be perfect - Farrell",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cqe9k80zjk2yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T08:05:21+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "What history tells us about the Premier League table after 10 games of a season",
+      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-table-history-after-10-games-season",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T08:00:26+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Inside the rise of 'humble' Nyoni and why Iraola trusts him",
+      "url": "https://www.bbc.co.uk/sport/football/articles/ck24enjqvlyeo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T07:42:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Moore eyes Kane shirt as Spurs' past and future stars meet",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cq0k65pyp4jvo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T07:26:36+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Russell fastest in Las Vegas practice after rain",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/c9gklmdmnzydo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T06:40:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "F1 bosses close to V8 engines deal from 2030",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/cvj6l7nk611jo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T06:35:38+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "The art of protection - inside an F1 helmet factory",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/cm20vpq8z6n4o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T06:29:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'I felt like I was a ghost' - when players miss a season through injury",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqvg27m9xp1xo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T06:13:23+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "The male footballers best associated with each shirt number – the readers’ edition",
+      "url": "https://www.theguardian.com/football/ng-interactive/2026/nov/20/male-footballers-best-associated-each-shirt-number-readers-edit",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T06:00:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "History, hunger and headline bills - why Price is box office",
+      "url": "https://www.bbc.co.uk/sport/boxing/articles/crwy8e7d5lj1o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T05:32:13+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Premier League: 10 things to look out for this weekend",
       "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-10-things-to-look-out-for-this-weekend",
@@ -25,27 +102,6 @@
       "category": "Sports"
     },
     {
-      "title": "England's Hull one stroke off lead at lucrative LPGA finale",
-      "url": "https://www.bbc.co.uk/sport/golf/articles/cmx20gypx244o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T22:31:40+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'Clearer' approach has lifted England mood - Itoje",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ckge31np9ew7o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T22:29:46+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Unbeaten Zverev hopes to be 'pain-free' after overcoming Fils at ATP Finals",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/c64gne03ykjro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T22:17:25+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "England get one-match suspended ban on away tickets for anti-pope chants in Spain",
       "url": "https://www.theguardian.com/football/2026/nov/19/england-one-match-suspended-away-tickets-ban-anti-pope-chants-spain-uefa",
       "source": "The Guardian Football",
@@ -60,20 +116,6 @@
       "category": "Sports"
     },
     {
-      "title": "Barcelona target Man Utd's Martinez - Friday's gossip",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cj5y14g2wppko?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T21:57:22+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Shevchenko accuses Mudryk camp of 'baseless slander'",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmgqx908lk44o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T20:44:11+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Thomas Frank admits he has a point to prove after taking reins at Crystal Palace",
       "url": "https://www.theguardian.com/football/2026/nov/19/thomas-frank-crystal-palace-premier-league",
       "source": "The Guardian Football",
@@ -81,24 +123,10 @@
       "category": "Sports"
     },
     {
-      "title": "England fined for fans' anti-Catholic chants in Spain",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmlye2n7p7d9o?at_medium=RSS&at_campaign=rss",
+      "title": "Sutton's predictions v world champion boxer Lauren Price",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c50mdnxy3ry0o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-19T19:11:03+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Pochettino's first Man Utd training session filmed by drone operator",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c6wy9d7wqy7wo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T18:45:56+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Summer signings join Lionel Messi among MLS’s top earners: Takeaways from the league’s salary release",
-      "url": "https://www.theguardian.com/football/2026/nov/19/mls-salary-release-lionel-messi-spent-per-point",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T18:01:17+00:00",
+      "publishedAt": "2026-11-19T18:52:00+00:00",
       "category": "Sports"
     },
     {
@@ -116,24 +144,10 @@
       "category": "Sports"
     },
     {
-      "title": "Culture, defence, Fernandes - Pochettino's priorities at Man Utd",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cxlylzyg38l8o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T15:05:21+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Cummins' Australia captaincy at a crossroads - Agnew",
       "url": "https://www.bbc.co.uk/sport/cricket/articles/c94gnev3kj4vo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T14:57:42+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Mauricio Pochettino calls for Manchester United to show no fear against Liverpool",
-      "url": "https://www.theguardian.com/football/2026/nov/19/manchester-united-mauricio-pochettino-liverpool-anfield-no-fear",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T12:38:05+00:00",
       "category": "Sports"
     },
     {
@@ -148,20 +162,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/19/gonzalo-garcia-fulham-spain-premier-leaue-interview",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-19T12:16:42+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Washington Spirit v Kansas City Current: where the NWSL Championship will be won and lost",
-      "url": "https://www.theguardian.com/football/2026/nov/19/nwsl-championship-washington-spirit-kc-current-moving-the-goalposts",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T11:40:20+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Vote for the first BBC Men's Footballer of the Year",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c61wrqr7l1d8o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T06:30:04+00:00",
       "category": "Sports"
     },
     {
@@ -4409,46 +4409,124 @@
           "id": "5a550de1-4b29-4109-bee2-7415416929a1",
           "homeTeam": "Sudur Paschim Royals",
           "awayTeam": "Chitwan Rhinos",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
+          "homeScore": 133,
+          "awayScore": 136,
+          "innings": [
+            {
+              "team": "chitwan rhinos Inning 1",
+              "runs": 133,
+              "wickets": 9,
+              "overs": 20
+            },
+            {
+              "team": "Sudur Paschim Royals,Chitwan Rhinos Inning 1",
+              "runs": 136,
+              "wickets": 7,
+              "overs": 19.5
+            }
+          ],
+          "winner": "Sudur Paschim Royals",
           "competition": "Sudur Paschim Royals vs Chitwan Rhinos, Qualifier 2, Nepal Premier League 2026",
           "matchType": "t20",
-          "overs": null,
+          "overs": 20,
           "startTime": "2026-11-19T10:45:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "4ae1d337-a9fb-4791-8e10-e3f8f802d218",
+          "homeTeam": "Sri Lanka Women",
+          "awayTeam": "Zimbabwe Women",
+          "homeScore": 68,
+          "awayScore": 69,
+          "innings": [
+            {
+              "team": "zimbabwe women Inning 1",
+              "runs": 68,
+              "wickets": 10,
+              "overs": 19.1
+            },
+            {
+              "team": "Sri Lanka Women,Zimbabwe Women Inning 1",
+              "runs": 69,
+              "wickets": 1,
+              "overs": 11.3
+            }
+          ],
+          "winner": "Sri Lanka Women",
+          "competition": "Sri Lanka Women vs Zimbabwe Women, 22nd Match, Super Six (A1 v B3), ICC Womens Emerging Nations Trophy, 2026",
+          "matchType": "t20",
+          "overs": 19.1,
+          "startTime": "2026-11-20T05:00:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "b61c3067-ac06-4ade-aaaf-dc0b705174e0",
+          "homeTeam": "Scotland Women",
+          "awayTeam": "Netherlands Women",
+          "homeScore": 154,
+          "awayScore": 155,
+          "innings": [
+            {
+              "team": "Scotland Women Inning 1",
+              "runs": 154,
+              "wickets": 7,
+              "overs": 20
+            },
+            {
+              "team": "Netherlands Women Inning 1",
+              "runs": 155,
+              "wickets": 3,
+              "overs": 19.4
+            }
+          ],
+          "winner": "Netherlands Women",
+          "competition": "Scotland Women vs Netherlands Women, 21st Match, Super Six (A2 v B2), ICC Womens Emerging Nations Trophy, 2026",
+          "matchType": "t20",
+          "overs": 20,
+          "startTime": "2026-11-20T05:00:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "f71a23e0-f244-4e76-8e6c-0655d76704c7",
+          "homeTeam": "Pakistan Women",
+          "awayTeam": "Ireland Women",
+          "homeScore": 12,
+          "awayScore": null,
+          "innings": [
+            {
+              "team": "pakistan women Inning 1",
+              "runs": 12,
+              "wickets": 2,
+              "overs": 3
+            }
+          ],
+          "winner": null,
+          "competition": "Pakistan Women vs Ireland Women, 23rd Match, Super Six (B1 v A3), ICC Womens Emerging Nations Trophy, 2026",
+          "matchType": "t20",
+          "overs": 3,
+          "startTime": "2026-11-20T09:15:00Z",
           "finishedAt": null,
           "status": "live",
           "source": "CricketData"
         },
         {
-          "id": "4ae1d337-a9fb-4791-8e10-e3f8f802d218",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
+          "id": "38961c95-3cdb-4559-9a4b-f4b59e7aab03",
+          "homeTeam": "Lumbini Lions",
+          "awayTeam": "Sudur Paschim Royals",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
           "winner": null,
-          "competition": "Tbc vs Tbc, 22nd Match, Super Six (A1 v B3), ICC Womens Emerging Nations Trophy, 2026",
+          "competition": "Lumbini Lions vs Sudur Paschim Royals, Final, Nepal Premier League 2026",
           "matchType": "t20",
           "overs": null,
-          "startTime": "2026-11-20T05:00:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "f71a23e0-f244-4e76-8e6c-0655d76704c7",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, 23rd Match, Super Six, ICC Womens Emerging Nations Trophy, 2026",
-          "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-20T09:15:00Z",
+          "startTime": "2026-11-21T10:45:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"

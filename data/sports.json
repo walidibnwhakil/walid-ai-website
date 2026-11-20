@@ -1,27 +1,104 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-19T18:51:09.641172+00:00",
+  "updatedAt": "2026-11-20T01:38:37.498958+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Premier League: 10 things to look out for this weekend",
+      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-10-things-to-look-out-for-this-weekend",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T00:00:15+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Arsenal 'have ingredients' but Europe's elite on another level",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm4gnxz8dvx1o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T23:57:54+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Unseeded Sykes stuns Humphries in Grand Slam thriller",
+      "url": "https://www.bbc.co.uk/sport/darts/articles/ckzd9n5996zno?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T22:45:41+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England's Hull one stroke off lead at lucrative LPGA finale",
+      "url": "https://www.bbc.co.uk/sport/golf/articles/cmx20gypx244o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T22:31:40+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'Clearer' approach has lifted England mood - Itoje",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ckge31np9ew7o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T22:29:46+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Unbeaten Zverev hopes to be 'pain-free' after overcoming Fils at ATP Finals",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/c64gne03ykjro?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T22:17:25+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England get one-match suspended ban on away tickets for anti-pope chants in Spain",
+      "url": "https://www.theguardian.com/football/2026/nov/19/england-one-match-suspended-away-tickets-ban-anti-pope-chants-spain-uefa",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T22:05:54+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "OL Lyonnes show their class to hit Arsenal’s ambitions for a top-four WCL finish",
+      "url": "https://www.theguardian.com/football/2026/nov/19/arsenal-ol-lyonnes-womens-champions-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T22:05:36+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Barcelona target Man Utd's Martinez - Friday's gossip",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cj5y14g2wppko?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T21:57:22+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Shevchenko accuses Mudryk camp of 'baseless slander'",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmgqx908lk44o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T20:44:11+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Thomas Frank admits he has a point to prove after taking reins at Crystal Palace",
+      "url": "https://www.theguardian.com/football/2026/nov/19/thomas-frank-crystal-palace-premier-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-19T19:50:10+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England fined for fans' anti-Catholic chants in Spain",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmlye2n7p7d9o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T19:11:03+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Pochettino's first Man Utd training session filmed by drone operator",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c6wy9d7wqy7wo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-19T18:45:56+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Summer signings join Lionel Messi among MLS’s top earners: Takeaways from the league’s salary release",
       "url": "https://www.theguardian.com/football/2026/nov/19/mls-salary-release-lionel-messi-spent-per-point",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-19T18:01:17+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Shelton moves closer to ATP Finals last-four spot",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/c64gne03ykjro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T16:18:50+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Struggling Blackpool sack Evatt on his birthday",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cm4g1rzjj4v2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T16:12:14+00:00",
       "category": "Sports"
     },
     {
@@ -39,20 +116,6 @@
       "category": "Sports"
     },
     {
-      "title": "Football Daily | Football’s political gamers face off at Fifa with the real-life final boss",
-      "url": "https://www.theguardian.com/football/2026/nov/19/football-daily-fifa-presidential-election",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T15:42:09+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Nicholls sets record for jump winners by British trainer",
-      "url": "https://www.bbc.co.uk/sport/horse-racing/articles/cr2klg0qwy98o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T15:19:28+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Culture, defence, Fernandes - Pochettino's priorities at Man Utd",
       "url": "https://www.bbc.co.uk/sport/football/articles/cxlylzyg38l8o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
@@ -64,27 +127,6 @@
       "url": "https://www.bbc.co.uk/sport/cricket/articles/c94gnev3kj4vo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T14:57:42+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Furbank leads returning England trio for All Blacks visit",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ckdd1y064y0go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T14:18:36+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Ireland hooker Sheehan named at number eight for Springboks game",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cm4gnpgn3z1wo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T13:59:31+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Premier League clubs to cover legal costs if Man City sponsors sue",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cqy4jvdw7jdlo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T13:29:42+00:00",
       "category": "Sports"
     },
     {
@@ -116,52 +158,10 @@
       "category": "Sports"
     },
     {
-      "title": "Inside women’s football’s difficult rise in Syria: ‘A joy that everyone in the country needed’",
-      "url": "https://www.theguardian.com/football/2026/nov/19/syria-womens-football",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T11:00:26+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Eight-year ban for player who threw rock that hit assistant referee",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cqlyk9yzkz2no?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T10:20:58+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Maine Road offer non-league haven to fans of scandal-hit Manchester City",
-      "url": "https://www.theguardian.com/football/2026/nov/19/manchester-city-guilty-verdict-premier-league-charges-maine-road-non-league",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T08:00:21+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "How Premier League's big six keep getting richer",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c6x28e93zv3jo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T07:38:22+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "UK firms owed thousands as Saudi-backed LIV paid golfers millions",
-      "url": "https://www.bbc.co.uk/sport/golf/articles/cw7vpv793n24o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T06:37:40+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Vote for the first BBC Men's Footballer of the Year",
       "url": "https://www.bbc.co.uk/sport/football/articles/c61wrqr7l1d8o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-19T06:30:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Manchester United’s infamous 1974 relegation is a warning from history",
-      "url": "https://www.theguardian.com/football/2026/nov/18/manchester-united-infamous-1974-relegation-is-a-warning-from-history",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-18T22:30:10+00:00",
       "category": "Sports"
     },
     {

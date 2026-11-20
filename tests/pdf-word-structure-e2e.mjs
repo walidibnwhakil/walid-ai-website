@@ -10,6 +10,33 @@ const root=new URL("../",import.meta.url);
 const mime=p=>p.endsWith(".mjs")||p.endsWith(".js")?"text/javascript":p.endsWith(".html")?"text/html":p.endsWith(".css")?"text/css":p.endsWith(".png")?"image/png":p.endsWith(".ttf")?"font/ttf":"application/octet-stream";
 const server=createServer(async(req,res)=>{
   const u=new URL(req.url,"http://127.0.0.1");
+  if(req.method==="POST"&&/^\/api\/tools\/(merge-pdf|split-pdf)$/.test(u.pathname)){
+    try{
+      let jsonText="";
+      for await(const chunk of req)jsonText+=chunk;
+      const body=JSON.parse(jsonText);
+      const name=u.pathname.endsWith("merge-pdf")?"merged.pdf":"split.pdf";
+      const doc=await PDFDocument.create();
+      if(name==="merged.pdf"){
+        for(const encoded of body.files){
+          const src=await PDFDocument.load(Buffer.from(encoded,"base64"));
+          const copied=await doc.copyPages(src,src.getPageIndices());
+          copied.forEach(p=>doc.addPage(p));
+        }
+      }else{
+        const src=await PDFDocument.load(Buffer.from(body.file,"base64"));
+        const indexes=String(body.pages||"1").split(",").flatMap(part=>{
+          const nums=part.split("-").map(Number);
+          return nums.length===2?Array.from({length:Math.max(0,nums[1]-nums[0]+1)},(_,i)=>nums[0]+i-1):[nums[0]-1];
+        });
+        const copied=await doc.copyPages(src,indexes);
+        copied.forEach(p=>doc.addPage(p));
+      }
+      res.writeHead(200,{"content-type":"application/json","access-control-allow-origin":"*"});
+      res.end(JSON.stringify({type:"application/pdf",name,file:Buffer.from(await doc.save()).toString("base64")}));
+    }catch(err){res.writeHead(500);res.end(JSON.stringify({error:String(err)}));}
+    return;
+  }
   let path=u.pathname==="/tool-workspace/"?"tool-workspace/index.html":u.pathname.slice(1);
   if(!path||path.endsWith("/"))path+="index.html";
   if(path.includes("..")){res.writeHead(403);res.end();return;}
@@ -75,6 +102,29 @@ async function convert(pdf,name="mixed-content.pdf"){
 }
 try {
   console.log("RICH_E2E START",base);
+
+  async function serverTool(slug,files,pages){
+    const p=await context.newPage();
+    try{
+      await p.goto(base+"/tool-workspace/?tool="+slug+"&standalone=1",{waitUntil:"domcontentloaded"});
+      // Test the page's recovery startup (no double reset after fast file selection).
+      await p.evaluate(()=>{window.WALID_AI_API=location.origin;});
+      await p.locator("#pdfFiles").setInputFiles(files.map((bytes,i)=>({name:"part"+i+".pdf",mimeType:"application/pdf",buffer:bytes})));
+      if(pages)await p.locator("#pages").fill(pages);
+      await p.locator("#runPdf").waitFor({state:"visible",timeout:16000});
+      await p.locator("#runPdf").click();
+      await p.locator("#pdfDownload").waitFor({state:"visible",timeout:20000});
+      return await download(p,"#pdfDownload");
+    }finally{await p.close();}
+  }
+  const merged=await serverTool("merge-pdf",[fixture,fixture]);
+  assert.equal((await PDFDocument.load(merged)).getPageCount(),4);
+  console.log("RICH_E2E MERGE_PASS");
+  const split=await serverTool("split-pdf",[fixture],"2");
+  assert.equal((await PDFDocument.load(split)).getPageCount(),1);
+  console.log("RICH_E2E SPLIT_PASS");
+
+
   const bytes=await convert(fixture);
   const output=await docx(bytes);
   assert.match(output.xml,/REPORT TITLE/);

@@ -282,7 +282,7 @@ $('#runImage').onclick=async()=>{
     }else if(activeTool==='background-remove'){
       if(!original)throw Error(messages.chooseImage);
       if(mobileBgDevice){
-        const {removeMobileBackground,cancelMobileBackgroundRemoval}=await import('/tools/background-remover/mobile-engine.js?v=20261120-mobile1');
+        const {removeMobileBackground,cancelMobileBackgroundRemoval}=await import('/tools/background-remover/mobile-engine.js?v=20261120-mobile2');
         cancelBgWork=cancelMobileBackgroundRemoval;$('#cancelBg').hidden=false;
         try{
           const info=await removeMobileBackground(original,imageCanvas,{onStatus:setStatus});

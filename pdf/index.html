@@ -77,6 +77,20 @@
   .grid .tool .desc{font-size:13px}
 }
 @media(prefers-reduced-motion:reduce){.grid .tool .icon{transition:none}}
+
+/* Phone: keep two balanced PDF cards, with compact text rather than stretched gaps. */
+@media(max-width:560px){
+  .wrap{padding:22px 12px 35px}
+  .intro{margin-bottom:18px}
+  .intro h1{font-size:30px}
+  .intro p{text-align:center;text-align-last:center;font-size:14px;line-height:1.5}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .grid .tool{min-width:0;min-height:170px;padding:15px 9px 14px}
+  .grid .tool .icon{width:50px;height:50px;flex-basis:50px;margin-bottom:11px;border-radius:14px}
+  .grid .tool .icon svg{width:26px;height:26px}
+  .grid .tool .name{font-size:15px;line-height:1.2;margin-bottom:5px}
+  .grid .tool .desc{font-size:12.5px;line-height:1.36;text-align:center;text-align-last:center;hyphens:none;overflow-wrap:anywhere}
+}
 </style>
 
 <link rel="stylesheet" href="/walid-branding.css">

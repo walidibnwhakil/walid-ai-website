@@ -67,7 +67,7 @@ try {
        throw Error('This image did not separate properly. Please try another photo.');
    }
  }
- if(routes[job.tool])editMore.href='/tools/'+routes[job.tool]+'/';
+ if(routes[job.tool])editMore.href='/image/'+routes[job.tool]+'/';
  for(const [index,item] of job.items.entries()){
   if(!(item.blob instanceof Blob))continue;
   const card=node('article','result');

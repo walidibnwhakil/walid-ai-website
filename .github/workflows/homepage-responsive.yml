@@ -1,0 +1,32 @@
+name: Homepage responsive E2E
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "tests/homepage-responsive-e2e.mjs"
+      - ".github/workflows/homepage-responsive.yml"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "tests/homepage-responsive-e2e.mjs"
+      - ".github/workflows/homepage-responsive.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  homepage-responsive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Test homepage layout across mobile and desktop
+        run: node tests/homepage-responsive-e2e.mjs

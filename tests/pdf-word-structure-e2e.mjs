@@ -88,6 +88,24 @@ try {
   assert.match(output.zip.file("word/_rels/document.xml.rels")?await output.zip.file("word/_rels/document.xml.rels").async("string"):"",/relationships\/image/);
   console.log("RICH_E2E WORD_PASS",JSON.stringify({bytes:bytes.length,images:output.pictures.length,tables:(output.xml.match(/<w:tbl>/g)||[]).length}));
 
+
+  const scanPng=await readFile("tests/fixtures/bengali-mixed.png");
+  const scanDoc=await PDFDocument.create();
+  const scanImage=await scanDoc.embedPng(scanPng);
+  const scannedPage=scanDoc.addPage([595,842]);
+  scannedPage.drawImage(scanImage,{x:40,y:650,width:520,height:85});
+  const scanOut=await docx(await convert(Buffer.from(await scanDoc.save()),"scanned-bengali.pdf"));
+  assert.match(scanOut.xml,/[\u0980-\u09ff]/,"Scanned Bengali page must create editable text runs");
+  assert.match(scanOut.xml,/<w:t\b/);
+  console.log("RICH_E2E SCANNED_BENGALI_WORD_PASS");
+
+  const longDoc=await PDFDocument.create();
+  for(let n=1;n<=11;n++)longDoc.addPage([595,842]).drawText("PAGE "+n+" EXTENDED",{x:55,y:750,size:20});
+  const longResult=await docx(await convert(Buffer.from(await longDoc.save()),"eleven-pages.pdf"));
+  assert.match(longResult.xml,/PAGE 11 EXTENDED/,"Must include content beyond the old ten page limit");
+  assert.equal((longResult.xml.match(/w:type="page"/g)||[]).length,10,"Keep explicit Word page breaks");
+  console.log("RICH_E2E ELEVEN_PAGE_WORD_PASS");
+
   const edit=await context.newPage();
   await edit.goto(base+"/tools/pdf-browser/studio.html?tool=edit",{waitUntil:"domcontentloaded"});
   await edit.locator("#file").setInputFiles({name:"editor.pdf",mimeType:"application/pdf",buffer:fixture});

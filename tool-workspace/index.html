@@ -173,11 +173,11 @@ function qualitySettings(){
 }
 function updateFormatControls(){
   const isPng=imageFormat.value==='image/png';
-  $('#qualityWrap').hidden=activeTool==='image-convert'||(isPng&&activeTool==='image-resize');
+  $('#qualityWrap').hidden=activeTool==='image-convert';
   $('#formatNote').textContent=activeTool==='image-convert'
     ? isPng?'PNG preserves transparent areas.':imageFormat.value==='image/webp'?'WebP can preserve transparent areas.':'JPG / JPEG replaces transparent areas with white.'
     : isPng&&activeTool==='image-compress'?'Best preserves colors; Good and Average may reduce color detail.'
-    : isPng?'PNG preserves transparent areas.'
+    : isPng?'PNG preserves transparency; Good and Average may change some colors.'
     : imageFormat.value==='image/webp'?'WebP can preserve transparent areas.'
     : 'JPG / JPEG replaces transparent areas with white.';
 }
@@ -423,7 +423,8 @@ $('#runImage').onclick=async()=>{
       const context=resized.getContext('2d');context.imageSmoothingEnabled=true;context.imageSmoothingQuality='high';
       if(type==='image/jpeg'){context.fillStyle='#fff';context.fillRect(0,0,width,height)}
       context.drawImage(original,0,0,width,height);
-      const blob=await encodeCanvas(resized,type,q);
+      const outputCanvas=type==='image/png'?quantizePngCanvas(resized,qualitySettings().png):resized;
+      const blob=await encodeCanvas(outputCanvas,type,q);
       await recordImage(blob,file,resized,original);
     }else if(activeTool==='image-compress'){
       const compressionCanvas=type==='image/png'?quantizePngCanvas(imageCanvas,qualitySettings().png):imageCanvas;

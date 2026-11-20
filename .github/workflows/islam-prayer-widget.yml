@@ -1,0 +1,59 @@
+name: Islam prayer widget mobile test
+on:
+  pull_request:
+    paths:
+      - islam/index.html
+      - islam/prayer-widget.js
+      - .github/workflows/islam-prayer-widget.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.56.1
+      - name: Check widget and mobile layout with deterministic prayer timings
+        run: |
+          node --check islam/prayer-widget.js
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/islam-http.log 2>&1 &
+          sleep 1
+          node <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({args:['--no-sandbox']});
+            const page=await browser.newPage({viewport:{width:360,height:800},isMobile:true,hasTouch:true});
+            await page.clock.install({time:new Date('2026-11-20T07:00:00Z')});
+            await page.route('https://api.aladhan.com/**',route=>route.fulfill({
+              status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},
+              body:JSON.stringify({code:200,data:{timings:{
+                Fajr:'05:10',Sunrise:'06:25',Dhuhr:'12:00',Asr:'15:30',Maghrib:'17:15',Isha:'19:00'
+              }}})
+            }));
+            await page.goto('http://127.0.0.1:8765/islam/',{waitUntil:'domcontentloaded'});
+            await page.waitForFunction(()=>document.querySelector('#prayer-current')?.textContent==='যোহরের ওয়াক্ত');
+            if(await page.locator('#prayer-countdown').textContent()!=='০২:৩০:০০')throw Error('Unexpected Dhuhr countdown');
+            if(await page.locator('#prayer-divisions').isVisible())throw Error('Division menu must be hidden');
+            await page.locator('#prayer-location').click();
+            if(!await page.locator('#prayer-divisions').isVisible())throw Error('Division menu did not open');
+            if(await page.locator('#prayer-division-list button').count())throw Error('Unexpected obsolete selector');
+            if(await page.locator('button[data-division]').count()!==8)throw Error('All 8 divisions must be present');
+            await page.locator('button[data-division="sylhet"]').click();
+            await page.waitForFunction(()=>document.querySelector('#prayer-place')?.textContent==='সিলেট');
+            if(await page.locator('#prayer-divisions').isVisible())throw Error('Menu must close after selection');
+            if(await page.locator('.islam-hub-cards .surah-card').count()!==3)throw Error('Original Islam cards changed');
+            if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+1))throw Error('Mobile horizontal overflow');
+            await page.clock.setFixedTime(new Date('2026-11-20T05:55:00Z'));
+            await page.waitForFunction(()=>!document.querySelector('#prayer-warning').hidden,{timeout:3000});
+            if(!((await page.locator('#prayer-warning-title').textContent()).includes('মধ্যাহ্ন')))throw Error('Midday warning missing');
+            await browser.close();
+            console.log('PASS: live countdown, hidden selector, eight divisions, warning, mobile, original cards');
+          })().catch(error=>{console.error(error);process.exit(1)});
+          JS

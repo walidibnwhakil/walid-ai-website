@@ -27,7 +27,7 @@
     const initials=esc(name.split(/\s+/).map(p=>p[0]||"").slice(0,2).join("").toUpperCase());
     const fallback="<span class='logo-fallback' aria-hidden='true'>"+initials+"</span>";
     const content=country?"<span class='primary-flag' role='img' aria-label='"+esc(country)+" flag'>"+flag(country)+"</span>":url?"<img src='"+esc(url)+"' alt='"+esc(name)+" crest' loading='lazy' referrerpolicy='no-referrer' onerror='this.hidden=true;this.nextElementSibling.hidden=false'>"+ "<span class='logo-fallback' aria-hidden='true' hidden>"+initials+"</span>":fallback;
-    return "<span class='"+size+"'>"+content+"</span>";
+    return "<span class='"+size+(country?" flag-only":"")+"'>"+content+"</span>";
   }
   function statusOf(match) {
     const status=String(match.status||"").toLowerCase().replace(/[- ]+/g,"_");

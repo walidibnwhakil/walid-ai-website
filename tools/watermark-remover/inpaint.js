@@ -7,7 +7,7 @@ const MAX_AREA=320000;
 function fitPlane(data,width,height,rect){
   // Fit gentle backgrounds using known pixels around the selection.
   let n=0,sx=0,sy=0,sxx=0,syy=0,sxy=0;
-  const values=[0,0,0],xc=[0,0,0],yc=[0,0,0];
+  const values=[0,0,0,0],xc=[0,0,0,0],yc=[0,0,0,0];
   const xc0=rect.x+rect.w/2,yc0=rect.y+rect.h/2;
   const radius=Math.max(5,Math.min(14,Math.round(Math.min(rect.w,rect.h)*0.15)));
   const stride=Math.max(1,Math.floor(Math.min(rect.w,rect.h)/100));
@@ -20,7 +20,7 @@ function fitPlane(data,width,height,rect){
       if(d>radius*1.5)continue;
       const px=xx-xc0,py=yy-yc0,o=index(xx,yy,width);
       n++;sx+=px;sy+=py;sxx+=px*px;syy+=py*py;sxy+=px*py;
-      for(let c=0;c<3;c++){values[c]+=data[o+c];xc[c]+=px*data[o+c];yc[c]+=py*data[o+c];}
+      for(let c=0;c<4;c++){values[c]+=data[o+c];xc[c]+=px*data[o+c];yc[c]+=py*data[o+c];}
     }
   }
   if(n<8)throw Error('Select a smaller area so the surrounding image is visible.');
@@ -37,7 +37,7 @@ function fitPlane(data,width,height,rect){
     }
     return [m[0][3],m[1][3],m[2][3]];
   }
-  const coeff=[solve(0),solve(1),solve(2)];
+  const coeff=[solve(0),solve(1),solve(2),solve(3)];
   const color=(x,y,c)=>clamp(coeff[c][0]+coeff[c][1]*(x-xc0)+coeff[c][2]*(y-yc0),0,255);
   let err=0,count=0;
   for(let yy=Math.max(0,rect.y-radius);yy<Math.min(height,rect.y+rect.h+radius);yy+=stride)
@@ -47,7 +47,7 @@ function fitPlane(data,width,height,rect){
               Math.max(rect.y-yy,0,yy-(rect.y+rect.h-1));
       if(d>radius*1.5)continue;
       const o=index(xx,yy,width);
-      for(let c=0;c<3;c++){const diff=data[o+c]-color(xx,yy,c);err+=diff*diff;count++}
+      for(let c=0;c<4;c++){const diff=data[o+c]-color(xx,yy,c);err+=diff*diff;count++}
     }
   return {color,rmse:Math.sqrt(err/Math.max(1,count))};
 }
@@ -219,8 +219,8 @@ export function repairSelectedArea(source,width,height,selection){
     const output=new Uint8ClampedArray(source);
     for(let y=rect.y;y<rect.y+rect.h;y++)for(let x=rect.x;x<rect.x+rect.w;x++){
       const o=index(x,y,width);
-      for(let c=0;c<3;c++)output[o+c]=Math.round(plane.color(x,y,c));
-      // Preserve the photo's own alpha channel, rather than painting white.
+      for(let c=0;c<4;c++)output[o+c]=Math.round(plane.color(x,y,c));
+      // Reconstruct alpha from the clean surrounding pixels; do not keep an opaque text silhouette.
     }
     source.set(output);
     return {x:rect.x,y:rect.y,w:rect.w,h:rect.h,method:'clean'};

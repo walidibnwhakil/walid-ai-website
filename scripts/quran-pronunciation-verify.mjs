@@ -2,32 +2,53 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const root = process.argv[2] ?? "islam/quran/data";
-const files = fs.readdirSync(root).filter(f => /^surah-\\d{3}\\.json$/.test(f)).sort();
+const root = process.argv.find((arg, index) => index > 1 && !arg.startsWith("--")) ?? "islam/quran/data";
+const files = fs.readdirSync(root).filter(file => /^surah-\d{3}\.json$/.test(file)).sort();
+const arabicWords = text => (text?.match(/[\u0621-\u064A\u0671-\u06D3]+/gu) ?? []).length;
+const bengaliWords = text => (text?.match(/[\u0980-\u09FF]+/gu) ?? []).length;
+const stripArabic = text => (text ?? "").replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E4]/gu, "");
 const rows = [];
 let total = 0, reviewed = 0, draft = 0;
-const stripArabic = value => value.replace(/[\\u064B-\\u065F\\u0670\\u06D6-\\u06ED\\u06DF-\\u06E4]/g, "");
-const words = value => (value?.match(/[\\u0600-\\u06ff]+/g) ?? []).length;
 for (const file of files) {
   const data = JSON.parse(fs.readFileSync(path.join(root, file), "utf8"));
   for (const verse of data.verses ?? []) {
     total++;
-    const status = verse.pronunciationStatus ?? (data.surah === 2 && verse.verse <= 110 ? "reviewed" : "draft");
+    const status = verse.pronunciationStatus === "reviewed" ? "reviewed" : "draft";
     status === "reviewed" ? reviewed++ : draft++;
+    const pronunciation = verse.pronunciation ?? "";
+    const arabicTokens = arabicWords(stripArabic(verse.arabic));
+    const phoneticTokens = bengaliWords(pronunciation);
     const flags = [];
-    if (!verse.pronunciation) flags.push("missing-pronunciation");
-    if (verse.pronunciation && words(verse.pronunciation) === 0) flags.push("no-bengali-token");
-    const arabicTokens = words(stripArabic(verse.arabic ?? ""));
-    const phoneticTokens = words(verse.pronunciation ?? "");
-    if (arabicTokens && phoneticTokens < Math.max(1, Math.floor(arabicTokens * 0.35))) flags.push("possible-token-loss");
-    if (/[ّ]/u.test(verse.arabic)) flags.push("shaddah");
-    if (/[ًٌٍْ]/u.test(verse.arabic)) flags.push("vowel-signs");
-    if (/[ٰٓ]/u.test(verse.arabic)) flags.push("madd");
-    if (/[ۖۗۘۙۚۛۜ۝۞]/u.test(verse.arabic)) flags.push("waqf");
-    if (flags.length) rows.push({ surah: data.surah, verse: verse.verse, status, flags, arabicTokens, phoneticTokens });
+    if (!pronunciation.trim()) flags.push("missing-pronunciation");
+    else {
+      if (!phoneticTokens) flags.push("no-bengali-token");
+      if (/[\u09BE-\u09CC][\u09BE-\u09CC]/u.test(pronunciation) ||
+          /আান|ইিল|ওাআ|আল্াযিই|ররাব্বি/u.test(pronunciation))
+        flags.push("malformed-bengali-vowels");
+      if (arabicTokens && phoneticTokens < Math.max(1, Math.floor(arabicTokens * 0.35)))
+        flags.push("possible-token-loss");
+      if (status === "reviewed" && !pronunciation.trimEnd().endsWith("।"))
+        flags.push("missing-verse-terminator");
+    }
+    // These signs require care when reading Arabic; they are NOT proof of a Bengali error.
+    const hints = [];
+    if (/ّ/u.test(verse.arabic)) hints.push("shaddah");
+    if (/[ًٌٍْ]/u.test(verse.arabic)) hints.push("vowel-signs");
+    if (/[ٰٓ]/u.test(verse.arabic)) hints.push("madd");
+    if (/[ۖۗۘۙۚۛۜ۝۞]/u.test(verse.arabic)) hints.push("waqf");
+    if (flags.length || status === "draft")
+      rows.push({ surah: data.surah, verse: verse.verse, status, flags, hints, arabicTokens, phoneticTokens });
   }
 }
-const priority = rows.filter(r => r.flags.includes("missing-pronunciation") || r.flags.includes("possible-token-loss") || r.flags.includes("no-bengali-token"));
-const result = { version: 1, generatedBy: "scripts/quran-pronunciation-verify.mjs", humanReviewRequired: true, tajwidCertified: false, totals: { total, reviewed, draft, flagged: rows.length, priority: priority.length }, queue: priority, secondaryFlags: rows.filter(r => !priority.includes(r)) };
+const priority = rows.filter(row => row.flags.length);
+const result = {
+  version: 2,
+  generatedBy: "scripts/quran-pronunciation-verify.mjs",
+  humanReviewRequired: true,
+  tajwidCertified: false,
+  totals: { total, reviewed, draft, flagged: priority.length, priority: priority.length },
+  queue: priority,
+  note: "Heuristic flags are not linguistic certification; draft rows require individual Arabic review."
+};
 if (process.argv.includes("--json")) console.log(JSON.stringify(result, null, 2));
 else console.log(JSON.stringify(result.totals, null, 2));

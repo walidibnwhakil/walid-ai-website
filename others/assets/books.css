@@ -1,3 +1,4 @@
+@import url("https://fonts.maateen.me/solaiman-lipi/font.css");
 @font-face{font-family:"Walid Bengali";src:url("/fonts/NotoSansBengali-Regular.ttf") format("truetype");font-style:normal;font-weight:400 700;font-display:swap}
 :root{color-scheme:light;--ink:#193128;--muted:#58675d;--line:#dbe7dd;--gold:#bf9b54;--green:#17694b;--paper:#fffdf8}
 *{box-sizing:border-box}
@@ -87,3 +88,15 @@ body.others-toc-open{overflow:hidden}
 html[lang="bn"] .others-chapter p{font-kerning:normal;text-justify:inter-word;line-break:strict;word-break:normal;hyphens:none}
 .others-reader{padding-bottom:52px}
 @media(max-width:620px){html[lang="bn"] .others-chapter p{font-size:1rem;letter-spacing:0;line-height:1.9}}
+
+/* Unified Bengali typography and resilient alignment for desktop and mobile. */
+html[lang="bn"] body,html[lang="bn"] button,html[lang="bn"] .others-book-title,html[lang="bn"] .others-toc-dialog{font-family:"SolaimanLipi","Walid Bengali","Noto Sans Bengali",sans-serif}
+.others-grid{align-items:stretch}
+.others-card{display:grid;grid-template-columns:62px minmax(0,1fr) 12px;align-items:center;gap:13px}
+.others-card-icon{grid-column:1;justify-self:center}
+.others-card-copy{grid-column:2;min-width:0;width:100%;text-align:start}
+.others-card::after{grid-column:3;margin:0;justify-self:center}
+.others-card strong,.others-card small{width:100%;overflow-wrap:break-word;word-break:normal;hyphens:none}
+.others-chapter p,.others-book-title p{font-variant-ligatures:common-ligatures;overflow-wrap:break-word}
+.others-toc-dialog .others-toc a{min-width:0}
+@media(max-width:620px){.others-card{grid-template-columns:52px minmax(0,1fr) 12px;gap:12px}.others-card-copy{min-width:0}.others-book-title{padding:20px 16px}.others-hero h1,.others-book-title h1{overflow-wrap:break-word}}

@@ -85,6 +85,19 @@ tools_parser.feed((ROOT / "pdf/index.html").read_text(encoding="utf-8"))
 for image_link in [*image_tool_links, *(f"/tools/{slug}/" for slug in image_tool_slugs)]:
     if image_link in tools_parser.links:
         errors.append(f"pdf/index.html: image tool leaked into PDF-only page: {image_link}")
+# PDF and Image Tools are public utilities. Authentication links belong to AI Chat.
+account_links = ('href="/?auth=login"', 'href="/?auth=signup"', "href='/?auth=login'", "href='/?auth=signup'")
+for tool_dir in ("pdf", "image"):
+    for tool_page in (ROOT / tool_dir).rglob("*.html"):
+        body = tool_page.read_text(encoding="utf-8")
+        if any(link in body for link in account_links):
+            errors.append(f"{tool_page}: unexpected login/sign-up link in a public tool")
+        if re.search(r">\s*(?:Log in|Sign up)\s*<", body, re.I):
+            errors.append(f"{tool_page}: unexpected account control in a public tool")
+legacy_pdf_page = ROOT / "tools/image-to-pdf/index.html"
+if legacy_pdf_page.exists() and any(link in legacy_pdf_page.read_text(encoding="utf-8") for link in account_links):
+    errors.append("tools/image-to-pdf/index.html: unexpected account link")
+
 if errors:
     print("\n".join(f"ERROR: {item}" for item in errors))
     sys.exit(1)

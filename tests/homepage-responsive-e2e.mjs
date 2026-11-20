@@ -43,6 +43,7 @@ try{
         svgCount:card.querySelectorAll(".card-icon").length,
         title:card.querySelector("h2")?.textContent?.trim(),
         desc:card.querySelector("p")?.textContent?.trim(),
+        descRect:rect(card.querySelector("p")),
         action:card.querySelector(".arrow")?.textContent?.trim(),
         actionRect:rect(card.querySelector(".arrow")),
         align:getComputedStyle(card).textAlign
@@ -103,6 +104,23 @@ try{
         assert.ok(Math.abs(iconMiddle-cardMiddle)<1.5,
           card.title+" icon should be centered on phone");
         assert.equal(card.align,"center",card.title+" phone text centered");
+      }
+    }
+    const cardRows=new Map();
+    for(const card of layout.cards){
+      const key=Math.round(card.r.y);
+      if(!cardRows.has(key))cardRows.set(key,[]);
+      cardRows.get(key).push(card);
+    }
+    for(const [top,row] of cardRows){
+      const anchor=row[0];
+      for(const card of row){
+        assert.ok(Math.abs(card.descRect.y-anchor.descRect.y)<=2,
+          "Description should begin at the same height for "+card.title+
+          " and "+anchor.title+" at "+width+"px (row "+top+")");
+        assert.ok(Math.abs(card.actionRect.y-anchor.actionRect.y)<=2,
+          "Action labels should align at the bottom of the same row at "+width+
+          "px: "+card.title+" and "+anchor.title);
       }
     }
     checks++;

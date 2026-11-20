@@ -102,6 +102,25 @@ class QuranIntegrityTests(unittest.TestCase):
         self.assertNotIn("transliteration_bn", reader)
         self.assertGreater(len(json.loads((DATA / "reading.json").read_text(encoding="utf-8"))["bismillah"]), 30)
 
+    def test_reviewed_bengali_pronunciation_is_a_separate_optional_dataset(self):
+        """Publishing pronunciation must not modify canonical imported Quran JSON."""
+        separate = DATA / "pronunciation-003.json"
+        data = json.loads(separate.read_text(encoding="utf-8"))
+        original = json.loads((DATA / "surah-003.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["surah"], 3)
+        self.assertEqual(len(data["verses"]), len(original["verses"]))
+        self.assertEqual(len(data["verses"]), 200)
+        self.assertEqual([v["verse"] for v in data["verses"]], list(range(1, 201)))
+        for verse in data["verses"]:
+            text = verse["pronunciation"]
+            self.assertRegex(text, r"[\u0980-\u09ff]")
+            self.assertTrue(text.endswith("।"), verse["verse"])
+            self.assertNotRegex(text, r"আান|ইিল|ওাআ|আল্াযিই|ররাব্বি")
+            self.assertNotRegex(text, r"[\u09be-\u09cc][\u09be-\u09cc]")
+        renderer = (QURAN / "verses-stable.js").read_text(encoding="utf-8")
+        self.assertIn("approvedPronunciationSurahs=new Set([3])", renderer)
+        self.assertIn("attachPronunciation", renderer)
+
     def test_story_coverage_and_quran_references(self):
         stories = json.loads((ROOT / "islam" / "stories" / "stories.json").read_text(encoding="utf-8"))
         self.assertGreaterEqual(len(stories), 30)

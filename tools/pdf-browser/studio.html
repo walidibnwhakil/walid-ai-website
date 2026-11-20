@@ -66,6 +66,8 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
           <button class="minor tool-btn" type="button" data-edit="note">Note</button>
           <button class="minor tool-btn" type="button" data-edit="select">Select</button>
         </div>
+        <button class="minor" type="button" id="recognizeEditText">Recognize text on a scanned page (OCR)</button>
+        <p class="hint">For scanned pages, recognize text first, then choose Edit text and select the highlighted words. Check every OCR result before exporting.</p>
         <div class="option-row">
           <label class="field">Size <input id="fontSize" type="number" min="8" max="96" value="22"></label>
           <label class="field">Color <input id="textColor" type="color" value="#14241f"></label>

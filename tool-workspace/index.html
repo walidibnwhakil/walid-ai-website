@@ -196,7 +196,14 @@ let pendingImageResults=[];
 function fileExtension(type){return ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'})[type]||'png'}
 function outputName(file,type){const base=(file?.name||'walid-image').replace(/\.[^.]+$/,'')||'walid-image';return walidDownloadName(base+'.'+fileExtension(type))}
 async function encodeCanvas(canvas,type,qualityValue){
-  const blob=await new Promise(resolve=>canvas.toBlob(resolve,type,qualityValue));
+  let target=canvas;
+  if(type==='image/jpeg'){
+    // JPEG has no alpha channel; composite transparent pixels on white rather than black.
+    target=document.createElement('canvas');target.width=canvas.width;target.height=canvas.height;
+    const context=target.getContext('2d');context.fillStyle='#fff';context.fillRect(0,0,target.width,target.height);
+    context.drawImage(canvas,0,0);
+  }
+  const blob=await new Promise(resolve=>target.toBlob(resolve,type,qualityValue));
   if(!blob)throw Error(messages.fileError);
   if(blob.type&&blob.type!==type)throw Error('This browser cannot export '+fileExtension(type).toUpperCase()+' images. Try PNG instead.');
   return blob;

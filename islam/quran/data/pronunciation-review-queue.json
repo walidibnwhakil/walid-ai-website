@@ -5,10 +5,11 @@
   "tajwidCertified": false,
   "totals": {
     "total": 4623,
-    "reviewed": 4623,
-    "draft": 0,
-    "flagged": 0,
-    "priority": 0
+    "reviewed": 0,
+    "draft": 4623,
+    "flagged": 4417,
+    "priority": 4417
   },
-  "queue": []
+  "queue": [],
+  "reviewNote": "Queue detail requires reconstruction from verse-level checks; 4417 is the reported heuristic flag count, not 4417 independently verified errors. Do not treat an empty queue as no issues."
 }

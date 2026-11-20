@@ -10,28 +10,33 @@
   },
   "pending": {
     "scope": "Surahs 2–49",
-    "verses": 4403
+    "verses": 4513
   },
   "source": "Verified records were reviewed against Arabic and Bengali pronunciation conventions; generated draft entries are retained only as unverified drafts and are not represented as fully manually verified.",
   "audit": {
     "scope": "Surahs 2–49",
-    "recordsInScope": 4513,
+    "recordsInScope": 4623,
     "recordsReviewed": 110,
     "recordsCorrected": 110,
-    "draftGenerated": 4403,
-    "unresolved": 4403,
-    "method": "Only the verified range was independently reviewed. Remaining records have structural Arabic/verse alignment checks but no human pronunciation review and no tajwid certification.",
+    "draftGenerated": 4513,
+    "unresolved": 4513,
+    "method": "Automated Arabic-aware structural scan ran across all records and emitted a human-review queue; no draft was promoted to reviewed and no tajwid certification is claimed.",
     "lastVerifiedBatch": {
       "surah": 2,
       "ayahStart": 75,
       "ayahEnd": 110,
       "verses": 36,
       "method": "Independent Arabic-aligned Bengali pronunciation review"
+    },
+    "automatedScan": {
+      "flaggedPriorityRecords": 176,
+      "queue": "islam/quran/data/pronunciation-review-queue.json",
+      "safeAutomaticCorrections": 0
     }
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 4403,
-    "method": "Arabic-character-aligned Bengali phonetic draft; automated structural/readback checked, not human-reviewed"
+    "verses": 4513,
+    "method": "Arabic-aware structural scan only; missing/possible token-loss records are queued for human pronunciation review and remain unverified."
   }
 }

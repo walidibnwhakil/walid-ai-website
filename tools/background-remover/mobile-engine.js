@@ -7,9 +7,9 @@ export function cancelMobileBackgroundRemoval(){
 }
 export async function removeMobileBackground(source,target,{onStatus=()=>{}}={}){
  if(!source?.width||!source?.height)throw Error('Choose an image first.');
- if(source.width*source.height>1_200_000)throw Error('This image is too large for the mobile background remover.');
- if(typeof Worker==='undefined')throw Error('This browser does not support background processing. Try a newer browser.');
- if(activeWorker)throw Error('A background-removal job is already running.');
+ if(source.width*source.height>1_200_000)throw Error('This image is too large. Choose a smaller one.');
+ if(typeof Worker==='undefined')throw Error('This feature is unavailable here. Try another browser.');
+ if(activeWorker)throw Error('Please finish the current image first.');
  const context=source.getContext('2d',{willReadFrequently:true});
  const data=context.getImageData(0,0,source.width,source.height);
  const worker=new Worker('/tools/background-remover/mobile-worker.js?v=20261120-2',{type:'module'});
@@ -26,16 +26,16 @@ export async function removeMobileBackground(source,target,{onStatus=()=>{}}={})
     if(err)reject(err);else resolve(done);
    };
    abortActive=error=>finish(error);
-   const timeout=setTimeout(()=>finish(Error('The mobile model is taking too long. Try a smaller image or a different browser.')),MOBILE_TIMEOUT_MS);
-   worker.onerror=()=>finish(Error('The mobile model could not start. Please try another browser.'));
+   const timeout=setTimeout(()=>finish(Error('This is taking too long. Try a smaller image.')),MOBILE_TIMEOUT_MS);
+   worker.onerror=()=>finish(Error('Could not start. Please try another browser.'));
    worker.onmessage=event=>{
      const message=event.data||{};
      if(message.type==='status'){onStatus(message.text||'Processing…');return}
-     if(message.type==='error'){finish(Error('Mobile background removal failed: '+message.message));return}
+     if(message.type==='error'){const detail=String(message.message||'');const safe=/^(The subject could not be separated|Choose a smaller image|The image could not be read)/.test(detail)?detail:'Could not remove the background. Check your connection and try again.';finish(Error(safe));return}
      if(message.type==='complete'){
        try{
          if(message.width!==source.width||message.height!==source.height||!(message.pixels instanceof ArrayBuffer)||
-           message.pixels.byteLength!==source.width*source.height*4)throw Error('The mobile model returned invalid pixels.');
+           message.pixels.byteLength!==source.width*source.height*4)throw Error('The image could not be processed. Please try again.');
          target.width=message.width;target.height=message.height;
          target.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(message.pixels),message.width,message.height),0,0);
          finish(null,{tier:'mobile-modnet',device:'wasm',width:message.width,height:message.height});

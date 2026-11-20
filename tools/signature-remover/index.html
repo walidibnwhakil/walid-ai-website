@@ -14,24 +14,12 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
 </head><body><header class="top"><a class="brand" href="/" aria-label="Walid AI home"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a><nav class="nav" aria-label="Main navigation"><a href="/tools/merge-pdf/">Merge PDF</a><a href="/tools/split-pdf/">Split PDF</a><a href="/tools/compress-pdf/">Compress PDF</a><a href="/tools/pdf-to-word/">Convert PDF</a><a href="/tools/">All Tools <i class="chevron" aria-hidden="true"></i></a></nav><div class="account"><a href="/?auth=login">Log in</a><a class="signup" href="/?auth=signup">Sign up</a></div></header><main class="wrap"><article><nav class="crumb" aria-label="Breadcrumb"><a href="/">Walid AI</a><span class="separator" aria-hidden="true">›</span><a href="/tools/">Tools</a><span class="separator" aria-hidden="true">›</span><span aria-current="page">Signature Background Remover</span></nav><section class="hero"><h1>Remove Signature Background</h1><p>Make the paper behind a signature transparent.</p></section><iframe class="tool-frame" title="Remove Signature Background tool" src="/tool-workspace.html?tool=signature-remove&amp;embedded=1&amp;standalone=1&amp;v=20261101-04"></iframe><aside id="adWrapLanding" class="ad-wrap" aria-label="Advertisement"><p id="sponsoredLanding" class="sponsored" hidden>Sponsored</p><div id="adLanding"></div></aside>
 <section class="panel">
-<h2>How to clear a signature’s paper</h2>
-<p>Select a PNG, JPEG, or WebP scan of a signature on relatively plain paper. Press Remove Signature Background. The page samples the color around the edges and clears pixels of a similar color that connect back to the edge. Download the PNG and check it on a colored background.</p>
-<h2>Formats and limits</h2>
-<ul>
-<li>One PNG, JPEG, or WebP image.</li>
-<li>The download is a transparent PNG.</li>
-<li>There is no account requirement and no upload size field. Very large images depend on the browser.</li>
-</ul>
-<h2>Where the file is processed</h2>
-<p>Processing stays in this browser. The image is not sent to the Walid AI backend and no model is downloaded.</p>
-<h2>Troubleshooting</h2>
-<ul>
-<li>A dark desk, a photograph, or a page with writing out to the edge can be cleared in the wrong places. Crop to the signature and a margin of plain paper first.</li>
-<li>Ink close to the paper color can fade. If that happens, keep the original.</li>
-<li>This is not the portrait background remover and it is not a way to delete a signature from a contract. It only clears an edge-connected paper color.</li>
-</ul>
-<h2>Short FAQ</h2>
-<p><strong>Can I adjust the strength?</strong> The page uses a fixed color distance. It does not show a slider for this tool.</p>
-<p><strong>Will a blue-ink signature survive?</strong> Usually, if the ink is darker or more colored than the paper and does not touch the edge as a solid block. Check the download.</p>
+<h2>How to remove a signature background</h2>
+<p>Select a JPG, PNG, or WebP image of a signature on plain paper. Adjust <strong>Paper color tolerance</strong> if necessary, then choose <strong>Remove Signature Background</strong>. Check the result and download the transparent PNG.</p>
+<h2>Supported images</h2>
+<ul><li>One JPG, PNG, or WebP image at a time.</li><li>The result is a PNG with transparent areas.</li><li>Signatures on clean, plain paper work best.</li></ul>
+<h2>Tips for better results</h2>
+<p>If parts of the ink disappear, reduce the tolerance and try again. For busy backgrounds, crop the image around the signature first. Always review the signature before using it.</p>
+<h2>Your privacy</h2><p>Your selected image stays on your device.</p>
 </section>
 </article></main><footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer><script src="/ads-config.js"></script><script>(()=>{const frame=document.querySelector(".tool-frame");window.addEventListener("message",event=>{if(event.origin!==location.origin||event.source!==frame.contentWindow)return;if(event.data?.type==="walid-tool-editor-state"){document.body.classList.toggle("editor-active",!!event.data.active);if(event.data.active)history.replaceState(null,"",location.pathname+location.search+"#workspace");else history.replaceState(null,"",location.pathname+location.search);return}if(event.data?.type!=="walid-tool-frame-height")return;const height=Number(event.data.height);if(Number.isFinite(height))frame.style.height=Math.max(220,Math.min(2000,height+8))+"px"})})();(()=>{const config=window.WALID_ADS||{},publisher=config.publisherId||"",slot=config.slots?.landing||config.slots?.tools||"";if(!/^ca-pub-\d+$/.test(publisher)||!/^\d+$/.test(slot))return;const script=document.createElement("script");script.async=true;script.crossOrigin="anonymous";script.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+encodeURIComponent(publisher);script.onload=()=>{const ad=document.createElement("ins");ad.className="adsbygoogle";ad.style.cssText="display:block";ad.dataset.adClient=publisher;ad.dataset.adSlot=slot;ad.dataset.adFormat="auto";ad.dataset.fullWidthResponsive="true";document.querySelector("#adLanding").append(ad);document.querySelector("#sponsoredLanding").hidden=false;document.querySelector("#adWrapLanding").classList.add("ready");(window.adsbygoogle=window.adsbygoogle||[]).push({})};document.head.append(script)})();</script><script src="/usage.js?v=20261109-2"></script></body></html>

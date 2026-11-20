@@ -240,15 +240,80 @@
 
   const sidebar = document.createElement('aside');
   sidebar.className = 'quran-sidebar';
+  sidebar.id = 'quran-surah-sidebar';
   const sidebarTitle = document.createElement('h2');
+  sidebarTitle.id = 'quran-surah-sidebar-title';
   sidebarTitle.textContent = 'সব সূরা';
+  sidebar.setAttribute('aria-labelledby', sidebarTitle.id);
+  const sidebarClose = document.createElement('button');
+  sidebarClose.type = 'button';
+  sidebarClose.className = 'quran-sidebar-close';
+  sidebarClose.setAttribute('aria-label', 'সূরার তালিকা বন্ধ করুন');
+  sidebarClose.textContent = '✕';
+  const sidebarHeader = document.createElement('div');
+  sidebarHeader.className = 'quran-sidebar-header';
+  sidebarHeader.append(sidebarTitle, sidebarClose);
   const sidebarList = document.createElement('div');
   sidebarList.className = 'side-list';
   sidebarList.setAttribute('role', 'navigation');
   sidebarList.setAttribute('aria-label', '১১৪টি সূরা');
-  sidebar.append(sidebarTitle, sidebarList);
+  sidebar.append(sidebarHeader, sidebarList);
+
+  // Mobile-only drawer; the desktop sidebar and reader tabs stay unchanged.
+  const sidebarToggle = document.createElement('button');
+  sidebarToggle.type = 'button';
+  sidebarToggle.className = 'quran-sidebar-toggle';
+  sidebarToggle.textContent = '☰  সূরার তালিকা';
+  sidebarToggle.setAttribute('aria-controls', sidebar.id);
+  sidebarToggle.setAttribute('aria-expanded', 'false');
+  const backdrop = document.createElement('button');
+  backdrop.type = 'button';
+  backdrop.className = 'quran-sidebar-backdrop';
+  backdrop.setAttribute('aria-label', 'সূরার তালিকা বন্ধ করুন');
+  backdrop.tabIndex = -1;
+  const mobileQuery = window.matchMedia('(max-width: 899px)');
+  const drawerIsOpen = () => document.body.classList.contains('quran-drawer-open');
+  const setDrawerOpen = (open, restoreFocus = false) => {
+    const expanded = mobileQuery.matches && Boolean(open);
+    document.body.classList.toggle('quran-drawer-open', expanded);
+    sidebarToggle.setAttribute('aria-expanded', String(expanded));
+    if (mobileQuery.matches) {
+      sidebar.inert = !expanded;
+      sidebar.setAttribute('aria-hidden', String(!expanded));
+    } else {
+      sidebar.inert = false;
+      sidebar.removeAttribute('aria-hidden');
+    }
+    if (expanded) sidebarClose.focus();
+    else if (restoreFocus && mobileQuery.matches) sidebarToggle.focus();
+  };
+  sidebarToggle.addEventListener('click', () => setDrawerOpen(!drawerIsOpen(), true));
+  sidebarClose.addEventListener('click', () => setDrawerOpen(false, true));
+  backdrop.addEventListener('click', () => setDrawerOpen(false, true));
+  sidebarList.addEventListener('click', event => {
+    if (event.target.closest('a')) setDrawerOpen(false);
+  });
+  sidebar.addEventListener('keydown', event => {
+    if (event.key !== 'Tab' || !drawerIsOpen()) return;
+    const focusables = [sidebarClose, ...sidebarList.querySelectorAll('a')];
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && drawerIsOpen()) setDrawerOpen(false, true);
+  });
+  mobileQuery.addEventListener('change', () => setDrawerOpen(false));
   context?.remove();
+  head.before(sidebarToggle);
   head.after(sidebar, nav, panel);
+  document.body.append(backdrop);
+  setDrawerOpen(false);
   showSection('surah');
 
   Promise.all([fetchJSON('data/metadata.json'), fetchJSON('data/bengali-metadata.json')]).then(([all, allBangla]) => {

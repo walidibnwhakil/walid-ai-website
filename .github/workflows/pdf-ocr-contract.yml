@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "tools/pdf-browser/**"
+      - "pdf/**"
       - "pdf/index.html"
       - "tools/*/index.html"
       - "tests/pdf-copy-audit.mjs"

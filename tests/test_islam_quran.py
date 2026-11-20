@@ -110,7 +110,10 @@ class QuranIntegrityTests(unittest.TestCase):
         for story in stories:
             self.assertGreaterEqual(len(story["paragraphs"]), 3, story["id"])
             self.assertTrue(story["lessons"].strip(), story["id"])
-            self.assertTrue(story["limits"].strip(), story["id"])
+            for account in story.get("additional", []):
+                self.assertTrue(account["text"].strip(), story["id"])
+                self.assertTrue(account["source"].strip(), story["id"])
+                self.assertRegex(account["url"], r"^https://sunnah\.com/(bukhari|muslim):\d+$")
             self.assertTrue(story["refs"].strip(), story["id"])
             self.assertRegex(story["refs"], r"\d+[: ]")
             self.assertGreater(sum(map(len, story["paragraphs"])), 300, story["id"])

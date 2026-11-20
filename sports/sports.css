@@ -110,3 +110,23 @@ body[data-sport-detail="cricket"] .detail-hero .sport-title-logo{
   background:transparent;
   box-shadow:none;
 }
+
+
+/* Standalone sport symbols for the Football and Cricket choices on Sports home. */
+.featured-card .sport-tag .sport-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:auto;
+  height:auto;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  font-size:1.85rem;
+  line-height:1;
+}
+@media(max-width:720px){
+  .featured-card .sport-tag .sport-icon{font-size:1.75rem}
+}

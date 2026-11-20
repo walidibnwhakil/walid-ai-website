@@ -50,7 +50,7 @@ function cutout(original,width,height,rawMask){
   }
   const coverage=opaque/Math.max(1,samples);
   // Reject nearly-empty and nearly-unchanged outputs rather than offering broken PNGs.
-  if(coverage<0.025||coverage>0.975)throw Error('The subject could not be separated clearly. Please try a different photo.');
+  if(coverage<0.025||coverage>0.95)throw Error('The subject could not be separated clearly. Please try a different photo.');
   return result;
 }
 async function getModel(){

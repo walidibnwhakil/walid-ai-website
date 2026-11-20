@@ -121,9 +121,16 @@ await test('Edit PDF / rotate, delete page, export',async()=>{
   const {p,f}=await studio('edit-pdf');
   try{
     await uploadStudio(f,inputA,'alpha.pdf');await f.locator('#panelEdit').waitFor({state:'visible'});
+    await f.locator('#pageLabel').filter({hasText:'1 / 3'}).waitFor({state:'visible',timeout:16000});
     await f.locator('#rotateRight').click();
+    await f.locator('#pageCanvas').evaluate(el=>new Promise((resolve,reject)=>{
+      let n=0;const timer=setInterval(()=>{if(el.width>el.height){clearInterval(timer);resolve(true);}
+      else if(++n>100){clearInterval(timer);reject(Error('Rotate preview did not become landscape'));}},100);
+    }));
     await f.locator('#pageNext').click();
+    await f.locator('#pageLabel').filter({hasText:'2 / 3'}).waitFor({state:'visible',timeout:16000});
     await f.locator('#deletePage').click();
+    await f.locator('#pageLabel').filter({hasText:'2 / 2'}).waitFor({state:'visible',timeout:16000});
     await f.locator('#saveEdit').click();
     const out=await saveDownload(p,f);const v=await checkPdf(out.bytes,2);const d=await PDFDocument.load(out.bytes);
     assert.equal(d.getPage(0).getRotation().angle,90);
@@ -176,6 +183,7 @@ await test('Sign PDF / drawn signature / output',async()=>{
     const out=await saveDownload(p,f);return {filename:out.name,...await checkPdf(out.bytes,3)};
   }finally{await p.close();}
 });
+let protectedBytes;
 await test('Protect PDF / password encryption',async()=>{
   const {p,f}=await studio('protect-pdf');
   try{
@@ -184,6 +192,7 @@ await test('Protect PDF / password encryption',async()=>{
     await f.locator('#protectConfirm').fill('AuditPass123');
     await f.locator('#applyProtect').click();
     const out=await saveDownload(p,f);
+    protectedBytes=out.bytes;
     assert.equal(out.bytes.subarray(0,5).toString(),'%PDF-');
     let blocked=false;try{await PDFDocument.load(out.bytes);}catch(e){blocked=true;}
     assert.ok(blocked,'Output PDF was readable without a password; protection not verified');
@@ -213,6 +222,66 @@ await test('Image to PDF / PNG to PDF / one page',async()=>{
     return {filename:out.name,...await checkPdf(out.bytes,1)};
   }finally{await p.close();}
 });
+
+await test('Unlock PDF / reuse password / decrypted valid output',async()=>{
+  assert.ok(protectedBytes?.length,'Protected fixture was not produced');
+  const {p,f}=await studio('protect-pdf');
+  try{
+    await uploadStudio(f,protectedBytes,'locked.pdf');await f.locator('#panelProtect').waitFor({state:'visible'});
+    await f.locator('input[name="protectMode"][value="unlock"]').check();
+    await f.locator('#protectPassword').fill('AuditPass123');
+    await f.locator('#applyProtect').click();
+    const out=await saveDownload(p,f);
+    return {filename:out.name,...await checkPdf(out.bytes,3)};
+  }finally{await p.close();}
+});
+await test('PDF to Word / scanned Bengali PDF / editable recovered script',async()=>{
+  const img=await readFile('tests/fixtures/bengali-mixed.png');
+  const pdf=await PDFDocument.create();
+  const embedded=await pdf.embedPng(img);const pg=pdf.addPage([595,842]);
+  pg.drawImage(embedded,{x:20,y:650,width:555,height:90});
+  const scan=Buffer.from(await pdf.save());
+  const out=await workspacePdf('pdf-to-word',[fileArg('bengali-scanned.pdf',scan)],{timeout:120000});
+  assert.match(out.name,/\.docx$/i);
+  const zip=await JSZip.loadAsync(out.bytes);
+  const xml=await zip.file('word/document.xml')?.async('string');
+  assert.ok(xml);
+  assert.match(xml,/[\u0980-\u09ff]/,'Bengali OCR did not survive to Word text');
+  assert.match(xml,/<w:t\b/);
+  return {filename:out.name,bytes:out.bytes.length,bengaliText:true};
+});
+await test('Compress PDF / actual large image-heavy PDF / size reduction',async()=>{
+  const render=await context.newPage();
+  const dataUrl=await render.evaluate(()=>{
+    const canvas=document.createElement('canvas');canvas.width=750;canvas.height=1050;
+    const c=canvas.getContext('2d');const img=c.createImageData(canvas.width,canvas.height);
+    let seed=314159;
+    for(let i=0;i<img.data.length;i+=4){
+      seed=(seed*1664525+1013904223)>>>0;img.data[i]=seed&255;
+      img.data[i+1]=(seed>>>8)&255;img.data[i+2]=(seed>>>16)&255;img.data[i+3]=255;
+    }
+    c.putImageData(img,0,0);
+    return canvas.toDataURL('image/png').split(',')[1];
+  });
+  await render.close();
+  const pdf=await PDFDocument.create();
+  const embedded=await pdf.embedPng(Buffer.from(dataUrl,'base64'));
+  const pg=pdf.addPage([595,842]);
+  pg.drawImage(embedded,{x:0,y:0,width:595,height:842});
+  const rasterInput=Buffer.from(await pdf.save());
+  const {p,f}=await studio('compress-pdf');
+  try{
+    await uploadStudio(f,rasterInput,'image-heavy.pdf');
+    await f.locator('#panelCompress').waitFor({state:'visible'});
+    await f.locator('#compressQuality').selectOption('small');
+    await f.locator('#applyCompress').click();
+    const out=await saveDownload(p,f);
+    const inspected=await checkPdf(out.bytes,1);
+    assert.ok(out.bytes.length<rasterInput.length,'Large image-based PDF was not compressed');
+    return {filename:out.name,originalBytes:rasterInput.length,...inspected,reductionPct:Math.round((1-out.bytes.length/rasterInput.length)*100)};
+  }finally{await p.close();}
+});
+
 await test('Mobile page / PDF index + PDF to Word UI load',async()=>{
   const p=await context.newPage({viewport:{width:390,height:844}});
   try{

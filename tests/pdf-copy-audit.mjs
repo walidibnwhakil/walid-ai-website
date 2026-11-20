@@ -87,7 +87,28 @@ try {
         assert.ok(!banned.test(state.text),path+" exposes internal implementation text");
         assert.ok(state.text.length<1000,path+" has excessive instructions");
       }
+      if (path==="pdf/index.html") {
+        const cards=await page.evaluate(()=>[...document.querySelectorAll(".grid a.tool")].map(card=>{
+          const icon=card.querySelector(".icon"),rect=card.getBoundingClientRect(),ir=icon?.getBoundingClientRect();
+          return {href:card.getAttribute("href"),centerOffset:ir?Math.abs((ir.left+ir.right)/2-(rect.left+rect.right)/2):Infinity,
+            iconWidth:ir?.width||0,hasVector:!!icon?.querySelector("svg"),name:card.querySelector(".name")?.textContent?.trim()};
+        }));
+        assert.equal(cards.length,slugs.length,"PDF homepage must show exactly 11 tools");
+        cards.forEach((card,index)=>{
+          assert.equal(card.href,"/pdf/"+slugs[index]+"/","Tool card must use canonical PDF route");
+          assert.ok(card.centerOffset<1.5,card.name+" icon must be centered ("+width+"px)");
+          assert.ok(card.iconWidth>=50&&card.iconWidth<=65,card.name+" icon must be premium-sized");
+          assert.ok(card.hasVector,card.name+" must use an SVG icon");
+        });
+      }
       total++;
+    }
+    if (width===1280) {
+      for (const slug of ["merge-pdf","pdf-to-word","bengali-ocr"]) {
+        await page.goto(origin+"/tools/"+slug+"/?legacy=1#check",{waitUntil:"domcontentloaded"}).catch(()=>{});
+        await page.waitForURL(url=>url.pathname==="/pdf/"+slug+"/"&&url.search==="?legacy=1"&&url.hash==="#check");
+        assert.ok(await page.locator("h1").count(),"Legacy URL must arrive on the real PDF tool page");
+      }
     }
     await page.close();
   }

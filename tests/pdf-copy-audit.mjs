@@ -13,7 +13,7 @@ const slugs = [
 const banned = /\b(?:backend|PDF\.js|Tesseract|jsDelivr|onrender|free-tier|sign-in token|provider libraries|API endpoints)\b/i;
 let browser, server;
 try {
-  const files = ["pdf/index.html", ...slugs.map(slug => "tools/" + slug + "/index.html")];
+  const files = ["pdf/index.html", ...slugs.map(slug => "pdf/" + slug + "/index.html")];
   for (const path of files) {
     const html = await readFile(new URL(path, root), "utf8");
     assert.ok(!/<a class="tool" href="\/tools\/image-to-pdf\/"/.test(html),
@@ -23,6 +23,10 @@ try {
     const panelText=start<0?"":html.slice(start,end);
     assert.ok(!/Where the file is processed|Short FAQ|Troubleshooting|Formats and limits/.test(panelText),
       path+" contains legacy editorial sections");
+  }
+  for (const slug of slugs) {
+    const legacy = await readFile(new URL("tools/" + slug + "/index.html",root),"utf8");
+    assert.match(legacy,new RegExp("/pdf/"+slug+"/"),"Legacy URL must redirect to canonical PDF route");
   }
   const studio = await readFile(new URL("tools/pdf-browser/studio.html",root), "utf8");
   assert.ok(!/Tesseract|jsDelivr|raster fallback|embedded font|<code>ben\+eng<\/code>/.test(studio),

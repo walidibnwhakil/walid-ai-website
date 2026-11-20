@@ -56,8 +56,16 @@ check_page("games/index.html",
             "/games/tic-tac-toe/", "/games/snakes-and-ladders/", "/games/2048/"],
            ['class="games"', "game-title", "game-subtitle", 'name="description"', '"@type":"ItemList"'])
 check_page("pdf/index.html",
-           ["/tools/merge-pdf/", "/tools/split-pdf/", "/tools/compress-pdf/"],
+           ["/pdf/merge-pdf/", "/pdf/split-pdf/", "/pdf/compress-pdf/"],
            ['class="grid"', 'class="tool"', 'data-kind="pdf"', 'name="description"', '"@type":"ItemList"'])
+pdf_tool_slugs = (
+    "merge-pdf", "split-pdf", "compress-pdf", "pdf-to-word",
+    "edit-pdf", "organize-pdf", "page-numbers", "watermark-pdf",
+    "sign-pdf", "protect-pdf", "bengali-ocr",
+)
+for slug in pdf_tool_slugs:
+    check_page(f"pdf/{slug}/index.html", ["/pdf/"], ['rel="canonical"', 'name="description"'])
+    check_page(f"tools/{slug}/index.html", [f"/pdf/{slug}/"], ['http-equiv="refresh"'])
 image_tool_slugs = (
     "resize-image", "compress-image", "convert-image",
     "background-remover", "signature-remover", "watermark-remover",

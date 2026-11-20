@@ -21,11 +21,11 @@ a{color:var(--green)}
 .others-card:nth-child(3n+1){--edge:#bbd9cb;--wash:#f0faf3}
 .others-card:nth-child(3n+2){--edge:#e9d8af;--wash:#fffaf1}
 .others-card:nth-child(3n){--edge:#d5caeb;--wash:#f8f3ff}
-.others-card-icon{flex:0 0 63px;width:63px;height:63px;border-radius:50%;display:grid;place-items:center;font-size:2rem;background:linear-gradient(140deg,#fffdf8,#e6f1e8);border:1px solid #d6bd78}
-.others-card-copy{min-width:0}
+.others-card-icon{display:block;flex:0 0 62px;width:62px;height:62px;background:none;border:0;border-radius:0;line-height:0}
+.others-card-copy{min-width:0;flex:1}
 .others-card strong{display:block;font-size:1.16rem;line-height:1.45;color:#1b4131}
-.others-card small{display:block;font-size:.91rem;line-height:1.55;color:#53685b;margin-top:5px}
-.others-card em{display:block;color:#18714a;font-style:normal;font-size:.91rem;margin-top:8px;font-weight:700}
+.others-card small{display:block;font-size:.92rem;line-height:1.65;color:#52675b;margin-top:6px}
+.others-card::after{content:"›";margin-left:auto;font:600 1.7rem/1 "Times New Roman",serif;color:#72907c;align-self:center}
 .others-note{margin:18px 0;color:#5d645a;font-size:.94rem;line-height:1.7;text-align:justify}
 .others-reader{max-width:880px;width:100%;margin:0 auto 24px}
 .others-book-title{margin:0 0 20px;padding:24px 20px;text-align:center;background:linear-gradient(135deg,#fcf8ec,#f6faf7);border-top:5px solid #bb9650;border-bottom:1px solid #ded4b7;border-radius:14px}
@@ -52,7 +52,7 @@ a{color:var(--green)}
 .legal-footer a{text-decoration:none;color:inherit}
 .legal-footer p{margin:16px 0 0}
 @media(max-width:880px){.others-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.others-shell{padding-inline:18px}}
-@media(max-width:620px){.others-shell{padding:12px 13px 28px}.others-brand img{width:112px}.others-hero{padding:20px 16px;margin-bottom:16px}.others-grid{grid-template-columns:1fr;gap:12px}.others-card{padding:14px;gap:13px}.others-card-icon{flex-basis:54px;width:54px;height:54px;font-size:1.75rem}.others-chapter{padding:0 2px 22px}.others-chapter p{text-align:justify;line-height:1.85}.others-toc{padding:15px 17px}.legal-footer{font-size:.95rem}}
+@media(max-width:620px){.others-shell{padding:12px 13px 28px}.others-brand img{width:112px}.others-hero{padding:20px 16px;margin-bottom:16px}.others-grid{grid-template-columns:1fr;gap:12px}.others-card{padding:14px;gap:13px}.others-card-icon{flex-basis:52px;width:52px;height:52px}.others-chapter{padding:0 2px 22px}.others-chapter p{text-align:justify;line-height:1.85}.others-toc{padding:15px 17px}.legal-footer{font-size:.95rem}}
 @media(prefers-reduced-motion:reduce){body::before{animation:none}.others-card{transition:none}}
 
 /* Book reader: always-available chapter sidebar, hidden until requested. */
@@ -77,3 +77,7 @@ a{color:var(--green)}
 body.others-toc-open{overflow:hidden}
 @media(max-width:620px){.others-toc-trigger{right:13px;bottom:16px;padding:10px 14px;font-size:.92rem}.others-toc-dialog{width:min(380px,92vw)}.others-toc-dialog-head{padding:15px 16px}.others-toc-dialog .others-toc{padding:12px 13px 20px}.others-toc-dialog .others-toc a{padding:12px 8px}}
 @media(prefers-reduced-motion:reduce){.others-toc-trigger{transition:none}}
+
+.others-card-art{display:block;width:100%;height:auto;aspect-ratio:1;transition:transform .2s ease}
+.others-card:hover .others-card-art{transform:scale(1.05)}
+@media(prefers-reduced-motion:reduce){.others-card-art{transition:none}}

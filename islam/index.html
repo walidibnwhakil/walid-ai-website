@@ -9,5 +9,47 @@
 .islam-hub-cards .surah-card{gap:12px;padding:12px 13px}
 .islam-hub-cards .islam-card-icon{flex-basis:60px;width:60px;height:60px}
 }
-</style></head>
-<body><main class="shell"><a href="/" aria-label="Walid AI home"><img class="islam-brand" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><header class="page-head"><h1>আল-কুরআন ও ইসলাম</h1><p>সূরাভিত্তিক আরবি পাঠ, নির্ভরযোগ্য বাংলা অর্থ এবং কুরআনে বর্ণিত মানুষ ও ঘটনাবলির সূত্রসহ আলোচনা।</p></header><nav class="surah-grid islam-hub-cards" aria-label="বিভাগ"><a class="surah-card" href="/islam/quran/"><span class="islam-card-icon"><img src="/islam/assets/quran-round.svg" alt="" width="112" height="112" decoding="async"></span><span><strong>আল-কুরআন</strong><small>সূরা পরিচিতি, আরবি আয়াত, বাংলা অর্থ ও প্রকাশক-প্রদত্ত উৎস-নোট</small></span></a><a class="surah-card" href="/islam/stories/"><span class="islam-card-icon"><img src="/islam/assets/stories-round.svg" alt="" width="112" height="112" decoding="async"></span><span><strong>কুরআনে বর্ণিত কাহিনি</strong><small>নবী-রাসুল, ব্যক্তি, জাতি ও গুরুত্বপূর্ণ ঘটনা—আয়াতের সূত্রসহ</small></span></a><a class="surah-card" href="/islam/zikr-dua/"><span class="islam-card-icon"><img src="/islam/assets/zikr-dua-round.svg" alt="" width="112" height="112" decoding="async"></span><span><strong>জিকির ও দোয়া</strong><small>আল্লাহর স্মরণ, তাসবিহ, ইস্তিগফার ও দোয়া</small></span></a></nav><footer class="source-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p class="copyright">© 2026 Walid AI. All rights reserved.</p></footer></main></body></html>
+
+/* Only the Islam hub gains the prayer-time header; shared Quran layouts stay intact. */
+.islam-hub-header{padding:clamp(18px,3.5vw,32px)!important}
+.islam-hub-header h1{font-size:clamp(1.55rem,4.3vw,2.15rem);margin:0 0 18px;text-align:center}
+.prayer-widget{position:relative;border:1px solid #dceadf;border-radius:18px;background:linear-gradient(150deg,#f9fdf9,#f2f7f2);padding:18px;min-width:0}
+.prayer-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.prayer-heading{font-size:1rem;font-weight:700}
+.prayer-location-holder{position:relative}
+.prayer-location{display:inline-flex;align-items:center;gap:6px;color:#215840;border:1px solid #caddcd;border-radius:999px;background:#fff;padding:6px 12px;font:inherit;font-size:.86rem;font-weight:700;cursor:pointer}
+.prayer-divisions{position:absolute;z-index:12;right:0;top:calc(100% + 8px);width:min(310px,82vw);background:white;border:1px solid #cbded2;box-shadow:0 12px 34px #152e2330;border-radius:14px;padding:12px}
+.prayer-divisions[hidden],.prayer-warning[hidden]{display:none!important}
+.prayer-divisions>p{font-weight:700;font-size:.88rem;margin:0 0 8px!important}
+.prayer-division-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.prayer-division-list button,.prayer-gps{cursor:pointer;background:#f5f9f6;color:#24533e;border:1px solid #e0e8e1;border-radius:9px;padding:8px 5px;font:inherit;font-size:.86rem}
+.prayer-division-list button:hover,.prayer-division-list button:focus-visible,.prayer-gps:hover{background:#e4f0e7;border-color:#a4c8b0}
+.prayer-gps{display:block;width:100%;margin-top:9px}
+#prayer-gps-status{display:block;text-align:center;color:#637c6c;margin-top:5px}
+.prayer-primary{text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 0 7px}
+.prayer-spark{display:grid;place-items:center;margin-bottom:2px}
+.prayer-primary h2{font-size:clamp(1.3rem,4vw,1.85rem);line-height:1.45;margin:0}
+.prayer-primary p{font-size:.9rem;margin:0!important;color:#5e7567}
+#prayer-countdown{font-family:system-ui, sans-serif;font-variant-numeric:tabular-nums;font-weight:750;letter-spacing:.035em;font-size:clamp(2.25rem,8vw,3.45rem);line-height:1.32}
+.prayer-warning{display:flex;gap:10px;align-items:flex-start;border:1px solid #e8c793;border-radius:10px;padding:9px 12px;background:#fff7e9;color:#78501d;margin:8px 0}
+.prayer-warning strong{display:block;font-size:.92rem}.prayer-warning p{margin:0!important;font-size:.82rem;color:#78501d!important}
+.prayer-footnote{font-size:.74rem;text-align:center;margin:10px 0 0!important;color:#617466!important}
+@media(max-width:620px){.islam-hub-header{padding:12px!important}.islam-hub-header h1{margin:2px 0 12px}.prayer-widget{padding:12px;border-radius:13px}.prayer-heading{font-size:.89rem}.prayer-location{padding:5px 9px;font-size:.8rem}.prayer-primary{padding:9px 0 3px}.prayer-spark svg{width:31px;height:31px}.prayer-footnote{font-size:.7rem}}
+</style><script defer src="/islam/prayer-widget.js?v=20261120a"></script></head>
+<body><main class="shell"><a href="/" aria-label="Walid AI home"><img class="islam-brand" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><header class="page-head islam-hub-header"><h1>আল-কুরআন ও ইসলাম</h1>
+<section id="prayer-widget" class="prayer-widget" aria-label="চলমান নামাজের ওয়াক্ত">
+  <div class="prayer-top"><span class="prayer-heading">নামাজের সময়সূচি</span><div class="prayer-location-holder">
+    <button id="prayer-location" class="prayer-location" type="button" aria-expanded="false" aria-controls="prayer-divisions"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.7"/></svg><span id="prayer-place">ঢাকা</span><span aria-hidden="true">⌄</span></button>
+    <div id="prayer-divisions" class="prayer-divisions" hidden><p>বিভাগ নির্বাচন করুন</p><div class="prayer-division-list">
+      <button type="button" data-division="dhaka">ঢাকা</button><button type="button" data-division="chattogram">চট্টগ্রাম</button><button type="button" data-division="rajshahi">রাজশাহী</button><button type="button" data-division="khulna">খুলনা</button><button type="button" data-division="barishal">বরিশাল</button><button type="button" data-division="sylhet">সিলেট</button><button type="button" data-division="rangpur">রংপুর</button><button type="button" data-division="mymensingh">ময়মনসিংহ</button>
+    </div><button id="prayer-gps" type="button" class="prayer-gps">⌖ GPS দিয়ে বর্তমান অবস্থান</button><small id="prayer-gps-status" role="status"></small></div>
+  </div></div>
+  <div class="prayer-primary">
+    <span class="prayer-spark" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40" fill="none"><path d="M27 3a16.8 16.8 0 1 0 10 29A17 17 0 0 1 27 3Z" fill="#b99746"/><path d="m32 8 1.2 3.1 3.1 1.2-3.1 1.2-1.2 3.1-1.2-3.1-3.1-1.2 3.1-1.2L32 8Z" fill="#b99746"/></svg></span>
+    <h2 id="prayer-current">ওয়াক্তের সময় নির্ণয় হচ্ছে…</h2>
+    <p id="prayer-countdown-caption">বাংলাদেশ সময়</p>
+    <output id="prayer-countdown" aria-live="off">--:--:--</output>
+  </div>
+  <div id="prayer-warning" class="prayer-warning" role="status" hidden><span aria-hidden="true">⚠</span><div><strong id="prayer-warning-title">নিষিদ্ধ সময়</strong><p id="prayer-warning-description"></p></div></div>
+  <p class="prayer-footnote">আনুমানিক সময় · হানাফি আসর · স্থানীয় মসজিদের সময়সূচি অনুসরণ করুন</p>
+</section></header><nav class="surah-grid islam-hub-cards" aria-label="বিভাগ"><a class="surah-card" href="/islam/quran/"><span class="islam-card-icon"><img src="/islam/assets/quran-round.svg" alt="" width="112" height="112" decoding="async"></span><span><strong>আল-কুরআন</strong><small>সূরা পরিচিতি, আরবি আয়াত, বাংলা অর্থ ও প্রকাশক-প্রদত্ত উৎস-নোট</small></span></a><a class="surah-card" href="/islam/stories/"><span class="islam-card-icon"><img src="/islam/assets/stories-round.svg" alt="" width="112" height="112" decoding="async"></span><span><strong>কুরআনে বর্ণিত কাহিনি</strong><small>নবী-রাসুল, ব্যক্তি, জাতি ও গুরুত্বপূর্ণ ঘটনা—আয়াতের সূত্রসহ</small></span></a><a class="surah-card" href="/islam/zikr-dua/"><span class="islam-card-icon"><img src="/islam/assets/zikr-dua-round.svg" alt="" width="112" height="112" decoding="async"></span><span><strong>জিকির ও দোয়া</strong><small>আল্লাহর স্মরণ, তাসবিহ, ইস্তিগফার ও দোয়া</small></span></a></nav><footer class="source-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p class="copyright">© 2026 Walid AI. All rights reserved.</p></footer></main></body></html>

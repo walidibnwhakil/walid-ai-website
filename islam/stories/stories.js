@@ -6,25 +6,15 @@ const status=document.querySelector("#story-status");
 let stories=[];
 let surahs=[];
 function ascii(value){return value.replace(/[০-৯]/g,function(ch){return String("০১২৩৪৫৬৭৮৯".indexOf(ch));});}
-function renderRefs(refs){
-  const output=document.createDocumentFragment();
-  for(const part of refs.split(";")){
-    const match=part.match(/(?:^|[^0-9০-৯])([0-9০-৯]+):\s*([0-9০-৯–-]+(?:,\s*[0-9০-৯–-]+)*)/);
-    if(!match){output.append(document.createTextNode(part+"; "));continue;}
-    const chapter=surahs[Number(ascii(match[1]))-1];
-    if(!chapter){output.append(document.createTextNode(part+"; "));continue;}
-    for(const item of match[2].split(",")){
-      const value=item.trim();
-      const verse=Number(ascii(value.split(/[–-]/)[0]));
-      if(!verse)continue;
-      const link=document.createElement("a");
-      link.href="/islam/quran/"+chapter.slug+"/#ayah-"+verse;
-      link.textContent=chapter.transliteration+" "+value;
-      output.append(link,document.createTextNode(" · "));
-    }
-  }
-  return output;
+function bracketRefs(refs){
+  if(typeof refs!=="string")return "";
+  // Keep the exact cited Quran passages, without hyperlink-style source rows.
+  return refs.split(";").map(function(ref){return ref.trim();})
+    .filter(Boolean).map(function(ref){
+      return "["+ref.replace(/[0-9]/g,function(d){return "০১২৩৪৫৬৭৮৯"[Number(d)];})+"]";
+    }).join(" ");
 }
+
 function paragraph(text, className){
   const node=document.createElement("p");
   node.textContent=text;
@@ -48,7 +38,11 @@ function render(){
     const heading=document.createElement("h2");
     heading.textContent=story.title;
     article.append(heading);
-    for(const p of story.paragraphs)article.append(paragraph(p));
+    story.paragraphs.forEach(function(p,index){
+      const last=index===story.paragraphs.length-1;
+      const refs=last?bracketRefs(story.refs):"";
+      article.append(paragraph(p+(refs?" "+refs:"")));
+    });
     if(Array.isArray(story.additional)&&story.additional.length){
       const section=document.createElement("section");
       section.className="story-additional";
@@ -56,24 +50,9 @@ function render(){
       title.textContent="অন্যান্য হাদিস এবং কিতাব থেকে পাওয়া পূর্ণ কাহিনি";
       section.append(title);
       for(const entry of story.additional){
-        section.append(paragraph(entry.text));
-      }
-      const labels=new Map();
-      for(const entry of story.additional){
-        if(entry.source&&/^https:\/\/sunnah\.com\/[a-z0-9:/-]+$/i.test(entry.url||""))labels.set(entry.source,entry.url);
-      }
-      if(labels.size){
-        const sources=document.createElement("p");
-        sources.className="story-hadith-sources";
-        const lead=document.createElement("strong");
-        lead.textContent="হাদিসের উৎস: ";
-        sources.append(lead);
-        for(const [name,url] of labels){
-          const a=document.createElement("a");
-          a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=name;
-          sources.append(a,document.createTextNode(" · "));
-        }
-        section.append(sources);
+        const source=typeof entry.source==="string"?
+          entry.source.replace(/[0-9]/g,function(d){return "০১২৩৪৫৬৭৮৯"[Number(d)];}).trim():"";
+        section.append(paragraph(entry.text+(source?" ["+source+"]":"")));
       }
       article.append(section);
     }
@@ -84,12 +63,6 @@ function render(){
       note.prepend(lead);
       article.append(note);
     }
-    const references=document.createElement("p");
-    references.className="story-refs";
-    const label=document.createElement("strong");
-    label.textContent="কুরআনের সূত্র: ";
-    references.append(label,renderRefs(story.refs));
-    article.append(references);
     fragment.append(article);
   }
   list.replaceChildren(fragment);

@@ -70,7 +70,7 @@ async function convert(pdf,name="mixed-content.pdf"){
     await p.locator("#runPdf").waitFor({state:"visible"});
     await p.locator("#runPdf").click();
     await p.locator("#pdfDownload").waitFor({state:"visible",timeout:100000});
-    return download(p,"#pdfDownload");
+    return await download(p,"#pdfDownload");
   }finally{await p.close();}
 }
 try {

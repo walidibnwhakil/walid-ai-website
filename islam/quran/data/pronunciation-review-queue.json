@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "generatedBy": "scripts/quran-pronunciation-verify.mjs",
+  "humanReviewRequired": true,
+  "tajwidCertified": false,
+  "totals": {
+    "total": 4623,
+    "reviewed": 110,
+    "draft": 4513,
+    "flagged": 4565,
+    "priority": 176
+  },
+  "queue": []
+}

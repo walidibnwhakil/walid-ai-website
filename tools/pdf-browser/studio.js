@@ -1151,30 +1151,54 @@ async function compressPdf() {
   }
   const choice = $("compressQuality").value;
   const preset = choice === "small" ? { scale: 0.9, quality: 0.42 } : choice === "clear" ? { scale: 1.6, quality: 0.78 } : { scale: 1.15, quality: 0.58 };
-  setStatus("Resampling pages…");
-  const doc = await PDFDocument.create();
-  for (let index = 0; index < state.pages.length; index += 1) {
-    const info = state.pages[index];
-    const { pdfPage, view } = await viewportFor(info, 1);
-    const scale = Math.min(preset.scale, 1800 / Math.max(view.width, view.height));
-    const renderView = pdfPage.getViewport({ scale, rotation: totalRotation(info) });
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(renderView.width);
-    canvas.height = Math.ceil(renderView.height);
-    const context = canvas.getContext("2d");
-    context.fillStyle = "#fff";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    await pdfPage.render({ canvasContext: context, viewport: renderView }).promise;
-    const jpg = await doc.embedJpg(new Uint8Array(await (await canvasBlob(canvas, "image/jpeg", preset.quality)).arrayBuffer()));
-    doc.addPage([view.width, view.height]).drawImage(jpg, { x: 0, y: 0, width: view.width, height: view.height });
-    setStatus("Resampling page " + (index + 1) + " of " + state.pages.length + "…");
+  setStatus("Checking text and images before compressing…");
+  let containsText=false;
+  for (let i=0;i<state.pages.length;i++) {
+    const page=await state.doc.getPage(state.pages[i].sourceIndex+1);
+    const text=await page.getTextContent();
+    if(text.items.some(item=>String(item.str||"").trim().length>2)){containsText=true;break;}
   }
-  const bytes = await doc.save();
-  downloadBlob(new Blob([bytes], { type: "application/pdf" }), baseName() + "-compressed.pdf");
-  const smaller = bytes.length < state.bytes.length;
-  setStatus("Original " + formatSize(state.bytes.length) + ". Download " + formatSize(bytes.length) + "." + (smaller ? "" : " The new file is not smaller. Keep the original if you need the smaller one."));
+  let bytes;
+  if (containsText) {
+    // Never destroy selectable text for the sake of smaller JPEG page pictures.
+    // Object-stream packing is lossless; a larger result is never forced on users.
+    try{
+      const parsed=await PDFDocument.load(state.bytes.slice(0));
+      bytes=await parsed.save({useObjectStreams:true,objectsPerTick:20});
+    }catch(error){
+      console.warn("Lossless PDF repack unavailable:",error);
+      bytes=state.bytes;
+    }
+    if(bytes.length>=state.bytes.length)bytes=state.bytes;
+    downloadBlob(new Blob([bytes],{type:"application/pdf"}),baseName()+"-compressed.pdf");
+    setStatus(bytes.length<state.bytes.length
+      ? "Lossless compression complete: "+formatSize(state.bytes.length)+" → "+formatSize(bytes.length)+". Text remains selectable."
+      : "No safe size reduction was available. Original PDF downloaded unchanged; its text stays selectable.");
+    return;
+  }
+  setStatus("Resampling image-only pages…");
+  const doc=await PDFDocument.create();
+  for(let index=0;index<state.pages.length;index++){
+    const info=state.pages[index];
+    const {pdfPage,view}=await viewportFor(info,1);
+    const scale=Math.min(preset.scale,1800/Math.max(view.width,view.height));
+    const renderView=pdfPage.getViewport({scale,rotation:totalRotation(info)});
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.ceil(renderView.width);canvas.height=Math.ceil(renderView.height);
+    const ctx=canvas.getContext("2d");
+    ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+    await pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
+    const jpg=await doc.embedJpg(new Uint8Array(await (await canvasBlob(canvas,"image/jpeg",preset.quality)).arrayBuffer()));
+    doc.addPage([view.width,view.height]).drawImage(jpg,{x:0,y:0,width:view.width,height:view.height});
+    setStatus("Compressing image-only page "+(index+1)+" of "+state.pages.length+"…");
+  }
+  bytes=await doc.save();
+  if(bytes.length>=state.bytes.length)bytes=state.bytes;
+  downloadBlob(new Blob([bytes],{type:"application/pdf"}),baseName()+"-compressed.pdf");
+  setStatus(bytes.length===state.bytes.length
+    ? "The original was already smaller. Downloaded it unchanged."
+    : "Compressed "+formatSize(state.bytes.length)+" → "+formatSize(bytes.length)+".");
 }
-
 async function runOcr() {
   if (!state.doc && !state.images.length) {
     setStatus("Choose a PDF or an image first.");

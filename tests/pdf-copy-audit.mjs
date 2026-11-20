@@ -80,7 +80,8 @@ try {
       });
       assert.ok(state.heading.trim(),path+" missing title");
       assert.ok(state.count>0,path+" missing instructions");
-      assert.ok(state.align.every(v=>v==="justify"),path+" copy not justified: "+state.align.join(","));
+      const expectedAlignment=width<=700?(path==="pdf/index.html"?"center":"left"):"justify";
+      assert.ok(state.align.every(v=>v===expectedAlignment),path+" copy alignment at "+width+"px should be "+expectedAlignment+": "+state.align.join(","));
       assert.ok(state.left>=-2 && state.right<=width+2,path+" content extends past viewport at "+width+"px: "+JSON.stringify(state));
       assert.ok(state.widths.every(v=>v>0 && v<=width),path+" paragraph does not fit "+width+"px");
       if (path!=="pdf/index.html") {

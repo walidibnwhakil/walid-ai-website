@@ -243,3 +243,28 @@ textarea.ocr-text { min-height: 220px; resize: vertical; font-family: "Noto Sans
   .source-text-hit{min-height:12px;}
   .tool-row .tool-btn{flex:1 1 auto;}
 }
+
+
+/* PDF editing controls remain usable without sideways scrolling on phones. */
+@media(max-width:700px){
+  html,body{max-width:100%;overflow-x:clip}
+  .work,.layout,.stage-wrap,.options,.organize,.image-list{min-width:0;max-width:100%}
+  .layout{grid-template-columns:minmax(0,1fr);gap:12px}
+  .summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-bottom:9px}
+  .summary span{min-width:0;white-space:normal;overflow-wrap:anywhere;text-overflow:clip;line-height:1.3}
+  .file-drop{min-height:110px;padding:8px}
+  .select-file{max-width:100%;height:62px;font-size:1.05rem}
+  .options{padding:11px;gap:8px}
+  .hint{line-height:1.5;text-align:left;hyphens:none}
+  .page-bar,.tool-row,.option-row{gap:6px;margin-bottom:8px}
+  .page-bar .minor,.tool-row .minor,.tool-row .action{min-width:0;white-space:normal;padding:9px 10px;font-size:.9rem}
+  .page-label{min-width:0;overflow-wrap:anywhere;text-align:center;font-size:.86rem}
+  .tool-row .tool-btn{flex:1 1 31%;min-width:0}
+  .organize{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .page-card{min-width:0;padding:6px}
+  .page-card .card-actions{flex-wrap:wrap;gap:5px}
+  .page-card .card-actions button{font-size:.85rem;padding:7px 9px}
+  .image-row{min-width:0;flex-wrap:wrap}
+  .image-row strong{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
+  .sign-pad{width:100%;max-width:100%}
+}

@@ -43,7 +43,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
       <div class="organize" id="organizeGrid" hidden></div>
       <div class="image-list" id="imageList" hidden></div>
       <label class="field" id="ocrField" hidden>Recognized text
-        <textarea class="ocr-text" id="ocrOutput" readonly></textarea>
+        <textarea class="ocr-text" id="ocrOutput" spellcheck="true" aria-label="Correct recognized text"></textarea>
       </label>
     </div>
     <form class="options" id="options" autocomplete="off" onsubmit="return false">
@@ -55,9 +55,11 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="submitPassword">Open PDF</button>
       </div>
       <div id="panelEdit" hidden>
-        <p class="hint">Click the page to add text. Bengali uses a bundled licensed font for selectable PDF text when available; a rasterized browser-canvas fallback is used if embedding fails. Turn a sideways page before adding text. The file stays in this browser.</p>
+        <p class="hint">Edit existing text by selecting <strong>Edit text</strong> and clicking a highlighted line. Type directly in the replacement box. Use Cover area to hide or replace a picture, then Image to insert a new one. The file stays in your browser.</p>
         <div class="tool-row" id="editTools">
-          <button class="minor tool-btn" type="button" data-edit="text">Text</button>
+          <button class="minor tool-btn" type="button" data-edit="replace">Edit text</button>
+          <button class="minor tool-btn" type="button" data-edit="cover">Cover area</button>
+          <button class="minor tool-btn" type="button" data-edit="text">Add text</button>
           <button class="minor tool-btn" type="button" data-edit="image">Image</button>
           <button class="minor tool-btn" type="button" data-edit="highlight">Highlight</button>
           <button class="minor tool-btn" type="button" data-edit="ink">Draw</button>
@@ -72,6 +74,8 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
           <label class="field">Ink <input id="inkColor" type="color" value="#14241f"></label>
           <label class="field">Ink width <input id="inkWidth" type="number" min="1" max="16" value="2"></label>
         </div>
+        <label class="choice secure-choice"><input id="flattenReplacements" type="checkbox"> Permanently remove covered content (flattens edited pages; other text on those pages will no longer be selectable)</label>
+        <p class="hint" id="replaceWarning">Without permanent removal, original PDF text or pictures may remain recoverable behind the visual replacement. Do not use visual covering to hide secrets.</p>
         <input id="placeImage" type="file" accept="image/png,image/jpeg,image/webp" hidden>
         <div class="tool-row">
           <button class="minor" type="button" id="rotateLeft">Rotate left</button>
@@ -146,7 +150,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="applyImages">Create PDF</button>
       </div>
       <div id="panelCompress" hidden>
-        <p class="hint">Pages are redrawn as JPEG images in this browser. Text will not stay selectable. A text-only PDF may not get smaller.</p>
+        <p class="hint">Searchable text is preserved when present. Image-only PDFs can be downsampled. If compression makes a file larger, the original file is returned instead.</p>
         <label class="field">Quality
           <select id="compressQuality">
             <option value="small">Smaller file</option>
@@ -157,7 +161,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
         <button class="action" type="button" id="applyCompress">Compress PDF</button>
       </div>
       <div id="panelOcr" hidden>
-        <p class="hint">Bengali and English text are read in this browser with Tesseract (<code>ben+eng</code>). The first 10 pages are read. The file is not uploaded.</p>
+        <p class="hint">Bengali and English text is extracted from the PDF when available, otherwise read with OCR (<code>ben+eng</code>) up to 30 pages. OCR can make mistakes: review and correct the text before downloading. Files stay in your browser.</p>
         <button class="action" type="button" id="applyOcr">Read Bengali text</button>
         <a class="download" id="downloadText" hidden>Download text</a>
       </div>

@@ -36,6 +36,25 @@
   const locationButton=$('prayer-location');
   const gpsButton=$('prayer-gps');
   const warning=$('prayer-warning');
+  const prayerSymbol = card.querySelector('.prayer-spark');
+  // Restrained, scalable vector artwork. Each icon corresponds to the current
+  // solar period, never a decorative cartoon or an unrelated prayer symbol.
+  const iconBase = '<svg viewBox="0 0 48 48" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">';
+  const iconPaths = {
+    isha: '<defs><linearGradient id="prayer-moon-gold" x1="8" y1="4" x2="41" y2="43" gradientUnits="userSpaceOnUse"><stop stop-color="#E1C995"/><stop offset=".56" stop-color="#B38C48"/><stop offset="1" stop-color="#86662E"/></linearGradient></defs><path d="M35.2 38.6A19 19 0 0 1 28.8 3.2 19.6 19.6 0 1 0 44 30.1a19 19 0 0 1-8.8 8.5Z" fill="url(#prayer-moon-gold)" stroke="#927239" stroke-width=".45" stroke-linejoin="round"/>',
+    fajr: '<path d="M7 30h34" stroke="#6A7E91" stroke-width="1.6" stroke-linecap="round"/><path d="M14 30a10 10 0 0 1 20 0" fill="#E2BD7B" stroke="#C99A59" stroke-width="1"/><path d="M24 6v6M10.8 13.7l4.1 4.1M37.2 13.7l-4.1 4.1M5 23h5M38 23h5" stroke="#859AB0" stroke-width="1.7" stroke-linecap="round"/><path d="M9 36h30M15 41h18" stroke="#A0ACB5" stroke-width="1.3" stroke-linecap="round" opacity=".65"/>',
+    sunrise: '<path d="M6 31h36" stroke="#947E5F" stroke-width="1.7" stroke-linecap="round"/><path d="M12 31a12 12 0 0 1 24 0" fill="#E6BD71" stroke="#B78646" stroke-width=".8"/><path d="M24 6v7M10 15l5 5M38 15l-5 5M4 24h6M38 24h6" stroke="#D4A057" stroke-width="1.7" stroke-linecap="round"/>',
+    dhuhr: '<circle cx="24" cy="24" r="10.5" fill="#D8AF62" stroke="#B88F49" stroke-width="1"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7M9.9 9.9l5 5M33.1 33.1l5 5M38.1 9.9l-5 5M14.9 33.1l-5 5" stroke="#BE9854" stroke-width="2" stroke-linecap="round"/>',
+    asr: '<circle cx="28" cy="21" r="10" fill="#D5A35D" stroke="#AC7D42" stroke-width="1"/><path d="M28 5v5M28 32v4M12 21h6M38 21h5M16.5 9.5l4.3 4.3M35.2 28.2l4 4M40 9l-4.2 4.2" stroke="#B68C54" stroke-width="1.8" stroke-linecap="round"/><path d="M8 37h32M13 42h22" stroke="#9B8A73" stroke-width="1.5" stroke-linecap="round"/>',
+    maghrib: '<path d="M6 29h36" stroke="#9B7D65" stroke-width="1.8" stroke-linecap="round"/><path d="M13 29a11 11 0 0 1 22 0" fill="#C88157" stroke="#AD6E49" stroke-width=".9"/><path d="M24 9v6M9.5 17l5.1 5M38.5 17l-5.1 5M4 24h6M38 24h6" stroke="#B67856" stroke-width="1.8" stroke-linecap="round"/><path d="M11 35h26M16 40h16" stroke="#B49B8A" stroke-width="1.3" stroke-linecap="round"/>'
+  };
+  let activeIcon = '';
+  function showPrayerIcon(phase) {
+    if (!prayerSymbol || !Object.hasOwn(iconPaths,phase) || activeIcon===phase) return;
+    activeIcon=phase;
+    prayerSymbol.dataset.phase=phase;
+    prayerSymbol.innerHTML=iconBase+iconPaths[phase]+'</svg>';
+  }
   function showError(message) {
     $('prayer-current').textContent='সময়সূচি পাওয়া যাচ্ছে না';
     $('prayer-countdown').textContent='—';
@@ -91,14 +110,15 @@
       $('prayer-warning-title').textContent=prohibited.title;
       $('prayer-warning-description').textContent='আনুমানিক সময় · শেষ হতে '+displayDuration(prohibited.end-now)+' বাকি';
     }
-    let title,caption,end;
-    if(now<t.Fajr){title='এশা';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
-    else if(now<t.Sunrise){title='ফজর';caption='সূর্যোদয় হতে বাকি';end=t.Sunrise;}
-    else if(now<t.Dhuhr){title='এখন ফরজ নামাজের ওয়াক্ত নয়';caption='যোহর শুরু হতে বাকি';end=t.Dhuhr;}
-    else if(now<t.Asr){title='যোহর';caption='আসর শুরু হতে বাকি';end=t.Asr;}
-    else if(now<t.Maghrib){title='আসর';caption='মাগরিব শুরু হতে বাকি';end=t.Maghrib;}
-    else if(now<t.Isha){title='মাগরিব';caption='এশা শুরু হতে বাকি';end=t.Isha;}
-    else {title='এশা';caption='পরবর্তী ফজর শুরু হতে বাকি';end=tm.Fajr;}
+    let title,caption,end,phase;
+    if(now<t.Fajr){phase='isha';title='এশা';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
+    else if(now<t.Sunrise){phase='fajr';title='ফজর';caption='সূর্যোদয় হতে বাকি';end=t.Sunrise;}
+    else if(now<t.Dhuhr){phase='sunrise';title='এখন ফরজ নামাজের ওয়াক্ত নয়';caption='যোহর শুরু হতে বাকি';end=t.Dhuhr;}
+    else if(now<t.Asr){phase='dhuhr';title='যোহর';caption='আসর শুরু হতে বাকি';end=t.Asr;}
+    else if(now<t.Maghrib){phase='asr';title='আসর';caption='মাগরিব শুরু হতে বাকি';end=t.Maghrib;}
+    else if(now<t.Isha){phase='maghrib';title='মাগরিব';caption='এশা শুরু হতে বাকি';end=t.Isha;}
+    else {phase='isha';title='এশা';caption='পরবর্তী ফজর শুরু হতে বাকি';end=tm.Fajr;}
+    showPrayerIcon(prohibited && now >= t.Maghrib-15*60000 ? 'maghrib' : phase);
     $('prayer-current').textContent=title;
     $('prayer-countdown-caption').textContent=caption;
     $('prayer-countdown').textContent=displayDuration(end-now);

@@ -67,6 +67,23 @@ jobs:
             if(await night.locator('.prayer-footnote').count())throw Error('Unwanted footnote remains');
             if(!await night.locator('.prayer-spark svg linearGradient').count())throw Error('Premium crescent missing');
             if(!await night.locator('link[href*="solaiman-lipi/font.css"]').count())throw Error('SolaimanLipi stylesheet missing');
+            // The artwork must follow the active solar period automatically.
+            for(const [utc,phase] of [
+              ['2026-11-19T23:30:00Z','fajr'],
+              ['2026-11-20T00:30:00Z','sunrise'],
+              ['2026-11-20T07:00:00Z','dhuhr'],
+              ['2026-11-20T10:00:00Z','asr'],
+              ['2026-11-20T11:05:00Z','maghrib'],
+              ['2026-11-20T11:30:00Z','maghrib'],
+              ['2026-11-20T14:00:00Z','isha']
+            ]){
+              await page.clock.setFixedTime(new Date(utc));
+              await page.clock.runFor(1100);
+              const actual=await page.locator('.prayer-spark').getAttribute('data-phase');
+              if(actual!==phase)throw Error('Prayer artwork wrong for '+utc+': '+actual+' expected '+phase);
+              if(await page.locator('.prayer-spark svg path, .prayer-spark svg circle').count()<1)
+                throw Error('Prayer artwork SVG missing at '+utc);
+            }
             await night.close();
             await browser.close();
             console.log('PASS: live countdown, hidden selector, eight divisions, warning, mobile, original cards');

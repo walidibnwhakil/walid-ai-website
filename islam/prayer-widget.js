@@ -118,7 +118,7 @@
     else if(now<t.Maghrib){phase='asr';title='আসর';caption='মাগরিব শুরু হতে বাকি';end=t.Maghrib;}
     else if(now<t.Isha){phase='maghrib';title='মাগরিব';caption='এশা শুরু হতে বাকি';end=t.Isha;}
     else {phase='isha';title='এশা';caption='পরবর্তী ফজর শুরু হতে বাকি';end=tm.Fajr;}
-    showPrayerIcon(phase);
+    showPrayerIcon(prohibited && now >= t.Maghrib-15*60000 ? 'maghrib' : phase);
     $('prayer-current').textContent=title;
     $('prayer-countdown-caption').textContent=caption;
     $('prayer-countdown').textContent=displayDuration(end-now);

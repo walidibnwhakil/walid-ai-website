@@ -19,21 +19,21 @@
     "recordsInScope": 4623,
     "recordsReviewed": 11,
     "recordsCorrected": 11,
-    "draftGenerated": 4358,
+    "draftGenerated": 4376,
     "unresolved": 4612,
-    "method": "11 Surah 3 ayahs previously reviewed. All 200 Surah 3 ayahs and all 29 Surah 48, 18 Surah 49 ayahs now have Bengali-script text drafted manually: 254 are newly authored drafts awaiting pronunciation verification; 4,358 remaining records in 2–49 retain prior machine-derived text. No linguistic certification is claimed.",
+    "method": "11 Surah 3 ayahs previously reviewed. The remaining 189 Surah 3 ayahs, all 29 Surah 48 ayahs and all 18 Surah 49 ayahs now have manually authored Bengali pronunciation drafts (236 new drafts total). 4376 remaining records in Surahs 2–49 retain older machine-derived text; no linguistic certification is claimed.",
     "automatedScan": {
       "flaggedPriorityRecords": null,
       "queue": "islam/quran/data/pronunciation-review-queue.json",
       "lastReportedHeuristicFlagsBeforeManualRevisions": 4417
     },
     "flaggedPriorityRecords": null,
-    "handAuthoredDraftVerses": 254,
-    "machineGeneratedPending": 4358
+    "handAuthoredDraftVerses": 236,
+    "machineGeneratedPending": 4376
   },
   "draft": {
     "scope": "Surahs 2–49",
     "verses": 4612,
-    "method": "254 manually authored Bengali drafts plus 4358 unresolved older machine-generated strings; a separate phonetic review remains necessary."
+    "method": "236 manually authored Bengali drafts plus 4376 unresolved older machine-generated strings; a separate phonetic review remains necessary."
   }
 }

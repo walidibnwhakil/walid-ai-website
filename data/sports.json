@@ -1,20 +1,139 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-20T09:39:11.389145+00:00",
+  "updatedAt": "2026-11-20T18:18:12.729726+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Pochettino’s first United training session leaked on drone footage; Premier League returns – football live",
+      "title": "Pochettino demands say on big United decisions; Arteta takes fantasy football action; Nations League draw – live",
       "url": "https://www.theguardian.com/football/live/2026/nov/20/weekend-football-countdown-live-news-updates",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T09:15:38+00:00",
+      "publishedAt": "2026-11-20T18:05:11+00:00",
       "category": "Sports"
     },
     {
-      "title": "Refereeing will never be perfect - Farrell",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cqe9k80zjk2yo?at_medium=RSS&at_campaign=rss",
+      "title": "A men's netball World Cup - not a question of if, but when?",
+      "url": "https://www.bbc.co.uk/sport/netball/articles/c60evgr13deyo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-20T08:05:21+00:00",
+      "publishedAt": "2026-11-20T18:00:20+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'Right time' for Smith exit - but Murray not ready for role",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/cvze7d03880ko?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T17:47:38+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Pochettino’s fiery start, plus England v All Blacks and ATP Finals finale – follow with us",
+      "url": "https://www.theguardian.com/sport/2026/nov/20/pochettinos-fiery-start-plus-england-v-all-blacks-and-atp-finals-finale-follow-with-us",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T17:27:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Man Utd fan criticism has gone too far at times - Berrada",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cwz0k32j9kr9o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T16:55:11+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Stacked England aim to pile on style and add to All Black misery",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cqrmgjpp0l48o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T16:51:17+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Football Daily | The Premier League resumes: here’s our almost essential club-by-club recap",
+      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-resumes-club-by-club-recap-football-daily-newsletter",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T16:32:26+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'No-one is going to break us' - defiant Boks face Ireland without Erasmus",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cm930nj435dvo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T16:28:47+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Premier League news: Grealish available again for Everton, Maresca hints at City tweaks",
+      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-news-everton-jack-grealish-manchester-city-liverpool-chelsea",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T16:24:12+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "10 games, 0 points & 30 goals conceded - Charlton's struggles explained",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cq0k0kxg5k4zo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T16:00:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Why injured Joao Pedro may be Chelsea's most important player",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cr62p7x23vg3o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T15:18:42+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Filming training by drones should be illegal - Iraola",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqdr1xmekmg5o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T15:08:51+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Alcaraz puts aside injury concerns to take apart Cobolli",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/cqrkgn17emr2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T14:55:49+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Tom Brady in talks over buying Chelsea stake after Birmingham City exit",
+      "url": "https://www.theguardian.com/football/2026/nov/20/tom-brady-chelsea-talks-stake-birmingham-city",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T14:50:09+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Arteta warns Arsenal players over FPL team news leak",
+      "url": "https://www.bbc.co.uk/sport/football/articles/ck62pz5r16pro?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T14:08:55+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Arsenal’s Lisa Baum: ‘I believe in us. I think it’s all about the small margins’",
+      "url": "https://www.theguardian.com/football/2026/nov/20/arsenal-lisa-baum-germany-brother-dennis",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T13:00:29+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Liverpool fan found not guilty of racial abuse after Antoine Semenyo withdraws from case",
+      "url": "https://www.theguardian.com/football/2026/nov/20/liverpool-fan-not-guilty-racial-abuse-antoine-semenyo-withdraws-from-case-bournemouth-liverpool",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T12:20:00+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Bukayo Saka may not return for Arsenal before Christmas, Mikel Arteta admits",
+      "url": "https://www.theguardian.com/football/2026/nov/20/bukayo-saka-injury-may-not-play-arsenal-before-christmas-mikel-arteta",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T10:46:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Cummins retains Cricket Australia support as captain",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c6808y17r0l0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T10:13:23+00:00",
       "category": "Sports"
     },
     {
@@ -22,48 +141,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-table-history-after-10-games-season",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T08:00:26+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Inside the rise of 'humble' Nyoni and why Iraola trusts him",
-      "url": "https://www.bbc.co.uk/sport/football/articles/ck24enjqvlyeo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T07:42:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Moore eyes Kane shirt as Spurs' past and future stars meet",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cq0k65pyp4jvo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T07:26:36+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Russell fastest in Las Vegas practice after rain",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/c9gklmdmnzydo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T06:40:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "F1 bosses close to V8 engines deal from 2030",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/cvj6l7nk611jo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T06:35:38+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "The art of protection - inside an F1 helmet factory",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/cm20vpq8z6n4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T06:29:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'I felt like I was a ghost' - when players miss a season through injury",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cqvg27m9xp1xo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T06:13:23+00:00",
       "category": "Sports"
     },
     {
@@ -88,87 +165,10 @@
       "category": "Sports"
     },
     {
-      "title": "Arsenal 'have ingredients' but Europe's elite on another level",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cm4gnxz8dvx1o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T23:57:54+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Unseeded Sykes stuns Humphries in Grand Slam thriller",
-      "url": "https://www.bbc.co.uk/sport/darts/articles/ckzd9n5996zno?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T22:45:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "England get one-match suspended ban on away tickets for anti-pope chants in Spain",
-      "url": "https://www.theguardian.com/football/2026/nov/19/england-one-match-suspended-away-tickets-ban-anti-pope-chants-spain-uefa",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T22:05:54+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "OL Lyonnes show their class to hit Arsenal’s ambitions for a top-four WCL finish",
-      "url": "https://www.theguardian.com/football/2026/nov/19/arsenal-ol-lyonnes-womens-champions-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T22:05:36+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Thomas Frank admits he has a point to prove after taking reins at Crystal Palace",
-      "url": "https://www.theguardian.com/football/2026/nov/19/thomas-frank-crystal-palace-premier-league",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T19:50:10+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Sutton's predictions v world champion boxer Lauren Price",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c50mdnxy3ry0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T18:52:00+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Premier League clubs vote through new rules to increase legal protection for board",
-      "url": "https://www.theguardian.com/football/2026/nov/19/premier-league-vote-new-rules-financial-indemnity-lawsuits",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T16:03:07+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Fifa sparks tension with demand for tax-free status in UK for Women’s World Cup",
-      "url": "https://www.theguardian.com/football/2026/nov/19/fifa-demand-tax-free-status-in-uk-womens-world-cup-2035-government",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T16:00:06+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Cummins' Australia captaincy at a crossroads - Agnew",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c94gnev3kj4vo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-19T14:57:42+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Danny Kelly loved football and never forgot the absurdity of earning a living talking about it | Max Rushden",
       "url": "https://www.theguardian.com/football/2026/nov/19/danny-kelly-death-football-radio",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-19T12:28:40+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Gonzalo García: ‘I love Craven Cottage – the fans can reach out and touch you’",
-      "url": "https://www.theguardian.com/football/2026/nov/19/gonzalo-garcia-fulham-spain-premier-leaue-interview",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T12:16:42+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Sign up for the Football Daily newsletter: our free football email",
-      "url": "https://www.theguardian.com/info/2022/nov/14/football-daily-email-sign-up",
-      "source": "The Guardian Football",
-      "publishedAt": "2022-11-14T09:05:50+00:00",
       "category": "Sports"
     }
   ],
@@ -4496,23 +4496,29 @@
           "id": "f71a23e0-f244-4e76-8e6c-0655d76704c7",
           "homeTeam": "Pakistan Women",
           "awayTeam": "Ireland Women",
-          "homeScore": 12,
-          "awayScore": null,
+          "homeScore": 107,
+          "awayScore": 111,
           "innings": [
             {
               "team": "pakistan women Inning 1",
-              "runs": 12,
-              "wickets": 2,
-              "overs": 3
+              "runs": 107,
+              "wickets": 10,
+              "overs": 18.4
+            },
+            {
+              "team": "Pakistan Women,Ireland Women Inning 1",
+              "runs": 111,
+              "wickets": 1,
+              "overs": 13.2
             }
           ],
-          "winner": null,
+          "winner": "Ireland Women",
           "competition": "Pakistan Women vs Ireland Women, 23rd Match, Super Six (B1 v A3), ICC Womens Emerging Nations Trophy, 2026",
           "matchType": "t20",
-          "overs": 3,
+          "overs": 18.4,
           "startTime": "2026-11-20T09:15:00Z",
           "finishedAt": null,
-          "status": "live",
+          "status": "finished",
           "source": "CricketData"
         },
         {

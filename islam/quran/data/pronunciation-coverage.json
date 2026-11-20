@@ -1,14 +1,22 @@
 {
   "version": 1,
-  "updated": "2026-11-17",
-  "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated.",
+  "updated": "2026-11-20",
+  "policy": "Only Arabic-checked Bengali-script pronunciation is shown. Bengali phonetic aid is not a substitute for learning Arabic and Tajwid.",
   "verified": {
-    "surah": 1,
-    "verses": 7
+    "surahs": [
+      1,
+      49
+    ],
+    "verses": 25,
+    "bySurah": {
+      "1": 7,
+      "49": 18
+    },
+    "note": "Surah 49: independently drafted and manually checked against the canonical Arabic verse text; reading aid, not certified Tajwid."
   },
   "pending": {
-    "surahs": 113,
-    "verses": 6229
+    "surahs": 112,
+    "verses": 6211
   },
-  "source": "Walid AI review of quran.gov.bd pronunciation; government source is linked for uncovered verses."
+  "source": "Surah Al-Hujuraat: original Walid AI Bengali phonetic draft, manually compared to the Quranpedia Arabic text. Surah Al-Fatiha: existing reviewed pronunciation. No third-party pronunciation text copied."
 }

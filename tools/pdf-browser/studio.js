@@ -1199,64 +1199,86 @@ async function compressPdf() {
     ? "The original was already smaller. Downloaded it unchanged."
     : "Compressed "+formatSize(state.bytes.length)+" → "+formatSize(bytes.length)+".");
 }
+function updateOcrDownload(text) {
+  const link=$("downloadText");
+  if(link.href)URL.revokeObjectURL(link.href);
+  const value=String(text||"");
+  link.href=URL.createObjectURL(new Blob([value],{type:"text/plain;charset=utf-8"}));
+  link.download=walidName(baseName()+"-bengali.txt");
+  link.textContent="Download "+link.download;
+  link.hidden=!value.trim();
+}
 async function runOcr() {
-  if (!state.doc && !state.images.length) {
+  if(!state.doc && !state.images.length){
     setStatus("Choose a PDF or an image first.");
     return;
   }
-  $("ocrField").hidden = false;
-  $("ocrOutput").value = "";
-  setStatus("Loading Bengali OCR…");
-  const tesseractModule = await import("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.esm.min.js");
-  const tesseract = tesseractModule.createWorker ? tesseractModule : tesseractModule.default;
+  $("ocrField").hidden=false;
+  $("ocrOutput").value="";
+  updateOcrDownload("");
+  const total=state.doc?state.pages.length:state.images.length;
+  if(total>30){
+    setStatus("To prevent browser crashes, process up to 30 pages or images per batch. Use Split PDF for larger files.");
+    return;
+  }
   let worker;
-  try {
-    worker = await tesseract.createWorker("ben+eng", 1, {
-      logger: (message) => {
-        if (!message?.status) return;
-        const progress = typeof message.progress === "number" ? " " + Math.round(message.progress * 100) + "%" : "";
-        setStatus(message.status + progress);
-      }
-    });
-    const parts = [];
-    if (state.doc) {
-      const total = Math.min(state.pages.length, 10);
-      for (let index = 0; index < total; index += 1) {
-        setStatus("Reading page " + (index + 1) + " of " + total + "…");
-        const { pdfPage, view } = await viewportFor(state.pages[index], 1);
-        const renderView = pdfPage.getViewport({
-          scale: Math.min(2, 1600 / Math.max(view.width, view.height)),
-          rotation: totalRotation(state.pages[index])
+  const getWorker=async()=>{
+    if(worker)return worker;
+    setStatus("Loading Bengali and English OCR…");
+    const tesseractModule=await import("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.esm.min.js");
+    const tesseract=tesseractModule.createWorker?tesseractModule:tesseractModule.default;
+    worker=await tesseract.createWorker("ben+eng",1,{logger:message=>{
+      if(!message?.status)return;
+      const progress=typeof message.progress==="number"?" "+Math.round(message.progress*100)+"%":"";
+      setStatus(message.status+progress);
+    }});
+    return worker;
+  };
+  const sections=[];
+  try{
+    if(state.doc){
+      for(let index=0;index<total;index++){
+        setStatus("Reading page "+(index+1)+" of "+total+"…");
+        const {pdfPage,view}=await viewportFor(state.pages[index],1);
+        const textContent=await pdfPage.getTextContent();
+        const selectable=textContent.items.map(item=>String(item.str||"")).filter(Boolean).join(" ").trim();
+        if(selectable.replace(/\s/g,"").length>12) {
+          sections.push("Page "+(index+1)+"\n"+selectable);
+          continue;
+        }
+        const renderView=pdfPage.getViewport({
+          scale:Math.min(2.7,2200/Math.max(view.width,view.height)),
+          rotation:totalRotation(state.pages[index])
         });
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.ceil(renderView.width);
-        canvas.height = Math.ceil(renderView.height);
-        await pdfPage.render({ canvasContext: canvas.getContext("2d"), viewport: renderView }).promise;
-        const result = await worker.recognize(canvas);
-        parts.push("Page " + (index + 1) + "\n" + (result.data.text || "").trim());
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.ceil(renderView.width);canvas.height=Math.ceil(renderView.height);
+        const ctx=canvas.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+        await pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
+        const result=await (await getWorker()).recognize(canvas);
+        sections.push("Page "+(index+1)+"\n"+(result.data.text||"").trim());
       }
-      if (state.pages.length > 10) parts.push("Stopped after 10 pages.");
-    } else {
-      for (let index = 0; index < state.images.length; index += 1) {
-        setStatus("Reading image " + (index + 1) + " of " + state.images.length + "…");
-        const result = await worker.recognize(new Blob([state.images[index].bytes], { type: state.images[index].mime }));
-        parts.push((state.images[index].name || "Image " + (index + 1)) + "\n" + (result.data.text || "").trim());
+    }else{
+      for(let index=0;index<total;index++){
+        setStatus("Reading image "+(index+1)+" of "+total+"…");
+        const img=state.images[index];
+        const bitmap=await createImageBitmap(new Blob([img.bytes],{type:img.mime}));
+        const scale=Math.min(2,2600/Math.max(bitmap.width,bitmap.height));
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.ceil(bitmap.width*scale);
+        canvas.height=Math.ceil(bitmap.height*scale);
+        const ctx=canvas.getContext("2d");
+        ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close?.();
+        const result=await (await getWorker()).recognize(canvas);
+        sections.push((img.name||"Image "+(index+1))+"\n"+(result.data.text||"").trim());
       }
     }
-    const text = parts.join("\n\n").trim();
-    $("ocrOutput").value = text || "No Bengali text was found.";
-    const link = $("downloadText");
-    if (link.href) URL.revokeObjectURL(link.href);
-    link.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-    link.download = walidName(baseName() + "-bengali.txt");
-    link.textContent = "Download " + link.download;
-    link.hidden = !text;
-    setStatus(text ? "Done." : "No Bengali text was found.");
-  } finally {
-    await worker?.terminate();
-  }
+    const text=sections.join("\n\n").trim();
+    $("ocrOutput").value=text;
+    updateOcrDownload(text);
+    setStatus(text?"Text extracted. Review and correct mistakes in the text box before downloading.":"No readable text was found.");
+  }finally{await worker?.terminate();}
 }
-
 function cropSignature() {
   const pad = $("signPad");
   const context = pad.getContext("2d", { willReadFrequently: true });
@@ -1542,6 +1564,7 @@ document.addEventListener("keydown", (event) => {
 });
 bindDrop($("drop"), $("file"));
 bindSignPad();
+$("ocrOutput").addEventListener("input",()=>updateOcrDownload($("ocrOutput").value));
 for (const [id, job] of [
   ["saveEdit", () => saveEdited("-edited")],
   ["saveOrganize", () => saveEdited("-organized")],

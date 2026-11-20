@@ -311,4 +311,11 @@ try {
   assert.equal(errors.length,0,errors.join("\n"));
   console.log("RICH_E2E SUCCESS");
 }catch(error){console.error("RICH_E2E FAILURE",error?.stack||error);process.exitCode=1;}
-finally{await Promise.allSettled([context.close(),browser.close(),new Promise(resolve=>server.close(resolve))]);}
+finally{
+  // Close browser clients first. Terminate lingering HTTP keep-alive connections so
+  // Node does not exit with code 13 from an unresolved top-level await.
+  await Promise.allSettled([context.close(),browser.close()]);
+  const closed=new Promise(resolve=>server.close(resolve));
+  server.closeAllConnections();
+  await closed;
+}

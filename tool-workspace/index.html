@@ -218,7 +218,7 @@ async function thumbBlob(source){
 }
 async function recordImage(blob,file,dimensions,sourceCanvas,note=''){
   pendingImageResults.push({name:outputName(file,blob.type||'image/png'),blob,beforeBlob:await thumbBlob(sourceCanvas),
-    originalSize:file?.size||0,originalWidth:sourceCanvas?.width||0,originalHeight:sourceCanvas?.height||0,
+    originalSize:file?.size||0,originalType:file?.type||'',originalWidth:sourceCanvas?.width||0,originalHeight:sourceCanvas?.height||0,
     width:dimensions.width,height:dimensions.height,note});
 }
 async function finishImageResults(){

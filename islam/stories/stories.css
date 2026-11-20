@@ -1,0 +1,8 @@
+.story-additional{margin:18px 0 15px;padding:14px 16px;border-left:3px solid #bba264;background:#fbfaf4;border-radius:0 10px 10px 0}
+.story-additional h3{margin:0 0 10px;color:#604f25;font-size:1.04rem;line-height:1.6}
+.story-additional p{margin:.65em 0}
+.story-hadith-sources{border-top:1px solid #ece1c6;padding-top:9px;font-size:.9rem;overflow-wrap:anywhere}
+.story-hadith-sources a{color:#206647;text-decoration:underline;text-underline-offset:2px}
+.story-card{scroll-margin-top:16px;overflow-wrap:anywhere}
+.story-card .story-note{font-size:.96rem}
+@media(max-width:620px){.story-additional{padding:12px 13px}.story-additional h3{font-size:1rem}}

@@ -208,7 +208,7 @@ export function repairSelectedArea(source,width,height,selection){
   if(!selection)throw Error('Select an area to remove first.');
   const sx=clamp(Math.floor(selection.x),0,width-1),sy=clamp(Math.floor(selection.y),0,height-1);
   const sw=clamp(Math.ceil(selection.w),1,width-sx),sh=clamp(Math.ceil(selection.h),1,height-sy);
-  if(sw<3||sh<3||sw>width*.7||sh>height*.7||sw*sh>MAX_AREA)
+  if(sw<3||sh<3||sw>width*.92||sh>height*.85||sw*sh>MAX_AREA)
     throw Error('Select a smaller area for better results.');
   const margin=Math.min(3,Math.max(1,Math.round(Math.min(sw,sh)*.03)));
   const rect={x:Math.max(0,sx-margin),y:Math.max(0,sy-margin)};
@@ -239,7 +239,7 @@ export async function repairWatermark(context,width,height,selection){
   if(!selection)throw Error('Select an area to remove first.');
   const x=Math.max(0,Math.floor(selection.x)),y=Math.max(0,Math.floor(selection.y));
   const w=Math.min(width-x,Math.ceil(selection.w)),h=Math.min(height-y,Math.ceil(selection.h));
-  if(w<3||h<3||w>width*.45||h>height*.45||w*h>MAX_AREA)
+  if(w<3||h<3||w>width*.90||h>height*.75||w*h>MAX_AREA)
     throw Error('Select a smaller area for better results.');
   const pad=Math.min(260,Math.max(70,Math.round(Math.max(w,h)*1.4)));
   const rx=Math.max(0,x-pad),ry=Math.max(0,y-pad);

@@ -1,7 +1,8 @@
+@font-face{font-family:"Walid Bengali";src:url("/fonts/NotoSansBengali-Regular.ttf") format("truetype");font-style:normal;font-weight:400 700;font-display:swap}
 :root{color-scheme:light;--ink:#193128;--muted:#58675d;--line:#dbe7dd;--gold:#bf9b54;--green:#17694b;--paper:#fffdf8}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:#fff;color:var(--ink);font:17px/1.75 "SolaimanLipi","Noto Sans Bengali",system-ui,sans-serif;isolation:isolate}
+body{margin:0;background:#fff;color:var(--ink);font:17px/1.75 "SolaimanLipi","Walid Bengali","Noto Sans Bengali",system-ui,sans-serif;isolation:isolate}
 body::before{content:"";position:fixed;inset:0 auto auto 50%;width:min(78vw,760px);aspect-ratio:1;transform:translate(-50%,-25%);background:url("/walid-ai-approved-flower.png") center/contain no-repeat;opacity:.05;animation:others-flower-spin 10s linear infinite;z-index:-1;pointer-events:none}
 @keyframes others-flower-spin{to{rotate:360deg}}
 a{color:var(--green)}
@@ -56,7 +57,7 @@ a{color:var(--green)}
 @media(prefers-reduced-motion:reduce){body::before{animation:none}.others-card{transition:none}}
 
 /* Book reader: always-available chapter sidebar, hidden until requested. */
-.others-toc-trigger{position:fixed;z-index:110;right:max(18px,calc((100vw - 1140px)/2 + 22px));bottom:24px;display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border:1px solid #b8d1bc;border-radius:999px;background:#fffefa;color:#15573e;box-shadow:0 7px 24px #0b302323;font:700 1rem/1.3 "SolaimanLipi","Noto Sans Bengali",sans-serif;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.others-toc-trigger{position:fixed;z-index:110;right:max(18px,calc((100vw - 1140px)/2 + 22px));bottom:24px;display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border:1px solid #b8d1bc;border-radius:999px;background:#fffefa;color:#15573e;box-shadow:0 7px 24px #0b302323;font:700 1rem/1.3 "SolaimanLipi","Walid Bengali","Noto Sans Bengali",sans-serif;cursor:pointer;transition:transform .15s ease,background .15s ease}
 .others-toc-trigger:hover{background:#eff8f1;transform:translateY(-2px)}
 .others-toc-trigger:focus-visible,.others-toc-close:focus-visible{outline:3px solid #b89650;outline-offset:3px}
 .others-toc-trigger-icon{font:700 1.1rem/1 system-ui,sans-serif}
@@ -81,3 +82,8 @@ body.others-toc-open{overflow:hidden}
 .others-card-art{display:block;width:100%;height:auto;aspect-ratio:1;transition:transform .2s ease}
 .others-card:hover .others-card-art{transform:scale(1.05)}
 @media(prefers-reduced-motion:reduce){.others-card-art{transition:none}}
+
+/* Bengali book paragraph shaping and long-reading ergonomics. */
+html[lang="bn"] .others-chapter p{font-kerning:normal;text-justify:inter-word;line-break:strict;word-break:normal;hyphens:none}
+.others-reader{padding-bottom:52px}
+@media(max-width:620px){html[lang="bn"] .others-chapter p{font-size:1rem;letter-spacing:0;line-height:1.9}}

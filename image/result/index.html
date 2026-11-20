@@ -54,6 +54,8 @@ try {
   const facts=node('div','facts');
   facts.append(node('span','', 'Original: '+size(item.originalSize||0)));
   facts.append(node('span','', 'Result: '+size(item.blob.size)));
+  const formats={'image/png':'PNG','image/jpeg':'JPG','image/webp':'WebP'};
+  if(item.originalType||item.blob.type)facts.append(node('span','','Format: '+(formats[item.originalType]||'Image')+' → '+(formats[item.blob.type]||'Image')));
   if(item.originalWidth&&item.originalHeight)facts.append(node('span','','Before: '+item.originalWidth+' × '+item.originalHeight+' px'));
   if(item.width&&item.height)facts.append(node('span','','After: '+item.width+' × '+item.height+' px'));
   const delta=(item.originalSize||0)-item.blob.size;

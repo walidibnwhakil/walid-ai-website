@@ -1,14 +1,23 @@
 {
   "version": 1,
-  "updated": "2026-11-17",
+  "updated": "2026-11-20",
   "policy": "Only reviewed Bengali-script pronunciation is published; no automatic transliteration is generated.",
   "verified": {
-    "surah": 1,
+    "surah": 2,
+    "ayahStart": 1,
+    "ayahEnd": 7,
     "verses": 7
   },
   "pending": {
-    "surahs": 113,
-    "verses": 6229
+    "surahs": 112,
+    "verses": 6222
   },
-  "source": "Walid AI review of quran.gov.bd pronunciation; government source is linked for uncovered verses."
+  "source": "Walid AI review against quran.gov.bd Bengali pronunciation source; government source is linked for uncovered verses.",
+  "audit": {
+    "scope": "Surahs 2–49",
+    "recordsReviewed": 6229,
+    "recordsCorrected": 7,
+    "unresolved": 6222,
+    "method": "Arabic-to-Bengali source comparison; no blanket transliteration"
+  }
 }

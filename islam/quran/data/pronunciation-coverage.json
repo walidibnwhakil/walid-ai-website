@@ -5,25 +5,25 @@
   "verified": {
     "surah": 2,
     "ayahStart": 1,
-    "ayahEnd": 20,
-    "verses": 20
+    "ayahEnd": 30,
+    "verses": 30
   },
   "pending": {
     "surahs": 112,
-    "verses": 6209
+    "verses": 6199
   },
   "source": "Walid AI review against quran.gov.bd Bengali pronunciation source; government source is linked for uncovered verses.",
   "audit": {
     "scope": "Surahs 2–49",
     "recordsReviewed": 6229,
-    "recordsCorrected": 20,
-    "unresolved": 6209,
+    "recordsCorrected": 30,
+    "unresolved": 6199,
     "method": "Arabic-to-Bengali source comparison; no blanket transliteration",
     "lastBatch": {
       "surah": 2,
-      "ayahStart": 8,
-      "ayahEnd": 20,
-      "verses": 13,
+      "ayahStart": 21,
+      "ayahEnd": 30,
+      "verses": 10,
       "method": "Arabic verse review with Bengali-script pronunciation authored and checked against the linked government source"
     }
   }

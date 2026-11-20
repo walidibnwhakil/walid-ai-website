@@ -1254,7 +1254,8 @@ async function runOcr() {
         canvas.width=Math.ceil(renderView.width);canvas.height=Math.ceil(renderView.height);
         const ctx=canvas.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
         await pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
-        const result=await (await getWorker()).recognize(canvas);
+        const worker=await getWorker();
+        const result=await worker.recognize(canvas);
         sections.push("Page "+(index+1)+"\n"+(result.data.text||"").trim());
       }
     }else{
@@ -1269,7 +1270,8 @@ async function runOcr() {
         const ctx=canvas.getContext("2d");
         ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close?.();
-        const result=await (await getWorker()).recognize(canvas);
+        const worker=await getWorker();
+        const result=await worker.recognize(canvas);
         sections.push((img.name||"Image "+(index+1))+"\n"+(result.data.text||"").trim());
       }
     }

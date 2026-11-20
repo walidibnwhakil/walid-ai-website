@@ -124,21 +124,17 @@
   }
 
   function renderReferences(parent, sources) {
-    if (!Array.isArray(sources) || sources.length === 0) return;
-    const line = document.createElement('p');
-    line.className = 'quran-source-credit';
-    line.append(document.createTextNode('উৎস: '));
-    sources.forEach((src, index) => {
-      if (index) line.append(document.createTextNode(' · '));
-      if (!src || typeof src.url !== 'string' || !/^https:\/\/(?:sunnah\.com|quran\.com)\//.test(src.url)) return;
-      const anchor = document.createElement('a');
-      anchor.href = src.url;
-      anchor.target = '_blank';
-      anchor.rel = 'noopener noreferrer';
-      anchor.textContent = src.label || 'উৎস';
-      line.append(anchor);
-    });
-    parent.append(line);
+    if (!Array.isArray(sources) || !sources.length) return;
+    // The full Quran/source licences stay on the dedicated credits page.
+    // Inline evidence is formatted as [সহিহ বুখারী ৪৪৭৪], not a separate link.
+    const paragraph = parent.lastElementChild;
+    if (!paragraph || paragraph.tagName !== 'P') return;
+    const labels = [...new Set(sources
+      .filter(src => src && typeof src.label === 'string' && src.label.trim())
+      .map(src => digits(src.label.trim())))];
+    if (labels.length) {
+      paragraph.append(document.createTextNode(' ' + labels.map(label => '[' + label + ']').join(' ')));
+    }
   }
 
   function renderBackgroundEntries(items) {

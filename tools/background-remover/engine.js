@@ -4,7 +4,9 @@ import { applyMatte, fillEnclosedHoles, pasteAlpha, pickTiles, refineAlpha, subj
 // RMBG-1.4 is not used: those weights are non-commercial, and this site runs AdSense.
 // @imgly/background-removal is AGPL-3.0, so it is not used either.
 const TRANSFORMERS_URL = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.2';
-const MAX_PIXELS = 16_000_000;
+// Keep transient RGBA buffers manageable on phones; retain full output dimensions.
+const memoryGiB = Number(navigator.deviceMemory) || 4;
+const MAX_PIXELS = Math.max(2_000_000, Math.min(8_000_000, Math.round(memoryGiB * 1_250_000)));
 
 const MODEL_1024 = {
   tier: '1024',

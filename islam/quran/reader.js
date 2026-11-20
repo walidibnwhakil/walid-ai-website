@@ -19,6 +19,7 @@
   let surahMeta = null;
   let bengaliMeta = null;
   let notesPromise = null;
+  let backgroundPromise = null;
   let sectionVersion = 0;
   let activeSection = 'surah';
 
@@ -105,6 +106,52 @@
     return notesPromise;
   }
 
+  // Original editorial summaries; QuranEnc footnotes remain unchanged and are
+  // never treated as authenticated Hadith simply because they mention one.
+  function getBackground() {
+    if (!backgroundPromise) backgroundPromise = fetchJSON('data/surah-background-v1.json').then(data => {
+      if (data.schema !== 1 || !Array.isArray(data.surahs) || data.surahs.length !== 114) {
+        throw new Error('Incomplete background data');
+      }
+      const item = data.surahs[n - 1];
+      if (!item || item.number !== n || !item.theme || !['মাক্কি', 'মাদানি'].includes(item.period) ||
+          !Array.isArray(item.occasions) || !Array.isArray(item.virtues) || !Array.isArray(item.practices)) {
+        throw new Error('Invalid background for surah ' + n);
+      }
+      return item;
+    });
+    return backgroundPromise;
+  }
+
+  function renderReferences(parent, sources) {
+    if (!Array.isArray(sources) || sources.length === 0) return;
+    const line = document.createElement('p');
+    line.className = 'quran-source-credit';
+    line.append(document.createTextNode('উৎস: '));
+    sources.forEach((src, index) => {
+      if (index) line.append(document.createTextNode(' · '));
+      if (!src || typeof src.url !== 'string' || !/^https:\/\/(?:sunnah\.com|quran\.com)\//.test(src.url)) return;
+      const anchor = document.createElement('a');
+      anchor.href = src.url;
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+      anchor.textContent = src.label || 'উৎস';
+      line.append(anchor);
+    });
+    parent.append(line);
+  }
+
+  function renderBackgroundEntries(items) {
+    for (const item of items) {
+      if (!item || typeof item.text !== 'string') continue;
+      const article = document.createElement('article');
+      article.className = 'section-note quran-context-entry';
+      simpleParagraph(article, item.text);
+      renderReferences(article, item.sources);
+      panel.append(article);
+    }
+  }
+
   function sourceExcerpt(notes, matcher) {
     for (const note of notes) {
       const headings = [...note.text.matchAll(/<b[^>]*>[\s\S]*?<\/b>/gi)];
@@ -139,21 +186,37 @@
     heading.textContent = tabDefs.find(item => item[0] === key)[1];
     panel.append(heading);
     if (key === 'virtue' || key === 'revelation') {
-      if (key === 'revelation' && surahMeta) simpleParagraph(panel, 'নাজিলের স্থানভিত্তিক পরিচয়: ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + ' সূরা।');
-      const loading = simpleParagraph(panel, 'এই বিষয়ের উৎস-নোট লোড হচ্ছে…');
-      getNotes().then(notes => {
+      const loading = simpleParagraph(panel, 'তথ্য ও সূত্র লোড হচ্ছে…');
+      getBackground().then(info => {
         if (sectionVersion !== version) return;
         loading.remove();
-        const excerpt = sourceExcerpt(notes, key === 'virtue' ? /ফযীলত|ফজিলত|ফজীলত/ : /নাযিল|নাজিল|নুযুল|অবতীর্ণ/);
-        if (excerpt) {
-          noteText(panel, excerpt);
-
-
+        if (key === 'revelation') {
+          simpleParagraph(panel, 'নাজিল-পর্ব: ' + info.period + '। মাক্কি/মাদানি শ্রেণিবিভাগ মূলত হিজরতের আগে বা পরে অবতীর্ণ হওয়ার পরিচয়; প্রতিটি আয়াত একই সময়ে নাজিল হয়েছে এমন নয়।');
+          simpleParagraph(panel, 'সূরার আলোচ্য বিষয়: ' + info.theme + ' (এটি নির্দিষ্ট শানে নুযুলের দাবি নয়।)');
+          renderReferences(panel, [info.themeSource]);
+          if (info.occasions.length) {
+            const h3 = document.createElement('h3');
+            h3.textContent = 'প্রমাণিত বা কুরআনে উল্লেখিত নির্দিষ্ট প্রেক্ষাপট';
+            panel.append(h3);
+            renderBackgroundEntries(info.occasions);
+          } else {
+            simpleParagraph(panel, 'এই সূরার নির্দিষ্ট আয়াত নাজিলের পৃথকভাবে যাচাই করা ঘটনা এখানে এখনো যুক্ত করা হয়নি।');
+          }
         } else {
-          simpleParagraph(panel, key === 'virtue' ? 'এই সূরার নির্দিষ্ট ফযীলত সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।' : 'এই সূরার নাজিলের বিস্তারিত ইতিহাস সম্পর্কে পৃথক উৎস-নোট পাওয়া যায়নি।');
+          if (info.virtues.length) {
+            renderBackgroundEntries(info.virtues);
+          } else {
+            simpleParagraph(panel, 'এই সূরার স্বতন্ত্র ফযীলত সম্পর্কে সহিহ সূত্রে যাচাই করা কোনো নির্দিষ্ট বর্ণনা এখনো এখানে যুক্ত করা হয়নি।');
+          }
+          if (info.practices.length) {
+            const h3 = document.createElement('h3');
+            h3.textContent = 'সহিহ সূত্রে বর্ণিত পাঠের আমল (পৃথক বিশেষ সওয়াবের দাবি নয়)';
+            panel.append(h3);
+            renderBackgroundEntries(info.practices);
+          }
         }
       }).catch(() => {
-        if (sectionVersion === version) loading.textContent = 'এই বিষয়ের উৎস-নোট এখন লোড করা যাচ্ছে না।';
+        if (sectionVersion === version) loading.textContent = 'এই বিভাগের যাচাইকৃত তথ্য এখন লোড করা যাচ্ছে না।';
       });
       return;
     }

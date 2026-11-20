@@ -5,30 +5,29 @@
   "verified": {
     "surah": 3,
     "ayahStart": 1,
-    "ayahEnd": 30,
-    "verses": 30,
-    "notes": "Only Surah 3:1-30 are marked reviewed within current scope; remaining handwritten text is draft."
+    "ayahEnd": 60,
+    "verses": 60
   },
   "pending": {
     "scope": "Surahs 2–49",
-    "verses": 4593
+    "verses": 4563
   },
   "source": "Original Arabic and Bengali translations from existing source records; manually authored Bengali-script draft pronunciation is not certified.",
   "audit": {
     "scope": "Surahs 2–49",
     "recordsInScope": 4623,
-    "recordsReviewed": 30,
-    "recordsCorrected": 30,
+    "recordsReviewed": 60,
+    "recordsCorrected": 60,
     "draftGenerated": 4011,
-    "unresolved": 4593,
-    "method": "Surah 3:1-30 checked against Arabic; remaining 475 handwritten verse drafts and 4118 machine-generated records still require Arabic-aligned review.",
+    "unresolved": 4563,
+    "method": "Surah 3:1–60 inspected against original Arabic, manually corrected where needed; Surah 3:61–200 and Surahs 43–49 remain Bengali drafts requiring cross-check, and legacy other surahs remain machine-derived.",
     "automatedScan": {
       "flaggedPriorityRecords": null,
       "queue": "islam/quran/data/pronunciation-review-queue.json",
       "lastReportedHeuristicFlagsBeforeManualRevisions": 4417
     },
     "flaggedPriorityRecords": null,
-    "handAuthoredDraftVerses": 475,
+    "handAuthoredDraftVerses": 445,
     "machineGeneratedPending": 4011,
     "completedDraftSurahs": [
       3,
@@ -45,7 +44,7 @@
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 4593,
-    "method": "475 handwritten Bengali pronunciation drafts awaiting review, plus 4118 legacy machine-derived pronunciations."
+    "verses": 4563,
+    "method": "445 manually authored Bengali drafts and 4118 legacy machine-derived records pending review."
   }
 }

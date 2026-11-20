@@ -108,7 +108,7 @@ await compress.setInputFiles("#file", { name: "compress-me.pdf", mimeType: "appl
 await compress.locator("#panelCompress").waitFor({ state: "visible" });
 await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("2 pages ready"));
 await compress.locator("#applyCompress").click();
-await compress.waitForFunction(() => document.querySelector("#status")?.textContent.includes("Download"));
+await compress.locator("#download").waitFor({state:"visible",timeout:20000});
 const compressed = await download(compress, "#download"); assert.equal(compressed[0], 37); assert.equal((await withTimeout(inspect(compressed), 15000, "compressed PDF inspection")).length, 2);
 
 const word = await context.newPage();

@@ -57,7 +57,7 @@ async function getModel(){
  if(!modelPromise){
   modelPromise=(async()=>{
     progress('Preparing image…');
-    const ort=await import(ORT_BASE+'ort.min.mjs');
+    const ort=await import(ORT_BASE+'ort.wasm.min.mjs');
     ort.env.wasm.wasmPaths=ORT_BASE;
     ort.env.wasm.numThreads=1;
     const response=await fetch(MODEL_URL,{cache:'force-cache',mode:'cors'});

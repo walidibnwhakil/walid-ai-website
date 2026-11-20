@@ -53,6 +53,21 @@ jobs:
             await page.clock.setFixedTime(new Date('2026-11-20T05:55:00Z'));
             await page.waitForFunction(()=>!document.querySelector('#prayer-warning').hidden,{timeout:3000});
             if(!((await page.locator('#prayer-warning-title').textContent()).includes('মধ্যাহ্ন')))throw Error('Midday warning missing');
+            // After midnight, Isha remains the displayed prayer until Fajr.
+            const night=await browser.newPage({viewport:{width:360,height:800},isMobile:true});
+            await night.clock.install({time:new Date('2026-11-20T18:30:00Z')});
+            await night.route('https://api.aladhan.com/**',route=>route.fulfill({
+              status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},
+              body:JSON.stringify({code:200,data:{timings:{
+                Fajr:'05:10',Sunrise:'06:25',Dhuhr:'12:00',Asr:'15:30',Maghrib:'17:15',Isha:'19:00'
+              }}})
+            }));
+            await night.goto('http://127.0.0.1:8765/islam/',{waitUntil:'domcontentloaded'});
+            await night.waitForFunction(()=>document.querySelector('#prayer-current')?.textContent==='এশার ওয়াক্ত');
+            if(await night.locator('.prayer-footnote').count())throw Error('Unwanted footnote remains');
+            if(!await night.locator('.prayer-spark svg linearGradient').count())throw Error('Premium crescent missing');
+            if(!await night.locator('link[href*="solaiman-lipi/font.css"]').count())throw Error('SolaimanLipi stylesheet missing');
+            await night.close();
             await browser.close();
             console.log('PASS: live countdown, hidden selector, eight divisions, warning, mobile, original cards');
           })().catch(error=>{console.error(error);process.exit(1)});

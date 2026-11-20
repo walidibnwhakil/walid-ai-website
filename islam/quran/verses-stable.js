@@ -9,7 +9,7 @@ const displayed=n===1?(()=>{const last=data.verses[6];const split=last.arabic.in
 displayed.forEach((v,i)=>{if(v.verse!==i+1||!v.arabic||!v.translation)throw Error('আয়াত '+(i+1)+' অসম্পূর্ণ');const card=document.createElement('article');card.className='ayah';card.id='ayah-'+v.verse;card.dataset.verse=String(v.verse);const number=document.createElement('div');number.className='ayah-number';number.textContent=digits(v.verse);const ar=document.createElement('div');ar.className='arabic';ar.lang='ar';ar.dir='rtl';ar.textContent=v.arabic;card.append(number,ar);if(v.pronunciation){const p=document.createElement('p');p.className='pronunciation';p.dataset.verified='true';p.textContent=v.pronunciation;p.hidden=true;card.append(p)}const t=document.createElement('p');t.className='translation';t.textContent=v.translation.replace(/\s*\[\s*[0-9০-৯]+\s*\]/g,'');t.hidden=!(toggle && toggle.checked);card.append(t);fragment.append(card)});root.replaceChildren(fragment);if(status)status.textContent=digits(displayed.length)+'টি আয়াত · আরবি পাঠ';};
 const fetchJSON=async url=>{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return r.json();};
 const sourceURL='/islam/quran/data/surah-'+String(n).padStart(3,'0')+'.json';
-const approvedPronunciationSurahs=new Set([3,42,43,44,45,46,47,48,49]);
+const approvedPronunciationSurahs=new Set([3,41,42,43,44,45,46,47,48,49]);
 const attachPronunciation=async data=>{
   if(!approvedPronunciationSurahs.has(n))return data;
   try{

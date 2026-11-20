@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112" fill="none">
+  <title>Quranic stories illustrated book</title>
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientTransform="translate(38 20) rotate(59) scale(107)">
+      <stop stop-color="#326D5D"/><stop offset="1" stop-color="#103B39"/>
+    </radialGradient>
+    <linearGradient id="book" x1="25" y1="58" x2="88" y2="88">
+      <stop stop-color="#FFF2CE"/><stop offset="1" stop-color="#E8C889"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="26" y1="30" x2="96" y2="98">
+      <stop stop-color="#F7DF96"/><stop offset=".5" stop-color="#BE9348"/><stop offset="1" stop-color="#FFF0B4"/>
+    </linearGradient>
+    <clipPath id="circle"><circle cx="56" cy="56" r="49"/></clipPath>
+  </defs>
+  <circle cx="56" cy="56" r="54" fill="url(#bg)" stroke="#CEA954" stroke-width="3"/>
+  <circle cx="56" cy="56" r="48" stroke="#EBD48C" stroke-opacity=".7"/>
+  <g clip-path="url(#circle)">
+    <path d="M88 23A17 17 0 1 0 96 53A20 20 0 1 1 88 23Z" fill="#E9CB7A"/>
+    <circle cx="24" cy="29" r="1.5" fill="#F9E7AE"/>
+    <circle cx="47" cy="20" r="1.2" fill="#F9E7AE"/>
+    <circle cx="77" cy="56" r="1" fill="#F9E7AE"/>
+    <path d="M16 68Q38 47 56 60Q78 42 103 64V96H14V68Z" fill="#184F42" opacity=".78"/>
+    <path d="M12 77Q32 64 50 71Q70 55 104 73V98H12V77Z" fill="#0B382F"/>
+    <path d="M29 65Q44 60 56 69Q70 60 85 65V90Q69 86 56 93Q44 86 29 90V65Z" fill="#C18E4A" stroke="#F1D18C" stroke-width="2.3" stroke-linejoin="round"/>
+    <path d="M24 59Q41 53 56 64V87Q39 78 24 84V59Z" fill="url(#book)" stroke="#EFD28F" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M88 59Q70 53 56 64V87Q72 78 88 84V59Z" fill="url(#book)" stroke="#EFD28F" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M56 64V87" stroke="#B0813E" stroke-width="1.7"/>
+    <path d="M31 64L41 63M31 69L47 69M31 74L45 75M63 69L81 65M63 75L80 72" stroke="#A78750" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M19 90Q39 85 56 95Q73 85 93 90" stroke="#F1D28D" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

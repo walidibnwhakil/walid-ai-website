@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112" fill="none">
+  <title>Open Quran illustration</title>
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientTransform="translate(44 30) rotate(53) scale(99)">
+      <stop stop-color="#21795A"/><stop offset="1" stop-color="#073F32"/>
+    </radialGradient>
+    <linearGradient id="paper" x1="16" y1="42" x2="90" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFAE7"/><stop offset="1" stop-color="#EAD8A1"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="23" y1="29" x2="90" y2="88">
+      <stop stop-color="#FFF1B6"/><stop offset=".48" stop-color="#CDA14B"/><stop offset="1" stop-color="#F9DB87"/>
+    </linearGradient>
+  </defs>
+  <circle cx="56" cy="56" r="54" fill="url(#bg)" stroke="#CDA953" stroke-width="3"/>
+  <circle cx="56" cy="56" r="48" stroke="#EBD48C" stroke-opacity=".7" stroke-width="1"/>
+  <path d="M56 18V22M56 90V94M18 56H22M90 56H94" stroke="#D9B96B" stroke-linecap="round" opacity=".8"/>
+  <path d="M22 43Q39 32 56 44Q73 32 90 43V82Q72 77 56 87Q40 77 22 82V43Z" fill="#002D23" opacity=".35" transform="translate(0 3)"/>
+  <path d="M20 41Q38 32 56 43V83Q37 74 20 80V41Z" fill="url(#paper)" stroke="url(#gold)" stroke-width="2.7" stroke-linejoin="round"/>
+  <path d="M92 41Q74 32 56 43V83Q74 74 92 80V41Z" fill="url(#paper)" stroke="url(#gold)" stroke-width="2.7" stroke-linejoin="round"/>
+  <path d="M56 43V83" stroke="#B38A3A" stroke-width="2"/>
+  <path d="M26 46Q39 42 51 48M26 53Q39 49 51 55M26 60Q39 56 51 62M26 67Q39 64 51 69M26 74Q39 71 51 76" stroke="#C7AC6D" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M61 48Q74 42 86 46M61 55Q74 49 86 53M61 62Q74 56 86 60M61 69Q74 64 86 67M61 76Q74 71 86 74" stroke="#C7AC6D" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M19 79Q39 74 56 85Q74 74 93 79" stroke="#F2D88B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M56 44V67" stroke="#B27A25" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M56 68L53 75L56 73L59 75L56 68Z" fill="#B27A25"/>
+  <path d="M56 24L57.6 28.4L62 30L57.6 31.6L56 36L54.4 31.6L50 30L54.4 28.4L56 24Z" fill="#EBD48C"/>
+</svg>

@@ -61,9 +61,9 @@ async function getModel(){
     ort.env.wasm.wasmPaths=ORT_BASE;
     ort.env.wasm.numThreads=1;
     const response=await fetch(MODEL_URL,{cache:'force-cache',mode:'cors'});
-    if(!response.ok)throw Error('Could not load the image processor.');
+    if(!response.ok)throw Error('Could not prepare the image. Check your connection and try again.');
     const modelBytes=await response.arrayBuffer();
-    if(modelBytes.byteLength<1000000||modelBytes.byteLength>10000000)throw Error('The image processor returned an unexpected file.');
+    if(modelBytes.byteLength<1000000||modelBytes.byteLength>10000000)throw Error('Could not prepare the image. Please try again.');
     const session=await ort.InferenceSession.create(modelBytes,{executionProviders:['wasm'],graphOptimizationLevel:'basic'});
     return {ort,session};
   })().catch(err=>{modelPromise=null;throw err});

@@ -233,8 +233,9 @@ function renderAnnotations() {
   const page = currentPage();
   for (const ann of page?.annotations || []) {
     const el = document.createElement("div");
-    const kind = ann.type === "ink" ? "ink" : ann.type === "highlight" ? "highlight" : ann.type === "note" ? "note" : ann.type === "text" ? "text" : "image";
+    const kind = ann.type === "ink" ? "ink" : ann.type === "highlight" ? "highlight" : ann.type === "note" ? "note" : ann.type === "text" ? "text" : ann.type === "cover" ? "cover" : "image";
     el.className = "ann ann-" + kind;
+    if (ann.kind === "replacement") el.classList.add("ann-replacement");
     if (ann.id === state.selectedId) el.classList.add("selected");
     el.style.left = (ann.x / view.width) * 100 + "%";
     el.style.top = (ann.y / view.height) * 100 + "%";
@@ -252,6 +253,8 @@ function renderAnnotations() {
         ann.h = Math.max(ann.fontSize * 1.4, (ann.type === "note" ? 16 : 4) + lines.length * ann.fontSize * 1.35);
         el.style.height = (ann.h / view.height) * 100 + "%";
       });
+    } else if (ann.type === "cover") {
+      el.title = "Covered area. Remove this box to reveal the original content.";
     } else if (ann.type === "image") {
       const img = document.createElement("img");
       img.alt = "";
@@ -387,7 +390,44 @@ async function renderPage() {
   $("pageLabel").textContent = (state.index + 1) + " / " + state.pages.length;
   $("pageBar").hidden = false;
   renderAnnotations();
+  await renderEditableTextHits(pdfPage, view, token);
   notifyEditor(true);
+}
+
+async function renderEditableTextHits(pdfPage, view, token) {
+  if (tool !== "edit" || state.editTool !== "replace") return;
+  const textContent = await pdfPage.getTextContent();
+  if (token !== state.renderToken) return;
+  const overlay = $("overlay");
+  for (const item of textContent.items) {
+    if (!item.str?.trim() || !Number.isFinite(item.transform?.[4])) continue;
+    const size = Math.max(8, Math.hypot(item.transform[0], item.transform[1]) || item.height || 12);
+    const x = item.transform[4], baseline = item.transform[5];
+    const r = view.convertToViewportRectangle([x, baseline - size * .24, x + Math.max(8, item.width || size), baseline + size * .92]);
+    const box = {x:Math.max(0,Math.min(r[0],r[2])),y:Math.max(0,Math.min(r[1],r[3])),w:Math.abs(r[2]-r[0]),h:Math.abs(r[3]-r[1])};
+    if (box.w < 3 || box.h < 3 || box.x >= view.width || box.y >= view.height) continue;
+    const replaced = currentPage()?.annotations.some(a => a.kind === "replacement" && a.originalRect && Math.abs(a.originalRect.x-box.x)<4 && Math.abs(a.originalRect.y-box.y)<4);
+    if (replaced) continue;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "source-text-hit";
+    button.title = "Edit: " + item.str.slice(0,100);
+    button.setAttribute("aria-label","Edit text: "+item.str.slice(0,90));
+    button.style.left = (box.x/view.width*100)+"%";
+    button.style.top = (box.y/view.height*100)+"%";
+    button.style.width = (Math.max(8,box.w)/view.width*100)+"%";
+    button.style.height = (Math.max(9,box.h)/view.height*100)+"%";
+    button.addEventListener("click", () => {
+      const ann = addAnnotation({
+        kind: "replacement", type: "text", text: item.str, fontSize: Math.min(96,size),
+        color: $("textColor").value, x:box.x,y:box.y,
+        w:Math.max(42,box.w+10),h:Math.max(size*1.4,box.h), originalRect: {...box}
+      });
+      setStatus("Edit the selected text, then download. The old PDF content may remain underneath unless permanent removal is selected.");
+      $("overlay").querySelector(".ann.selected")?.focus();
+    });
+    overlay.append(button);
+  }
 }
 
 function boundsOf(points) {
@@ -404,7 +444,7 @@ function boundsOf(points) {
 function onOverlayPointerDown(event) {
   if (!state.view || event.target !== $("overlay")) return;
   const point = pointerPos(event);
-  if (state.editTool === "select" || tool === "sign") {
+  if (state.editTool === "select" || state.editTool === "replace" || tool === "sign") {
     state.selectedId = null;
     renderAnnotations();
     return;
@@ -434,7 +474,7 @@ function onOverlayPointerDown(event) {
     placePendingImage(point);
     return;
   }
-  if (state.editTool === "highlight" || state.editTool === "ink") {
+  if (state.editTool === "highlight" || state.editTool === "cover" || state.editTool === "ink") {
     state.drag = { kind: state.editTool, start: point, points: [point] };
     $("stage").setPointerCapture?.(event.pointerId);
   }
@@ -458,7 +498,7 @@ function onPointerMove(event) {
     drag.ann.w = Math.max(12, drag.w + (point.x - drag.x));
     drag.ann.h = Math.max(12, drag.h + (point.y - drag.y));
     renderAnnotations();
-  } else if (drag.kind === "highlight") {
+  } else if (drag.kind === "highlight" || drag.kind === "cover") {
     let ghost = $("overlay").querySelector(".ghost");
     if (!ghost) {
       ghost = document.createElement("div");
@@ -492,13 +532,13 @@ function onPointerUp(event) {
   const drag = state.drag;
   if (!drag) return;
   state.drag = null;
-  if (drag.kind === "highlight") {
+  if (drag.kind === "highlight" || drag.kind === "cover") {
     const point = pointerPos(event);
     const x = Math.min(drag.start.x, point.x);
     const y = Math.min(drag.start.y, point.y);
     const w = Math.abs(point.x - drag.start.x);
     const h = Math.abs(point.y - drag.start.y);
-    if (w > 4 && h > 4) addAnnotation({ type: "highlight", x, y, w, h });
+    if (w > 4 && h > 4) addAnnotation({ type: drag.kind, kind: drag.kind === "cover" ? "replacement-cover" : undefined, x, y, w, h });
     else renderAnnotations();
   } else if (drag.kind === "ink" && drag.points.length > 1) {
     addAnnotation({
@@ -649,6 +689,16 @@ async function drawTextAnnotation(pdfDoc, page, view, ann) {
 }
 
 async function drawAnnotation(pdfDoc, page, view, ann, rotation) {
+  if (ann.type === "cover") {
+    const box = visualRectToPdf(view, ann.x, ann.y, ann.w, ann.h);
+    page.drawRectangle({ x:box.left,y:box.bottom,width:box.width,height:box.height,color:rgb(1,1,1) });
+    return;
+  }
+  if (ann.kind === "replacement" && ann.originalRect) {
+    const rect = ann.originalRect;
+    const box = visualRectToPdf(view, rect.x-1, rect.y-1, rect.w+2, rect.h+2);
+    page.drawRectangle({ x:box.left,y:box.bottom,width:box.width,height:box.height,color:rgb(1,1,1) });
+  }
   if ((ann.type === "text" || ann.type === "note") && !String(ann.text || "").trim()) return;
   if (ann.type === "highlight") {
     const box = visualRectToPdf(view, ann.x, ann.y, ann.w, ann.h);
@@ -712,13 +762,32 @@ async function buildEditedPdf() {
   const src = await PDFDocument.load(state.bytes.slice(0), state.password ? { password: state.password } : {});
   const out = await PDFDocument.create();
   for (const info of state.pages) {
-    const [copied] = await out.copyPages(src, [info.sourceIndex]);
-    const page = out.addPage(copied);
-    const rotation = totalRotation(info);
-    page.setRotation(degrees(rotation));
-    if (!info.annotations.length) continue;
-    const { view } = await viewportFor(info, 1);
-    for (const ann of info.annotations) await drawAnnotation(out, page, view, ann, rotation);
+    const securityMode = tool === "edit" && $("flattenReplacements")?.checked && info.annotations.some(ann => ann.kind === "replacement" || ann.kind === "replacement-cover");
+    let page, rotation=totalRotation(info), view;
+    if (securityMode) {
+      // Rebuild just this page as a flat image so covered original strings/images
+      // cannot be extracted from hidden underlying PDF content.
+      const original = await viewportFor(info,1);
+      view = original.view;
+      const scale = Math.min(2.2, 2300/Math.max(view.width,view.height));
+      const renderView = original.pdfPage.getViewport({scale,rotation});
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.ceil(renderView.width);canvas.height=Math.ceil(renderView.height);
+      const ctx=canvas.getContext("2d");
+      ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+      await original.pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
+      const jpg=await out.embedJpg(new Uint8Array(await (await canvasBlob(canvas,"image/jpeg",.94)).arrayBuffer()));
+      page=out.addPage([view.width,view.height]);
+      page.drawImage(jpg,{x:0,y:0,width:view.width,height:view.height});
+      view={width:view.width,height:view.height,convertToPdfPoint:(x,y)=>[x,view.height-y]};
+      rotation=0;
+    }else{
+      const [copied]=await out.copyPages(src,[info.sourceIndex]);
+      page=out.addPage(copied);
+      page.setRotation(degrees(rotation));
+      if(info.annotations.length)({view}=await viewportFor(info,1));
+    }
+    for(const ann of info.annotations)await drawAnnotation(out,page,view,ann,rotation);
   }
   return out.save();
 }
@@ -1357,10 +1426,12 @@ function bindDrop(zone, input) {
 }
 
 function markEditTool(name) {
+  const changed = state.editTool !== name;
   state.editTool = name;
   document.querySelectorAll("[data-edit]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.edit === name));
   });
+  if (changed && tool === "edit" && state.doc && state.view) renderPage().catch(error=>setStatus(error.message));
 }
 
 async function busy(button, job) {

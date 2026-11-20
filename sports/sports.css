@@ -45,3 +45,19 @@
 .sports-footer{margin-top:32px;padding:16px 14px}
 .sports-footer nav{gap:6px}
 }
+
+
+/* Country flags stand on their own; keep the existing crest boxes for clubs. */
+.team-mark.flag-only,
+.mini-mark.flag-only{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.team-mark.flag-only .primary-flag{font-size:3.4rem;line-height:1}
+.mini-mark.flag-only .primary-flag{font-size:2.65rem;line-height:1}
+@media(max-width:720px){
+  .team-mark.flag-only .primary-flag{font-size:3rem}
+  .mini-mark.flag-only .primary-flag{font-size:2.5rem}
+}

@@ -151,6 +151,7 @@ try {
     await p.goto(base+"/tools/pdf-browser/studio.html?tool="+tool,{waitUntil:"domcontentloaded"});
     await p.locator("#file").setInputFiles({name:"audit.pdf",mimeType:"application/pdf",buffer:pdf});
     await p.locator("#work").waitFor({state:"visible"});
+    if(tool==="numbers"||tool==="watermark")await p.locator("#status").filter({hasText:"2 pages ready."}).waitFor({state:"visible",timeout:25000});
     return p;
   }
   const secure=await toolPage("edit");

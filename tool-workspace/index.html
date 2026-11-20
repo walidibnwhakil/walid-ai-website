@@ -166,7 +166,7 @@ const imageFile=$('#imageFile');
 const keepAspect=$('#keepAspect');
 const imageFormat=$('#format');
 const qualityPreset=$('#qualityPreset');
-const QUALITY_MAP={best:{quality:.98,png:100},good:{quality:.85,png:85},average:{quality:.68,png:65}};
+const QUALITY_MAP={best:{quality:1,png:100},good:{quality:.85,png:85},average:{quality:.68,png:65}};
 function qualitySettings(){
   if(activeTool==='image-convert')return {quality:1,png:100};
   return QUALITY_MAP[qualityPreset.value]||QUALITY_MAP.best;

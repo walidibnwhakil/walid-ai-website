@@ -64,5 +64,5 @@ try {
  }
  if(!holder.children.length)throw Error('The edited image is not available.');
 } catch(err){holder.replaceChildren();showError(err.message)}
-addEventListener('pagehide',()=>urls.forEach(URL.revokeObjectURL));
+addEventListener('pagehide',()=>urls.forEach(url=>URL.revokeObjectURL(url)));
 </script></body></html>

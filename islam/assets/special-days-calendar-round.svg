@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112" fill="none" role="img" aria-label="Calendar for special Islamic days">
+<title>Calendar for special Islamic days</title>
+<defs><radialGradient id="bg" cx="0" cy="0" r="1" gradientTransform="translate(42 27) rotate(55) scale(103)"><stop stop-color="#27785B"/><stop offset="1" stop-color="#073F32"/></radialGradient></defs>
+<circle cx="56" cy="56" r="54" fill="url(#bg)" stroke="#CDA953" stroke-width="3"/>
+<circle cx="56" cy="56" r="48" stroke="#EBD48C" stroke-opacity=".7" stroke-width="1"/>
+<rect x="23" y="27" width="66" height="64" rx="8" fill="#F9EAC1" stroke="#D2A554" stroke-width="2.5"/>
+<path d="M23 38Q23 28 33 28H79Q89 28 89 38V47H23Z" fill="#BB9149"/>
+<path d="M39 23V34M73 23V34" stroke="#F9E1A4" stroke-width="5" stroke-linecap="round"/>
+<path d="M34 55H46M65 55H78M34 66H46M65 66H78M34 77H46" stroke="#B99C68" stroke-width="2.8" stroke-linecap="round"/>
+<circle cx="59" cy="69" r="16" fill="#246C52" stroke="#D0A957" stroke-width="2"/>
+<path d="M64 58A12 12 0 1 0 70 79A14 14 0 1 1 64 58Z" fill="#FBE7A9"/>
+<path d="M76 58L77.4 61.5L81 62.5L77.4 63.5L76 67L74.6 63.5L71 62.5L74.6 61.5Z" fill="#FAE6A7"/>
+</svg>

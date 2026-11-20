@@ -56,9 +56,9 @@ function progressText(update) {
   if (!update) return '';
   if (update.status === 'progress_total' || update.status === 'progress') {
     const pct = Math.max(0, Math.min(100, Math.round(Number(update.progress) || 0)));
-    return `Downloading the background model… ${pct}%`;
+    return `Preparing image… ${pct}%`;
   }
-  if (update.status === 'initiate' || update.status === 'download') return 'Downloading the background model…';
+  if (update.status === 'initiate' || update.status === 'download') return 'Preparing image…';
   return '';
 }
 
@@ -89,7 +89,7 @@ async function loadSpec(mod, spec, onStatus) {
     },
   };
   if (spec.model_file_name) options.model_file_name = spec.model_file_name;
-  onStatus(spec.device === 'webgpu' ? 'Preparing the background model on this GPU…' : 'Preparing the background model…');
+  onStatus(spec.device === 'webgpu' ? 'Preparing image…' : 'Preparing image…');
   const model = await mod.AutoModel.from_pretrained(spec.id, options);
   const processor = await mod.AutoProcessor.from_pretrained(spec.id, { revision: spec.revision });
   return { ...spec, model, processor, transformers: mod };
@@ -232,7 +232,7 @@ async function render(current, source, target, onStatus) {
   if (current.tier === '512') {
     const crop = subjectCrop(alpha, work.width, work.height);
     if (crop) {
-      onStatus('Refining the subject…');
+      onStatus('Removing background…');
       const local = await inferAlpha(current, cropOf(work, crop));
       const localAlpha = upsample(local.alpha, local.width, local.height, crop.w, crop.h);
       const feather = Math.max(8, Math.round(Math.min(crop.w, crop.h) * 0.06));
@@ -243,7 +243,7 @@ async function render(current, source, target, onStatus) {
       const tile = Math.round(Math.min(1100, Math.max(640, longSide * 0.55)));
       const tiles = pickTiles(alpha, work.width, work.height, 3, tile);
       for (let index = 0; index < tiles.length; index++) {
-        onStatus(`Refining edges (${index + 1} of ${tiles.length})…`);
+        onStatus('Removing background…');
         const rect = tiles[index];
         const local = await inferAlpha(current, cropOf(work, rect));
         const localAlpha = upsample(local.alpha, local.width, local.height, rect.w, rect.h);
@@ -253,7 +253,7 @@ async function render(current, source, target, onStatus) {
     }
     fillEnclosedHoles(alpha, work.width, work.height, 1800);
   }
-  onStatus('Cleaning the outline…');
+  onStatus('Finishing image…');
   const image = work.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, work.width, work.height);
   const refined = refineAlpha(alpha, image.data, image.width, image.height);
   const matted = applyMatte(image.data, refined);
@@ -287,7 +287,7 @@ export async function removeBackground(source, target, { onStatus = () => {}, on
         rememberSkip1024();
         await dispose(session);
         session = null;
-        onStatus('Switching to the compatible model…');
+        onStatus('Preparing image…');
         session = await createSession(onStatus);
         onRuntime({ tier: session.tier, device: session.device, id: session.id, revision: session.revision });
         await render(session, source, target, onStatus);

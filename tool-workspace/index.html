@@ -367,7 +367,7 @@ $('#runImage').onclick=async()=>{
       eraseConnectedBackground();await downloadCanvas('image/png',1);
     }else if(activeTool==='watermark-remove'){
       if(!selection)throw Error(messages.chooseArea);
-      if(selection.w>imageCanvas.width*.45||selection.h>imageCanvas.height*.45)throw Error(messages.areaTooLarge);
+      if(selection.w>imageCanvas.width*.90||selection.h>imageCanvas.height*.75)throw Error(messages.areaTooLarge);
       const {repairWatermark,cancelWatermarkRepair}=await import('/tools/watermark-remover/inpaint.js?v=20261120-wm2');
       cancelWmWork=cancelWatermarkRepair;
       setStatus('Removing selected mark…');

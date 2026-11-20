@@ -255,7 +255,21 @@ function quantizePngCanvas(source,qualityValue){
   }
   context.putImageData(pixels,0,0);return working;
 }
+function ensureTransparentCutout(canvas){
+  // Small sampled thumbnail to avoid allocating another full-size pixel buffer.
+  const sample=document.createElement('canvas');sample.width=64;sample.height=64;
+  const context=sample.getContext('2d',{willReadFrequently:true});
+  context.clearRect(0,0,64,64);context.drawImage(canvas,0,0,64,64);
+  const rgba=context.getImageData(0,0,64,64).data;
+  let transparent=0,subject=0;
+  for(let i=3;i<rgba.length;i+=4){
+    if(rgba[i]<24)transparent++;
+    if(rgba[i]>220)subject++;
+  }
+  if(transparent<20||subject<20)throw Error('Could not separate the subject from the background. Try a photo with a clear foreground.');
+}
 async function downloadCanvas(type,qualityValue,note=''){
+  if(activeTool==='background-remove')ensureTransparentCutout(imageCanvas);
   const blob=await encodeCanvas(imageCanvas,type,qualityValue);
   await recordImage(blob,imageFile.files[0],imageCanvas,original,note);
   return blob;
@@ -282,7 +296,7 @@ $('#runImage').onclick=async()=>{
     }else if(activeTool==='background-remove'){
       if(!original)throw Error(messages.chooseImage);
       if(mobileBgDevice){
-        const {removeMobileBackground,cancelMobileBackgroundRemoval}=await import('/tools/background-remover/mobile-engine.js?v=20261120-mobile1');
+        const {removeMobileBackground,cancelMobileBackgroundRemoval}=await import('/tools/background-remover/mobile-engine.js?v=20261120-mobile3');
         cancelBgWork=cancelMobileBackgroundRemoval;$('#cancelBg').hidden=false;
         try{
           const info=await removeMobileBackground(original,imageCanvas,{onStatus:setStatus});

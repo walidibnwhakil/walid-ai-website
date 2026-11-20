@@ -255,7 +255,22 @@ function quantizePngCanvas(source,qualityValue){
   }
   context.putImageData(pixels,0,0);return working;
 }
+function ensureTransparentCutout(canvas){
+  // Check a tiny sample instead of allocating another full-resolution buffer.
+  const sample=document.createElement('canvas');sample.width=64;sample.height=64;
+  const context=sample.getContext('2d',{willReadFrequently:true});
+  context.clearRect(0,0,64,64);
+  context.drawImage(canvas,0,0,64,64);
+  const pixels=context.getImageData(0,0,64,64).data;
+  let transparent=0,visible=0;
+  for(let i=3;i<pixels.length;i+=4){
+    if(pixels[i]<24)transparent++;
+    if(pixels[i]>220)visible++;
+  }
+  if(transparent<20||visible<20)throw Error('The background was not removed correctly. Try an image with a clearer subject.');
+}
 async function downloadCanvas(type,qualityValue,note=''){
+  if(activeTool==='background-remove')ensureTransparentCutout(imageCanvas);
   const blob=await encodeCanvas(imageCanvas,type,qualityValue);
   await recordImage(blob,imageFile.files[0],imageCanvas,original,note);
   return blob;

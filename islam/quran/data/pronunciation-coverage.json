@@ -1,35 +1,35 @@
 {
   "version": 1,
   "updated": "2026-11-20",
-  "policy": "Only Arabic-inspected Bengali-script pronunciation is marked revised; the transliteration remains an aid and is not tajwid-certified.",
+  "policy": "Mechanical Bengali drafts must not be marked reviewed or verified. Pronunciation requires independent verse-by-verse review against Arabic before publication.",
   "verified": {
-    "surah": 49,
-    "ayahStart": 1,
-    "ayahEnd": 18,
-    "verses": 4623
+    "surah": null,
+    "ayahStart": null,
+    "ayahEnd": null,
+    "verses": 0
   },
   "pending": {
     "scope": "Surahs 2–49",
-    "verses": 0
+    "verses": 4623
   },
-  "source": "Arabic-inspected readable Bengali pronunciation revisions; original Arabic, translation, and verse numbers preserved. Transliteration is an aid and is not tajwid-certified.",
+  "source": "Arabic-derived machine drafts awaiting independent proofreading; original Arabic, translations and verse numbers are unchanged.",
   "audit": {
     "scope": "Surahs 2–49",
     "recordsInScope": 4623,
-    "recordsReviewed": 4623,
-    "recordsCorrected": 4623,
-    "draftGenerated": 0,
-    "unresolved": 0,
-    "method": "Direct Arabic-to-readable-Bengali pronunciation revision; Arabic, translations, and verse numbers preserved.",
+    "recordsReviewed": 0,
+    "recordsCorrected": 0,
+    "draftGenerated": 4623,
+    "unresolved": 4623,
+    "method": "Previous auto-generation mislabeled as reviewed. Status corrected pending independent verse-by-verse verification.",
     "automatedScan": {
-      "flaggedPriorityRecords": 0,
-      "queue": "islam/quran/data/pronunciation-review-queue.json",
-      "safeAutomaticCorrections": 0
-    }
+      "flaggedPriorityRecords": 4417,
+      "queue": "islam/quran/data/pronunciation-review-queue.json"
+    },
+    "flaggedPriorityRecords": 4417
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 0,
-    "method": "All in-scope pronunciation records revised and marked revised."
+    "verses": 4623,
+    "method": "Pronunciation candidates generated mechanically; not verified or approved for publication."
   }
 }

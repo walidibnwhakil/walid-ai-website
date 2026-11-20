@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112" fill="none" role="img" aria-label="Sunrise for morning duas">
+<title>Sunrise for morning duas</title>
+<defs><radialGradient id="bg" cx="0" cy="0" r="1" gradientTransform="translate(42 27) rotate(55) scale(103)"><stop stop-color="#27785B"/><stop offset="1" stop-color="#073F32"/></radialGradient></defs>
+<circle cx="56" cy="56" r="54" fill="url(#bg)" stroke="#CDA953" stroke-width="3"/>
+<circle cx="56" cy="56" r="48" stroke="#EBD48C" stroke-opacity=".7" stroke-width="1"/>
+<path d="M13 78Q35 63 55 73Q78 61 99 75V94H13Z" fill="#0D503E"/>
+<path d="M19 85Q39 76 56 83Q79 74 94 84" stroke="#84B394" stroke-width="2" opacity=".8"/>
+<path d="M20 67H92" stroke="#F8DF9D" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M36 67A20 20 0 0 1 76 67Z" fill="#FFD56B" stroke="#C58D39" stroke-width="1.7"/>
+<path d="M56 28V38M35 37L42 44M77 37L70 44M24 55H34M78 55H88" stroke="#FFDEA0" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M38 58Q56 49 74 58" stroke="#FFF0BE" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+</svg>

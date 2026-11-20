@@ -399,12 +399,18 @@ async function renderEditableTextHits(pdfPage, view, token) {
   const textContent = await pdfPage.getTextContent();
   if (token !== state.renderToken) return;
   const overlay = $("overlay");
-  for (const item of textContent.items) {
-    if (!item.str?.trim() || !Number.isFinite(item.transform?.[4])) continue;
-    const size = Math.max(8, Math.hypot(item.transform[0], item.transform[1]) || item.height || 12);
-    const x = item.transform[4], baseline = item.transform[5];
-    const r = view.convertToViewportRectangle([x, baseline - size * .24, x + Math.max(8, item.width || size), baseline + size * .92]);
-    const box = {x:Math.max(0,Math.min(r[0],r[2])),y:Math.max(0,Math.min(r[1],r[3])),w:Math.abs(r[2]-r[0]),h:Math.abs(r[3]-r[1])};
+  const textItems=textContent.items.filter(item=>item.str?.trim());
+  const sourceItems=textItems.length?textItems:(currentPage()?.ocrSpans||[]);
+  for (const item of sourceItems) {
+    if (!item.str?.trim() || (!item.ocr && !Number.isFinite(item.transform?.[4]))) continue;
+    const size = item.ocr ? item.size : Math.max(8, Math.hypot(item.transform[0], item.transform[1]) || item.height || 12);
+    let box;
+    if (item.ocr) box={...item.box};
+    else {
+      const x = item.transform[4], baseline = item.transform[5];
+      const r = view.convertToViewportRectangle([x, baseline - size * .24, x + Math.max(8, item.width || size), baseline + size * .92]);
+      box={x:Math.max(0,Math.min(r[0],r[2])),y:Math.max(0,Math.min(r[1],r[3])),w:Math.abs(r[2]-r[0]),h:Math.abs(r[3]-r[1])};
+    }
     if (box.w < 3 || box.h < 3 || box.x >= view.width || box.y >= view.height) continue;
     const replaced = currentPage()?.annotations.some(a => a.kind === "replacement" && a.originalRect && Math.abs(a.originalRect.x-box.x)<4 && Math.abs(a.originalRect.y-box.y)<4);
     if (replaced) continue;
@@ -428,6 +434,43 @@ async function renderEditableTextHits(pdfPage, view, token) {
     });
     overlay.append(button);
   }
+}
+
+
+async function recognizeEditPageText() {
+  if (tool !== "edit" || !state.doc || !state.pages.length) {
+    setStatus("Choose a PDF first.");
+    return;
+  }
+  const info=currentPage();
+  const {pdfPage,view}=await viewportFor(info,1);
+  const scale=Math.min(2.7,2200/Math.max(view.width,view.height));
+  const viewport=pdfPage.getViewport({scale,rotation:totalRotation(info)});
+  const canvas=document.createElement("canvas");
+  canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+  const ctx=canvas.getContext("2d");
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+  setStatus("Recognizing scanned text on the selected page…");
+  await pdfPage.render({canvasContext:ctx,viewport}).promise;
+  const {createWorker}=await import("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm");
+  const worker=await createWorker("ben+eng");
+  let result;
+  try{result=await worker.recognize(canvas);}
+  finally{await worker.terminate();}
+  info.ocrSpans=(result.data.words||[]).filter(word=>word.text?.trim()).map(word=>{
+    const box={
+      x:word.bbox.x0/scale,y:word.bbox.y0/scale,
+      w:(word.bbox.x1-word.bbox.x0)/scale,h:(word.bbox.y1-word.bbox.y0)/scale
+    };
+    return {ocr:true,str:word.text.trim(),box,size:Math.max(10,box.h)};
+  });
+  if(!info.ocrSpans.length){
+    setStatus("No words were recognized. Use Cover area and Add text manually.");
+    return;
+  }
+  markEditTool("replace");
+  await renderPage();
+  setStatus("Recognized "+info.ocrSpans.length+" word(s). Select a highlighted word to edit it; OCR may contain spelling errors.");
 }
 
 function boundsOf(points) {
@@ -614,6 +657,7 @@ async function rotateBy(delta) {
   if (!page) return;
   const old = await viewportFor(page, 1);
   page.rotation = ((page.rotation || 0) + delta + 360) % 360;
+  page.ocrSpans = null;
   const next = await viewportFor(page, 1);
   await retargetPage(page, old.view, next.view);
   if (tool !== "organize") await renderPage();
@@ -1566,6 +1610,7 @@ document.addEventListener("keydown", (event) => {
 });
 bindDrop($("drop"), $("file"));
 bindSignPad();
+$("recognizeEditText").addEventListener("click",()=>busy($("recognizeEditText"),recognizeEditPageText));
 $("ocrOutput").addEventListener("input",()=>updateOcrDownload($("ocrOutput").value));
 for (const [id, job] of [
   ["saveEdit", () => saveEdited("-edited")],

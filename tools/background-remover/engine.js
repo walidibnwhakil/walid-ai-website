@@ -89,7 +89,7 @@ async function loadSpec(mod, spec, onStatus) {
     },
   };
   if (spec.model_file_name) options.model_file_name = spec.model_file_name;
-  onStatus(spec.device === 'webgpu' ? 'Preparing image…' : 'Preparing image…');
+  onStatus('Preparing image…');
   const model = await mod.AutoModel.from_pretrained(spec.id, options);
   const processor = await mod.AutoProcessor.from_pretrained(spec.id, { revision: spec.revision });
   return { ...spec, model, processor, transformers: mod };
@@ -121,7 +121,7 @@ async function createSession(onStatus) {
       if (spec.device === 'webgpu' && spec.tier !== '1024') forceWasm = true;
     }
   }
-  throw lastError || new Error('The background model could not be loaded.');
+  throw lastError || new Error('Could not prepare the image.');
 }
 
 function firstTensor(result) {
@@ -168,7 +168,7 @@ async function inferAlpha(current, canvas) {
     result = await current.model(pixelValues);
   }
   const tensor = result?.logits ?? result?.output_image ?? result?.output ?? firstTensor(result);
-  if (!tensor?.data) throw new Error('The background model returned no mask.');
+  if (!tensor?.data) throw new Error('Could not finish removing the background.');
   return tensorToAlpha(tensor);
 }
 
@@ -297,7 +297,7 @@ export async function removeBackground(source, target, { onStatus = () => {}, on
         forceWasm = true;
         await dispose(session);
         session = null;
-        onStatus('Switching to the compatible model…');
+        onStatus('Preparing image…');
         session = await createSession(onStatus);
         onRuntime({ tier: session.tier, device: session.device, id: session.id, revision: session.revision });
         await render(session, source, target, onStatus);

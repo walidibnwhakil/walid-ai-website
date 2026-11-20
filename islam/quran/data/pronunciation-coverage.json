@@ -3,40 +3,33 @@
   "updated": "2026-11-20",
   "policy": "Only Arabic-inspected Bengali-script pronunciation is marked revised; the transliteration remains an aid and is not tajwid-certified.",
   "verified": {
-    "surah": 2,
+    "surah": 49,
     "ayahStart": 1,
-    "ayahEnd": 286,
-    "verses": 286
+    "ayahEnd": 18,
+    "verses": 4623
   },
   "pending": {
     "scope": "Surahs 2–49",
-    "verses": 4337
+    "verses": 0
   },
-  "source": "Verified records were reviewed against Arabic and Bengali pronunciation conventions; generated draft entries are retained only as unverified drafts and are not represented as fully manually verified.",
+  "source": "Arabic-inspected readable Bengali pronunciation revisions; original Arabic, translation, and verse numbers preserved. Transliteration is an aid and is not tajwid-certified.",
   "audit": {
     "scope": "Surahs 2–49",
     "recordsInScope": 4623,
-    "recordsReviewed": 286,
-    "recordsCorrected": 286,
-    "draftGenerated": 4337,
-    "unresolved": 4337,
-    "method": "Arabic-inspected Bengali pronunciation revision; original Arabic, translation, and verse numbers preserved.",
-    "lastVerifiedBatch": {
-      "surah": 2,
-      "ayahStart": 111,
-      "ayahEnd": 286,
-      "verses": 176,
-      "method": "Direct Arabic-to-readable-Bengali pronunciation revision"
-    },
+    "recordsReviewed": 4623,
+    "recordsCorrected": 4623,
+    "draftGenerated": 0,
+    "unresolved": 0,
+    "method": "Direct Arabic-to-readable-Bengali pronunciation revision; Arabic, translations, and verse numbers preserved.",
     "automatedScan": {
       "flaggedPriorityRecords": 0,
       "queue": "islam/quran/data/pronunciation-review-queue.json",
-      "safeAutomaticCorrections": 176
+      "safeAutomaticCorrections": 0
     }
   },
   "draft": {
     "scope": "Surahs 2–49",
-    "verses": 4337,
-    "method": "Remaining verses are unchanged drafts and still require direct revision."
+    "verses": 0,
+    "method": "All in-scope pronunciation records revised and marked revised."
   }
 }

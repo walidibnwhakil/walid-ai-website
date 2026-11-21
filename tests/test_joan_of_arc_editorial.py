@@ -85,6 +85,19 @@ class JoanOfArcEditorialTests(unittest.TestCase):
         self.assertNotRegex(HTML, r'class="others-(?:next|sources)"')
         self.assertNotIn("href=\"#chapter-14\"", HTML)
 
+    def test_cauchon_political_context_and_post_trial_career(self):
+        chapters = {int(n): body for n, _, body in SECTIONS}
+        trial = chapters[8]
+        aftermath = chapters[11]
+        for term in ("পিয়ের কোশোঁ", "প্যারিস বিশ্ববিদ্যালয়ে",
+                     "বার্গান্ডীয়", "১৪২৯", "বোভে",
+                     "ইংরেজ", "ধর্মীয় আইনের"):
+            self.assertIn(term, trial, "Missing judge's context: " + term)
+        for term in ("পিয়ের কোশোঁ", "লিজিয়ুর বিশপ",
+                     "১৪৩২", "১৪৪২", "১৪৫৬"):
+            self.assertIn(term, aftermath, "Missing later outcome: " + term)
+        self.assertIn("joan-source-metadata", HTML)
+
     def test_canonical_logo_and_reader_assets(self):
         expected = (
             '<html lang="bn">', 'name="viewport"',

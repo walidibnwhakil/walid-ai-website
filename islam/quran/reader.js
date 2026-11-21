@@ -54,7 +54,7 @@
     pronunciationStatus.hidden = !pronunciation.checked || items.length > 0;
   }
   pronunciation.addEventListener('change', refreshPronunciation);
-  new MutationObserver(refreshPronunciation).observe(verses, {childList: true});
+  new MutationObserver(refreshPronunciation).observe(verses, {childList: true, subtree: true});
 
   const tabDefs = [
     ['surah', 'সূরা'],

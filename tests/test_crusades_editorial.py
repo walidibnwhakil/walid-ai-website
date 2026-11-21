@@ -130,6 +130,19 @@ class CrusadesEditorialTests(unittest.TestCase):
                 f"Repeated long sentences in chapter {number}: {title}"
             )
 
+    def test_raynald_familial_roots_held_captive_and_border_choices(self):
+        """Raynald needs a documented arc rather than a one-sentence villain role."""
+        origins = self.chapters[9][2]
+        battle = self.chapters[10][2]
+        for term in ("কনস্টান্স", "আন্তাকিয়া", "সাইপ্রাস", "মানুয়েল",
+                     "আলেপ্পোয়", "স্টেফানি", "কেরাক", "১১৮২–৮৩",
+                     "কাফেলা", "তীর্থযাত্রী"):
+            self.assertIn(term, origins, "Missing Raynald backstory: " + term)
+        for term in ("রাইনল্ড", "গাই", "সালাহউদ্দিন",
+                     "কাফেলা", "শান্তিচুক্তি"):
+            self.assertIn(term, battle, "Missing Raynald 1187 context: " + term)
+        self.assertIn("crusades-source-metadata", self.page)
+
     def test_preserved_site_shell(self):
         text = self.page
         self.assertIn('<html lang="bn">', text)

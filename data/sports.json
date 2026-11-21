@@ -1,34 +1,118 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-21T09:12:00.908924+00:00",
+  "updatedAt": "2026-11-21T17:06:01.045141+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Harden passes Bryant for 50-point games",
-      "url": "https://www.bbc.co.uk/sport/basketball/articles/cwx2e8y1lr8lo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T09:10:18+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Premier League resumes, Kane facing spell on sidelines: football news – matchday live",
-      "url": "https://www.theguardian.com/football/live/2026/nov/21/premier-league-resumes-kane-facing-spell-on-sidelines-football-news-matchday-live",
+      "title": "Chelsea 1-4 Leeds, Tottenham 2-0 Ipswich, and more: football clockwatch – live",
+      "url": "https://www.theguardian.com/football/live/2026/nov/21/chelsea-v-leeds-tottenham-v-ipswich-and-more-football-clockwatch-live",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T09:00:22+00:00",
+      "publishedAt": "2026-11-21T17:04:01+00:00",
       "category": "Sports"
     },
     {
-      "title": "'Somebody has to stand up to that guy' - and Russell has his chance in Vegas",
+      "title": "Newcastle United v Arsenal: Premier League – live",
+      "url": "https://www.theguardian.com/football/live/2026/nov/21/newcastle-united-v-arsenal-premier-league-live",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T17:01:00+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Teenager Williams-Barnett puts Tottenham on path to win over Ipswich",
+      "url": "https://www.theguardian.com/football/2026/nov/21/tottenham-ipswich-premier-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T16:58:31+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Ex-captain Moody joins England in emotional haka response",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c5vg2ppp90w8o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T16:42:55+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England beat New Zealand by record margin",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/videos/c6742znzggeyo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T16:28:09+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "McConnell shines as 11-try Scotland dismantle Japan",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cmx2x00w08keo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T16:23:11+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Superb England run up record win over New Zealand",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cwm2jxd8k15mo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T16:08:59+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Fernandez dropped, Anderson scores - Man City's £327m midfield dilemma",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cxe8944j188yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T16:07:19+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'It's quite clear' - Maresca believes Haaland goal should have stood",
+      "url": "https://www.bbc.co.uk/sport/football/videos/c9e85mmr3z8vo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T15:34:35+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Liverpool keeper Keating holds leaders Chelsea at bay in scoreless WSL draw",
+      "url": "https://www.theguardian.com/football/2026/nov/21/liverpool-chelsea-london-city-lionesses-crystal-palace-wsl",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T15:03:50+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Championship roundup: Southampton get Larin lift as Norwich win five in a row",
+      "url": "https://www.theguardian.com/football/2026/nov/21/championship-roundup-southampton-birmingham-middlesbrough-swansea",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T14:50:20+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Elliot Anderson halts Manchester City’s losing run but boos greet Fulham draw",
+      "url": "https://www.theguardian.com/football/2026/nov/21/manchester-city-fulham-premier-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T14:34:03+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Elon Musk’s lawyer joining Tom Brady in buying Chelsea stake",
+      "url": "https://www.theguardian.com/football/2026/nov/21/elon-musk-lawyer-tom-brady-nfl-chelsea-stake",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T14:20:05+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Bayern draw with Cologne as Kane picks up ankle injury",
+      "url": "https://www.bbc.co.uk/sport/football/videos/ck7v2nz0lp32o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T13:29:40+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Australia's Chaudhary downs England in tetchy first T20",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/cme39qlevnrqo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T12:24:33+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'Somebody has to stand up to that guy' - Verstappen-Russell rivalry blows up again",
       "url": "https://www.bbc.co.uk/sport/formula1/articles/c34gnrvl9zvro?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-21T08:13:58+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Cummins' integrity not compromised - Cricket Australia",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c65y1gjnqe50o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T07:55:06+00:00",
       "category": "Sports"
     },
     {
@@ -39,20 +123,6 @@
       "category": "Sports"
     },
     {
-      "title": "Athlete who lost hand saving friends in attack 'would do it again'",
-      "url": "https://www.bbc.co.uk/sport/taekwondo/articles/crpdwljj0v89o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T06:35:06+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Jeers, injuries and doubters - White's journey back to the top",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cv7028xeler2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T06:17:32+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Brighton are rocking the Premier League elite. But can they mount a title tilt?",
       "url": "https://www.theguardian.com/football/2026/nov/21/brighton-rocking-premier-league-elite-title-challenge",
       "source": "The Guardian Football",
@@ -60,71 +130,15 @@
       "category": "Sports"
     },
     {
-      "title": "Antonelli fastest but penalty leaves Verstappen on pole",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/cqlyj4yg366wo?at_medium=RSS&at_campaign=rss",
+      "title": "Watch: Inverness and Ayr play out goalless draw",
+      "url": "https://www.bbc.co.uk/sport/football/videos/c6zxvnzjnne4o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-21T05:54:10+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Price beats Kotaskova to become undisputed champion",
-      "url": "https://www.bbc.co.uk/sport/boxing/articles/cw808y2lrkzxo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T23:30:56+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Cost of Man Utd hiring and firing managers nears £100m",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cwd01n9z23x5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T23:18:16+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Bayern Munich confirm Harry Kane ‘out for next few months’ with ankle injury",
-      "url": "https://www.theguardian.com/football/2026/nov/20/harry-kane-ankle-ligament-injury-bayern-munich-england",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T22:43:40+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Premier League news: Moyes demands more from Grealish, Iraola wary of United threat",
-      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-news-everton-jack-grealish-manchester-city-liverpool-chelsea",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T22:31:19+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Shevchenko lying about drugs test claims - Mudryk",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cjn502n9vqp4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T21:54:17+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Osimhen keen on Man Utd move - Saturday's gossip",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c60qj1924wyeo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T20:06:51+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Washington Spirit provide hope and joy in a city that badly needs it",
-      "url": "https://www.theguardian.com/football/2026/nov/20/washington-spirit-provide-hope-and-joy-in-a-city-that-badly-needs-it",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T19:56:49+00:00",
+      "publishedAt": "2026-11-20T21:47:58+00:00",
       "category": "Sports"
     },
     {
       "title": "Pochettino the connector: will human touch lift Manchester United?",
       "url": "https://www.theguardian.com/football/2026/nov/20/mauricio-pochettino-manchester-united-manager-liverpool-premier-league",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T19:00:37+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Training hard and biding his time, Dele Alli has not given up on football yet",
-      "url": "https://www.theguardian.com/football/2026/nov/20/dele-alli-tottenham-mk-dons-england",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T19:00:37+00:00",
       "category": "Sports"
@@ -137,17 +151,10 @@
       "category": "Sports"
     },
     {
-      "title": "Stacked England aim to pile on style and add to All Black misery",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cqrmgjpp0l48o?at_medium=RSS&at_campaign=rss",
+      "title": "We want to have a positive impact - Pochettino",
+      "url": "https://www.bbc.co.uk/sport/football/videos/cw20xd2zgl0xo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-20T16:51:17+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Tom Brady in talks over buying Chelsea stake after Birmingham City exit",
-      "url": "https://www.theguardian.com/football/2026/nov/20/tom-brady-chelsea-talks-stake-birmingham-city",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T14:50:09+00:00",
+      "publishedAt": "2026-11-20T16:01:53+00:00",
       "category": "Sports"
     },
     {
@@ -162,13 +169,6 @@
       "url": "https://www.theguardian.com/football/ng-interactive/2026/nov/20/male-footballers-best-associated-each-shirt-number-readers-edit",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T06:00:24+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Premier League: 10 things to look out for this weekend",
-      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-10-things-to-look-out-for-this-weekend",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T00:00:15+00:00",
       "category": "Sports"
     }
   ],
@@ -216,13 +216,13 @@
           "id": "83238",
           "homeTeam": "Bayer 04 Leverkusen",
           "awayTeam": "SC Paderborn 07",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 4,
+          "awayScore": 0,
+          "winner": "Bayer 04 Leverkusen",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -233,13 +233,13 @@
           "id": "83239",
           "homeTeam": "Eintracht Frankfurt",
           "awayTeam": "TSG Hoffenheim",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 1,
+          "awayScore": 0,
+          "winner": "Eintracht Frankfurt",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -250,13 +250,13 @@
           "id": "83241",
           "homeTeam": "1. FC Union Berlin",
           "awayTeam": "RB Leipzig",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 1,
+          "awayScore": 5,
+          "winner": "RB Leipzig",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -267,13 +267,13 @@
           "id": "83242",
           "homeTeam": "Borussia Mönchengladbach",
           "awayTeam": "Borussia Dortmund",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 0,
+          "awayScore": 1,
+          "winner": "Borussia Dortmund",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -284,13 +284,13 @@
           "id": "83245",
           "homeTeam": "SV 07 Elversberg",
           "awayTeam": "SC Freiburg",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 0,
+          "awayScore": 1,
+          "winner": "SC Freiburg",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-21T14:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -4132,93 +4132,6 @@
           "source": "CricketData"
         },
         {
-          "id": "ca1e79e1-cff2-420e-9ce4-858ae45c402b",
-          "homeTeam": "Bangladesh Women",
-          "awayTeam": "Thailand Women",
-          "homeScore": 132,
-          "awayScore": 129,
-          "innings": [
-            {
-              "team": "Bangladesh Women Inning 1",
-              "runs": 132,
-              "wickets": 6,
-              "overs": 20
-            },
-            {
-              "team": "Thailand Women Inning 1",
-              "runs": 129,
-              "wickets": 5,
-              "overs": 20
-            }
-          ],
-          "winner": "Bangladesh Women",
-          "competition": "Bangladesh Women vs Thailand Women, 20th Match, Group B, ICC Womens Emerging Nations Trophy, 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-18T09:15:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "b2c12e64-3f13-41fb-a65d-5e8a3b5c655b",
-          "homeTeam": "Netherlands Women",
-          "awayTeam": "Zimbabwe Women",
-          "homeScore": 160,
-          "awayScore": 127,
-          "innings": [
-            {
-              "team": "zimbabwe women Inning 1",
-              "runs": 160,
-              "wickets": 2,
-              "overs": 20
-            },
-            {
-              "team": "Netherlands Women,Zimbabwe Women Inning 1",
-              "runs": 127,
-              "wickets": 7,
-              "overs": 20
-            }
-          ],
-          "winner": "Zimbabwe Women",
-          "competition": "Netherlands Women vs Zimbabwe Women, 19th Match, Group B, ICC Womens Emerging Nations Trophy, 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-18T09:15:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "2b71cf65-0739-4709-acc5-4c3f93c535e9",
-          "homeTeam": "Kathmandu Gorkhas",
-          "awayTeam": "Chitwan Rhinos",
-          "homeScore": 204,
-          "awayScore": 143,
-          "innings": [
-            {
-              "team": "chitwan rhinos Inning 1",
-              "runs": 204,
-              "wickets": 4,
-              "overs": 20
-            },
-            {
-              "team": "Kathmandu Gorkhas,Chitwan Rhinos Inning 1",
-              "runs": 143,
-              "wickets": 9,
-              "overs": 20
-            }
-          ],
-          "winner": "Chitwan Rhinos",
-          "competition": "Kathmandu Gorkhas vs Chitwan Rhinos, Eliminator, Nepal Premier League 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-18T11:15:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
           "id": "b143ee8f-6faa-48bd-a69e-dc7aa65494ba",
           "homeTeam": "Sri Lanka A",
           "awayTeam": "Afghanistan A",
@@ -4488,50 +4401,53 @@
           "innings": [
             {
               "team": "sri lanka a Inning 1",
-              "runs": 234,
-              "wickets": 4,
-              "overs": 43.2
+              "runs": 284,
+              "wickets": 9,
+              "overs": 50
+            },
+            {
+              "team": "Sri Lanka A,Hong Kong Inning 1",
+              "runs": 260,
+              "wickets": 9,
+              "overs": 50
             }
           ],
-          "winner": null,
-          "resultText": null,
+          "winner": "Sri Lanka A",
+          "resultText": "Sri Lanka A won by 24 runs",
           "competition": "Sri Lanka A vs Hong Kong, China, 5th Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
           "matchType": "odi",
           "startTime": "2026-11-21T06:00:00Z",
           "finishedAt": null,
-          "status": "live",
+          "status": "finished",
           "source": "CricketData"
         },
         {
           "id": "92cae33c-1743-488c-aa5e-dce5d1887a91",
           "homeTeam": "Bangladesh A",
           "awayTeam": "Afghanistan A",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
+          "homeScore": 160,
+          "awayScore": 174,
+          "innings": [
+            {
+              "team": "Afghanistan A Inning 1",
+              "runs": 174,
+              "wickets": 10,
+              "overs": 45
+            },
+            {
+              "team": "Bangladesh A Inning 1",
+              "runs": 160,
+              "wickets": 7,
+              "overs": 42.4
+            }
+          ],
           "winner": null,
           "resultText": null,
           "competition": "Bangladesh A vs Afghanistan A, 6th Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
           "matchType": "odi",
           "startTime": "2026-11-21T10:00:00Z",
           "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "38961c95-3cdb-4559-9a4b-f4b59e7aab03",
-          "homeTeam": "Lumbini Lions",
-          "awayTeam": "Sudur Paschim Royals",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Lumbini Lions vs Sudur Paschim Royals, Final, Nepal Premier League 2026",
-          "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-21T10:45:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
+          "status": "live",
           "source": "CricketData"
         },
         {

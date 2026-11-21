@@ -983,6 +983,7 @@ function resetAll() {
   state.doc?.destroy?.();
   state.doc = null;
   state.bytes = null;
+  state.fileName = "";
   state.pages = [];
   state.images = [];
   state.signature = null;
@@ -1022,12 +1023,22 @@ async function afterPdfOpened() {
 
 async function acceptPdfFile(file) {
   if (!file) return;
+  resetAll(); // An invalid new upload must not leave the previous document or download active.
+  if (!file.size) {
+    setStatus("This PDF is empty. Choose a valid PDF file.");
+    return;
+  }
   if (file.size > MAX_BYTES) {
     setStatus("This file is too large for the browser tool. Try a smaller PDF.");
     return;
   }
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (!new TextDecoder("latin1").decode(bytes.subarray(0,Math.min(1024,bytes.length))).includes("%PDF-")) {
+    setStatus("The selected file is not a valid PDF.");
+    return;
+  }
   state.fileName = file.name;
-  state.bytes = new Uint8Array(await file.arrayBuffer());
+  state.bytes = bytes;
   // Encryption detection is only needed by the protect workflow. Running a second
   // full PDF parse here made ordinary tools, including compression, stall before
   // their PDF.js document was ready.
@@ -1143,6 +1154,7 @@ async function acceptImages(fileList) {
     return;
   }
   setStatus("Reading images…");
+  if (!state.fileName) state.fileName = list[0].name;
   for (const file of list) state.images.push(await loadImageFile(file));
   showWork(state.images.length + " image" + (state.images.length === 1 ? "" : "s"));
   $("stage").hidden = true;
@@ -1278,7 +1290,7 @@ async function runOcr() {
     }});
     return worker;
   };
-  const sections=[];
+  const sections=[],unreadable=[];let recovered=0;
   try{
     if(state.doc){
       for(let index=0;index<total;index++){
@@ -1288,6 +1300,7 @@ async function runOcr() {
         const selectable=textContent.items.map(item=>String(item.str||"")).filter(Boolean).join(" ").trim();
         if(selectable.replace(/\s/g,"").length>12) {
           sections.push("Page "+(index+1)+"\n"+selectable);
+          recovered++;
           continue;
         }
         const renderView=pdfPage.getViewport({
@@ -1300,7 +1313,9 @@ async function runOcr() {
         await pdfPage.render({canvasContext:ctx,viewport:renderView}).promise;
         const worker=await getWorker();
         const result=await worker.recognize(canvas);
-        sections.push("Page "+(index+1)+"\n"+(result.data.text||"").trim());
+        const found=(result.data.text||"").trim();
+        if(found){sections.push("Page "+(index+1)+"\n"+found);recovered++;}
+        else unreadable.push(index+1);
       }
     }else{
       for(let index=0;index<total;index++){
@@ -1316,13 +1331,19 @@ async function runOcr() {
         ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close?.();
         const worker=await getWorker();
         const result=await worker.recognize(canvas);
-        sections.push((img.name||"Image "+(index+1))+"\n"+(result.data.text||"").trim());
+        const found=(result.data.text||"").trim();
+        if(found){sections.push((img.name||"Image "+(index+1))+"\n"+found);recovered++;}
+        else unreadable.push(index+1);
       }
     }
     const text=sections.join("\n\n").trim();
     $("ocrOutput").value=text;
     updateOcrDownload(text);
-    setStatus(text?"Text extracted. Review and correct mistakes in the text box before downloading.":"No readable text was found.");
+    setStatus(!recovered
+      ? "No readable text was found. Nothing was downloaded."
+      : unreadable.length
+        ? "Text found in "+recovered+" of "+total+" pages or images. No readable text in item(s) "+unreadable.join(", ")+". Review the result."
+        : "Text extracted. Review and correct mistakes before downloading.");
   }finally{await worker?.terminate();}
 }
 function cropSignature() {
@@ -1503,18 +1524,25 @@ function bindDrop(zone, input) {
     zone.classList.add("dragover");
   });
   zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
-  zone.addEventListener("drop", async (event) => {
+  const processFiles=async files=>{
+    try {
+      if(tool==="ocr" && files[0] && /^image\//.test(files[0].type)) {
+        resetAll();
+        await acceptImages(files);
+      } else if(tool==="image") await acceptImages(files);
+      else await acceptPdfFile(files[0]);
+    } catch(error) {
+      console.error(error);
+      resetAll();
+      setStatus(error?.message || "The file could not be processed.");
+    }
+  };
+  zone.addEventListener("drop", event => {
     event.preventDefault();
     zone.classList.remove("dragover");
-    const files = [...event.dataTransfer.files];
-    if (tool === "image" || (tool === "ocr" && files[0] && /^image\//.test(files[0].type))) await acceptImages(files);
-    else await acceptPdfFile(files[0]);
+    void processFiles([...event.dataTransfer.files]);
   });
-  input.addEventListener("change", async () => {
-    const files = [...input.files];
-    if (tool === "image" || (tool === "ocr" && files[0] && /^image\//.test(files[0].type))) await acceptImages(files);
-    else await acceptPdfFile(files[0]);
-  });
+  input.addEventListener("change", () => {void processFiles([...input.files]);});
 }
 
 function markEditTool(name) {

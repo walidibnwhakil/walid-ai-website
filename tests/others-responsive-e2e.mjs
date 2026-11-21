@@ -28,6 +28,7 @@ const indexes=[
   ["/others/islamic-literature/",5],
 ];
 const storyPaths=[
+  "/others/history/alexander/",
   "/others/history/ottoman-empire/",
   "/others/folklore/ramayana/",
   "/others/folklore/mahabharata/",

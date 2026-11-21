@@ -154,7 +154,7 @@ class HatimTaiEditorialTests(unittest.TestCase):
             seen = set()
             for paragraph in paragraphs:
                 cleaned = re.sub(r"<[^>]+>", "", paragraph)
-                for sentence in re.split(r"(?<=[।!?])\\s*", cleaned):
+                for sentence in re.split(r"(?<=[।!?])\s*", cleaned):
                     normalized = " ".join(sentence.split())
                     if len(normalized) < 110:
                         continue

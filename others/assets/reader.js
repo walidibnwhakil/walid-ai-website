@@ -201,11 +201,11 @@
 
 
   // A reading part contains whole, consecutive chapters totalling at least
-  // ~900 Bengali words, or about five minutes of reading for many readers.
+  // ~1100 Bengali words, about five minutes or more for most readers.
   // No editorial text, chapter anchor or original paragraph is modified.
   const wordsIn = (chapter) => (Array.from(chapter.querySelectorAll("p"))
     .map(node => node.textContent).join(" ").trim().match(/\S+/gu) || []).length;
-  const minimumWords = 900;
+  const minimumWords = 1100;
   const groups = [];
   let queue = [], wordTotal = 0;
   chapters.forEach((chapter) => {

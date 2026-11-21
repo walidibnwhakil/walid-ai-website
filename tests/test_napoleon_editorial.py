@@ -89,3 +89,70 @@ assert "১৮৪৮ সালে" not in "".join(chapter_text[:16]), "1848 outc
 assert html.count('href="#chapter-') == 17 and html.count('class="legal-footer"') == 1
 assert "others-sources" not in html and "others-next" not in html
 print("NAPOLEON_LONG_FORM_PASS", {"chapters": len(sections), "paragraphs": sum(map(len, chapter_paragraphs)), "checks": len(coverage)})
+
+
+# Chapter-level narrative QA: enforce the sequence of *developed* scenes, not
+# only the appearance of names somewhere in a chapter. The published reader
+# deliberately contains no obsolete sources/next-reading block.
+def paragraph_position(chapter, anchor):
+    paragraphs = chapter_paragraphs[chapter - 1]
+    positions = [i for i, paragraph in enumerate(paragraphs) if anchor in paragraph]
+    assert positions, f"Chapter {chapter}: missing scene anchor {anchor}"
+    return positions[0]
+
+
+chronological_scenes = {
+    14: (
+        "১৮১৩ সালের জুনে স্পেনের ভিতোরিয়া",
+        "ল্যুটজেন ও বাউটজেনে ফরাসিরা",
+        "লাইপজিগের প্রথম দিন",
+        "৩১ মার্চ ১৮১৪",
+        "৪ এপ্রিল পুত্রের পক্ষে",
+        "মে ১৮১৪-তে নেপোলিয়ন এলবায়",
+    ),
+    16: (
+        "১৫ জুন ফরাসি বাহিনী",
+        "লিনিতে ব্লুশার",
+        "১৭ জুন ওয়েলিংটন",
+        "১৮ জুন ওয়াটারলুতে",
+        "২২ জুন ১৮১৫",
+        "ব্রিটিশরা নেপোলিয়নকে",
+    ),
+    17: (
+        "৫ মে ১৮২১",
+        "১৮৩২ সালে",
+        "১৮৪০ সালে রাজা লুই-ফিলিপের",
+        "১৮৪৮ সালের",
+        "২ ডিসেম্বর ১৮৫২",
+    ),
+}
+for chapter, anchors in chronological_scenes.items():
+    positions = [paragraph_position(chapter, anchor) for anchor in anchors]
+    assert positions == sorted(positions) and len(set(positions)) == len(positions), (
+        f"Chapter {chapter}: premature aftermath or repeated historical scenes: {positions}"
+    )
+
+historical_precision = {
+    3: ("সিসালপাইন প্রজাতন্ত্র", "রিভোলি", "ক্যাম্পো ফর্মিও"),
+    6: ("২০ মে ১৮০২", "তুসাঁ", "দেসালিন", "বারবে-মারবোয়া"),
+    7: ("পোর্তালিস", "সিভিল কোড", "জোসেফিন", "নারীর"),
+    8: ("প্রেসবুর্গ", "ট্রাফালগার", "প্রাতসেন"),
+    10: ("জুলি ক্লারি", "ক্যাথারিন", "এলিজা", "ক্যারোলিন", "পলিন", "লুসিয়েন"),
+    11: ("আস্পার্ন-এসলিং", "ম্যাকডোনাল্ড", "দাভু", "শঁব্রুন"),
+    12: ("বার্নাদোৎ", "নেপোলিয়ন ফ্রাঁসোয়া", "তোরেস ভেদ্রাস"),
+    13: ("চিচাগভ", "বেরেজিনা", "সালামাঙ্কা", "স্মোলেনস্ক"),
+    16: ("ওয়েলিংটন", "ব্লুশার", "গ্রুশি", "দ্যেরলঁ"),
+    17: ("আর্সেনিক", "ক্যানসার", "১৮৬১", "তৃতীয় নেপোলিয়ন"),
+}
+for chapter, anchors in historical_precision.items():
+    for anchor in anchors:
+        assert anchor in chapter_text[chapter - 1], (
+            f"Chapter {chapter}: source-checked context lost: {anchor}"
+        )
+assert html.count('class="legal-footer"') == 1
+assert html.count('class="others-toc-dialog"') == 1
+assert "উৎস ও পরবর্তী পাঠ" not in html
+print("NAPOLEON_CHRONOLOGY_QA_PASS", {
+    "scenes": sum(map(len, chronological_scenes.values())),
+    "historical_contexts": sum(map(len, historical_precision.values())),
+})

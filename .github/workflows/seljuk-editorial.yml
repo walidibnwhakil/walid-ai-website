@@ -1,0 +1,27 @@
+name: Seljuk editorial content and browser regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/seljuk-empire/index.html"
+      - "tests/seljuk-editorial-e2e.mjs"
+      - ".github/workflows/seljuk-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seljuk-reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Run all Others structural regression checks
+        run: python3 tests/test_others_readers.py
+      - name: Install Chromium browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Check Seljuk chronology TOC, branding, navigation and responsive browser layouts
+        run: node tests/seljuk-editorial-e2e.mjs

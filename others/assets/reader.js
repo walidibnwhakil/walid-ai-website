@@ -465,18 +465,16 @@
 
   drawPanel();
 
-  // Browser-restored scrolling on refresh must never erase the last real
-  // reading position. Track new reading after actual touch, wheel, or key input.
-  let canTrackReading = !isPageReload;
-  if (isPageReload) {
-    const allowTracking = () => { canTrackReading = true; };
-    window.addEventListener("wheel", allowTracking, {passive: true});
-    window.addEventListener("touchmove", allowTracking, {passive: true});
-    window.addEventListener("keydown", (event) => {
-      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " ", "Home", "End"].includes(event.key))
-        allowTracking();
-    });
-  }
+  // Save progress only when the reader scrolls intentionally. Browser
+  // restoration and auto-scroll to toolbar buttons are not reading progress.
+  let lastReadingGestureAt = 0;
+  const markReadingGesture = () => { lastReadingGestureAt = Date.now(); };
+  window.addEventListener("wheel", markReadingGesture, {passive: true});
+  window.addEventListener("touchmove", markReadingGesture, {passive: true});
+  window.addEventListener("keydown", (event) => {
+    if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " ", "Home", "End"].includes(event.key))
+      markReadingGesture();
+  });
   // Capture scroll position when scrolling occurs, not while unloading:
   // on refresh the browser can move the viewport during pagehide.
   let scrollTimer = null;
@@ -491,7 +489,7 @@
     recordedChapter = current.chapterId;
   };
   window.addEventListener("scroll", () => {
-    if (!canTrackReading) return;
+    if (Date.now() - lastReadingGestureAt > 1800) return;
     pendingPosition = positionInView();
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(rememberPosition, 850);

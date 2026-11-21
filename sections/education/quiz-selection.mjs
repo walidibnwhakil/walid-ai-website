@@ -41,7 +41,13 @@ export function selectQuestions(pool,count,history=[],rand=Math.random){
   const fresh=unique.filter(q=>!recentlyUsed.has(q.id));
   // If the available pool has enough previously-unseen questions, use only
   // those. Reuse older questions only when the unique pool is exhausted.
-  const chosen=balanced(fresh,count,rand);
+  // Prefer authored chapter-tagged concepts over mass-produced arithmetic
+  // variants while still rotating unseen questions and balancing subjects.
+  const priority=fresh.filter(q=>Boolean(q.chapter));
+  const chapterCount=Math.min(priority.length,Math.ceil(count*.4));
+  const core=balanced(priority,chapterCount,rand);
+  const coreIds=new Set(core.map(q=>q.id));
+  const chosen=core.concat(balanced(fresh.filter(q=>!coreIds.has(q.id)),count-core.length,rand));
   if(chosen.length<count){
     const selectedIds=new Set(chosen.map(q=>q.id));
     const recycled=balanced(unique.filter(q=>!selectedIds.has(q.id)),count-chosen.length,rand);

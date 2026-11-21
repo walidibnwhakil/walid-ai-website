@@ -31,11 +31,25 @@ for number, title, section in parts:
     for word in markers[i]:
         assert word in block, f"Chapter {i} omits {word}"
     paragraphs = re.findall(r"<p>(.*?)</p>", section, re.S)
-    assert len(paragraphs) >= 6, f"Chapter {i} is insufficiently developed"
+    assert len(paragraphs) >= 10, f"Chapter {i} is insufficiently developed"
     assert all(len(re.sub(r"<[^>]+>", "", p).strip()) >= 200 for p in paragraphs), f"Chapter {i} contains a thin paragraph"
     all_paragraphs.extend(paragraphs)
-assert len(all_paragraphs) >= 72, "Unexpectedly short or incomplete book"
+assert len(all_paragraphs) >= 140, "Unexpectedly short or incomplete book"
 assert len(set(all_paragraphs)) == len(all_paragraphs), "Duplicated body paragraphs"
+
+assert sum(len(re.sub(r"<[^>]+>", "", p).split()) for p in all_paragraphs) >= 8000, "Biography lost narrative depth"
+required_people_and_context = (
+    "লুবাবা আল-সুগরা", "আমর ইবন হিশাম", "আবু সুফিয়ান",
+    "হুদাইবিয়া", "শুরাহবিল ইবন আমর", "আলী ইবন আবি তালিব",
+    "মালিক ইবন নুওয়াইরা", "লায়লা বিনতুল মিনহাল", "ইকরিমা ইবন আবি জাহল",
+    "মুসায়লিমা", "ওয়াহশি ইবন হারব", "আল-মুসান্না ইবন হারিসা",
+    "হরমুজ", "ওয়ালাজা", "উল্লাইস", "আনবার", "আইনুত তামর",
+    "আবু উবায়দা ইবনুল জাররাহ", "থিওডোর", "ভাহান", "জাবালা",
+    "আশআস ইবন কায়স", "সুলাইমান", "আবদুর রহমান", "মুহাজির", "হিমস",
+)
+for item in required_people_and_context:
+    assert item in html, f"Lost essential historical person or location: {item}"
+
 for phrase in ("মুতার যুদ্ধের সিদ্ধান্ত", "ইয়ারমুকের যুদ্ধ: একাধিক নেতার সমন্বয়", "সেনা-নেতৃত্বে পরিবর্তন ও পরবর্তী জীবনের দলিল", "উৎস ও পরবর্তী পাঠ", "এই অধ্যায়ে", "পরের অধ্যায়ে"):
     assert phrase not in html, f"Obsolete or fragmented editorial heading/copy returned: {phrase}"
 for marker in (

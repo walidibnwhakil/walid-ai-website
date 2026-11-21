@@ -299,9 +299,11 @@ def validate_index(path):
 
 
 def main():
-    books = sorted(path for category in CATEGORIES for path in (BASE / category).glob("*/index.html"))
-    if len(books) != 32:
-        errors.append(f"Expected 32 Others books; found {len(books)}")
+    retired = {"hasan-ibn-ali", "husayn-ibn-ali", "karbala"}
+    books = sorted(path for category in CATEGORIES for path in (BASE / category).glob("*/index.html")
+                   if path.parent.name not in retired)
+    if len(books) != 30:
+        errors.append(f"Expected 30 canonical Others books; found {len(books)}")
     validate_saladin_timeline()
     for book in books:
         validate_book(book)
@@ -314,8 +316,8 @@ def main():
 
     indexes = [BASE / "index.html", *(BASE / category / "index.html" for category in CATEGORIES)]
     card_count = sum(validate_index(index) for index in indexes)
-    if card_count != 35:
-        errors.append(f"Expected 35 distinct cards across four indexes; found {card_count}")
+    if card_count != 33:
+        errors.append(f"Expected 33 distinct cards across four indexes; found {card_count}")
 
     stylesheet = (BASE / "assets/books.css").read_text(encoding="utf-8")
     if '.others-toc-dialog' not in stylesheet or '.others-card-art' not in stylesheet:

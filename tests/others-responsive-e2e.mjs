@@ -38,6 +38,7 @@ const storyPaths=[
   "/others/islamic-literature/hatim-tai/",
   "/others/islamic-literature/aladdin/",
   "/others/islamic-literature/ali-baba/",
+  "/others/history/timur/",
 ];
 const widths=[320,375,768,1280];
 let browser,checks=0,sidebarChecks=0;

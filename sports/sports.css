@@ -130,3 +130,42 @@ body[data-sport-detail="cricket"] .detail-hero .sport-title-logo{
 @media(max-width:720px){
   .featured-card .sport-tag .sport-icon{font-size:1.75rem}
 }
+
+/* Main Sports landing page: centered, editorial-style title and subtitle.
+   Keep the Football and Cricket detail-page headings unchanged. */
+.sports-hero:not(.detail-hero){
+  text-align:center;
+  padding:clamp(34px,5vw,58px) 0 30px;
+}
+.sports-hero:not(.detail-hero) h1{
+  margin:0;
+  color:var(--green-deep);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(3rem,7vw,4.75rem);
+  font-weight:700;
+  line-height:1.08;
+  letter-spacing:-.035em;
+}
+.sports-hero:not(.detail-hero) h1::after{
+  content:"";
+  display:block;
+  width:74px;
+  height:3px;
+  margin:16px auto 0;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--gold),var(--green));
+}
+.sports-hero:not(.detail-hero) p{
+  max-width:36rem;
+  margin:14px auto 0;
+  color:#596c61;
+  font-size:clamp(.98rem,2vw,1.125rem);
+  font-weight:400;
+  line-height:1.5;
+  letter-spacing:.01em;
+  text-align:center;
+}
+@media(max-width:370px){
+  .sports-hero:not(.detail-hero){padding:32px 0 22px}
+  .sports-hero:not(.detail-hero) h1::after{margin-top:12px}
+}

@@ -92,7 +92,7 @@ require(not any("পশ্চিম সাম্রাজ্যের শেষ 
 # The revised edition must keep contextual details inside their historical reigns
 # rather than treating imperial women or generals as detached appendices.
 focused = {
-    5: ("লিভিয়া", "জুলিয়া অগাস্টা", "সন্দেহ"),
+    5: ("লিভিয়া", "জুলিয়া অগাস্টা", "প্রমাণিত নয়"),
     6: ("জার্মানিকাস", "পিসো", "আগ্রিপিনা"),
     7: ("আউলুস প্লাউতিয়ুস", "ব্রিটেন", "পাল্লাস"),
     13: ("জুলিয়া ডোমনা", "পেসকেন্নিয়ুস", "লুগদুনুম"),

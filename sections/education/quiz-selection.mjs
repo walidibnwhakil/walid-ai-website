@@ -102,13 +102,23 @@ export function selectBcsQuestions(pool,count,history=[],rand=Math.random){
   for(const {subject,quantity} of quotas){
     const bySubject=all.filter(q=>q.subject===subject);
     if(bySubject.length<quantity)throw Error("Insufficient BCS "+subject+" questions");
-    const authored=bySubject.filter(q=>!q.generated);
-    const priorityCount=Math.min(authored.length,quantity,Math.ceil(quantity*.75));
+    // Include one independently generated mathematical skill exercise, rather
+    // than letting authored-first sampling eliminate every worked variant.
+    // Keep the syllabus quota for this subject unchanged.
+    const variants=subject==="গাণিতিক যুক্তি"&&quantity>0?
+      bySubject.filter(q=>q.generated&&q.topic):[];
+    const fresh=variants.filter(q=>!history.includes(q.id));
+    const worked=(fresh.length?shuffle(fresh,rand):shuffle(variants,rand))[0];
+    const remainingPool=worked?bySubject.filter(q=>q.id!==worked.id):bySubject;
+    const required=quantity-(worked?1:0);
+    const authored=remainingPool.filter(q=>!q.generated);
+    const priorityCount=Math.min(authored.length,required,Math.ceil(required*.75));
     const authoredSelected=priorityCount?selectQuestions(authored,priorityCount,history,rand):[];
     const selectedIds=new Set(authoredSelected.map(q=>q.id));
-    const remainder=quantity-authoredSelected.length;
-    const other=remainder?selectQuestions(bySubject.filter(q=>!selectedIds.has(q.id)),remainder,history,rand):[];
+    const remainder=required-authoredSelected.length;
+    const other=remainder?selectQuestions(remainingPool.filter(q=>!selectedIds.has(q.id)),remainder,history,rand):[];
     output.push(...authoredSelected,...other);
+    if(worked)output.push(worked);
   }
   if(output.length!==count)throw Error("BCS weight allocation mismatch");
   return shuffle(output,rand);

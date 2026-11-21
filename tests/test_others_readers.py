@@ -415,7 +415,7 @@ def validate_index(path):
 
 
 def main():
-    retired = {"hasan-ibn-ali", "husayn-ibn-ali", "karbala"}
+    retired = {"hasan-ibn-ali", "husayn-ibn-ali", "ali-hasan-husayn-karbala"}
     books = sorted(path for category in CATEGORIES for path in (BASE / category).glob("*/index.html")
                    if path.parent.name not in retired)
     if len(books) != 30:

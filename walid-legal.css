@@ -16,3 +16,18 @@ html[lang="bn"] .legal-page p,html[lang="bn"] .legal-page li{text-align:justify;
 .legal-page .review-list{padding-left:24px}
 @media(max-width:600px){.legal-footer{margin-top:32px;padding:16px 14px}.legal-footer nav{gap:6px}.legal-page{padding:24px 18px 40px;font-size:16px}.legal-page .legal-brand img{width:112px;height:38px}}
 
+
+/* Consistent, readable legal typography across phone and desktop. */
+.legal-page,.legal-page *{box-sizing:border-box}
+.legal-page{width:100%;max-width:850px;min-width:0}
+.legal-page p,.legal-page li{max-width:100%;text-align:justify;text-align-last:left;text-justify:inter-word;overflow-wrap:break-word;word-break:normal}
+.legal-page p a,.legal-page li a,.legal-page .contact-email{overflow-wrap:anywhere}
+.legal-page .legal-effective{font-size:.93em;color:#647369;margin:0 0 20px}
+.legal-page .contact-address{text-align:left!important;text-align-last:left!important;margin:13px 0}
+.legal-page .contact-email{display:inline-block;font-size:clamp(18px,3.5vw,23px);font-weight:700;line-height:1.4}
+.legal-page .review-list{padding-inline-start:clamp(18px,4vw,27px)}
+.legal-page .review-list li{padding-inline-start:2px;margin-bottom:9px}
+.legal-page h1,.legal-page h2{overflow-wrap:break-word}
+.legal-page h2{letter-spacing:-.01em}
+.legal-footer nav a{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:600px){.legal-page{padding:24px 17px 40px;line-height:1.75}.legal-page h2{font-size:21px;margin-top:26px}.legal-page .contact-email{font-size:19px}}

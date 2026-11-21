@@ -29,6 +29,7 @@ const indexes=[
 ];
 const storyPaths=[
   "/others/history/alexander/",
+  "/others/history/ashab-al-kahf/",
   "/others/history/ottoman-empire/",
   "/others/folklore/ramayana/",
   "/others/folklore/mahabharata/",
@@ -47,6 +48,7 @@ const storyPaths=[
   "/others/history/mongol-empire/",
   "/others/history/mamluk-sultanate/",
   "/others/history/joan-of-arc/",
+  "/others/history/khalid-ibn-walid/",
 ];
 const widths=[320,375,768,1280];
 let browser,checks=0,sidebarChecks=0;
@@ -96,6 +98,13 @@ try{
           const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));
           const tocIds=await page.locator(".others-toc a[href^='#chapter-']").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href").slice(1)));
           assert.deepEqual(tocIds,ids,"Mongol chapter and TOC anchors should match");
+        }
+        if(path==="/others/history/khalid-ibn-walid/"){
+          assert.equal(layout.chapterCount,12,"Khalid biography must have 12 integrated chronological chapters");
+          assert.equal(layout.tocChapterCount,12,"Khalid chapter drawer must have 12 links");
+          const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));
+          const tocIds=await page.locator(".others-toc a[href^='#chapter-']").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href").slice(1)));
+          assert.deepEqual(tocIds,ids,"Khalid TOC must resolve to chapters in order");
         }
         if(path==="/others/history/bengal-sultanate/"){
           assert.equal(layout.chapterCount,15,"Bengal Sultanate must contain 15 chronological chapters");

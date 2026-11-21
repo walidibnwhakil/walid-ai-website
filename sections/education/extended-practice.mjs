@@ -17,6 +17,7 @@ export const STREAM_SUBJECTS = Object.freeze({
 export function needsStream(level) { return ["9","10","11","12","admission"].includes(String(level)); }
 export function isAllowedSubject(level,stream,subject) {
   if(!needsStream(level)) return true;
+  if(["11","12"].includes(String(level))&&subject==="বাংলাদেশ ও বিশ্বপরিচয়")return false;
   if(SHARED.has(subject))return true;
   if(["11","12"].includes(String(level))&&subject==="গণিত")return stream==="science";
   if(["9","10"].includes(String(level))&&subject==="গণিত")return true;
@@ -275,7 +276,7 @@ function arithmetic(subject,level,kind,index){
       break;
     default:throw Error("Unknown template "+kind);
   }
-  const offsets=[b,c,b+c];
+  const offsets=[b+3,b+c+9,b+2*c+17];
   const options=[correct,correct+offsets[0],correct+offsets[1],correct-offsets[2]].map(String);
   if(new Set(options).size!==4)throw Error("Duplicate math choice "+kind);
   const answer=(index+kind.length)%4,remaining=options.slice(1);

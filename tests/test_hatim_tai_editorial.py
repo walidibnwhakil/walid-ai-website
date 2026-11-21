@@ -35,8 +35,8 @@ class HatimTaiEditorialTests(unittest.TestCase):
         seen = set()
         for i, title, body in self.chapters:
             paragraphs = re.findall(r"<p>(.*?)</p>", body, re.S)
-            self.assertGreaterEqual(len(paragraphs), 8, f"chapter {i}: {title}")
-            self.assertGreater(len(body), 2300, f"chapter {i}: too thin")
+            self.assertGreaterEqual(len(paragraphs), 12, f"chapter {i}: {title}")
+            self.assertGreater(len(body), 3700, f"chapter {i}: too thin")
             for paragraph in paragraphs:
                 paragraph = re.sub(r"<[^>]+>", "", paragraph).strip()
                 self.assertGreater(len(paragraph), 80, f"chapter {i}: filler")
@@ -60,7 +60,7 @@ class HatimTaiEditorialTests(unittest.TestCase):
                 self.assertIn(term, book[chapter], f"chapter {chapter}: missing {term}")
         self.assertIn("মুনির", book[12])
         self.assertIn("বিবাহ", book[12])
-        self.assertIn("ঐতিহাসিক হাতেম", book[12])
+        self.assertIn("ঐতিহাসিক আরব কবি হাতেম", self.html)
         self.assertIn("জারিনপোশ", book[12])
 
     def test_seventh_question_is_a_single_complete_story(self):
@@ -72,6 +72,41 @@ class HatimTaiEditorialTests(unittest.TestCase):
         self.assertIn("জীবিত হয়ে ওঠে", seventh)
         self.assertNotIn("হাম্মাম বাদগিরদ", self.chapters[9][1], "sixth question must not be split")
         self.assertTrue(self.chapters[11][1].startswith("সাত উত্তর"))
+
+
+    def test_literary_narrative_and_separate_reader_note(self):
+        opening, _sep, rest = self.html.partition('<section class="others-chapter" id="chapter-1">')
+        self.assertIn('<p class="others-note"><strong>পাঠপরিচিতি:', opening)
+        self.assertIn('হাতেম-নামা', opening)
+        self.assertIn('ঐতিহাসিক আরব কবি হাতেম', opening)
+        self.assertIn('ভালুকরাজকন্যার', opening)
+        for number, title, body in self.chapters:
+            for interruption in (
+                "কিস্সার বর্ণনায়", "কিস্সার ভিতরে", "কিস্সার নিয়মে",
+                "এই অধ্যায়ে", "এই পুনর্কথনে", "বাস্তব চিকিৎসা",
+                "কোনো রত্নের নথিভুক্ত ইতিহাস", "পুঁথিভেদে",
+            ):
+                self.assertNotIn(interruption, body, f"chapter {number}: editorial interruption")
+
+    def test_main_characters_and_complete_folklore_arcs(self):
+        book = {i: body for i, _title, body in self.chapters}
+        expectations = {
+            1: ("বুরজখ", "দরবেশ", "ধাত্রী", "উজির", "গুপ্তধন"),
+            2: ("শাহাবাদ", "আজরাক", "সাতটি শর্ত", "পঞ্চম শর্ত", "সপ্তম"),
+            3: ("মুনির", "প্রতিকৃতি", "হাতেম", "ইয়েমেন", "সাক্ষীদের"),
+            4: ("নেকড়ে", "শেয়াল", "হায়েনা", "ভালুক", "অজগর", "হ্রদ", "বৃদ্ধ"),
+            5: ("নঈম", "গুহা", "ইউসুফ", "শাহমুহরা", "হারিস", "বণ্টন"),
+            6: ("দালানের", "দস্যু", "দুটি রুটি", "দিনার", "নদী", "শাহাবাদ"),
+            7: ("হামির", "আলকানপরি", "খাঁচা", "ফুল", "দৃষ্টি"),
+            8: ("জারিনপোশ", "সাম আহমার", "কামলাক", "করম", "সত্য"),
+            9: ("নিদা", "জাম", "মৃত্যু", "সমুদ্র", "শাহাবাদ"),
+            10: ("মুক্তা", "নিতকা", "মাহইয়ার", "পরিরাজপুত্র", "দৈত্য"),
+            11: ("বাদগিরদ", "কাতান", "প্রহরী", "কুয়া", "তোতাপাখি", "তৃতীয় তীর", "হীরা"),
+            12: ("হুসন বানু", "মুনির", "বিবাহ", "জারিনপোশ", "ইয়েমেন", "পিতা"),
+        }
+        for chapter, terms in expectations.items():
+            for term in terms:
+                self.assertIn(term, book[chapter], f"chapter {chapter}: missing {term}")
 
     def test_design_canonical_footer_and_ads_remain_untouched(self):
         for required in (

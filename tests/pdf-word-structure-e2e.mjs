@@ -138,6 +138,21 @@ try {
   assert.match(output.zip.file("word/_rels/document.xml.rels")?await output.zip.file("word/_rels/document.xml.rels").async("string"):"",/relationships\/image/);
   console.log("RICH_E2E WORD_PASS",JSON.stringify({bytes:bytes.length,images:output.pictures.length,tables:(output.xml.match(/<w:tbl>/g)||[]).length}));
 
+  // A mislabeled or corrupted upload must never show a stale DOCX download link.
+  const invalidWord=await context.newPage();
+  await invalidWord.goto(base+"/tool-workspace/?tool=pdf-to-word&standalone=1",{waitUntil:"domcontentloaded"});
+  await invalidWord.locator("#pdfFiles").setInputFiles({
+    name:"not-really-a-pdf.pdf",mimeType:"application/pdf",
+    buffer:Buffer.from("this upload is not a PDF")
+  });
+  await invalidWord.locator("#runPdf").click();
+  await invalidWord.locator("#status").filter({hasText:"not a valid PDF"}).waitFor({state:"visible",timeout:15000});
+  assert.equal(await invalidWord.locator("#pdfDownload").isVisible(),false,
+    "Invalid PDF input must not expose a DOCX download");
+  await invalidWord.close();
+  console.log("RICH_E2E INVALID_PDF_WORD_REJECTED");
+
+
 
   const scanPng=await readFile("tests/fixtures/bengali-mixed.png");
   const scanDoc=await PDFDocument.create();

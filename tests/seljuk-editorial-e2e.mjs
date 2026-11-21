@@ -19,15 +19,20 @@ assert.match(source, /\/others\/assets\/reader\.js/);
 assert.equal((source.match(/class="legal-footer"/g) || []).length, 1, "Exactly one footer");
 assert.equal((source.match(/class="others-toc-dialog"/g) || []).length, 1, "Exactly one TOC sidebar");
 assert.doesNotMatch(source, /class="others-(?:sources|next)"/, "Removed source/other-story blocks must stay removed");
+for (const requiredLink of [
+  "https://www.iranicaonline.org/articles/maleksah/",
+  "https://www.iranicaonline.org/articles/sanjar/",
+  "https://www.iranicaonline.org/articles/saljuqs/saljuqs-iii/",
+]) assert(source.includes(requiredLink), "Source evidence link missing: " + requiredLink);
 const existingParagraphs = new Set();
 for (const [i, chapter] of chapters.entries()) {
   assert.equal(+chapter[1], i + 1, "Chapters must have contiguous IDs");
   assert.equal(+toc[i][1], i + 1, "TOC must have contiguous links");
   assert.equal(toc[i][2], chapter[2], "TOC title must equal chapter heading");
   const paragraphs = [...chapter[3].matchAll(/<p>(.*?)<\/p>/g)].map(m => m[1].trim());
-  assert(paragraphs.length >= 5, "Chapter " + (i + 1) + " must have at least five paragraphs");
+  assert(paragraphs.length >= 10, "Chapter " + (i + 1) + " must have at least ten developed paragraphs");
   assert(paragraphs.every(p => p.length >= 150), "Chapter " + (i + 1) + " has a too-short paragraph");
-  assert(chapter[3].length >= 1300, "Chapter " + (i + 1) + " is unexpectedly short");
+  assert(chapter[3].length >= 3500, "Chapter " + (i + 1) + " is unexpectedly short");
   for (const paragraph of paragraphs) {
     assert(!existingParagraphs.has(paragraph), "Duplicate long paragraph in chapter " + (i + 1));
     existingParagraphs.add(paragraph);
@@ -36,7 +41,13 @@ for (const [i, chapter] of chapters.entries()) {
 for (const [number, needle] of [
   [3, "১০৫৫"], [5, "২৬ আগস্ট ১০৭১"], [7, "নিজামুল মুলক"],
   [8, "তেরকেন খাতুন"], [11, "১১৪১"], [12, "১১৯৪"],
-  [14, "১০৯৭"], [16, "১১৭৬"], [20, "১২৪৩"], [22, "১৩০৮"]
+  [14, "১০৯৭"], [16, "১১৭৬"], [20, "১২৪৩"], [22, "১৩০৮"],
+  [2, "১০৪১"], [5, "ইউদোকিয়া"], [5, "মিখাইল সপ্তম"],
+  [7, "জুবাইদা খাতুন"], [8, "মাহমুদের শৈশব"], [11, "ইয়েলু দাশি"],
+  [12, "ইলদেগিজ"], [13, "সময়রেখা ইচ্ছাকৃতভাবে"],
+  [15, "তৃতীয় কনরাড"], [18, "ট্রেবিজন্দের"],
+  [19, "মাহপেরি"], [20, "১২৫৬"], [21, "কারাতাই"],
+  [22, "ইলখানীয়"], [23, "প্রাথমিক বিবরণের সঙ্গে আধুনিক গবেষণা"]
 ]) assert(chapters[number - 1][3].includes(needle), "Chronological event missing from chapter " + number);
 
 const types = {".html":"text/html; charset=utf-8",".css":"text/css",".js":"text/javascript",

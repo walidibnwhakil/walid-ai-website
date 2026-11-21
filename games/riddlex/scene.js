@@ -270,7 +270,7 @@ export function createScene(canvas) {
     g.fillStyle = "#24160f";
     g.textAlign = "center";
     g.textBaseline = "middle";
-    let size = Math.round(h * (portraitMode ? 0.62 : 0.46));
+    let size = Math.round(h * (portraitMode ? 0.62 : 0.78));
     g.font = font.replace(/\d+px/, `${size}px`);
     while (g.measureText(name).width > w * 0.86 && size > 14) {
       size -= 2;
@@ -315,30 +315,34 @@ export function createScene(canvas) {
       const y = Math.min(held.y, limit - h);
       return { u, photo, photoH, nameH, w, h, x: (canvas.width - w) / 2, y: Math.max(8, y) };
     }
-    // Sit the card under the chin so the hat and smile stay clear, and stop
-    // above the carved desk front so the buttons remain on the flat top.
+    // A photo card sits on the empty desk to the right of the detective, clear of
+    // his face and hands, the cat and the lamp. A name-only card stays centred.
     const cssH = canvas.getBoundingClientRect().height || canvas.height;
     const dpr = canvas.height / Math.max(1, cssH);
-    const top = iy(FACE.landscape.v + FACE.landscape.h) + 6 * dpr;
-    const stack = 108 * dpr;
-    const floor = Math.min(iy(0.72), canvas.height - 4 * dpr) - stack;
-    const avail = Math.max(64 * dpr, floor - top);
     let w;
     let photoH = 0;
     let nameH;
+    let x;
+    let y;
     if (photo) {
-      nameH = Math.min(42 * dpr, Math.max(28 * dpr, avail * 0.28));
-      photoH = Math.max(32 * dpr, avail - nameH);
-      w = Math.min(view.w * 0.22, photoH / 0.66);
-      photoH = Math.min(photoH, w * 0.78);
-      if (top + photoH + nameH > floor) photoH = Math.max(32 * dpr, floor - top - nameH);
+      const right = ix(0.68);
+      const left = ix(0.505);
+      w = Math.max(210 * dpr, right - left);
+      x = right - w;
+      if (x < left) x = left;
+      nameH = 40 * dpr;
+      const top = iy(0.450);
+      const room = Math.min(iy(0.668), canvas.height * 0.668) - top - nameH;
+      photoH = Math.max(100 * dpr, Math.min(w * 0.64, room));
+      y = top;
     } else {
-      w = Math.min(view.w * 0.30, canvas.width * 0.46);
-      nameH = Math.min(view.h * 0.11, avail, 64 * dpr);
+      w = Math.min(view.w * 0.32, canvas.width * 0.46);
+      nameH = Math.min(view.h * 0.11, 72 * dpr);
+      x = ix(0.50) - w / 2;
+      y = iy(0.50) - nameH;
     }
     const h = Math.max(16, photoH + nameH);
-    const y = Math.max(8, Math.min(top, floor - h));
-    return { u, photo, photoH, nameH, w, h, x: ix(0.50) - w / 2, y };
+    return { u, photo, photoH, nameH, w, h, x, y };
   }
 
   function drawSheet(turn) {
@@ -347,6 +351,8 @@ export function createScene(canvas) {
     const parent = canvas.parentElement;
     if (parent && canvas.height) {
       parent.style.setProperty("--note-bottom", ((box.y + h) / canvas.height).toFixed(4));
+      parent.style.setProperty("--note-left", (box.x / canvas.width).toFixed(4));
+      parent.style.setProperty("--note-width", (box.w / canvas.width).toFixed(4));
     }
     ctx.save();
     ctx.translate(box.x + w / 2, box.y + h / 2);
@@ -370,23 +376,33 @@ export function createScene(canvas) {
       ctx.beginPath();
       ctx.roundRect(pad, pad, w - pad * 2, photoH - pad, 8);
       ctx.clip();
-      const aspect = photo.width / Math.max(1, photo.height);
       const frameW = w - pad * 2;
       const frameH = photoH - pad;
-      let dw = frameW;
-      let dh = dw / aspect;
-      if (dh < frameH) {
+      const aspect = photo.width / Math.max(1, photo.height);
+      const frameAspect = frameW / Math.max(1, frameH);
+      let dw;
+      let dh;
+      let dx;
+      let dy;
+      if (aspect > frameAspect) {
         dh = frameH;
-        dw = dh * aspect;
+        dw = frameH * aspect;
+        dx = pad + (frameW - dw) / 2;
+        dy = pad;
+      } else {
+        dw = frameW;
+        dh = frameW / aspect;
+        dx = pad;
+        dy = pad;
       }
-      ctx.drawImage(photo, pad + (frameW - dw) / 2, pad + (frameH - dh) / 2, dw, dh);
+      ctx.drawImage(photo, dx, dy, dw, dh);
       ctx.restore();
     }
     if (reveal?.page) {
       const bandY = photoH;
       const maxW = w * 0.9;
-      const maxH = Math.max(12, nameH * 0.8);
-      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 3 : 1.4);
+      const maxH = Math.max(12, nameH * (portraitMode ? 0.8 : 0.92));
+      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 3 : 1.8);
       const dw = reveal.page.w * scale;
       const dh = reveal.page.h * scale;
       ctx.drawImage(reveal.page.canvas, (w - dw) / 2, bandY + (nameH - dh) / 2, dw, dh);

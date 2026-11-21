@@ -235,18 +235,23 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 }
 @media (min-aspect-ratio: 4/5) {
   #hud:has(#guess:not([hidden])) {
-    top: calc(var(--note-bottom, 0.52) * 100% + 28px);
-    bottom: auto; left: 16px; right: 16px; z-index: 6;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    top: calc(var(--note-bottom, 0.52) * 100% + 10px);
+    bottom: auto;
+    left: calc(var(--note-left, 0.18) * 100%);
+    right: auto;
+    width: calc(var(--note-width, 0.64) * 100%);
+    z-index: 6;
+    display: flex; flex-direction: column; align-items: stretch; gap: 4px;
     background: transparent;
   }
   #hud:has(#guess:not([hidden])) #guess {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    width: min(560px, 100%); margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    width: 100%; margin: 0;
   }
   #hud:has(#guess:not([hidden])) #guess button { min-height: 52px; font-size: 18px; }
   #hud:has(#guess:not([hidden])) #credit {
-    position: static; margin: 0; max-width: 70%; text-align: center; font-size: 11px;
+    position: static; margin: 0; max-width: 100%; text-align: center; font-size: 11px;
+    line-height: 1.2;
   }
 }
 @media (max-width: 520px) {

@@ -141,7 +141,7 @@ def main() -> None:
         cache[index] = parser
 
     expected_history = [
-        "alexander", "roman-empire", "ashab-al-kahf", "byzantine-empire",
+        "roman-empire", "alexander", "ashab-al-kahf", "byzantine-empire",
         "khalid-ibn-walid", "rashidun-caliphate", "karbala", "venice",
         "seljuk-empire", "crusades", "saladin", "mongol-empire",
         "mamluk-sultanate", "ottoman-empire", "bengal-sultanate", "timur",

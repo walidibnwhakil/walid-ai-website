@@ -153,6 +153,15 @@ class MongolEditorialTests(unittest.TestCase):
                  "ওলজেইতুর পরে")
         in_order(27, "১৩৫০-এর দশকে", "১৩৬৮ সালে মিং বাহিনী")
 
+    def test_qutulun_political_arc_not_only_wrestling_legend(self):
+        chapters = {n: content for n, _, content in self.sections}
+        text = chapters[23]
+        for term in ("খুতুলুন", "কাইদুর কন্যা", "মার্কো পোলোর",
+                     "রশিদউদ্দিন", "সামরিক", "বিবাহ", "১৩০১",
+                     "ওরুসের", "চাপার", "রাজপরিবার"):
+            self.assertIn(term, text, "Missing Qutulun's biography: " + term)
+        self.assertIn("mongol-source-metadata", self.html)
+
     def test_sources_are_discriminated_without_reviving_source_box(self):
         all_text = " ".join(content for _, _, content in self.sections)
         for primary_source in ("মঙ্গোলদের গোপন ইতিহাস", "জুভায়নি",

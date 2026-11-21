@@ -40,6 +40,7 @@ const storyPaths=[
   "/others/islamic-literature/hatim-tai/",
   "/others/islamic-literature/aladdin/",
   "/others/islamic-literature/ali-baba/",
+  "/others/history/british-empire/",
   "/others/history/saladin/",
   "/others/history/bengal-sultanate/",
   "/others/history/mughal-empire/",

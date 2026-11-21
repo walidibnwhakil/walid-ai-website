@@ -23,5 +23,7 @@ jobs:
           npx playwright install chromium
       - name: Verify Ottoman editorial structure and design contracts
         run: python3 tests/test_ottoman_editorial.py
+      - name: Verify Khalid ibn al-Walid chronology and content integrity
+        run: python3 tests/test_khalid_editorial.py
       - name: Verify Others book and catalog pages at mobile and desktop widths
         run: node tests/others-responsive-e2e.mjs

@@ -62,7 +62,7 @@ def validate_book(path):
         if content.count(verified_prayer) != 1:
             fail(path, "Quran 18:10 prayer was altered or duplicated")
         if not all(token in content for token in (
-            "বাংলা ভাবার্থ", "কোনো প্রকাশিত অনুবাদ হুবহু উদ্ধৃত নয়",
+            "বাংলা ভাবার্থ", "স্বতন্ত্রভাবে রচিত",
             'href="/islam/quran/al-kahf/"',
             'href="https://www.iranicaonline.org/articles/ephesus/"',
             "আটজন", "৩০০ বছরের সঙ্গে আরও নয়",

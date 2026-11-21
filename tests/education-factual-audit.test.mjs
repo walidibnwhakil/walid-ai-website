@@ -82,7 +82,7 @@ test("BCS answer sets prioritize factual material while still containing skill e
   assert(selected.filter(x=>!x.generated).length>=60);
   assert(selected.some(q=>q.generated));
 });
-test("six-digit numerical count is explicitly separated from independently curated facts",()=>{
+test("six-digit numerical count is explicitly separated from independently curated facts",async()=>{
   assert.equal(SKILL_SCOPES.length,19);
   assert.equal(EXPECTED_SKILL_COUNT,103000);
   assert(FACT_COUNT<EXPECTED_SKILL_COUNT);

@@ -155,6 +155,13 @@ function quizSetupChanged(){
   updateQuizCount();
 }
 function quizStreamChanged(){updateQuizCount()}
+function openQuizSetup(){
+  byId("quizLevel").value="";
+  byId("quizStream").value="";
+  syncStream("quizLevel","quizStream","quizStreamField");
+  updateQuizCount();
+  changeView("quizSetup");
+}
 const questionTotal=()=>activeTest?.questions.length||0;
 function refreshProgress(){
   if(!activeTest)return;
@@ -410,15 +417,15 @@ byId("questionCount").addEventListener("change",quizCountChanged);
 byId("notesLevel").addEventListener("change",()=>{syncStream("notesLevel","notesStream","notesStreamField");updateSubjects()});
 byId("notesStream").addEventListener("change",updateSubjects);
 byId("notesSubject").addEventListener("change",()=>{byId("notesContent").hidden=true});
-byId("openQuiz").addEventListener("click",()=>changeView("quizSetup"));
+byId("openQuiz").addEventListener("click",openQuizSetup);
 byId("openNotes").addEventListener("click",()=>openNotes());
 document.querySelectorAll("[data-home]").forEach(b=>b.addEventListener("click",()=>changeView("modeSelection")));
 byId("startQuiz").addEventListener("click",startQuiz);
-byId("exitQuiz").addEventListener("click",()=>{activeTest=null;changeView("quizSetup")});
+byId("exitQuiz").addEventListener("click",()=>{activeTest=null;openQuizSetup()});
 byId("finishQuiz").addEventListener("click",submitQuiz);
 byId("confirmFinish").addEventListener("click",showResults);
 byId("cancelFinish").addEventListener("click",()=>{byId("finishConfirm").hidden=true});
-byId("retakeQuiz").addEventListener("click",()=>changeView("quizSetup"));
+byId("retakeQuiz").addEventListener("click",openQuizSetup);
 byId("goToNotes").addEventListener("click",()=>openNotes(byId("quizLevel").value));
 byId("showNotes").addEventListener("click",async()=>{
   if(!baseNotes)await openNotes(byId("notesLevel").value);

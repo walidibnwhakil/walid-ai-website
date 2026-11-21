@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json,re,sys,os
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import urlparse,urlencode
@@ -78,7 +78,8 @@ def read_events(url,status):
         elif any(word in provider_status for word in ("cancelled","canceled","abandoned")): actual="cancelled"
         elif any(word in provider_status for word in ("finished","complete","full time","ft")): actual="finished"
         elif any(word in provider_status for word in ("in progress","live","half time","1st half","2nd half")): actual="live"
-        else: actual=status
+        elif any(word in provider_status for word in ("not started","scheduled","upcoming")): actual="scheduled"
+        else: actual="scheduled" if status=="scheduled" and datetime.fromisoformat(start.replace("Z","+00:00"))>datetime.now(timezone.utc) else "unavailable"
         winner=None
         if actual=="finished" and hs is not None and as_ is not None:
             try: winner=home if int(hs)>int(as_) else away if int(as_)>int(hs) else "Draw"
@@ -100,6 +101,8 @@ def read_global_soccer_recent():
             if not home or not away or not start: continue
             hs,as_=e.get("intHomeScore"),e.get("intAwayScore")
             if hs is None or as_ is None: continue
+            provider_status=clean(str(e.get("strStatus") or e.get("strProgress") or "")).lower()
+            if not any(word in provider_status for word in ("finished","complete","full time","ft","final")): continue
             winner=home if str(hs).isdigit() and str(as_).isdigit() and int(hs)>int(as_) else away if str(hs).isdigit() and str(as_).isdigit() and int(as_)>int(hs) else "Draw"
             out.append({"id":str(e.get("idEvent") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("strLeague")) or "Soccer","startTime":start,"status":"finished","source":"TheSportsDB"})
     seen=set(); unique=[]
@@ -116,19 +119,34 @@ def read_openliga():
     now=datetime.now(timezone.utc)
     for e in payload if isinstance(payload,list) else []:
         home,away=clean((e.get("team1") or {}).get("teamName")),clean((e.get("team2") or {}).get("teamName"))
-        start=iso(e.get("matchDateTimeUTC")) or iso(e.get("matchDateTime"))
+        # The alternate matchDateTime is local German time; never parse it as UTC.
+        start=iso(e.get("matchDateTimeUTC"))
         if not home or not away or not start: continue
         kickoff=datetime.fromisoformat(start.replace("Z","+00:00"))
         finished=bool(e.get("matchIsFinished"))
         if finished and (now-kickoff).total_seconds() > 72*3600: continue
         results=e.get("matchResults") or []
-        latest=results[-1] if results else {}
-        hs,as_=latest.get("pointsTeam1"),latest.get("pointsTeam2")
+        finals=[r for r in results if isinstance(r,dict) and (
+            str(r.get("resultTypeID"))=="2" or clean(r.get("resultName")).casefold()=="endergebnis")]
+        final=finals[-1] if finals else {}
+        hs,as_=final.get("pointsTeam1"),final.get("pointsTeam2")
+        if not finished: hs,as_=None,None
+        if not all(isinstance(n,int) and not isinstance(n,bool) and n>=0 for n in (hs,as_)):
+            hs,as_=None,None
         winner=None
-        if finished and hs is not None and as_ is not None:
+        if finished and hs is not None:
             winner=home if hs>as_ else away if as_>hs else "Draw"
-        out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,"homeScore":hs,"awayScore":as_,"winner":winner,"competition":clean(e.get("leagueName")) or "1. Bundesliga","startTime":start,"finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,"status":"finished" if finished else "scheduled","source":"OpenLigaDB", "homeCountry":"Germany", "awayCountry":"Germany", "homeLogo":clean((e.get("team1") or {}).get("teamIconUrl")) or None, "awayLogo":clean((e.get("team2") or {}).get("teamIconUrl")) or None})
+        out.append({"id":str(e.get("matchID") or ""), "homeTeam":home,"awayTeam":away,
+            "homeScore":hs,"awayScore":as_,"winner":winner,
+            "competition":clean(e.get("leagueName")) or "1. Bundesliga",
+            "startTime":start,
+            "finishedAt":iso(e.get("matchEndTime") or e.get("endTime")) if finished else None,
+            "status":"finished" if finished else "scheduled","source":"OpenLigaDB",
+            "homeCountry":"Germany","awayCountry":"Germany",
+            "homeLogo":clean((e.get("team1") or {}).get("teamIconUrl")) or None,
+            "awayLogo":clean((e.get("team2") or {}).get("teamIconUrl")) or None})
     return out
+
 def event_key(event):
     """Use source plus team/time identity so ID-less duplicates collapse too."""
     source=str(event.get("source") or "").strip()
@@ -141,16 +159,33 @@ def event_key(event):
     return (source, identifier)
 
 def dedupe_events(events):
-    found={}
+    """Match by provider ID as well as team/date; prefer attributable, complete records."""
+    unique=[]
+    by_id={}
+    by_identity={}
+    def useful(event):
+        names=(clean(event.get("homeTeam")),clean(event.get("awayTeam")))
+        placeholders=sum(n.casefold() in ("tbc","tbd","unknown","to be confirmed") for n in names)
+        status={"finished":3,"live":2,"scheduled":1}.get(str(event.get("status") or "").lower(),0)
+        valid_scores=sum(x is not None for x in (event.get("homeScore"),event.get("awayScore")))
+        return (-placeholders,status,valid_scores,len(event.get("innings") or []))
     for event in events:
-        key=event_key(event)
-        if key not in found:
-            found[key]=event
-        else:
-            old=found[key]
-            if (event.get("homeScore") is not None or event.get("awayScore") is not None) and old.get("homeScore") is None:
-                found[key]=event
-    return sorted(found.values(),key=lambda x:x.get("startTime") or "")
+        source=clean(str(event.get("source") or ""))
+        identifier=clean(str(event.get("id") or ""))
+        identity=event_key(event)
+        key=(source,identifier)
+        index=by_id.get(key) if identifier else None
+        if index is None: index=by_identity.get(identity)
+        if index is None:
+            index=len(unique)
+            unique.append(event)
+        elif useful(event)>useful(unique[index]):
+            unique[index]=event
+        if identifier: by_id[key]=index
+        by_identity[identity]=index
+    return sorted((e for e in unique if clean(e.get("homeTeam")).casefold() not in ("tbc","tbd","unknown","to be confirmed")
+        and clean(e.get("awayTeam")).casefold() not in ("tbc","tbd","unknown","to be confirmed")),
+        key=lambda x:x.get("startTime") or "")
 
 def recent_cache_matches(events, cached, now=None):
     now=now or datetime.now(timezone.utc)
@@ -176,6 +211,20 @@ def recent_cache_matches(events, cached, now=None):
         else: continue
         keep.append(event)
     return dedupe_events(keep)
+
+def safe_outage_matches(events):
+    """Keep historical verified results, but never reuse live or elapsed fixture flags."""
+    now=datetime.now(timezone.utc)
+    safe=[]
+    for event in events or []:
+        copy=dict(event)
+        status=str(copy.get("status") or "").lower()
+        start=iso(copy.get("startTime"))
+        elapsed=not start or datetime.fromisoformat(start.replace("Z","+00:00"))<=now
+        if status=="live" or status in ("scheduled","upcoming") and elapsed:
+            copy["status"]="stale"
+        safe.append(copy)
+    return dedupe_events(safe)
 
 def scores(previous):
     result={}
@@ -205,7 +254,7 @@ def scores(previous):
     elif old_cricket.get("matches"):
         # A failed provider refresh must preserve the last known-good cricket snapshot;
         # expiry filtering applies to normal refreshes, not outage fallback data.
-        result["cricket"]={**old_cricket,"coverage":"stale","matches":old_cricket.get("matches",[]),"note":"Cricket information could not be refreshed; showing previously verified information."}
+        result["cricket"]={**old_cricket,"coverage":"stale","matches":safe_outage_matches(old_cricket.get("matches",[])),"note":"Cricket information could not be refreshed; showing previously verified information."}
     else:
         result["cricket"]={"label":"Cricket","coverage":"unavailable","source":"","matches":[],"note":"No verified cricket information is available right now."}
     for entry in result.values():
@@ -214,7 +263,7 @@ def scores(previous):
             match.setdefault("source","unknown")
     return result
 def read_cricketdata():
-    """Combine scheduled match listings and score feed; never log the credential."""
+    """Combine provider responses without guessing a team's score from innings order."""
     key=os.getenv("CRICKETDATA_API_KEY","").strip()
     if not key:
         print("Cricket feed unavailable: CRICKETDATA_API_KEY is missing from this workflow process.",file=sys.stderr)
@@ -258,41 +307,60 @@ def read_cricketdata():
             continue
         for e in rows:
             if not isinstance(e,dict): continue
-            teams=e.get("teams") or []
+            teams=[clean(str(t)) for t in (e.get("teams") or [])]
             start=iso(e.get("dateTimeGMT"))
-            if len(teams)<2 or not start: continue
+            if len(teams)<2 or not start or not all(teams[:2]): continue
+            if any(n.casefold() in ("tbc","tbd","unknown","to be confirmed") for n in teams[:2]): continue
             raw_scores=e.get("score") or []
             innings=[]
-            for item in raw_scores:
+            for item in raw_scores if isinstance(raw_scores,list) else []:
                 if not isinstance(item,dict): continue
                 innings.append({"team":clean(str(item.get("inning") or "")),
                     "runs":item.get("r"),"wickets":item.get("w"),"overs":item.get("o")})
-            first=innings[0] if innings else {}
-            second=innings[1] if len(innings)>1 else {}
-            status_text=clean(str(e.get("status") or "")).lower()
-            ended=bool(e.get("matchEnded")) or any(x in status_text for x in ("match ended","completed","finished","won by","drawn","tied"))
-            live=bool(e.get("matchStarted")) and not ended
-            status="finished" if ended else "live" if live else "scheduled"
-            winner=None
-            if ended:
-                m=re.search(r"^(.+?)\s+won by\b",str(e.get("status") or ""),re.I)
-                winner=clean(m.group(1)) if m else None
-            out.append({
-                "id":str(e.get("id") or ""),
-                "homeTeam":clean(str(teams[0])),"awayTeam":clean(str(teams[1])),
-                "homeScore":first.get("runs"),"awayScore":second.get("runs"),
-                "innings":innings,"winner":winner,
-                "competition":clean(str(e.get("name") or e.get("series_id") or e.get("matchType") or "Cricket match")),
+            def team_innings(name):
+                prefix=name.casefold()+" "
+                def belongs(i):
+                    label=i["team"].casefold()
+                    if label==name.casefold():return True
+                    if not label.startswith(prefix):return False
+                    suffix=label[len(prefix):]
+                    return bool(re.fullmatch(r"(?:(?:\d+)(?:st|nd|rd|th)\s+)?innings?(?:\s+\d+)?",suffix))
+                return [i for i in innings if belongs(i)]
+            home_rows,away_rows=team_innings(teams[0]),team_innings(teams[1])
+            scores_unambiguous=len(innings)==2 and len(home_rows)==1 and len(away_rows)==1 and home_rows[0] is not away_rows[0]
+            home_score=home_rows[0].get("runs") if scores_unambiguous else None
+            away_score=away_rows[0].get("runs") if scores_unambiguous else None
+            status_text=clean(str(e.get("status") or ""))
+            lowered=status_text.casefold()
+            cancelled=any(x in lowered for x in ("abandoned","no result","cancelled","canceled","postponed","suspended"))
+            ended=bool(e.get("matchEnded")) or any(x in lowered for x in ("match ended","completed","finished","won by","drawn","tied"))
+            started=bool(e.get("matchStarted"))
+            kickoff=datetime.fromisoformat(start.replace("Z","+00:00"))
+            ongoing=started and not ended and not cancelled and kickoff<=datetime.now(timezone.utc) and datetime.now(timezone.utc)-kickoff<=timedelta(days=5)
+            status="abandoned" if cancelled else "finished" if ended else "live" if ongoing else "scheduled"
+            winner=clean(str(e.get("matchWinner") or ""))
+            winner=next((t for t in teams[:2] if t.casefold()==winner.casefold()),None)
+            if not winner and ended:
+                possible=re.match(r"^(.+?)\s+won by\b",status_text,re.I)
+                if possible:
+                    candidate=clean(possible.group(1))
+                    winner=next((t for t in teams[:2] if t.casefold()==candidate.casefold()),None)
+            result_text=status_text if status=="finished" and winner and lowered.startswith(winner.casefold()+" won by ") else None
+            out.append({"id":str(e.get("id") or ""),
+                "homeTeam":teams[0],"awayTeam":teams[1],
+                "homeScore":home_score,"awayScore":away_score,
+                "innings":innings,"winner":winner if status=="finished" else None,
+                "resultText":result_text,"competition":clean(str(e.get("name") or e.get("series_id") or e.get("matchType") or "Cricket match")),
                 "matchType":clean(str(e.get("matchType") or "")),
-                "overs":first.get("overs"),"startTime":start,
+                "startTime":start,
                 "finishedAt":iso(e.get("matchEndedAt") or e.get("endTime")) if ended else None,
-                "status":status,"source":"CricketData"
-            })
+                "status":status,"source":"CricketData"})
     normalized=dedupe_events(out)
     if normalized: return normalized, None
     reason=errors[0] if errors else "empty"
     if not errors: print("Cricket feeds returned valid empty data.",file=sys.stderr)
     return [], reason
+
 def build(kind):
     items=[]; sources=[]; errors=[]
     for name,url in FEEDS[kind]:

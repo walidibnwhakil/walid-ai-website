@@ -35,7 +35,7 @@ async function openPage(width) {
   return {page,errors};
 }
 async function start(page,level,count){
-  await page.locator("#openQuiz").click();
+  if(await page.locator("#modeSelection").isVisible())await page.locator("#openQuiz").click();
   await page.locator("#quizLevel").selectOption(level);
   await page.locator('input[name="questionCount"][value="'+count+'"]').check();
   await page.locator("#startQuiz").click();
@@ -91,7 +91,7 @@ try {
     await page.locator("#exitQuiz").click();
     checks++;
   }
-  await page.locator('[data-home]').first().click();
+  await page.locator("#quizSetup [data-home]").click();
   await page.locator("#openNotes").click();
   await page.locator("#notesSetup").waitFor({state:"visible"});
   for(const [level,subject,min] of [["1","বাংলা",2],["7","বিজ্ঞান",3],["12","ইংরেজি ১ম পত্র",10],["admission","বিজ্ঞান",2],["bcs","মানসিক দক্ষতা",1]]){

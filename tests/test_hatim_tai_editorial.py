@@ -164,5 +164,37 @@ class HatimTaiEditorialTests(unittest.TestCase):
                     )
                     seen.add(normalized)
 
+
+    def test_quest_chronology_and_distinct_endings(self):
+        book = {i: body for i, _, body in self.chapters}
+        episodes = {
+            2: ("শাহাবাদের প্রথম", "আজরাক", "সাতটি শর্ত"),
+            4: ("নেকড়ের", "শেয়াল", "ভালুক", "হ্রদ", "বৃদ্ধ", "শাহাবাদে ফিরে"),
+            5: ("নঈম", "ইউসুফ", "শাহমুহরা নামে রত্নের খোঁজে", "নদীর তীরে"),
+            9: ("জাম নামের", "জাম পানপাত্র", "নিথর", "সমুদ্র", "শাহাবাদে"),
+            10: ("নিতকা", "পরিরাজপুত্র", "মুহাইকাল", "মুক্তা আনালেন"),
+        }
+        for chapter, phrases in episodes.items():
+            offsets = [book[chapter].find(phrase) for phrase in phrases]
+            self.assertTrue(all(pos >= 0 for pos in offsets),
+                            f"chapter {chapter}: episode anchor missing")
+            self.assertEqual(offsets, sorted(offsets),
+                             f"chapter {chapter}: plot events out of sequence")
+        self.assertIn("কে ডাক দেয়, তার সম্পূর্ণ রহস্য তাঁর জানা নয়", book[9])
+        self.assertLessEqual(self.html.count("শর্ত পূর্ণ"), 6)
+
+    def test_adjacent_paragraphs_do_not_duplicate_the_same_scene(self):
+        for chapter, title, body in self.chapters:
+            paragraphs = [
+                re.sub(r"<[^>]+>", "", text).strip()
+                for text in re.findall(r"<p>(.*?)</p>", body, re.S)
+            ]
+            for first, second in zip(paragraphs, paragraphs[1:]):
+                a, b = set(first.split()), set(second.split())
+                ratio = len(a & b) / max(1, len(a | b))
+                self.assertLess(ratio, .44,
+                                f"chapter {chapter}: adjacent scene repeated: {title}")
+
+
 if __name__ == "__main__":
     unittest.main()

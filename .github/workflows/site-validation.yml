@@ -24,6 +24,8 @@ jobs:
         run: python3 tests/test_british_empire_editorial.py
       - name: Verify sourced character context and competing perspectives
         run: python3 tests/test_character_context_editorial.py
+      - name: Check balanced character and motive coverage across all 30 books
+        run: python3 -m unittest discover -s tests -p 'test_library_character_depth_30.py' -v
       - name: Validate Quran, translations, routes, stories and source checksums
         run: python3 tests/test_islam_quran.py
       - name: Check current Quran header, Basmala and verse layout

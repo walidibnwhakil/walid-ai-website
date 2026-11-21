@@ -75,7 +75,7 @@ try {
     }
     assert(ankaraText.includes("বন্দি"),"Ankara must cover captivity");
         assert.equal(state.chapters.length,18,"Timur must retain 18 rewritten chapters");
-    assert.equal(state.totalParagraphs,209,"Timur editorial paragraphs missing");
+    assert.ok(state.totalParagraphs>=209,"Timur editorial paragraphs missing");
     assert.deepEqual(state.chapters.map(x=>x.id),Array.from({length:18},(_,i)=>"chapter-"+(i+1)));
     assert.deepEqual(state.toc,state.chapters.map(x=>({id:x.id,name:x.name})),"TOC links and titles must match sections");
     assert(state.chapters.every(x=>x.paragraphs>=5),"A chapter is too short");

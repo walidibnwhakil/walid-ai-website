@@ -128,3 +128,38 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
  .quiz-nav-main button{flex:1}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.mode-card{transition:none}.mode-card:hover{transform:none}}
+
+
+/* Stream picker is only shown for grades 9–12 and university admissions. */
+.stream-field[hidden]{display:none!important}
+.question-stack{display:grid;gap:16px;margin:18px 0 24px}
+.question-stack .question-card{scroll-margin-top:78px;box-shadow:0 5px 19px rgba(19,49,35,.055)}
+.question-card-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.question-number{font-size:.88rem;font-weight:750;color:var(--forest)}
+.question-stack .question-card h3{margin:12px 0 18px}
+.question-stack .quiz-subject{white-space:normal;max-width:100%;overflow-wrap:anywhere}
+.question-option:disabled{opacity:1;cursor:default}
+.question-option:disabled:hover{background:#fff}
+.question-option[aria-pressed="true"].is-correct,.question-option.is-correct{
+  background:#e8f7ec;border-color:#2a8b55;color:#165335
+}
+.question-option[aria-pressed="true"].is-wrong,.question-option.is-wrong{
+  background:#fff0ed;border-color:#c24d43;color:#82382c
+}
+.question-option.is-correct .option-letter{background:#20834c;color:#fff}
+.question-option.is-wrong .option-letter{background:#b64539;color:#fff}
+.question-feedback{margin-top:14px;padding:13px 16px;border-left:4px solid #2b8953;border-radius:10px;background:#edf8ef;color:#235739}
+.question-feedback.is-wrong{border-left-color:#bb493e;background:#fff4f0;color:#813b32}
+.question-feedback strong{font-size:1rem}
+.question-feedback p{margin:8px 0 0;font-size:.9rem;line-height:1.6}
+.question-card.was-correct{border-color:#b6d9c3}
+.quiz-instruction{margin:12px 0 16px;color:var(--secondary);font-size:.9rem}
+.quiz-finish-actions{margin:24px 0 10px;scroll-margin-top:90px}
+@media(max-width:600px){
+ .question-stack{gap:12px}
+ .question-stack .question-card{padding:17px 15px;scroll-margin-top:55px}
+ .question-card-head{gap:7px}
+ .question-options{gap:8px}
+ .question-option{padding:11px 12px}
+ .question-feedback{padding:12px}
+}

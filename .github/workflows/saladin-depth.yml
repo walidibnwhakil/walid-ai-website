@@ -1,0 +1,19 @@
+name: Saladin history depth and reader integrity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/saladin/index.html"
+      - "tests/test_saladin_depth.py"
+      - ".github/workflows/saladin-depth.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  saladin-editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check all Saladin chapters, content depth, chronology and reader SEO
+        run: python3 tests/test_saladin_depth.py

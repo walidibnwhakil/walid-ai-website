@@ -28,6 +28,25 @@ for (const [index, chapter] of chapters.entries()) {
     paragraphCount++;
   }
 }
+// Narrative regression: a chapter count alone must not hide omitted embedded tales.
+assert.ok(paragraphCount >= 125, "Selected tales were reduced to outlines");
+const chapterText = n => chapters[n - 1][3];
+const mustContain = (n, words) => {
+  for (const word of words) {
+    assert.ok(chapterText(n).includes(word), "Chapter " + n + " lost nested tale or resolution: " + word);
+  }
+};
+mustContain(1, ["বলদ", "গাধা", "বণিক", "উজির", "দুনিয়াজাদ"]);
+mustContain(5, ["টিয়াপাখি", "রাক্ষসী", "দুবান", "বিষ"]);
+mustContain(7, ["প্রথম দরবেশ", "দ্বিতীয় দরবেশ", "তৃতীয় দরবেশ", "দুই প্রতিবেশী", "কুয়োয়", "নিষিদ্ধ দরজা"]);
+mustContain(8, ["পাথর", "জুবাইদা", "পরি", "দুই বোন", "আমিনা", "দোকানদার"]);
+mustContain(9, ["দুই ভাই", "নূরুদ্দিন", "শামসুদ্দিন", "বদরুদ্দিন", "আজিব", "খলিফা"]);
+mustContain(10, ["খ্রিস্টান দালালের গল্প", "খাদ্যতত্ত্বাবধায়কের গল্প", "ইহুদি চিকিৎসকের গল্প", "দর্জির গল্প", "নাপিতের কথা", "প্রথম ভাই", "দ্বিতীয় ভাই", "তৃতীয় ভাই", "চতুর্থ ভাই", "পঞ্চম ভাই", "ষষ্ঠ ভাই", "কাঁটা", "সুস্থ"]);
+assert.ok(chapterText(10).length > 10000, "Hunchback nested cycle cut too short");
+assert.ok((chapterText(10).match(/<h3>/g) || []).length >= 5, "Hunchback substory navigation lost");
+assert.ok(html.includes("এই সংস্করণের পাঠ-পরিচয়"), "Editorial recension note absent");
+assert.ok(html.includes("জন পেইনের"), "Edition/source identification absent");
+
 const requirements = {
   1: ["শাহরিয়ার", "শাহজামান", "শেহেরজাদ", "দুনিয়াজাদ"],
   2: ["খেজুর", "বণিক", "এক বছরের", "হরিণীর", "কুকুর", "খচ্চর"],

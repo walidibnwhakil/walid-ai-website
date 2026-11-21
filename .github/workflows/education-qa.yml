@@ -5,6 +5,7 @@ on:
     paths:
       - "sections/education/**"
       - "tests/education-contract.test.mjs"
+      - "tests/education-50k-audit.test.mjs"
       - "tests/education-responsive-e2e.mjs"
       - ".github/workflows/education-qa.yml"
   push:
@@ -12,6 +13,7 @@ on:
     paths:
       - "sections/education/**"
       - "tests/education-contract.test.mjs"
+      - "tests/education-50k-audit.test.mjs"
       - "tests/education-responsive-e2e.mjs"
       - ".github/workflows/education-qa.yml"
 
@@ -30,8 +32,9 @@ jobs:
         run: |
           node --check sections/education/question-content.mjs
           node --check sections/education/education-app.mjs
+          node --check sections/education/skill-practice.mjs
       - name: Check question banks and lesson coverage
-        run: node --test tests/education-contract.test.mjs
+        run: node --test tests/education-contract.test.mjs tests/education-50k-audit.test.mjs
       - name: Install headless Chromium
         run: |
           npm install --no-save playwright@1.56.1

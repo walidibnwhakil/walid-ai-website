@@ -176,3 +176,19 @@ html[lang="bn"] body,html[lang="bn"] button,html[lang="bn"] .others-book-title,h
 }
 .others-reading-resume-link{font-weight:600;text-decoration:none}
 .others-reading-resume-link:hover{text-decoration:underline;text-underline-offset:3px}
+
+
+/* Editorial catalog: historically neutral illustrations without decorative badges. */
+.others-card-icon{width:60px;flex:0 0 60px;height:60px;display:grid;place-items:center;background:transparent;border:0;border-radius:0}
+.others-card-art{width:58px;height:58px;max-width:100%;aspect-ratio:1}
+.others-card{min-height:115px;grid-template-columns:60px minmax(0,1fr) 12px;column-gap:15px;padding:19px 18px;border-radius:15px}
+.others-card-copy strong{font-size:1.11rem;line-height:1.46;letter-spacing:0}
+.others-card-copy small{font-size:.91rem;line-height:1.66;margin-top:7px;color:#52655a;text-wrap:pretty}
+.others-hero p{text-wrap:pretty}
+@media(max-width:620px){
+  .others-card{grid-template-columns:52px minmax(0,1fr) 10px;gap:11px;min-height:104px;padding:14px}
+  .others-card-icon{width:52px;height:52px;flex-basis:52px}
+  .others-card-art{width:52px;height:52px}
+  .others-card-copy strong{font-size:1.05rem}
+  .others-card-copy small{font-size:.87rem;line-height:1.57}
+}

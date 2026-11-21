@@ -58,7 +58,7 @@ try {
     while (true) {
       const part = await reading(page);
       assert.equal(part.navCount, 1, "Only one bottom navigation appears per reading part");
-      assert.ok(part.words >= 900, "Reading part should have roughly five minutes of prose, got " + part.words);
+      assert.ok(part.words >= 1100, "Reading part should have roughly five minutes of prose, got " + part.words);
       assert.ok(part.visibleIds.length >= 1 && part.visibleIds.length < 12,
         "Do not show the entire novel on one screen");
       assert.ok(part.visibleIds.every(id => !seen.has(id)), "Do not repeat a chapter in later parts");

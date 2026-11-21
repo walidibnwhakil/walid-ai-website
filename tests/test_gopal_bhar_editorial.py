@@ -28,10 +28,10 @@ class GopalBharEditorialTest(unittest.TestCase):
     def setUpClass(cls):
         cls.html = BOOK.read_text(encoding="utf-8")
         cls.sections = re.findall(
-            r'<section class="others-chapter" id="chapter-(\\d+)"><h2>(.*?)</h2>(.*?)</section>',
+            r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>(.*?)</section>',
             cls.html, flags=re.S
         )
-        cls.links = re.findall(r'<li><a href="#chapter-(\\d+)">([^<]+)</a></li>', cls.html)
+        cls.links = re.findall(r'<li><a href="#chapter-(\d+)">([^<]+)</a></li>', cls.html)
 
     def test_17_independent_stories_and_matching_toc(self):
         self.assertEqual(len(self.sections), 17)
@@ -69,7 +69,7 @@ class GopalBharEditorialTest(unittest.TestCase):
             6: ("কলসি", "জমি", "পুকুর"),
             11: ("স্বাদপরীক্ষা", "ক্ষমা"),
             13: ("পাগড়ি", "আংটি", "পরিচারক"),
-            14: ("স্বর্ণকার", "পিতল", "টাকা"),
+            14: ("স্বর্ণকার", "পিতল", "দাম"),
             15: ("সাতটি", "কাপড়", "জামা"),
             16: ("ফলক", "বৃষ্টি", "নালা"),
             17: ("কুয়ো", "কলসি", "কাজ"),

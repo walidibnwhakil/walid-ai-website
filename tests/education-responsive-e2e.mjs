@@ -78,7 +78,7 @@ try {
       await page.locator("#quizResults").waitFor({state:"visible"});
       assert.equal(await page.locator(".review-item").count(),100);
       assert(await page.locator("#subjectBreakdown tr").count()>=4);
-      await page.locator('[data-home]').last().click();
+      await page.locator("#quizResults [data-home]").click();
     } else {
       await page.locator("#exitQuiz").click();
       await page.locator("#startQuiz").waitFor({state:"visible"});

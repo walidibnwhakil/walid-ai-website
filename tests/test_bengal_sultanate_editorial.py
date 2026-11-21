@@ -13,14 +13,14 @@ class BengalSultanateEditorialTests(unittest.TestCase):
   self.assertEqual(toc,[(n,h) for n,h,_ in CHAPTERS])
   self.assertIn("অধ্যায়সূচি — 15টি অধ্যায়",PAGE)
  def test_depth_and_no_exact_repetition(self):
-  all=[]
+  paragraphs=[]
   for n,_,body in CHAPTERS:
    ps=[re.sub(r"<[^>]+>","",p).strip() for p in re.findall(r"<p>(.*?)</p>",body,re.S)]
    self.assertGreaterEqual(len(ps),13,f"Chapter {n} abbreviated")
    self.assertTrue(all(len(p)>=155 for p in ps),f"Chapter {n} has thin paragraph")
-   all.extend(ps)
-  self.assertGreaterEqual(len(all),220)
-  self.assertEqual(len(set(all)),len(all))
+   paragraphs.extend(ps)
+  self.assertGreaterEqual(len(paragraphs),220)
+  self.assertEqual(len(set(paragraphs)),len(paragraphs))
  def test_historical_order_and_people(self):
   must={
    1:("বখতিয়ার","সোনারগাঁও"),2:("ফখরুদ্দিন","ইবন বতুতা","চট্টগ্রাম"),
@@ -54,6 +54,7 @@ class BengalSultanateEditorialTests(unittest.TestCase):
    self.assertIn(token,PAGE)
   self.assertEqual(PAGE.count('class="legal-footer"'),1)
   self.assertEqual(PAGE.count('class="others-reader"'),1)
+  self.assertIn('/others/assets/books.css?v=20261121-solaiman',PAGE)
   self.assertNotIn("উৎস ও পরবর্তী পাঠ",PAGE)
   self.assertNotRegex(PAGE,r'class="others-(?:sources|next)"')
   self.assertNotIn("noindex",PAGE.lower())

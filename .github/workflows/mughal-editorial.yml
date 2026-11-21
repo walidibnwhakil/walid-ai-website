@@ -1,0 +1,19 @@
+name: Mughal Empire editorial integrity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/mughal-empire/**"
+      - "tests/test_mughal_editorial.py"
+      - ".github/workflows/mughal-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mughal-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate 25 historical chapters, chronology, sources and reader shell
+        run: python3 -m unittest discover -s tests -p 'test_mughal_editorial.py' -v

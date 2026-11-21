@@ -3,6 +3,7 @@ import {createServer} from "node:http";
 import {readFile} from "node:fs/promises";
 import {once} from "node:events";
 import {chromium} from "playwright";
+import {bcsQuotas} from "../sections/education/quiz-selection.mjs";
 const root=new URL("../",import.meta.url);
 const types={".html":"text/html",".css":"text/css",".js":"text/javascript",".mjs":"text/javascript",
  ".json":"application/json",".svg":"image/svg+xml",".png":"image/png",".webp":"image/webp",".ttf":"font/ttf"};
@@ -32,9 +33,16 @@ async function quiz(page,level,stream,count){
   await page.locator("#quizLevel").selectOption(level);
   if(stream){
     await page.locator("#quizStreamField").waitFor({state:"visible"});
+    assert(await page.locator("#quizCountField").isHidden(),"Group must precede count selection");
     await page.locator("#quizStream").selectOption(stream);
-  }else assert(await page.locator("#quizStreamField").isHidden(),"stream picker should be hidden "+level);
-  await page.locator('input[name="questionCount"][value="'+count+'"]').check();
+  }else assert(await page.locator("#quizStreamField").isHidden(),"Stream picker should be hidden "+level);
+  await page.locator("#quizCountField").waitFor({state:"visible"});
+  const expected=level==="bcs"?["100","200"]:["20","30","40","50","70","100"];
+  const options=await page.locator("#questionCount option").evaluateAll(elements=>elements.filter(e=>e.value).map(e=>e.value));
+  assert.deepEqual(options,expected,"Question-count options must match level "+level);
+  assert(await page.locator("#quizStartActions").isHidden(),"Start only appears after count selection");
+  await page.locator("#questionCount").selectOption(String(count));
+  await page.locator("#quizStartActions").waitFor({state:"visible"});
   await page.locator("#startQuiz").click();
   await page.locator("#quizRunning").waitFor({state:"visible",timeout:25000});
   const cards=page.locator("#questionList > article.question-card");
@@ -55,7 +63,8 @@ try{
         footer:!!document.querySelector(".legal-footer")};
     });
     assert.equal(layout.cards.length,2);
-    assert.equal(layout.columns,width<=520?1:2);
+    assert.equal(layout.columns,2,"MCQ and Study Notes must remain side by side on all screens");
+    assert(Math.abs(layout.cards[0].top-layout.cards[1].top)<2,"The two study cards must share a row "+width);
     assert(layout.scrollWidth<=width+2,"horizontal overflow "+width);
     assert(layout.cards.every(c=>c.left>=-2&&c.right<=width+2));
     assert(layout.logo&&layout.footer);
@@ -64,13 +73,36 @@ try{
   }
   const {page,errors}=await open(390);
   await page.locator("#openQuiz").click();
+  assert(await page.locator("#quizStreamField").isHidden());
+  assert(await page.locator("#quizCountField").isHidden());
+  assert(await page.locator("#quizStartActions").isHidden());
+  await page.locator("#quizLevel").selectOption("9");
+  assert(await page.locator("#quizStreamField").isVisible(),"Grade 9 reveals stream");
+  assert(await page.locator("#quizCountField").isHidden(),"Grade 9 must not reveal count until stream");
+  await page.locator("#quizStream").selectOption("science");
+  assert(await page.locator("#quizCountField").isVisible(),"Selecting stream reveals count");
+  await page.locator("#quizLevel").selectOption("6");
+  assert(await page.locator("#quizStreamField").isHidden(),"Grade 6 needs no stream");
+  assert(await page.locator("#quizCountField").isVisible(),"Grade 6 reveals count directly");
+  assert.equal(await page.locator("#questionCount").inputValue(),"","Changing grade clears stale count");
+  await page.locator("#quizLevel").selectOption("bcs");
+  assert(await page.locator("#quizStreamField").isHidden(),"BCS needs no stream");
+  assert.deepEqual(await page.locator("#questionCount option").evaluateAll(options=>options.filter(x=>x.value).map(x=>x.value)),["100","200"],"BCS only 100/200");
+  await page.locator("#quizLevel").selectOption("");
+  assert(await page.locator("#quizCountField").isHidden(),"Cleared level hides count");
   const levels=await page.locator("#quizLevel option").evaluateAll(options=>options.map(o=>o.value));
   assert(!["1","2","3","4","5"].some(v=>levels.includes(v)));
-  for(const count of [20,30,40,50,70,100]){
-    const level=count===100?"bcs":"6";
+  for(const count of [20,30,40,50,70,100,200]){
+    const level=count>=100?"bcs":"6";
     await quiz(page,level,null,count);
     if(level==="bcs"){
-      const allSubjects=new Set(await page.locator("#questionList .question-card-head .quiz-subject").allInnerTexts());
+      const subjectLabels=await page.locator("#questionList .question-card-head .quiz-subject").allInnerTexts();
+      const allSubjects=new Set(subjectLabels);
+      if(count===200){
+        const quotas=bcsQuotas(200);
+        for(const quota of quotas)assert.equal(subjectLabels.filter(s=>s===quota.subject).length,quota.quantity,
+          "200-question BCS syllabus weighting "+quota.subject);
+      }
       assert.equal(allSubjects.size,10,"BCS sample must cover all ten exam topic areas");
       const chapters=await page.locator("#questionList .question-chapter").count();
       assert(chapters>=35,"BCS sample must include topic-tagged questions");
@@ -85,7 +117,6 @@ try{
       await firstFact.locator(".question-feedback .question-source").waitFor({state:"visible"});
       const sourceUrl=await firstFact.locator(".question-feedback .question-source").getAttribute("href");
       assert(sourceUrl.startsWith("https://"),"Citation must open a secure primary source");
-      assert.equal(await page.locator("#bcsNotice").evaluate(el=>el.hidden),false,"BCS syllabus note must be enabled for BCS selection");
 
     }
     if(count===20){
@@ -105,7 +136,7 @@ try{
     }else{
       await page.locator("#exitQuiz").click();
     }
-    if(count<100&&!(await page.locator("#quizSetup").isVisible()))await page.locator("#openQuiz").click();
+    if(count<200&&!(await page.locator("#quizSetup").isVisible()))await page.locator("#openQuiz").click();
   }
   await quiz(page,"9","science",20);
   const scienceSubjects=await page.locator("#questionList .question-card-head .quiz-subject").allInnerTexts();
@@ -146,11 +177,23 @@ try{
     await page.locator("#showNotes").click();
     await page.locator("#notesContent").waitFor({state:"visible"});
     assert((await page.locator(".note-article").count())>=min,level+" "+stream+" "+subject);
+    assert.equal(await page.locator("#noteList .note-article .note-example").count(),
+      await page.locator("#noteList .note-article").count(),
+      "Every lesson must show a worked example");
+    assert.equal(await page.locator("#noteList .note-article .note-exercise").count(),
+      await page.locator("#noteList .note-article").count(),
+      "Every lesson must include independent practice");
+    if(level==="6"&&subject==="গণিত"){
+      assert((await page.locator("#noteList .lesson-illustration svg").count())>=2,
+        "Class 6 math lessons must include subject-specific teaching diagrams");
+      assert((await page.locator("#noteList .lesson-illustration figcaption").count())>=2,
+        "Every diagram must have an explanatory caption");
+    }
     checks++;
   }
   assert.deepEqual(errors,[],"Browser runtime errors");
   await page.close();
-  console.log("EDUCATION_STREAMED_E2E_PASS",JSON.stringify({checks,viewports:8,questionCounts:[20,30,40,50,70,100],streams:["science","commerce","arts"],notesExamples:8}));
+  console.log("EDUCATION_STREAMED_E2E_PASS",JSON.stringify({checks,viewports:8,questionCounts:[20,30,40,50,70,100,200],streams:["science","commerce","arts"],notesExamples:9}));
 }finally{
   await browser?.close();
   const closed=new Promise(resolve=>server.close(resolve));

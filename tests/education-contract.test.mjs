@@ -27,15 +27,29 @@ test("grade options start at 6 and subject groups are required only at 9–12 an
   assert.match(app,/values:\[6,7,8,9,10\]/);
   assert.doesNotMatch(app,/createPrimaryBank/);
 });
-test("six quiz sizes and stacked instant-feedback experience",()=>{
-  assert.equal((html.match(/name="questionCount"/g)||[]).length,6);
-  for(const size of [20,30,40,50,70,100])assert.match(html,new RegExp('value="'+size+'"'));
-  assert.match(html,/id="questionList"/);
-  assert.match(css,/\.question-stack\{display:grid/);
+test("progressive quiz settings support grade-first streams and BCS 100/200",()=>{
+  assert.match(html,/id="quizLevel" required/);
+  assert.match(html,/id="quizStreamField" hidden/);
+  assert.match(html,/id="quizCountField" hidden/);
+  assert.match(html,/id="questionCount" disabled/);
+  assert.match(html,/id="quizStartActions" hidden/);
+  assert.match(html,/<select class="field-select" id="questionCount"/);
+  assert.doesNotMatch(html,/name="questionCount"/,"Do not render six number chips");
+  assert.match(app,/STANDARD_QUIZ_COUNTS=Object\.freeze\(\[20,30,40,50,70,100\]\)/);
+  assert.match(app,/BCS_QUIZ_COUNTS=Object\.freeze\(\[100,200\]\)/);
+  assert.match(app,/if\(level==="bcs"\)return BCS_QUIZ_COUNTS/);
+  assert.match(app,/function updateQuizCount\(\)/);
+  assert.match(app,/function quizCountChanged\(\)/);
+  assert.match(app,/byId\("quizStream"\)\.value=""/);
+  assert.match(app,/quizStreamChanged/);
+  assert.match(app,/availableQuizCounts\(level,stream\)\.includes\(count\)/);
   assert.match(app,/function chooseAnswer\(index,choice\)/);
   assert.match(app,/function feedback\(card,q,chosen\)/);
-  assert.match(app,/scrollIntoView\(\{behavior:"smooth",block:"center"\}\)/);
+  assert.match(html,/id="questionList"/);
+  assert.match(css,/\.question-stack\{display:grid/);
   assert.doesNotMatch(html,/id="jumpQuestion"/);
+  assert.doesNotMatch(html,/id="bcsNotice"|class="supporting-copy"|class="edu-sources"|class="quiz-instruction"/);
+  assert.doesNotMatch(html,/Learning & Preparation/);
 });
 test("preserve 2,547 original grade 6–12 questions, each with answer and explanation",()=>{
   assert.equal(questions.length,2547);
@@ -114,17 +128,24 @@ test("200+ original learning notes plus guided examples and subject explanations
   }
   for(const n of notes){
     assert(n.title?.trim()&&n.concept?.trim()&&n.example?.trim(),n.id);
+    assert(n.practice?.trim()&&n.solution?.trim()&&n.steps?.trim(),n.id+" should have an exercise, answer and teaching steps");
     assert(!/পাঠের মূল ধারণা শনাক্ত করুন/.test(n.steps||""),n.id);
   }
   assert.match(html,/id="notesSubject"/);
   assert.match(html,/id="notesStream"/);
 });
-test("brand, footer and mobile layout remain intact",()=>{
+test("brand, footer and mobile layout remain intact",async()=>{
   assert.match(html,/walid-ai-approved-logo.png/);
   assert.match(html,/walid-branding.css/);
   assert.match(html,/class="legal-footer"/);
   assert.match(css,/\.mode-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(css,/@media\(max-width:520px\)/);
+  assert.match(css,/\.mode-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\);gap:10px/);
+  assert.match(html,/viewBox="0 0 48 48"/);
+  assert.match(app,/buildStudyVisual\(note\)/);
+  const visualSource=await readFile(new URL("sections/education/study-visuals.mjs",root),"utf8");
+  assert((visualSource.match(/match:\//g)||[]).length>=18,"Study Notes need topic-specific illustrated examples");
+  assert.match(css,/\.lesson-illustration svg/);
 });
 
 

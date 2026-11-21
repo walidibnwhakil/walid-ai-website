@@ -16,10 +16,10 @@ class VeniceStaticTests(unittest.TestCase):
     def test_chapter_count_and_toc(self):
         headings = re.findall(r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>', HTML)
         links = re.findall(r'<li><a href="#chapter-(\d+)">(.*?)</a></li>', HTML)
-        self.assertEqual(len(headings), 23)
-        self.assertEqual(len(links), 23)
+        self.assertEqual(len(headings), 26)
+        self.assertEqual(len(links), 26)
         self.assertEqual(headings, links)
-        self.assertEqual([int(number) for number, _ in headings], list(range(1, 24)))
+        self.assertEqual([int(number) for number, _ in headings], list(range(1, 27)))
 
     def test_chronology_and_editorial_merge(self):
         headings = re.findall(r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>', HTML)
@@ -28,20 +28,34 @@ class VeniceStaticTests(unittest.TestCase):
         self.assertLess(index("১৩৪৮"), index("মারিনো ফালিয়েরো"))
         self.assertLess(index("মারিনো ফালিয়েরো"), index("চিওজ্জা"))
         self.assertLess(index("মোরোসিনা"), index("শেষ ডোজ লুদোভিকো মানিন"))
+        self.assertEqual(title[16], "১৫০১–১৫২১: লোরেদান, মসলাবাণিজ্য ও ক্যামব্রের লিগের যুদ্ধ")
+        self.assertEqual(title[17], "১৫২২–১৫৬৯: গ্রিত্তি, রেনেসাঁ, মুদ্রণ ও নাগরিক সমাজ")
+        self.assertEqual(title[18], "১৫৭০–১৫৯০: সাইপ্রাসের অবরোধ, লেপান্তো ও নতুন মহামারি")
+        self.assertLess(index("উস্কোক যুদ্ধ"), index("ক্রিটের দীর্ঘ যুদ্ধ"))
+        self.assertLess(index("ক্রিটের দীর্ঘ যুদ্ধ"), index("মোরিয়ার অভিযান"))
+        self.assertLess(index("মোরিয়ার অভিযান"), index("স্থবির শাসন"))
         self.assertIn("১২ মে ১৭৯৭", HTML)
         self.assertIn("১৭৮৯ সালের মার্চে", HTML)
+        self.assertIn("১৫১৭ সালে উসমানীয় সুলতান প্রথম সেলিম", HTML)
+        self.assertIn("১৪ মে ১৫০৯", HTML)
+        self.assertIn("২৭ নভেম্বর ১৫৬০", HTML)
+        self.assertIn("১২ মে ১৭৯৭", HTML)
+        self.assertIn("আলুইকা", HTML)
+        self.assertIn("আর্সেনাল", HTML)
+        self.assertNotIn("১৫০১–১৫২০: মিসর", HTML)
+        self.assertNotIn("১৫০১–১৫২১: লিওনার্দো লোরেদান", HTML)
         self.assertIn("১৪২৩ সালে মহামারি", HTML)
-        self.assertIn("২৯ মার্চ ১৫১৬", HTML)
+        self.assertIn("১৫১৬ সালের মার্চে", HTML)
         self.assertNotIn("১৭৮৮ সালে ডোজ নির্বাচিত", HTML)
         self.assertNotIn("শেষ ডোজ লুদোভিকো মানিনের জীবন: ১৭৮৮", HTML)
         self.assertNotIn("উৎস ও পরবর্তী পাঠ", HTML)
 
     def test_every_chapter_substantive(self):
         chapters = re.findall(r'<section class="others-chapter" id="chapter-\d+"><h2>.*?</h2>(.*?)</section>', HTML)
-        self.assertEqual(len(chapters), 23)
+        self.assertEqual(len(chapters), 26)
         for number, chapter in enumerate(chapters, 1):
-            self.assertGreaterEqual(chapter.count("<p>"), 5, f"chapter {number}")
-            self.assertGreater(len(re.sub(r"<[^>]*>", "", chapter)), 900, f"chapter {number}")
+            self.assertGreaterEqual(chapter.count("<p>"), 8, f"chapter {number}")
+            self.assertGreater(len(re.sub(r"<[^>]*>", "", chapter)), 2500, f"chapter {number}")
 
     def test_branding_canonical_and_footer(self):
         for expected in (
@@ -88,9 +102,9 @@ class VeniceBrowserTests(unittest.TestCase):
         page = context.new_page()
         response = page.goto(f"{self.base}/others/history/venice/", wait_until="domcontentloaded")
         self.assertEqual(response.status, 200)
-        self.assertEqual(page.locator("section.others-chapter").count(), 23)
+        self.assertEqual(page.locator("section.others-chapter").count(), 26)
         self.assertEqual(page.locator("footer.legal-footer").count(), 1)
-        self.assertEqual(page.locator("nav.others-toc a").count(), 23)
+        self.assertEqual(page.locator("nav.others-toc a").count(), 26)
         self.assertTrue(page.locator(".others-brand img").is_visible())
         self.assertIn("SolaimanLipi", page.locator("body").evaluate("(el) => getComputedStyle(el).fontFamily"))
         self.assertFalse(page.evaluate("document.documentElement.scrollWidth > innerWidth + 3"),
@@ -112,6 +126,9 @@ class VeniceBrowserTests(unittest.TestCase):
 
     def test_mobile(self):
         self.check_layout(390, 844, "mobile")
+
+    def test_tablet(self):
+        self.check_layout(768, 1024, "tablet")
 
 
 if __name__ == "__main__":

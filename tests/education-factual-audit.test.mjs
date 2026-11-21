@@ -68,9 +68,9 @@ test("BCS answer sets prioritize factual material while still containing skill e
   const bank=[...authored,...skill];
   // Each syllabus area must be selectable even with this focused fixture.
   for(const [subject] of BCS_PRELIM_50_WEIGHTS){
-    if(bank.some(q=>q.subject===subject))continue;
+    const existing=bank.filter(q=>q.subject===subject).length;
     const source=authored[0];
-    for(let i=0;i<30;i++)bank.push({...source,
+    for(let i=existing;i<30;i++)bank.push({...source,
       id:"fixture-"+subject+"-"+i,subject,q:subject+"-এর অনুশীলন নির্দেশক "+i+" কোনটি?",
       options:["ক","খ","গ","ঘ"],answer:0,why:"এই প্রশ্নটি কেবল বিষয়ভিত্তিক বরাদ্দ টেস্টের fixture।"});
   }

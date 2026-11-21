@@ -66,3 +66,50 @@ export function updatedHistory(pool,count,history,selected){
   }
   return merged.slice(-max);
 }
+
+/* The 50th BCS preliminary syllabus allocation, 200 marks; different BCS
+   examinations (e.g. special BCS) can use a different published syllabus.
+   This is a preparation-topic distribution, not an official examination. */
+export const BCS_PRELIM_50_WEIGHTS=Object.freeze([
+ ["বাংলা ভাষা ও সাহিত্য",30],
+ ["ইংরেজি ভাষা ও সাহিত্য",30],
+ ["বাংলাদেশ বিষয়াবলি",25],
+ ["আন্তর্জাতিক বিষয়াবলি",25],
+ ["ভূগোল ও পরিবেশ",10],
+ ["সাধারণ বিজ্ঞান",15],
+ ["কম্পিউটার ও তথ্যপ্রযুক্তি",15],
+ ["গাণিতিক যুক্তি",20],
+ ["মানসিক দক্ষতা",15],
+ ["নৈতিকতা ও সুশাসন",15]
+]);
+export function bcsQuotas(count){
+  if(!Number.isInteger(count)||count<10)throw Error("BCS test count must be at least 10");
+  const total=BCS_PRELIM_50_WEIGHTS.reduce((sum,[,weight])=>sum+weight,0);
+  if(total!==200)throw Error("BCS marks must total 200");
+  const weighted=BCS_PRELIM_50_WEIGHTS.map(([subject,weight],i)=>{
+    const exact=count*weight/total;
+    return {subject,quantity:Math.floor(exact),fraction:exact-Math.floor(exact),index:i};
+  });
+  let left=count-weighted.reduce((sum,item)=>sum+item.quantity,0);
+  const order=[...weighted].sort((a,b)=>b.fraction-a.fraction||a.index-b.index);
+  for(let i=0;i<left;i++)order[i].quantity++;
+  return weighted.map(({subject,quantity})=>({subject,quantity}));
+}
+export function selectBcsQuestions(pool,count,history=[],rand=Math.random){
+  const quotas=bcsQuotas(count);
+  const all=distinct(pool);
+  const output=[];
+  for(const {subject,quantity} of quotas){
+    const bySubject=all.filter(q=>q.subject===subject);
+    if(bySubject.length<quantity)throw Error("Insufficient BCS "+subject+" questions");
+    const authored=bySubject.filter(q=>!q.generated);
+    const priorityCount=Math.min(authored.length,quantity,Math.ceil(quantity*.75));
+    const authoredSelected=priorityCount?selectQuestions(authored,priorityCount,history,rand):[];
+    const selectedIds=new Set(authoredSelected.map(q=>q.id));
+    const remainder=quantity-authoredSelected.length;
+    const other=remainder?selectQuestions(bySubject.filter(q=>!selectedIds.has(q.id)),remainder,history,rand):[];
+    output.push(...authoredSelected,...other);
+  }
+  if(output.length!==count)throw Error("BCS weight allocation mismatch");
+  return shuffle(output,rand);
+}

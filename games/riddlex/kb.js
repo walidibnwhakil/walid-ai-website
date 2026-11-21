@@ -136,7 +136,7 @@ export function mergePools(pools) {
 export function imageSrc(image) {
   if (!image) return "";
   if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) return image;
-  return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(image) + "?width=480";
+  return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(image) + "?width=320";
 }
 
 export function attachManifest(pool, manifest) {
@@ -275,6 +275,7 @@ export function appendShard(pool, shard) {
 }
 
 export const traffic = { bytes: 0 };
+const shardCache = new Map();
 
 function poolFromDecoded(data, questions) {
   return {
@@ -329,24 +330,46 @@ function decodeOffThread(buffer, questions) {
   });
 }
 
-export async function loadShards(base, manifest, names, onPool, existing = null) {
-  let pool = existing;
-  const questions = manifest.questions;
-  for (const name of names) {
-    const response = await fetch(`${base}/${name}`);
+async function fetchShard(base, name, questions) {
+  const key = `${base}/${name}`;
+  if (shardCache.has(key)) return shardCache.get(key);
+  const pending = (async () => {
+    const response = await fetch(key);
     if (!response.ok) throw new Error("Knowledge shard failed");
     const buffer = await response.arrayBuffer();
     traffic.bytes += buffer.byteLength;
-    let shard;
     try {
-      shard = await decodeOffThread(buffer, questions);
+      return await decodeOffThread(buffer, questions);
     } catch {
-      shard = decodeShard(buffer, questions);
+      return decodeShard(buffer, questions);
     }
+  })();
+  shardCache.set(key, pending);
+  try {
+    return await pending;
+  } catch (error) {
+    shardCache.delete(key);
+    throw error;
+  }
+}
+
+export async function loadShards(base, manifest, names, onPool, existing = null) {
+  let pool = existing;
+  const questions = manifest.questions;
+  const decoded = new Array(names.length);
+  let cursor = 0;
+  const workers = Math.min(4, names.length);
+  await Promise.all(Array.from({ length: workers }, async () => {
+    while (cursor < names.length) {
+      const index = cursor;
+      cursor += 1;
+      decoded[index] = await fetchShard(base, names[index], questions);
+    }
+  }));
+  for (const shard of decoded) {
     pool = appendShard(pool, shard);
     attachManifest(pool, manifest);
     if (onPool) onPool(pool);
-    await new Promise((resolve) => setTimeout(resolve, 0));
   }
   return pool;
 }

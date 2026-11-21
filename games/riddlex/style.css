@@ -34,6 +34,10 @@ button { cursor: pointer; }
   aspect-ratio: 1672 / 941;
 }
 .menu-card { display: block; width: 100%; height: 100%; object-fit: contain; }
+.menu-cat {
+  position: absolute; z-index: 2; pointer-events: none;
+  left: 32.6%; top: 67%; width: 8.1%; height: 9.6%;
+}
 .menu-port { display: none; }
 .menu-back, .lang-switch {
   position: absolute; z-index: 3; top: 3%;
@@ -216,29 +220,52 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #answers button:nth-child(odd) { border-right: 1px solid #d5dee8; }
   #answers button:nth-child(5) { grid-column: auto; }
   #hud:has(#guess:not([hidden])) {
-    top: auto; bottom: 0; left: 0; right: 0; z-index: 6;
-    padding: 6px 12px 8px; background: #1a100c;
-    display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
+    top: calc(var(--note-bottom, 0.62) * 100% + 8px);
+    bottom: auto; left: 12px; right: 12px; z-index: 6;
+    padding: 0; background: transparent;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
   }
-  .guess-line { display: block; margin: 0; text-align: center; color: #fff6e4; font-size: 16px; }
-  #guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .guess-line { display: none; }
+  #guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
   #guess button { min-height: 44px; }
+  #hud:has(#guess:not([hidden])) #credit {
+    margin: 0; max-width: 92%; text-align: center; font-size: 11px; line-height: 1.25;
+  }
   #back { bottom: 8px; }
 }
 @media (min-aspect-ratio: 4/5) {
   #hud:has(#guess:not([hidden])) {
-    top: calc(var(--note-bottom, 0.52) * 100% + 28px);
-    bottom: auto; left: 16px; right: 16px; z-index: 6;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    top: calc(var(--note-bottom, 0.52) * 100% + 10px);
+    bottom: auto;
+    left: calc(var(--note-left, 0.18) * 100%);
+    right: auto;
+    width: calc(var(--note-width, 0.64) * 100%);
+    z-index: 6;
+    display: flex; flex-direction: column; align-items: stretch; gap: 4px;
     background: transparent;
   }
   #hud:has(#guess:not([hidden])) #guess {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    width: min(560px, 100%); margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    width: 100%; margin: 0;
   }
   #hud:has(#guess:not([hidden])) #guess button { min-height: 52px; font-size: 18px; }
   #hud:has(#guess:not([hidden])) #credit {
-    position: static; margin: 0; max-width: 70%; text-align: center;
+    position: static; margin: 0; max-width: 100%; text-align: center; font-size: 11px;
+    line-height: 1.2;
+  }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) {
+    gap: 8px;
+  }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #guess {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #credit {
+    margin-top: 2px;
+  }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #guess button {
+    min-height: var(--guess-btn, 52px);
+    font-size: var(--guess-font, 18px);
   }
 }
 @media (max-width: 520px) {

@@ -2,6 +2,8 @@
 // life, real or fictional, human or not) outweighs fame. Probably stays soft.
 // Someone ruled out that way only returns if the player contradicts that fact.
 
+import { POLITICS_EXTRAS } from "./politics-extra.js";
+
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
 const MATCH = {
@@ -28,7 +30,70 @@ const LATE = new Set([
 
 export function attrAt(attrs, attrBytes, index, qi) {
   const base = index * attrBytes + (qi >> 2);
+  if (base < 0 || base >= attrs.length) return 0;
   return (attrs[base] >> ((qi & 3) << 1)) & 3;
+}
+
+// Questions added after the shards were packed live in a side array.
+// A qi past the stored slots must not read the next person's bytes.
+function ensureExtras(pool) {
+  const stored = pool.attrBytes * 4;
+  const need = pool.questions.length - stored;
+  if (need <= 0) return;
+  const extraBytes = Math.ceil(need / 4);
+  if (pool.extraAttrs && pool.extraBytes === extraBytes && pool._extraCount === pool.count) return;
+  const extra = new Uint8Array(pool.count * extraBytes);
+  for (const [id, spec] of Object.entries(POLITICS_EXTRAS)) {
+    const index = pool.ids.indexOf(id);
+    if (index < 0) continue;
+    const write = (qid, value) => {
+      const qi = pool.qIndex.get(qid);
+      if (qi == null || qi < stored) return;
+      const eo = qi - stored;
+      const base = index * extraBytes + (eo >> 2);
+      const shift = (eo & 3) << 1;
+      extra[base] = (extra[base] & ~(3 << shift)) | ((value & 3) << shift);
+    };
+    for (const qid of spec.yes || []) write(qid, 2);
+    for (const qid of spec.no || []) write(qid, 1);
+  }
+  pool.extraAttrs = extra;
+  pool.extraBytes = extraBytes;
+  pool._extraCount = pool.count;
+}
+
+function regionBit(pool, index, members) {
+  let yes = false;
+  let nos = 0;
+  let present = 0;
+  for (const member of members) {
+    const mqi = pool.qIndex.get(member);
+    if (mqi == null) continue;
+    present += 1;
+    const bit = attrAt(pool.attrs, pool.attrBytes, index, mqi);
+    if (bit === 2) yes = true;
+    else if (bit === 1) nos += 1;
+  }
+  if (yes) return 2;
+  if (present > 0 && nos === present) return 1;
+  return 0;
+}
+
+export function factBit(pool, index, qi) {
+  if (!pool || qi == null || index < 0) return 0;
+  const id = pool.questions[qi]?.id;
+  const members = id && REGIONS[id];
+  if (members && members.length > 1) return regionBit(pool, index, members);
+  ensureExtras(pool);
+  const stored = pool.attrBytes * 4;
+  if (qi < stored) return attrAt(pool.attrs, pool.attrBytes, index, qi);
+  const extra = pool.extraAttrs;
+  const extraBytes = pool.extraBytes || 0;
+  if (!extra || !extraBytes) return 0;
+  const eo = qi - stored;
+  const base = index * extraBytes + (eo >> 2);
+  if (base < 0 || base >= extra.length) return 0;
+  return (extra[base] >> ((eo & 3) << 1)) & 3;
 }
 
 export function packAttrBytes(questionIds, yes, no) {
@@ -54,7 +119,7 @@ function binaryEntropy(p) {
 export function inCategory(pool, index, category) {
   const bit = (id) => {
     const qi = pool.qIndex.get(id);
-    return qi == null ? 0 : attrAt(pool.attrs, pool.attrBytes, index, qi);
+    return qi == null ? 0 : factBit(pool, index, qi);
   };
   const real = bit("real") === 2;
   const fictional = bit("fictional") === 2;
@@ -85,7 +150,7 @@ function massOf(state, qi, bit) {
   let total = 0;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
-    const bitValue = attrAt(pool.attrs, pool.attrBytes, i, qi);
+    const bitValue = factBit(pool, i, qi);
     if (bitValue === bit) total += weights[i];
   }
   return total;
@@ -104,13 +169,25 @@ function hardFacts() {
     ["alive", "dead"],
     ["real", "fictional"],
     ["animal", "object"],
-    ["party_bnp", "party_al"],
+    ["party_bnp", "party_al", "party_jp", "party_jamaat"],
     ["led_gov"],
+    ["been_minister"],
+    ["been_premier"],
+    ["head_of_state"],
+    ["party_chief"],
+    ["party_secretary"],
+    ["in_government"],
+    ...PRIMARY_JOBS.map((job) => [job]),
     ["played_barcelona"],
     ["ballon_dor"],
     ["zia_family"],
     ["mujib_family"],
     ["lives_abroad"],
+    ["from_asia"],
+    ["from_europe"],
+    ["from_africa"],
+    ["from_north_america"],
+    ["from_south_america"],
   ];
   const index = new Map();
   families.forEach((ids, fam) => ids.forEach((id) => index.set(id, fam)));
@@ -159,7 +236,7 @@ export function recompute(state) {
     for (let a = 0; a < answers.length; a++) {
       const answer = answers[a];
       if (answer.value === "unknown") continue;
-      const bit = attrAt(pool.attrs, pool.attrBytes, i, answer.qi);
+      const bit = factBit(pool, i, answer.qi);
       const firm = hardLog(answer, bit, conflicted);
       score += firm == null ? LOG_MATCH[answer.value][bit] : firm;
     }
@@ -263,7 +340,7 @@ function gainOn(state, qi, rows) {
     const w = weights[i];
     if (w <= 0) continue;
     total += w;
-    const bit = attrAt(pool.attrs, pool.attrBytes, i, qi);
+    const bit = factBit(pool, i, qi);
     if (bit === 2) yes += w;
     else if (bit === 1) no += w;
   }
@@ -283,7 +360,7 @@ function yesMass(state, id, rows) {
     const i = use[k];
     const weight = weights[i];
     total += weight;
-    if (attrAt(pool.attrs, pool.attrBytes, i, qi) === 2) yes += weight;
+    if (factBit(pool, i, qi) === 2) yes += weight;
   }
   return total > 0 ? yes / total : 0;
 }
@@ -506,7 +583,7 @@ function candidatesSplit(state, id, rows) {
     const weight = state.weights[rows[k]];
     if (weight <= 0) continue;
     total += weight;
-    const bit = attrAt(state.pool.attrs, state.pool.attrBytes, rows[k], qi);
+    const bit = factBit(state.pool, rows[k], qi);
     if (bit === 2) yes += weight;
     else if (bit === 1) no += weight;
   }
@@ -537,7 +614,16 @@ function skippedAsDuplicate(state, id) {
   if ((id === "wild" && yes("pet")) || (id === "pet" && yes("wild"))) return true;
   if (COUNTRIES.includes(id) && COUNTRIES.some((country) => country !== id && yes(country))) return true;
   if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;
-  if ((id === "party_al" && yes("party_bnp")) || (id === "party_bnp" && yes("party_al"))) return true;
+  const parties = ["party_bnp", "party_al", "party_jp", "party_jamaat"];
+  if (parties.includes(id) && parties.some((party) => party !== id && yes(party))) return true;
+  const regionIds = ["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"];
+  if (regionIds.includes(id) && regionIds.some((region) => region !== id && yes(region))) return true;
+  if (COUNTRIES.includes(id)) {
+    for (const region of regionIds) {
+      const members = REGIONS[region] || [];
+      if (yes(region) && !members.includes(id)) return true;
+    }
+  }
   return false;
 }
 
@@ -586,7 +672,7 @@ function parentAbsent(state, parentId, rows, cache) {
     const weight = weights[rows[k]];
     if (weight <= 0) continue;
     total += weight;
-    const bit = attrAt(pool.attrs, pool.attrBytes, rows[k], qi);
+    const bit = factBit(pool, rows[k], qi);
     if (bit === 2) {
       yes += weight;
       known += weight;
@@ -665,7 +751,11 @@ export function chooseQuestion(state) {
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
-    if ((question.id === "played_barcelona" || question.id === "ballon_dor") && saidYes("footballer")) gain *= 3;
+    if ((question.id === "played_barcelona" || question.id === "ballon_dor") && saidYes("footballer")) gain *= 4;
+    const regionIds = ["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"];
+    const regionOpen = answers.length >= 5 && !regionIds.some((region) => saidYes(region));
+    if (regionOpen && regionIds.includes(question.id)) gain *= 8;
+    if (regionOpen && COUNTRIES.includes(question.id) && question.id !== "from_bd") gain *= 0.12;
     if (state.category === "character" && answers.length < 4) {
       const genderOpen = !asked.has("male") && !asked.has("female");
       const lifeOpen = !asked.has("alive") && !asked.has("dead");

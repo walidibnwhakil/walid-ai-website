@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, questionBlocked, rejectIndex, recompute } from "./engine.js";
+import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute } from "./engine.js";
 import { decodeShard, poolFromEntries } from "./kb.js";
 
 const questions = [
@@ -476,11 +476,7 @@ test("truthful answers about Lionel Messi guess him, not Sergio Agüero", () => 
   pool.opening = manifest.opening;
   const messi = pool.ids.indexOf("Q615");
   assert.ok(messi >= 0);
-  const bit = (qid) => {
-    const qi = pool.qIndex.get(qid);
-    const row = messi * pool.attrBytes + (qi >> 2);
-    return (pool.attrs[row] >> ((qi & 3) << 1)) & 3;
-  };
+  const bit = (qid) => factBit(pool, messi, pool.qIndex.get(qid));
   assert.equal(bit("played_barcelona"), 2);
   assert.equal(bit("ballon_dor"), 2);
   assert.equal(bit("from_es"), 1);
@@ -509,5 +505,74 @@ test("truthful answers about Lionel Messi guess him, not Sergio Agüero", () => 
     answer(state, qid, value);
   }
   assert.equal(guessed, "Q615", asked.join(","));
-  assert.ok(asked.length < 25, asked.length);
+  assert.ok(asked.length <= 12, asked.join(","));
+  const regions = new Set(["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"]);
+  let run = 0;
+  for (const qid of asked) {
+    run = qid.startsWith("from_") && !regions.has(qid) ? run + 1 : 0;
+    assert.ok(run < 5, asked.join(","));
+  }
+  assert.ok(asked.includes("from_south_america") || asked.includes("from_ar"), asked.join(","));
+});
+
+test("a wrong guess keeps a firm occupation from being forgotten", () => {
+  const qs = [
+    ["real", "kind"], ["male", "person"], ["alive", "life"], ["from_bd", "country"],
+    ["politician", "job"], ["actor", "job"], ["cricketer", "job"], ["footballer", "job"],
+    ["party_bnp", "politics"], ["party_al", "politics"],
+  ].map(([id, group]) => ({ id, group, en: id, bn: id }));
+  const person = (id, pop, yes, no, en) => ({ id, pop, en, yes, no });
+  const pool = poolFromEntries(qs, [
+    person("fakhrul", 190, ["real", "male", "alive", "from_bd", "politician", "party_bnp"], ["actor", "cricketer", "footballer", "party_al"], "Mirza Fakhrul"),
+    person("star", 8000, ["real", "male", "alive", "actor"], ["politician", "cricketer", "footballer", "from_bd", "party_bnp", "party_al"], "Famous Actor"),
+    person("bat", 6000, ["real", "male", "alive", "cricketer", "from_bd"], ["politician", "actor", "footballer", "party_bnp", "party_al"], "Famous Cricketer"),
+    person("other", 100, ["real", "male", "alive", "from_bd", "politician", "party_al"], ["actor", "cricketer", "footballer", "party_bnp"], "Other Minister"),
+  ]);
+  const state = createState(pool, { category: "character", opening: "real" });
+  recompute(state);
+  for (const [qid, value] of [["real", "yes"], ["male", "yes"], ["alive", "yes"], ["from_bd", "yes"], ["politician", "yes"]]) {
+    answer(state, qid, value);
+  }
+  assert.equal(questionBlocked(state, "actor"), true);
+  assert.equal(questionBlocked(state, "cricketer"), true);
+  const decision = decide(state);
+  if (decision.type === "guess") rejectIndex(state, decision.index);
+  assert.equal(questionBlocked(state, "actor"), true);
+  assert.equal(questionBlocked(state, "cricketer"), true);
+  for (let n = 0; n < 6; n++) {
+    const qid = chooseQuestion(state);
+    assert.ok(qid !== "actor" && qid !== "cricketer", qid);
+    if (!qid) break;
+    answer(state, qid, "no");
+  }
+});
+
+test("truthful answers about Mirza Fakhrul guess him within 15 questions", () => {
+  const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));
+  const buf = readFileSync(new URL("./kb/ix/top.bin", import.meta.url));
+  const pool = decodeShard(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), manifest.questions);
+  const index = pool.ids.indexOf("Q6874839");
+  assert.ok(index >= 0);
+  const state = createState(pool, { category: "character", opening: "real" });
+  recompute(state);
+  const asked = [];
+  let guessed = "";
+  for (let n = 0; n < 20 && !guessed; n++) {
+    const decision = decide(state);
+    if (decision.type === "guess") {
+      guessed = pool.ids[decision.index];
+      break;
+    }
+    const qid = decision.qid;
+    const value = factBit(pool, index, pool.qIndex.get(qid));
+    asked.push(qid);
+    answer(state, qid, value === 2 ? "yes" : value === 1 ? "no" : "unknown");
+  }
+  assert.equal(guessed, "Q6874839", asked.join(","));
+  assert.ok(asked.length <= 15, asked.join(","));
+  let countryRun = 0;
+  for (const qid of asked) {
+    countryRun = qid.startsWith("from_") && qid !== "from_bd" ? countryRun + 1 : 0;
+    assert.ok(countryRun < 5, asked.join(","));
+  }
 });

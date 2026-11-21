@@ -30,7 +30,7 @@ export const UI = {
     photo: "Picture, if you have one",
     save: "Teach the detective",
     needName: "Type the name first.",
-    saved: "Thank you. This stays pending until more players agree, or the owner approves it.",
+    saved: "Thank you.",
     noPhoto: "Pictures are not kept for this kind of answer.",
     progress: (n) => `Question ${n}`,
     failedSave: "That could not be saved. Check your connection and try again.",
@@ -68,7 +68,7 @@ export const UI = {
     photo: "ছবি, থাকলে",
     save: "গোয়েন্দাকে শেখাও",
     needName: "আগে নামটি লিখুন।",
-    saved: "ধন্যবাদ। এই নামটি আরও কয়েকজন মিললে, বা মালিক অনুমোদন করলে, খেলায় যোগ হবে।",
+    saved: "ধন্যবাদ।",
     noPhoto: "এই ধরনের উত্তরের ছবি রাখা হয় না।",
     progress: (n) => `প্রশ্ন ${n}`,
     failedSave: "এটি জমা হয়নি। সংযোগ দেখে আবার চেষ্টা করুন।",
@@ -81,5 +81,5 @@ export function guessFont(lang, name) {
   const bangla = lang === "bn" || /[\u0980-\u09FF]/.test(name || "");
   return bangla
     ? '400 28px SolaimanLipi, "Times New Roman", Times, serif'
-    : '500 34px Caveat, "Segoe Script", cursive';
+    : '500 34px "Times New Roman", Times, serif';
 }

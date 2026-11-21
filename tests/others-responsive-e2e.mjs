@@ -39,6 +39,7 @@ const storyPaths=[
   "/others/islamic-literature/hatim-tai/",
   "/others/islamic-literature/aladdin/",
   "/others/islamic-literature/ali-baba/",
+  "/others/history/bengal-sultanate/",
   "/others/history/mughal-empire/",
 ];
 const widths=[320,375,768,1280];
@@ -82,6 +83,12 @@ try{
       }
       if(cardsCount===0){
         assert(layout.chapterCount>=12,path+" lost book chapters");
+        if(path==="/others/history/bengal-sultanate/"){
+          assert.equal(layout.chapterCount,15,"Bengal Sultanate must contain 15 chronological chapters");
+          const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));
+          const tocIds=await page.locator(".others-toc a[href^='#chapter-']").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href").slice(1)));
+          assert.deepEqual(tocIds,ids,"Bengal Sultanate chapter links must match the document sections");
+        }
         if(path.includes("ottoman-empire")) assert.equal(layout.chapterCount,38,"Ottoman book lost its revised chapters");
         assert.equal(layout.emptyChapters,0,path+" has empty/short chapters");
         assert.equal(layout.hasSidebar,true,path+" missing chapter drawer");

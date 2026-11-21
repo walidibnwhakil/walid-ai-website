@@ -24,9 +24,9 @@
   let activeSection = 'surah';
 
   const status = document.getElementById('load-status');
-  if (status) status.textContent = 'আরবি আয়াত লোড হচ্ছে…';
+  if (status) status.textContent = verses.querySelector('.ayah') ? 'আরবি পাঠ ও বাংলা অনুবাদ' : 'আরবি আয়াত লোড হচ্ছে…';
   const translation = document.getElementById('show-translation');
-  if (translation) translation.checked = false;
+  // Preserve the checked HTML default so Bengali meaning remains visible on first load.
   const oldNotes = document.getElementById('show-notes');
   if (oldNotes) oldNotes.closest('label')?.remove();
 

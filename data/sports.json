@@ -1,13 +1,62 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-21T06:33:43.358236+00:00",
+  "updatedAt": "2026-11-21T09:12:00.908924+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Harden passes Bryant for 50-point games",
+      "url": "https://www.bbc.co.uk/sport/basketball/articles/cwx2e8y1lr8lo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T09:10:18+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Premier League resumes, Kane facing spell on sidelines: football news – matchday live",
+      "url": "https://www.theguardian.com/football/live/2026/nov/21/premier-league-resumes-kane-facing-spell-on-sidelines-football-news-matchday-live",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T09:00:22+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'Somebody has to stand up to that guy' - and Russell has his chance in Vegas",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/c34gnrvl9zvro?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T08:13:58+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Cummins' integrity not compromised - Cricket Australia",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c65y1gjnqe50o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T07:55:06+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Wales hungry to show they are not one-hit wonders",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6n83rj3v9zmo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T07:37:23+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Athlete who lost hand saving friends in attack 'would do it again'",
+      "url": "https://www.bbc.co.uk/sport/taekwondo/articles/crpdwljj0v89o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T06:35:06+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Jeers, injuries and doubters - White's journey back to the top",
       "url": "https://www.bbc.co.uk/sport/football/articles/cv7028xeler2o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-21T06:17:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Brighton are rocking the Premier League elite. But can they mount a title tilt?",
+      "url": "https://www.theguardian.com/football/2026/nov/21/brighton-rocking-premier-league-elite-title-challenge",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T06:00:52+00:00",
       "category": "Sports"
     },
     {
@@ -39,31 +88,10 @@
       "category": "Sports"
     },
     {
-      "title": "NFL great Brady could buy Chelsea stake",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmg46k97k92do?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T22:36:35+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Premier League news: Moyes demands more from Grealish, Iraola wary of United threat",
       "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-news-everton-jack-grealish-manchester-city-liverpool-chelsea",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T22:31:19+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Price survives match darts to reach Grand Slam semis",
-      "url": "https://www.bbc.co.uk/sport/darts/articles/ck7928yjd1dgo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T22:30:34+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Alcaraz puts aside injury concerns to take apart Cobolli",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/cqrkgn17emr2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T21:58:24+00:00",
       "category": "Sports"
     },
     {
@@ -102,20 +130,6 @@
       "category": "Sports"
     },
     {
-      "title": "Premier League team news: predicted lineups for the weekend action",
-      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-team-news-predicted-lineups-for-the-weekend-action",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T18:03:15+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "A men's netball World Cup - not a question of if, but when?",
-      "url": "https://www.bbc.co.uk/sport/netball/articles/c60evgr13deyo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T18:00:20+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Pochettino’s fiery start, plus England v All Blacks and ATP Finals finale – follow with us",
       "url": "https://www.theguardian.com/sport/2026/nov/20/pochettinos-fiery-start-plus-england-v-all-blacks-and-atp-finals-finale-follow-with-us",
       "source": "The Guardian Football",
@@ -141,20 +155,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/20/arsenal-lisa-baum-germany-brother-dennis",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T13:00:29+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Cummins retains Cricket Australia support as captain",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c6808y17r0l0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T10:13:23+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "What history tells us about the Premier League table after 10 games of a season",
-      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-table-history-after-10-games-season",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T08:00:26+00:00",
       "category": "Sports"
     },
     {
@@ -4488,9 +4488,9 @@
           "innings": [
             {
               "team": "sri lanka a Inning 1",
-              "runs": 26,
-              "wickets": 1,
-              "overs": 5
+              "runs": 234,
+              "wickets": 4,
+              "overs": 43.2
             }
           ],
           "winner": null,

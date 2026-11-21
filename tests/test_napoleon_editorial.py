@@ -33,7 +33,7 @@ for n, title, body in sections:
     assert all(len(re.sub(r"<[^>]+>", "", p).strip()) >= 170 for p in paragraphs), f"Chapter {n}: stub paragraph"
 assert html.count('class="legal-footer"') == 1, "Shared footer missing or doubled"
 assert '<link rel="canonical" href="https://walid-ai.com/others/history/napoleon/">' in html
-assert 'walid-ai-approved-logo.png' in html and '20261121-solaiman' in html
+assert 'walid-ai-approved-logo.png' in html and '20261121-editorial' in html
 assert '/others/assets/reader.js' in html and '/others/assets/books.css' in html
 assert 'class="others-sources"' not in html and 'class="others-next"' not in html
 assert "১৮৩২ সালে" not in "".join(body for _, _, body in sections[:16]), "Future family outcome moved earlier"

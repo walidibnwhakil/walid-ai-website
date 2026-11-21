@@ -114,8 +114,8 @@ class MughalEditorialTests(unittest.TestCase):
         for token in (
             'href="https://walid-ai.com/others/history/mughal-empire/"',
             '/walid-ai-approved-logo.png',
-            '/others/assets/books.css?v=20261121-solaiman',
-            '/others/assets/reader.js?v=20261120-sidebar',
+            '/others/assets/books.css?v=20261121-editorial',
+            '/others/assets/reader.js?v=20261121-editorial',
             'class="others-toc-dialog"',
             'class="legal-footer"',
             'href="/privacy-policy/"',

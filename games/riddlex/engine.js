@@ -3,7 +3,7 @@
 // Someone ruled out that way only returns if the player contradicts that fact.
 
 const politicsUrl = new URL(
-  import.meta.url.includes("?") ? "./politics-extra.js?v=akinator-32" : "./politics-extra.js",
+  import.meta.url.includes("?") ? "./politics-extra.js?v=akinator-33" : "./politics-extra.js",
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);

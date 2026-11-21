@@ -129,6 +129,7 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   min-height: 42px; border-radius: 10px; border: 1px solid #bd9969;
   background: linear-gradient(#fff0cb, #dfbb81); color: #392417; padding: 6px 4px;
 }
+.answer-row { display: contents; }
 #answers {
   position: absolute; z-index: 5; left: 16px; right: 16px; bottom: 14px;
   display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px;
@@ -215,28 +216,27 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   }
   .q-badge { flex: 0 0 32px; font-size: 15px; border-radius: 12px 0 0 12px; }
   #status { font-size: 15px; padding: 8px 12px; border-radius: 14px; }
-  #categories {
-    /* Sit under the speech bubble. chin-y is the bubble's anchor; do not use desk-y. */
-    top: min(calc(var(--chin-y, 0.42) * 100% + 46px), calc(100% - 184px));
-    bottom: auto; left: 12px; right: 12px; z-index: 6;
+  #categories, #answers {
+    /* Just under the speech bubble. --under-bubble is the bubble's bottom, not desk-y. */
+    top: var(--under-bubble, calc(var(--chin-y, 0.42) * 100% + 52px));
+    bottom: auto; left: 12px; right: 12px; width: auto; z-index: 6;
   }
-  .cat-row { display: flex; flex-direction: column; gap: 8px; }
-  .cat-row button, #load-retry {
-    min-height: 52px; height: 52px; width: 100%; font-size: 18px;
-    border-radius: 12px; padding: 8px 14px;
+  .cat-row, .answer-row {
+    display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px;
+  }
+  .cat-row button, #answers button, #load-retry {
+    flex: 0 1 auto; width: auto; min-height: 44px; height: 44px;
+    font-size: 16px; line-height: 1.1; padding: 0 14px; border-radius: 999px;
   }
   #answers {
-    position: absolute; left: 12px; right: 12px; bottom: 8px; top: auto; width: auto;
-    display: flex; flex-direction: column; gap: 6px;
-    background: transparent; border: 0; box-shadow: none; border-radius: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: transparent; border: 0; box-shadow: none;
   }
   #answers button {
-    min-height: 44px; height: 44px; font-size: 16px;
-    border: 1px solid #d5dee8; border-radius: 12px; border-bottom: 1px solid #d5dee8;
-    background: #f7f9fc;
+    border: 1px solid #d5dee8; background: #f7f9fc;
+    box-shadow: 0 3px 8px rgba(20, 16, 10, 0.12);
   }
-  #answers button:nth-child(odd) { border-right: 1px solid #d5dee8; }
-  #answers button:nth-child(5) { grid-column: auto; }
+  #load-retry { margin: 8px auto 0; }
   #hud:has(#guess:not([hidden])) {
     top: calc(var(--note-bottom, 0.62) * 100% + 8px);
     bottom: auto; left: 12px; right: 12px; z-index: 6;

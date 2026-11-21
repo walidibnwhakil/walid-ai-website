@@ -88,6 +88,8 @@ try {
       const p = paragraphs[Math.min(2, paragraphs.length - 1)];
       scrollTo({top: scrollY + p.getBoundingClientRect().top + 65, behavior: "instant"});
     });
+    await page.mouse.move(Math.min(200, width / 2), 300);
+    await page.mouse.wheel(0, 180);
     await page.waitForTimeout(1000);
     const saved = await page.evaluate(k => JSON.parse(localStorage.getItem(k)), key + "progress");
     assert.ok(visible.includes(saved?.chapterId), "Reading progress saves an actual visible chapter");

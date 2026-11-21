@@ -139,6 +139,8 @@ def verify():
             f"Ramayana chapter {chapter} has overlapping/reversed scenes: {phrases}"
         )
 
+    require_scene_order(37, "নন্দীগ্রামে ভরত তখনও", "হনুমান প্রথমে গঙ্গার ধারে",
+                        "নন্দীগ্রামে এসে হনুমান", "ভরতের নির্দেশে অযোধ্যায় দূত")
     require_scene_order(35, "রাবণ বিভীষণকে লক্ষ্য করে", "মাতলি রামের কাছে পৌঁছান",
                         "রাবণ রণক্ষেত্রে নিহত হন")
     require_scene_order(36, "সীতা লক্ষ্মণকে আগুনের চিতা", "সীতা অগ্নিতে প্রবেশ করলে")

@@ -34,6 +34,35 @@ def validate_book(path):
         fail(path, "obsolete source or previous/next book block present")
     if ">undefined<" in content or 'content="undefined"' in content:
         fail(path, "undefined text appears in reader")
+    if path.relative_to(ROOT).as_posix() == "others/history/ashab-al-kahf/index.html":
+        # Chapter-count, developed narrative, Quranic chronology, and reader-shell contract.
+        sections = re.findall(
+            r'<section class="others-chapter" id="chapter-\\d+"><h2>(.*?)</h2>(.*?)</section>',
+            content, re.S
+        )
+        expected_titles = (
+            "বিশ্বাসের ঘোষণা", "সমাজ থেকে বিচ্ছেদ", "আশ্রয়ে প্রবেশ",
+            "দীর্ঘ নিদ্রা", "জাগরণের পরে", "রৌপ্যমুদ্রা",
+            "ঘটনা প্রকাশ", "স্মারক নির্মাণ", "সংখ্যা,",
+            "তিনশ বছর", "এফেসাসের", "গুহার স্থান",
+        )
+        if len(sections) != 12 or "অধ্যায়সূচি — 12টি অধ্যায়" not in content:
+            fail(path, "Ashab al-Kahf must have 12 chronological chapters")
+        elif any(not title.startswith(prefix) for (title, _), prefix in zip(sections, expected_titles)):
+            fail(path, "Ashab al-Kahf chronology or TOC titles were changed")
+        for number, (_, body) in enumerate(sections, 1):
+            paragraphs = re.findall(r"<p>(.*?)</p>", body, re.S)
+            if len(paragraphs) < 5 or any(len(re.sub(r"<[^>]*>", "", p).strip()) < 190 for p in paragraphs):
+                fail(path, f"Ashab al-Kahf chapter {number} has an abbreviated section")
+        for token in ("১৮:","১৮–", "ডেসিয়ুস", "থিওডোসিয়ুস", "রৌপ্যমুদ্রা", "কুকুর", "আর-রাকিম"):
+            if token not in content:
+                fail(path, f"Ashab al-Kahf source-context anchor missing: {token}")
+        if content.count('class="legal-footer"') != 1 or not all(s in content for s in (
+            'href="https://walid-ai.com/others/history/ashab-al-kahf/"',
+            '/walid-ai-approved-logo.png', '/others/assets/books.css',
+            '/others/assets/reader.js')):
+            fail(path, "Ashab al-Kahf SEO, branding, or footer regressed")
+
     if path.relative_to(ROOT).as_posix() == "others/history/mughal-empire/index.html":
         # Book-scoped editorial contract: other books retain their original tests.
         if len(chapters) != 25:

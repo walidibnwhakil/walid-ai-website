@@ -9,9 +9,9 @@ export const POLITICS_EXTRAS = {
     no: ["been_premier", "head_of_state", "party_jp", "party_jamaat", "party_chief", "in_government"],
   },
   Q7686199: {
-    // Tarique Rahman, BNP acting chairman.
-    yes: ["party_chief"],
-    no: ["been_minister", "been_premier", "head_of_state", "party_jp", "party_jamaat", "party_secretary", "in_government"],
+    // Tarique Rahman, BNP chairman and prime minister.
+    yes: ["party_chief", "been_premier", "in_government"],
+    no: ["head_of_state", "party_jp", "party_jamaat", "party_secretary"],
   },
   Q52183: {
     // Sheikh Hasina, former prime minister and Awami League leader.
@@ -29,8 +29,8 @@ export const POLITICS_EXTRAS = {
     no: ["been_premier", "head_of_state", "party_jp", "party_jamaat", "party_chief", "in_government"],
   },
   Q43969: {
-    // Muhammad Yunus, chief adviser, not a party leader.
-    yes: ["in_government"],
-    no: ["been_minister", "been_premier", "head_of_state", "party_jp", "party_jamaat", "party_chief", "party_secretary"],
+    // Muhammad Yunus, former chief adviser, not a party leader.
+    yes: [],
+    no: ["been_minister", "been_premier", "head_of_state", "party_jp", "party_jamaat", "party_chief", "party_secretary", "in_government"],
   },
 };

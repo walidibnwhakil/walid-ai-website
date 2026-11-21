@@ -150,6 +150,10 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
 }
 #credit, #learn-note { margin: 2px 4px; font-size: 12px; color: #fff6e4; text-shadow: 0 1px 2px #201209; }
 .guess-line { display: none; margin: 0; }
+#solved-line {
+  margin: 0; text-align: center; color: #fff6e4;
+  text-shadow: 0 1px 2px #201209; font-size: 18px; line-height: 1.3;
+}
 #guess { display: flex; gap: 4px; align-items: center; }
 #back {
   position: absolute; z-index: 6; left: 10px; bottom: 8px;
@@ -228,6 +232,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   .guess-line { display: none; }
   #guess { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
   #guess button { min-height: 52px; font-size: 18px; width: 100%; padding: 8px 14px; }
+  #solved-line { font-size: 18px; }
   #hud:has(#guess:not([hidden])) #credit {
     margin: 0; max-width: 92%; text-align: center; font-size: 11px; line-height: 1.25;
   }
@@ -251,6 +256,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #hud:has(#guess:not([hidden])) #guess button {
     min-height: 58px; font-size: 20px; width: 100%; padding: 10px 16px;
   }
+  #solved-line { font-size: 20px; }
   #hud:has(#guess:not([hidden])) #credit {
     position: static; margin: 0; max-width: 100%; text-align: center; font-size: 11px;
     line-height: 1.2;

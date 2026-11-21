@@ -681,7 +681,7 @@ export function createScene(canvas) {
 
   async function loadOverlaySet(orient) {
     const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-27`)];
+      return [key, await loadImage(`${src}?v=akinator-28`)];
     }));
     const overlays = {};
     for (const [key, image] of entries) if (image) overlays[key] = image;

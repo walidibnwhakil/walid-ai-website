@@ -1,0 +1,24 @@
+name: Alexander chronology and content checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/alexander/index.html"
+      - "tests/test_alexander_editorial.py"
+      - ".github/workflows/alexander-editorial.yml"
+  push:
+    branches: [main]
+    paths:
+      - "others/history/alexander/index.html"
+      - "tests/test_alexander_editorial.py"
+      - ".github/workflows/alexander-editorial.yml"
+permissions:
+  contents: read
+jobs:
+  historical-content:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Alexander historical events, chronology and site design
+        run: python3 tests/test_alexander_editorial.py

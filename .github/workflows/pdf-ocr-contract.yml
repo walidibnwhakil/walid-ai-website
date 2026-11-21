@@ -19,6 +19,7 @@ on:
       - "tests/pdf-word-structure-e2e.mjs"
       - "tests/tesseract-benchmark.mjs"
       - "tests/pdf-tool-regression-contract.mjs"
+      - "tests/pdf-merge-split-contract.mjs"
       - ".github/workflows/pdf-ocr-contract.yml"
   push:
     branches: [main, "fix/**", "codex/**"]
@@ -54,6 +55,7 @@ jobs:
       - run: node tests/ocr-language-contract.mjs
       - run: node tests/pdf-bengali-export-contract.mjs
       - run: node tests/pdf-tool-regression-contract.mjs
+      - run: node tests/pdf-merge-split-contract.mjs
       - run: node tests/pdf-copy-audit.mjs
       - run: node tests/pdf-mobile-layout-e2e.mjs
       - run: node tests/pdf-browser-e2e.mjs

@@ -93,8 +93,9 @@ class RupbanEditorialTest(unittest.TestCase):
             self.assertIn(word, note.group(1))
         self.assertIn("সাহিত্যিক সংযোজন", note.group(1))
         self.assertIn("উল্লিখিত মঞ্চ ও চলচ্চিত্র প্রতিবেদনে তা নিশ্চিত নয়", note.group(1))
-        self.assertIn("https://www.kaliokalam.com/", note.group(1))
-        self.assertIn("https://anyadinbd.com/article/22027", note.group(1))
+        self.assertIn("‘লোকসংস্কৃতি: রূপবান-কাহন’", note.group(1))
+        self.assertIn("‘ষাট বছরে রূপবান’", note.group(1))
+        self.assertNotIn("<a ", note.group(1), "Bibliographic names must be plain text")
         for forbidden in ("উৎস ও পরবর্তী পাঠ", "এই অধ্যায়ে আমরা", "পাঠক শিখবেন",
                           'class="others-sources"', 'class="others-next"'):
             self.assertNotIn(forbidden, self.html)

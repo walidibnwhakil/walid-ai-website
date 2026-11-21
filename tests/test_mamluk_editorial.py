@@ -58,6 +58,38 @@ class MamlukEditorialTests(unittest.TestCase):
         print("MAMLUK_EDITORIAL_DEPTH_PASS", total_words, "words",
               len(seen), "unique paragraphs")
 
+    def test_related_paragraphs_avoid_repeating_the_same_event(self):
+        """Keep distinct the cause, action, outcome, and succession paragraphs."""
+        passages = {
+            int(number): [text_only(p) for p in PARAGRAPH_RE.findall(body)]
+            for number, _, body in CHAPTERS
+        }
+        # (chapter, paragraph owning this detail, neighboring paragraph, cue)
+        ownership = [
+            (2, 9, 8, "১২৫৪"),
+            (3, 5, 6, "১২৫৯"),
+            (4, 5, 6, "বায়বার্স"),
+            (4, 9, 7, "ইলখানাত"),
+            (4, 10, 11, "আলেপ্পোর"),
+            (4, 11, 10, "অক্টোবরে"),
+            (5, 9, 10, "এলবিস্তানের"),
+            (5, 10, 9, "বেরকে"),
+            (7, 12, 13, "বাইদারা"),
+            (7, 13, 12, "১২৯৩"),
+            (7, 14, 13, "আল-নাসির"),
+            (8, 5, 6, "১৩০৯"),
+            (8, 6, 5, "১৩১০"),
+            (8, 10, 9, "১৩২৩"),
+            (11, 14, 13, "১৪১২"),
+            (13, 8, 7, "১৪৫৩"),
+            (13, 11, 10, "১৪৬১"),
+            (17, 9, 8, "১৮১১"),
+        ]
+        for chapter, owned_by, not_in, cue in ownership:
+            with self.subTest(chapter=chapter, cue=cue):
+                self.assertIn(cue, passages[chapter][owned_by - 1])
+                self.assertNotIn(cue, passages[chapter][not_in - 1])
+
     def test_people_events_and_chronology_anchors(self):
         required = {
             1: ("ইকতা", "বাহরি", "আস-সালিহ"),

@@ -44,7 +44,7 @@ try {
     assert.equal(new URL(page.url()).hash, "#chapter-2", "Next chapter link works");
     await page.evaluate(() => {
       const section = document.querySelector("#chapter-4");
-      scrollTo(0, section.getBoundingClientRect().top + scrollY + 180);
+      scrollTo({top: section.getBoundingClientRect().top + scrollY + 180, behavior: "instant"});
     });
     await page.waitForTimeout(1050);
     const progress = await page.evaluate(k => JSON.parse(localStorage.getItem(k)), key + "progress");

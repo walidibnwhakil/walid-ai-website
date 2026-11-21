@@ -29,6 +29,7 @@ const indexes=[
 ];
 const storyPaths=[
   "/others/history/alexander/",
+  "/others/history/ashab-al-kahf/",
   "/others/history/ottoman-empire/",
   "/others/folklore/ramayana/",
   "/others/folklore/mahabharata/",

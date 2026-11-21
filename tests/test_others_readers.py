@@ -57,6 +57,32 @@ def validate_book(path):
         for token in ("সূরা আল-কাহফ", "ডেসিয়ুস", "থিওডোসিয়ুস", "রৌপ্যমুদ্রা", "কুকুর", "আর-রাকিম"):
             if token not in content:
                 fail(path, f"Ashab al-Kahf source-context anchor missing: {token}")
+        # The only direct Arabic excerpt is Quran 18:10; the Bengali rendering is original.
+        verified_prayer = "رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحۡمَةٗ وَهَيِّئۡ لَنَا مِنۡ أَمۡرِنَا رَشَدٗا"
+        if content.count(verified_prayer) != 1:
+            fail(path, "Quran 18:10 prayer was altered or duplicated")
+        if not all(token in content for token in (
+            "বাংলা ভাবার্থ", "কোনো প্রকাশিত অনুবাদ হুবহু উদ্ধৃত নয়",
+            'href="/islam/quran/al-kahf/"',
+            'href="https://www.iranicaonline.org/articles/ephesus/"',
+            "আটজন", "৩০০ বছরের সঙ্গে আরও নয়",
+        )):
+            fail(path, "Ashab al-Kahf source attribution or variant caution missing")
+        for index, requirements in {
+            1: ("১৪ নম্বর আয়াতে", "প্রতিপালক", "সমাজ"),
+            3: ("১৮:১০", "আরবি", "প্রার্থনা"),
+            4: ("১১–১২ নম্বর আয়াতে", "১৭ নম্বর আয়াত", "১৮ নম্বর আয়াত", "কুকুর"),
+            5: ("১৯ নম্বর আয়াতে", "দিন", "সময়"),
+            6: ("১৯ নম্বর আয়াতে", "২০ নম্বর আয়াতে", "খাদ্য", "রৌপ্য"),
+            7: ("২১ নম্বর আয়াতে", "পুনরুত্থান"),
+            9: ("২২ নম্বর আয়াতে", "তিনজন", "পাঁচজন", "সাতজন"),
+            10: ("২৫ নম্বর আয়াতে", "২৬ নম্বর আয়াতে", "ব্যাখ্যা"),
+            11: ("ডেসিয়ুস", "থিওডোসিয়ুস", "পৃথক"),
+        }.items():
+            if len(sections) >= index and not all(
+                requirement in sections[index - 1][1] for requirement in requirements
+            ):
+                fail(path, f"Ashab al-Kahf chapter {index} lost Quran or source anchors")
         if content.count('class="legal-footer"') != 1 or not all(s in content for s in (
             'href="https://walid-ai.com/others/history/ashab-al-kahf/"',
             '/walid-ai-approved-logo.png', '/others/assets/books.css',

@@ -1,5 +1,9 @@
 import {createExamExtras,auditQuestion} from "./question-content.mjs";
-import {STREAMS,SHARED,needsStream,isAllowedSubject,createConceptQuestions,conceptNotes,createWorkedPractice,createWorkedLessons} from "./extended-practice.mjs";
+import {STREAMS,needsStream,isAllowedSubject,createWorkedPractice,createWorkedLessons} from "./extended-practice.mjs";
+import {makeQuestion,makeLesson} from "./chapter-utils.mjs";
+import {SCHOOL_ROWS} from "./grade-chapters.mjs";
+import {BCS_ROWS} from "./bcs-chapters.mjs";
+import {ADMISSION_ROWS} from "./admission-chapters.mjs";
 import {selectQuestions,updatedHistory} from "./quiz-selection.mjs";
 
 const byId=id=>document.getElementById(id);
@@ -67,14 +71,21 @@ const countChosen=()=>Number(document.querySelector('input[name="questionCount"]
 const normalized=(q,id,subject)=>({id:String(id),q:q.q,grade:q.grade,subject:subject||q.subject,
     options:q.options.map(String),answer:q.answer,why:q.why||"সংশ্লিষ্ট পাঠের ব্যাখ্যা পর্যালোচনা করুন।"});
 
+function chapterRowsFor(level,stream){
+  const rows=level==="bcs"?BCS_ROWS:level==="admission"?ADMISSION_ROWS:SCHOOL_ROWS;
+  return rows.filter(row=>row.level===level&&(!row.stream||row.stream===stream));
+}
+function chapterQuestions(level,stream){
+  return chapterRowsFor(level,stream).map((row,i)=>makeQuestion(row,i));
+}
 function questionPool(level,stream,questions){
   if(["6","7","8"].includes(level))
     return questions.filter(q=>q.grade===Number(level)).map(q=>normalized(q,"base-"+q.id))
-      .concat(createWorkedPractice(level,null,160));
+      .concat(chapterQuestions(level,stream),createWorkedPractice(level,null,160));
   if(["9","10","11","12"].includes(level)){
     const base=questions.filter(q=>q.grade===Number(level)&&isAllowedSubject(level,stream,q.subject))
       .map(q=>normalized(q,"base-"+q.id));
-    return base.concat(createConceptQuestions(stream,level),createWorkedPractice(level,stream,160));
+    return base.concat(chapterQuestions(level,stream),createWorkedPractice(level,stream,160));
   }
   if(level==="admission"){
     const common=new Set(["বাংলা","ইংরেজি","বাংলাদেশ ও বিশ্বপরিচয়","তথ্য ও যোগাযোগ প্রযুক্তি"]);
@@ -84,7 +95,7 @@ function questionPool(level,stream,questions){
         গণিত:"গণিত ও যুক্তি",পদার্থবিজ্ঞান:"পদার্থবিজ্ঞান",বিজ্ঞান:"জীববিজ্ঞান",
         "বাংলাদেশ ও বিশ্বপরিচয়":"সাধারণ জ্ঞান"
       })[q.subject]||q.subject));
-    return base.concat(createConceptQuestions(stream,level),createWorkedPractice(level,stream,170));
+    return base.concat(chapterQuestions(level,stream),createWorkedPractice(level,stream,170));
   }
   if(level==="bcs"){
     const general={বাংলা:"বাংলা ভাষা ও সাহিত্য",ইংরেজি:"ইংরেজি ভাষা ও সাহিত্য",
@@ -93,7 +104,7 @@ function questionPool(level,stream,questions){
       "তথ্য ও যোগাযোগ প্রযুক্তি":"কম্পিউটার ও তথ্যপ্রযুক্তি"};
     return questions.filter(q=>q.grade>=9&&q.grade<=12&&general[q.subject])
       .map(q=>normalized(q,"bcs-"+q.id,general[q.subject]))
-      .concat(createExamExtras(),createWorkedPractice(level,null,180));
+      .concat(chapterQuestions(level,stream),createExamExtras(),createWorkedPractice(level,null,180));
   }
   return [];
 }
@@ -177,6 +188,7 @@ function drawQuestions(){
     heading.append(el("span","প্রশ্ন "+bn(i+1)+" / "+bn(current.questions.length),"question-number"),
       el("span",q.subject,"quiz-subject"));
     card.append(heading,el("h3",q.q));
+    if(q.chapter)card.append(el("p","বিষয়ভিত্তিক পাঠ: "+q.chapter,"question-chapter"));
     const options=el("div",undefined,"question-options");
     for(let position=0;position<4;position++){
       const button=el("button",undefined,"question-option");
@@ -279,9 +291,8 @@ function notePool(level,stream){
        (stream==="science"&&n.subject==="বিজ্ঞান")||
        isAllowedSubject(level,stream,n.subject))
       :isAllowedSubject(level,stream,n.subject)):true));
-  const generated=needsStream(level)?
-    conceptNotes(stream,level).concat(createWorkedLessons(level,stream)):
-    createWorkedLessons(level,null);
+  const generated=chapterRowsFor(level,stream).map((row,i)=>makeLesson(row,i))
+    .concat(createWorkedLessons(level,stream));
   return fixed.concat(generated).filter(isValidNote);
 }
 let currentNotes=[];

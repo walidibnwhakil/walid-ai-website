@@ -95,7 +95,13 @@
         break;
       }
     }
-    if (!active) return null;
+    if (!active) {
+      const visible = groups[activeGroup];
+      const first = visible[0], last = visible[visible.length - 1];
+      if (!first) return null;
+      return last.getBoundingClientRect().bottom < readingLine
+        ? chapterEnd(last.id) : {chapterId: first.id, paragraphIndex: 0, fraction: 0};
+    }
     const paragraphs = Array.from(active.querySelectorAll("p"));
     if (!paragraphs.length) return {chapterId: active.id, paragraphIndex: 0, fraction: 0};
     let index = 0;
@@ -119,6 +125,7 @@
     if (!position) return;
     const chapter = byId.get(position.chapterId);
     if (!chapter) return;
+    activateChapter(position.chapterId, {scroll: false, save: false});
     const paragraphs = chapter.node.querySelectorAll("p");
     const target = paragraphs.length ?
       paragraphs[Math.min(position.paragraphIndex, paragraphs.length - 1)] : chapter.node;
@@ -184,6 +191,7 @@
     mark.setAttribute("aria-pressed", "false");
     mark.setAttribute("aria-label", "অধ্যায় " + bn(index + 1) + "-এ বুকমার্ক রাখুন");
     mark.addEventListener("click", () => {
+      if (bookmark && groupByChapter.get(bookmark.chapterId) === groupByChapter.get(chapter.id)) return clearBookmark();
       const visible = positionInView();
       saveBookmark(visible?.chapterId === chapter.id ? visible : chapterEnd(chapter.id));
     });
@@ -191,10 +199,148 @@
     chapter.insertAdjacentElement("afterend", navigation);
   });
 
+
+  // A reading part contains whole, consecutive chapters totalling at least
+  // ~1100 Bengali words, about five minutes or more for most readers.
+  // No editorial text, chapter anchor or original paragraph is modified.
+  const wordsIn = (chapter) => (Array.from(chapter.querySelectorAll("p"))
+    .map(node => node.textContent).join(" ").trim().match(/\S+/gu) || []).length;
+  const minimumWords = 1100;
+  const groups = [];
+  let queue = [], wordTotal = 0;
+  chapters.forEach((chapter) => {
+    queue.push(chapter);
+    wordTotal += wordsIn(chapter);
+    if (wordTotal >= minimumWords) {
+      groups.push(queue);
+      queue = [];
+      wordTotal = 0;
+    }
+  });
+  if (queue.length) {
+    if (groups.length) groups[groups.length - 1].push(...queue);
+    else groups.push(queue);
+  }
+  const groupByChapter = new Map(groups.flatMap((group, index) =>
+    group.map(chapter => [chapter.id, index])));
+  const lastInGroup = new Set(groups.map(group => group[group.length - 1].id));
+
+  const readingLink = (chapter, next) => {
+    if (!chapter) {
+      const placeholder = document.createElement("span");
+      placeholder.className = "others-chapter-nav-empty";
+      placeholder.setAttribute("aria-hidden", "true");
+      return placeholder;
+    }
+    const link = document.createElement("a");
+    link.href = "#" + chapter.id;
+    link.className = "others-chapter-nav-link " + (next ? "others-nav-next" : "others-nav-previous");
+    const title = document.createElement("strong");
+    title.textContent = next ? "পরের পাঠপর্ব →" : "← আগের পাঠপর্ব";
+    const description = document.createElement("small");
+    description.textContent = chapter.querySelector("h2")?.textContent.trim() || "";
+    link.append(title, description);
+    return link;
+  };
+  groups.forEach((group, index) => {
+    const last = group[group.length - 1];
+    const nav = last.nextElementSibling;
+    const bookmarkAction = nav?.querySelector(".others-chapter-bookmark");
+    if (!bookmarkAction) return;
+    const prevStart = index ? groups[index - 1][0] : null;
+    const nextStart = groups[index + 1]?.[0] || null;
+    nav.setAttribute("aria-label", "পাঠপর্ব " + bn(index + 1) + " / " + bn(groups.length));
+    nav.replaceChildren(
+      readingLink(prevStart, false),
+      bookmarkAction,
+      readingLink(nextStart, true)
+    );
+  });
+
+  let activeGroup = 0;
+  let activeChapterId = chapters[0].id;
+  const updateDrawerSelection = () => {
+    document.querySelectorAll('.others-toc a[href^="#chapter-"]').forEach((link) => {
+      if (link.getAttribute("href") === "#" + activeChapterId)
+        link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
+    });
+  };
+  const activateChapter = (chapterId, options = {}) => {
+    const found = byId.get(chapterId);
+    if (!found) return;
+    const {scroll = true, save = true, push = false} = options;
+    activeGroup = groupByChapter.get(chapterId);
+    activeChapterId = chapterId;
+    const group = groups[activeGroup];
+    chapters.forEach((chapter) => {
+      const hidden = groupByChapter.get(chapter.id) !== activeGroup;
+      chapter.hidden = hidden;
+      chapter.setAttribute("aria-hidden", String(hidden));
+      chapter.classList.toggle("others-group-continuation", !hidden && chapter !== group[0]);
+      if ("inert" in chapter) chapter.inert = hidden;
+      const nav = chapter.nextElementSibling;
+      if (nav?.classList.contains("others-chapter-navigation")) {
+        const navHidden = hidden || !lastInGroup.has(chapter.id);
+        nav.hidden = navHidden;
+        if ("inert" in nav) nav.inert = navHidden;
+      }
+    });
+    updateDrawerSelection();
+    const hash = "#" + chapterId;
+    if (push) history.pushState(null, "", hash);
+    else if (scroll && location.hash !== hash) history.replaceState(null, "", hash);
+    if (save) {
+      const position = {chapterId, paragraphIndex: 0, fraction: 0};
+      if (store("progress", position)) {
+        progress = position;
+        drawPanel();
+      }
+    }
+    if (scroll) {
+      const y = window.scrollY + found.node.getBoundingClientRect().top - 22;
+      window.scrollTo({top: Math.max(0, y), behavior: "instant"});
+    }
+  };
+  reader.classList.add("others-single-chapter-reader");
+  reader.setAttribute("data-reading-parts", String(groups.length));
+  reader.querySelectorAll(".others-chapter-navigation a[href^='#chapter-']").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      activateChapter(link.getAttribute("href").slice(1), {push: true});
+    });
+  });
+  document.querySelectorAll('.others-toc a[href^="#chapter-"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      activateChapter(link.getAttribute("href").slice(1), {push: true});
+    });
+  });
+  const restoreLinkedChapter = () => {
+    const target = decodeURIComponent(location.hash.slice(1));
+    if (byId.has(target)) activateChapter(target, {scroll: true, save: false});
+  };
+  window.addEventListener("popstate", restoreLinkedChapter);
+  window.addEventListener("hashchange", restoreLinkedChapter);
+  const initialChapter = decodeURIComponent(location.hash.slice(1));
+  activateChapter(byId.has(initialChapter) ? initialChapter : chapters[0].id, {scroll: false, save: false});
+  if (byId.has(initialChapter)) requestAnimationFrame(() => {
+    const target = byId.get(initialChapter)?.node;
+    if (target) window.scrollTo({top: Math.max(0, window.scrollY + target.getBoundingClientRect().top - 22), behavior: "instant"});
+  });
+
+  // Fiction chapters remain uninterrupted prose. Keep source text as plain text
+  // rather than clickable distractions; retain all real navigation and citations.
+  if (/^\/others\/(?:folklore|islamic-literature)\//.test(cleanPath)) {
+    reader.querySelectorAll(".others-book-title p a, .others-chapter p a").forEach((link) => {
+      link.replaceWith(document.createTextNode(link.textContent));
+    });
+  }
+
   const updateBookmarkButtons = () => {
     reader.querySelectorAll(".others-chapter-bookmark").forEach((button) => {
       const chapterId = button.closest(".others-chapter-navigation")?.previousElementSibling?.id;
-      const selected = Boolean(bookmark && bookmark.chapterId === chapterId);
+      const selected = Boolean(bookmark && groupByChapter.get(bookmark.chapterId) === groupByChapter.get(chapterId));
       button.setAttribute("aria-pressed", String(selected));
       button.classList.toggle("is-bookmarked", selected);
       button.textContent = selected ? "বুকমার্ক রাখা আছে" : "বুকমার্ক রাখুন";
@@ -202,13 +348,12 @@
   };
   updateBookmarkButtons();
 
-  // Do not insert a changing panel above the reader after the user starts scrolling.
-  const panel = progress || bookmark ? document.createElement("aside") : null;
-  if (panel) {
-    panel.className = "others-reading-progress";
-    panel.setAttribute("aria-label", "এই ডিভাইসে সংরক্ষিত পড়ার জায়গা");
-    reader.querySelector(".others-book-title")?.insertAdjacentElement("afterend", panel);
-  }
+  // Exists immediately so a bookmark saved on mobile can be removed without reload.
+  const panel = document.createElement("aside");
+  panel.className = "others-reading-progress";
+  panel.setAttribute("aria-label", "এই ডিভাইসে সংরক্ষিত পড়ার জায়গা");
+  panel.hidden = true;
+  reader.querySelector(".others-book-title")?.insertAdjacentElement("afterend", panel);
   const createResume = (position, label) => {
     const link = document.createElement("a");
     link.className = "others-reading-resume-link";
@@ -242,7 +387,7 @@
       line.appendChild(del);
       panel.appendChild(line);
     }
-    if (!progress && !bookmark) panel.hidden = true;
+    panel.hidden = !progress && !bookmark;
   };
 
   const drawer = document.querySelector(".others-toc-dialog .others-toc");

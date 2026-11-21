@@ -134,7 +134,8 @@ try{
           assert.deepEqual(tocIds,ids,"Bengal Sultanate chapter links must match the document sections");
           const paragraphs=await page.locator(".others-chapter p").count();
           assert.ok(paragraphs>=200,"Bengal Sultanate reader should retain its expanded chronological narrative");
-          const readerText=await page.locator(".others-reader").innerText();
+          // The new reader hides inactive chapters, but the full editorial text must remain intact.
+          const readerText=await page.locator(".others-reader").textContent();
           for(const subject of ["ফখরুদ্দিন","ইলিয়াস শাহ","সিকন্দর শাহ","গিয়াসউদ্দিন আজম শাহ","রাজা গণেশ","হাবশি","হুসেন শাহ","নসরত শাহ","শের শাহ","কররানি","দাউদ খান","ঈসা খান","মুসা খান"]){
             assert.ok(readerText.includes(subject),"Bengal Sultanate missing historical subject: "+subject);
           }

@@ -63,7 +63,7 @@ def configured_provider_names():
 def mentions_creator(answer):
     """Do not serve canned dataset text as an authoritative owner biography."""
     return bool(re.search(
-        r"\\b(?:whakil|shakil|walid)\\b|শাকিল|ওয়ালিদ|ওয়ালিদ",
+        r"\b(?:whakil|shakil|walid)\b|শাকিল|ওয়ালিদ|ওয়ালিদ",
         str(answer or ""), re.IGNORECASE,
     ))
 

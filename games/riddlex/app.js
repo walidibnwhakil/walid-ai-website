@@ -45,6 +45,8 @@ function applyLanguage() {
   $("correct").textContent = copy.correct;
   $("wrong").textContent = copy.wrong;
   $("retry").textContent = copy.retry;
+  $("solved-line").textContent = copy.solvedLine;
+  $("again").textContent = copy.playAgain;
   $("new").textContent = copy.newGame;
   $("to-menu").textContent = copy.menu;
   $("back").textContent = copy.undo;
@@ -123,10 +125,12 @@ function showOnly(which) {
   const panel = $("ask-panel");
   if (panel) panel.hidden = which !== "ask" && which !== "pick";
   answers.hidden = which !== "ask";
-  guessBox.hidden = which !== "guess" && which !== "wrong";
+  guessBox.hidden = which !== "guess" && which !== "wrong" && which !== "solved";
   $("correct").hidden = which !== "guess";
   $("wrong").hidden = which !== "guess";
   $("retry").hidden = which !== "wrong";
+  $("solved-line").hidden = which !== "solved";
+  $("again").hidden = which !== "solved";
   learnForm.hidden = which !== "learn";
   $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
   $("credit").hidden = which === "pick" || which === "ask";
@@ -343,9 +347,14 @@ function onCorrect() {
   if (mode !== "guess") return;
   mode = "solved";
   scene.setMood("happy");
-  setStatus(text().solved);
-  showOnly("none");
+  showOnly("solved");
   $("back").hidden = true;
+}
+
+function onPlayAgain() {
+  if (mode !== "solved") return;
+  scene.clearReveal();
+  openPlay();
 }
 
 function onUndo() {
@@ -397,6 +406,7 @@ $("confirm-no").addEventListener("click", () => { $("confirm").hidden = true; })
 document.querySelectorAll("[data-cat]").forEach((node) => node.addEventListener("click", () => startGame(node.dataset.cat)));
 $("to-menu").addEventListener("click", showMenu);
 $("correct").addEventListener("click", onCorrect);
+$("again").addEventListener("click", onPlayAgain);
 $("wrong").addEventListener("click", onWrong);
 $("retry").addEventListener("click", onRetry);
 $("back").addEventListener("click", onUndo);
@@ -433,6 +443,8 @@ if (new URLSearchParams(location.search).has("autotest")) {
     bytes: () => traffic.bytes,
     blinkCat: () => scene.blinkCat(),
     flickCat: () => scene.flickCat(),
+    setMood: (value) => scene.setMood(value),
+    react: (answer) => scene.react(answer),
     expression: () => scene.debug(),
     reveal: (name, imageUrl) => scene.playReveal({ name, imageUrl }),
     loaded: () => loadedNames.slice(),

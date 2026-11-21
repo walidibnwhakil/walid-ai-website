@@ -6,6 +6,8 @@
   const verses = document.getElementById('verses');
   const tools = document.querySelector('.reading-tools');
   const context = document.getElementById('surah-context');
+  // Keep source-backed HTML introduction accessible when optional JSON notes fail.
+  const htmlIntro = context?.querySelector('#chapter-note > p')?.textContent?.trim() || '';
   if (!Number.isInteger(n) || n < 1 || n > 114 || !head || !verses || !tools) return;
 
   document.body.classList.add('quran-reader-page');
@@ -217,6 +219,7 @@
       return;
     }
     if (key === 'intro') {
+      if (htmlIntro) simpleParagraph(panel, htmlIntro);
       if (surahMeta) simpleParagraph(panel, 'সূরা ' + (bengaliMeta?.title || surahMeta.transliteration) + ' — কুরআনের ' + digits(n) + ' নম্বর সূরা; ' + digits(surahMeta.verseCount) + 'টি আয়াত; ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + '।');
       const loading = simpleParagraph(panel, 'সূরা-সংক্রান্ত উৎস-নোট লোড হচ্ছে…');
       getNotes().then(notes => {

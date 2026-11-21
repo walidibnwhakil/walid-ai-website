@@ -8,9 +8,9 @@
   <meta name="description" content="ষষ্ঠ থেকে দ্বাদশ শ্রেণি, বিভাগভিত্তিক বিশ্ববিদ্যালয় ভর্তি এবং BCS প্রস্তুতির জন্য মিশ্র-বিষয়ের MCQ অনুশীলন ও বিষয়ভিত্তিক স্টাডি নোট।">
   <link rel="canonical" href="https://walid-ai.com/sections/education/">
   <link rel="icon" href="/favicon.ico">
-  <link rel="stylesheet" href="/sections/education/education.css?v=20261121-facts-v3">
+  <link rel="stylesheet" href="/sections/education/education.css?v=20261122-flow-v1">
   <link rel="stylesheet" href="/walid-branding.css">
-  <script type="module" src="/sections/education/education-app.mjs?v=20261121-facts-v5"></script>
+  <script type="module" src="/sections/education/education-app.mjs?v=20261122-flow-v1"></script>
 </head>
 <body>
 <main class="edu-shell">
@@ -19,34 +19,32 @@
     <a class="edu-home" href="/">মূল পাতা</a>
   </header>
   <section class="edu-hero" aria-labelledby="educationTitle">
-    <span class="edu-eyebrow">Learning & Preparation</span>
     <h1 id="educationTitle">Education</h1>
-    <p>পাঠ বুঝে শেখা এবং নিয়মিত অনুশীলনের জন্য শ্রেণিভিত্তিক পড়াশোনা, ভর্তি প্রস্তুতি ও BCS-এর আলাদা ব্যবস্থা।</p>
+    <p>শ্রেণিভিত্তিক MCQ অনুশীলন, বিষয়ভিত্তিক স্টাডি নোট এবং ভর্তি ও বিসিএস পরীক্ষার প্রস্তুতি।</p>
   </section>
 
   <section class="mode-grid" id="modeSelection" aria-label="শেখার পদ্ধতি বেছে নিন">
     <button type="button" class="mode-card" id="openQuiz">
       <span class="card-symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><rect x="5" y="5" width="30" height="30" rx="6"/><path d="m11 14 3 3 5-6M23 14h7M11 27l3-3m0 3-3-3M23 25h7"/></svg></span>
       <strong>MCQ Practice</strong>
-      <span class="card-copy">শ্রেণি বা পরীক্ষার বিভাগ এবং প্রশ্নসংখ্যা বেছে সব বিষয়ের সমন্বিত অনুশীলন পরীক্ষা দিন। শেষে নম্বর, সঠিক উত্তর ও ব্যাখ্যা দেখুন।</span>
-      <span class="card-action">অনুশীলন শুরু করুন</span>
+      <span class="card-copy">শ্রেণি ও পরীক্ষার ধরন অনুযায়ী MCQ অনুশীলন করুন। ফলাফল ও উত্তর যাচাই করুন।</span>
+      <span class="card-action">MCQ অনুশীলন</span>
     </button>
     <button type="button" class="mode-card notes-card" id="openNotes">
       <span class="card-symbol" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M7 8.5c5-2 9-1 13 2.5 4-3.5 8-4.5 13-2.5v25c-5-2-9-1-13 2.5-4-3.5-8-4.5-13-2.5zM20 11v25M11 17h5M24 17h5M11 23h5M24 23h5"/></svg></span>
       <strong>Study Notes</strong>
-      <span class="card-copy">শ্রেণি ও বিষয় অনুযায়ী মূল ধারণা, ব্যাখ্যা, বাস্তব উদাহরণ এবং অনুশীলনসহ পাঠগুলো পড়ুন।</span>
-      <span class="card-action">নোট পড়ুন</span>
+      <span class="card-copy">বিষয়ভিত্তিক পাঠ, উদাহরণ ও অনুশীলনের মাধ্যমে প্রস্তুতি নিন।</span>
+      <span class="card-action">স্টাডি নোট দেখুন</span>
     </button>
   </section>
 
   <section class="edu-panel" id="quizSetup" hidden aria-labelledby="quizSetupHeading">
-    <div class="edu-panel-head"><div><h2 id="quizSetupHeading">MCQ Practice</h2><p class="panel-subtitle">বিভাগ ও প্রশ্নসংখ্যা নির্বাচন করুন। সব প্রাসঙ্গিক বিষয় থেকে প্রশ্ন আসবে।</p></div><button type="button" class="edu-back" data-home>← পেছনে</button></div>
+    <div class="edu-panel-head"><div><h2 id="quizSetupHeading">MCQ Practice</h2><p class="panel-subtitle">শ্রেণি ও প্রশ্নসংখ্যা নির্বাচন করে শুরু করুন।</p></div><button type="button" class="edu-back" data-home>← পেছনে</button></div>
     <div class="setup-card">
       <div class="setup-fields">
         <div>
-          <label class="field-label" for="quizLevel">শ্রেণি / পরীক্ষার বিভাগ</label>
+          <label class="field-label" for="quizLevel">শ্রেণি / পরীক্ষা নির্বাচন করুন</label>
           <select class="field-select" id="quizLevel" required></select>
-          <p class="field-hint">বিষয় আলাদা করে বাছতে হবে না। ষষ্ঠ–অষ্টম শ্রেণিতে সব সাধারণ বিষয়, নবম–দ্বাদশ ও ভর্তিতে নির্বাচিত বিভাগ অনুযায়ী প্রশ্ন আসবে।</p>
         </div>
         <div class="stream-field" id="quizStreamField" hidden>
           <label class="field-label" for="quizStream">বিভাগ নির্বাচন করুন</label>
@@ -56,22 +54,15 @@
             <option value="commerce">ব্যবসায় শিক্ষা (Commerce)</option>
             <option value="arts">মানবিক (Arts)</option>
           </select>
-          <p class="field-hint">শুধু নির্বাচিত বিভাগের প্রাসঙ্গিক বিষয় থেকে প্রশ্ন তৈরি হবে। ভর্তি পরীক্ষার প্রকৃত বিষয়বণ্টন প্রতিষ্ঠানের বিজ্ঞপ্তি অনুযায়ী যাচাই করুন।</p>
         </div>
-        <fieldset class="count-fieldset"><legend>প্রশ্নসংখ্যা</legend>
-          <div class="count-list">
-            <label class="count-choice"><input type="radio" name="questionCount" value="20" checked><span>২০</span></label>
-            <label class="count-choice"><input type="radio" name="questionCount" value="30"><span>৩০</span></label>
-            <label class="count-choice"><input type="radio" name="questionCount" value="40"><span>৪০</span></label>
-            <label class="count-choice"><input type="radio" name="questionCount" value="50"><span>৫০</span></label>
-            <label class="count-choice"><input type="radio" name="questionCount" value="70"><span>৭০</span></label>
-            <label class="count-choice"><input type="radio" name="questionCount" value="100"><span>১০০</span></label>
-          </div>
-        </fieldset>
+        <div class="quiz-count-field" id="quizCountField" hidden>
+          <label class="field-label" for="questionCount">প্রশ্নসংখ্যা নির্বাচন করুন</label>
+          <select class="field-select" id="questionCount" disabled>
+            <option value="">প্রশ্নসংখ্যা নির্বাচন করুন</option>
+          </select>
+        </div>
       </div>
-      <div class="setup-actions"><button class="primary-button" id="startQuiz" type="button">পরীক্ষা শুরু করুন</button></div>
-      <p class="supporting-copy">এটি অনুশীলনের প্রশ্নসেট, কোনো বোর্ড, বিশ্ববিদ্যালয় বা BCS-এর আসল প্রশ্নপত্র নয়। তথ্যভিত্তিক MCQ এবং সূত্রভিত্তিক সংখ্যাগত অনুশীলন আলাদা উৎস থেকে প্রস্তুত করা হয়েছে।</p>
-      <p class="supporting-copy" id="bcsNotice" hidden>BCS প্রস্তুতিতে ৫০তম সাধারণ প্রিলিমিনারির ২০০ নম্বরের সংশোধিত বিষয়বণ্টনের অনুপাত অনুসরণ করা হয়। আন্তর্জাতিক ও সাম্প্রতিক বিষয়াবলির প্রশ্নে মূল উৎস এবং ঘটনাবলি যাচাইয়ের তারিখ দেওয়া আছে। সাম্প্রতিক তথ্য সর্বশেষ যাচাই: ২১ নভেম্বর ২০২৬। বিশেষ BCS বা পরবর্তী পরীক্ষার জন্য <a href="https://bpsc.gov.bd/" target="_blank" rel="noopener noreferrer">কমিশনের সর্বশেষ বিজ্ঞপ্তি</a> অনুসরণ করুন।</p>
+      <div class="setup-actions" id="quizStartActions" hidden><button class="primary-button" id="startQuiz" type="button">পরীক্ষা শুরু করুন</button></div>
       <p class="status-message" id="quizStatus" hidden role="status"></p>
     </div>
   </section>
@@ -80,14 +71,13 @@
     <div class="edu-panel-head"><div><h2 id="runningHeading">MCQ Practice</h2><p class="panel-subtitle" id="runningLevel"></p></div><button class="edu-back" type="button" id="exitQuiz">পরীক্ষা থেকে বের হন</button></div>
     <div class="quiz-bar"><span class="quiz-counter" id="quizCounter"></span><span class="quiz-subject" id="quizSubject"></span></div>
     <progress class="quiz-progress" id="quizProgress" value="0" max="20" aria-label="উত্তর দেওয়া প্রশ্নের অগ্রগতি"></progress>
-    <p class="quiz-instruction">প্রশ্নগুলো নিচে ধারাবাহিকভাবে রয়েছে। একটি উত্তর নির্বাচন করলে তাৎক্ষণিক ফল দেখা যাবে এবং পরের প্রশ্নে এগিয়ে যাবে।</p>
     <div class="question-stack" id="questionList" aria-label="পরীক্ষার প্রশ্ন"></div>
     <div class="setup-actions quiz-finish-actions"><button type="button" class="secondary-button" id="finishQuiz">পরীক্ষা জমা দিন</button><span class="field-hint" id="answeredCount"></span></div>
     <div class="finish-confirm" id="finishConfirm" hidden><span id="confirmMessage"></span><button type="button" class="primary-button" id="confirmFinish">ফলাফল দেখুন</button><button type="button" class="secondary-button" id="cancelFinish">ফিরে যান</button></div>
   </section>
 
   <section class="edu-panel" id="quizResults" hidden aria-labelledby="resultHeading">
-    <div class="edu-panel-head"><div><h2 id="resultHeading">পরীক্ষার ফলাফল</h2><p class="panel-subtitle" id="resultLevel"></p></div><button class="edu-back" type="button" data-home>← মূল Education</button></div>
+    <div class="edu-panel-head"><div><h2 id="resultHeading">পরীক্ষার ফলাফল</h2><p class="panel-subtitle" id="resultLevel"></p></div><button class="edu-back" type="button" data-home>← Education</button></div>
     <div class="result-card">
       <div class="result-score"><strong class="score-number" id="scorePercent"></strong><span id="scoreMessage" class="score-caption"></span></div>
       <div class="result-stats" id="resultStats"></div>
@@ -98,10 +88,10 @@
   </section>
 
   <section class="edu-panel" id="notesSetup" hidden aria-labelledby="notesHeading">
-    <div class="edu-panel-head"><div><h2 id="notesHeading">Study Notes</h2><p class="panel-subtitle">শ্রেণি ও বিষয় নির্বাচন করে পাঠের ব্যাখ্যা, উদাহরণ ও অনুশীলন পড়ুন।</p></div><button type="button" class="edu-back" data-home>← পেছনে</button></div>
+    <div class="edu-panel-head"><div><h2 id="notesHeading">Study Notes</h2><p class="panel-subtitle">শ্রেণি ও বিষয় অনুযায়ী পাঠ নির্বাচন করুন।</p></div><button type="button" class="edu-back" data-home>← পেছনে</button></div>
     <div class="setup-card">
       <div class="setup-fields">
-        <div><label class="field-label" for="notesLevel">শ্রেণি / পরীক্ষার বিভাগ</label><select class="field-select" id="notesLevel"></select></div>
+        <div><label class="field-label" for="notesLevel">শ্রেণি / পরীক্ষা নির্বাচন করুন</label><select class="field-select" id="notesLevel"></select></div>
         <div class="stream-field" id="notesStreamField" hidden><label class="field-label" for="notesStream">বিভাগ নির্বাচন করুন</label><select class="field-select" id="notesStream" disabled><option value="">বিভাগ নির্বাচন করুন</option><option value="science">বিজ্ঞান (Science)</option><option value="commerce">ব্যবসায় শিক্ষা (Commerce)</option><option value="arts">মানবিক (Arts)</option></select></div>
         <div><label class="field-label" for="notesSubject">বিষয়</label><select class="field-select" id="notesSubject" disabled><option>প্রথমে শ্রেণি নির্বাচন করুন</option></select></div>
       </div>
@@ -111,9 +101,6 @@
     <div id="notesContent" hidden><p class="note-overview" id="notesOverview"></p><div class="note-list" id="noteList"></div></div>
   </section>
 
-  <aside class="edu-sources" aria-label="পাঠ্যক্রম ও পরীক্ষার তথ্যের উৎস">
-    <p>পাঠ্যসূচি ও পরীক্ষার নিয়ম পরিবর্তিত হতে পারে। মূল পাঠ্যবইয়ের জন্য <a href="https://nctb.gov.bd/" target="_blank" rel="noopener noreferrer">জাতীয় শিক্ষাক্রম ও পাঠ্যপুস্তক বোর্ড</a> এবং BCS-এর সর্বশেষ বিজ্ঞপ্তির জন্য <a href="https://bpsc.portal.gov.bd/" target="_blank" rel="noopener noreferrer">বাংলাদেশ সরকারি কর্ম কমিশন</a> দেখুন। ভর্তি পরীক্ষার ক্ষেত্রে সংশ্লিষ্ট প্রতিষ্ঠানের বিজ্ঞপ্তিই চূড়ান্ত।</p>
-  </aside>
   <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us/">About Us</a><a href="/contact-us/">Contact Us</a><a href="/privacy-policy/">Privacy Policy</a><a href="/terms-of-service/">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </main>
 </body></html>

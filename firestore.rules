@@ -66,7 +66,7 @@ service cloud.firestore {
         && request.resource.data.answers is list
         && request.resource.data.answers.size() > 0
         && request.resource.data.answers.size() <= 36
-        && request.resource.data.status == "pending"
+        && request.resource.data.status in ["pending", "confirmed"]
         && request.resource.data.confirmations == 1
         && request.resource.data.confirmers == [request.auth.uid]
         && request.resource.data.createdBy == request.auth.uid
@@ -86,7 +86,10 @@ service cloud.firestore {
         && request.resource.data.nameEn == resource.data.nameEn
         && request.resource.data.nameBn == resource.data.nameBn
         && request.resource.data.adult == resource.data.adult
-        && request.resource.data.answers == resource.data.answers
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() > 0
+        && request.resource.data.answers.size() <= 36
+        && request.resource.data.answers.size() >= resource.data.answers.size()
         && request.resource.data.createdBy == resource.data.createdBy
         && request.resource.data.createdAt == resource.data.createdAt
         && (("image" in resource.data) == ("image" in request.resource.data))

@@ -2,6 +2,8 @@
 // the Firestore document. Firebase Storage is not used. Adult-entertainment
 // answers never accept a picture.
 
+import { mergeAnswerLists, reviewSubmission } from "./learn-guard.js";
+
 const SCRIPTS = [
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js",
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js",
@@ -114,7 +116,7 @@ export async function loadLearned(questions) {
         bn: String(data.nameBn || ""),
         pop: 25 + Math.min(40, Number(data.confirmations) || 1) * 4,
         yes, no, adult,
-        image: !adult && data.status === "approved" && typeof data.image === "string" ? data.image : "",
+        image: !adult && (data.status === "approved" || data.status === "confirmed") && typeof data.image === "string" ? data.image : "",
         credit: data.image ? "Player submission" : "",
       };
     }).filter((entry) => entry.en);
@@ -123,11 +125,24 @@ export async function loadLearned(questions) {
   }
 }
 
-export async function submitLearning({ name, nameBn, file, answers, adult }) {
-  const clean = name.trim().slice(0, 80);
+export function nameInPool(pool, name) {
+  const key = normalizeName(name);
+  if (!key || !pool) return false;
+  for (let index = 0; index < pool.count; index++) {
+    const names = [pool.ens[index], pool.bns[index], ...(pool.aliasMap?.get(pool.ids[index]) || [])];
+    if (names.some((item) => normalizeName(item) === key)) return true;
+  }
+  return false;
+}
+
+export async function submitLearning({ name, nameBn, file, answers, adult, alreadyKnown }) {
+  const verdict = reviewSubmission(name, answers);
+  if (!verdict.ok) return { status: "thanked", stored: false };
+  const clean = verdict.name.slice(0, 80);
   const slug = slugify(clean);
-  if (!slug) throw new Error("name");
-  const packed = answers.slice(0, 36).map((answer) => ({ q: answer.qid, a: answer.value }));
+  if (!slug) return { status: "thanked", stored: false };
+  if (alreadyKnown) return { status: "thanked", stored: false };
+  const packed = mergeAnswerLists([], answers.slice(0, 36).map((answer) => ({ q: answer.qid, a: answer.value })));
   let image = "";
   if (file && !adult) image = await compressImage(file);
   const { auth, db } = await ready();
@@ -156,21 +171,35 @@ export async function submitLearning({ name, nameBn, file, answers, adult }) {
     if (slot < 0) throw new Error("rate");
     const payload = {
       slug, nameEn: clean, nameBn: (nameBn || "").trim().slice(0, 80),
-      adult: !!adult, answers: packed, status: "pending", confirmations: 1,
+      adult: !!adult, answers: packed, status: "confirmed", confirmations: 1,
       confirmers: [uid], createdBy: uid, slot,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
     if (image && !adult) payload.image = image;
     await ref.set(payload);
-    return { status: "pending", confirmations: 1 };
+    return { status: "confirmed", confirmations: 1 };
   }
   const data = existing.data();
-  if ((data.confirmers || []).includes(uid)) return { status: data.status, confirmations: data.confirmations };
-  if (data.status === "rejected") return { status: "rejected", confirmations: data.confirmations };
+  if (data.status === "rejected") return { status: "thanked", stored: false };
+  const merged = mergeAnswerLists(data.answers, packed);
+  if ((data.confirmers || []).includes(uid)) {
+    if (merged.length !== (data.answers || []).length) {
+      try {
+        await ref.update({
+          answers: merged,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch {
+        // The first saved answers stay if this client cannot update them.
+      }
+    }
+    return { status: data.status, confirmations: data.confirmations };
+  }
   const confirmations = Math.min(12, (data.confirmations || 1) + 1);
   const status = data.status === "pending" && confirmations >= 3 ? "confirmed" : data.status;
   await ref.update({
+    answers: merged,
     confirmations,
     confirmers: [...(data.confirmers || []), uid].slice(0, 12),
     status,

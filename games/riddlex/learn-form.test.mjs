@@ -17,5 +17,14 @@ test("the learn form keeps its name field when the language changes", () => {
 test("a failed or empty teach shows a message and does not hide the form", () => {
   assert.match(app, /needName/);
   assert.match(app, /showLearnMessage\(text\(\)\.failedSave\)/);
-  assert.doesNotMatch(app, /learnForm\.hidden = true/);
+  const failure = app.slice(app.indexOf("showLearnMessage(text().failedSave)"));
+  assert.doesNotMatch(failure, /learnForm\.hidden = true/);
+});
+
+test("a saved name ends on a short thank-you in both languages", () => {
+  const i18n = readFileSync(new URL("./i18n.js", import.meta.url), "utf8");
+  assert.match(app, /learnForm\.hidden = true/);
+  assert.match(i18n, /saved: "Thank you\."/);
+  assert.match(i18n, /saved: "ধন্যবাদ।"/);
+  assert.doesNotMatch(i18n, /approv|review|pending|মালিক|অনুমোদন/i);
 });

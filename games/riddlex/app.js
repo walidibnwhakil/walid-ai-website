@@ -2,8 +2,8 @@ import { setGameInProgress } from "../refresh-guard.mjs";
 import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js";
 import { UI, guessFont } from "./i18n.js";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js";
-import { answersImplyAdult, loadLearned, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js?v=akinator-26";
+import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js";
+import { createScene } from "./scene.js?v=akinator-27";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -161,10 +161,12 @@ async function loadNamed(entries, token, begin) {
     state = createState(pool, { opening: "real", category });
     mode = "ask";
     step();
-    loadLearned(manifest.questions).then((rows) => {
+    const learnLater = () => loadLearned(manifest.questions).then((rows) => {
       if (!rows.length || token !== loadToken || !pool) return;
       adoptPool(mergePools([pool, poolFromEntries(manifest.questions, rows)]));
     }).catch(() => {});
+    if (typeof requestIdleCallback === "function") requestIdleCallback(() => learnLater());
+    else setTimeout(learnLater, 400);
   }, pool);
   } catch (error) {
     loadedNames = loadedNames.filter((name) => !names.includes(name));
@@ -326,9 +328,10 @@ async function onLearnSubmit(event) {
       file,
       adult,
       answers: state?.answers || [],
+      alreadyKnown: nameInPool(pool, name),
     });
     showLearnMessage(text().saved);
-    learnForm.querySelectorAll("input").forEach((input) => { input.disabled = true; });
+    learnForm.hidden = true;
   } catch {
     showLearnMessage(text().failedSave);
     if (save) save.disabled = false;

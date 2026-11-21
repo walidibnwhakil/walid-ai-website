@@ -3,7 +3,7 @@
 // Face and cat plates cross-fade with opacity and share that same transform.
 // Nothing is ever a shifted rectangle of the painting.
 
-import { createExpressions } from "./expressions.js?v=akinator-26";
+import { createExpressions } from "./expressions.js?v=akinator-27";
 
 const BASE = {
   landscape: "./images/approved/game-desk.webp",
@@ -519,13 +519,13 @@ export function createScene(canvas) {
         reveal.printed = false;
       }
     } else if (reveal.phase === "print") {
-      if (reveal.t > 1.6) {
+      if (reveal.t > 0.75) {
         reveal.phase = "turn";
         reveal.t = 0;
         reveal.printed = true;
       }
     } else if (reveal.phase === "turn") {
-      if (reveal.t > 0.85) {
+      if (reveal.t > 0.4) {
         reveal.phase = "present";
         reveal.t = 0;
       }
@@ -562,9 +562,9 @@ export function createScene(canvas) {
     if (!reveal) return;
     if (reveal.phase === "write" || reveal.phase === "print") {
       drawSheet(0);
-      if (reveal.phase === "print") drawPrintout(reveal.t / 1.45, 1);
+      if (reveal.phase === "print") drawPrintout(reveal.t / 0.75, 1);
     } else if (reveal.phase === "turn") {
-      drawSheet(easeOut(Math.min(1, reveal.t / 0.8)));
+      drawSheet(easeOut(Math.min(1, reveal.t / 0.4)));
       drawPrintout(1, 1);
     } else if (reveal.phase === "present") {
       drawSheet(1);
@@ -669,7 +669,7 @@ export function createScene(canvas) {
 
   async function loadOverlaySet(orient) {
     const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-26`)];
+      return [key, await loadImage(`${src}?v=akinator-27`)];
     }));
     const overlays = {};
     for (const [key, image] of entries) if (image) overlays[key] = image;
@@ -677,13 +677,18 @@ export function createScene(canvas) {
   }
 
   async function loadPack(orient) {
-    const [base, overlays, printer] = await Promise.all([
+    const pack = { base: null, overlays: {} };
+    const [base, printer] = await Promise.all([
       loadImage(BASE[orient]),
-      loadOverlaySet(orient),
-      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-26`),
+      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-27`),
     ]);
+    pack.base = base;
     if (printer) images.printer = printer;
-    return { base, overlays };
+    loadOverlaySet(orient).then((overlays) => {
+      pack.overlays = overlays || {};
+      if (images.baseOrient === orient) images.overlays = pack.overlays;
+    }).catch(() => {});
+    return pack;
   }
 
   async function start() {
@@ -718,7 +723,7 @@ export function createScene(canvas) {
       imageUrl: photo ? options.imageUrl : "",
       photo,
       printed: false,
-      writeDur: reduce ? 0.01 : Math.min(2.6, Math.max(1.15, (options.name || "").length * 0.09)),
+      writeDur: reduce ? 0.01 : Math.min(1.15, Math.max(0.55, (options.name || "").length * 0.05)),
       inkWidth: prepared.width,
       textX: prepared.textX || 0,
       present: 1,

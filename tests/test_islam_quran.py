@@ -173,7 +173,7 @@ class QuranIntegrityTests(unittest.TestCase):
         for page in pages:
             text = page.read_text(encoding="utf-8")
             self.assertIn('class="islam-brand"', text, page)
-            for href in ("/about-us.html", "/contact-us.html", "/privacy-policy.html", "/terms-of-service.html"):
+            for href in ("/about-us/", "/contact-us/", "/privacy-policy/", "/terms-of-service/"):
                 self.assertIn(f'href="{href}"', text, page)
             self.assertIn('class="copyright"', text, page)
 

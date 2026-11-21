@@ -161,9 +161,14 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
 }
 #guess { display: flex; gap: 4px; align-items: center; }
 #back {
-  position: absolute; z-index: 6; left: 10px; bottom: 8px;
-  min-height: 36px; padding: 4px 14px; border-radius: 999px;
+  position: absolute; z-index: 7; left: 8px; bottom: 8px; top: auto;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0;
+  border-radius: 50%; display: grid; place-items: center;
+  font-size: 22px; line-height: 1;
   border: 1px solid #e6bd68; background: #24150dcc; color: #ffe6a4;
+}
+@media (min-aspect-ratio: 4/5) {
+  .stage-wrap:has(#back:not([hidden])) #answers { left: 60px; }
 }
 html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-weight: 400; }
 #learn {
@@ -206,30 +211,34 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
     left: auto; right: auto; top: auto; width: auto; max-height: none;
   }
   .speech {
-    position: absolute; left: 12px; right: 12px; width: auto; z-index: 5;
+    position: absolute; left: 0; right: 0; z-index: 5;
+    width: fit-content; max-width: calc(100% - 24px);
+    margin-left: auto; margin-right: auto;
     top: calc(var(--chin-y, 0.42) * 100% - 14px);
   }
+  #status { width: auto; flex: 0 1 auto; }
   .speech::after, .speech.has-badge::after {
     left: 50%; margin-left: -9px; top: -16px; bottom: auto; right: auto;
     border: 9px solid transparent;
     border-bottom: 16px solid #f7f9fc;
   }
   .q-badge { flex: 0 0 32px; font-size: 15px; border-radius: 12px 0 0 12px; }
-  #status { font-size: 15px; padding: 8px 12px; border-radius: 14px; }
+  #status { font-size: 16px; padding: 10px 16px; border-radius: 14px; }
   #categories, #answers {
     /* Just under the speech bubble. --under-bubble is the bubble's bottom, not desk-y. */
     top: var(--under-bubble, calc(var(--chin-y, 0.42) * 100% + 52px));
     bottom: auto; left: 12px; right: 12px; width: auto; z-index: 6;
   }
   .cat-row, .answer-row {
-    display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px;
+    display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;
+    align-items: center; gap: 14px;
   }
   .cat-row button, #answers button, #load-retry {
-    flex: 0 1 auto; width: auto; min-height: 44px; height: 44px;
-    font-size: 16px; line-height: 1.1; padding: 0 14px; border-radius: 999px;
+    flex: 0 0 auto; width: auto; min-width: 44px; min-height: 44px; height: 44px;
+    font-size: 16px; line-height: 1; padding: 0 16px; border-radius: 999px;
   }
   #answers {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
     background: transparent; border: 0; box-shadow: none;
   }
   #answers button {
@@ -250,7 +259,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #hud:has(#guess:not([hidden])) #credit {
     margin: 0; max-width: 92%; text-align: center; font-size: 11px; line-height: 1.25;
   }
-  #back { top: 8px; bottom: auto; height: auto; }
+  #back { top: auto; bottom: 8px; width: 44px; height: 44px; }
 }
 @media (min-aspect-ratio: 4/5) {
   #hud:has(#guess:not([hidden])) {

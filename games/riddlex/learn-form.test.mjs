@@ -28,7 +28,10 @@ test("phone choices sit under the bubble in compact rows", () => {
   assert.match(html, /class="answer-row"/);
   assert.match(html, /id="answer-yes"/);
   assert.match(app, /placeUnderBubble/);
-  assert.match(app, /akinator-33/);
+  assert.match(css, /width: fit-content/);
+  assert.match(css, /gap: 14px/);
+  assert.match(app, /copy\.previous/);
+  assert.match(app, /akinator-34/);
 });
 
 test("a saved name ends on a short thank-you in both languages", () => {

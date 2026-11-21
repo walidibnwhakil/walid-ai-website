@@ -88,4 +88,33 @@ require(not any("সম্রাজ্ঞী, রাজমাতা ও ক্�
         "disconnected empress appendix was restored")
 require(not any("পশ্চিম সাম্রাজ্যের শেষ সেনাপতিরা" in t for t in titles),
         "disconnected generals appendix was restored")
+
+# The revised edition must keep contextual details inside their historical reigns
+# rather than treating imperial women or generals as detached appendices.
+focused = {
+    5: ("লিভিয়া", "জুলিয়া অগাস্টা", "সন্দেহ"),
+    6: ("জার্মানিকাস", "পিসো", "আগ্রিপিনা"),
+    7: ("আউলুস প্লাউতিয়ুস", "ব্রিটেন", "পাল্লাস"),
+    13: ("জুলিয়া ডোমনা", "পেসকেন্নিয়ুস", "লুগদুনুম"),
+    14: ("জুলিয়া ডোমনা", "প্যাপিরাস", "মায়েসা"),
+    15: ("জেনোবিয়া", "ইম্মাই", "এমেসা", "ওয়াহবাল্লাত"),
+    17: ("ল্যাক্টান্টিয়ুস", "ইউসেবিয়ুস", "নাইসিয়া"),
+    22: ("গাল্লা প্লাসিদিয়া", "৪৪২", "গাইসেরিক"),
+    24: ("থিওদোরা", "প্রোকোপিয়ুস", "হেরাক্লিয়ুস"),
+    25: ("আন্না কোমনেন", "১২০৪", "১২৬১", "জুস্তিনিয়ানি", "১৪৫৩"),
+}
+for chapter, details in focused.items():
+    narrative = chapters[chapter-1][2]
+    require(all(detail in narrative for detail in details),
+            f"chapter {chapter} lost contextual material: {details}")
+
+late = chapters[24][2]
+require(late.count("মানজিকার্তে") == 1,
+        "Manzikert battle is unnecessarily repeated within the final chapter")
+require("বাইজেন্টাইন রাজবংশের সমস্ত বিস্তারিত ইতিহাস অন্য বইয়ে" not in late,
+        "an out-of-book editorial aside has returned")
+require("এই অধ্যায়ে" not in late and "পরের অধ্যায়ে" not in late,
+        "reader-facing meta-narration has returned")
+print("ROMAN_CONTEXT_PASS: women, armies, primary-source caution and final chronology")
+
 print(f"ROMAN_EDITORIAL_PASS: {len(chapters)} chapters, {len(all_paragraphs)} paragraphs, {sum(len(p.split()) for p in all_paragraphs)} words, {len(toc)} TOC links")

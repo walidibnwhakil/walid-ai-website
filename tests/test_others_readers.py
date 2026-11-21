@@ -34,6 +34,44 @@ def validate_book(path):
         fail(path, "obsolete source or previous/next book block present")
     if ">undefined<" in content or 'content="undefined"' in content:
         fail(path, "undefined text appears in reader")
+    if path.relative_to(ROOT).as_posix() == "others/history/mughal-empire/index.html":
+        # Book-scoped editorial contract: other books retain their original tests.
+        if len(chapters) != 25:
+            fail(path, f"Mughal reader expected 25 integrated chapters; found {len(chapters)}")
+        if "অধ্যায়সূচি — ২৫টি অধ্যায়" not in content:
+            fail(path, "Mughal TOC count does not match revised editorial plan")
+        if content.count("<p>") < 200:
+            fail(path, "Mughal reader unexpectedly lost narrative detail")
+        titles = re.findall(r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>', content)
+        for emperor in (
+            "বাবর", "হুমায়ুন", "আকবর", "জাহাঙ্গীর", "শাহজাহান",
+            "ঔরঙ্গজেব", "আজম শাহ", "বাহাদুর শাহ", "জাহান্দার শাহ",
+            "ফররুখসিয়ার", "রফি-উদ-দারাজাত", "দ্বিতীয় শাহজাহান",
+            "মুহাম্মদ শাহ", "আহমদ শাহ বাহাদুর", "দ্বিতীয় আলমগীর",
+            "তৃতীয় শাহজাহান", "দ্বিতীয় শাহ আলম", "দ্বিতীয় আকবর",
+            "দ্বিতীয় বাহাদুর শাহ জাফর",
+        ):
+            if not any(emperor in title for title in titles):
+                fail(path, f"Mughal emperor missing from TOC: {emperor}")
+        for removed in ("হুমায়ুনের ভাইয়েরা ও নির্বাসিত পরিবার",
+                        "আকবরের পুত্ররা, বৈরাম খান",
+                        "নূরজাহানের উত্থান ও পতন",
+                        "ঔরঙ্গজেবের সন্তান, স্ত্রী ও সেনাপতি"):
+            if any(removed in title for title in titles):
+                fail(path, f"orphaned Mughal family chapter: {removed}")
+        final_section = re.search(
+            r'<section class="others-chapter" id="chapter-25">(.*?)</section>',
+            content, re.S)
+        if not final_section or not all(item in final_section.group(1)
+          for item in ("১৮৫৭", "হডসন", "জাফর", "বিচার", "রেঙ্গুন", "১৮৬২")):
+            fail(path, "Mughal final reign is missing the 1857–1862 sequence")
+        if content.count('class="legal-footer"') != 1:
+            fail(path, "Mughal reader lost the shared legal footer")
+        if 'href="https://walid-ai.com/others/history/mughal-empire/"' not in content:
+            fail(path, "Mughal canonical URL changed")
+        if '/walid-ai-approved-logo.png' not in content or '/others/assets/books.css' not in content:
+            fail(path, "Mughal branding or reader styles changed")
+
 
 
 

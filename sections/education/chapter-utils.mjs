@@ -26,3 +26,26 @@ export function makeLesson(row,index){
     steps:"প্রথমে প্রশ্নের মূল বিষয় শনাক্ত করুন; সংজ্ঞাটি উদাহরণে প্রয়োগ করুন; বিকল্পের মধ্যে অর্থের পার্থক্য মিলিয়ে নিন।",
     practice:row.q,solution:row.correct+"। "+row.why};
 }
+
+/* One multi-concept overview per chapter and subject, so students can
+   read several connected ideas before answering the chapter questions. */
+export function makeChapterOverviews(rows){
+  const grouped=new Map();
+  for(const row of rows){
+    const key=[row.level,row.stream||"common",row.chapter,row.subject].join("::");
+    if(!grouped.has(key))grouped.set(key,[]);
+    grouped.get(key).push(row);
+  }
+  return [...grouped.entries()].map(([key,items],index)=>{
+    const first=items[0],last=items.at(-1);
+    return {
+      id:"overview-"+index+"-"+key,scope:first.level,stream:first.stream,subject:first.subject,
+      chapter:first.chapter,title:first.chapter+" — বিষয়সংক্ষেপ",
+      concept:items.map((item,i)=>(i+1)+". "+item.correct+" — "+item.why).join("\n"),
+      explanation:"এই পাঠে "+items.length+"টি ধারণা একসঙ্গে তুলনা করা হয়েছে। প্রতিটি ধারণার সংজ্ঞা, প্রয়োগ ও মূল পার্থক্য বুঝে পড়ুন। বিষয়গুলো একই পাঠক্ষেত্রের হলেও তাদের অর্থ এক নয়; তাই প্রশ্নের মূল শব্দের সঙ্গে সঠিক ধারণা মিলিয়ে উত্তর নির্বাচন করুন।",
+      example:"উদাহরণ: "+first.q+"\nউত্তর: "+first.correct+"। "+first.why,
+      steps:"১) উপরের ধারণাগুলো আলাদা করে পড়ুন। ২) প্রতিটির সঙ্গে বাস্তব বা পাঠ্য উদাহরণ মিলিয়ে দেখুন। ৩) নিচের অনুশীলনটি সমাধান করুন এবং উত্তরের কারণ ব্যাখ্যা করুন।",
+      practice:last.q,solution:last.correct+"। "+last.why
+    };
+  });
+}

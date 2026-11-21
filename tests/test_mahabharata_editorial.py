@@ -131,4 +131,43 @@ has(44, "জনমেজয়", "কর্ণ", "দ্রৌপদী")
 assert "দ্রৌপদীর মৃত্যুর" not in parts[12], "Her ending was revealed before the life arc"
 assert "পরীক্ষিতের জন্ম" not in parts[28], "The birth belongs to the postwar parva"
 
+
+# Editorial guardrails: a high paragraph count cannot disguise recycled scenes.
+bhishma_paras = re.findall(r"<p>(.*?)</p>", parts[26], re.S)
+assert len(bhishma_paras) >= 20, "First ten days should not collapse into a synopsis"
+first_day_losses = [
+    p for p in bhishma_paras if "উত্তর" in p and "শ্বেত" in p
+]
+assert len(first_day_losses) == 1, "Uttara and Shveta must have one distinct first-day scene"
+assert "শল্য" in first_day_losses[0] and "ভীষ্ম" in first_day_losses[0], (
+    "Uttara and Shveta must not be assigned the same killer"
+)
+timeline = [
+    "প্রথম দিনের ভোরে", "দ্বিতীয় দিনে", "তৃতীয় দিনের",
+    "চতুর্থ দিনে", "পঞ্চম দিনে", "ষষ্ঠ দিনের", "সপ্তম দিনে",
+    "অষ্টম দিনের", "নবম দিনের", "দশম দিনের",
+]
+positions = [parts[26].find(day) for day in timeline]
+assert all(p >= 0 for p in positions), "Bhishma's ten days need scene anchors"
+assert positions == sorted(positions) and len(set(positions)) == 10, (
+    "Bhishma war chronology must remain sequential"
+)
+for name in ("ইরাবান", "আলম্বুষ", "ঘটোৎকচ", "শিখণ্ডী",
+             "অম্বা", "গঙ্গা", "কর্ণ", "উত্তরায়ণ"):
+    assert name in parts[26], "Missing Bhishma episode: " + name
+
+assert "সুলভা" in parts[37] and "তুলাধার" in parts[37], (
+    "Shanti parva exemplars were replaced with abstract recap"
+)
+assert "গঙ্গা" in parts[38] and "উত্তরায়ণ" in parts[38]
+assert "আস্তীক" in parts[44] and "জনমেজয়" in parts[44]
+assert "উৎস ও পরবর্তী পাঠ" not in text
+
+# Catch copy-pasted adjacent long paragraphs even when the words are plentiful.
+for n, _, body in chapters:
+    paras = [re.sub(r"\s+", " ", p).strip() for p in
+             re.findall(r"<p>(.*?)</p>", body, re.S)]
+    for left, right in zip(paras, paras[1:]):
+        assert left != right, f"Duplicate consecutive paragraphs in chapter {n}"
+
 print(f"PASS: {len(chapters)} chapters, {sum(len(re.findall(r'<p>', body)) for _, _, body in chapters)} paragraphs, 18 parvas, {word_total} words, matched TOC and preserved reader shell")

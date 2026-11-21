@@ -84,4 +84,51 @@ for marker in (
 css = CSS.read_text(encoding="utf-8")
 assert "SolaimanLipi" in css and "walid-ai-approved-flower.png" in css
 assert "others-flower-spin 10s" in css
-print(f"PASS: {len(chapters)} chapters, {sum(len(re.findall(r'<p>', body)) for _, _, body in chapters)} paragraphs, 18 parvas, matched TOC and preserved reader shell")
+
+# A nominal "chapter" must not be just a short plot synopsis.  This book
+# deliberately keeps the original 44 anchors, but requires substantive prose.
+paragraphs = [re.sub(r"<[^>]+>", "", p).strip()
+              for _, _, body in chapters for p in re.findall(r"<p>(.*?)</p>", body, re.S)]
+assert len(paragraphs) >= 700, f"Only {len(paragraphs)} paragraphs: narrative was compressed"
+assert len(set(paragraphs)) == len(paragraphs), "Duplicated paragraphs in book"
+word_total = 0
+for n, _, body in chapters:
+    clean = re.sub(r"<[^>]+>", " ", body)
+    words = len(clean.split())
+    word_total += words
+    assert words >= 550, f"Chapter {n} has only {words} words; restore its narrative"
+    assert len(re.findall(r"<p>", body)) >= 14, f"Chapter {n} lacks scene development"
+assert word_total >= 30000, f"Book regressed to {word_total} words"
+
+# Distinct character arcs unfold in the appropriate parva and life phase.
+has(1, "জনমেজয়", "আস্তীক", "যযাতি", "ভরত")
+has(2, "দেবব্রত", "গঙ্গা", "বসু", "শিক্ষা")
+has(3, "সত্যবতী", "অম্বা", "পরশুরাম", "ইচ্ছামৃত্যু")
+has(8, "দ্রোণ", "অশ্বত্থামা", "একলব্য", "দ্রুপদ")
+has(10, "লাক্ষা", "হিড়িম্বা", "ঘটোৎকচ", "বকাসুর")
+has(16, "শকুনি", "যুধিষ্ঠির", "পাশা")
+has(18, "অক্ষয়পাত্র", "জয়দ্রথ", "অর্জুন")
+has(22, "বিদুর", "কৃষ্ণ", "শান্তি")
+has(25, "গীতা", "বিশ্বরূপ", "অর্জুন")
+has(26, "দশম", "শিখণ্ডী", "শরশয্যা")
+has(27, "একাদশ", "ভগদত্ত", "দ্রোণ")
+has(28, "ত্রয়োদশ", "অভিমন্যু", "জয়দ্রথ")
+has(29, "চতুর্দশ", "জয়দ্রথ", "ঘটোৎকচ")
+has(30, "পঞ্চদশ", "দ্রোণ", "ধৃষ্টদ্যুম্ন")
+has(31, "ষোড়শ", "কর্ণ", "শল্য")
+has(32, "সপ্তদশ", "বৃষসেন", "দুঃশাসন")
+has(33, "অষ্টাদশ", "শকুনি", "দুর্যোধন")
+has(34, "নিশি", "অশ্বত্থামা", "পুত্র")
+has(36, "রাজধর্ম", "ভীষ্ম", "প্রজা")
+has(38, "উত্তরায়ণ", "ভীষ্ম", "গঙ্গা")
+has(39, "পরীক্ষিত", "উত্তরা", "বভ্রুবাহন")
+has(40, "কুন্তী", "গান্ধারী", "ধৃতরাষ্ট্র", "বিদুর")
+has(41, "কৃষ্ণ", "বলরাম", "সাত্যকি", "কৃতবর্মা")
+has(42, "যুধিষ্ঠির", "কুকুর", "দ্রৌপদী")
+has(43, "যুধিষ্ঠির", "দুর্যোধন", "স্বর্গ")
+has(44, "জনমেজয়", "কর্ণ", "দ্রৌপদী")
+
+assert "দ্রৌপদীর মৃত্যুর" not in parts[12], "Her ending was revealed before the life arc"
+assert "পরীক্ষিতের জন্ম" not in parts[28], "The birth belongs to the postwar parva"
+
+print(f"PASS: {len(chapters)} chapters, {sum(len(re.findall(r'<p>', body)) for _, _, body in chapters)} paragraphs, 18 parvas, {word_total} words, matched TOC and preserved reader shell")

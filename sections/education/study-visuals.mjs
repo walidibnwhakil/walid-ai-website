@@ -22,6 +22,144 @@ function box(svg,x,y,w,h,{fill="#e8f3ec",stroke="#41876b",rx=8,width=2}={}){
 }
 const illustrations=[
   {
+    match:/ভগ্নাংশের ধারণা|দশমিক ভগ্নাংশ/,
+    title:"সমান ভাগে ভগ্নাংশ",
+    caption:"উদাহরণ: চার ভাগের তিন ভাগ = ৩/৪; এটি দশমিকে ০.৭৫।",
+    draw(svg){
+      text(svg,185,44,"৩/৪ = ০.৭৫",{size:22,bold:true});
+      for(let i=0;i<4;i++)box(svg,48+i*72,68,61,70,{
+        fill:i<3?"#a7dcc0":"#eef3ef",stroke:i<3?"#2c805b":"#9bbdab",rx:6});
+      text(svg,185,172,"৪ ভাগের মধ্যে ৩ ভাগ নেওয়া হয়েছে",{size:14});
+    }
+  },
+  {
+    match:/খাদ্যশৃঙ্খল/,
+    title:"খাদ্যশৃঙ্খলে শক্তি স্থানান্তর",
+    caption:"উদাহরণ: ঘাস উৎপাদক; ঘাসফড়িং, ব্যাঙ ও সাপ ধারাবাহিক খাদ্যগ্রাহক।",
+    draw(svg){
+      const names=["ঘাস","ঘাসফড়িং","ব্যাঙ","সাপ"];
+      for(let i=0;i<names.length;i++){
+        box(svg,19+i*91,69,74,67,{fill:i===0?"#d9f1e0":"#fff5df",rx:9});
+        text(svg,56+i*91,109,names[i],{size:i===1?12:15,bold:true});
+        if(i<3)text(svg,101+i*91,108,"→",{size:19,bold:true,fill:"#aa7e2f"});
+      }
+      text(svg,185,42,"উৎপাদক থেকে খাদ্যগ্রাহক",{size:17,bold:true});
+      text(svg,185,163,"তীরচিহ্ন খাদ্যের মাধ্যমে শক্তির প্রবাহ দেখায়",{size:12});
+    }
+  },
+  {
+    match:/সালোকসংশ্লেষণ/,
+    title:"সালোকসংশ্লেষণের উপাদান",
+    caption:"সূর্যালোকের শক্তিতে উদ্ভিদ পানি ও CO₂ থেকে শর্করা তৈরি করে এবং অক্সিজেন ছাড়ে।",
+    draw(svg){
+      svg.append(node("circle",{cx:70,cy:55,r:24,fill:"#f8e6ae",stroke:"#c49a39","stroke-width":2}));
+      text(svg,70,61,"☀",{size:26,fill:"#986e25"});
+      svg.append(node("ellipse",{cx:178,cy:105,rx:49,ry:35,fill:"#d9f1dd",stroke:"#2d8356","stroke-width":2}));
+      line(svg,155,125,200,88,{color:"#388559",width:3});
+      text(svg,178,110,"পাতা",{size:18,bold:true});
+      text(svg,105,119,"পানি",{size:13,anchor:"end"});
+      text(svg,250,80,"CO₂",{size:15,anchor:"start"});
+      text(svg,250,121,"O₂",{size:16,anchor:"start"});
+      line(svg,105,113,126,113,{color:"#b58a36"});
+      line(svg,226,85,250,85,{color:"#b58a36"});
+      line(svg,226,119,245,119,{color:"#2d8356"});
+      text(svg,185,167,"আলো + পানি + CO₂ → শর্করা + O₂",{size:13,bold:true});
+    }
+  },
+  {
+    match:/পদার্থের অবস্থা/,
+    title:"কঠিন, তরল ও গ্যাস",
+    caption:"তাপমাত্রা ও চাপের পরিবর্তনে পদার্থের অবস্থা বদলাতে পারে; বরফ গলে পানি হয়।",
+    draw(svg){
+      const labels=["কঠিন","তরল","গ্যাস"];
+      for(let k=0;k<3;k++){
+        const x=29+k*123;
+        box(svg,x,60,101,88,{fill:"#f3f8f5",stroke:"#92bca8"});
+        text(svg,x+50,47,labels[k],{size:15,bold:true});
+        for(let i=0;i<9;i++){
+          const px=k===0?x+28+(i%3)*21:k===1?x+18+(i%3)*31+(i%2)*5:x+16+(i%3)*34+(i%2)*9;
+          const py=k===0?83+Math.floor(i/3)*20:k===1?88+Math.floor(i/3)*20:72+Math.floor(i/3)*30;
+          svg.append(node("circle",{cx:px,cy:py,r:5,fill:k===2?"#e0bb78":"#58a483"}));
+        }
+      }
+      text(svg,185,177,"কণাগুলোর অবস্থান একটি ধারণামূলক চিত্র",{size:12});
+    }
+  },
+  {
+    match:/ওহমের সূত্র|বিদ্যুৎপ্রবাহ|বৈদ্যুতিক ক্ষমতা/,
+    title:"বিভব, প্রবাহ ও রোধের সম্পর্ক",
+    caption:"উদাহরণ: ৩ A প্রবাহ এবং ২ Ω রোধ হলে V = IR = ৬ V। বৈদ্যুতিক ক্ষমতায় P = VI।",
+    draw(svg){
+      const heads=[["V","বিভব"],["I","প্রবাহ"],["R","রোধ"]];
+      for(let i=0;i<heads.length;i++){
+        const x=41+i*114;
+        box(svg,x,63,87,80,{fill:i===1?"#fff2d5":"#e9f5ed",stroke:i===1?"#b5914e":"#41876b"});
+        text(svg,x+43,102,heads[i][0],{size:26,bold:true});
+        text(svg,x+43,129,heads[i][1],{size:12});
+      }
+      text(svg,185,42,"V = I × R",{size:23,bold:true});
+      text(svg,185,171,"৬ V = ৩ A × ২ Ω",{size:16,bold:true});
+    }
+  },
+  {
+    match:/বৃত্তের পরিমাপ/,
+    title:"বৃত্তের ব্যাসার্ধ ও ক্ষেত্রফল",
+    caption:"উদাহরণ: ব্যাসার্ধ ৩ একক হলে ক্ষেত্রফল = π × ৩² = ৯π বর্গ একক।",
+    draw(svg){
+      svg.append(node("circle",{cx:185,cy:97,r:65,fill:"#e8f3eb",stroke:"#2b845e","stroke-width":3}));
+      line(svg,185,97,250,97,{color:"#b78d3e",width:3});
+      svg.append(node("circle",{cx:185,cy:97,r:4,fill:"#1c684a"}));
+      text(svg,223,86,"r = ৩",{size:13,bold:true});
+      text(svg,185,182,"A = πr²",{size:18,bold:true});
+    }
+  },
+  {
+    match:/ফাংশনের ধারণা/,
+    title:"ফাংশনের ইনপুট ও আউটপুট",
+    caption:"উদাহরণ: f(x) = ২x + ১; x = ৩ দিলে ফলাফল ৭।",
+    draw(svg){
+      box(svg,34,69,85,74,{fill:"#eef5ee"});
+      box(svg,255,69,85,74,{fill:"#fff3df",stroke:"#ae8a45"});
+      text(svg,76,95,"x = ৩",{size:16,bold:true});
+      text(svg,76,121,"ইনপুট",{size:12});
+      text(svg,297,95,"৭",{size:21,bold:true});
+      text(svg,297,121,"আউটপুট",{size:12});
+      line(svg,125,105,247,105,{color:"#367a58",width:3});
+      svg.append(node("polygon",{points:"247,105 235,98 235,112",fill:"#367a58"}));
+      text(svg,185,90,"f(x)=২x+১",{size:13,bold:true});
+    }
+  },
+  {
+    match:/তরঙ্গ/,
+    title:"তরঙ্গদৈর্ঘ্যের ধারণা",
+    caption:"একটি পর্যাবৃত্ত তরঙ্গের গতি, কম্পাঙ্ক ও তরঙ্গদৈর্ঘ্যের সম্পর্ক v = fλ।",
+    draw(svg){
+      svg.append(node("path",{d:"M25 108 C49 44 73 44 97 108 S145 172 169 108 S217 44 241 108 S289 172 313 108 S349 44 365 77",
+        fill:"none",stroke:"#358666","stroke-width":4,"stroke-linecap":"round"}));
+      line(svg,25,108,365,108,{dash:true,color:"#c1d8c9",width:1.5});
+      line(svg,57,56,200,56,{color:"#b18a43",width:2});
+      text(svg,129,45,"λ",{size:22,bold:true});
+      text(svg,185,187,"v = f × λ",{size:18,bold:true});
+    }
+  },
+  {
+    match:/বাংলাদেশের ইতিহাসের গুরুত্বপূর্ণ ধাপ|বাংলাদেশের ইতিহাস ও রাষ্ট্রব্যবস্থা|ভাষা আন্দোলন/,
+    title:"বাংলাদেশের ইতিহাস: ঘটনাক্রম",
+    caption:"সময়ক্রমে: ১৯৫২ ভাষা আন্দোলন, ১৯৬৬ ছয় দফা, ১৯৬৯ গণঅভ্যুত্থান, ১৯৭১ মুক্তিযুদ্ধ।",
+    draw(svg){
+      line(svg,34,96,341,96,{color:"#5a9775",width:3});
+      const years=["১৯৫২","১৯৬৬","১৯৬৯","১৯৭১"];
+      const names=["ভাষা","ছয় দফা","গণঅভ্যুত্থান","মুক্তিযুদ্ধ"];
+      for(let i=0;i<4;i++){
+        const x=44+i*97;
+        svg.append(node("circle",{cx:x,cy:96,r:8,fill:"#267852"}));
+        text(svg,x,70,years[i],{size:14,bold:true});
+        text(svg,x,121,names[i],{size:i===2?10.5:12});
+      }
+      text(svg,185,161,"ঐতিহাসিক ঘটনাগুলো সময়ক্রমে পড়ুন",{size:13});
+    }
+  },
+  {
     match:/ত্রিভুজের ক্ষেত্রফল/,
     title:"ত্রিভুজের ক্ষেত্রফল",
     caption:"উদাহরণ: ভূমি ৬ এবং উচ্চতা ৪ হলে ক্ষেত্রফল = ½ × ৬ × ৪ = ১২ বর্গ একক।",

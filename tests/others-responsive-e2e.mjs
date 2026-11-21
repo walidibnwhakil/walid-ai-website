@@ -28,6 +28,7 @@ const indexes=[
   ["/others/islamic-literature/",5],
 ];
 const storyPaths=[
+  "/others/history/ottoman-empire/",
   "/others/folklore/ramayana/",
   "/others/folklore/mahabharata/",
   "/others/folklore/behula-lakhindar/",
@@ -80,6 +81,7 @@ try{
       }
       if(cardsCount===0){
         assert(layout.chapterCount>=12,path+" lost book chapters");
+        if(path.includes("ottoman-empire")) assert.equal(layout.chapterCount,38,"Ottoman book lost its revised chapters");
         assert.equal(layout.emptyChapters,0,path+" has empty/short chapters");
         assert.equal(layout.hasSidebar,true,path+" missing chapter drawer");
         if(width===375||width===1280){

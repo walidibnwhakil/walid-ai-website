@@ -1,9 +1,9 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-31";
-import { UI, guessFont } from "./i18n.js?v=akinator-31";
-import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-31";
-import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-31";
-import { createScene, startMenuCat } from "./scene.js?v=akinator-31";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-32";
+import { UI, guessFont } from "./i18n.js?v=akinator-32";
+import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-32";
+import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-32";
+import { createScene, startMenuCat } from "./scene.js?v=akinator-32";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -82,7 +82,7 @@ function gameInProgress() {
 }
 
 const LOAD_MS = 15000;
-const BUILD = "akinator-31";
+const BUILD = "akinator-32";
 
 function withTimeout(promise, ms) {
   let timer;

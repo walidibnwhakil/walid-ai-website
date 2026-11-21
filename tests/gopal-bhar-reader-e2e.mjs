@@ -84,7 +84,7 @@ try {
       assert.equal(await page.locator(".others-toc-dialog").evaluate(x=>x.open),true,"TOC open");
       const box=await page.locator(".others-toc-dialog").boundingBox();
       assert.ok(box.x >= -2 && box.x+box.width <= width+2,"Drawer overflow at "+width);
-      await page.locator('a[href="#chapter-17"]').click();
+      await page.locator('.others-toc a[href="#chapter-17"]').click();
       await page.waitForFunction(()=>location.hash==="#chapter-17" && !document.querySelector(".others-toc-dialog").open);
       const end=await page.locator("#chapter-17 h2").textContent();
       assert.ok(end.includes("খালি কলসির জ্ঞান"),"Last story accessible");

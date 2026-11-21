@@ -139,7 +139,7 @@ try{
       assert.equal(await page.locator(".others-toc-dialog").evaluate(x=>x.open),true,"TOC did not open");
       const rect=await page.locator(".others-toc-dialog").boundingBox();
       assert.ok(rect.x>=-2&&rect.x+rect.width<=width+2,"TOC drawer overflow");
-      await page.locator('a[href="#chapter-29"]').click();
+      await page.locator('.others-toc a[href="#chapter-29"]').click();
       await page.waitForFunction(()=>location.hash==="#chapter-29"&&!document.querySelector(".others-toc-dialog").open);
       await page.locator(".others-toc-trigger").click();
       await page.keyboard.press("Escape");

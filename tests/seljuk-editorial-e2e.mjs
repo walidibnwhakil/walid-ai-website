@@ -24,7 +24,7 @@ for (const referenceName of [
   "আহমদ সানজার",
   "এন্ড্রু পিকক: সেলজুকস অব রুম",
 ]) assert(source.includes(referenceName), "Source attribution text missing: " + referenceName);
-assert.doesNotMatch(source, /<a\\b[^>]*href="https?:\\/\\//, "In-text sources must not be clickable");
+assert(!((source.match(/<a[^>]+>/g)||[]).some(tag=>tag.includes('href="https://')||tag.includes('href="http://'))), "References in the narrative must be plain text");
 const existingParagraphs = new Set();
 for (const [i, chapter] of chapters.entries()) {
   assert.equal(+chapter[1], i + 1, "Chapters must have contiguous IDs");

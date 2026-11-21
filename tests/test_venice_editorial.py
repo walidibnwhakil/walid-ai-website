@@ -45,7 +45,7 @@ class VeniceStaticTests(unittest.TestCase):
         self.assertNotIn("১৫০১–১৫২০: মিসর", HTML)
         self.assertNotIn("১৫০১–১৫২১: লিওনার্দো লোরেদান", HTML)
         self.assertIn("১৪২৩ সালে মহামারি", HTML)
-        self.assertIn("২৯ মার্চ ১৫১৬", HTML)
+        self.assertIn("১৫১৬ সালের মার্চে", HTML)
         self.assertNotIn("১৭৮৮ সালে ডোজ নির্বাচিত", HTML)
         self.assertNotIn("শেষ ডোজ লুদোভিকো মানিনের জীবন: ১৭৮৮", HTML)
         self.assertNotIn("উৎস ও পরবর্তী পাঠ", HTML)

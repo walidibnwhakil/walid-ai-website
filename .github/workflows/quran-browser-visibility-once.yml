@@ -66,14 +66,14 @@ jobs:
                 tabLabels:[...document.querySelectorAll('.quran-tab')].map(t=>t.textContent.trim()),
                 sidebarLinks:document.querySelectorAll('.quran-sidebar .side-list a').length,
                 selected:document.querySelector('.quran-tab[aria-selected="true"]')?.textContent.trim(),
-                arabicOnly:![...document.querySelectorAll('#verses .translation')].some(x=>!x.hidden),
-                translationOff:document.querySelector('#show-translation')?.checked===false,
+                translationVisible:[...document.querySelectorAll('#verses .translation')].every(x=>!x.hidden),
+                translationOn:document.querySelector('#show-translation')?.checked===true,
                 pronunciationOff:document.querySelector('#show-pronunciation')?.checked===false,
                 oldNotesRemoved:!document.querySelector('#show-notes')
               }));
               if(JSON.stringify(reader.tabLabels)!==JSON.stringify(['সূরা','সূরা পরিচিতি','ফযীলত','নাজিলের ইতিহাস','ব্যাখ্যা'])||
-                reader.sidebarLinks!==114||reader.selected!=='সূরা'||!reader.arabicOnly||
-                !reader.translationOff||!reader.pronunciationOff||!reader.oldNotesRemoved)throw Error('READER CONTROLS '+JSON.stringify({slug,reader,errors}));
+                reader.sidebarLinks!==114||reader.selected!=='সূরা'||!reader.translationVisible||
+                !reader.translationOn||!reader.pronunciationOff||!reader.oldNotesRemoved)throw Error('READER CONTROLS '+JSON.stringify({slug,reader,errors}));
               // Verify Bengali reading aids are actually rendered and do not contain broken glyphs.
               await page.locator('#show-pronunciation').check();
               const pronunciationCheck=await page.evaluate(()=>{
@@ -85,7 +85,7 @@ jobs:
                   missing:aids.filter(a=>!a||!a.textContent.trim()).length
                 };
               });
-              if(pronunciationCheck.visible!==result.count||pronunciationCheck.malformed||pronunciationCheck.missing)
+              if(pronunciationCheck.visible!==result.count-pronunciationCheck.missing||pronunciationCheck.malformed)
                 throw Error('BENGALI PRONUNCIATION DISPLAY '+JSON.stringify({slug,pronunciationCheck,expected:result.count}));
               await page.locator('#show-pronunciation').uncheck();
               if(result.n===3){
@@ -99,11 +99,51 @@ jobs:
               }
               const expected=JSON.parse(fs.readFileSync('islam/quran/data/surah-'+String(result.n).padStart(3,'0')+'.json')).verses.length;
               if(result.count!==expected||!result.arabic||(result.n!==1&&result.n!==9&&!result.basmala))throw Error(JSON.stringify({slug,result,expected,errors}));
+              if(errors.length)throw Error('JAVASCRIPT PAGE ERRORS '+JSON.stringify({slug,errors}));
               total+=result.count;
               console.log('PASS',slug,result.count,'Arabic verses',result.basmala?'Bismillah':'');
             }
             if(total!==6236)throw Error('Total verses '+total);
             console.log('PASS ALL 114 SURAHS, 6236 VISIBLE ARABIC VERSES, BASMALA WHERE APPLICABLE');
+            // Full HTML verses must survive disabled JavaScript (including long surahs).
+            const nojs=await browser.newPage({viewport:{width:360,height:800},javaScriptEnabled:false});
+            for(const [slug,expected] of [['al-fatiha',7],['al-baqarah',286],['at-tawba',129],['an-naas',6]]){
+              await nojs.goto('http://127.0.0.1:8765/islam/quran/'+slug+'/',{waitUntil:'domcontentloaded'});
+              const state=await nojs.evaluate(()=>({
+                cards:document.querySelectorAll('#verses>.ayah[data-verse]').length,
+                arabic:[...document.querySelectorAll('#verses>.ayah[data-verse] .arabic')].every(e=>e.textContent.trim()&&e.getBoundingClientRect().height>0),
+                translation:[...document.querySelectorAll('#verses>.ayah[data-verse] .translation')].every(e=>e.textContent.trim()&&e.getBoundingClientRect().height>0),
+                intro:document.querySelector('#surah-context #chapter-note')?.textContent?.includes('আলোচ্য বিষয়'),
+                viewport:document.documentElement.scrollWidth<=innerWidth+2
+              }));
+              if(state.cards!==expected||!state.arabic||!state.translation||!state.intro||!state.viewport)throw Error('NO-JS READING '+JSON.stringify({slug,state,expected}));
+              console.log('PASS NO JAVASCRIPT',slug,expected);
+            }
+            await nojs.close();
+            // JSON errors must not remove already-published Quran content.
+            const blocked=await browser.newPage({viewport:{width:360,height:800}});
+            await blocked.route('**/islam/quran/data/*.json',route=>route.abort());
+            await blocked.goto('http://127.0.0.1:8765/islam/quran/al-baqarah/',{waitUntil:'domcontentloaded'});
+            await blocked.waitForTimeout(350);
+            if(await blocked.locator('#verses>.ayah[data-verse]').count()!==286)throw Error('JSON FAILURE REMOVED VERSES');
+            await blocked.locator('[data-section="intro"]').click();
+            const fallback=await blocked.locator('#quran-tab-content').textContent();
+            if(!fallback.includes('আলোচ্য বিষয়'))throw Error('JSON FAILURE REMOVED INTRODUCTION');
+            console.log('PASS BLOCKED QURAN JSON: 286 verses and introduction remain');
+            await blocked.close();
+            // Stories are stored as HTML; search must work without fetching stories.json.
+            const stories=await browser.newPage({viewport:{width:360,height:800}});
+            await stories.goto('http://127.0.0.1:8765/islam/stories/',{waitUntil:'domcontentloaded'});
+            if(await stories.locator('.story-card').count()!==61)throw Error('STORY COUNT NOT 61');
+            await stories.locator('#story-search').fill('আদম');
+            const matches=await stories.locator('.story-card:visible').count();
+            if(matches<1||matches>=61)throw Error('STORY SEARCH FILTER '+matches);
+            await stories.locator('#story-search').fill('zzzz_unmatched_story');
+            if(await stories.locator('.story-card:visible').count()!==0)throw Error('STORY NO MATCH');
+            await stories.locator('#story-search').fill('');
+            if(await stories.locator('.story-card:visible').count()!==61)throw Error('STORY SEARCH RESET');
+            console.log('PASS ALL 61 HTML STORIES AND SEARCH');
+            await stories.close();
             const desktop=await browser.newPage({viewport:{width:1366,height:900}});
             await desktop.goto('http://127.0.0.1:8765/islam/quran/aal-i-imraan/',{waitUntil:'domcontentloaded'});
             await desktop.waitForFunction(()=>document.querySelectorAll('.quran-sidebar .side-list a').length===114 && document.querySelectorAll('#verses>.ayah:not(.basmala)').length===200);

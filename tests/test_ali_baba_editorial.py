@@ -23,6 +23,7 @@ for index, (_, title, body) in enumerate(sections, 1):
     assert count >= 7, f"Chapter {index}: only {count} substantive paragraphs"
     assert words >= 300, f"Chapter {index}: only {words} words"
     assert not re.search(r"এই অধ্যায়|এই পর্বে|পাঠককে ভাবতে|পরবর্তী শেষ সংঘর্ষ", chapter_texts[index - 1]), f"Chapter {index}: editorial commentary in narration"
+    assert not re.search(r"প্রচলিত কাহিনি|গালাঁ-সূত্রে|গালাঁ-ভিত্তিক|পুরোনো কাহিনির", chapter_texts[index - 1]), f"Chapter {index}: source aside interrupts narrative"
 
 required = {
     1: ["কাসিম", "আলিবাবা", "চল্লিশজন"],

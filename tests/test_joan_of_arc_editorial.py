@@ -40,8 +40,8 @@ class JoanOfArcEditorialTests(unittest.TestCase):
             paragraphs = [unescape(re.sub(r"<[^>]+>", "", p)).strip()
                           for p in re.findall(r"<p>(.*?)</p>", section, re.S)]
             counts.append(len(paragraphs))
-            self.assertGreaterEqual(len(paragraphs), 9, number)
-            self.assertGreater(len("".join(paragraphs)), 2900, number)
+            self.assertGreaterEqual(len(paragraphs), 12, number)
+            self.assertGreater(len("".join(paragraphs)), 3600, number)
             self.assertTrue(all(len(p) > 100 for p in paragraphs), number)
             all_paragraphs.extend(paragraphs)
         self.assertGreater(len(set(counts)), 1, "Every chapter should not have identical paragraph counts")

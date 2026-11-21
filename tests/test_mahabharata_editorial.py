@@ -163,11 +163,26 @@ assert "গঙ্গা" in parts[38] and "উত্তরায়ণ" in parts[38
 assert "আস্তীক" in parts[44] and "জনমেজয়" in parts[44]
 assert "উৎস ও পরবর্তী পাঠ" not in text
 
-# Catch copy-pasted adjacent long paragraphs even when the words are plentiful.
+# Reject adjacent recaps, including paraphrases, not just exact-copy paragraphs.
+COMMON = set("""এবং তাঁর তাদের তিনি থেকে সঙ্গে করে করেন হয়ে হয় হতে কিন্তু
+এই সেই একটি তখন পরে যে তাঁকে কথা আছে ছিল নিয়ে নিজের তাই তাঁরা মধ্যে আবার
+তাঁদের সামনে জন্য এক আর কোনো তবে যুদ্ধ রাজ্য রাজা""".split())
+
+def salient_words(p):
+    clean = re.sub(r"[।,:;—!?‘’“”()]", " ", re.sub(r"<[^>]+>", "", p))
+    return {w for w in clean.split() if len(w) > 3 and w not in COMMON}
+
 for n, _, body in chapters:
     paras = [re.sub(r"\s+", " ", p).strip() for p in
              re.findall(r"<p>(.*?)</p>", body, re.S)]
-    for left, right in zip(paras, paras[1:]):
+    for idx, (left, right) in enumerate(zip(paras, paras[1:]), 1):
         assert left != right, f"Duplicate consecutive paragraphs in chapter {n}"
+        a, b = salient_words(left), salient_words(right)
+        if min(len(a), len(b)) >= 12:
+            overlap = len(a & b) / min(len(a), len(b))
+            assert overlap < 0.45, (
+                f"Potential paraphrased repeated scene in chapter {n}, "
+                f"paragraphs {idx}/{idx+1}: {overlap:.2f}"
+            )
 
 print(f"PASS: {len(chapters)} chapters, {sum(len(re.findall(r'<p>', body)) for _, _, body in chapters)} paragraphs, 18 parvas, {word_total} words, matched TOC and preserved reader shell")

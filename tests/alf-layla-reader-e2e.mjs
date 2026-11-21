@@ -60,6 +60,34 @@ assert.ok((chapterText(10).match(/<h3>/g) || []).length >= 5, "Hunchback substor
 assert.ok(html.includes("এই সংস্করণের পাঠ-পরিচয়"), "Editorial recension note absent");
 assert.ok(html.includes("জন পেইনের"), "Edition/source identification absent");
 
+const editionNote = html.match(/<p class="others-edition-note">([\s\S]*?)<\/p>/)?.[1] || "";
+for (const marker of [
+  "কামার আল-জামান (বদুরের কাহিনি)",
+  "কামার আল-আকমার (সাবুরের পুত্র",
+  "সন্তানদের ঘিরে পরবর্তী গল্পচক্র",
+  "আমানতদারের দণ্ডের বিবরণ সংস্করণভেদে আলাদা",
+  "গ্যালাঁ-পরম্পরার বঙ্গদেশ–কাশ্মীর",
+]) {
+  assert.ok(editionNote.includes(marker), "Editorial context missing from introductory note: " + marker);
+}
+const finalParagraph = n => [...chapterText(n).matchAll(/<p>([\s\S]*?)<\/p>/g)].at(-1)?.[1] || "";
+for (const [n, terms] of [
+  [11, ["বিস্তৃত প্রচলিত পাঠে", "নির্বাচিত পর্ব", "পরবর্তী গল্পচক্র"]],
+  [12, ["পেইন-পরম্পরার", "গ্যালাঁ-পরম্পরার", "আগের অধ্যায়ের"]],
+  [13, ["সংস্করণে ভিন্ন", "প্রমাণিত প্রশাসনিক"]],
+  [14, ["পাণ্ডুলিপি", "পুনর্কথন", "সংস্করণভেদ"]],
+]) {
+  for (const term of terms) {
+    assert.ok(!finalParagraph(n).includes(term), "Chapter " + n + " ending interrupted by editorial commentary: " + term);
+  }
+}
+assert.ok(finalParagraph(11).includes("হায়াত") && finalParagraph(11).includes("সম্মতি"), "Hayat's choice missing from resolution");
+assert.ok(finalParagraph(12).includes("শামস") && finalParagraph(12).includes("রাজ্যভার"), "Ebony Horse conclusion lost");
+assert.ok(finalParagraph(13).includes("শিশুবিচারকের") && finalParagraph(13).includes("স্বর্ণমুদ্রা"), "Olive-jar verdict lost");
+assert.ok(chapterText(14).indexOf("এই বাংলা পুনর্কথনে") < chapterText(14).indexOf("প্রচলিত এক সমাপ্তিতে"), "Final-night editorial context should precede the climax");
+assert.ok(!chapterText(8).includes("আব্বাসীয় প্রশাসনের দলিল"), "Court history explanation interrupts the sisters' ending");
+
+
 const requirements = {
   1: ["শাহরিয়ার", "শাহজামান", "শেহেরজাদ", "দুনিয়াজাদ"],
   2: ["খেজুর", "বণিক", "এক বছরের", "হরিণীর", "কুকুর", "খচ্চর"],

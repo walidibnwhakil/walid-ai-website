@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffffff">
   <title>Education — MCQ Practice & Study Notes | Walid AI</title>
-  <meta name="description" content="প্রথম থেকে দ্বাদশ শ্রেণি, বিশ্ববিদ্যালয় ভর্তি এবং BCS প্রস্তুতির জন্য মিশ্র-বিষয়ের MCQ অনুশীলন ও বিষয়ভিত্তিক স্টাডি নোট।">
+  <meta name="description" content="ষষ্ঠ থেকে দ্বাদশ শ্রেণি, বিভাগভিত্তিক বিশ্ববিদ্যালয় ভর্তি এবং BCS প্রস্তুতির জন্য মিশ্র-বিষয়ের MCQ অনুশীলন ও বিষয়ভিত্তিক স্টাডি নোট।">
   <link rel="canonical" href="https://walid-ai.com/sections/education/">
   <link rel="icon" href="/favicon.ico">
-  <link rel="stylesheet" href="/sections/education/education.css?v=20261121-v1">
+  <link rel="stylesheet" href="/sections/education/education.css?v=20261121-streamed-v2">
   <link rel="stylesheet" href="/walid-branding.css">
-  <script type="module" src="/sections/education/education-app.mjs?v=20261121-v1"></script>
+  <script type="module" src="/sections/education/education-app.mjs?v=20261121-streamed-v2"></script>
 </head>
 <body>
 <main class="edu-shell">
@@ -46,7 +46,17 @@
         <div>
           <label class="field-label" for="quizLevel">শ্রেণি / পরীক্ষার বিভাগ</label>
           <select class="field-select" id="quizLevel" required></select>
-          <p class="field-hint">বিষয় আলাদা করে বাছতে হবে না। নির্বাচিত স্তরের উপযোগী মিশ্র প্রশ্ন দেওয়া হবে।</p>
+          <p class="field-hint">বিষয় আলাদা করে বাছতে হবে না। ষষ্ঠ–অষ্টম শ্রেণিতে সব সাধারণ বিষয়, নবম–দ্বাদশ ও ভর্তিতে নির্বাচিত বিভাগ অনুযায়ী প্রশ্ন আসবে।</p>
+        </div>
+        <div class="stream-field" id="quizStreamField" hidden>
+          <label class="field-label" for="quizStream">বিভাগ নির্বাচন করুন</label>
+          <select class="field-select" id="quizStream" disabled>
+            <option value="">বিভাগ নির্বাচন করুন</option>
+            <option value="science">বিজ্ঞান (Science)</option>
+            <option value="commerce">ব্যবসায় শিক্ষা (Commerce)</option>
+            <option value="arts">মানবিক (Arts)</option>
+          </select>
+          <p class="field-hint">শুধু নির্বাচিত বিভাগের প্রাসঙ্গিক বিষয় থেকে প্রশ্ন তৈরি হবে। ভর্তি পরীক্ষার প্রকৃত বিষয়বণ্টন প্রতিষ্ঠানের বিজ্ঞপ্তি অনুযায়ী যাচাই করুন।</p>
         </div>
         <fieldset class="count-fieldset"><legend>প্রশ্নসংখ্যা</legend>
           <div class="count-list">
@@ -60,7 +70,7 @@
         </fieldset>
       </div>
       <div class="setup-actions"><button class="primary-button" id="startQuiz" type="button">পরীক্ষা শুরু করুন</button></div>
-      <p class="supporting-copy">এটি অনুশীলনের জন্য প্রস্তুতকৃত প্রশ্নসেট; কোনো বোর্ড, বিশ্ববিদ্যালয় বা BCS-এর আসল প্রশ্নপত্র নয়।</p>
+      <p class="supporting-copy">এটি অনুশীলনের জন্য প্রস্তুতকৃত প্রশ্নসেট; কোনো বোর্ড, বিশ্ববিদ্যালয় বা BCS-এর আসল প্রশ্নপত্র নয়; গণনাভিত্তিক অনেক প্রশ্ন একই শিক্ষাগত নিয়মের নতুন সংখ্যায় তৈরি।</p>
       <p class="status-message" id="quizStatus" hidden role="status"></p>
     </div>
   </section>
@@ -69,14 +79,9 @@
     <div class="edu-panel-head"><div><h2 id="runningHeading">MCQ Practice</h2><p class="panel-subtitle" id="runningLevel"></p></div><button class="edu-back" type="button" id="exitQuiz">পরীক্ষা থেকে বের হন</button></div>
     <div class="quiz-bar"><span class="quiz-counter" id="quizCounter"></span><span class="quiz-subject" id="quizSubject"></span></div>
     <progress class="quiz-progress" id="quizProgress" value="0" max="20" aria-label="উত্তর দেওয়া প্রশ্নের অগ্রগতি"></progress>
-    <article class="question-card" aria-live="polite">
-      <h3 id="questionText"></h3><div class="question-options" id="questionOptions"></div>
-    </article>
-    <div class="quiz-nav">
-      <div class="quiz-nav-main"><button type="button" class="secondary-button" id="prevQuestion">← পূর্ববর্তী</button><button type="button" class="primary-button" id="nextQuestion">পরবর্তী →</button></div>
-      <label for="jumpQuestion">প্রশ্নে যান <select id="jumpQuestion" aria-label="প্রশ্ন নম্বর নির্বাচন"></select></label>
-    </div>
-    <div class="setup-actions"><button type="button" class="secondary-button" id="finishQuiz">পরীক্ষা জমা দিন</button><span class="field-hint" id="answeredCount"></span></div>
+    <p class="quiz-instruction">প্রশ্নগুলো নিচে ধারাবাহিকভাবে রয়েছে। একটি উত্তর নির্বাচন করলে তাৎক্ষণিক ফল দেখা যাবে এবং পরের প্রশ্নে এগিয়ে যাবে।</p>
+    <div class="question-stack" id="questionList" aria-label="পরীক্ষার প্রশ্ন"></div>
+    <div class="setup-actions quiz-finish-actions"><button type="button" class="secondary-button" id="finishQuiz">পরীক্ষা জমা দিন</button><span class="field-hint" id="answeredCount"></span></div>
     <div class="finish-confirm" id="finishConfirm" hidden><span id="confirmMessage"></span><button type="button" class="primary-button" id="confirmFinish">ফলাফল দেখুন</button><button type="button" class="secondary-button" id="cancelFinish">ফিরে যান</button></div>
   </section>
 
@@ -96,6 +101,7 @@
     <div class="setup-card">
       <div class="setup-fields">
         <div><label class="field-label" for="notesLevel">শ্রেণি / পরীক্ষার বিভাগ</label><select class="field-select" id="notesLevel"></select></div>
+        <div class="stream-field" id="notesStreamField" hidden><label class="field-label" for="notesStream">বিভাগ নির্বাচন করুন</label><select class="field-select" id="notesStream" disabled><option value="">বিভাগ নির্বাচন করুন</option><option value="science">বিজ্ঞান (Science)</option><option value="commerce">ব্যবসায় শিক্ষা (Commerce)</option><option value="arts">মানবিক (Arts)</option></select></div>
         <div><label class="field-label" for="notesSubject">বিষয়</label><select class="field-select" id="notesSubject" disabled><option>প্রথমে শ্রেণি নির্বাচন করুন</option></select></div>
       </div>
       <div class="setup-actions"><button class="primary-button" type="button" id="showNotes">নোট পড়ুন</button></div>

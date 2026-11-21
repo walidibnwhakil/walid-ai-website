@@ -98,7 +98,7 @@ await edit.locator("#pageNext").click();
 await edit.waitForFunction(() => document.querySelector("#pageLabel")?.textContent.includes("2 / 3"));
 await edit.locator("#deletePage").click();
 await edit.waitForFunction(() => document.querySelector("#pageLabel")?.textContent.includes("2 / 2")); await edit.locator("#saveEdit").click();
-await edit.waitForFunction(() => document.querySelector("#status")?.textContent.startsWith("Done."));
+await edit.waitForFunction(() => document.querySelector("#status")?.textContent.startsWith("Your updated PDF is ready."));
 const edited = await download(edit, "#download"); assert.equal(edited[0], 37);
 const pages = await withTimeout(inspect(edited), 15000, "edited PDF inspection"); assert.equal(pages.length, 2); assert.deepEqual(pages[0], [595, 842, 90]);
 

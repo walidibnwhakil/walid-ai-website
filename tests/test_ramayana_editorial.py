@@ -120,6 +120,42 @@ def verify():
     for signature in ("SolaimanLipi", "others-flower-spin", "/walid-ai-approved-flower.png"):
         assert signature in stylesheet, f"Missing shared design invariant: {signature}"
 
+    # Distinct military and family turning points must be told in actual scene order.
+    # Word-count checks alone cannot detect late repetitions or reversed episodes.
+    paragraphs_by_chapter = {
+        int(number): [re.sub(r"<[^>]+>", "", p).strip()
+                      for p in re.findall(r"<p>(.*?)</p>", body, re.S)]
+        for number, _, body in sections
+    }
+
+    def require_scene_order(chapter, *phrases):
+        indices = []
+        for phrase in phrases:
+            hits = [i for i, paragraph in enumerate(paragraphs_by_chapter[chapter])
+                    if phrase in paragraph]
+            assert hits, f"Ramayana chapter {chapter} lost narrative scene: {phrase}"
+            indices.append(hits[0])
+        assert indices == sorted(indices) and len(set(indices)) == len(indices), (
+            f"Ramayana chapter {chapter} has overlapping/reversed scenes: {phrases}"
+        )
+
+    require_scene_order(35, "রাবণ বিভীষণকে লক্ষ্য করে", "মাতলি রামের কাছে পৌঁছান",
+                        "রাবণ রণক্ষেত্রে নিহত হন")
+    require_scene_order(36, "সীতা লক্ষ্মণকে আগুনের চিতা", "সীতা অগ্নিতে প্রবেশ করলে")
+    require_scene_order(39, "শত্রুঘ্নও বাল্মীকির আশ্রম", "লবণ নিহত হলে",
+                        "কুশ ও লব বড় হওয়ার")
+    require_scene_order(40, "সীতা ধরিত্রীমাতার কাছে আশ্রয়",
+                        "ধরিত্রী সীতাকে গ্রহণ করলে")
+    require_scene_order(41, "কালের দূত রামের সঙ্গে", "লক্ষ্মণ আর ভাইয়ের কাছ থেকে",
+                        "সরযূর জলে প্রবেশ")
+
+    assert "ব্রহ্মাস্ত্র" in sections[32][2] and "শক্তিশূল" in sections[34][2], (
+        "Distinct Indrajit and Ravana battle injuries were conflated"
+    )
+    assert "মায়ামূর্তি" in sections[33][2] and "ভক্তিমূলক" in sections[33][2], (
+        "Indrajit's battlefield illusion must remain distinct from later Maya-Sita traditions"
+    )
+
     print("RAMAYANA_EDITORIAL_PASS: 41 full epic chapters, verified biographies, source variants and unchanged reader design.")
 
 if __name__ == "__main__":

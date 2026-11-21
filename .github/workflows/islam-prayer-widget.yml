@@ -53,6 +53,17 @@ jobs:
             await page.clock.setFixedTime(new Date('2026-11-20T05:50:00Z'));
             await page.waitForFunction(()=>!document.querySelector('#prayer-warning').hidden,{timeout:3000});
             if(!((await page.locator('#prayer-warning-title').textContent()).includes('মধ্যাহ্ন')))throw Error('Midday warning missing');
+            // A no-prayer interval must use the exact concise Bengali sentence.
+            await page.clock.setFixedTime(new Date('2026-11-20T03:00:00Z'));
+            await page.clock.runFor(1100);
+            if(await page.locator('#prayer-current').textContent()!=='এখন কোনো ফরজ নামাজের ওয়াক্ত নয়')
+              throw Error('Incorrect no-Fard-prayer message');
+            // This visual must be a shaded atmospheric landscape, not weather glyphs.
+            const artwork=await page.locator('.prayer-spark').innerHTML();
+            if(!artwork.includes('radialGradient')||!artwork.includes('clipPath')||!artwork.includes('linearGradient'))
+              throw Error('Atmospheric sky artwork missing');
+            if(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+1))
+              throw Error('Sky artwork causes horizontal overflow');
             // Every prohibited period must follow the mocked solar events,
             // with no warning outside its defined limits.
             const windows=[

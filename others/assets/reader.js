@@ -47,6 +47,15 @@
   const chapters = Array.from(reader.querySelectorAll(".others-chapter[id^='chapter-']"));
   if (!chapters.length) return;
 
+  // A refresh is not a request to resume. A freshly opened direct chapter
+  // link still works, while a refresh starts calmly at the book's beginning.
+  const navigation = performance.getEntriesByType?.("navigation")?.[0];
+  const isPageReload = navigation?.type === "reload";
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if (isPageReload && location.hash) {
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
   const byId = new Map(chapters.map((node, index) => [node.id, {node, index, heading: node.querySelector("h2")}]));
   const bn = (number) => String(number).replace(/\d/g, (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]);
   const cleanPath = location.pathname.replace(/index\.html$/, "").replace(/\/?$/, "/");
@@ -328,6 +337,11 @@
     const target = byId.get(initialChapter)?.node;
     if (target) window.scrollTo({top: Math.max(0, window.scrollY + target.getBoundingClientRect().top - 22), behavior: "instant"});
   });
+  if (isPageReload) {
+    const resetScroll = () => window.scrollTo({top: 0, behavior: "instant"});
+    resetScroll();
+    window.addEventListener("pageshow", () => requestAnimationFrame(resetScroll), {once: true});
+  }
 
   // Fiction chapters remain uninterrupted prose. Keep source text as plain text
   // rather than clickable distractions; retain all real navigation and citations.
@@ -370,14 +384,11 @@
   const drawPanel = () => {
     if (!panel) return;
     panel.replaceChildren();
-    const heading = document.createElement("strong");
-    heading.textContent = "এই ডিভাইসে আপনার পড়ার জায়গা";
-    panel.appendChild(heading);
-    if (progress) panel.appendChild(createResume(progress, "যেখান থেকে পড়েছিলেন"));
+    if (progress) panel.appendChild(createResume(progress, "আগের জায়গা থেকে পড়ুন"));
     if (bookmark) {
       const line = document.createElement("div");
       line.className = "others-reading-bookmark-row";
-      line.appendChild(createResume(bookmark, "বুকমার্কে যান"));
+      line.appendChild(createResume(bookmark, "বুকমার্ক থেকে পড়ুন"));
       const del = document.createElement("button");
       del.type = "button";
       del.className = "others-remove-bookmark";
@@ -454,6 +465,18 @@
 
   drawPanel();
 
+  // Browser-restored scrolling on refresh must never erase the last real
+  // reading position. Track new reading after actual touch, wheel, or key input.
+  let canTrackReading = !isPageReload;
+  if (isPageReload) {
+    const allowTracking = () => { canTrackReading = true; };
+    window.addEventListener("wheel", allowTracking, {passive: true});
+    window.addEventListener("touchmove", allowTracking, {passive: true});
+    window.addEventListener("keydown", (event) => {
+      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " ", "Home", "End"].includes(event.key))
+        allowTracking();
+    });
+  }
   // Save at most once after a pause in scrolling; never send reading data online.
   let scrollTimer = null;
   let readerScrolled = false;
@@ -466,6 +489,7 @@
     recordedChapter = current.chapterId;
   };
   window.addEventListener("scroll", () => {
+    if (!canTrackReading) return;
     readerScrolled = true;
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(rememberPosition, 850);

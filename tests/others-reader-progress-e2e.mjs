@@ -110,16 +110,31 @@ try {
     assert.equal(await page.locator(".others-reading-resume-link").count(), 2,
       "Continue Reading and Bookmark resume links survive reload");
     const afterReload = await reading(page);
-    assert.ok(afterReload.visibleIds.includes("chapter-4"), "Hash restores correct reading part");
+    assert.equal(afterReload.visibleIds[0], "chapter-1", "Refresh always starts at the beginning");
+    assert.equal(new URL(page.url()).hash, "", "Refresh clears the old chapter anchor");
+    await page.waitForTimeout(1100);
+    assert.ok(await page.evaluate(() => scrollY < 55), "Refresh does not jump to the last reading position");
+    const retained = await page.evaluate(k => JSON.parse(localStorage.getItem(k)), key + "progress");
+    assert.deepEqual(retained, saved, "Refresh does not overwrite previously saved reading position");
+    assert.match(await page.locator(".others-reading-resume-link").first().textContent(), /আগের জায়গা থেকে পড়ুন/,
+      "Resume is a small optional action rather than automatic navigation");
     await page.locator(".others-reading-resume-link").first().click();
     assert.equal(new URL(page.url()).hash, "#" + saved.chapterId,
       "Continue Reading points to saved chapter");
     assert.ok(await page.evaluate(() => scrollY > 0), "Saved reading position restores scroll");
+    await page.reload({waitUntil:"load"});
+    assert.equal(new URL(page.url()).hash, "", "Refresh after resuming does not restore a fragment");
+    assert.equal((await reading(page)).visibleIds[0], "chapter-1",
+      "Refresh after resuming shows the first reading part");
     await page.locator(".others-toc-trigger").click();
     await page.locator(".others-toc-bookmark-remove").click();
     assert.equal(await page.evaluate(k => localStorage.getItem(k), key + "bookmark"), null,
       "Bookmark removal also works in drawer");
 
+    await page.goto(base + route + "?deep-link=1#chapter-4", {waitUntil:"load"});
+    assert.ok((await reading(page)).visibleIds.includes("chapter-4"),
+      "Explicit deep links still open the selected chapter");
+    assert.equal(new URL(page.url()).hash, "#chapter-4");
     await page.goto(base + "/others/islamic-literature/alf-layla/", {waitUntil:"load"});
     assert.equal(await page.locator(".others-book-title p a").count(), 0,
       "Unnecessary inline fiction reference link rendered as plain text");

@@ -166,3 +166,13 @@ html[lang="bn"] body,html[lang="bn"] button,html[lang="bn"] .others-book-title,h
   .others-single-chapter-reader .others-chapter.others-group-continuation{margin-top:34px;padding-top:26px}
   .others-single-chapter-reader .others-chapter-navigation{margin-top:44px}
 }
+
+
+/* A quiet, inline invitation to continue reading; never an intrusive notice. */
+.others-reading-progress{
+  margin:0 0 20px;padding:5px 2px 12px;border:0;
+  border-bottom:1px solid #e1e9df;border-radius:0;background:transparent;
+  box-shadow:none;gap:5px
+}
+.others-reading-resume-link{font-weight:600;text-decoration:none}
+.others-reading-resume-link:hover{text-decoration:underline;text-underline-offset:3px}

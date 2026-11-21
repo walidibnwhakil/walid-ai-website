@@ -477,25 +477,27 @@
         allowTracking();
     });
   }
-  // Save at most once after a pause in scrolling; never send reading data online.
+  // Capture scroll position when scrolling occurs, not while unloading:
+  // on refresh the browser can move the viewport during pagehide.
   let scrollTimer = null;
-  let readerScrolled = false;
+  let pendingPosition = null;
   let recordedChapter = progress?.chapterId || null;
   const rememberPosition = () => {
-    const current = positionInView();
+    const current = pendingPosition;
+    pendingPosition = null;
     if (!current || !store("progress", current)) return;
     progress = current;
-    if (panel && recordedChapter !== current.chapterId) drawPanel();
+    if (recordedChapter !== current.chapterId) drawPanel();
     recordedChapter = current.chapterId;
   };
   window.addEventListener("scroll", () => {
     if (!canTrackReading) return;
-    readerScrolled = true;
+    pendingPosition = positionInView();
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(rememberPosition, 850);
   }, {passive: true});
   window.addEventListener("pagehide", () => {
-    if (readerScrolled) {
+    if (pendingPosition) {
       clearTimeout(scrollTimer);
       rememberPosition();
     }

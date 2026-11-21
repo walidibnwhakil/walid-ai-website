@@ -19,7 +19,7 @@ h1{font-size:clamp(30px,4vw,44px);font-weight:500;margin:8px 0}.muted{color:#667
 /* Let both images retain their natural proportions; never crop inside a fixed box. */
 .preview{display:flex;justify-content:center;align-items:center;min-width:0;padding:8px;background:transparent;border:0;overflow:visible}
 .preview img{display:block;width:auto;height:auto;max-width:100%;max-height:min(82vh,1000px);object-fit:contain}.download{display:inline-flex;text-align:center;justify-content:center;min-width:180px;padding:11px 22px;border:0;border-radius:10px;background:#006a4e;color:#fff;text-decoration:none;font-weight:700}.download:hover,.download:focus-visible{background:#004f3a}
-.legal-footer{margin-top:44px}@media(max-width:650px){.compare{grid-template-columns:1fr}.preview{padding:4px}.preview img{max-height:78vh}.result{padding:14px}.download{width:100%}.shell{padding:18px 14px 48px}.top img{width:112px;height:38px}}
+.result-meta{margin:13px 0 0;color:#57685f;font-size:.92rem;line-height:1.5;overflow-wrap:anywhere}.result-note{margin:8px 0 0;color:#485c51;font-size:.92rem}.legal-footer{margin-top:44px}@media(max-width:650px){.compare{grid-template-columns:1fr}.preview{padding:4px}.preview img{max-height:78vh}.result{padding:14px}.download{width:100%}.shell{padding:18px 14px 48px}.top img{width:112px;height:38px}}
 @media(prefers-reduced-motion:reduce){.shell:before{animation:none}}
 </style></head>
 <body><main class="shell"><header class="top"><a href="/"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a><a class="back" id="editMore" href="/image/">Image Tools</a></header>
@@ -55,6 +55,7 @@ async function isEmptyCutout(blob){
     return coverage<0.025||coverage>0.95;
   }finally{image.close()}
 }
+function formatBytes(value){const size=Number(value);if(!Number.isFinite(size)||size<0)return 'unknown';if(size>=1048576)return (size/1048576).toFixed(2)+' MB';if(size>=1024)return Math.round(size/1024)+' KB';return size+' B'}
 function showError(message){const safe=/^(The result is missing or has expired|The edited image is not available|This image did not separate properly)/.test(String(message||''));empty.hidden=false;errorText.textContent=safe?message:'Could not open this result. Please process your image again.';title.textContent='Result unavailable'}
 try {
  const id=new URLSearchParams(location.search).get('id');
@@ -73,6 +74,10 @@ try {
   const card=node('article','result');
   if(job.items.length>1){const head=node('div','result-head');head.append(node('h2','','Image '+(index+1)));card.append(head)}
   const compare=node('div','compare');compare.append(preview(item,'Before',item.beforeBlob),preview(item,'After',item.blob));card.append(compare);
+  const details=['Original: '+formatBytes(item.originalSize),'Result: '+formatBytes(item.blob.size)];
+  if(Number.isInteger(item.width)&&Number.isInteger(item.height))details.push(item.width+' × '+item.height+' px');
+  card.append(node('p','result-meta',details.join(' · ')));
+  if(item.note)card.append(node('p','result-note',item.note));
   const link=node('a','download','Download image');link.href=URL.createObjectURL(item.blob);urls.push(link.href);link.download=item.name||'Walid AI_image.png';card.append(link);holder.append(card);
  }
  if(!holder.children.length)throw Error('The edited image is not available.');

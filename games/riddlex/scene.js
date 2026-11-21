@@ -377,9 +377,14 @@ export function createScene(canvas) {
       parent.style.setProperty("--note-width", (box.w / canvas.width).toFixed(4));
     }
     ctx.save();
-    ctx.translate(box.x + w / 2, box.y + h / 2);
-    ctx.rotate(Math.PI * (1 - u));
-    ctx.scale(1, 0.55 + 0.45 * u);
+    // Settle upright: a short fade, a small rise, and a slight scale.
+    // Never a half-turn, and never a mirror.
+    const rise = (1 - u) * Math.min(22, h * 0.06);
+    ctx.globalAlpha = 0.2 + 0.8 * u;
+    ctx.translate(box.x + w / 2, box.y + h / 2 + rise);
+    ctx.rotate((1 - u) * 0.05);
+    const settle = 0.94 + 0.06 * u;
+    ctx.scale(settle, settle);
     ctx.translate(-w / 2, -h / 2);
     ctx.fillStyle = "rgba(40,20,10,0.22)";
     ctx.beginPath();
@@ -531,20 +536,15 @@ export function createScene(canvas) {
       sg.drawImage(mask, 0, 0);
       reveal.page = { canvas: reveal.scratch, w: ink.width, h: ink.height, penX: 8 + reveal.inkWidth * p };
       if (p >= 1) {
-        reveal.phase = "turn";
+        reveal.phase = "present";
         reveal.t = 0;
         reveal.printed = !!(reveal.photo && reveal.photo.width > 0);
       }
     } else if (reveal.phase === "print") {
-      if (reveal.t > 0.75) {
-        reveal.phase = "turn";
-        reveal.t = 0;
-        reveal.printed = true;
-      }
-    } else if (reveal.phase === "turn") {
       if (reveal.t > 0.4) {
         reveal.phase = "present";
         reveal.t = 0;
+        reveal.printed = true;
       }
     } else if (reveal.phase === "present") {
       reveal.present = 0.92 + Math.min(0.18, reveal.t * 0.4);
@@ -578,8 +578,6 @@ export function createScene(canvas) {
   function drawReveal() {
     if (!reveal) return;
     if (reveal.phase === "write" || reveal.phase === "print") {
-      drawSheet(0);
-    } else if (reveal.phase === "turn") {
       drawSheet(easeOut(Math.min(1, reveal.t / 0.4)));
     } else if (reveal.phase === "present") {
       drawSheet(1);

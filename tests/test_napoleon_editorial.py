@@ -29,7 +29,7 @@ assert links == expected, "TOC does not match Napoleon chapters"
 assert len({title for _, title, _ in sections}) == 17, "Repeated chapter titles"
 for n, title, body in sections:
     paragraphs = re.findall(r"<p>(.*?)</p>", body, re.S)
-    assert len(paragraphs) >= 5, f"Chapter {n}: too few paragraphs"
+    assert len(paragraphs) >= 11, f"Chapter {n}: incomplete extended history"
     assert all(len(re.sub(r"<[^>]+>", "", p).strip()) >= 170 for p in paragraphs), f"Chapter {n}: stub paragraph"
 assert html.count('class="legal-footer"') == 1, "Shared footer missing or doubled"
 assert '<link rel="canonical" href="https://walid-ai.com/others/history/napoleon/">' in html
@@ -53,3 +53,39 @@ parser.feed(html)
 parser.close()
 assert parser.open_sections == 17 and not parser.issues, parser.issues
 print(f"NAPOLEON_EDITORIAL_PASS chapters={len(sections)} paragraphs={sum(len(re.findall('<p>', s[2])) for s in sections)}")
+
+
+# Deep editorial follow-up: protect the long-form rewrite from accidental truncation.
+chapter_paragraphs = [re.findall(r"<p>(.*?)</p>", body, re.S) for _, _, body in sections]
+assert sum(map(len, chapter_paragraphs)) >= 220, "The long-form Napoleon history was unexpectedly reduced"
+assert len(html) > 95000, "Long-form chapter text was truncated"
+assert len({re.sub(r"<[^>]+>", "", p).strip() for part in chapter_paragraphs for p in part}) == sum(map(len, chapter_paragraphs)), "Repeated full paragraph"
+chapter_text = [re.sub(r"<[^>]+>", "", sec[2]) for sec in sections]
+coverage = {
+    1: ("কার্লো", "লেতিসিয়া", "পাওলি", "ব্রিয়েনে"),
+    2: ("তুলোঁ", "ভঁদেমিয়ের", "বারাস"),
+    3: ("মান্তুয়া", "রিভোলি", "জোসেফিন"),
+    4: ("নেলসন", "আক্রে", "রোজেটা", "আবুকির"),
+    5: ("ব্রুমেয়ারে", "কাম্বাসেরেস", "ফুশে"),
+    6: ("গুয়াদেলুপ", "সাঁ-দোমিঙ্গ", "দেসালিন", "লুইজিয়ানা"),
+    7: ("সিভিল কোড", "পোর্তালিস", "জোসেফিন"),
+    8: ("উলম", "ট্রাফালগার", "অস্টারলিৎস", "সুল্ট"),
+    9: ("জেনা", "আউয়ারশ্টেড্ট", "আইলাউ", "ফ্রিডল্যান্ড"),
+    10: ("বাইলেন", "তালাভেরা", "জোসেফ", "গেরিলা"),
+    11: ("আস্পার্ন", "ভাগ্রাম", "জোসেফিন"),
+    12: ("মারি লুইজ", "তোরেস ভেদ্রাস", "নেপোলিয়ন ফ্রাঁসোয়া"),
+    13: ("স্মোলেনস্ক", "বোরোদিনো", "বেরেজিনা", "সালামাঙ্কা"),
+    14: ("লাইপজিগ", "ভিতোরিয়া", "ফঁতেনব্লো", "মারমোঁ"),
+    15: ("এলবা", "শত দিবস", "নেপোলিয়ন"),
+    16: ("লিনি", "কাত্র-ব্রা", "গ্রুশি", "ওয়াটারলু"),
+    17: ("সেন্ট হেলেনা", "১৮৪৮", "১৮৪০", "আর্সেনিক")
+}
+for ch, phrases in coverage.items():
+    for phrase in phrases:
+        assert phrase in chapter_text[ch - 1], f"Chapter {ch}: missing {phrase}"
+assert "১৮১২ সালে সালামাঙ্কার" not in chapter_text[9], "1812 Salamanca leaked into 1808-09 chapter"
+assert "১৮১৩ সালের জুনে স্পেনের ভিতোরিয়া" in chapter_text[13], "1813 Iberian theatre not sequenced correctly"
+assert "১৮৪৮ সালে" not in "".join(chapter_text[:16]), "1848 outcome leaked before the posthumous legacy"
+assert html.count('href="#chapter-') == 17 and html.count('class="legal-footer"') == 1
+assert "others-sources" not in html and "others-next" not in html
+print("NAPOLEON_LONG_FORM_PASS", {"chapters": len(sections), "paragraphs": sum(map(len, chapter_paragraphs)), "checks": len(coverage)})

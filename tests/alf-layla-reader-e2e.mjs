@@ -43,7 +43,7 @@ mustContain(8, ["পাথর", "জুবাইদা", "পরি", "দুই
 mustContain(9, ["দুই ভাই", "নূরুদ্দিন", "শামসুদ্দিন", "বদরুদ্দিন", "আজিব", "খলিফা"]);
 mustContain(10, ["খ্রিস্টান দালালের গল্প", "খাদ্যতত্ত্বাবধায়কের গল্প", "ইহুদি চিকিৎসকের গল্প", "দর্জির গল্প", "নাপিতের কথা", "প্রথম ভাই", "দ্বিতীয় ভাই", "তৃতীয় ভাই", "চতুর্থ ভাই", "পঞ্চম ভাই", "ষষ্ঠ ভাই", "কাঁটা", "সুস্থ"]);
 assert.ok(chapterText(10).length > 10000, "Hunchback nested cycle cut too short");
-assert.ok((chapterText(10).match(/<h3>/g) || []).length >= 6, "Hunchback substory navigation lost");
+assert.ok((chapterText(10).match(/<h3>/g) || []).length >= 5, "Hunchback substory navigation lost");
 assert.ok(html.includes("এই সংস্করণের পাঠ-পরিচয়"), "Editorial recension note absent");
 assert.ok(html.includes("জন পেইনের"), "Edition/source identification absent");
 

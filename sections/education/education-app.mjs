@@ -1,6 +1,6 @@
 import {createExamExtras,auditQuestion} from "./question-content.mjs";
 import {STREAMS,needsStream,isAllowedSubject,createWorkedPractice,createWorkedLessons} from "./extended-practice.mjs";
-import {makeQuestion,makeLesson} from "./chapter-utils.mjs";
+import {makeQuestion,makeLesson,makeChapterOverviews} from "./chapter-utils.mjs";
 import {SCHOOL_ROWS} from "./grade-chapters.mjs";
 import {BCS_ROWS} from "./bcs-chapters.mjs";
 import {ADMISSION_ROWS} from "./admission-chapters.mjs";
@@ -291,8 +291,9 @@ function notePool(level,stream){
        (stream==="science"&&n.subject==="বিজ্ঞান")||
        isAllowedSubject(level,stream,n.subject))
       :isAllowedSubject(level,stream,n.subject)):true));
-  const generated=chapterRowsFor(level,stream).map((row,i)=>makeLesson(row,i))
-    .concat(createWorkedLessons(level,stream));
+  const rows=chapterRowsFor(level,stream);
+  const generated=makeChapterOverviews(rows).concat(
+    rows.map((row,i)=>makeLesson(row,i)),createWorkedLessons(level,stream));
   return fixed.concat(generated).filter(isValidNote);
 }
 let currentNotes=[];

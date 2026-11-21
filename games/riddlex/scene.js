@@ -315,26 +315,29 @@ export function createScene(canvas) {
       const y = Math.min(held.y, limit - h);
       return { u, photo, photoH, nameH, w, h, x: (canvas.width - w) / 2, y: Math.max(8, y) };
     }
-    // A photo card sits on the empty desk to the right of the detective, clear of
-    // his face and hands, the cat and the lamp. A name-only card stays centred.
-    const cssH = canvas.getBoundingClientRect().height || canvas.height;
-    const dpr = canvas.height / Math.max(1, cssH);
+    // A photo card is a tall portrait on the right, over the shelves. A name-only
+    // card stays centred under the chin. Phone layout is unchanged above.
+    const rect = canvas.getBoundingClientRect();
+    const cssW = rect.width || canvas.width;
+    const cssH = rect.height || canvas.height;
+    const dpr = canvas.width / Math.max(1, cssW);
     let w;
     let photoH = 0;
     let nameH;
     let x;
     let y;
+    let pad = 8;
+    let namePx = 0;
     if (photo) {
-      const right = ix(0.68);
-      const left = ix(0.505);
-      w = Math.max(210 * dpr, right - left);
-      x = right - w;
-      if (x < left) x = left;
-      nameH = 40 * dpr;
-      const top = iy(0.450);
-      const room = Math.min(iy(0.668), canvas.height * 0.668) - top - nameH;
-      photoH = Math.max(100 * dpr, Math.min(w * 0.64, room));
-      y = top;
+      const s = Math.min(cssW / 1280, cssH / 760);
+      pad = 10 * s * dpr;
+      const photoW = 280 * s * dpr;
+      photoH = 373 * s * dpr + pad;
+      nameH = 48 * s * dpr;
+      namePx = 30 * s * dpr;
+      w = photoW + pad * 2;
+      x = (cssW - 50 * s) * dpr - w;
+      y = 70 * s * dpr;
     } else {
       w = Math.min(view.w * 0.32, canvas.width * 0.46);
       nameH = Math.min(view.h * 0.11, 72 * dpr);
@@ -342,7 +345,7 @@ export function createScene(canvas) {
       y = iy(0.50) - nameH;
     }
     const h = Math.max(16, photoH + nameH);
-    return { u, photo, photoH, nameH, w, h, x, y };
+    return { u, photo, photoH, nameH, w, h, x, y, pad, namePx };
   }
 
   function drawSheet(turn) {
@@ -353,6 +356,12 @@ export function createScene(canvas) {
       parent.style.setProperty("--note-bottom", ((box.y + h) / canvas.height).toFixed(4));
       parent.style.setProperty("--note-left", (box.x / canvas.width).toFixed(4));
       parent.style.setProperty("--note-width", (box.w / canvas.width).toFixed(4));
+      const cssH = canvas.getBoundingClientRect().height || canvas.height;
+      const dpr = canvas.height / Math.max(1, cssH);
+      const s = Math.min((canvas.width / dpr) / 1280, cssH / 760);
+      parent.style.setProperty("--guess-btn", `${Math.round(52 * s)}px`);
+      parent.style.setProperty("--guess-font", `${Math.round(18 * s)}px`);
+      parent.classList.toggle("photo-note", !portraitMode && !!(photo && photoH > 0));
     }
     ctx.save();
     ctx.translate(box.x + w / 2, box.y + h / 2);
@@ -370,7 +379,7 @@ export function createScene(canvas) {
     ctx.roundRect(0, 0, w, h, 10);
     ctx.fill();
     ctx.stroke();
-    const pad = 8;
+    const pad = box.pad || 8;
     if (photo && photoH > 0) {
       ctx.save();
       ctx.beginPath();
@@ -378,31 +387,28 @@ export function createScene(canvas) {
       ctx.clip();
       const frameW = w - pad * 2;
       const frameH = photoH - pad;
-      const aspect = photo.width / Math.max(1, photo.height);
-      const frameAspect = frameW / Math.max(1, frameH);
-      let dw;
-      let dh;
-      let dx;
-      let dy;
-      if (aspect > frameAspect) {
-        dh = frameH;
-        dw = frameH * aspect;
-        dx = pad + (frameW - dw) / 2;
-        dy = pad;
-      } else {
-        dw = frameW;
-        dh = frameW / aspect;
-        dx = pad;
-        dy = pad;
-      }
-      ctx.drawImage(photo, dx, dy, dw, dh);
+      const cover = Math.max(frameW / photo.width, frameH / photo.height);
+      const dw = photo.width * cover;
+      const dh = photo.height * cover;
+      const posY = portraitMode ? 0 : 0.2;
+      ctx.drawImage(
+        photo,
+        pad + (frameW - dw) * 0.5,
+        pad + (frameH - dh) * posY,
+        dw,
+        dh,
+      );
       ctx.restore();
     }
     if (reveal?.page) {
       const bandY = photoH;
       const maxW = w * 0.9;
       const maxH = Math.max(12, nameH * (portraitMode ? 0.8 : 0.92));
-      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 3 : 1.8);
+      let scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 3 : 1.8);
+      if (box.namePx) {
+        const inkFont = Math.max(12, Math.round(reveal.page.h * 0.78));
+        scale = Math.min(box.namePx / inkFont, maxW / Math.max(1, reveal.inkWidth || reveal.page.w));
+      }
       const dw = reveal.page.w * scale;
       const dh = reveal.page.h * scale;
       ctx.drawImage(reveal.page.canvas, (w - dw) / 2, bandY + (nameH - dh) / 2, dw, dh);

@@ -253,6 +253,20 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
     position: static; margin: 0; max-width: 100%; text-align: center; font-size: 11px;
     line-height: 1.2;
   }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) {
+    gap: 8px;
+  }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #guess {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #credit {
+    margin-top: 2px;
+  }
+  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #guess button {
+    min-height: var(--guess-btn, 52px);
+    font-size: var(--guess-font, 18px);
+  }
 }
 @media (max-width: 520px) {
   #learn { grid-template-columns: 1fr; }

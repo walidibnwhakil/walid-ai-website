@@ -79,7 +79,7 @@
       '<g clip-path="url(#'+id+'-clip)">'+
         '<circle cx="50" cy="50" r="47" fill="url(#'+id+'-sky)"/>'+
         sun+moon+
-        '<path d="M3 66c14-7 25 3 40-1 20-5 36-7 54-1v10c-17-4-32 5-51 4C25 76 15 80 3 76Z" fill="'+cloudColor+'" opacity="'+(t.moon?.15:.32)+'"/>'+
+        '<path d="M3 66c14-7 25 3 40-1 20-5 36-7 54-1v10c-17-4-32 5-51 4C25 76 15 80 3 76Z" fill="'+cloudColor+'" opacity="'+(t.moon ? 0.15 : 0.32)+'"/>'+
         '<path d="M3 '+horizon+'q24-4 47 0t47-2v30H3Z" fill="'+t.land+'" opacity=".77"/>'+
         '<path d="M3 '+(horizon+10)+'q24-4 47 0t47-3v24H3Z" fill="#26394B" opacity=".52"/>'+
         '<circle cx="50" cy="50" r="46.5" stroke="#FFFFFF" stroke-width=".9" stroke-opacity=".34"/>'+

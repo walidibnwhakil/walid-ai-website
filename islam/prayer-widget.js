@@ -37,23 +37,53 @@
   const gpsButton=$('prayer-gps');
   const warning=$('prayer-warning');
   const prayerSymbol = card.querySelector('.prayer-spark');
-  // Restrained, scalable vector artwork. Each icon corresponds to the current
-  // solar period, never a decorative cartoon or an unrelated prayer symbol.
-  const iconBase = '<svg viewBox="0 0 48 48" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">';
-  const iconPaths = {
-    isha: '<defs><linearGradient id="prayer-moon-gold" x1="8" y1="4" x2="41" y2="43" gradientUnits="userSpaceOnUse"><stop stop-color="#E1C995"/><stop offset=".56" stop-color="#B38C48"/><stop offset="1" stop-color="#86662E"/></linearGradient></defs><path d="M35.2 38.6A19 19 0 0 1 28.8 3.2 19.6 19.6 0 1 0 44 30.1a19 19 0 0 1-8.8 8.5Z" fill="url(#prayer-moon-gold)" stroke="#927239" stroke-width=".45" stroke-linejoin="round"/>',
-    fajr: '<path d="M7 30h34" stroke="#6A7E91" stroke-width="1.6" stroke-linecap="round"/><path d="M14 30a10 10 0 0 1 20 0" fill="#E2BD7B" stroke="#C99A59" stroke-width="1"/><path d="M24 6v6M10.8 13.7l4.1 4.1M37.2 13.7l-4.1 4.1M5 23h5M38 23h5" stroke="#859AB0" stroke-width="1.7" stroke-linecap="round"/><path d="M9 36h30M15 41h18" stroke="#A0ACB5" stroke-width="1.3" stroke-linecap="round" opacity=".65"/>',
-    sunrise: '<path d="M6 31h36" stroke="#947E5F" stroke-width="1.7" stroke-linecap="round"/><path d="M12 31a12 12 0 0 1 24 0" fill="#E6BD71" stroke="#B78646" stroke-width=".8"/><path d="M24 6v7M10 15l5 5M38 15l-5 5M4 24h6M38 24h6" stroke="#D4A057" stroke-width="1.7" stroke-linecap="round"/>',
-    dhuhr: '<circle cx="24" cy="24" r="10.5" fill="#D8AF62" stroke="#B88F49" stroke-width="1"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7M9.9 9.9l5 5M33.1 33.1l5 5M38.1 9.9l-5 5M14.9 33.1l-5 5" stroke="#BE9854" stroke-width="2" stroke-linecap="round"/>',
-    asr: '<circle cx="28" cy="21" r="10" fill="#D5A35D" stroke="#AC7D42" stroke-width="1"/><path d="M28 5v5M28 32v4M12 21h6M38 21h5M16.5 9.5l4.3 4.3M35.2 28.2l4 4M40 9l-4.2 4.2" stroke="#B68C54" stroke-width="1.8" stroke-linecap="round"/><path d="M8 37h32M13 42h22" stroke="#9B8A73" stroke-width="1.5" stroke-linecap="round"/>',
-    maghrib: '<path d="M6 29h36" stroke="#9B7D65" stroke-width="1.8" stroke-linecap="round"/><path d="M13 29a11 11 0 0 1 22 0" fill="#C88157" stroke="#AD6E49" stroke-width=".9"/><path d="M24 9v6M9.5 17l5.1 5M38.5 17l-5.1 5M4 24h6M38 24h6" stroke="#B67856" stroke-width="1.8" stroke-linecap="round"/><path d="M11 35h26M16 40h16" stroke="#B49B8A" stroke-width="1.3" stroke-linecap="round"/>'
+
+  // Atmospheric sky illustrations: realistic gradient light, soft horizons and
+  // shaded sun/moon. These are display-only and do not rely on image services.
+  const skyThemes={
+    fajr:{top:'#162A49',mid:'#667D96',bottom:'#E8B68D',sunX:49,sunY:74,sunR:19,land:'#41596A'},
+    sunrise:{top:'#507A9A',mid:'#E6A47D',bottom:'#FFD6A5',sunX:50,sunY:74,sunR:20,land:'#5F6C71'},
+    dhuhr:{top:'#287DB1',mid:'#83C2E1',bottom:'#DAEEF4',sunX:50,sunY:36,sunR:18,land:'#6B8B95'},
+    asr:{top:'#547F9C',mid:'#D6B28D',bottom:'#F4D5A8',sunX:68,sunY:54,sunR:18,land:'#677E7A'},
+    maghrib:{top:'#323C68',mid:'#C86E63',bottom:'#F3AD79',sunX:50,sunY:76,sunR:20,land:'#4E536A'},
+    isha:{top:'#0C1830',mid:'#2B3F61',bottom:'#516785',land:'#233850',moon:true}
   };
-  let activeIcon = '';
-  function showPrayerIcon(phase) {
-    if (!prayerSymbol || !Object.hasOwn(iconPaths,phase) || activeIcon===phase) return;
+  let activeIcon='';
+  function showPrayerIcon(phase){
+    const t=skyThemes[phase];
+    if(!prayerSymbol||!t||activeIcon===phase)return;
     activeIcon=phase;
     prayerSymbol.dataset.phase=phase;
-    prayerSymbol.innerHTML=iconBase+iconPaths[phase]+'</svg>';
+    const id='prayer-sky-'+phase;
+    const defs='<defs>'+
+      '<linearGradient id="'+id+'-sky" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop stop-color="'+t.top+'"/><stop offset=".57" stop-color="'+t.mid+'"/><stop offset="1" stop-color="'+t.bottom+'"/></linearGradient>'+
+      '<radialGradient id="'+id+'-sun" cx=".34" cy=".28" r=".77"><stop stop-color="#FFFFFC"/><stop offset=".54" stop-color="#FFF0C2"/><stop offset="1" stop-color="#EFA85F"/></radialGradient>'+
+      '<linearGradient id="'+id+'-moon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFDEF"/><stop offset=".57" stop-color="#E7E1D6"/><stop offset="1" stop-color="#BBC1C8"/></linearGradient>'+
+      '<radialGradient id="'+id+'-glow"><stop stop-color="#FFE7AD" stop-opacity=".3"/><stop offset="1" stop-color="#FFE7AD" stop-opacity="0"/></radialGradient>'+
+      '<clipPath id="'+id+'-clip"><circle cx="50" cy="50" r="47"/></clipPath>'+
+      '</defs>';
+    const sun=t.moon?'':(
+      '<circle cx="'+t.sunX+'" cy="'+t.sunY+'" r="'+(t.sunR*2.2)+'" fill="url(#'+id+'-glow)"/>'+
+      '<circle cx="'+t.sunX+'" cy="'+t.sunY+'" r="'+t.sunR+'" fill="url(#'+id+'-sun)"/>'
+    );
+    const moon=t.moon?(
+      '<path d="M65 20a17.5 17.5 0 1 0 11 29A17 17 0 0 1 65 20Z" fill="url(#'+id+'-moon)"/>'+
+      '<circle cx="26" cy="25" r="1.1" fill="#DDE7F3" opacity=".8"/>'+
+      '<circle cx="38" cy="38" r=".75" fill="#DDE7F3" opacity=".65"/>'+
+      '<circle cx="80" cy="23" r=".8" fill="#DDE7F3" opacity=".8"/>'
+    ):'';
+    const horizon=t.moon?84:phase==='dhuhr'?90:phase==='asr'?85:75;
+    const cloudColor=t.moon?'#A2B0C7':'#FFF0DE';
+    prayerSymbol.innerHTML='<svg viewBox="0 0 100 100" width="72" height="72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+defs+
+      '<g clip-path="url(#'+id+'-clip)">'+
+        '<circle cx="50" cy="50" r="47" fill="url(#'+id+'-sky)"/>'+
+        sun+moon+
+        '<path d="M3 66c14-7 25 3 40-1 20-5 36-7 54-1v10c-17-4-32 5-51 4C25 76 15 80 3 76Z" fill="'+cloudColor+'" opacity="'+(t.moon?.15:.32)+'"/>'+
+        '<path d="M3 '+horizon+'q24-4 47 0t47-2v30H3Z" fill="'+t.land+'" opacity=".77"/>'+
+        '<path d="M3 '+(horizon+10)+'q24-4 47 0t47-3v24H3Z" fill="#26394B" opacity=".52"/>'+
+        '<circle cx="50" cy="50" r="46.5" stroke="#FFFFFF" stroke-width=".9" stroke-opacity=".34"/>'+
+      '</g></svg>';
   }
   function showError(message) {
     $('prayer-current').textContent='সময়সূচি পাওয়া যাচ্ছে না';
@@ -119,7 +149,7 @@
     let title,caption,end,phase;
     if(now<t.Fajr){phase='isha';title='এশা';caption='ফজর শুরু হতে বাকি';end=t.Fajr;}
     else if(now<t.Sunrise){phase='fajr';title='ফজর';caption='সূর্যোদয় হতে বাকি';end=t.Sunrise;}
-    else if(now<t.Dhuhr){phase='sunrise';title='এখন ফরজ নামাজের ওয়াক্ত নয়';caption='যোহর শুরু হতে বাকি';end=t.Dhuhr;}
+    else if(now<t.Dhuhr){phase='sunrise';title='এখন কোনো ফরজ নামাজের ওয়াক্ত নয়';caption='যোহর শুরু হতে বাকি';end=t.Dhuhr;}
     else if(now<t.Asr){phase='dhuhr';title='যোহর';caption='আসর শুরু হতে বাকি';end=t.Asr;}
     else if(now<t.Maghrib){phase='asr';title='আসর';caption='মাগরিব শুরু হতে বাকি';end=t.Maghrib;}
     else if(now<t.Isha){phase='maghrib';title='মাগরিব';caption='এশা শুরু হতে বাকি';end=t.Isha;}

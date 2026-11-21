@@ -48,12 +48,18 @@ test("BCS-specific practice covers geography, mental reasoning, international an
     assert(items.some(q=>q.subject===subject),subject);
 });
 test("study notes cover every level, with exam categories and no old placeholder instructions",()=>{
-  assert(notes.length>=200);
+  assert(notes.length>=227);
   for(const level of [...Array.from({length:12},(_,i)=>String(i+1)),"admission","bcs"]){
     const selected=notes.filter(n=>n.scope===level);
     assert(selected.length>0,"Missing "+level);
     assert(new Set(selected.map(n=>n.subject)).size >= (level==="bcs"?10:level==="admission"?5:4),
       "Missing subject options at "+level);
+  }
+  for(let grade=6;grade<=12;grade++){
+    const subjects=new Set(questions.filter(q=>q.grade===grade).map(q=>q.subject));
+    const available=new Set(notes.filter(n=>n.scope===String(grade)).map(n=>n.subject));
+    for(const subject of subjects)assert(available.has(subject),
+      "Missing lesson subject for grade "+grade+": "+subject);
   }
   for(const item of notes){
     assert(item.title?.trim()&&item.concept?.trim()&&item.example?.trim(),"Uninformative note "+item.id);

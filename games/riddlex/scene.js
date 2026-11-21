@@ -307,16 +307,20 @@ export function createScene(canvas) {
     const photo = reveal?.photo && reveal.photo.width > 0 ? reveal.photo : null;
     if (portraitMode) {
       const held = paperBox();
+      const chrome = phoneChrome();
       const w = photo ? Math.min(canvas.width * 0.62, held.w * 1.35) : held.w;
-      const photoH = photo ? w * 0.72 : 0;
+      let photoH = photo ? w * 0.72 : 0;
       const nameH = photo ? w * 0.28 : held.h;
-      const h = photoH + nameH;
-      const limit = canvas.height - phoneChrome().buttons - 8;
-      const y = Math.min(held.y, limit - h);
+      // Two stacked 52px buttons plus the credit sit under the note.
+      const reserve = Math.round(140 * chrome.dpr);
+      const limit = canvas.height - reserve;
+      let y = Math.min(held.y, limit - (photoH + nameH));
+      const h = Math.max(16, photoH + nameH);
       return { u, photo, photoH, nameH, w, h, x: (canvas.width - w) / 2, y: Math.max(8, y) };
     }
-    // A photo card is a tall portrait on the right, over the shelves. A name-only
-    // card stays centred under the chin. Phone layout is unchanged above.
+    // A photo card shows the whole picture, large, in the space to the right of
+    // the detective's face. It may cover the shelves, cat, lamp and desk.
+    // A name-only card stays centred under the chin.
     const rect = canvas.getBoundingClientRect();
     const cssW = rect.width || canvas.width;
     const cssH = rect.height || canvas.height;
@@ -329,15 +333,30 @@ export function createScene(canvas) {
     let pad = 8;
     let namePx = 0;
     if (photo) {
+      const face = FACE.landscape;
+      const faceRight = ix(face.u + face.w);
       const s = Math.min(cssW / 1280, cssH / 760);
-      pad = 10 * s * dpr;
-      const photoW = 280 * s * dpr;
-      photoH = 373 * s * dpr + pad;
+      pad = 12 * s * dpr;
       nameH = 48 * s * dpr;
       namePx = 30 * s * dpr;
+      const gap = 20 * s * dpr;
+      const margin = 16 * s * dpr;
+      const top = 16 * s * dpr;
+      // Hud offset, two 58px buttons, gaps, and the credit line.
+      const buttonStack = 164 * dpr;
+      const maxW = Math.max(120 * dpr, canvas.width - faceRight - gap - margin);
+      const maxH = Math.max(80 * dpr, canvas.height - top - buttonStack);
+      const aspect = photo.width / Math.max(1, photo.height);
+      let photoW = maxW - pad * 2;
+      let frameH = photoW / aspect;
+      if (pad + frameH + nameH > maxH) {
+        frameH = Math.max(40 * dpr, maxH - pad - nameH);
+        photoW = frameH * aspect;
+      }
+      photoH = frameH + pad;
       w = photoW + pad * 2;
-      x = (cssW - 50 * s) * dpr - w;
-      y = 70 * s * dpr;
+      x = Math.max(faceRight + gap, canvas.width - margin - w);
+      y = top;
     } else {
       w = Math.min(view.w * 0.32, canvas.width * 0.46);
       nameH = Math.min(view.h * 0.11, 72 * dpr);
@@ -356,12 +375,6 @@ export function createScene(canvas) {
       parent.style.setProperty("--note-bottom", ((box.y + h) / canvas.height).toFixed(4));
       parent.style.setProperty("--note-left", (box.x / canvas.width).toFixed(4));
       parent.style.setProperty("--note-width", (box.w / canvas.width).toFixed(4));
-      const cssH = canvas.getBoundingClientRect().height || canvas.height;
-      const dpr = canvas.height / Math.max(1, cssH);
-      const s = Math.min((canvas.width / dpr) / 1280, cssH / 760);
-      parent.style.setProperty("--guess-btn", `${Math.round(52 * s)}px`);
-      parent.style.setProperty("--guess-font", `${Math.round(18 * s)}px`);
-      parent.classList.toggle("photo-note", !portraitMode && !!(photo && photoH > 0));
     }
     ctx.save();
     ctx.translate(box.x + w / 2, box.y + h / 2);
@@ -387,10 +400,13 @@ export function createScene(canvas) {
       ctx.clip();
       const frameW = w - pad * 2;
       const frameH = photoH - pad;
-      const cover = Math.max(frameW / photo.width, frameH / photo.height);
-      const dw = photo.width * cover;
-      const dh = photo.height * cover;
-      const posY = portraitMode ? 0 : 0.2;
+      // Phone keeps the previous top-aligned cover. Desktop shows the whole picture.
+      const fit = portraitMode
+        ? Math.max(frameW / photo.width, frameH / photo.height)
+        : Math.min(frameW / photo.width, frameH / photo.height);
+      const dw = photo.width * fit;
+      const dh = photo.height * fit;
+      const posY = portraitMode ? 0 : 0.5;
       ctx.drawImage(
         photo,
         pad + (frameW - dw) * 0.5,

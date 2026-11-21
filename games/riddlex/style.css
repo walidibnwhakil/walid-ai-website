@@ -226,8 +226,8 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
     display: flex; flex-direction: column; align-items: center; gap: 4px;
   }
   .guess-line { display: none; }
-  #guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
-  #guess button { min-height: 44px; }
+  #guess { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
+  #guess button { min-height: 52px; font-size: 18px; width: 100%; padding: 8px 14px; }
   #hud:has(#guess:not([hidden])) #credit {
     margin: 0; max-width: 92%; text-align: center; font-size: 11px; line-height: 1.25;
   }
@@ -245,27 +245,15 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
     background: transparent;
   }
   #hud:has(#guess:not([hidden])) #guess {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    display: grid; grid-template-columns: 1fr; gap: 8px;
     width: 100%; margin: 0;
   }
-  #hud:has(#guess:not([hidden])) #guess button { min-height: 52px; font-size: 18px; }
+  #hud:has(#guess:not([hidden])) #guess button {
+    min-height: 58px; font-size: 20px; width: 100%; padding: 10px 16px;
+  }
   #hud:has(#guess:not([hidden])) #credit {
     position: static; margin: 0; max-width: 100%; text-align: center; font-size: 11px;
     line-height: 1.2;
-  }
-  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) {
-    gap: 8px;
-  }
-  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #guess {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #credit {
-    margin-top: 2px;
-  }
-  .stage-wrap.photo-note #hud:has(#guess:not([hidden])) #guess button {
-    min-height: var(--guess-btn, 52px);
-    font-size: var(--guess-font, 18px);
   }
 }
 @media (max-width: 520px) {

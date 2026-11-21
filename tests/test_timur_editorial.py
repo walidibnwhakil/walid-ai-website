@@ -36,7 +36,7 @@ class TimurEditorialTests(unittest.TestCase):
 
     def test_editorial_depth_and_no_duplicate_paragraphs(self):
         paragraphs = [paragraph for _, _, items in self.chapters for paragraph in items]
-        self.assertEqual(len(paragraphs), 209)
+        self.assertGreaterEqual(len(paragraphs), 209)  # Permit sourced chapter expansion
         self.assertTrue(all(len(items) >= 8 for _, _, items in self.chapters))
         self.assertTrue(all(len(p) >= 150 for p in paragraphs))
         self.assertEqual(len(paragraphs), len(set(paragraphs)),

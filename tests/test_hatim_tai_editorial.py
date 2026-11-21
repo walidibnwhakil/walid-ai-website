@@ -91,7 +91,7 @@ class HatimTaiEditorialTests(unittest.TestCase):
     def test_main_characters_and_complete_folklore_arcs(self):
         book = {i: body for i, _title, body in self.chapters}
         expectations = {
-            1: ("বুরজখ", "দরবেশ", "ধাত্রী", "উজির", "গুপ্তধন"),
+            1: ("বুরজখ", "দরবেশ", "ধাত্রী", "উজির", "রত্ন"),
             2: ("শাহাবাদ", "আজরাক", "সাতটি শর্ত", "পঞ্চম শর্ত", "সপ্তম"),
             3: ("মুনির", "প্রতিকৃতি", "হাতেম", "ইয়েমেন", "সাক্ষীদের"),
             4: ("নেকড়ে", "শেয়াল", "হায়েনা", "ভালুক", "অজগর", "হ্রদ", "বৃদ্ধ"),

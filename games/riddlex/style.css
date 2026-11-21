@@ -216,10 +216,15 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   .q-badge { flex: 0 0 32px; font-size: 15px; border-radius: 12px 0 0 12px; }
   #status { font-size: 15px; padding: 8px 12px; border-radius: 14px; }
   #categories {
-    top: auto; bottom: 8px; left: 12px; right: 12px; z-index: 6;
+    /* Sit under the speech bubble. chin-y is the bubble's anchor; do not use desk-y. */
+    top: min(calc(var(--chin-y, 0.42) * 100% + 46px), calc(100% - 184px));
+    bottom: auto; left: 12px; right: 12px; z-index: 6;
   }
-  .cat-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .cat-row button, #load-retry { min-height: 52px; font-size: 18px; }
+  .cat-row { display: flex; flex-direction: column; gap: 8px; }
+  .cat-row button, #load-retry {
+    min-height: 52px; height: 52px; width: 100%; font-size: 18px;
+    border-radius: 12px; padding: 8px 14px;
+  }
   #answers {
     position: absolute; left: 12px; right: 12px; bottom: 8px; top: auto; width: auto;
     display: flex; flex-direction: column; gap: 6px;

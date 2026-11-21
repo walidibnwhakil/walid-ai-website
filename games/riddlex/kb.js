@@ -233,7 +233,7 @@ export function categoryShards(manifest, category) {
 }
 
 export async function loadManifest(base = "./kb") {
-  const response = await fetch(`${base}/manifest.json?v=akinator-31`);
+  const response = await fetch(`${base}/manifest.json?v=akinator-32`);
   if (!response.ok) throw new Error("Knowledge manifest failed");
   return response.json();
 }

@@ -27,6 +27,22 @@ for (let i = 0; i < chapters.length; i++) {
     seen.add(paragraph);
   }
 }
+// Prevent a repeat of the editorial regression in the Yazid family chapter.
+const yazidChapter = chapters[23][3];
+const yazidParagraphs = [...yazidChapter.matchAll(/<p>(.*?)<\/p>/g)].map(m => m[1]);
+assert(yazidParagraphs.length >= 9, "Yazid biography lost narrative depth");
+for (const [topic, maximum] of [
+  ["কনস্টান্টিনোপল", 1],
+  ["ফাখিতা", 1],
+  ["উম্মে কুলসুম", 1],
+  ["মুয়াবিয়া দ্বিতীয়", 1]
+]) {
+  const occurrences = yazidParagraphs.filter(paragraph => paragraph.includes(topic)).length;
+  assert(occurrences <= maximum, "Repeated Yazid chapter topic: " + topic);
+}
+assert(yazidChapter.includes("৬৬৯–৬৭০") && yazidChapter.includes("৬৭১–৬৭২"),
+  "Missing distinct Byzantine campaign and pilgrimage chronology");
+
 // Word and paragraph counts are *regression guardrails*, not a declaration that the history is complete.
 let totalWords = 0;
 for (const [, number, , body] of chapters) {

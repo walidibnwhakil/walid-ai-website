@@ -31,7 +31,7 @@ test("phone choices sit under the bubble in compact rows", () => {
   assert.match(css, /width: fit-content/);
   assert.match(css, /gap: 14px/);
   assert.match(app, /copy\.previous/);
-  assert.match(app, /akinator-34/);
+  assert.match(app, /akinator-35/);
 });
 
 test("a saved name ends on a short thank-you in both languages", () => {

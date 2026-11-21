@@ -3,7 +3,7 @@
 // Someone ruled out that way only returns if the player contradicts that fact.
 
 const politicsUrl = new URL(
-  import.meta.url.includes("?") ? "./politics-extra.js?v=akinator-34" : "./politics-extra.js",
+  import.meta.url.includes("?") ? "./politics-extra.js?v=akinator-35" : "./politics-extra.js",
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
@@ -500,6 +500,7 @@ const ROLE_PARENT = {
   forward: "footballer",
   played_barcelona: "footballer",
   ballon_dor: "footballer",
+  all_rounder: "cricketer",
   bollywood: "actor",
   hollywood: "actor",
   tollywood: "actor",
@@ -595,6 +596,15 @@ export function buildTraitLinks(questions) {
     if (question.group === "politics" && id !== "politician") {
       add("politician", id, { entail: !NO_ENTAIL.has(id), mass: true });
     }
+    if ((id === "cricketer" || id === "footballer") && idSet.has("athlete")) {
+      add("athlete", id, { entail: true, mass: true });
+    }
+    if (question.group === "fiction" && id !== "fictional" && idSet.has("fictional")) {
+      add("fictional", id, { entail: true, mass: true });
+    }
+    if (question.group === "animal" && id !== "animal" && idSet.has("animal")) {
+      add("animal", id, { entail: true, mass: false });
+    }
   }
   for (const question of list) {
     const regionMembers = REGIONS[question.id];
@@ -646,17 +656,10 @@ function candidatesSplit(state, id, rows) {
   return total > 0 && yes / total >= 0.15 && no / total >= 0.15;
 }
 
-function politicsBranch(state, rows) {
+function politicsBranch(state) {
   if (said(state, "politician", ["no", "probably_not"])) return false;
   if (said(state, "politician", ["yes", "probably"])) return true;
-  const use = rows || state.alive;
-  if (yesMass(state, "politician", use) > 0.3) return true;
-  if (!said(state, "from_bd", ["yes", "probably"])) return false;
-  if (said(state, "athlete", ["yes", "probably"]) || said(state, "cricketer", ["yes", "probably"]) || said(state, "footballer", ["yes", "probably"])) return false;
-  if (said(state, "athlete", ["no", "probably_not"])) return true;
-  if (said(state, "cricketer", ["no", "probably_not"]) && said(state, "footballer", ["no", "probably_not"])) return true;
-  const sport = Math.max(yesMass(state, "athlete", use), yesMass(state, "cricketer", use), yesMass(state, "footballer", use));
-  return sport < 0.22;
+  return impliedYes(state, "politician", linksFor(state.pool));
 }
 
 function politicsSplit(state, qi, rows) {
@@ -772,12 +775,62 @@ function parentAbsent(state, parentId, rows, cache) {
   return absent;
 }
 
+// A child question is asked only when every listed parent still agrees.
+// strict: the parent must already be yes (or implied). Otherwise a no or
+// probably-not is enough to close the branch; an unasked parent stays open.
+export const QUESTION_REQUIRES = {
+  party_bnp: [{ id: "from_bd", value: "yes" }],
+  party_al: [{ id: "from_bd", value: "yes" }],
+  party_jp: [{ id: "from_bd", value: "yes" }],
+  party_jamaat: [{ id: "from_bd", value: "yes" }],
+  zia_family: [{ id: "from_bd", value: "yes" }],
+  mujib_family: [{ id: "from_bd", value: "yes" }],
+};
+
+const STRICT_PARENT = {
+  politics: "politician",
+};
+
+function answerValue(state, qid) {
+  for (let i = state.answers.length - 1; i >= 0; i--) {
+    if (state.answers[i].qid === qid) return state.answers[i].value;
+  }
+  return null;
+}
+
+export function prerequisitesFor(question) {
+  const list = [];
+  const strictParent = STRICT_PARENT[question.group];
+  if (strictParent && question.id !== strictParent) {
+    list.push({ id: strictParent, value: "yes", strict: true });
+  }
+  for (const req of QUESTION_REQUIRES[question.id] || []) list.push(req);
+  return list;
+}
+
+function requirementFails(state, req, links) {
+  const value = answerValue(state, req.id);
+  const affirmed = value === "yes" || value === "probably" || (value == null && impliedYes(state, req.id, links));
+  if (affirmed) return false;
+  if (value === "no" || value === "probably_not") return true;
+  return !!req.strict;
+}
+
+export function questionContradicts(state, qid) {
+  const qi = state.pool.qIndex.get(qid);
+  if (qi == null) return false;
+  const question = state.pool.questions[qi];
+  const links = linksFor(state.pool);
+  if (prerequisitesFor(question).some((req) => requirementFails(state, req, links))) return true;
+  return ancestorRejected(state, qid, links);
+}
+
 function blockedQuestion(state, question, rows, cache) {
   if (skippedAsDuplicate(state, question.id)) return true;
   const links = linksFor(state.pool);
-  if (impliedYes(state, question.id, links) || ancestorRejected(state, question.id, links)) return true;
+  if (impliedYes(state, question.id, links) || questionContradicts(state, question.id)) return true;
   for (const parent of links.massParents.get(question.id) || []) {
-    if (parent === "politician" && politicsBranch(state, rows)) continue;
+    if (parent === "politician" && politicsBranch(state)) continue;
     if (parentAbsent(state, parent, rows, cache)) return true;
   }
   return false;

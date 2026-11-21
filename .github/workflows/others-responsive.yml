@@ -1,0 +1,25 @@
+name: Others reading library responsive E2E
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/**"
+      - "tests/others-responsive-e2e.mjs"
+      - ".github/workflows/others-responsive.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reading-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Install Chromium browser test dependencies
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Verify Others book and catalog pages at mobile and desktop widths
+        run: node tests/others-responsive-e2e.mjs

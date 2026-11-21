@@ -180,7 +180,8 @@
     const mark = document.createElement("button");
     mark.type = "button";
     mark.className = "others-chapter-bookmark";
-    mark.textContent = "🔖 বুকমার্ক";
+    mark.textContent = "বুকমার্ক রাখুন";
+    mark.setAttribute("aria-pressed", "false");
     mark.setAttribute("aria-label", "অধ্যায় " + bn(index + 1) + "-এ বুকমার্ক রাখুন");
     mark.addEventListener("click", () => {
       const visible = positionInView();
@@ -189,6 +190,17 @@
     navigation.append(chapterLink(chapters[index - 1], true), mark, chapterLink(chapters[index + 1], false));
     chapter.insertAdjacentElement("afterend", navigation);
   });
+
+  const updateBookmarkButtons = () => {
+    reader.querySelectorAll(".others-chapter-bookmark").forEach((button) => {
+      const chapterId = button.closest(".others-chapter-navigation")?.previousElementSibling?.id;
+      const selected = Boolean(bookmark && bookmark.chapterId === chapterId);
+      button.setAttribute("aria-pressed", String(selected));
+      button.classList.toggle("is-bookmarked", selected);
+      button.textContent = selected ? "বুকমার্ক রাখা আছে" : "বুকমার্ক রাখুন";
+    });
+  };
+  updateBookmarkButtons();
 
   // Do not insert a changing panel above the reader after the user starts scrolling.
   const panel = progress || bookmark ? document.createElement("aside") : null;
@@ -220,7 +232,7 @@
     if (bookmark) {
       const line = document.createElement("div");
       line.className = "others-reading-bookmark-row";
-      line.appendChild(createResume(bookmark, "🔖 বুকমার্কে যান"));
+      line.appendChild(createResume(bookmark, "বুকমার্কে যান"));
       const del = document.createElement("button");
       del.type = "button";
       del.className = "others-remove-bookmark";
@@ -243,6 +255,7 @@
   function clearBookmark() {
     if (remove("bookmark")) {
       bookmark = null;
+      updateBookmarkButtons();
       drawDrawer();
       drawPanel();
       notify("এই বইয়ের বুকমার্ক মুছে দেওয়া হয়েছে");
@@ -255,6 +268,7 @@
       {chapterId: chapters[0].id, paragraphIndex: 0, fraction: 0};
     if (store("bookmark", chosen)) {
       bookmark = chosen;
+      updateBookmarkButtons();
       drawDrawer();
       drawPanel();
       notify("বুকমার্ক এই ডিভাইসে সংরক্ষিত হয়েছে");
@@ -269,7 +283,7 @@
     const save = document.createElement("button");
     save.type = "button";
     save.className = "others-toc-bookmark-save";
-    save.textContent = "🔖 বর্তমান জায়গায় বুকমার্ক রাখুন";
+    save.textContent = "বর্তমান জায়গায় বুকমার্ক রাখুন";
     save.addEventListener("click", () => {
       saveBookmark(positionInView());
       document.querySelector(".others-toc-close")?.click();

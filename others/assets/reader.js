@@ -489,11 +489,21 @@
     recordedChapter = current.chapterId;
   };
   window.addEventListener("scroll", () => {
-    if (Date.now() - lastReadingGestureAt > 1800) return;
+    if (Date.now() - lastReadingGestureAt > 700) return;
     pendingPosition = positionInView();
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(rememberPosition, 850);
   }, {passive: true});
+  document.addEventListener("pointerdown", (event) => {
+    if (!event.target.closest?.(".others-toc-trigger, .others-toc-dialog, .others-reading-progress, .others-chapter-navigation")) return;
+    // Preserve the last genuinely read paragraph before a toolbar interaction
+    // causes automatic scrolling to a button.
+    lastReadingGestureAt = 0;
+    if (pendingPosition) {
+      clearTimeout(scrollTimer);
+      rememberPosition();
+    }
+  }, {capture: true});
   window.addEventListener("pagehide", () => {
     if (pendingPosition) {
       clearTimeout(scrollTimer);

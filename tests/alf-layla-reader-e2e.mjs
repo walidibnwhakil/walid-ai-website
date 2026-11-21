@@ -111,7 +111,7 @@ for (const [n, terms] of Object.entries(requirements)) {
 assert.match(html, /<html lang="bn">/);
 assert.match(html, /<meta name="description"/);
 assert.ok(html.includes('rel="canonical" href="https://walid-ai.com/others/islamic-literature/alf-layla/"'));
-for (const asset of ["/walid-ai-approved-logo.png", "/others/assets/books.css?v=20261121-editorial", "/others/assets/reader.js?v=20261121-editorial"]) {
+for (const asset of ["/walid-ai-approved-logo.png", "/others/assets/books.css?v=20261122-symbols", "/others/assets/reader.js?v=20261122-symbols"]) {
   assert.ok(html.includes(asset), "Site asset lost: " + asset);
 }
 assert.ok(html.includes("পূর্ণ এক হাজার এক রাতের অনুবাদ নয়"));

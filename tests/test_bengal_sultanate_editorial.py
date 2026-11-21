@@ -54,7 +54,7 @@ class BengalSultanateEditorialTests(unittest.TestCase):
    self.assertIn(token,PAGE)
   self.assertEqual(PAGE.count('class="legal-footer"'),1)
   self.assertEqual(PAGE.count('class="others-reader"'),1)
-  self.assertIn('/others/assets/books.css?v=20261121-editorial',PAGE)
+  self.assertIn('/others/assets/books.css?v=20261122-symbols',PAGE)
   self.assertNotIn("উৎস ও পরবর্তী পাঠ",PAGE)
   self.assertNotRegex(PAGE,r'class="others-(?:sources|next)"')
   self.assertNotIn("noindex",PAGE.lower())

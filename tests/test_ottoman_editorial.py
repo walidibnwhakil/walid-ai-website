@@ -99,8 +99,8 @@ class OttomanEditorialTests(unittest.TestCase):
 
     def test_brand_links_and_policy_unchanged(self):
         for required in ('href="https://walid-ai.com/others/history/ottoman-empire/"',
-                         'href="/others/assets/books.css?v=20261121-editorial"',
-                         '/others/assets/reader.js?v=20261121-editorial',
+                         'href="/others/assets/books.css?v=20261122-symbols"',
+                         '/others/assets/reader.js?v=20261122-symbols',
                          '/walid-ai-approved-logo.png', 'class="legal-footer"',
                          'href="/about-us/"', 'href="/privacy-policy/"'):
             self.assertIn(required, TEXT)

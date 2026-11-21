@@ -87,6 +87,8 @@ try{
           description:document.querySelector('meta[name="description"]')?.content,
           heading:document.querySelector("h1")?.textContent?.trim(),
           cardCount:cards.length,cardRects:cards.map(visibleRect),
+          iconTitleCount:cards.filter(card=>card.querySelector(".others-card-art title")?.textContent?.trim()).length,
+          inlineReadingLinks:document.querySelectorAll(".others-reader .others-book-title p a, .others-reader .others-chapter p a").length,
           chapterCount:chapters.length,
           chapterIds:chapters.map(node=>node.id),
           tocIds:[...document.querySelectorAll('.others-toc a[href^="#chapter-"]')].map(node=>node.getAttribute("href").slice(1)),
@@ -106,6 +108,8 @@ try{
       assert.ok(layout.description?.length>15,path+" missing SEO description");
       assert.ok(layout.heading?.length>2,path+" missing readable heading");
       assert.equal(layout.cardCount,cardsCount,path+" unexpected card count");
+      if(cardsCount>0) assert.equal(layout.iconTitleCount,cardsCount,path+" cards must explain their historically scoped images");
+      else assert.equal(layout.inlineReadingLinks,0,path+" prose must not display hyperlink text");
       for(const rect of layout.cardRects){
         assert(rect.left>=-2&&rect.right<=width+2,
           path+" card extends beyond viewport at "+width+"px");

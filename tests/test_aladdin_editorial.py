@@ -72,8 +72,8 @@ class AladdinEditorial(unittest.TestCase):
     def test_branding_fonts_seo_footer_ads_and_no_legacy_blocks(self):
         required = (
             '/walid-ai-approved-logo.png',
-            '/others/assets/books.css?v=20261121-editorial',
-            '/others/assets/reader.js?v=20261121-editorial',
+            '/others/assets/books.css?v=20261122-symbols',
+            '/others/assets/reader.js?v=20261122-symbols',
             '<link rel="canonical" href="https://walid-ai.com/others/islamic-literature/aladdin/">',
             '<meta name="description"',
             '<footer class="legal-footer">',

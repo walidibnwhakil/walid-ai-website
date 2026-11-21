@@ -1,10 +1,11 @@
 (() => {
   "use strict";
   const REFRESH_MS = 5 * 60 * 1000;
+  const LIVE_FRESH_MS = 70 * 60 * 1000; // The published feed normally refreshes every two hours.
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const validDate = (value) => { const time = value ? Date.parse(value) : NaN; return Number.isFinite(time) ? time : null; };
-  const timeLabel = (value) => value ? new Date(value).toLocaleString("en-GB",{timeZone:"Asia/Dhaka",dateStyle:"medium",timeStyle:"short"}) : "Time to be announced";
-  const countryCodes = {Germany:"DE",England:"GB",Spain:"ES",Italy:"IT",France:"FR",India:"IN",Pakistan:"PK",Bangladesh:"BD",Nepal:"NP",Australia:"AU",Canada:"CA",Japan:"JP",China:"CN",Namibia:"NA",Rwanda:"RW",Uganda:"UG","United States of America":"US","Sri Lanka":"LK",Ireland:"IE","Papua New Guinea":"PG",Scotland:"GB",Netherlands:"NL",Thailand:"TH",Zimbabwe:"ZW",Afghanistan:"AF","South Africa":"ZA","New Zealand":"NZ","Falkland Islands":"FK","Costa Rica":"CR","West Indies":"JM"};
+  const validDate = (value) => { const text=String(value||""); if(!/(?:Z|[+-]\d{2}:\d{2})$/i.test(text)) return null; const time=Date.parse(text); return Number.isFinite(time)?time:null; };
+  const timeLabel = (value) => validDate(value)!==null ? new Date(value).toLocaleString("en-GB",{timeZone:"Asia/Dhaka",dateStyle:"medium",timeStyle:"short"})+" BDT" : "Time to be announced";
+  const countryCodes = {Germany:"DE",Spain:"ES",Italy:"IT",France:"FR",India:"IN",Pakistan:"PK",Bangladesh:"BD",Nepal:"NP",Australia:"AU",Canada:"CA",Japan:"JP",China:"CN",Namibia:"NA",Rwanda:"RW",Uganda:"UG","United States of America":"US","Sri Lanka":"LK",Ireland:"IE","Papua New Guinea":"PG",Netherlands:"NL",Thailand:"TH",Zimbabwe:"ZW",Afghanistan:"AF","South Africa":"ZA","New Zealand":"NZ","Falkland Islands":"FK","Costa Rica":"CR",};
   // A country's league does not make its clubs national teams.
   function nationalCountry(match,side) {
     const name=String(match[side+"Team"]||"").trim().toLowerCase();
@@ -22,7 +23,8 @@
   }
   function logo(match,side,compact=false) {
     const name=String(match[side+"Team"]||"Team"), country=nationalCountry(match,side);
-    const url=!country?String(match[side+"Logo"]||""):"";
+    const candidate=!country?String(match[side+"Logo"]||""):"";
+    const url=/^https:\/\/[^\s]+$/i.test(candidate)?candidate:"";
     const size=compact?"mini-mark":"team-mark";
     const initials=esc(name.split(/\s+/).map(p=>p[0]||"").slice(0,2).join("").toUpperCase());
     const fallback="<span class='logo-fallback' aria-hidden='true'>"+initials+"</span>";
@@ -32,9 +34,21 @@
   function statusOf(match) {
     const status=String(match.status||"").toLowerCase().replace(/[- ]+/g,"_");
     if(["live","in_progress","innings","in_play","1st_innings","2nd_innings"].includes(status)) return "live";
-    if(["finished","final","completed","result","abandoned"].includes(status)) return "finished";
-    if(status==="postponed"||status==="cancelled"||status==="canceled") return status;
-    return "scheduled";
+    if(["finished","final","completed","result"].includes(status)) return "finished";
+    if(["scheduled","upcoming","not_started","fixture","ns"].includes(status)) return "scheduled";
+    if(["postponed","cancelled","canceled","abandoned","suspended"].includes(status)) return status;
+    return "unavailable"; // Unknown/stale is never implicitly a scheduled match.
+  }
+  function verifiedStatus(match,data,sport) {
+    const status=statusOf(match),start=validDate(match.startTime);
+    if(status==="scheduled"&&start!==null&&start<Date.now()) return "unavailable";
+    if(status!=="live") return status;
+    const updated=validDate(data?.updatedAt);
+    const age=updated===null?Infinity:Date.now()-updated;
+    const maxDuration=sport==="cricket"?5*86400000:6*3600000;
+    if(data?.sports?.[sport]?.coverage!=="available"||age<0||age>LIVE_FRESH_MS||
+       start===null||start>Date.now()||Date.now()-start>maxDuration) return "unavailable";
+    return "live";
   }
   const matchTime=(match)=>validDate(match.finishedAt||match.endTime||match.startTime)||0;
   function dedupe(matches) {
@@ -49,23 +63,28 @@
   }
   function countdown(value) {
     const target=validDate(value); if(target===null) return "Time TBA";
+    if(target<=Date.now()) return "Awaiting match update";
     const seconds=Math.max(0,Math.floor((target-Date.now())/1000)), days=Math.floor(seconds/86400);
     const hours=String(Math.floor(seconds%86400/3600)).padStart(2,"0"), minutes=String(Math.floor(seconds%3600/60)).padStart(2,"0"), secs=String(seconds%60).padStart(2,"0");
     return days?days+"d "+hours+":"+minutes+":"+secs:hours+":"+minutes+":"+secs;
   }
-  function score(match) { return match.homeScore==null||match.awayScore==null ? "VS" : esc(match.homeScore)+" – "+esc(match.awayScore); }
-  function pickFeatured(matches) {
+  function footballScoreValid(match) {
+    return [match.homeScore,match.awayScore].every(value=>
+      value!==null&&value!==""&&Number.isInteger(Number(value))&&Number(value)>=0);
+  }
+  function score(match) { return footballScoreValid(match)?esc(match.homeScore)+" – "+esc(match.awayScore):"VS"; }
+  function pickFeatured(matches,data,sport) {
     const clean=dedupe(matches);
-    const live=clean.filter(m=>statusOf(m)==="live").sort((a,b)=>matchTime(a)-matchTime(b));
+    const live=clean.filter(m=>verifiedStatus(m,data,sport)==="live").sort((a,b)=>matchTime(a)-matchTime(b));
     if(live.length) return live[0];
-    const upcoming=clean.filter(m=>statusOf(m)==="scheduled"&&validDate(m.startTime)!==null&&validDate(m.startTime)>=Date.now()).sort((a,b)=>validDate(a.startTime)-validDate(b.startTime));
+    const upcoming=clean.filter(m=>verifiedStatus(m,data,sport)==="scheduled"&&validDate(m.startTime)!==null&&validDate(m.startTime)>=Date.now()).sort((a,b)=>validDate(a.startTime)-validDate(b.startTime));
     if(upcoming.length) return upcoming[0];
-    return clean.filter(m=>statusOf(m)==="finished").sort((a,b)=>matchTime(b)-matchTime(a))[0]||null;
+    return clean.filter(m=>verifiedStatus(m,data,sport)==="finished"&&(sport!=="football"||footballScoreValid(m))).sort((a,b)=>matchTime(b)-matchTime(a))[0]||null;
   }
   function featuredCard(id,label,icon,data) {
-    const matches=dedupe(data?.sports?.[id]?.matches), match=pickFeatured(matches), target="/sports/"+id+"/";
+    const matches=dedupe(data?.sports?.[id]?.matches), match=pickFeatured(matches,data,id), target="/sports/"+id+"/";
     if(!match) return "<article class='featured-card'><div class='featured-top'><span class='sport-tag'><span class='sport-icon'>"+icon+"</span>"+label+"</span><span class='status-pill'>Feed check</span></div><div class='featured-empty'>No verified "+label.toLowerCase()+" fixture is available right now.</div><div class='featured-footer'><span class='featured-time'>Scores and fixtures update automatically</span><a class='view-matches' href='"+target+"'>View All Matches <span aria-hidden='true'>→</span></a></div></article>";
-    const status=statusOf(match), live=status==="live", upcoming=status==="scheduled"&&validDate(match.startTime)!==null&&validDate(match.startTime)>=Date.now();
+    const status=verifiedStatus(match,data,id), live=status==="live", upcoming=status==="scheduled"&&validDate(match.startTime)!==null&&validDate(match.startTime)>=Date.now();
     const badge=live?"<span class='status-pill live'><i class='status-dot'></i>Live now</span>":"<span class='status-pill'>"+(upcoming?"Next match":"Latest result")+"</span>";
     const center=live||status==="finished"?"<div class='versus'><span class='versus-score'>"+(id==="cricket"?"VS":score(match))+"</span></div>":"<div class='versus'><span class='versus-mark'>VS</span><span class='countdown' data-countdown='"+esc(match.startTime)+"'>"+countdown(match.startTime)+"</span></div>";
     const description=live?"In progress":status==="finished"?"Final score":upcoming?timeLabel(match.startTime):"Schedule to be announced";
@@ -78,46 +97,36 @@
   function renderHome(data) {
     const grid=document.querySelector("#featuredMatches"); if(!grid) return;
     grid.innerHTML=featuredCard("football","Football","⚽",data)+featuredCard("cricket","Cricket","🏏",data);
-    const updated=validDate(data.updatedAt), node=document.querySelector("#feedUpdated");
-    if(node) node.textContent=updated?"Scores and fixtures checked "+timeLabel(data.updatedAt)+" (Bangladesh time)":"Scores and fixtures are temporarily unavailable.";
+    const updated=validDate(data?.updatedAt), node=document.querySelector("#feedUpdated");
+    if(node) node.textContent=data?.fetchFailed?"Refresh failed. Displaying the last verified snapshot where available.":updated?"Last feed check: "+timeLabel(data.updatedAt)+(Date.now()-updated>LIVE_FRESH_MS?" · Live updates may be delayed.":""):"Scores and fixtures are temporarily unavailable.";
   }
   function inningsFor(match,side) {
     const team=String(match[side+"Team"]||"").trim().toLowerCase();
-    return (Array.isArray(match.innings)?match.innings:[]).find(inn=>{
+    return (Array.isArray(match.innings)?match.innings:[]).filter(inn=>{
       const label=String(inn.team||"").trim().toLowerCase();
-      return label===team || label.startsWith(team+" inning") || label.startsWith(team+" innings");
-    })||null;
+      if(label===team) return true;
+      if(!team||!label.startsWith(team+" ")) return false;
+      // Reject combined/ambiguous cricket labels such as "Team A,Team B Inning 1".
+      return /^(?:(?:\d+)(?:st|nd|rd|th)\s+)?innings?(?:\s+\d+)?$/.test(label.slice(team.length+1));
+    });
   }
   function inningsScore(inn) {
-    return inn?.runs==null?null:String(inn.runs)+(inn.wickets==null?"":"/"+inn.wickets);
+    if(inn?.runs==null||!Number.isInteger(Number(inn.runs))||Number(inn.runs)<0) return null;
+    const wickets=inn.wickets;
+    return String(inn.runs)+(wickets==null||!Number.isInteger(Number(wickets))||Number(wickets)<0||Number(wickets)>10?"":"/"+wickets);
   }
   function cricketFigures(match) {
-    const innings=Array.isArray(match.innings)?match.innings:[];
-    const home=inningsFor(match,"home"),away=inningsFor(match,"away");
-    const h=inningsScore(home),a=inningsScore(away);
-    const homeName=String(match.homeTeam||"").trim().toLowerCase();
-    const awayName=String(match.awayTeam||"").trim().toLowerCase();
-    const winner=String(match.winner||"").trim().toLowerCase();
-    const winningSide=winner===homeName?"home":winner===awayName?"away":null;
-    const complete=innings.length===2&&home&&away&&home!==away&&
-      innings.every(i=>!String(i.team||"").includes(","))&&
-      [home,away].every(i=>Number.isInteger(i.runs)&&i.runs>=0&&
-        Number.isInteger(i.wickets)&&i.wickets>=0&&i.wickets<=10&&
-        Number.isFinite(Number(i.overs))&&Number(i.overs)>=0);
-    const runsAgree=complete&&
-      [Number(match.homeScore),Number(match.awayScore)].every(Number.isFinite)&&
-      [home.runs,away.runs].every(n=>[Number(match.homeScore),Number(match.awayScore)].includes(n));
-    const win=winningSide==="home"?home:away,lose=winningSide==="home"?away:home;
-    const winIndex=innings.indexOf(win),loseIndex=innings.indexOf(lose);
-    const reliable=Boolean(complete&&runsAgree&&winningSide&&win.runs>lose.runs);
-    let margin="";
-    if(reliable&&winIndex>loseIndex&&win.wickets<10) margin="won by "+(10-win.wickets)+" wickets";
-    else if(reliable&&winIndex<loseIndex) margin="won by "+(win.runs-lose.runs)+" runs";
-    return {home,away,homeScore:complete?h:null,awayScore:complete?a:null,
-      reliable,margin,winner:winningSide?match[winningSide+"Team"]:""};
+    const homeInnings=inningsFor(match,"home"),awayInnings=inningsFor(match,"away");
+    const home=homeInnings.length===1?homeInnings[0]:null;
+    const away=awayInnings.length===1?awayInnings[0]:null;
+    const winner=String(match.winner||"").trim();
+    const winnerName=[match.homeTeam,match.awayTeam].find(n=>String(n).toLowerCase()===winner.toLowerCase())||"";
+    const providerText=String(match.resultText||"").trim();
+    const resultText=winnerName&&providerText.toLowerCase().startsWith(winnerName.toLowerCase()+" won by ")?providerText:"";
+    return {home,away,homeScore:inningsScore(home),awayScore:inningsScore(away),winner:winnerName,resultText};
   }
-  function matchRow(match,sport,kind) {
-    const status=statusOf(match),cricket=sport==="cricket",scheduled=kind==="schedule";
+  function matchRow(match,sport,kind,data) {
+    const status=verifiedStatus(match,data,sport),cricket=sport==="cricket",scheduled=kind==="schedule";
     const figures=cricket?cricketFigures(match):null;
     const hScore=cricket?figures.homeScore:match.homeScore,aScore=cricket?figures.awayScore:match.awayScore;
     const team=(side,scoreValue,inn)=>{
@@ -129,28 +138,29 @@
     const when=esc(timeLabel(match.finishedAt||match.endTime||match.startTime));
     const winner=String(match.winner||"").trim();
     const validWinner=[match.homeTeam,match.awayTeam].some(n=>String(n).toLowerCase()===winner.toLowerCase());
-    const result=kind==="result"&&cricket&&figures.reliable&&figures.margin?"<div class='scorecard-result'>"+esc(figures.winner+" "+figures.margin)+"</div>":kind==="result"&&!cricket&&validWinner?"<div class='scorecard-result'>"+esc(winner)+" won</div>":"";
+    const result=kind==="result"&&cricket&&figures.winner?"<div class='scorecard-result'>"+esc(figures.resultText||figures.winner+" won")+"</div>":kind==="result"&&!cricket&&validWinner?"<div class='scorecard-result'>"+esc(winner==="Draw"?"Draw":winner+" won")+"</div>":"";
+    const missingCricket=cricket&&kind!=="schedule"&&(figures.homeScore===null||figures.awayScore===null)?"<div class='scorecard-extra'>Full team-attributed innings scores are not available from this feed.</div>":"";
     const extra=cricket&&match.playerOfMatch?"<div class='scorecard-extra'>Player of the Match: "+esc(match.playerOfMatch)+"</div>":"";
     const scorers=!cricket&&Array.isArray(match.goalScorers)&&match.goalScorers.length?"<div class='scorecard-extra'>"+esc(match.goalScorers.join(" · "))+"</div>":"";
     return "<article class='match-row scorecard'><div class='scorecard-top'><span>"+meta+"</span><span class='scorecard-status"+(status==="live"?" is-live":"")+"'>"+(status==="live"?"● LIVE":scheduled?"Upcoming":"Completed")+"</span></div>"+
       "<div class='scorecard-board'>"+team("home",hScore,figures?.home)+"<div class='scorecard-vs'>"+(scheduled?"VS":cricket?"VS":score(match))+"</div>"+team("away",aScore,figures?.away)+"</div>"+
-      result+extra+scorers+"<div class='scorecard-date'>"+when+"</div></article>";
+      result+missingCricket+extra+scorers+"<div class='scorecard-date'>"+when+"</div></article>";
   }
   let scheduleLimit=10;
   function renderDetail(data) {
     const sport=document.body.dataset.sportDetail; if(!sport) return;
     const current=data?.sports?.[sport]||{}, matches=dedupe(current.matches);
-    const live=matches.filter(m=>statusOf(m)==="live").sort((a,b)=>matchTime(a)-matchTime(b));
-    const results=matches.filter(m=>statusOf(m)==="finished"&&(sport!=="cricket"||cricketFigures(m).reliable)).sort((a,b)=>matchTime(b)-matchTime(a)).slice(0,3);
-    const schedule=matches.filter(m=>statusOf(m)==="scheduled"&&(validDate(m.startTime)===null||validDate(m.startTime)>=Date.now())).sort((a,b)=>(validDate(a.startTime)||Number.MAX_SAFE_INTEGER)-(validDate(b.startTime)||Number.MAX_SAFE_INTEGER));
-    const updated=validDate(data.updatedAt), note=current.note||(current.coverage==="available"?"Scores and fixtures are supplied by the verified match feed.":"Match feed is temporarily unavailable.");
-    document.querySelector("#feedStatus").textContent=note+(updated?" Last checked "+timeLabel(data.updatedAt)+" (Bangladesh time).":"");
-    document.querySelector("#liveSection").hidden=!live.length;
-    document.querySelector("#liveMatches").innerHTML=live.length?live.map(m=>matchRow(m,sport,"live")).join(""):"<div class='empty-state'>No live "+(sport==="football"?"football":"cricket")+" match is available in the verified feed right now.</div>";
-    document.querySelector("#recentResults").closest(".match-section").hidden=!results.length;
-    document.querySelector("#recentResults").innerHTML=results.length?results.map(m=>matchRow(m,sport,"result")).join(""):"<div class='empty-state'>No verified completed "+(sport==="football"?"football":"cricket")+" results are available in the current feed.</div>";
+    const live=matches.filter(m=>verifiedStatus(m,data,sport)==="live").sort((a,b)=>matchTime(a)-matchTime(b));
+    const results=matches.filter(m=>verifiedStatus(m,data,sport)==="finished"&&(sport!=="football"||footballScoreValid(m))).sort((a,b)=>matchTime(b)-matchTime(a)).slice(0,3);
+    const schedule=matches.filter(m=>verifiedStatus(m,data,sport)==="scheduled"&&(validDate(m.startTime)===null||validDate(m.startTime)>=Date.now())).sort((a,b)=>(validDate(a.startTime)||Number.MAX_SAFE_INTEGER)-(validDate(b.startTime)||Number.MAX_SAFE_INTEGER));
+    const updated=validDate(data?.updatedAt), note=data?.fetchFailed?"Refresh failed; displaying the last verified snapshot where available.":current.note||(current.coverage==="available"?"Scores and fixtures are supplied by the verified match feed.":"Match feed is temporarily unavailable.");
+    document.querySelector("#feedStatus").textContent=note+(updated?" Last checked "+timeLabel(data.updatedAt)+(Date.now()-updated>LIVE_FRESH_MS?" Live status is paused until the feed refreshes.":"")+".":"");
+    document.querySelector("#liveSection").hidden=false;
+    document.querySelector("#liveMatches").innerHTML=live.length?live.map(m=>matchRow(m,sport,"live",data)).join(""):"<div class='empty-state'>No live "+(sport==="football"?"football":"cricket")+" match is available in the verified feed right now.</div>";
+    document.querySelector("#recentResults").closest(".match-section").hidden=false;
+    document.querySelector("#recentResults").innerHTML=results.length?results.map(m=>matchRow(m,sport,"result",data)).join(""):"<div class='empty-state'>No verified completed "+(sport==="football"?"football":"cricket")+" results are available in the current feed.</div>";
     const shown=schedule.slice(0,scheduleLimit), scheduleEl=document.querySelector("#scheduleMatches");
-    scheduleEl.innerHTML=shown.length?shown.map(m=>matchRow(m,sport,"schedule")).join("")+(schedule.length>scheduleLimit?"<button class='load-more' type='button' id='loadMore'>Show more matches</button>":""):"<div class='empty-state'>No verified upcoming matches are listed right now.</div>";
+    scheduleEl.innerHTML=shown.length?shown.map(m=>matchRow(m,sport,"schedule",data)).join("")+(schedule.length>scheduleLimit?"<button class='load-more' type='button' id='loadMore'>Show more matches</button>":""):"<div class='empty-state'>No verified upcoming matches are listed right now.</div>";
     document.querySelector("#scheduleCount").textContent=schedule.length?schedule.length+" scheduled":"No upcoming fixtures";
     const button=document.querySelector("#loadMore");
     if(button) button.addEventListener("click",()=>{scheduleLimit+=10;renderDetail(data);});
@@ -167,10 +177,13 @@
     }catch(error){
       console.error("Sports data refresh failed",error);
       const updated=document.querySelector("#feedUpdated"),status=document.querySelector("#feedStatus");
-      if(updated&&!cachedData)updated.textContent="Sports information is temporarily unavailable.";
+      const fallback=cachedData?{...cachedData,fetchFailed:true}:{sports:{},fetchFailed:true};
+      renderHome(fallback);renderDetail(fallback);
+      if(updated&&!cachedData)updated.textContent="Sports information is temporarily unavailable. Please try again later.";
       if(status&&!cachedData)status.textContent="Sports information is temporarily unavailable. Please try again later.";
     }finally{inFlight=false;}
   }
   refresh();updateCountdowns();window.setInterval(updateCountdowns,1000);window.setInterval(refresh,REFRESH_MS);
+  window.setInterval(()=>{if(cachedData&&!document.hidden){renderHome(cachedData);renderDetail(cachedData);}},60000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh();});
 })();

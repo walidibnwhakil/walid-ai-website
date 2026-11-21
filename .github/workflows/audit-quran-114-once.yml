@@ -1,45 +1,66 @@
 name: Audit all 114 Quran surah pages
 on:
-  push:
+  pull_request:
+    branches: [main]
     paths:
-      - .github/workflows/audit-quran-114-once.yml
+      - 'islam/quran/**'
+      - 'tests/test_quran_layout.py'
+      - '.github/workflows/audit-quran-114-once.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'islam/quran/**'
+      - 'tests/test_quran_layout.py'
+      - '.github/workflows/audit-quran-114-once.yml'
+  workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify all 114 surah data and reader markup
+      - name: Verify 114 source datasets and statically readable Quran pages
         run: |
           python3 - <<'PY'
-          import json,re
+          import json, re
           from pathlib import Path
-          base=Path('islam/quran')
-          pages=sorted(base.glob('*/index.html'))
-          assert len(pages)==114, f'Expected 114 pages, found {len(pages)}'
-          metadata=json.loads((base/'data/metadata.json').read_text())
-          assert len(metadata)==114
-          total=0
-          for n in range(1,115):
-              data=json.loads((base/'data'/f'surah-{n:03}.json').read_text())
-              verses=data['verses']
-              assert data['surah']==n
-              assert len(verses)==metadata[n-1]['verseCount'],(n,len(verses))
-              for idx,verse in enumerate(verses,1):
-                  assert verse['verse']==idx,(n,idx)
-                  assert isinstance(verse.get('arabic'),str) and verse['arabic'].strip(),(n,idx,'arabic')
-                  assert isinstance(verse.get('translation'),str) and verse['translation'].strip(),(n,idx,'translation')
-              total+=len(verses)
-          assert total==6236,total
-          for page in pages:
-              html=page.read_text()
-              assert 'reader.js' in html and 'quran.css' in html,page
-              assert 'data-surah=' in html or 'document.body.dataset.surah=' in html,page
-          js=(base/'reader.js').read_text()
-          assert 'versesEl.replaceChildren(fragment)' in js
-          assert "card.append(num,arabic,pronunciation,translation,noteButton)" in js
-          css=(base/'quran.css').read_text()
+
+          base = Path('islam/quran')
+          metadata = json.loads((base / 'data/metadata.json').read_text(encoding='utf-8'))
+          # Credits and other utility pages are not surah pages.
+          pages = [base / info['slug'] / 'index.html' for info in metadata]
+          assert len(metadata) == len(pages) == 114
+          assert all(page.is_file() for page in pages), 'A surah page is missing'
+          total = 0
+          for expected_number, info in enumerate(metadata, 1):
+              assert info['number'] == expected_number
+              raw = json.loads((base / 'data' / f'surah-{expected_number:03}.json').read_text(encoding='utf-8'))
+              verses = raw['verses']
+              assert raw['surah'] == expected_number
+              assert len(verses) == info['verseCount']
+              for idx, ayah in enumerate(verses, 1):
+                  assert ayah['verse'] == idx
+                  assert isinstance(ayah.get('arabic'), str) and ayah['arabic'].strip()
+                  assert isinstance(ayah.get('translation'), str) and ayah['translation'].strip()
+
+              html = (base / info['slug'] / 'index.html').read_text(encoding='utf-8')
+              rendered = [int(n) for n in re.findall(r'<article class="ayah" id="ayah-(\d+)"', html)]
+              assert rendered == list(range(1, info['verseCount'] + 1)), info['slug']
+              assert 'class="translation"' in html, info['slug']
+              assert 'class="arabic"' in html, info['slug']
+              assert 'class="banner-meaning"' in html, info['slug']
+              assert 'id="surah-context"' in html, info['slug']
+              assert '/islam/quran/reader.js' in html and '/islam/quran/verses-stable.js' in html
+              assert ('<article class="ayah basmala">' in html) == (expected_number != 9), info['slug']
+              total += len(verses)
+
+          assert total == 6236, total
+          css = (base / 'quran.css').read_text(encoding='utf-8')
           assert '#verses .ayah:not(.basmala)>.arabic' in css
-          print(f'PASS: {len(pages)} pages, 114 JSON datasets, {total} verses with Arabic and Bengali translations, shared reader and visibility CSS')
+          print(f'PASS: {len(pages)} statically readable surahs; {total} verified source ayahs')
           PY
+      - name: Verify Quran layout behaviour against current markup
+        run: python3 -m unittest discover -s tests -p 'test_quran_layout.py' -v

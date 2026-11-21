@@ -115,13 +115,13 @@ class OttomanEditorialTests(unittest.TestCase):
         bayezid = re.sub(r'<[^>]+>', '', SECTIONS[9][2])
         self.assertNotIn("১৪৮২", fatih,
             "Gedik Ahmed's later execution belongs to Bayezid II")
-        self.assertIn("১৪৮২ সালের নভেম্বরে গেদিককে মৃত্যুদণ্ড", bayezid)
+        self.assertIn("১৪৮২ সালের নভেম্বরে এডিরনে গেদিককে মৃত্যুদণ্ড", bayezid)
         for text, events in (
             (fatih, ("১৪৭৩ সালের ওতলুকবেলি", "১৪৭৫ সালে কাফা",
                      "১৪৮০ সালে গেদিক আহমেদ", "১৪৮১ সালে অভিযানের")),
             (bayezid, ("১৪৮১ সালে জেমের বাহিনীর", "১৪৮২ সালের নভেম্বরে",
                        "১৪৮৫–৯১ সালে", "১৪৯২ সালে", "১৪৯৫ সালে নেপলসে",
-                       "১৪৯৯–১৫০৩ সালের", "১৫১১ সালের শাহকুলু",
+                       "১৪৯৯–১৫০৩ সালের", "১৫০৯ সালে ইস্তাম্বুল", "১৫১১ সালের শাহকুলু",
                        "১৫১২ সালের এপ্রিলে")),
         ):
             previous = -1

@@ -157,6 +157,25 @@ class OttomanEditorialTests(unittest.TestCase):
         self.assertIn("জিহাঙ্গীর", prose)
         self.assertIn("কারা আহমেদ পাশা", prose)
 
+    def test_bayezid_sons_remain_in_suleiman_reign_with_source_caution(self):
+        """Bayezid's fifth son's fate and the disputed death date belong to Suleiman I."""
+        chapters = {int(n): re.sub(r'<[^>]+>', '', block)
+                    for n, _, block in SECTIONS}
+        suleiman = chapters[12]
+        self.assertIn("১৫৬২ সালে বায়েজিদ", suleiman)
+        self.assertIn("কাজভিনে থাকা চার পুত্র", suleiman)
+        self.assertIn("বুরসায় থাকা তাঁর অল্পবয়সী পঞ্চম পুত্র", suleiman)
+        self.assertIn("১৫৬১ সালের উল্লেখ", suleiman)
+        self.assertIn("শেরাফেত্তিন তুরানের", suleiman)
+        self.assertNotIn("বুরসায় থাকা তাঁর অল্পবয়সী পঞ্চম পুত্র", chapters[13])
+        source = re.search(
+            r'<script id="ottoman-source-metadata" type="application/ld\+json">(.*?)</script>',
+            TEXT, re.S)
+        self.assertIsNotNone(source)
+        references = json.loads(source.group(1))["citation"]
+        self.assertIn("https://islamansiklopedisi.org.tr/bayezid-sehzade",
+                      [item["url"] for item in references])
+
     def test_other_reigns_do_not_replay_key_scenes(self):
         chapters = {
             int(number): re.sub(r'<[^>]+>', '', block)

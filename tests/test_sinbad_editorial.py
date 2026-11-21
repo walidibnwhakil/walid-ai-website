@@ -110,4 +110,54 @@ assert 'class="others-next"' not in text
 assert "উৎস ও পরবর্তী পাঠ" not in text
 assert "এই অধ্যায়" not in text
 assert text.strip().endswith("</html>")
+# Protect the scene order, not merely the presence of names. Plot anchors follow
+# the seven-voyage tale in public-domain Arabian Nights editions, including
+# Andrew Lang's collection; the Bengali prose is an original retelling.
+paragraphs_by_chapter = {
+    int(number): [re.sub(r"<[^>]+>", "", p).strip()
+                  for p in re.findall(r"<p>(.*?)</p>", body, flags=re.S)]
+    for number, _, body in chapters
+}
+staged_scenes = {
+    2: ((5, "জাহাজ"), (6, "সামুদ্রিক প্রাণী"), (9, "পাত্র"), (11, "উপকূলে")),
+    3: ((2, "অশ্বপালকেরা"), (3, "মিহরজান"), (6, "গাঁটরি"),
+        (8, "অধিনায়ক"), (9, "পণ্যের")),
+    4: ((3, "ঘুমিয়ে"), (5, "ডিম"), (7, "পাগড়ি"), (9, "উঠতে")),
+    5: ((3, "মাংস"), (4, "পাগড়ি"), (5, "পাখি"), (6, "বণিক")),
+    6: ((5, "একচোখো"), (7, "ভেলা"), (8, "শলাকা")),
+    7: ((1, "সাপ"), (4, "জাহাজ"), (7, "দ্বিতীয় যাত্রার"), (8, "হিসাবমতো")),
+    8: ((3, "খাদ্য"), (4, "বনের"), (5, "মরিচ"), (7, "জিন")),
+    9: ((1, "বিবাহ"), (3, "সাত রুটি"), (6, "নবাগতকে"), (7, "ফাঁক")),
+    11: ((3, "আঙুর"), (5, "নারকেল"), (6, "বানরেরা")),
+    12: ((4, "শেষ সঙ্গীর"), (6, "ভেলা"), (7, "গুহার")),
+    13: ((1, "কৃষকেরা"), (4, "রাজা"), (6, "উপহার"), (7, "খলিফার")),
+    14: ((2, "দূতের দায়িত্ব"), (4, "জলদস্যু"), (5, "দাসবাজার"),
+         (6, "ধনুক"), (8, "হাতির")),
+    15: ((3, "গাছ উপড়ে"), (4, "অস্থি"), (5, "শহরের কাছে"),
+         (6, "মালিক"), (7, "মুক্তি")),
+    16: ((3, "অসমতা"), (5, "উপহারের"), (7, "সিঁড়িতে"), (8, "হিন্দবাদ")),
+}
+for chapter, expected_steps in staged_scenes.items():
+    paragraphs = paragraphs_by_chapter[chapter]
+    for index, keyword in expected_steps:
+        assert keyword in paragraphs[index - 1], (
+            f"Chapter {chapter} scene {index} missing or shifted: {keyword}"
+        )
+
+# A narrative can pass word-count tests yet repeat entire episodes in slightly
+# different language. Detect suspicious semantic overlap within each chapter.
+for chapter, parts in paragraphs_by_chapter.items():
+    token_sets = [
+        set(re.findall(r"[\w\u0980-\u09ff]+", p))
+        for p in parts
+    ]
+    for i, a in enumerate(token_sets):
+        for j in range(i + 1, len(token_sets)):
+            b = token_sets[j]
+            overlap = (2 * len(a & b)) / max(1, len(a) + len(b))
+            assert overlap < 0.57, (
+                f"Chapter {chapter} paragraphs {i + 1}/{j + 1} revisit one scene "
+                f"too closely (token overlap {overlap:.2f})"
+            )
+
 print(f"SINBAD_EDITORIAL_PASS chapters={len(chapters)} paragraphs={paras} toc={len(entries)}")

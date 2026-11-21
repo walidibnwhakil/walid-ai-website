@@ -210,6 +210,50 @@ def validate_editorial_metadata(path):
             fail(path, f"SEO description says {stated} stories/chapters; found {len(sections)}")
 
 
+def validate_saladin_timeline():
+    """Saladin's entire narrative must stay chronological, complete, and linked."""
+    path = BASE / "history" / "saladin" / "index.html"
+    content = path.read_text(encoding="utf-8")
+    parts = re.findall(
+        r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>(.*?)</section>',
+        content, re.S
+    )
+    toc = re.search(r'<nav class="others-toc" aria-label="অধ্যায় তালিকা">(.*?)</nav>',
+                    content, re.S)
+    if len(parts) != 27 or not toc:
+        fail(path, "expected 27 chronological chapters and a chapter TOC")
+        return
+    links = re.findall(r'<li><a href="#chapter-(\d+)">(.*?)</a></li>', toc.group(1))
+    if links != [(num, title) for num, title, _ in parts]:
+        fail(path, "Saladin chapter titles and TOC entries differ")
+    if "অধ্যায়সূচি — 27টি অধ্যায়" not in toc.group(1):
+        fail(path, "Saladin TOC chapter count is stale")
+    for n, title, body in parts:
+        paragraphs = [re.sub(r"<[^>]+>", "", p).strip()
+                      for p in re.findall(r"<p>(.*?)</p>", body, re.S)]
+        if len(paragraphs) < 6 or any(len(p) < 120 for p in paragraphs):
+            fail(path, f"Saladin chapter {n} has thin or incomplete narrative")
+    expected = {
+        1: "তাকরিত", 3: "প্রথম মিসর অভিযান", 6: "ফাতিমীয়",
+        8: "নূরুদ্দিনের মৃত্যু", 13: "হাত্তিন", 15: "জেরুজালেম",
+        17: "আক্কার দীর্ঘ অবরোধ", 19: "জাফফা",
+        20: "মৃত্যু", 21: "পুত্রদের দ্বন্দ্ব",
+        22: "আল-আদিল", 23: "আল-কামিল",
+        26: "শাজার আদ-দুর", 27: "সিরিয়ার শেষ আইয়ুবীয়রা",
+    }
+    for number, keyword in expected.items():
+        if keyword not in parts[number - 1][1]:
+            fail(path, f"Saladin chapter {number} is out of historical order")
+    if "উৎস ও পরবর্তী পাঠ" in content or 'class="others-sources"' in content:
+        fail(path, "obsolete sources/next-reading block returned")
+    if content.count('class="legal-footer"') != 1:
+        fail(path, "Saladin must preserve one shared footer")
+    for token in ("/walid-ai-approved-logo.png", "/others/assets/books.css",
+                  "/others/assets/reader.js", 'href="https://walid-ai.com/others/history/saladin/"'):
+        if token not in content:
+            fail(path, f"Saladin branding/canonical element missing: {token}")
+
+
 def validate_index(path):
     content = path.read_text(encoding="utf-8")
     cards = re.findall(r'<a class="others-card" href="[^"]+">(.*?)</a>', content, re.S)
@@ -229,6 +273,7 @@ def main():
     books = sorted(path for category in CATEGORIES for path in (BASE / category).glob("*/index.html"))
     if len(books) != 32:
         errors.append(f"Expected 32 Others books; found {len(books)}")
+    validate_saladin_timeline()
     for book in books:
         validate_book(book)
         if book.as_posix().endswith("/history/joan-of-arc/index.html"):

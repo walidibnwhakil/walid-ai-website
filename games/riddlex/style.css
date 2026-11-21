@@ -118,10 +118,12 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
 .speech.has-badge::after { border-right-color: #1c4f4a; }
 .speech.pop { animation: bubble-in .38s cubic-bezier(.16,.84,.32,1) both; }
 @keyframes bubble-in { from { opacity: 0; transform: translateY(8px) scale(.92); } to { opacity: 1; transform: none; } }
+[hidden] { display: none !important; }
 #categories, #hud {
   position: absolute; z-index: 3; left: 3%; right: 3%;
   top: calc(var(--desk-y, 0.62) * 100%);
 }
+#load-retry { width: 100%; margin-top: 8px; }
 .cat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .cat-row button, #guess button, #learn-save, #back, .confirm button {
   min-height: 42px; border-radius: 10px; border: 1px solid #bd9969;
@@ -213,6 +215,11 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   }
   .q-badge { flex: 0 0 32px; font-size: 15px; border-radius: 12px 0 0 12px; }
   #status { font-size: 15px; padding: 8px 12px; border-radius: 14px; }
+  #categories {
+    top: auto; bottom: 8px; left: 12px; right: 12px; z-index: 6;
+  }
+  .cat-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cat-row button, #load-retry { min-height: 52px; font-size: 18px; }
   #answers {
     position: absolute; left: 12px; right: 12px; bottom: 8px; top: auto; width: auto;
     display: flex; flex-direction: column; gap: 6px;
@@ -238,7 +245,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #hud:has(#guess:not([hidden])) #credit {
     margin: 0; max-width: 92%; text-align: center; font-size: 11px; line-height: 1.25;
   }
-  #back { bottom: 8px; }
+  #back { top: 8px; bottom: auto; height: auto; }
 }
 @media (min-aspect-ratio: 4/5) {
   #hud:has(#guess:not([hidden])) {

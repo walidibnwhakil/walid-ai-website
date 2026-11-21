@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="Riddlex — The Guessing Detective | Walid AI">
   <meta name="twitter:description" content="Think of a real person, character, animal or object. Riddlex asks one question at a time and tries to guess.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
-  <link rel="stylesheet" href="./style.css?v=akinator-29">
+  <link rel="stylesheet" href="./style.css?v=akinator-31">
   <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
@@ -84,6 +84,7 @@
           <button type="button" data-cat="object">Object</button>
           <button type="button" data-cat="animal">Animal</button>
         </div>
+        <button id="load-retry" type="button" hidden>Try again</button>
       </div>
       <div id="hud">
       <p id="guess-line" class="guess-line"></p>
@@ -115,7 +116,18 @@
     </div>
     </div>
   </div>
-  <script type="module" src="./app.js?v=akinator-30"></script>
+  <script>
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        if (!regs.length) return;
+        regs.forEach(function (reg) { reg.unregister(); });
+        if (window.caches) caches.keys().then(function (keys) {
+          keys.forEach(function (key) { caches.delete(key); });
+        });
+      }).catch(function () {});
+    }
+  </script>
+  <script type="module" src="./app.js?v=akinator-31"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>
 </html>

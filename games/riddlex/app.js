@@ -1,9 +1,9 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-30";
-import { UI, guessFont } from "./i18n.js";
-import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-30";
-import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene, startMenuCat } from "./scene.js?v=akinator-29";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-31";
+import { UI, guessFont } from "./i18n.js?v=akinator-31";
+import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-31";
+import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-31";
+import { createScene, startMenuCat } from "./scene.js?v=akinator-31";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -64,6 +64,8 @@ function applyLanguage() {
   $("learn-photo-text").textContent = copy.photo;
   $("learn-save").textContent = copy.save;
   $("play-label").textContent = copy.play;
+  const retryLoad = $("load-retry");
+  if (retryLoad) retryLoad.textContent = copy.tryLoad;
 }
 
 function showMenu() {
@@ -79,12 +81,37 @@ function gameInProgress() {
   return mode === "ask" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
 }
 
+const LOAD_MS = 15000;
+const BUILD = "akinator-31";
+
+function withTimeout(promise, ms) {
+  let timer;
+  const pending = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error("timeout")), ms);
+  });
+  return Promise.race([promise, pending]).finally(() => clearTimeout(timer));
+}
+
+function hideLoadRetry() {
+  const button = $("load-retry");
+  if (button) button.hidden = true;
+}
+
+function showLoadRetry() {
+  mode = "pick";
+  hideLoadRetry();
+  showOnly("pick");
+  const button = $("load-retry");
+  if (button) button.hidden = false;
+  setStatus(text().failedLoad);
+}
+
 async function boot() {
   applyLanguage();
   startMenuCat($("menu-cat"));
   loading = Promise.all([
     loadManifest("./kb"),
-    fetch("./kb/index.json").then((response) => {
+    fetch(`./kb/index.json?v=${BUILD}`).then((response) => {
       if (!response.ok) throw new Error("Knowledge index failed");
       return response.json();
     }),
@@ -143,13 +170,15 @@ async function openPlay() {
   category = null;
   state = null;
   setGameInProgress(true);
-  scene.setMood("curious");
-  await scene.start();
+  hideLoadRetry();
+  showOnly("pick");
   setStatus(text().pick);
   $("progress").textContent = "";
   $("confirm").hidden = true;
-  showOnly("pick");
-  try { await loading; } catch { setStatus(text().failedSave); }
+  scene.setMood("curious");
+  try { await scene.start(); } catch { /* the picture can arrive late; the choices stay up */ }
+  try { await withTimeout(loading, LOAD_MS); }
+  catch { showLoadRetry(); }
 }
 
 async function loadNamed(entries, token, begin) {
@@ -191,15 +220,25 @@ async function startGame(chosen) {
   loadedNames = [];
   pool = null;
   loadChain = Promise.resolve();
+  hideLoadRetry();
   setStatus(text().loading);
-  try { await loading; } catch { setStatus(text().failedSave); return; }
-  if (token !== loadToken) return;
-  if (chosen === "character" && catalog) {
-    await loadNamed(planShardLoads(catalog, [], []), token, true);
+  try { await withTimeout(loading, LOAD_MS); }
+  catch {
+    if (token === loadToken) showLoadRetry();
     return;
   }
-  const names = categoryShards(manifest, chosen);
-  await loadNamed(names.map((file) => ({ file })), token, true);
+  if (token !== loadToken) return;
+  const job = chosen === "character" && catalog
+    ? loadNamed(planShardLoads(catalog, [], []), token, true)
+    : loadNamed(categoryShards(manifest, chosen).map((file) => ({ file })), token, true);
+  job.catch(() => {});
+  try {
+    await withTimeout(job, LOAD_MS);
+  } catch {
+    if (token !== loadToken) return;
+    loadToken += 1;
+    showLoadRetry();
+  }
 }
 
 async function step() {
@@ -217,6 +256,10 @@ async function step() {
     currentQ = decision.qid;
     mode = "ask";
     const question = pool.questions[pool.qIndex.get(currentQ)];
+    if (!question) {
+      showLoadRetry();
+      return;
+    }
     setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
     $("progress").textContent = text().progress(state.answers.length + 1);
     scene.setMood(state.answers.length ? "thinking" : "curious");
@@ -404,6 +447,12 @@ $("confirm-yes").addEventListener("click", () => {
 });
 $("confirm-no").addEventListener("click", () => { $("confirm").hidden = true; });
 document.querySelectorAll("[data-cat]").forEach((node) => node.addEventListener("click", () => startGame(node.dataset.cat)));
+$("load-retry")?.addEventListener("click", () => {
+  hideLoadRetry();
+  boot();
+  if (category) startGame(category);
+  else openPlay();
+});
 $("to-menu").addEventListener("click", showMenu);
 $("correct").addEventListener("click", onCorrect);
 $("again").addEventListener("click", onPlayAgain);

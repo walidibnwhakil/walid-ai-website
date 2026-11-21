@@ -21,6 +21,14 @@ test("a failed or empty teach shows a message and does not hide the form", () =>
   assert.doesNotMatch(failure, /learnForm\.hidden = true/);
 });
 
+test("phone category buttons sit at the bottom instead of past the desk", () => {
+  const css = readFileSync(new URL("./style.css", import.meta.url), "utf8");
+  assert.match(css, /#categories \{\s*top: auto; bottom: 8px;/);
+  assert.match(html, /id="load-retry"/);
+  assert.match(app, /failedLoad/);
+  assert.match(app, /akinator-31/);
+});
+
 test("a saved name ends on a short thank-you in both languages", () => {
   const i18n = readFileSync(new URL("./i18n.js", import.meta.url), "utf8");
   assert.match(app, /learnForm\.hidden = true/);

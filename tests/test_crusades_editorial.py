@@ -27,11 +27,13 @@ class CrusadesEditorialTests(unittest.TestCase):
         all_paragraphs = []
         for number, title, body in self.chapters:
             paragraphs = [re.sub(r"<[^>]+>", "", p) for p in re.findall(r"<p>(.*?)</p>", body, re.S)]
-            self.assertGreaterEqual(len(paragraphs), 6, "Short chapter " + number)
-            self.assertGreaterEqual(sum(len(p) for p in paragraphs), 1800, "Thin narrative " + title)
+            self.assertGreaterEqual(len(paragraphs), 11, "Short chapter " + number)
+            self.assertGreaterEqual(sum(len(p) for p in paragraphs), 3800, "Thin narrative " + title)
             self.assertTrue(all(len(p.strip()) >= 90 for p in paragraphs), "Fragment " + title)
             all_paragraphs.extend(paragraphs)
+        self.assertGreaterEqual(len(all_paragraphs), 275)
         self.assertEqual(len(all_paragraphs), len(set(all_paragraphs)))
+        self.assertGreaterEqual(len(self.page), 100000)
         self.assertNotIn("এই অধ্যায়", self.page)
 
     def test_major_events_in_order(self):
@@ -55,6 +57,42 @@ class CrusadesEditorialTests(unittest.TestCase):
             narrative = self.chapters[chapter - 1][2]
             for term in terms:
                 self.assertIn(term, narrative, "Missing " + term + " in chapter " + str(chapter))
+
+
+    def test_key_people_and_controversies_in_their_eras(self):
+        important = {
+            1: ("আরবান", "ক্লেরমোঁ"),
+            2: ("আলেক্সিওস", "কিলিজ আরসলান"),
+            3: ("রাইনল্যান্ড", "ইহুদি"),
+            4: ("আদেমার", "কেরবোগা", "বোয়েমুন্দ"),
+            5: ("গডফ্রি", "ইফতিখার", "আল-আফদাল"),
+            6: ("মর্ফিয়া", "মেলিসেন্দে", "বল্ডউইন"),
+            7: ("টেম্পলার", "হসপিটালার"),
+            8: ("জঙ্গি", "নূরুদ্দিন", "জসলিন"),
+            9: ("কনরাড", "এলেনর", "বার্নার্ড"),
+            10: ("শিরকুহ", "সালাহউদ্দিন", "আমালরিক", "চতুর্থ বল্ডউইন"),
+            11: ("সিবিলা", "গাই", "রাইনল্ড", "হাত্তিন"),
+            12: ("বালিয়ান", "মুক্তিপণ"),
+            13: ("রিচার্ড", "ফিলিপ", "ফ্রেডেরিক", "আল-আদিল"),
+            14: ("দান্দোলো", "ইনোসেন্ট", "কনস্টান্টিনোপল", "১২০৪"),
+            15: ("আল-কামিল", "পেলাজিয়ুস", "দামিয়েত্তা"),
+            16: ("ফ্রেডেরিক", "আল-কামিল", "১২২৯"),
+            17: ("খাওয়ারিজমীয়", "১২৪৪", "লা ফরবি"),
+            18: ("লুই", "শাজার", "বাইবার্স", "মানসুরা"),
+            19: ("লুই", "আল-মুস্তানসির", "তিউনিস"),
+            20: ("বায়বার্স", "কালাউন", "খলিল", "১২৯১"),
+            21: ("ইহুদি", "নারী", "ইবন আল-আসির"),
+        }
+        for number, terms in important.items():
+            narrative = self.chapters[number - 1][2]
+            for term in terms:
+                self.assertIn(term, narrative, f"Missing {term} from chapter {number}")
+
+    def test_supporting_campaigns_and_claim_caution(self):
+        self.assertIn("১১০১ সালের ক্রুসেড", self.chapters[5][2])
+        self.assertIn("শিশুদের ক্রুসেড", self.chapters[13][2])
+        self.assertIn("কিংবদন্তি", self.page)
+        self.assertIn("১২৯৩", self.chapters[19][2])
 
     def test_preserved_site_shell(self):
         text = self.page

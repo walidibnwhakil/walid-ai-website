@@ -112,8 +112,8 @@ class HatimTaiEditorialTests(unittest.TestCase):
         for required in (
             '<html lang="bn">',
             '/walid-ai-approved-logo.png',
-            '/others/assets/books.css?v=20261121-solaiman',
-            '/others/assets/reader.js?v=20261120-sidebar',
+            '/others/assets/books.css?v=20261121-editorial',
+            '/others/assets/reader.js?v=20261121-editorial',
             'class="others-toc-trigger"',
             'class="others-toc-dialog"',
             'href="https://walid-ai.com/others/islamic-literature/hatim-tai/"',

@@ -18,8 +18,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OTHERS = ROOT / "others"
 DOMAIN = "https://walid-ai.com"
 CATEGORIES = {"history": 20, "folklore": 5, "islamic-literature": 5}
-RETIRED = {"hasan-ibn-ali", "husayn-ibn-ali", "karbala"}
-NEW_HISTORY = "/others/history/ali-hasan-husayn-karbala/"
+RETIRED = {"hasan-ibn-ali", "husayn-ibn-ali", "ali-hasan-husayn-karbala"}
+NEW_HISTORY = "/others/history/karbala/"
 ERRORS: list[str] = []
 
 
@@ -140,6 +140,22 @@ def main() -> None:
         parser.feed(html)
         cache[index] = parser
 
+    expected_history = [
+        "roman-empire", "alexander", "ashab-al-kahf", "byzantine-empire",
+        "khalid-ibn-walid", "rashidun-caliphate", "karbala", "venice",
+        "seljuk-empire", "crusades", "saladin", "mongol-empire",
+        "mamluk-sultanate", "ottoman-empire", "bengal-sultanate", "timur",
+        "joan-of-arc", "mughal-empire", "british-empire", "napoleon"
+    ]
+    history_html = (OTHERS / "history/index.html").read_text(encoding="utf-8")
+    cards = re.findall(r'<a class="others-card" href="/others/history/([^/]+)/">', history_html)
+    check(cards == expected_history, "history index: books are not in chronology")
+    check("Alexander the Great" in history_html, "history index: recognizable Alexander name missing")
+    check("<strong>কারবালা</strong>" in history_html, "history index: Karbala title is not concise")
+    for index in indexes:
+        content = index.read_text(encoding="utf-8")
+        check('cx="32" cy="32" r="28"' not in content,
+              f"{index.relative_to(ROOT)}: decorative circular icon frame remains")
     for category, expected in CATEGORIES.items():
         category_index = OTHERS / category / "index.html"
         paths = [
@@ -154,7 +170,7 @@ def main() -> None:
         check(len(paths) == expected, f"{category}: expected {expected} book cards")
         check(set(paths) == expected_paths, f"{category}: book cards missing, repeated or retired")
 
-    merged = OTHERS / "history/ali-hasan-husayn-karbala/index.html"
+    merged = OTHERS / "history/karbala/index.html"
     merged_ids = set(chapters_by_book.get(merged, []))
     for retired in sorted(RETIRED):
         old = OTHERS / "history" / retired / "index.html"
@@ -166,23 +182,27 @@ def main() -> None:
               f"{rel}: wrong destination canonical")
         check(DOMAIN + "/others/history/" + retired + "/" not in locs,
               f"{rel}: retired URL still in sitemap")
-        check(f'location.replace("{NEW_HISTORY}"+location.search+hash)' in html,
-              f"{rel}: redirect loses query/hash context")
-        match = re.search(r'var map=(\{.*?\});var key=', html)
-        check(match is not None, f"{rel}: missing hash translation map")
-        if match:
-            mapping = json.loads(match.group(1))
-            keys = [f"chapter-{n}" for n in range(1, len(mapping) + 1)]
-            check(list(mapping) == keys, f"{rel}: missing/out-of-order legacy chapter hashes")
-            for source, target in mapping.items():
-                check(target in merged_ids, f"{rel}: {source} maps to missing {target}")
+        if retired == "ali-hasan-husayn-karbala":
+            check(f'location.replace("{NEW_HISTORY}"+location.search+location.hash)' in html,
+                  f"{rel}: previous canonical URL must redirect without losing query/hash")
+        else:
+            check(f'location.replace("{NEW_HISTORY}"+location.search+hash)' in html,
+                  f"{rel}: redirect loses query/hash context")
+            match = re.search(r'var map=(\{.*?\});var key=', html)
+            check(match is not None, f"{rel}: missing hash translation map")
+            if match:
+                mapping = json.loads(match.group(1))
+                keys = [f"chapter-{n}" for n in range(1, len(mapping) + 1)]
+                check(list(mapping) == keys, f"{rel}: missing/out-of-order legacy chapter hashes")
+                for source, target in mapping.items():
+                    check(target in merged_ids, f"{rel}: {source} maps to missing {target}")
         check(html.count('class="legal-footer"') == 1, f"{rel}: missing footer")
         parser = Links()
         parser.feed(html)
         cache[old] = parser
         pages.append(old)
 
-    evidence = OTHERS / "history/ali-hasan-husayn-karbala/evidence/index.html"
+    evidence = OTHERS / "history/karbala/evidence/index.html"
     parser = Links()
     parser.feed(evidence.read_text(encoding="utf-8"))
     cache[evidence] = parser

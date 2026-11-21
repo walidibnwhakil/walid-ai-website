@@ -60,7 +60,7 @@ try {
       };
     });
     assert(state.documentWidth <= width + 2,"Horizontal overflow at " + width + ": " + JSON.stringify(state));
-    assert.equal(state.title,"তৈমুর লং ও তিমুরীয় সাম্রাজ্য");
+    assert.equal(state.title,"তৈমুর ও তিমুরীয় সাম্রাজ্য");
     assert.ok(state.description?.length >= 65,"Missing SEO description");
     assert.equal(state.canonical,"https://walid-ai.com/others/history/timur/");
     assert.equal(state.logoLoaded,true,"Approved logo must load");

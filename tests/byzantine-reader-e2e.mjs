@@ -157,7 +157,7 @@ try {
       assert.equal(await page.locator(".others-toc-dialog").evaluate(x=>x.open), true);
       const rect = await page.locator(".others-toc-dialog").boundingBox();
       assert.ok(rect.x >= -2 && rect.x + rect.width <= width + 2, "Drawer overflow");
-      await page.locator('a[href="#chapter-18"]').click();
+      await page.locator('.others-toc a[href="#chapter-18"]').click();
       await page.waitForFunction(() => location.hash === "#chapter-18" && !document.querySelector(".others-toc-dialog").open);
       assert.equal(await page.locator("body").evaluate(x=>x.classList.contains("others-toc-open")),false);
       await page.locator(".others-toc-trigger").click();

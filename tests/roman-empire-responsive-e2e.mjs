@@ -52,7 +52,7 @@ try {
       };
     });
     const ids = Array.from({length:25}, (_,i) => "chapter-" + (i+1));
-    assert.equal(state.title, "রোমান সাম্রাজ্যের ইতিহাস");
+    assert.equal(state.title, "রোমান সাম্রাজ্য");
     assert.equal(state.width <= width+2, true, "horizontal overflow at "+width);
     assert.deepEqual(state.ids, ids, "Roman chapters are missing or out of order");
     assert.deepEqual(state.tocIds, ids, "Roman chapter TOC mismatches document order");

@@ -60,6 +60,19 @@
   const bn = (number) => String(number).replace(/\d/g, (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]);
   const cleanPath = location.pathname.replace(/index\.html$/, "").replace(/\/?$/, "/");
   const keyPrefix = "walid-ai:others-reader:v1:" + cleanPath + ":";
+  // Keep previously saved device-only reading progress when shortening
+  // the canonical Karbala URL. Remove the old keys after a successful copy.
+  if (cleanPath === "/others/history/karbala/") {
+    for (const kind of ["progress", "bookmark"]) {
+      try {
+        const oldKey = "walid-ai:others-reader:v1:/others/history/ali-hasan-husayn-karbala/:" + kind;
+        const raw = localStorage.getItem(oldKey);
+        if (!raw) continue;
+        if (!localStorage.getItem(keyPrefix + kind)) localStorage.setItem(keyPrefix + kind, raw);
+        if (localStorage.getItem(keyPrefix + kind)) localStorage.removeItem(oldKey);
+      } catch { /* Storage can be disabled; other reading functions remain available. */ }
+    }
+  }
   const findSaved = (kind) => {
     try {
       const raw = localStorage.getItem(keyPrefix + kind);

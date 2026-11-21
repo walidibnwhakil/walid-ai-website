@@ -119,8 +119,8 @@ class MongolEditorialTests(unittest.TestCase):
         h = self.html
         self.assertIn('href="https://walid-ai.com/others/history/mongol-empire/"', h)
         self.assertIn('src="/walid-ai-approved-logo.png"', h)
-        self.assertIn('/others/assets/books.css?v=20261121-solaiman', h)
-        self.assertIn('/others/assets/reader.js?v=20261120-sidebar', h)
+        self.assertIn('/others/assets/books.css?v=20261121-editorial', h)
+        self.assertIn('/others/assets/reader.js?v=20261121-editorial', h)
         self.assertIn('class="others-toc-dialog"', h)
         self.assertEqual(h.count('class="legal-footer"'), 1)
         self.assertNotIn('class="others-sources"', h)

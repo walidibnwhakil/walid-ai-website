@@ -111,7 +111,7 @@ for (const [n, terms] of Object.entries(requirements)) {
 assert.match(html, /<html lang="bn">/);
 assert.match(html, /<meta name="description"/);
 assert.ok(html.includes('rel="canonical" href="https://walid-ai.com/others/islamic-literature/alf-layla/"'));
-for (const asset of ["/walid-ai-approved-logo.png", "/others/assets/books.css?v=20261121-solaiman", "/others/assets/reader.js?v=20261120-sidebar"]) {
+for (const asset of ["/walid-ai-approved-logo.png", "/others/assets/books.css?v=20261121-editorial", "/others/assets/reader.js?v=20261121-editorial"]) {
   assert.ok(html.includes(asset), "Site asset lost: " + asset);
 }
 assert.ok(html.includes("পূর্ণ এক হাজার এক রাতের অনুবাদ নয়"));
@@ -173,7 +173,7 @@ try {
       assert.equal(await page.locator(".others-toc-dialog").evaluate(d => d.open), true, "TOC open");
       const rect = await page.locator(".others-toc-dialog").boundingBox();
       assert.ok(rect.x >= -2 && rect.x + rect.width <= width + 2, "Drawer overflow " + width);
-      await page.locator('a[href="#chapter-14"]').click();
+      await page.locator('.others-toc a[href="#chapter-14"]').click();
       await page.waitForFunction(() => location.hash === "#chapter-14" && !document.querySelector(".others-toc-dialog").open);
       await page.locator(".others-toc-trigger").click();
       await page.keyboard.press("Escape");

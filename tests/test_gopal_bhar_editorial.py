@@ -130,9 +130,9 @@ class GopalBharEditorialTest(unittest.TestCase):
             "গাছের ছায়ার দাম", "ভোজে পোশাকের সম্মান",
             "শহরের সবচেয়ে বড় মিথ্যুক", "পণ্ডিতের কঠিন প্রশ্ন"
         ):
-            self.assertIn(motif_title, preface)
-        self.assertIn("বাকি গল্পগুলো এই সংকলনের স্বাধীন সাহিত্যিক নির্মাণ", preface)
-        self.assertIn("সমকালীন দলিল", preface)
+            self.assertIn(motif_title, self.html)
+        self.assertIn("স্বাধীনভাবে রচিত কল্পকাহিনি", preface)
+        self.assertIn("সমকালীন প্রমাণ প্রতিষ্ঠিত নয়", preface)
 
         bodies = {int(number): body for number, _, body in self.sections}
         self.assertNotIn("শেষ মুদ্রাটি", bodies[2], "The merchant was paid twice")

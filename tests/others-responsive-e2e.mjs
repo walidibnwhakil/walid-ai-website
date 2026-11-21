@@ -29,7 +29,7 @@ const indexes=[
   ["/others/history/",20],
 ];
 const storyPaths=[
-  "/others/history/ali-hasan-husayn-karbala/",
+  "/others/history/karbala/",
   "/others/history/byzantine-empire/",
   "/others/history/crusades/",
   "/others/history/napoleon/",
@@ -173,19 +173,28 @@ try{
   const legacyRoutes=[
     ["/others/history/hasan-ibn-ali/","chapter-11","chapter-25"],
     ["/others/history/husayn-ibn-ali/","chapter-15","chapter-49"],
-    ["/others/history/karbala/","chapter-16","chapter-49"],
+    ["/others/history/ali-hasan-husayn-karbala/","chapter-16","chapter-16"],
   ];
   for(const width of [375,1280]){
     for(const [oldPath,oldHash,newHash] of legacyRoutes){
       const page=await browser.newPage({viewport:{width,height:840}});
       await page.route("**/*",r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
       await page.goto(origin+oldPath+"?source=legacy#"+oldHash,{waitUntil:"load"});
-      await page.waitForURL(url=>url.pathname==="/others/history/ali-hasan-husayn-karbala/"&&url.hash==="#"+newHash);
+      await page.waitForURL(url=>url.pathname==="/others/history/karbala/"&&url.hash==="#"+newHash);
       assert.equal(new URL(page.url()).search,"?source=legacy",oldPath+" search params lost");
       assert.equal(await page.locator("#"+newHash).count(),1,oldPath+" redirect target is missing");
       legacyChecks++;
       await page.close();
     }
+  }
+  for(const width of [375,1280]){
+    const page=await browser.newPage({viewport:{width,height:840}});
+    await page.route("**/*",r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
+    await page.goto(origin+"/others/history/karbala/?source=legacy#chapter-16",{waitUntil:"load"});
+    assert.equal(new URL(page.url()).hash,"#chapter-16","Karbala deep link must retain the requested chapter");
+    assert.equal(await page.locator("#chapter-16").count(),1,"Karbala chapter remains available");
+    legacyChecks++;
+    await page.close();
   }
   console.log("OTHERS_RESPONSIVE_PASS",JSON.stringify({
     pageWidthChecks:checks,interactiveSidebarChecks:sidebarChecks,legacyRedirectChecks:legacyChecks,

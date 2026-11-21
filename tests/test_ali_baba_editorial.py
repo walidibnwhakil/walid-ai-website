@@ -43,6 +43,11 @@ for chapter, terms in required.items():
     for term in terms:
         assert term in chapter_texts[chapter - 1], f"Chapter {chapter} missing story beat: {term}"
 
+# Protect plot closure and prevent the stale time reference from returning.
+assert "কাসিমের বিধবাকে বিয়ে" in chapter_texts[4], "Chapter 5: missing Galland-derived family transition"
+assert "আগের সেই তেল ব্যবসায়ীর" in chapter_texts[9], "Chapter 10: flashback timeline inconsistent"
+assert "দস্যুনেতার দেহও" in chapter_texts[11], "Chapter 12: captain's burial missing"
+assert "সম্মত হলেন।" in chapter_texts[11], "Chapter 12: Bengali punctuation regressed"
 assert html.count('<footer class="legal-footer">') == 1, "Shared footer changed"
 assert html.count('<a class="others-brand"') == 1, "Approved logo wrapper changed"
 for fragment in [

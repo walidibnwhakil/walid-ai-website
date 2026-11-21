@@ -191,8 +191,8 @@ try{
     const page=await browser.newPage({viewport:{width,height:840}});
     await page.route("**/*",r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
     await page.goto(origin+"/others/history/karbala/?source=legacy#chapter-16",{waitUntil:"load"});
-    await page.waitForFunction(()=>location.hash==="#chapter-49");
-    assert.equal(await page.locator("#chapter-49").count(),1,"Legacy Karbala chapter preserved");
+    assert.equal(new URL(page.url()).hash,"#chapter-16","Karbala deep link must retain the requested chapter");
+    assert.equal(await page.locator("#chapter-16").count(),1,"Karbala chapter remains available");
     legacyChecks++;
     await page.close();
   }

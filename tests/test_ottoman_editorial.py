@@ -172,7 +172,7 @@ class OttomanEditorialTests(unittest.TestCase):
         self.assertNotIn('class="others-sources"', TEXT)
         self.assertNotIn('class="others-next"', TEXT)
         source = re.search(
-            r'<script id="ottoman-source-metadata" type="application/ld\\+json">(.*?)</script>',
+            r'<script id="ottoman-source-metadata" type="application/ld\+json">(.*?)</script>',
             TEXT, re.S
         )
         self.assertIsNotNone(source)

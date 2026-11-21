@@ -201,11 +201,19 @@ async function ocrPage(page,createWorkerHolder,onProgress,index,total) {
   return spans;
 }
 export async function convertPdfToDocx(file,onProgress) {
+  if(!file||typeof file.arrayBuffer!=="function"||!Number.isFinite(file.size)||file.size===0)
+    throw Error("Choose a non-empty PDF file.");
+  if(file.size>20*1024*1024)throw Error("The PDF must be under 20 MB.");
+  const input=new Uint8Array(await file.arrayBuffer());
+  if(!new TextDecoder("latin1").decode(input.subarray(0,Math.min(1024,input.length))).includes("%PDF-"))
+    throw Error("The selected file is not a valid PDF.");
   const pdfjs=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
   pdfjs.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
-  const pdf=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+  let pdf;
+  try{pdf=await pdfjs.getDocument({data:input}).promise;}
+  catch{throw Error("This PDF could not be opened. It may be damaged or password-protected.");}
   if(pdf.numPages>PDF_WORD_MAX_PAGES)throw Error("For browser conversion, split this PDF into groups of at most "+PDF_WORD_MAX_PAGES+" pages.");
-  const pages=[],holder={worker:null};
+  const pages=[],holder={worker:null};let ocrPages=0,recoveredCharacters=0;const unreadablePages=[];
   try{
     for(let n=1;n<=pdf.numPages;n++){
       onProgress?.({status:"Extracting page",page:n,pages:pdf.numPages});
@@ -213,16 +221,28 @@ export async function convertPdfToDocx(file,onProgress) {
       const content=await page.getTextContent();
       let spans=fromTextContent(content,v.height);
       const scan=spans.map(s=>s.text).join("").replace(/\s/g,"").length<8;
-      if(scan)spans=await ocrPage(page,holder,onProgress,n,pdf.numPages);
+      if(scan){
+        ocrPages++;
+        try{spans=await ocrPage(page,holder,onProgress,n,pdf.numPages);}
+        catch{throw Error("Text recognition failed on page "+n+". Check your connection and try again.");}
+        if(!spans.some(span=>span.text?.trim()))unreadablePages.push(n);
+      }
       let images=[];
       try{images=await extractImages(page,pdfjs,v.height);}catch(error){console.warn("Image extraction skipped",n,error);}
       // Full-page scan is a photographic substrate, not an independently editable illustration.
       if(scan)images=images.filter(im=>im.width*im.height<v.width*v.height*.45);
       const blocks=recognizeStructure(spans,images,v.width,v.height);
-      if(!blocks.length)blocks.push({type:"paragraph",text:"[This page has no recoverable text or images]",x:36,y:36,size:12});
+      // Preserve empty pages without inserting invented words into the document.
+      if(!blocks.length)blocks.push({type:"paragraph",text:"",x:36,y:36,size:12});
+      recoveredCharacters+=blocks.filter(block=>block.type==="paragraph").reduce((sum,block)=>sum+block.text.trim().length,0);
+      recoveredCharacters+=blocks.filter(block=>block.type==="table").reduce((sum,block)=>sum+block.rows.flat().join("").trim().length,0);
       pages.push({width:v.width,height:v.height,margin:36,blocks});
     }
   }finally{await holder.worker?.terminate();await pdf.destroy();}
+  if(!recoveredCharacters)throw Error("No readable text was found. Try a clearer scanned PDF; no Word file was created.");
   const JSZip=(await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm")).default;
-  return assembleDocx(pages,file.name.replace(/\.pdf$/i,"")+".docx",JSZip);
+  const result=await assembleDocx(pages,file.name.replace(/\.pdf$/i,"")+".docx",JSZip);
+  if(result.bytes.length<200||result.bytes[0]!==0x50||result.bytes[1]!==0x4b)
+    throw Error("The Word document failed validation. Please try again.");
+  return {...result,stats:{...result.stats,ocrPages,unreadablePages,recoveredCharacters}};
 }

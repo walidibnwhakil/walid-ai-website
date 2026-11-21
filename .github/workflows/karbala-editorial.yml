@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - "others/history/ali-hasan-husayn-karbala/**"
+      - "others/history/karbala/**"
       - "tests/karbala-editorial-e2e.mjs"
       - ".github/workflows/karbala-editorial.yml"
   workflow_dispatch:

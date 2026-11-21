@@ -5,7 +5,7 @@ import {once} from "node:events";
 import {chromium} from "playwright";
 
 const root = new URL("../", import.meta.url);
-const path = "others/history/ali-hasan-husayn-karbala/index.html";
+const path = "others/history/karbala/index.html";
 const html = await readFile(new URL(path, root), "utf8");
 const chapters = [...html.matchAll(/<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)<\/h2>([\s\S]*?)<\/section>/g)];
 const toc = [...html.matchAll(/<li><a href="#chapter-(\d+)">(.*?)<\/a><\/li>/g)];
@@ -50,12 +50,12 @@ for (const [, number, , body] of chapters) {
   const count = text.trim().split(/\s+/).length;
   assert(count >= 330, "Chapter " + number + " has become a short synopsis (" + count + " words)");
   totalWords += count;
-  assert(body.includes('href="/others/history/ali-hasan-husayn-karbala/evidence/#chapter-' + number + '"'),
+  assert(body.includes('href="/others/history/karbala/evidence/#chapter-' + number + '"'),
     "Missing chapter evidence link " + number);
 }
 assert(totalWords >= 24000, "Book unexpectedly lost developed historical detail: " + totalWords);
-const researchPage = await readFile(new URL("others/history/ali-hasan-husayn-karbala/evidence/index.html", root), "utf8");
-assert(researchPage.includes('href="https://walid-ai.com/others/history/ali-hasan-husayn-karbala/evidence/"'), "Evidence page canonical missing");
+const researchPage = await readFile(new URL("others/history/karbala/evidence/index.html", root), "utf8");
+assert(researchPage.includes('href="https://walid-ai.com/others/history/karbala/evidence/"'), "Evidence page canonical missing");
 assert.equal((researchPage.match(/<section class="others-chapter" id="chapter-\d+">/g) || []).length, chapters.length, "Evidence page must cover every chapter");
 for (let chapter = 1; chapter <= chapters.length; chapter++)
   assert(researchPage.includes('id="chapter-' + chapter + '"'), "Missing evidence anchor " + chapter);
@@ -97,8 +97,8 @@ assert.equal(html.split('class="legal-footer"').length - 1, 1);
 assert.equal(html.split('class="others-toc-dialog"').length - 1, 1);
 assert(!/উৎস ও পরবর্তী পাঠ|class="others-(?:sources|next)"/.test(html));
 
-const target = "/others/history/ali-hasan-husayn-karbala/";
-for (const old of ["hasan-ibn-ali", "husayn-ibn-ali", "karbala"]) {
+const target = "/others/history/karbala/";
+for (const old of ["hasan-ibn-ali", "husayn-ibn-ali", "ali-hasan-husayn-karbala"]) {
   const redirect = await readFile(new URL("others/history/" + old + "/index.html", root), "utf8");
   assert(redirect.includes('http-equiv="refresh"'), "Missing fallback redirect: " + old);
   assert(redirect.includes('name="robots" content="noindex,follow"'));
@@ -108,11 +108,11 @@ for (const old of ["hasan-ibn-ali", "husayn-ibn-ali", "karbala"]) {
 }
 const index = await readFile(new URL("others/history/index.html", root), "utf8");
 assert(index.includes('href="' + target + '"'), "New book missing from History index");
-for (const old of ["hasan-ibn-ali", "husayn-ibn-ali", "karbala"])
+for (const old of ["hasan-ibn-ali", "husayn-ibn-ali", "ali-hasan-husayn-karbala"])
   assert(!index.includes('href="/others/history/' + old + '/"'), "Retired card survived: " + old);
 const sitemap = await readFile(new URL("sitemap.xml", root), "utf8");
 assert(sitemap.includes("<loc>https://walid-ai.com" + target + "</loc>"));
-for (const old of ["hasan-ibn-ali", "husayn-ibn-ali", "karbala"])
+for (const old of ["hasan-ibn-ali", "husayn-ibn-ali", "ali-hasan-husayn-karbala"])
   assert(!sitemap.includes("<loc>https://walid-ai.com/others/history/" + old + "/</loc>"));
 
 const mime={".html":"text/html; charset=utf-8",".css":"text/css",".js":"text/javascript",

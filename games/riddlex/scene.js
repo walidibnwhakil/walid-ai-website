@@ -9,7 +9,6 @@ const BASE = {
   landscape: "./images/approved/game-desk.webp",
   portrait: "./images/approved/portrait-neutral.webp",
 };
-const PRINTER = "./images/approved/printer.webp";
 // Feathered face crops, one orientation only. Loaded after the first paint.
 const OVERLAYS = {
   landscape: {
@@ -49,6 +48,19 @@ function rand(min, max) {
   return min + Math.random() * (max - min);
 }
 
+function blinkCover(remaining) {
+  const elapsed = 0.28 - remaining;
+  if (elapsed < 0.04) return Math.max(0, elapsed / 0.04);
+  if (elapsed < 0.24) return 1;
+  return Math.max(0, 1 - (elapsed - 0.24) / 0.04);
+}
+
+function flickCover(remaining) {
+  const elapsed = 0.7 - remaining;
+  const u = Math.min(1, Math.max(0, elapsed / 0.7));
+  return Math.sin(Math.PI * u);
+}
+
 export function createScene(canvas) {
   const ctx = canvas.getContext("2d", { alpha: false });
   const images = {};
@@ -64,7 +76,7 @@ export function createScene(canvas) {
 
   let portraitMode = false;
   const smoke = Array.from({ length: 5 }, () => makePuff(true));
-  const catLife = { blink: 0, nextBlink: rand(1.2, 2.4), flick: 0, nextFlick: rand(1.8, 3.2) };
+  const catLife = { blink: 0, nextBlink: rand(0.6, 1.4), flick: 0, nextFlick: rand(1.2, 2.2) };
   const faces = createExpressions();
   let faceNow = faces.picture();
   let mood = "curious";
@@ -209,9 +221,9 @@ export function createScene(canvas) {
     for (const key of ["worried", "confused", "serious", "sad", "happy"]) {
       drawPlate(plates[key], box, levels[key] || 0);
     }
-    const catShut = !reduce && catLife.blink > 0 ? blinkAlpha(catLife.blink) : 0;
+    const catShut = catLife.blink > 0 ? blinkCover(catLife.blink) : 0;
     drawPlate(plates.cat, CAT_FACE[portraitMode ? "portrait" : "landscape"], catShut);
-    const flick = !reduce && catLife.flick > 0 ? blinkAlpha(catLife.flick) : 0;
+    const flick = catLife.flick > 0 ? flickCover(catLife.flick) : 0;
     drawPlate(plates.tail, CAT_TAIL[portraitMode ? "portrait" : "landscape"], flick);
   }
 
@@ -227,24 +239,23 @@ export function createScene(canvas) {
     portrait: { u: 0.69444, v: 0.36719, w: 0.29167, h: 0.14063 },
   };
   const CAT_TAIL = {
-    landscape: { u: 0.7536, v: 0.3486, w: 0.0957, h: 0.1509 },
+    landscape: { u: 0.8134, v: 0.3719, w: 0.0897, h: 0.1275 },
     portrait: { u: 0.7778, v: 0.3516, w: 0.2083, h: 0.1250 },
   };
 
   function stepCat(dt) {
-    if (reduce) return;
     catLife.nextBlink -= dt;
     if (catLife.nextBlink <= 0) {
-      catLife.blink = 1;
+      catLife.blink = 0.28;
       catLife.nextBlink = rand(3, 5);
     }
-    if (catLife.blink > 0) catLife.blink -= dt * 1.45;
+    if (catLife.blink > 0) catLife.blink = Math.max(0, catLife.blink - dt);
     catLife.nextFlick -= dt;
     if (catLife.nextFlick <= 0) {
-      catLife.flick = 1;
+      catLife.flick = 0.7;
       catLife.nextFlick = rand(4, 6);
     }
-    if (catLife.flick > 0) catLife.flick -= dt * 0.8;
+    if (catLife.flick > 0) catLife.flick = Math.max(0, catLife.flick - dt);
   }
 
   function prepareInk(name, font) {
@@ -277,7 +288,7 @@ export function createScene(canvas) {
     const dpr = canvas.height / Math.max(1, cssH);
     return {
       dpr,
-      buttons: Math.round(258 * dpr),
+      buttons: Math.round(108 * dpr),
       logo: Math.round(canvas.width * 0.145),
     };
   }
@@ -291,15 +302,36 @@ export function createScene(canvas) {
     return { x: canvas.width * 0.08, y: Math.max(8, y), w, h };
   }
 
-  function drawSheet(turn) {
+  function noteMetrics(turn) {
     const u = Math.max(0, Math.min(1, turn));
-    const held = portraitMode ? paperBox() : null;
-    const x = held ? held.x + held.w / 2 : ix(0.50);
-    const y = held ? held.y + held.h / 2 + (1 - u) * held.h * 0.2 : iy(0.58 - 0.20 * u);
-    const w = held ? held.w : view.w * 0.30;
-    const h = held ? held.h : view.h * 0.15;
+    const photo = reveal?.photo && reveal.photo.width > 0 ? reveal.photo : null;
+    if (portraitMode) {
+      const held = paperBox();
+      const w = photo ? Math.min(canvas.width * 0.62, held.w * 1.35) : held.w;
+      const photoH = photo ? w * 0.72 : 0;
+      const nameH = photo ? w * 0.28 : held.h;
+      const h = photoH + nameH;
+      const limit = canvas.height - phoneChrome().buttons - 8;
+      const y = Math.min(held.y, limit - h);
+      return { u, photo, photoH, nameH, w, h, x: (canvas.width - w) / 2, y: Math.max(8, y) };
+    }
+    const w = photo ? view.w * 0.20 : view.w * 0.30;
+    const photoH = photo ? w * 0.78 : 0;
+    const nameH = photo ? view.h * 0.07 : view.h * 0.15;
+    const h = photoH + nameH;
+    const bottom = iy(0.50);
+    return { u, photo, photoH, nameH, w, h, x: ix(0.50) - w / 2, y: bottom - h };
+  }
+
+  function drawSheet(turn) {
+    const box = noteMetrics(turn);
+    const { u, photo, photoH, nameH, w, h } = box;
+    const parent = canvas.parentElement;
+    if (parent && canvas.height) {
+      parent.style.setProperty("--note-bottom", ((box.y + h) / canvas.height).toFixed(4));
+    }
     ctx.save();
-    ctx.translate(x, y);
+    ctx.translate(box.x + w / 2, box.y + h / 2);
     ctx.rotate(Math.PI * (1 - u));
     ctx.scale(1, 0.55 + 0.45 * u);
     ctx.translate(-w / 2, -h / 2);
@@ -311,37 +343,37 @@ export function createScene(canvas) {
     ctx.strokeStyle = "#d5d0c8";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(0, 0, w, h, 8);
+    ctx.roundRect(0, 0, w, h, 10);
     ctx.fill();
     ctx.stroke();
+    const pad = 8;
+    if (photo && photoH > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(pad, pad, w - pad * 2, photoH - pad, 8);
+      ctx.clip();
+      const aspect = photo.width / Math.max(1, photo.height);
+      const frameW = w - pad * 2;
+      const frameH = photoH - pad;
+      let dw = frameW;
+      let dh = dw / aspect;
+      if (dh < frameH) {
+        dh = frameH;
+        dw = dh * aspect;
+      }
+      ctx.drawImage(photo, pad + (frameW - dw) / 2, pad + (frameH - dh) / 2, dw, dh);
+      ctx.restore();
+    }
     if (reveal?.page) {
-      const maxW = w * 0.88;
-      const maxH = h * 0.72;
-      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 4 : 1.6);
+      const bandY = photoH;
+      const maxW = w * 0.9;
+      const maxH = Math.max(12, nameH * 0.8);
+      const scale = Math.min(maxW / reveal.page.w, maxH / reveal.page.h, portraitMode ? 3 : 1.4);
       const dw = reveal.page.w * scale;
       const dh = reveal.page.h * scale;
-      const dx = (w - dw) / 2;
-      const dy = (h - dh) / 2;
-      ctx.drawImage(reveal.page.canvas, dx, dy, dw, dh);
+      ctx.drawImage(reveal.page.canvas, (w - dw) / 2, bandY + (nameH - dh) / 2, dw, dh);
     }
     ctx.restore();
-  }
-
-  function printerGeom() {
-    const printer = images.printer;
-    const ratio = printer ? printer.height / printer.width : 0.58;
-    if (portraitMode) {
-      const pw = canvas.width * 0.52;
-      const ph = pw * ratio;
-      const px = (canvas.width - pw) / 2;
-      const py = canvas.height - ph - canvas.height * 0.13;
-      return { px, py, pw, ph };
-    }
-    const pw = view.w * 0.20;
-    const ph = pw * ratio;
-    const px = ix(0.045);
-    const py = iy(0.69) - ph;
-    return { px, py, pw, ph };
   }
 
   function drawPhoneLogo() {
@@ -386,77 +418,6 @@ export function createScene(canvas) {
     const dw = Math.min(canvas.width * 0.78, phoneChrome().logo * (logoSprite.width / logoSprite.height));
     const dh = dw * (logoSprite.height / logoSprite.width);
     ctx.drawImage(logoSprite, (canvas.width - dw) / 2, phoneChrome().dpr * 2, dw, dh);
-  }
-
-  function drawPrinter() {
-    const printer = images.printer;
-    if (!printer || portraitMode) return;
-    const { px, py, pw, ph } = printerGeom();
-    const cx = px + pw * 0.50;
-    const cy = py + ph * 0.90;
-    const shade = ctx.createRadialGradient(cx, cy, pw * 0.04, cx, cy, pw * 0.62);
-    shade.addColorStop(0, "rgba(28, 14, 6, 0.55)");
-    shade.addColorStop(0.45, "rgba(28, 14, 6, 0.28)");
-    shade.addColorStop(1, "rgba(28, 14, 6, 0)");
-    ctx.save();
-    ctx.fillStyle = shade;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, pw * 0.62, Math.max(8, ph * 0.11), 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.drawImage(printer, px, py, pw, ph);
-    ctx.restore();
-  }
-
-  function drawPrintout(progress, alpha) {
-    if (!reveal?.photo || alpha < 0.02) return;
-    const slide = easeOut(Math.min(1, Math.max(0, progress)));
-    if (portraitMode || !images.printer) {
-      const held = portraitMode ? paperBox() : null;
-      const aspect = reveal.photo.width / Math.max(1, reveal.photo.height);
-      const pad = portraitMode ? 4 : 6;
-      const h = portraitMode ? held.h : view.w * 0.18 * 1.15;
-      const innerH = h - pad * 2;
-      const innerW = portraitMode ? innerH * aspect : (h - pad * 2) * aspect;
-      const w = portraitMode ? innerW + pad * 2 : view.w * 0.18;
-      let x = portraitMode ? held.x + held.w + canvas.width * 0.03 : ix(0.14);
-      if (portraitMode) x = Math.min(x, canvas.width - w - 6);
-      const y = portraitMode ? held.y : iy(0.48);
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = "rgba(32,16,8,0.28)";
-      ctx.beginPath();
-      ctx.ellipse(x + w * 0.5, y + h + 4, w * 0.36, 7, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#f6f1e6";
-      ctx.strokeStyle = "#8a6844";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(x, y, w, h, 8);
-      ctx.fill();
-      ctx.stroke();
-      ctx.drawImage(reveal.photo, x + pad, y + pad, portraitMode ? innerW : w - pad * 2, portraitMode ? innerH : h - pad * 2);
-      ctx.restore();
-      return;
-    }
-    const { px, py, pw, ph } = printerGeom();
-    const slotX = px + pw * 0.26;
-    const slotY = py + ph * 0.62;
-    const photoW = pw * 0.46;
-    const photoH = photoW * 1.22;
-    const out = photoH * (portraitMode ? 0.42 : 0.86) * slide;
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.beginPath();
-    ctx.rect(slotX - 4, slotY - 1, photoW + 14, out + 16);
-    ctx.clip();
-    ctx.translate(slotX, slotY + out);
-    ctx.transform(1, 0, -0.05 * (1 - slide), 1, 0, 0);
-    ctx.fillStyle = "rgba(30,16,8,0.28)";
-    ctx.fillRect(6, -photoH + 7, photoW, photoH);
-    ctx.fillStyle = "#f4efe4";
-    ctx.fillRect(0, -photoH, photoW, photoH);
-    ctx.drawImage(reveal.photo, 5, -photoH + 5, photoW - 10, photoH * 0.7);
-    ctx.restore();
   }
 
   function drawPresent() {
@@ -514,9 +475,9 @@ export function createScene(canvas) {
       sg.drawImage(mask, 0, 0);
       reveal.page = { canvas: reveal.scratch, w: ink.width, h: ink.height, penX: 8 + reveal.inkWidth * p };
       if (p >= 1) {
-        reveal.phase = reveal.imageUrl && reveal.photo && reveal.photo.width > 0 ? "print" : "turn";
+        reveal.phase = "turn";
         reveal.t = 0;
-        reveal.printed = false;
+        reveal.printed = !!(reveal.photo && reveal.photo.width > 0);
       }
     } else if (reveal.phase === "print") {
       if (reveal.t > 0.75) {
@@ -562,17 +523,13 @@ export function createScene(canvas) {
     if (!reveal) return;
     if (reveal.phase === "write" || reveal.phase === "print") {
       drawSheet(0);
-      if (reveal.phase === "print") drawPrintout(reveal.t / 0.75, 1);
     } else if (reveal.phase === "turn") {
       drawSheet(easeOut(Math.min(1, reveal.t / 0.4)));
-      drawPrintout(1, 1);
     } else if (reveal.phase === "present") {
       drawSheet(1);
-      drawPrintout(1, 1);
     } else if (reveal.phase === "wrong" && reveal.t < 1.05) {
       const gone = Math.min(1, reveal.t / 1.0);
       drawDismiss(gone);
-      drawPrintout(1, 1 - gone);
     }
   }
 
@@ -630,9 +587,8 @@ export function createScene(canvas) {
       else ctx.drawImage(art, view.x, view.y, view.w, view.h);
     }
     drawPhoneLogo();
-    drawPrinter();
     if (!reduce) drawSmoke(dt);
-    if (!reduce) stepCat(dt);
+    stepCat(dt);
     updateReveal(dt);
     drawFaces();
     drawReveal();
@@ -678,12 +634,7 @@ export function createScene(canvas) {
 
   async function loadPack(orient) {
     const pack = { base: null, overlays: {} };
-    const [base, printer] = await Promise.all([
-      loadImage(BASE[orient]),
-      images.printer ? Promise.resolve(images.printer) : loadImage(`${PRINTER}?v=akinator-27`),
-    ]);
-    pack.base = base;
-    if (printer) images.printer = printer;
+    pack.base = await loadImage(BASE[orient]);
     loadOverlaySet(orient).then((overlays) => {
       pack.overlays = overlays || {};
       if (images.baseOrient === orient) images.overlays = pack.overlays;
@@ -777,8 +728,8 @@ export function createScene(canvas) {
     start, stop, resize,
     setMood(value) { mood = value; faces.setMood(value); },
     react(answer) { return faces.react(answer); },
-    blinkCat() { catLife.blink = 0.55; },
-    flickCat() { catLife.flick = 0.5; },
+    blinkCat() { catLife.blink = 0.2; },
+    flickCat() { catLife.flick = 0.35; },
     debug() {
       return {
         expression: faces.picture(),
@@ -789,4 +740,47 @@ export function createScene(canvas) {
     },
     playReveal, playWrong, playRetry, playDefeat, clearReveal,
   };
+}
+
+export function startMenuCat(canvas) {
+  if (!canvas || canvas.dataset.catLive) return;
+  canvas.dataset.catLive = "1";
+  const life = { blink: 0, nextBlink: rand(0.6, 1.4), flick: 0, nextFlick: rand(1.2, 2.2) };
+  let blinkImg = null;
+  loadImage("./images/approved/menu-cat-blink.webp?v=akinator-27").then((img) => { blinkImg = img; });
+  let last = 0;
+  const frame = (now) => {
+    const dt = Math.min(0.034, (now - (last || now)) / 1000 || 0.016);
+    last = now;
+    life.nextBlink -= dt;
+    if (life.nextBlink <= 0) {
+      life.blink = 0.28;
+      life.nextBlink = 3 + Math.random() * 2;
+    }
+    if (life.blink > 0) life.blink = Math.max(0, life.blink - dt);
+    life.nextFlick -= dt;
+    if (life.nextFlick <= 0) {
+      life.flick = 0.7;
+      life.nextFlick = 4 + Math.random() * 2;
+    }
+    if (life.flick > 0) life.flick = Math.max(0, life.flick - dt);
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    const w = Math.max(1, Math.round(rect.width * dpr));
+    const h = Math.max(1, Math.round((rect.height || rect.width * 0.72) * dpr));
+    if (rect.width > 2 && (canvas.width !== w || canvas.height !== h)) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    const g = canvas.getContext("2d");
+    g.clearRect(0, 0, canvas.width, canvas.height);
+    const shut = life.blink > 0 ? blinkCover(life.blink) : 0;
+    if (blinkImg && shut > 0.02 && canvas.width > 2) {
+      g.globalAlpha = Math.min(1, shut);
+      g.drawImage(blinkImg, 0, 0, canvas.width, canvas.height);
+    }
+    g.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
 }

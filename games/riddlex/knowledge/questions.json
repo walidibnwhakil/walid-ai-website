@@ -718,5 +718,35 @@
     "group": "politics",
     "en": "Are they in the government now?",
     "bn": "তিনি কি এখন সরকারে আছেন?"
+  },
+  {
+    "id": "from_south_america",
+    "group": "country",
+    "en": "Is the person from South America?",
+    "bn": "তিনি কি দক্ষিণ আমেরিকার?"
+  },
+  {
+    "id": "from_europe",
+    "group": "country",
+    "en": "Is the person from Europe?",
+    "bn": "তিনি কি ইউরোপের?"
+  },
+  {
+    "id": "from_asia",
+    "group": "country",
+    "en": "Is the person from Asia?",
+    "bn": "তিনি কি এশিয়ার?"
+  },
+  {
+    "id": "from_africa",
+    "group": "country",
+    "en": "Is the person from Africa?",
+    "bn": "তিনি কি আফ্রিকার?"
+  },
+  {
+    "id": "from_north_america",
+    "group": "country",
+    "en": "Is the person from North America?",
+    "bn": "তিনি কি উত্তর আমেরিকার?"
   }
 ]

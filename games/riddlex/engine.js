@@ -62,8 +62,28 @@ function ensureExtras(pool) {
   pool._extraCount = pool.count;
 }
 
+function regionBit(pool, index, members) {
+  let yes = false;
+  let nos = 0;
+  let present = 0;
+  for (const member of members) {
+    const mqi = pool.qIndex.get(member);
+    if (mqi == null) continue;
+    present += 1;
+    const bit = attrAt(pool.attrs, pool.attrBytes, index, mqi);
+    if (bit === 2) yes = true;
+    else if (bit === 1) nos += 1;
+  }
+  if (yes) return 2;
+  if (present > 0 && nos === present) return 1;
+  return 0;
+}
+
 export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
+  const id = pool.questions[qi]?.id;
+  const members = id && REGIONS[id];
+  if (members && members.length > 1) return regionBit(pool, index, members);
   ensureExtras(pool);
   const stored = pool.attrBytes * 4;
   if (qi < stored) return attrAt(pool.attrs, pool.attrBytes, index, qi);
@@ -163,6 +183,11 @@ function hardFacts() {
     ["zia_family"],
     ["mujib_family"],
     ["lives_abroad"],
+    ["from_asia"],
+    ["from_europe"],
+    ["from_africa"],
+    ["from_north_america"],
+    ["from_south_america"],
   ];
   const index = new Map();
   families.forEach((ids, fam) => ids.forEach((id) => index.set(id, fam)));
@@ -591,6 +616,14 @@ function skippedAsDuplicate(state, id) {
   if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;
   const parties = ["party_bnp", "party_al", "party_jp", "party_jamaat"];
   if (parties.includes(id) && parties.some((party) => party !== id && yes(party))) return true;
+  const regionIds = ["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"];
+  if (regionIds.includes(id) && regionIds.some((region) => region !== id && yes(region))) return true;
+  if (COUNTRIES.includes(id)) {
+    for (const region of regionIds) {
+      const members = REGIONS[region] || [];
+      if (yes(region) && !members.includes(id)) return true;
+    }
+  }
   return false;
 }
 
@@ -718,7 +751,11 @@ export function chooseQuestion(state) {
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
-    if ((question.id === "played_barcelona" || question.id === "ballon_dor") && saidYes("footballer")) gain *= 3;
+    if ((question.id === "played_barcelona" || question.id === "ballon_dor") && saidYes("footballer")) gain *= 4;
+    const regionIds = ["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"];
+    const regionOpen = answers.length >= 5 && !regionIds.some((region) => saidYes(region));
+    if (regionOpen && regionIds.includes(question.id)) gain *= 8;
+    if (regionOpen && COUNTRIES.includes(question.id) && question.id !== "from_bd") gain *= 0.12;
     if (state.category === "character" && answers.length < 4) {
       const genderOpen = !asked.has("male") && !asked.has("female");
       const lifeOpen = !asked.has("alive") && !asked.has("dead");

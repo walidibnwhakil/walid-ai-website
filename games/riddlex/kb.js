@@ -136,7 +136,7 @@ export function mergePools(pools) {
 export function imageSrc(image) {
   if (!image) return "";
   if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) return image;
-  return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(image) + "?width=480";
+  return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(image) + "?width=320";
 }
 
 export function attachManifest(pool, manifest) {

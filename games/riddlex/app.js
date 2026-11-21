@@ -3,7 +3,7 @@ import { answer as applyAnswer, canPrint, createState, decide, displayName, enti
 import { UI, guessFont } from "./i18n.js";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js";
-import { createScene } from "./scene.js?v=akinator-27";
+import { createScene, startMenuCat } from "./scene.js?v=akinator-27";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -79,6 +79,7 @@ function gameInProgress() {
 
 async function boot() {
   applyLanguage();
+  startMenuCat($("menu-cat"));
   loading = Promise.all([
     loadManifest("./kb"),
     fetch("./kb/index.json").then((response) => {

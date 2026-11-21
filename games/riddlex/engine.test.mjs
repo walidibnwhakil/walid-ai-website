@@ -505,7 +505,14 @@ test("truthful answers about Lionel Messi guess him, not Sergio Agüero", () => 
     answer(state, qid, value);
   }
   assert.equal(guessed, "Q615", asked.join(","));
-  assert.ok(asked.length < 25, asked.length);
+  assert.ok(asked.length <= 12, asked.join(","));
+  const regions = new Set(["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"]);
+  let run = 0;
+  for (const qid of asked) {
+    run = qid.startsWith("from_") && !regions.has(qid) ? run + 1 : 0;
+    assert.ok(run < 5, asked.join(","));
+  }
+  assert.ok(asked.includes("from_south_america") || asked.includes("from_ar"), asked.join(","));
 });
 
 test("a wrong guess keeps a firm occupation from being forgotten", () => {

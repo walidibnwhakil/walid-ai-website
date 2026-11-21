@@ -135,6 +135,32 @@ export function nameInPool(pool, name) {
   return false;
 }
 
+export function isPermissionDenied(error) {
+  return /permission/i.test(`${error?.code || ""} ${error?.message || error}`);
+}
+
+export async function saveNewEntry(setDoc, payload) {
+  try {
+    await setDoc({ ...payload, status: "confirmed" });
+    return "confirmed";
+  } catch (error) {
+    if (!isPermissionDenied(error)) throw error;
+    await setDoc({ ...payload, status: "pending" });
+    return "pending";
+  }
+}
+
+export async function saveMergedEntry(updateDoc, merged, legacy) {
+  try {
+    await updateDoc(merged);
+    return "merged";
+  } catch (error) {
+    if (!isPermissionDenied(error)) throw error;
+    await updateDoc(legacy);
+    return "legacy";
+  }
+}
+
 export async function submitLearning({ name, nameBn, file, answers, adult, alreadyKnown }) {
   const verdict = reviewSubmission(name, answers);
   if (!verdict.ok) return { status: "thanked", stored: false };
@@ -177,8 +203,8 @@ export async function submitLearning({ name, nameBn, file, answers, adult, alrea
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
     if (image && !adult) payload.image = image;
-    await ref.set(payload);
-    return { status: "confirmed", confirmations: 1 };
+    const status = await saveNewEntry((data) => ref.set(data), payload);
+    return { status, confirmations: 1 };
   }
   const data = existing.data();
   if (data.status === "rejected") return { status: "thanked", stored: false };
@@ -198,12 +224,22 @@ export async function submitLearning({ name, nameBn, file, answers, adult, alrea
   }
   const confirmations = Math.min(12, (data.confirmations || 1) + 1);
   const status = data.status === "pending" && confirmations >= 3 ? "confirmed" : data.status;
-  await ref.update({
-    answers: merged,
-    confirmations,
-    confirmers: [...(data.confirmers || []), uid].slice(0, 12),
-    status,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-  });
-  return { status, confirmations };
+  const stamp = firebase.firestore.FieldValue.serverTimestamp();
+  const saved = await saveMergedEntry(
+    (data) => ref.update(data),
+    {
+      answers: merged,
+      confirmations,
+      confirmers: [...(data.confirmers || []), uid].slice(0, 12),
+      status,
+      updatedAt: stamp,
+    },
+    {
+      confirmations,
+      confirmers: [...(data.confirmers || []), uid].slice(0, 12),
+      status,
+      updatedAt: stamp,
+    },
+  );
+  return { status: saved === "legacy" ? status : status, confirmations };
 }

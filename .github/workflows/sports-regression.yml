@@ -1,0 +1,27 @@
+name: Sports data and display regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "sports/**"
+      - "scripts/fetch_updates.py"
+      - "tests/test_sports_backend.py"
+      - "tests/test_sports_frontend.cjs"
+      - ".github/workflows/sports-regression.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sports:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check sports feed Python syntax
+        run: python -m py_compile scripts/fetch_updates.py
+      - name: Test football and cricket feed normalization
+        run: python -m unittest discover -s tests -p 'test_sports_backend.py' -v
+      - name: Check match card JavaScript syntax
+        run: node --check sports/sports.js
+      - name: Test BDT, match statuses, scoring and stale states
+        run: node tests/test_sports_frontend.cjs

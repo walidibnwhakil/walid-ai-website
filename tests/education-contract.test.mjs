@@ -27,15 +27,29 @@ test("grade options start at 6 and subject groups are required only at 9–12 an
   assert.match(app,/values:\[6,7,8,9,10\]/);
   assert.doesNotMatch(app,/createPrimaryBank/);
 });
-test("six quiz sizes and stacked instant-feedback experience",()=>{
-  assert.equal((html.match(/name="questionCount"/g)||[]).length,6);
-  for(const size of [20,30,40,50,70,100])assert.match(html,new RegExp('value="'+size+'"'));
-  assert.match(html,/id="questionList"/);
-  assert.match(css,/\.question-stack\{display:grid/);
+test("progressive quiz settings support grade-first streams and BCS 100/200",()=>{
+  assert.match(html,/id="quizLevel" required/);
+  assert.match(html,/id="quizStreamField" hidden/);
+  assert.match(html,/id="quizCountField" hidden/);
+  assert.match(html,/id="questionCount" disabled/);
+  assert.match(html,/id="quizStartActions" hidden/);
+  assert.match(html,/<select class="field-select" id="questionCount"/);
+  assert.doesNotMatch(html,/name="questionCount"/,"Do not render six number chips");
+  assert.match(app,/STANDARD_QUIZ_COUNTS=Object\.freeze\(\[20,30,40,50,70,100\]\)/);
+  assert.match(app,/BCS_QUIZ_COUNTS=Object\.freeze\(\[100,200\]\)/);
+  assert.match(app,/if\(level==="bcs"\)return BCS_QUIZ_COUNTS/);
+  assert.match(app,/function updateQuizCount\(\)/);
+  assert.match(app,/function quizCountChanged\(\)/);
+  assert.match(app,/byId\("quizStream"\)\.value=""/);
+  assert.match(app,/quizStreamChanged/);
+  assert.match(app,/availableQuizCounts\(level,stream\)\.includes\(count\)/);
   assert.match(app,/function chooseAnswer\(index,choice\)/);
   assert.match(app,/function feedback\(card,q,chosen\)/);
-  assert.match(app,/scrollIntoView\(\{behavior:"smooth",block:"center"\}\)/);
+  assert.match(html,/id="questionList"/);
+  assert.match(css,/\.question-stack\{display:grid/);
   assert.doesNotMatch(html,/id="jumpQuestion"/);
+  assert.doesNotMatch(html,/id="bcsNotice"|class="supporting-copy"|class="edu-sources"|class="quiz-instruction"/);
+  assert.doesNotMatch(html,/Learning & Preparation/);
 });
 test("preserve 2,547 original grade 6–12 questions, each with answer and explanation",()=>{
   assert.equal(questions.length,2547);

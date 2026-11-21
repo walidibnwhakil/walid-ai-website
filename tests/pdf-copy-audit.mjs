@@ -28,7 +28,12 @@ try {
     const legacy = await readFile(new URL("tools/" + slug + "/index.html",root),"utf8");
     assert.match(legacy,new RegExp("/pdf/"+slug+"/"),"Legacy URL must redirect to canonical PDF route");
   }
+  const studioScript = await readFile(new URL("tools/pdf-browser/studio.js",root), "utf8");
+  assert.ok(!/Noto Sans Bengali could not be loaded\.|message\.status\+progress|setStatus\("Done\. The password|setStatus\("Done\." \+/.test(studioScript),
+    "PDF workspace must not expose raw library progress or generic success copy");
   const studio = await readFile(new URL("tools/pdf-browser/studio.html",root), "utf8");
+  assert.match(studio, /id="applyOcr">Extract text<\/button>/,
+    "OCR action should apply to Bengali and English text");
   assert.ok(!/Tesseract|jsDelivr|raster fallback|embedded font|<code>ben\+eng<\/code>/.test(studio),
     "PDF workspace hints should explain tasks rather than implementation");
   const workspace = await readFile(new URL("tool-workspace/index.html",root), "utf8");

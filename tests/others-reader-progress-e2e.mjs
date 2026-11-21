@@ -141,8 +141,10 @@ try {
     assert.equal(await page.locator(".others-book-title p a").count(), 0,
       "Unnecessary inline fiction reference link rendered as plain text");
     await page.goto(base + "/others/history/ashab-al-kahf/", {waitUntil:"load"});
-    assert.ok(await page.locator(".others-book-title p a").count() > 0,
-      "Historical / Quran source link preserved");
+    assert.equal(await page.locator(".others-book-title p a, .others-chapter p a").count(), 0,
+      "Historical / Quran references render as plain text, without disabling source metadata");
+    assert.match(await page.locator(".others-book-title p").textContent(), /সূরা আল-কাহফ/,
+      "The primary Quran source name remains readable");
     await page.goto(base + "/others/folklore/ramayana/", {waitUntil:"load"});
     assert.equal(await page.locator(".others-reading-progress:visible").count(), 0,
       "Progress and bookmarks are distinct for each book");

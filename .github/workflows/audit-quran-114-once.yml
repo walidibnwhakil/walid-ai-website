@@ -30,8 +30,10 @@ jobs:
 
           base = Path('islam/quran')
           metadata = json.loads((base / 'data/metadata.json').read_text(encoding='utf-8'))
-          pages = sorted(base.glob('*/index.html'))
+          # Credits and other utility pages are not surah pages.
+          pages = [base / info['slug'] / 'index.html' for info in metadata]
           assert len(metadata) == len(pages) == 114
+          assert all(page.is_file() for page in pages), 'A surah page is missing'
           total = 0
           for expected_number, info in enumerate(metadata, 1):
               assert info['number'] == expected_number

@@ -40,6 +40,7 @@ const storyPaths=[
   "/others/islamic-literature/aladdin/",
   "/others/islamic-literature/ali-baba/",
   "/others/history/mughal-empire/",
+  "/others/history/mamluk-sultanate/",
 ];
 const widths=[320,375,768,1280];
 let browser,checks=0,sidebarChecks=0;

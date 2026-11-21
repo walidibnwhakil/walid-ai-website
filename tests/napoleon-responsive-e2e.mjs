@@ -54,7 +54,7 @@ try{
     await page.waitForFunction(()=>location.hash==="#chapter-17"&&!document.querySelector(".others-toc-dialog").open);
     await page.locator(".others-toc-trigger").click();
     await page.keyboard.press("Escape");
-    await page.waitForFunction(()=>!document.querySelector(".others-toc-dialog").open);
+    await page.waitForFunction(()=>!document.querySelector(".others-toc-dialog").open && !document.body.classList.contains("others-toc-open"));
     assert.equal(await page.locator("body").evaluate(el=>el.classList.contains("others-toc-open")),false,"Body remained locked");
     await page.close();
   }

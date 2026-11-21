@@ -75,6 +75,55 @@ def validate_book(path):
 
 
 
+def validate_mamluk_chronology(path):
+    """Scope-specific chronology, editorial fullness, and unchanged reader chrome."""
+    content = path.read_text(encoding="utf-8")
+    titles = re.findall(
+        r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>',
+        content
+    )
+    if len(titles) != 17:
+        fail(path, f"expected 17 carefully integrated chapters; found {len(titles)}")
+        return
+    expected = {
+        2: ("শাজার আদ-দুর", "আইবেক"),
+        4: ("আইন জালুত", "কুতুজ"),
+        5: ("বায়বার্স", "ক্রুসেডার"),
+        6: ("কালাউন", "১২৭৭"),
+        7: ("খলিল", "আক্কার"),
+        8: ("আল-নাসির", "তিন রাজত্ব"),
+        10: ("বারকুক", "বুরজি"),
+        14: ("কায়তবাই", "১৪৬৮"),
+        15: ("আল-গাওরি", "১৫১৬"),
+        16: ("তুমান বায়", "১৫১৭"),
+    }
+    for n, phrases in expected.items():
+        if not all(phrase in titles[n - 1] for phrase in phrases):
+            fail(path, f"chapter {n} has lost its historical period or main ruler")
+    section_bodies = re.findall(
+        r'<section class="others-chapter" id="chapter-\d+">.*?</h2>(.*?)</section>',
+        content, re.S
+    )
+    for n, section in enumerate(section_bodies, 1):
+        paragraphs = re.findall(r'<p>(.*?)</p>', section, re.S)
+        if len(paragraphs) < 6:
+            fail(path, f"chapter {n} is too abbreviated ({len(paragraphs)} paragraphs)")
+        if any(len(re.sub(r'<[^>]+>', '', paragraph).strip()) < 90
+               for paragraph in paragraphs):
+            fail(path, f"chapter {n} contains a thin filler paragraph")
+    for phrase in ("উৎস ও পরবর্তী পাঠ", "Walid AI Reading Library", "এই অধ্যায়ে আলোচনা", "পরের অধ্যায়ে"):
+        if phrase in content:
+            fail(path, f"obsolete or meta editorial text: {phrase}")
+    for invariant in (
+        'href="https://walid-ai.com/others/history/mamluk-sultanate/"',
+        '/walid-ai-approved-logo.png',
+        '/others/assets/books.css',
+        '/others/assets/reader.js',
+        'class="legal-footer"',
+    ):
+        if invariant not in content:
+            fail(path, "reader chrome/SEO invariant missing: " + invariant)
+
 def validate_editorial_metadata(path):
     """Check published folklore/fiction readers for stale or cut-off metadata."""
     content = path.read_text(encoding="utf-8")
@@ -141,6 +190,8 @@ def main():
         errors.append(f"Expected 32 Others books; found {len(books)}")
     for book in books:
         validate_book(book)
+        if book.as_posix().endswith("/history/mamluk-sultanate/index.html"):
+            validate_mamluk_chronology(book)
         if "/history/" not in book.as_posix():
             validate_editorial_metadata(book)
 

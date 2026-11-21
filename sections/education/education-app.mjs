@@ -193,6 +193,7 @@ function drawQuestions(){
     const card=el("article",undefined,"question-card");
     card.id="question-"+i;
     card.dataset.contentType=q.generated?"worked-variant":"authored-concept";
+    card.dataset.sourceLinked=q.sourceUrl?"yes":"no";
     const heading=el("div",undefined,"question-card-head");
     heading.append(el("span","প্রশ্ন "+bn(i+1)+" / "+bn(current.questions.length),"question-number"),
       el("span",q.subject,"quiz-subject"));

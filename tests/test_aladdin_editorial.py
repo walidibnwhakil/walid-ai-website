@@ -90,5 +90,33 @@ class AladdinEditorial(unittest.TestCase):
         self.assertNotIn('adsbygoogle', self.page)
         self.assertTrue(self.page.endswith("</body></html>"))
 
+    def test_primary_story_motifs_and_provenance(self):
+        chapter = {int(number): re.sub(r"<[^>]*>", "", body)
+                   for number, title, body in self.chapters}
+        intro = self.page.split("</header>", 1)[0]
+        for item in ("হান্না দিয়াব", "গালাঁ", "১৭০৯", "১৭১২", "পাণ্ডুলিপি", "বাস্তব ইতিহাস নয়"):
+            self.assertIn(item, intro)
+        self.assertIn("মুস্তফা", chapter[1])
+        self.assertIn("তিনটি বড় কক্ষ", chapter[2])
+        self.assertIn("আংটির জিনি", chapter[3])
+        self.assertIn("প্রদীপের জিনি", chapter[4])
+        self.assertIn("তিন মাস", chapter[5])
+        self.assertIn("তিন মাস", chapter[6])
+        self.assertIn("চল্লিশটি সোনার পাত্র", chapter[6])
+        self.assertIn("চব্বিশ জানালার মহল", chapter[7])
+        self.assertIn("সেনাবাহিনীর দায়িত্ব", chapter[7])
+        self.assertIn("চল্লিশ দিনের", chapter[8])
+        self.assertIn("সেই আদেশ বাতিল করতে পারে না", chapter[9])
+        self.assertNotIn("পুরো প্রাসাদকে আগের জায়গায়", chapter[9])
+        self.assertIn("পুরো প্রাসাদকে আগের জায়গায়", chapter[10])
+        self.assertIn("ফাতিমা", chapter[11])
+        self.assertIn("রোখ পাখি", chapter[11])
+        self.assertIn("বৈধ উত্তরাধিকারী", chapter[12])
+        for n in (5, 6, 7, 8, 9, 10, 11, 12):
+            self.assertIn("বদরুলবুদুর", chapter[n])
+        for n in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12):
+            self.assertNotIn("এই অধ্যায়ে", chapter[n])
+        self.assertNotIn("উৎস ও পরবর্তী পাঠ", self.page)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

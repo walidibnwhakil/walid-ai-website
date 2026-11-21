@@ -29,7 +29,8 @@ for chapter, title, body in chapters:
         re.sub(r'<[^>]+>', "", paragraph).strip()
         for paragraph in re.findall(r'<p>(.*?)</p>', body, re.S)
     ]
-    require(len(paragraphs) >= 7, f"chapter {chapter} is too short ({len(paragraphs)} paragraphs)")
+    require(len(paragraphs) >= 9, f"chapter {chapter} is too short ({len(paragraphs)} paragraphs)")
+    require(len(' '.join(paragraphs).split()) >= 500, f"chapter {chapter} has fewer than 500 words")
     require(sum(len(p) for p in paragraphs) >= 1300,
             f"chapter {chapter} is insufficiently developed")
     require(all(p and p != "undefined" for p in paragraphs),
@@ -52,19 +53,31 @@ require('class="others-sources"' not in content and 'class="others-next"' not in
 require("Walid AI reading library" not in content, "retired editorial branding returned")
 
 expect = {
-    5: ("অগাস্টাস", "লিভিয়া", "আগ্রিপ্পা"),
-    7: ("ক্লডিয়ুস", "আগ্রিপিনা"),
-    8: ("নেরো", "আগ্রিপিনা", "৫৯", "৬৪"),
-    13: ("সেভেরুস", "জুলিয়া ডোমনা"),
-    14: ("গেটা", "জুলিয়া মায়েসা"),
-    15: ("ভ্যালেরিয়ান", "জেনোবিয়া", "অরেলিয়ান"),
-    16: ("ডায়োক্লেটিয়ান", "টেট্রার্কি"),
-    17: ("কনস্টান্টিন", "নাইসিয়া", "৩৩০"),
-    21: ("স্তিলিখো", "আলারিক", "৪১০"),
-    22: ("প্লাসিদিয়া", "এতিয়ুস", "৪৫১"),
-    23: ("মেজোরিয়ান", "রিসিমের", "ওদোআকর", "৪৭৬"),
-    24: ("জাস্টিনিয়ান", "থিওডোরা", "হেরাক্লিয়ুস"),
-    25: ("১২০৪", "১২৬১", "১৪৫৩"),
+    1: ("রোমুলুস", "প্রজাতন্ত্র", "প্লেবিয়ান",),
+    2: ("হ্যানিবাল", "স্কিপিও", "কার্থেজ", "১৪৬",),
+    3: ("গ্রাক্কুস", "মারিয়ুস", "সুল্লা", "৭৮",),
+    4: ("স্পার্টাকাস", "সিজার", "ক্লিওপেট্রা", "৪৪",),
+    5: ("অগাস্টাস", "লিভিয়া", "আগ্রিপ্পা", "১৪",),
+    6: ("টাইবেরিয়ুস", "জার্মানিকাস", "সেজানুস", "৩৭",),
+    7: ("মেসালিনা", "ক্লডিয়ুস", "আগ্রিপিনা", "৪৮", "৫৪",),
+    8: ("নেরো", "আগ্রিপিনা", "৫৯", "৬৪", "৬৮",),
+    9: ("ভেসপাসিয়ান", "টাইটাস", "ডোমিশিয়ান", "৯৬",),
+    10: ("নার্ভা", "ট্রাজান", "প্লোতিনা",),
+    11: ("হাদ্রিয়ান", "সাবিনা", "প্লোতিনা", "বার কোখবা",),
+    12: ("আন্তোনিনুস", "ভেরুস", "মার্কাস", "ফাউস্তিনা",),
+    13: ("কমোডুস", "সেভেরুস", "জুলিয়া ডোমনা",),
+    14: ("গেটা", "মায়েসা", "কারাকাল্লা",),
+    15: ("জেনোবিয়া", "অরেলিয়ান", "ভ্যালেরিয়ান",),
+    16: ("ডায়োক্লেটিয়ান", "টেট্রার্কি",),
+    17: ("কনস্টান্টিন", "হেলেনা", "ফাউস্তা", "৩৩০",),
+    18: ("জুলিয়ান", "কনস্টান্টিয়ুস",),
+    19: ("ভ্যালেন্স", "গথ", "৩৭৮",),
+    20: ("থিওডোসিয়ুস", "গাল্লা", "৩৯৫",),
+    21: ("স্তিলিখো", "আলারিক", "৪১০",),
+    22: ("প্লাসিদিয়া", "এতিয়ুস", "আত্তিলা", "৪৫৪",),
+    23: ("মেজোরিয়ান", "রিসিমের", "ওদোআকর", "৪৭৬",),
+    24: ("জাস্টিনিয়ান", "থিওদোরা", "হেরাক্লিয়ুস", "৬৪১",),
+    25: ("১৪৫৩", "১২০৪", "১২৬১",),
 }
 for number, terms in expect.items():
     text = chapters[number-1][1] + chapters[number-1][2]
@@ -75,4 +88,4 @@ require(not any("সম্রাজ্ঞী, রাজমাতা ও ক্�
         "disconnected empress appendix was restored")
 require(not any("পশ্চিম সাম্রাজ্যের শেষ সেনাপতিরা" in t for t in titles),
         "disconnected generals appendix was restored")
-print(f"ROMAN_EDITORIAL_PASS: {len(chapters)} chapters, {len(all_paragraphs)} paragraphs, {len(toc)} TOC links")
+print(f"ROMAN_EDITORIAL_PASS: {len(chapters)} chapters, {len(all_paragraphs)} paragraphs, {sum(len(p.split()) for p in all_paragraphs)} words, {len(toc)} TOC links")

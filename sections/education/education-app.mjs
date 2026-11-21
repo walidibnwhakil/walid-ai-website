@@ -69,7 +69,7 @@ async function fetchNotes(){
     .finally(()=>{notesPromise=null});
   return notesPromise;
 }
-const countChosen=()=>Number(document.querySelector('input[name="questionCount"]:checked')?.value||20);
+const countChosen=()=>Number(byId("questionCount").value);
 const normalized=(q,id,subject)=>({id:String(id),q:q.q,grade:q.grade,subject:subject||q.subject,
     options:q.options.map(String),answer:q.answer,why:q.why||"সংশ্লিষ্ট পাঠের ব্যাখ্যা পর্যালোচনা করুন।"});
 
@@ -125,7 +125,36 @@ function syncStream(levelSelect,streamSelect,wrapper){
   byId(streamSelect).disabled=!needed;
   if(!needed)byId(streamSelect).value="";
 }
-function quizSetupChanged(){syncStream("quizLevel","quizStream","quizStreamField");byId("bcsNotice").hidden=byId("quizLevel").value!=="bcs"}
+const STANDARD_QUIZ_COUNTS=Object.freeze([20,30,40,50,70,100]);
+const BCS_QUIZ_COUNTS=Object.freeze([100,200]);
+function availableQuizCounts(level,stream){
+  if(level==="bcs")return BCS_QUIZ_COUNTS;
+  if(!["6","7","8","9","10","11","12","admission"].includes(level))return [];
+  if(needsStream(level)&&!STREAMS[stream])return [];
+  return STANDARD_QUIZ_COUNTS;
+}
+function quizCountChanged(){
+  const count=byId("questionCount").value;
+  const available=availableQuizCounts(byId("quizLevel").value,byId("quizStream").value);
+  byId("quizStartActions").hidden=!count||!available.includes(Number(count));
+  byId("quizStatus").hidden=true;
+}
+function updateQuizCount(){
+  const select=byId("questionCount");
+  const counts=availableQuizCounts(byId("quizLevel").value,byId("quizStream").value);
+  select.replaceChildren(new Option("প্রশ্নসংখ্যা নির্বাচন করুন",""),
+    ...counts.map(count=>new Option(bn(count)+"টি প্রশ্ন",String(count))));
+  select.value="";
+  select.disabled=counts.length===0;
+  byId("quizCountField").hidden=counts.length===0;
+  quizCountChanged();
+}
+function quizSetupChanged(){
+  syncStream("quizLevel","quizStream","quizStreamField");
+  byId("quizStream").value="";
+  updateQuizCount();
+}
+function quizStreamChanged(){updateQuizCount()}
 const questionTotal=()=>activeTest?.questions.length||0;
 function refreshProgress(){
   if(!activeTest)return;
@@ -221,8 +250,13 @@ async function startQuiz(){
   const level=byId("quizLevel").value,stream=byId("quizStream").value;
   if(!level){status("quizStatus","প্রথমে শ্রেণি বা পরীক্ষার বিভাগ নির্বাচন করুন।",true);byId("quizLevel").focus();return}
   if(needsStream(level)&&!STREAMS[stream]){
-    status("quizStatus","অনুগ্রহ করে Science, Commerce বা Arts বিভাগ নির্বাচন করুন।",true);
+    status("quizStatus","বিভাগ নির্বাচন করুন।",true);
     byId("quizStream").focus();return;
+  }
+  const count=countChosen();
+  if(!availableQuizCounts(level,stream).includes(count)){
+    status("quizStatus","প্রশ্নসংখ্যা নির্বাচন করুন।",true);
+    byId("questionCount").focus();return;
   }
   const button=byId("startQuiz");
   button.disabled=true;
@@ -230,7 +264,7 @@ async function startQuiz(){
   try{
     const bank=await fetchBank();
     const pool=questionPool(level,stream,bank).filter(auditQuestion);
-    const count=countChosen(),key=level+":"+(stream||"common");
+    const key=level+":"+(stream||"common");
     const prev=getHistory(key);
     const selected=level==="bcs"?selectBcsQuestions(pool,count,prev):selectQuestions(pool,count,prev);
     storeHistory(key,updatedHistory(pool,count,prev,selected));
@@ -371,7 +405,8 @@ async function openNotes(level){
 
 populateLevels(byId("quizLevel"));populateLevels(byId("notesLevel"));
 byId("quizLevel").addEventListener("change",quizSetupChanged);
-byId("quizStream").addEventListener("change",()=>{byId("quizStatus").hidden=true});
+byId("quizStream").addEventListener("change",quizStreamChanged);
+byId("questionCount").addEventListener("change",quizCountChanged);
 byId("notesLevel").addEventListener("change",()=>{syncStream("notesLevel","notesStream","notesStreamField");updateSubjects()});
 byId("notesStream").addEventListener("change",updateSubjects);
 byId("notesSubject").addEventListener("change",()=>{byId("notesContent").hidden=true});

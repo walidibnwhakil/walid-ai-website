@@ -1,0 +1,17 @@
+name: Ramayana editorial integrity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/folklore/ramayana/**"
+      - "tests/test_ramayana_editorial.py"
+      - ".github/workflows/ramayana-editorial.yml"
+permissions:
+  contents: read
+jobs:
+  ramayana-content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Ramayana narrative, TOC, chronology, and reader chrome
+        run: python3 tests/test_ramayana_editorial.py

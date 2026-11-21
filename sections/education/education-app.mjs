@@ -4,8 +4,9 @@ import {makeQuestion,makeLesson,makeChapterOverviews} from "./chapter-utils.mjs"
 import {SCHOOL_ROWS} from "./grade-chapters.mjs";
 import {BCS_ROWS} from "./bcs-chapters.mjs";
 import {ADMISSION_ROWS} from "./admission-chapters.mjs";
-import {selectQuestions,updatedHistory} from "./quiz-selection.mjs";
+import {selectQuestions,selectBcsQuestions,updatedHistory} from "./quiz-selection.mjs";
 import {createSkillPractice,createSkillNotes} from "./skill-practice.mjs";
+import {createFactQuestions,createFactNotes,FACT_CHECKED_ON} from "./factual-bank.mjs";
 
 const byId=id=>document.getElementById(id);
 const views=["modeSelection","quizSetup","quizRunning","quizResults","notesSetup"];
@@ -105,7 +106,7 @@ function questionPool(level,stream,questions){
       "তথ্য ও যোগাযোগ প্রযুক্তি":"কম্পিউটার ও তথ্যপ্রযুক্তি"};
     return questions.filter(q=>q.grade>=9&&q.grade<=12&&general[q.subject])
       .map(q=>normalized(q,"bcs-"+q.id,general[q.subject]))
-      .concat(chapterQuestions(level,stream),createExamExtras(),createWorkedPractice(level,null,180),createSkillPractice(level,stream));
+      .concat(chapterQuestions(level,stream),createExamExtras(),createFactQuestions(level),createWorkedPractice(level,null,180),createSkillPractice(level,stream));
   }
   return [];
 }
@@ -150,6 +151,12 @@ function feedback(card,q,chosen){
   note.replaceChildren(el("strong",valid?"✓ সঠিক উত্তর":"✕ উত্তরটি সঠিক নয়"));
   if(!valid)note.append(el("p","সঠিক উত্তর: "+q.options[q.answer]));
   note.append(el("p","ব্যাখ্যা: "+q.why));
+  if(q.sourceUrl){
+    const citation=el("a","তথ্যসূত্র দেখুন","question-source");
+    citation.href=q.sourceUrl;citation.target="_blank";citation.rel="noopener noreferrer";
+    note.append(citation);
+    if(q.eventDate)note.append(el("span"," · ঘটনা: "+q.eventDate+" · যাচাই: "+q.checkedOn,"source-date"));
+  }
   note.hidden=false;
   card.classList.add("is-answered");
   card.classList.toggle("was-correct",valid);
@@ -224,7 +231,7 @@ async function startQuiz(){
     const pool=questionPool(level,stream,bank).filter(auditQuestion);
     const count=countChosen(),key=level+":"+(stream||"common");
     const prev=getHistory(key);
-    const selected=selectQuestions(pool,count,prev);
+    const selected=level==="bcs"?selectBcsQuestions(pool,count,prev):selectQuestions(pool,count,prev);
     storeHistory(key,updatedHistory(pool,count,prev,selected));
     activeTest={questions:selected,level,stream,responses:Array(count).fill(null)};
     byId("runningLevel").textContent=levelAndStream(level,stream)+" · "+bn(count)+"টি প্রশ্ন";
@@ -267,6 +274,7 @@ function showResults(){
       el("p","সঠিক উত্তর: "+q.options[q.answer],"good"),
       el("p","আপনার উত্তর: "+(given===null?"দেওয়া হয়নি":q.options[given]),ok?"good":"bad"),
       el("p","ব্যাখ্যা: "+q.why));
+    if(q.sourceUrl){const link=el("a","প্রামাণ্য উৎস দেখুন","question-source");link.href=q.sourceUrl;link.target="_blank";link.rel="noopener noreferrer";item.append(link);if(q.eventDate)item.append(el("span"," · ঘটনা: "+q.eventDate,"source-date"));}
     list.append(item);
   });
   for(const [subject,values] of sums){
@@ -295,7 +303,7 @@ function notePool(level,stream){
       :isAllowedSubject(level,stream,n.subject)):true));
   const rows=chapterRowsFor(level,stream);
   const generated=makeChapterOverviews(rows).concat(
-    rows.map((row,i)=>makeLesson(row,i)),createWorkedLessons(level,stream),createSkillNotes(level,stream));
+    rows.map((row,i)=>makeLesson(row,i)),createWorkedLessons(level,stream),createSkillNotes(level,stream),createFactNotes(level));
   return fixed.concat(generated).filter(isValidNote);
 }
 let currentNotes=[];
@@ -336,6 +344,7 @@ function showNotes(){
     addPart(article,"উদাহরণ",note.example,"note-example");
     addPart(article,"শেখার ধাপ",note.steps);
     addPart(article,"নিজে অনুশীলন",note.practice,"note-exercise");
+    if(note.sourceUrl){const link=el("a","উৎস যাচাই করুন","question-source");link.href=note.sourceUrl;link.target="_blank";link.rel="noopener noreferrer";article.append(link);if(note.contentKind==="dated-current-affairs")article.append(el("span"," · সর্বশেষ যাচাই: "+(note.checkedOn||FACT_CHECKED_ON),"source-date"));}
     if(note.solution){
       const details=el("details");
       details.append(el("summary","অনুশীলনের উত্তর দেখুন","note-toggle"),el("p",note.solution,"note-answer"));

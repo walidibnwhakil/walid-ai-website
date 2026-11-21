@@ -1,0 +1,28 @@
+name: Keep Walid AI chat backend warm
+
+# GitHub schedules are best-effort; Render may still restart Free services.
+# Bangladesh 06:00-01:59 (UTC 00:00-19:59) protects most chat traffic while
+# conserving a margin of the 750 free instance-hours shared by a workspace.
+# Do not enable 24/7 pings without checking the workspace's other free services.
+on:
+  schedule:
+    - cron: "7,17,27,37,47,57 0-19 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: walid-chat-warmup
+  cancel-in-progress: false
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Warm the public health endpoint without consuming AI API quota
+        run: |
+          curl --fail --silent --show-error --location \
+            --max-time 100 --retry 1 --retry-delay 3 \
+            "https://walid-ai-backend.onrender.com/health" > /dev/null

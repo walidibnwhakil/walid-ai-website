@@ -49,10 +49,10 @@ function independentExpected(family,{a,b,c}) {
     default:throw Error("Unhandled family "+family);
   }
 }
-test("exactly 57,680 new accessible MCQs across every school/exam group",()=>{
+test("exactly 103,000 accessible numerical practice MCQs across every school/exam group",()=>{
   assert.equal(SKILL_SCOPES.length,19);
-  assert.equal(DEFAULT_VARIANTS_PER_FAMILY,280);
-  assert.equal(EXPECTED_SKILL_COUNT,57680);
+  assert.equal(DEFAULT_VARIANTS_PER_FAMILY,500);
+  assert.equal(EXPECTED_SKILL_COUNT,103000);
   const allQuestions=[];
   const topicFrequency={};
   const scopeCounts={};
@@ -60,9 +60,9 @@ test("exactly 57,680 new accessible MCQs across every school/exam group",()=>{
     const [level,streamName]=scope.split(":");
     const stream=streamName==="common"?null:streamName;
     const questions=createSkillPractice(level,stream);
-    const expected=skillKinds(level,stream).length*280;
+    const expected=skillKinds(level,stream).length*500;
     assert.equal(questions.length,expected,scope+" count");
-    assert(questions.length>=2800,scope+" needs broad question availability");
+    assert(questions.length>=5000,scope+" needs broad question availability");
     const lessons=createSkillNotes(level,stream);
     assert.equal(lessons.length,skillKinds(level,stream).length,scope+" lesson coverage");
     for(const note of lessons){
@@ -86,16 +86,16 @@ test("exactly 57,680 new accessible MCQs across every school/exam group",()=>{
       allQuestions.push(q);
     }
   }
-  assert.equal(allQuestions.length,57680);
-  assert.equal(new Set(allQuestions.map(q=>q.id)).size,57680,"Repeated IDs");
-  assert.equal(new Set(allQuestions.map(q=>q.q.trim())).size,57680,
+  assert.equal(allQuestions.length,103000);
+  assert.equal(new Set(allQuestions.map(q=>q.id)).size,103000,"Repeated IDs");
+  assert.equal(new Set(allQuestions.map(q=>q.q.trim())).size,103000,
     "Questions must have distinct text across all levels, not duplicate copies");
   assert.equal(Object.keys(topicFrequency).length,34,"Broaden computation to 34 documented skills");
   console.log("EDUCATION_SKILL_AUDIT",JSON.stringify({
-    totalNewDistinctStem:allQuestions.length,scopeCounts,
+    totalNumericalPracticeStems:allQuestions.length,scopeCounts,
     uniqueSkillFamilies:Object.keys(topicFrequency).length,
-    generation:"numerical worked-practice variants; not separately authored facts",
-    oracle:"independent formula verification for each of the 57,680 items"
+    generation:"103,000 mathematically checked variants; distinct wording, not independently researched factual propositions",
+    oracle:"independent formula verification for each of the 103,000 items"
   }));
 });
 test("100 question test uses fresh items over repeat attempts",()=>{

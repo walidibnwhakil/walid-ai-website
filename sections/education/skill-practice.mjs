@@ -1,12 +1,12 @@
 /*
- * 57,680 deterministic, distinct multi-subject practice items across 19
+ * 103,000 deterministic, distinct multi-subject practice items across 19
  * education scopes. Every item contains numeric inputs, an independently
  * checkable answer, four distinct choices and a worked explanation.
  *
- * These are *problem variants*, not 57,680 independently authored textbook
+ * These are *problem variants*, not 103,000 independently authored textbook
  * facts, official past exam questions or a claim of chapter completeness.
  */
-export const DEFAULT_VARIANTS_PER_FAMILY = 280;
+export const DEFAULT_VARIANTS_PER_FAMILY = 500;
 const MATH_10=["operation","unknown","percent","ratio","average","perimeter","area","triangle","travel","centimetres"];
 const MATH_7=["operation","unknown","percent","ratio","average","perimeter","area","triangle","travel","gcd"];
 const MATH_8=["operation","unknown","percent","ratio","average","perimeter","area","triangle","travel","sequence"];

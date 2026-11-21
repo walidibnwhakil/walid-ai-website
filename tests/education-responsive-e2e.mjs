@@ -78,6 +78,15 @@ try{
       assert(authored>=35,"BCS should prioritize authored questions ahead of numerical variations");
       const computed=await page.locator('#questionList .question-card[data-content-type="worked-variant"]').count();
       assert(computed>=1,"BCS should also include independently validated skill practice");
+      const sourced=page.locator('#questionList .question-card[data-source-linked="yes"]');
+      assert((await sourced.count())>=5,"BCS should include date-stamped and stable source-backed facts");
+      const firstFact=sourced.first();
+      await firstFact.locator(".question-option").first().click();
+      await firstFact.locator(".question-feedback .question-source").waitFor({state:"visible"});
+      const sourceUrl=await firstFact.locator(".question-feedback .question-source").getAttribute("href");
+      assert(sourceUrl.startsWith("https://"),"Citation must open a secure primary source");
+      assert.equal(await page.locator("#bcsNotice").evaluate(el=>el.hidden),false,"BCS syllabus note must be enabled for BCS selection");
+
     }
     if(count===20){
       await page.locator("#question-0 .question-option").first().click();
@@ -129,7 +138,7 @@ try{
     ["6",null,"গণিত",4],["7",null,"বিজ্ঞান",3],
     ["9","science","রসায়ন",3],["10","commerce","হিসাববিজ্ঞান",3],
     ["11","arts","ইতিহাস",3],["12","science","জীববিজ্ঞান",3],
-    ["admission","commerce","হিসাববিজ্ঞান",3],["bcs",null,"মানসিক দক্ষতা",1]]){
+    ["admission","commerce","হিসাববিজ্ঞান",3],["bcs",null,"মানসিক দক্ষতা",1],["bcs",null,"আন্তর্জাতিক বিষয়াবলি",8]]){
     await page.locator("#notesLevel").selectOption(level);
     if(stream)await page.locator("#notesStream").selectOption(stream);
     else assert(await page.locator("#notesStreamField").isHidden());

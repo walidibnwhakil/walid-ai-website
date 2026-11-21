@@ -163,3 +163,8 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
  .question-option{padding:11px 12px}
  .question-feedback{padding:12px}
 }
+
+.question-source{display:inline-flex;align-items:center;gap:6px;margin-top:10px;color:#155740;font-size:.86rem;font-weight:750;text-underline-offset:3px;overflow-wrap:anywhere}
+.question-source:hover{color:#0a3d2b}
+.source-date{display:inline-block;margin:7px 0 0 6px;color:#64736a;font-size:.8rem;overflow-wrap:anywhere}
+.note-article .question-source{margin-top:20px}

@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="Riddlex — The Guessing Detective | Walid AI">
   <meta name="twitter:description" content="Think of a real person, character, animal or object. Riddlex asks one question at a time and tries to guess.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
-  <link rel="stylesheet" href="./style.css?v=akinator-32">
+  <link rel="stylesheet" href="./style.css?v=akinator-33">
   <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
@@ -71,11 +71,15 @@
           <p id="status" aria-live="polite"></p>
         </div>
         <div id="answers" role="group" aria-label="Answer">
-          <button id="answer-yes" type="button" data-answer="yes">Yes</button>
-          <button id="answer-no" type="button" data-answer="no">No</button>
-          <button id="answer-unknown" type="button" data-answer="unknown">Don't know</button>
-          <button id="answer-probably" type="button" data-answer="probably">Probably</button>
-          <button id="answer-probably-not" type="button" data-answer="probably_not">Probably not</button>
+          <div class="answer-row">
+            <button id="answer-yes" type="button" data-answer="yes">Yes</button>
+            <button id="answer-no" type="button" data-answer="no">No</button>
+            <button id="answer-unknown" type="button" data-answer="unknown">Don't know</button>
+          </div>
+          <div class="answer-row">
+            <button id="answer-probably" type="button" data-answer="probably">Probably</button>
+            <button id="answer-probably-not" type="button" data-answer="probably_not">Probably not</button>
+          </div>
         </div>
       </div>
       <div id="categories" hidden>
@@ -127,7 +131,7 @@
       }).catch(function () {});
     }
   </script>
-  <script type="module" src="./app.js?v=akinator-32"></script>
+  <script type="module" src="./app.js?v=akinator-33"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>
 </html>

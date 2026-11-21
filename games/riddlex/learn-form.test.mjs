@@ -21,14 +21,14 @@ test("a failed or empty teach shows a message and does not hide the form", () =>
   assert.doesNotMatch(failure, /learnForm\.hidden = true/);
 });
 
-test("phone category buttons stack under the question bubble", () => {
+test("phone choices sit under the bubble in compact rows", () => {
   const css = readFileSync(new URL("./style.css", import.meta.url), "utf8");
-  assert.match(css, /#categories \{\s*\/\* Sit under the speech bubble/);
-  assert.match(css, /var\(--chin-y/);
-  assert.doesNotMatch(css, /#categories \{\s*top: auto; bottom: 8px;/);
-  assert.match(html, /id="load-retry"/);
-  assert.match(app, /failedLoad/);
-  assert.match(app, /akinator-32/);
+  assert.match(css, /--under-bubble/);
+  assert.match(css, /\.answer-row \{ display: contents; \}/);
+  assert.match(html, /class="answer-row"/);
+  assert.match(html, /id="answer-yes"/);
+  assert.match(app, /placeUnderBubble/);
+  assert.match(app, /akinator-33/);
 });
 
 test("a saved name ends on a short thank-you in both languages", () => {

@@ -1,9 +1,9 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-32";
-import { UI, guessFont } from "./i18n.js?v=akinator-32";
-import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-32";
-import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-32";
-import { createScene, startMenuCat } from "./scene.js?v=akinator-32";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-33";
+import { UI, guessFont } from "./i18n.js?v=akinator-33";
+import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-33";
+import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-33";
+import { createScene, startMenuCat } from "./scene.js?v=akinator-33";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -82,7 +82,7 @@ function gameInProgress() {
 }
 
 const LOAD_MS = 15000;
-const BUILD = "akinator-32";
+const BUILD = "akinator-33";
 
 function withTimeout(promise, ms) {
   let timer;
@@ -145,6 +145,31 @@ function setStatus(message, number) {
   speech?.classList.remove("pop");
   void speech?.offsetWidth;
   speech?.classList.add("pop");
+  scheduleUnderBubble();
+}
+
+function placeUnderBubble() {
+  const wrap = document.querySelector(".stage-wrap");
+  const bubble = $("speech");
+  if (!wrap || !bubble || wrap.clientWidth / Math.max(1, wrap.clientHeight) >= 0.8) return;
+  const wr = wrap.getBoundingClientRect();
+  const sr = bubble.getBoundingClientRect();
+  if (sr.height < 8) return;
+  const shown = !$("categories").hidden ? $("categories") : $("answers");
+  const height = shown && !shown.hidden ? shown.getBoundingClientRect().height : 96;
+  const gap = 10;
+  let top = sr.bottom - wr.top + gap;
+  const max = Math.max(gap, wr.height - height - 8);
+  if (top > max) top = max;
+  const next = `${Math.round(top)}px`;
+  if (wrap.style.getPropertyValue("--under-bubble") !== next) {
+    wrap.style.setProperty("--under-bubble", next);
+  }
+}
+
+function scheduleUnderBubble() {
+  placeUnderBubble();
+  requestAnimationFrame(placeUnderBubble);
 }
 
 function showOnly(which) {
@@ -161,6 +186,7 @@ function showOnly(which) {
   learnForm.hidden = which !== "learn";
   $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
   $("credit").hidden = which === "pick" || which === "ask";
+  scheduleUnderBubble();
 }
 
 async function openPlay() {
@@ -177,6 +203,7 @@ async function openPlay() {
   $("confirm").hidden = true;
   scene.setMood("curious");
   try { await scene.start(); } catch { /* the picture can arrive late; the choices stay up */ }
+  scheduleUnderBubble();
   try { await withTimeout(loading, LOAD_MS); }
   catch { showLoadRetry(); }
 }
@@ -470,7 +497,11 @@ document.addEventListener("keydown", (event) => {
     onAnswer(values[Number(event.key) - 1]);
   }
 });
-window.addEventListener("resize", () => scene.resize());
+window.addEventListener("resize", () => { scene.resize(); scheduleUnderBubble(); });
+if (typeof ResizeObserver === "function") {
+  const bubble = $("speech");
+  if (bubble) new ResizeObserver(() => placeUnderBubble()).observe(bubble);
+}
 
 if (new URLSearchParams(location.search).has("autotest")) {
   window.__riddlex = {

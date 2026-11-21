@@ -178,7 +178,12 @@
       console.error("Sports data refresh failed",error);
       const updated=document.querySelector("#feedUpdated"),status=document.querySelector("#feedStatus");
       const fallback=cachedData?{...cachedData,fetchFailed:true}:{sports:{},fetchFailed:true};
-      renderHome(fallback);renderDetail(fallback);
+      if(cachedData||!document.querySelector("[data-static-ready]")){
+        renderHome(fallback);renderDetail(fallback);
+      }else{
+        const info=document.querySelector("#feedUpdated")||document.querySelector("#feedStatus");
+        if(info) info.textContent="Live refresh failed. Showing the last verified match snapshot; live status is unavailable.";
+      }
       if(updated&&!cachedData)updated.textContent="Sports information is temporarily unavailable. Please try again later.";
       if(status&&!cachedData)status.textContent="Sports information is temporarily unavailable. Please try again later.";
     }finally{inFlight=false;}

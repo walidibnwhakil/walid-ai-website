@@ -27,7 +27,7 @@ try {
           assert.ok(await page.locator("section.panel").count(), path + " has no tool instructions");
         }
         const visibleText = await page.locator("body").innerText();
-        assert.ok(!/\\b(?:FIXME|TODO|debug mode|stack trace|TypeError|ReferenceError|npm install|git clone)\\b/i.test(visibleText),
+        assert.ok(!/\b(?:FIXME|TODO|debug mode|stack trace|TypeError|ReferenceError|npm install|git clone)\b/i.test(visibleText),
           path + " appears to expose development text");
         results.push({ path, status: response.status(), heading });
         lastError = null;

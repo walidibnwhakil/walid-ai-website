@@ -46,7 +46,7 @@ for chapter_num, lead in ((6, "১৬৩০ সালে জন্ম"), (15, "�
     check(first is not None and first.group(1).startswith(lead),
           f"chapter {chapter_num}: reign biography must precede later-era context")
 
-check(sections[18][1].count("১৯৪৮ সালে বার্মা ও সিলন স্বাধীন") == 1,
+check(sections[18][1].count("১৯৪৮ সালের জানুয়ারিতে বার্মা") == 1,
       "George VI narrative must not repeat 1948 independence transition")
 
 required = {

@@ -266,6 +266,48 @@ def validate_joan_chronology(path):
     if "এই অধ্যায়ের শেষে" in content or "উৎস ও পরবর্তী পাঠ" in content:
         fail(path, "Joan book contains an obsolete editorial label")
 
+    # Regression contract for the expanded, research-led biography (not just 13 headings).
+    essential_people = {
+        1: ("বেডফোর্ড", "ইজাবো", "ফিলিপ দ্য গুড"),
+        2: ("জাকমাঁ", "ক্যাথরিন", "ইজাবেল রোমে"),
+        3: ("রবার্ট দ্য বোদ্রিকুর", "পুয়াতিয়ের", "জঁ দ্য অলোঁ"),
+        4: ("দুনোয়া", "সাফোক", "লে তুরেল"),
+        5: ("ট্যালবট", "পাতে", "রেনো দ্য শার্ত্র"),
+        6: ("লা ত্রেমুইয়", "বার্গান্ডি", "সাঁ-পিয়ের"),
+        7: ("গিয়োম দ্য ফ্লাভি", "জঁ দ্য লুক্সেমবুর্গ", "২৩ মে ১৪৩০"),
+        8: ("পিয়ের কোশোঁ", "মঁশোঁ", "ওয়ারউইকের"),
+        9: ("দে স্তিভে", "মাশিয়ু", "বারোটি"),
+        10: ("২৪ মে", "৩০ মে ১৪৩১", "মার্তাঁ লাদভেনু"),
+        11: ("আরাস", "ট্যালবট", "১৪৬১"),
+        12: ("ব্রেয়াল", "ক্যালিক্সটাস", "১৪৫৬"),
+        13: ("মিশলে", "কিশেরা", "১৯২০"),
+    }
+    for chapter, required in essential_people.items():
+        if chapter > len(sections):
+            continue
+        plain = re.sub(r"<[^>]+>", " ", sections[chapter - 1])
+        paragraphs = re.findall(r"<p>(.*?)</p>", sections[chapter - 1], re.S)
+        if len(paragraphs) < 12 or len(plain) < 3600:
+            fail(path, f"Joan chapter {chapter} lost developed biographical coverage")
+        for person_or_event in required:
+            if person_or_event not in plain:
+                fail(path, f"Joan chapter {chapter} lost {person_or_event}")
+    if content.count('class="legal-footer"') != 1:
+        fail(path, "Joan must retain exactly one footer")
+    for expected_asset in (
+        "/walid-ai-approved-logo.png",
+        "/others/assets/books.css",
+        "/others/assets/reader.js",
+        "/walid-legal.css",
+        'rel="canonical" href="https://walid-ai.com/others/history/joan-of-arc/"',
+    ):
+        if expected_asset not in content:
+            fail(path, f"Joan reader lost branding/navigation/SEO asset: {expected_asset}")
+
+
+
+
+
 
 
 def validate_editorial_metadata(path):

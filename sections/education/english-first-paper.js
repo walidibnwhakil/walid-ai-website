@@ -14,7 +14,7 @@ function optionsFor(correct,seed,type){const out=[correct];const pool=distractor
 const templates=[
 (p)=>['Where did the activity take place?',p.place],
 (p)=>['Who helped the participants?',p.helpers],
-(p)=>['When did the group hold its regular activity?',p.day],
+(p)=>['When did an activity or event in the passage take place?',p.day],
 (p)=>['What was an important activity or goal?',p.activity],
 (p)=>['What resources or materials are mentioned?',p.resource],
 (p)=>['What kind of initiative does the passage describe?',p.kind],
@@ -23,7 +23,7 @@ const templates=[
 const vocabulary=[
 ['community','a group of people living in the same area','a type of vehicle','a single building','a kind of weather'],
 ['compost','decayed organic material used to improve soil','a computer program','a metal tool','a river crossing'],
-['preparedness','being ready for possible events','forgetting a task','losing a document','winning a prize'],
+['prepare','to get ready for a possible event','forgetting a task','losing a document','winning a prize'],
 ['mechanic','a person who repairs machines','a person who writes novels','a person who studies stars','a person who grows rice'],
 ['reusable','able to be used again','designed to break easily','made only of paper','available for one hour'],
 ['remote','far from major towns or centres','extremely crowded','very expensive','recently painted'],
@@ -41,7 +41,7 @@ const vocabulary=[
 const vocabularyQuestions=passages.length*4;
 const skillPrompts=[
 {topic:'Information transfer',ask:'Which entry correctly completes a fact file for the initiative?',field:'place',label:'Location'},
-{topic:'Information transfer',ask:'Which entry correctly records the day of the activity?',field:'day',label:'Day'},
+{topic:'Information transfer',ask:'Which entry correctly records when the activity or event happened?',field:'day',label:'When'},
 {topic:'Information transfer',ask:'Which entry correctly records the helper or instructor?',field:'helpers',label:'Helper'},
 {topic:'Information transfer',ask:'Which entry correctly records the main goal?',field:'activity',label:'Goal'},
 {topic:'Matching information',ask:'Which pair correctly matches the initiative with its location?',field:'place',label:'Location'},

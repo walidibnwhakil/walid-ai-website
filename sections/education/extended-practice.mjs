@@ -296,10 +296,10 @@ export function createWorkedPractice(level,stream,perTemplate=130){
   const types=bcs?advanced:
     stream==="commerce"?(high||admission?
       [["হিসাববিজ্ঞান","accounting"],["হিসাববিজ্ঞান","profit"],["ফিন্যান্স ও ব্যাংকিং","interest"],["ব্যবসায় সংগঠন","cost"],["অর্থনীতি","percent"],["অর্থনীতি","average"]]:
-      common.concat([["হিসাববিজ্ঞান","accounting"],["হিসাববিজ্ঞান","profit"],["ফিন্যান্স ও ব্যাংকিং","interest"],["অর্থনীতি","percent"]])):
+      common.concat([["হিসাববিজ্ঞান","accounting"],["হিসাববিজ্ঞান","profit"],["ফিন্যান্স ও ব্যাংকিং","interest"],["ব্যবসায় সংগঠন","cost"]])):
     stream==="arts"?(high||admission?
       [["যুক্তিবিদ্যা","sequence"],["অর্থনীতি","percent"],["ভূগোল","population"],["অর্থনীতি","average"],["যুক্তিবিদ্যা","ratio"]]:
-      common.concat([["ভূগোল","population"],["যুক্তিবিদ্যা","sequence"],["অর্থনীতি","percent"]])):
+      common.concat([["ভূগোল","population"]])):
     science?(high||admission?
       [["উচ্চতর গণিত","algebra"],["উচ্চতর গণিত","equation"],["উচ্চতর গণিত","sequence"],["পদার্থবিজ্ঞান","force"],["পদার্থবিজ্ঞান","power"],["উচ্চতর গণিত","square"],["উচ্চতর গণিত","average"]]:
       common.concat([["পদার্থবিজ্ঞান","force"],["পদার্থবিজ্ঞান","power"]])):

@@ -102,6 +102,20 @@ const recent=[
 ];
 recent.forEach(([subject,q,correct,wrong,why,eventDate,source])=>add(subject,subject==="বাংলাদেশ বিষয়াবলি"?"সাম্প্রতিক বাংলাদেশ — ২০২৬":"সাম্প্রতিক আন্তর্জাতিক ঘটনাবলি — ২০২৬",
  q,correct,wrong,why,source,eventDate,"dated-current-affairs"));
+
+/* 118 distinct chemical-element atomic number facts, per IUPAC periodic table. */
+const ELEMENT_SYMBOLS=["H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe","Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu","Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg","Tl","Pb","Bi","Po","At","Rn","Fr","Ra","Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm","Md","No","Lr","Rf","Db","Sg","Bh","Hs","Mt","Ds","Rg","Cn","Nh","Fl","Mc","Lv","Ts","Og"];
+const ELEMENT_SOURCE="https://iupac.org/what-we-do/periodic-table-of-elements/";
+ELEMENT_SYMBOLS.forEach((symbol,index)=>{
+ const atomicNumber=index+1;
+ const alternatives=[(atomicNumber+1)%118+1,(atomicNumber+4)%118+1,(atomicNumber+9)%118+1];
+ add("সাধারণ বিজ্ঞান","রসায়ন: মৌল ও পারমাণবিক সংখ্যা",
+  "পর্যায় সারণিতে "+symbol+" চিহ্নের মৌলটির পারমাণবিক সংখ্যা কত?",
+  String(atomicNumber),alternatives.map(String),
+  "IUPAC-এর পর্যায় সারণিতে "+symbol+" চিহ্নের মৌলটির পারমাণবিক সংখ্যা "+atomicNumber+"।",
+  ELEMENT_SOURCE);
+});
+
 export const FACT_ROWS=Object.freeze(rows);
 export const FACT_COUNT=rows.length;
 export const CURRENT_AFFAIRS_COUNT=rows.filter(r=>r.kind==="dated-current-affairs").length;

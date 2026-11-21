@@ -63,13 +63,37 @@ seen = set()
 paras = 0
 for number, _, body in chapters:
     paragraphs = re.findall(r"<p>(.*?)</p>", body, flags=re.S)
-    assert len(paragraphs) >= 6, f"Chapter {number} is too abrupt"
+    assert len(paragraphs) >= 8, f"Chapter {number} has fewer than eight developed scenes"
+    words = len(re.sub(r"<[^>]+>", "", body).split())
+    assert words >= 400, f"Chapter {number} is too compressed ({words} words)"
+    for meta_phrase in ("প্রচলিত কাহিনিতে", "এই পর্বে", "কল্পকাহিনির", "লোককাহিনির"):
+        assert meta_phrase not in body, f"Chapter {number} interrupts narration with {meta_phrase}"
     for paragraph in paragraphs:
         plain = re.sub(r"<[^>]+>", "", paragraph).strip()
         assert len(plain) >= 140, f"Chapter {number} contains a filler paragraph"
         assert plain not in seen, f"Repeated paragraph in chapter {number}"
         seen.add(plain)
     paras += len(paragraphs)
+
+# Keep the seven voyages distinct, including the often misplaced second-voyage goods.
+detailed_milestones = {
+    3: ("অশ্বপালক", "মিহরজান", "অধিনায়ক"),
+    5: ("মাংস", "হীরা", "বণিক"),
+    6: ("অধিনায়ক", "দৈত্য", "ভেলা"),
+    7: ("দ্বিতীয় যাত্রার", "অবিক্রীত", "সাপ"),
+    8: ("পারস্য", "মরিচ", "জিন"),
+    9: ("সাত", "স্ত্রী", "গুহা", "আঘাত"),
+    10: ("জাহাজ", "রক পাখি", "ছানা"),
+    11: ("আঙুর", "সমুদ্রবৃদ্ধ", "নারকেল"),
+    12: ("সঙ্গী", "অন্ধকার", "নদী"),
+    13: ("সেরেন্দিব", "খলিফা", "উপহার"),
+    14: ("খলিফা", "জলদস্যু", "দাসবাজার", "ধনুক"),
+    15: ("হাতি", "মুক্ত", "বাগদাদ"),
+    16: ("হিন্দবাদ", "উপহার", "বাগদাদ"),
+}
+for i, words in detailed_milestones.items():
+    for word in words:
+        assert word in chapters[i - 1][2], f"Chapter {i} lost a core scene: {word}"
 
 for invariant in (
     "/walid-ai-approved-logo.png",

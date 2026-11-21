@@ -89,8 +89,9 @@ const evidence = {
 };
 for (const [index, anchors] of Object.entries(evidence))
   for (const token of anchors) assert.ok(chapters[Number(index) - 1][3].includes(token), "Lost evidence anchor in chapter " + index + ": " + token);
-for (const source of ["https://sunnah.com/bukhari:4240","https://sunnah.com/bukhari:4986","https://sunnah.com/bukhari:4987","https://doi.org/10.1093/jis/etac001"])
-  assert.ok(html.includes('href="' + source + '"'), "Missing accessible inline evidence link: " + source);
+for (const sourceName of ["সহিহ বুখারির ৪২৪০–৪২৪১ নম্বর বর্ণনায়","সহিহ বুখারির ৪৯৮৬ নম্বর বর্ণনায়","সহিহ বুখারির ৪৯৮৭ নম্বর বর্ণনায়","সিফফিনের সালিশচুক্তির আধুনিক গবেষণায়"])
+  assert.ok(html.includes(sourceName), "Missing scholarly attribution text: " + sourceName);
+assert(!((html.match(/<a[^>]+>/g)||[]).some(tag=>tag.includes('href="https://')||tag.includes('href="http://'))), "References in the narrative must be plain text");
 
 
 const contentTypes={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".png":"image/png",".ico":"image/x-icon",".ttf":"font/ttf",".woff2":"font/woff2"};

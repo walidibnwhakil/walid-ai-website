@@ -19,11 +19,12 @@ assert.match(source, /\/others\/assets\/reader\.js/);
 assert.equal((source.match(/class="legal-footer"/g) || []).length, 1, "Exactly one footer");
 assert.equal((source.match(/class="others-toc-dialog"/g) || []).length, 1, "Exactly one TOC sidebar");
 assert.doesNotMatch(source, /class="others-(?:sources|next)"/, "Removed source/other-story blocks must stay removed");
-for (const requiredLink of [
-  "https://www.iranicaonline.org/articles/maleksah/",
-  "https://www.iranicaonline.org/articles/sanjar/",
-  "https://www.iranicaonline.org/articles/saljuqs/saljuqs-iii/",
-]) assert(source.includes(requiredLink), "Source evidence link missing: " + requiredLink);
+for (const referenceName of [
+  "এনসাইক্লোপিডিয়া ইরানিকা: মালিক শাহ",
+  "আহমদ সানজার",
+  "এন্ড্রু পিকক: সেলজুকস অব রুম",
+]) assert(source.includes(referenceName), "Source attribution text missing: " + referenceName);
+assert(!((source.match(/<a[^>]+>/g)||[]).some(tag=>tag.includes('href="https://')||tag.includes('href="http://'))), "References in the narrative must be plain text");
 const existingParagraphs = new Set();
 for (const [i, chapter] of chapters.entries()) {
   assert.equal(+chapter[1], i + 1, "Chapters must have contiguous IDs");

@@ -63,8 +63,8 @@ def validate_book(path):
             fail(path, "Quran 18:10 prayer was altered or duplicated")
         if not all(token in content for token in (
             "বাংলা ভাবার্থ", "স্বতন্ত্রভাবে রচিত",
-            'href="/islam/quran/al-kahf/"',
-            'href="https://www.iranicaonline.org/articles/ephesus/"',
+            "সূরা আল-কাহফের পাঠে",
+            "Encyclopaedia Iranica-য় Nicholas Sims-Williams-এর আলোচনায়",
             "আটজন", "৩০০ বছরের সঙ্গে আরও নয়",
         )):
             fail(path, "Ashab al-Kahf source attribution or variant caution missing")

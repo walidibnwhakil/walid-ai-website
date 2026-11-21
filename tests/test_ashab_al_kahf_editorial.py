@@ -63,9 +63,12 @@ check('<html lang="bn">' in HTML, "Bengali language attribute missing")
 check('rel="canonical" href="https://walid-ai.com/others/history/ashab-al-kahf/"' in HTML,
       "canonical URL incorrect")
 check('<meta name="description"' in HTML, "SEO description missing")
-check('href="/islam/quran/al-kahf/"' in HTML, "Quran primary text link missing")
-check('href="https://www.iranicaonline.org/articles/ephesus/"' in HTML,
-      "Seven Sleepers research attribution link missing")
+check("সূরা আল-কাহফের পাঠে" in HTML, "Quran primary-text attribution missing")
+check("Encyclopaedia Iranica-য় Nicholas Sims-Williams-এর আলোচনায়" in HTML,
+      "Seven Sleepers research attribution missing")
+check('href="/islam/quran/al-kahf/"' not in HTML and
+      'href="https://www.iranicaonline.org/articles/ephesus/"' not in HTML,
+      "Prose references must be plain text, not hyperlinks")
 check(HTML.count('class="legal-footer"') == 1, "footer must appear exactly once")
 check(HTML.count('class="others-toc-dialog"') == 1, "chapter drawer missing or repeated")
 check('class="others-toc-trigger"' in HTML and '/others/assets/reader.js' in HTML,

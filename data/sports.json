@@ -1,13 +1,97 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-20T18:18:12.729726+00:00",
+  "updatedAt": "2026-11-21T01:04:15.660693+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Pochettino demands say on big United decisions; Arteta takes fantasy football action; Nations League draw – live",
-      "url": "https://www.theguardian.com/football/live/2026/nov/20/weekend-football-countdown-live-news-updates",
+      "title": "Price beats Kotaskova to become undisputed champion",
+      "url": "https://www.bbc.co.uk/sport/boxing/articles/cw808y2lrkzxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T23:30:56+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Cost of Man Utd hiring and firing managers nears £100m",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cwd01n9z23x5o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T23:18:16+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Bayern Munich confirm Harry Kane ‘out for next few months’ with ankle injury",
+      "url": "https://www.theguardian.com/football/2026/nov/20/harry-kane-ankle-ligament-injury-bayern-munich-england",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T18:05:11+00:00",
+      "publishedAt": "2026-11-20T22:43:40+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "NFL great Brady could buy Chelsea stake",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmg46k97k92do?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T22:36:35+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Premier League news: Moyes demands more from Grealish, Iraola wary of United threat",
+      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-news-everton-jack-grealish-manchester-city-liverpool-chelsea",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T22:31:19+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Price survives match darts to reach Grand Slam semis",
+      "url": "https://www.bbc.co.uk/sport/darts/articles/ck7928yjd1dgo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T22:30:34+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Alcaraz puts aside injury concerns to take apart Cobolli",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/cqrkgn17emr2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T21:58:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Shevchenko lying about drugs test claims - Mudryk",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cjn502n9vqp4o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T21:54:17+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Osimhen keen on Man Utd move - Saturday's gossip",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c60qj1924wyeo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T20:06:51+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Washington Spirit provide hope and joy in a city that badly needs it",
+      "url": "https://www.theguardian.com/football/2026/nov/20/washington-spirit-provide-hope-and-joy-in-a-city-that-badly-needs-it",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T19:56:49+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Pochettino the connector: will human touch lift Manchester United?",
+      "url": "https://www.theguardian.com/football/2026/nov/20/mauricio-pochettino-manchester-united-manager-liverpool-premier-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T19:00:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Training hard and biding his time, Dele Alli has not given up on football yet",
+      "url": "https://www.theguardian.com/football/2026/nov/20/dele-alli-tottenham-mk-dons-england",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T19:00:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Premier League team news: predicted lineups for the weekend action",
+      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-team-news-predicted-lineups-for-the-weekend-action",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-20T18:03:15+00:00",
       "category": "Sports"
     },
     {
@@ -46,52 +130,10 @@
       "category": "Sports"
     },
     {
-      "title": "Football Daily | The Premier League resumes: here’s our almost essential club-by-club recap",
-      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-resumes-club-by-club-recap-football-daily-newsletter",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T16:32:26+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'No-one is going to break us' - defiant Boks face Ireland without Erasmus",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cm930nj435dvo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T16:28:47+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Premier League news: Grealish available again for Everton, Maresca hints at City tweaks",
-      "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-news-everton-jack-grealish-manchester-city-liverpool-chelsea",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T16:24:12+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "10 games, 0 points & 30 goals conceded - Charlton's struggles explained",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cq0k0kxg5k4zo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T16:00:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Why injured Joao Pedro may be Chelsea's most important player",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cr62p7x23vg3o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T15:18:42+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Filming training by drones should be illegal - Iraola",
       "url": "https://www.bbc.co.uk/sport/football/articles/cqdr1xmekmg5o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-20T15:08:51+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Alcaraz puts aside injury concerns to take apart Cobolli",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/cqrkgn17emr2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T14:55:49+00:00",
       "category": "Sports"
     },
     {
@@ -102,38 +144,10 @@
       "category": "Sports"
     },
     {
-      "title": "Arteta warns Arsenal players over FPL team news leak",
-      "url": "https://www.bbc.co.uk/sport/football/articles/ck62pz5r16pro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T14:08:55+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Arsenal’s Lisa Baum: ‘I believe in us. I think it’s all about the small margins’",
       "url": "https://www.theguardian.com/football/2026/nov/20/arsenal-lisa-baum-germany-brother-dennis",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T13:00:29+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Liverpool fan found not guilty of racial abuse after Antoine Semenyo withdraws from case",
-      "url": "https://www.theguardian.com/football/2026/nov/20/liverpool-fan-not-guilty-racial-abuse-antoine-semenyo-withdraws-from-case-bournemouth-liverpool",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T12:20:00+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Bukayo Saka may not return for Arsenal before Christmas, Mikel Arteta admits",
-      "url": "https://www.theguardian.com/football/2026/nov/20/bukayo-saka-injury-may-not-play-arsenal-before-christmas-mikel-arteta",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-20T10:46:32+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Cummins retains Cricket Australia support as captain",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c6808y17r0l0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T10:13:23+00:00",
       "category": "Sports"
     },
     {
@@ -151,24 +165,10 @@
       "category": "Sports"
     },
     {
-      "title": "History, hunger and headline bills - why Price is box office",
-      "url": "https://www.bbc.co.uk/sport/boxing/articles/crwy8e7d5lj1o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T05:32:13+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Premier League: 10 things to look out for this weekend",
       "url": "https://www.theguardian.com/football/2026/nov/20/premier-league-10-things-to-look-out-for-this-weekend",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T00:00:15+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Danny Kelly loved football and never forgot the absurdity of earning a living talking about it | Max Rushden",
-      "url": "https://www.theguardian.com/football/2026/nov/19/danny-kelly-death-football-radio",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-19T12:28:40+00:00",
       "category": "Sports"
     }
   ],
@@ -199,13 +199,13 @@
           "id": "83237",
           "homeTeam": "FC Bayern München",
           "awayTeam": "1. FC Köln",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 1,
+          "awayScore": 1,
+          "winner": "Draw",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-20T19:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",

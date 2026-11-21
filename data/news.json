@@ -1,21 +1,70 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-20T18:18:12.456666+00:00",
+  "updatedAt": "2026-11-21T01:04:15.261980+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Mamdani announces plan to close New York's Rikers Island jail by 2032",
+      "url": "https://www.bbc.co.uk/news/articles/cmjeqv89egylo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-21T00:01:39+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "In a year of AI solving maths problems, Anthropic may have just solved the biggest",
+      "url": "https://www.bbc.co.uk/news/articles/c6pqr2g7w059o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-20T23:08:57+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Tech stock sell-off drags markets down as Anthropic shares slide",
+      "url": "https://www.bbc.co.uk/news/articles/c6808ym10vzgo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-20T22:42:47+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "French police officers sentenced for beating of music producer Michel Zecler",
+      "url": "https://www.bbc.co.uk/news/articles/ck9d7e9wvvweo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-20T22:37:09+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Denmark accuses Russia of plotting to assassinate US-Ukrainian rapper",
+      "url": "https://www.bbc.co.uk/news/articles/cmde1lj4yjxno?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-20T21:57:07+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Trump threatens ban on US firms building AI data centres overseas",
+      "url": "https://www.bbc.co.uk/news/articles/cmde1lw9y54ko?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-20T20:54:12+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Gérard Depardieu and French author investigated over sexual allegations",
+      "url": "https://www.bbc.co.uk/news/articles/c9ly43pj10mvo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-20T19:45:20+00:00",
+      "category": "World"
+    },
     {
       "title": "Indian man sentenced to 19-plus years in plot to assassinate US-based Sikh separatist leader",
       "url": "https://www.bbc.co.uk/news/articles/cq702ez8d4lwo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-20T17:54:37+00:00",
+      "publishedAt": "2026-11-20T19:27:49+00:00",
       "category": "Bangladesh"
     },
     {
-      "title": "Anthropic shares fall after blockbuster opening as wider tech sell-off continues",
-      "url": "https://www.bbc.co.uk/news/articles/c6808ym10vzgo?at_medium=RSS&at_campaign=rss",
+      "title": "UK to explore even closer ties with EU after agreeing deal, says Burnham",
+      "url": "https://www.bbc.co.uk/news/articles/c6jreyqgw4e9o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
-      "publishedAt": "2026-11-20T17:36:29+00:00",
-      "category": "Technology"
+      "publishedAt": "2026-11-20T17:49:48+00:00",
+      "category": "World"
     },
     {
       "title": "Russian missile hits Poland as Ukraine's allies hold military exercise, says Tusk",
@@ -25,13 +74,6 @@
       "category": "Technology"
     },
     {
-      "title": "Jaiswal declines to comment on Bangladesh’s internal affairs",
-      "url": "https://en.prothomalo.com/international/india/6fwupdtx6k",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-20T16:18:53+00:00",
-      "category": "Bangladesh"
-    },
-    {
       "title": "Nearly 600 women killed in South Africa within three months",
       "url": "https://www.bbc.co.uk/news/articles/c69vwyjp0339o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -39,88 +81,11 @@
       "category": "World"
     },
     {
-      "title": "Catherine Zeta-Jones' daughter says parents warned her about 'nepo baby' label",
-      "url": "https://www.bbc.co.uk/news/articles/cmgj35zvjyp9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T15:55:02+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Explanation sought over toll collection allegations, people to be deployed to count vehicles",
-      "url": "https://en.prothomalo.com/bangladesh/igphzd0kgq",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-20T15:50:55+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Rohingyas must be repatriated to Myanmar as per verdict: Foreign Minister",
-      "url": "https://en.prothomalo.com/bangladesh/local-news/gj4f7fj8nv",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-20T14:48:14+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "BGB foils BSF bid to push 4 people into Bangladesh at Meherpur border",
-      "url": "https://en.prothomalo.com/bangladesh/vjgdiyndlr",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-20T14:41:40+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "White House removes cyber-security chief after series of tech outages",
-      "url": "https://www.bbc.co.uk/news/articles/cwz0k3nn5p5mo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T13:28:32+00:00",
-      "category": "Technology"
-    },
-    {
       "title": "Russia targets Kyiv crossings days after Ukraine hits Crimean Bridge",
       "url": "https://www.bbc.co.uk/news/articles/c6x29gn4pdn9o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-20T13:01:16+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Texas death-row inmate screams as execution takes more than one hour",
-      "url": "https://www.bbc.co.uk/news/articles/ck20vl1dd8qzo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T12:42:37+00:00",
-      "category": "World"
-    },
-    {
-      "title": "South Korea catches 111 students with new measures against exam cheating",
-      "url": "https://www.bbc.co.uk/news/articles/cm3vgw1xevvwo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T10:16:19+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "No change in metro vending machines, long queues at other counters",
-      "url": "https://en.prothomalo.com/bangladesh/jcylv46nsw",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-20T07:37:35+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Nigeria moves to end jail terms for attempted suicide",
-      "url": "https://www.bbc.co.uk/news/articles/cm3rgnvxj339o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T06:32:17+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Europe ready for talks with Russia on ending war in Ukraine, leaders say",
-      "url": "https://www.bbc.co.uk/news/articles/ckzd9nln5e6go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T00:50:24+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Massive hope for pancreatic cancer pill after trial saw tumours vanish",
-      "url": "https://www.bbc.co.uk/news/articles/cqrmgjnzz9l0o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T00:08:22+00:00",
-      "category": "World"
     }
   ],
   "sources": [
@@ -134,7 +99,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": true
+      "ok": false
     },
     {
       "name": "BBC World",

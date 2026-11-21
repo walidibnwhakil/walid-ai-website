@@ -23,5 +23,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check canonical URLs, internal links, and Quran/story integrity
         run: python3 scripts/site_quality_audit.py
+
+  others_readers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
       - name: Check Others books, chapter navigation and editorial metadata
         run: python3 tests/test_others_readers.py

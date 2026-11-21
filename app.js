@@ -1173,8 +1173,11 @@
       return kept.reverse();
     }
 
-    function thinkingText(seconds) {
-      return "Responding… " + Math.max(0, Math.floor(seconds)) + "s";
+    function thinkingText(seconds, question = "") {
+      const bengali = /[\u0980-\u09ff]/.test(question) ||
+        /\b(?:ami|tumi|apni|ki|kemon|obostha|obosta|naki|paro|koro|bhalo|valo)\b/i.test(question);
+      return (bengali ? "উত্তর দিচ্ছি… " : "Responding… ") +
+        Math.max(0, Math.floor(seconds)) + "s";
     }
 
     // Chat submit
@@ -1222,9 +1225,9 @@
       const requestId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
       let streamedBubble = null, streamedBody = null, streamedText = "", streamVisible = 0, streamTicker = null;
       let attempt = 0;
-      const thinking = addMessage("thinking", thinkingText(0));
+      const thinking = addMessage("thinking", thinkingText(0, question));
       const timer = setInterval(() => {
-        thinking.textContent = thinkingText((performance.now() - requestStarted) / 1000);
+        thinking.textContent = thinkingText((performance.now() - requestStarted) / 1000, question);
       }, 100);
 
       const headers = { "Content-Type": "application/json" };
@@ -1299,9 +1302,12 @@
                 chatError.status = response.status;
                 chatError.quota = parsed.quota || "";
                 chatError.retryable = Boolean(parsed.retryable);
-                const retryable = chatError.quota !== "daily_limit" && (chatError.retryable || response.status === 502 || response.status === 503 || response.status === 504 || response.status === 429);
+                // Retry only gateway failures, never daily limits or an
+                // exhausted provider chain. A 60-second wake loop here made
+                // ordinary chat failures feel like a frozen conversation.
+                const retryable = response.status === 502 || response.status === 504;
                 if (retryable && attempt < 2) {
-                  await wakeBackend(response.status === 429 ? 5000 : 60000);
+                  await new Promise(resolve => setTimeout(resolve, 750));
                   continue;
                 }
                 throw chatError;
@@ -1314,7 +1320,7 @@
             chatError = error;
             const network = error.name === "AbortError" || /failed to fetch|networkerror|load failed/i.test(String(error.message || ""));
             if (network && attempt < 2) {
-              await wakeBackend(60000);
+              await new Promise(resolve => setTimeout(resolve, 750));
               continue;
             }
             throw error;

@@ -16,6 +16,7 @@ import threading
 from walid_providers import (
     configured_provider_names,
     generate_fallback_answer,
+    detect_answer_language,
     mentions_creator,
 )
 from walid_staff import (
@@ -230,6 +231,20 @@ def tokenize(text):
 def small_talk_answer(question):
     """Answer common greetings without searching the PDF library."""
     normalized = normalize_text(question)
+    if normalized in {
+        "কিঅবস্থা", "কীঅবস্থা", "kiobostha", "kiobosta",
+        "kiabostha", "kiobosthaa", "কেমনআছেন", "কেমনআছো",
+    }:
+        return "আলহামদুলিল্লাহ, ভালো আছি। আপনার কী খবর?"
+    if normalized in {
+        "তুমিনাকিসবপারো", "তুমিকিসবপারো", "tuminakisobparo",
+        "tumikisobparo",
+    }:
+        return (
+            "সবকিছু পারি না। তবে প্রশ্নের উত্তর, বাংলা-ইংরেজি লেখা, "
+            "ব্যাখ্যা, পরিকল্পনা ও নানা কাজে সাহায্য করতে পারি। "
+            "ভুলও হতে পারে—গুরুত্বপূর্ণ তথ্য যাচাই করা ভালো।"
+        )
     greetings = {
         "tumikemonaso", "tumikmnaso", "tumikemonacho", "tumikmnacho",
         "kemonaso", "kmnaso", "kemonacho", "kmn acho", "howareyou",
@@ -243,7 +258,7 @@ def small_talk_answer(question):
     normalized_greetings = {normalize_text(item) for item in greetings}
     if normalized in normalized_greetings:
         if normalized in {"hi", "hey", "hello", "howareyou"}:
-            return "Hi! What would you like to talk about with Walid AI?"
+            return "Hi! How are you? What would you like to talk about with Walid AI?"
         return "আমি ভালো আছি, ধন্যবাদ! তুমি কেমন আছো? Walid AI-কে কী জানতে চাও?"
     return None
 
@@ -1625,7 +1640,9 @@ class WalidAIHandler(BaseHTTPRequestHandler):
             self.send_json(400, {"error": "আগে একটি প্রশ্ন লিখো।"})
             return
 
-        language = "en" if data.get("language") == "en" else "bn"
+        language = detect_answer_language(
+            question, "en" if data.get("language") == "en" else "bn"
+        )
         quota_user = dict(self.authenticated_user)
         quota_user["ip"] = self.client_address[0]
         quota_user["guest_id"] = str(data.get("guest_id", ""))[:128]

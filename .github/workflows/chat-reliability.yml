@@ -1,0 +1,35 @@
+name: Chat reliability
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - app.py
+      - app.js
+      - walid_providers.py
+      - tests/test_chat_reliability.py
+      - .github/workflows/chat-reliability.yml
+  push:
+    branches: [main]
+    paths:
+      - app.py
+      - app.js
+      - walid_providers.py
+      - tests/test_chat_reliability.py
+      - .github/workflows/chat-reliability.yml
+
+permissions:
+  contents: read
+
+jobs:
+  chat-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Python syntax
+        run: python3 -m py_compile app.py walid_providers.py tests/test_chat_reliability.py
+      - name: Verify browser JavaScript syntax
+        run: node --check app.js
+      - name: Test chat fallback, latency and language routing
+        run: python3 tests/test_chat_reliability.py

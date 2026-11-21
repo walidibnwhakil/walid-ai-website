@@ -19,7 +19,10 @@ from walid_providers import (  # noqa: E402
     configured_provider_names,
     is_billing_block,
     trim_history,
+    detect_answer_language,
+    build_prompt,
 )
+from app import small_talk_answer
 
 
 class MockHandler(BaseHTTPRequestHandler):
@@ -100,6 +103,20 @@ def test_units():
     trimmed = trim_history(history)
     assert len(trimmed) <= 8
     assert sum(len(item["text"]) for item in trimmed) <= 4000
+    assert detect_answer_language("কি অবস্থা?", "en") == "bn"
+    assert detect_answer_language("ki obostha", "en") == "bn"
+    assert detect_answer_language("tumi naki sob paro?", "en") == "bn"
+    assert detect_answer_language("How are you?", "bn") == "en"
+    assert detect_answer_language("বাংলায় বলো না, in English please", "bn") == "en"
+    assert "MANDATORY RESPONSE LANGUAGE: Bangla" in build_prompt(
+        "tumi naki sob paro?", [], [], [], "en", ""
+    )
+    assert "MANDATORY RESPONSE LANGUAGE: English" in build_prompt(
+        "How are you?", [], [], [], "bn", ""
+    )
+    assert "আলহামদুলিল্লাহ" in small_talk_answer("কি অবস্থা?")
+    assert "আলহামদুলিল্লাহ" in small_talk_answer("ki obostha?")
+    assert "সবকিছু পারি না" in small_talk_answer("tumi naki sob paro")
     assert is_billing_block(402, {}) is True
     assert is_billing_block(429, {"error": {"message": "You exceeded your current quota"}}) is False
     os.environ["MISTRAL_API_KEY"] = "must-not-be-used"
@@ -158,6 +175,18 @@ def test_server():
         }))
         assert status == 200, (status, answer)
         assert "Walid AI" in answer
+        assert own.bodies == [] and groq.bodies == []
+
+        for question in ("কি অবস্থা?", "ki obostha?", "tumi naki sob paro?"):
+            t0 = time.monotonic()
+            status, answer, meta = read_answer(*post_json(base + "/api/chat", {
+                "question": question,
+                "guest_id": "quick-" + str(len(question)),
+                "language": "en",
+            }))
+            assert status == 200, (question, status, answer)
+            assert any(token in answer for token in ("আলহামদুলিল্লাহ", "সবকিছু পারি না"))
+            assert (time.monotonic() - t0) < 3, question
         assert own.bodies == [] and groq.bodies == []
 
         status, answer, meta = read_answer(*post_json(base + "/api/chat", {

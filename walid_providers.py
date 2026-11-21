@@ -60,6 +60,14 @@ def configured_provider_names():
     return [name for name in allowed if name in names]
 
 
+def mentions_creator(answer):
+    """Do not serve canned dataset text as an authoritative owner biography."""
+    return bool(re.search(
+        r"\\b(?:whakil|shakil|walid)\\b|শাকিল|ওয়ালিদ|ওয়ালিদ",
+        str(answer or ""), re.IGNORECASE,
+    ))
+
+
 def trim_history(history, max_messages=8, max_chars=4000):
     """Keep the newest short turns so a long chat cannot blow the free context."""
     if not isinstance(history, list):

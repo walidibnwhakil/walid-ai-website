@@ -43,7 +43,8 @@ export function selectQuestions(pool,count,history=[],rand=Math.random){
   // those. Reuse older questions only when the unique pool is exhausted.
   // Prefer authored chapter-tagged concepts over mass-produced arithmetic
   // variants while still rotating unseen questions and balancing subjects.
-  const priority=fresh.filter(q=>Boolean(q.chapter));
+  // Original authored chapter questions take precedence over numeric variants.
+  const priority=fresh.filter(q=>Boolean(q.chapter)&&!q.generated);
   const chapterCount=Math.min(priority.length,Math.ceil(count*.4));
   const core=balanced(priority,chapterCount,rand);
   const coreIds=new Set(core.map(q=>q.id));

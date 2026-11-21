@@ -1,0 +1,22 @@
+name: Mongol history chronology and editorial integrity
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/mongol-empire/**"
+      - "tests/test_mongol_editorial.py"
+      - ".github/workflows/mongol-editorial.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mongol-history-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Mongol history, chronology, chapter coverage, TOC and branding
+        run: python3 -m unittest discover -s tests -p 'test_mongol_editorial.py' -v

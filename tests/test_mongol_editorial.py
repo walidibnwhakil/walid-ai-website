@@ -130,5 +130,39 @@ class MongolEditorialTests(unittest.TestCase):
         self.assertNotRegex(h, r'[\u0900-\u0963\u0966-\u097f]')
 
 
+    def test_key_events_follow_their_own_narrative_chronology(self):
+        chapter = {n: body for n, _, body in self.sections}
+
+        def in_order(number, *anchors):
+            positions = [chapter[number].find(s) for s in anchors]
+            self.assertTrue(all(p >= 0 for p in positions),
+                            f"Chapter {number}: missing chronology marker {anchors}: {positions}")
+            self.assertEqual(positions, sorted(positions),
+                             f"Chapter {number}: events narrated out of order: {anchors}")
+
+        # A reader must encounter the actual surrender/battle before its aftermath.
+        in_order(18, "১০ ফেব্রুয়ারি ১২৫৮", "দখলের পরে নগরে লুটপাট",
+                 "খলিফা হত্যার পরে")
+        in_order(19, "১২৬০ সালের ৩ সেপ্টেম্বর", "১২৮১ সালে হিমসের")
+        in_order(22, "১২৬৮ থেকে ১২৭৩", "ঝেনজিন ১২৮৬",
+                 "১২৮৭ সালে নায়ানের")
+        in_order(25, "উজবেক বা ওজবেগ খান", "উজবেকের পরে জানিবেগ",
+                 "তখতামিশ")
+        in_order(26, "আবাকার মৃত্যুর পরে", "আর্গুনের পরে",
+                 "১২৯৫ সালে গাজান", "১৩০৪ সালে গাজানের",
+                 "ওলজেইতুর পরে")
+        in_order(27, "১৩৫০-এর দশকে", "১৩৬৮ সালে মিং বাহিনী")
+
+    def test_sources_are_discriminated_without_reviving_source_box(self):
+        all_text = " ".join(content for _, _, content in self.sections)
+        for primary_source in ("মঙ্গোলদের গোপন ইতিহাস", "জুভায়নি",
+                               "রশিদউদ্দিন", "ইউয়ান শি"):
+            self.assertIn(primary_source, all_text)
+        for claim_caveat in ("নির্ভরযোগ্য", "প্রমাণ", "মতভেদ"):
+            self.assertIn(claim_caveat, all_text)
+        self.assertNotIn("উৎস ও পরবর্তী পাঠ", self.html)
+        self.assertNotIn('class="others-sources"', self.html)
+
+
 if __name__ == "__main__":
     unittest.main()

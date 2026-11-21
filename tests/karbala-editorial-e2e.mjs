@@ -19,14 +19,33 @@ for (let i = 0; i < chapters.length; i++) {
   assert.equal(Number(toc[i][1]), i + 1, "TOC numbers must be sequential");
   assert.equal(toc[i][2], heading, "Heading and TOC must match");
   const paragraphs = [...body.matchAll(/<p>(.*?)<\/p>/g)].map(m => m[1]);
-  assert.equal(paragraphs.length, 5, "Chapter " + number + " requires developed prose");
-  assert(body.length >= 750, "Chapter " + number + " lost detail");
+  assert(paragraphs.length >= 5, "Chapter " + number + " lost developed prose");
+  assert(body.length >= 1700, "Chapter " + number + " lost substantive narrative");
   for (const paragraph of paragraphs) {
-    assert(paragraph.length >= 105, "Thin paragraph in chapter " + number);
+    assert(paragraph.length >= 95, "Thin paragraph in chapter " + number);
     assert(!seen.has(paragraph), "Duplicate paragraph in " + number);
     seen.add(paragraph);
   }
 }
+// Word and paragraph counts are *regression guardrails*, not a declaration that the history is complete.
+let totalWords = 0;
+for (const [, number, , body] of chapters) {
+  const text = [...body.matchAll(/<p>(.*?)<\/p>/g)].map(m => m[1].replace(/<[^>]+>/g, "")).join(" ");
+  const count = text.trim().split(/\s+/).length;
+  assert(count >= 330, "Chapter " + number + " has become a short synopsis (" + count + " words)");
+  totalWords += count;
+  assert(body.includes('href="/others/history/ali-hasan-husayn-karbala/evidence/#chapter-' + number + '"'),
+    "Missing chapter evidence link " + number);
+}
+assert(totalWords >= 24000, "Book unexpectedly lost developed historical detail: " + totalWords);
+const researchPage = await readFile(new URL("others/history/ali-hasan-husayn-karbala/evidence/index.html", root), "utf8");
+assert(researchPage.includes('href="https://walid-ai.com/others/history/ali-hasan-husayn-karbala/evidence/"'), "Evidence page canonical missing");
+assert.equal((researchPage.match(/<section class="others-chapter" id="chapter-\d+">/g) || []).length, chapters.length, "Evidence page must cover every chapter");
+for (let chapter = 1; chapter <= chapters.length; chapter++)
+  assert(researchPage.includes('id="chapter-' + chapter + '"'), "Missing evidence anchor " + chapter);
+const notes = await readFile(new URL("others/history/ali-hasan-husayn-karbala/research-notes.md", root), "utf8");
+assert(notes.includes("সনদ") && notes.includes("সীমাবদ্ধতা"), "Research limitations missing");
+
 for (const [chapter, keywords] of [
   [5, ["ফাতিমা", "হাসান", "হুসাইন"]],
   [10, ["ফাদাক", "ফাতিমা", "আবু বকর"]],
@@ -135,8 +154,21 @@ try {
     await page.close();
     checked++;
   }
+
+  for (const width of [375, 1280]) {
+    const page=await browser.newPage({viewport:{width,height:800}});
+    await page.route("**/*",r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
+    const response=await page.goto(origin + target + "evidence/",{waitUntil:"load"});
+    assert.equal(response.status(),200,"Evidence page must load");
+    const layout=await page.evaluate(()=>({width:document.documentElement.scrollWidth,viewport:innerWidth,sections:document.querySelectorAll(".history-evidence-page .others-chapter").length,logo:document.querySelector(".others-brand img")?.naturalWidth>0,footers:document.querySelectorAll(".legal-footer").length}));
+    assert(layout.width<=width+2,"Evidence page horizontal overflow");
+    assert.equal(layout.sections,49);
+    assert(layout.logo);
+    assert.equal(layout.footers,1);
+    await page.close();
+  }
 }finally{
   await browser?.close();
   await new Promise(resolve=>server.close(resolve));
 }
-console.log("Merged history chapter, SEO, redirect and responsive checks passed:",chapters.length,"chapters,",checked,"viewports");
+console.log("Merged history integrity, references and responsive checks passed:",chapters.length,"chapters,",totalWords,"words,",checked,"viewports");

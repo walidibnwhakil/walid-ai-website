@@ -156,5 +156,80 @@ class SportsBackendTests(unittest.TestCase):
         self.assertNotIn("private-value", json.dumps(rows))
 
 
+    def test_openliga_uses_full_time_result_even_when_halftime_is_last(self):
+        row = {
+            "matchID": 1, "team1": {"teamName": "A"}, "team2": {"teamName": "B"},
+            "matchDateTimeUTC": "2026-11-21T12:00:00Z",
+            "matchDateTime": "2026-11-21T13:00:00",
+            "matchIsFinished": True,
+            "matchResults": [
+                {"resultTypeID": 2, "pointsTeam1": 3, "pointsTeam2": 1},
+                {"resultTypeID": 1, "pointsTeam1": 0, "pointsTeam2": 1}
+            ]
+        }
+        with patch.object(fetch, "urlopen", return_value=Response([row])), \
+             patch.object(fetch, "datetime") as clock:
+            clock.now.return_value = fetch.timezone and __import__("datetime").datetime(2026, 11, 21, 14, tzinfo=fetch.timezone.utc)
+            clock.fromisoformat = __import__("datetime").datetime.fromisoformat
+            data = fetch.read_openliga()
+        self.assertEqual((data[0]["homeScore"], data[0]["awayScore"]), (3, 1))
+        self.assertEqual(data[0]["startTime"], "2026-11-21T12:00:00Z")
+
+    def test_openliga_does_not_pass_off_halftime_as_final(self):
+        row = {
+            "matchID": 2, "team1": {"teamName": "A"}, "team2": {"teamName": "B"},
+            "matchDateTimeUTC": "2026-11-21T12:00:00Z", "matchIsFinished": True,
+            "matchResults": [{"resultTypeID": 1, "pointsTeam1": 1, "pointsTeam2": 0}]
+        }
+        with patch.object(fetch, "urlopen", return_value=Response([row])):
+            matches = fetch.read_openliga()
+        self.assertEqual(matches[0]["homeScore"], None)
+        self.assertEqual(matches[0]["awayScore"], None)
+
+    def test_cricket_does_not_assume_innings_order_matches_teams(self):
+        rows = [
+            {"id": "good", "teams": ["Scotland Women", "Netherlands Women"],
+             "dateTimeGMT": "2026-11-20T05:00:00Z", "matchStarted": True, "matchEnded": True,
+             "matchWinner": "Netherlands Women", "status": "Netherlands Women won by 7 wickets",
+             "score": [{"inning": "Netherlands Women Inning 1", "r": 155, "w": 3, "o": 19.4},
+                       {"inning": "Scotland Women Inning 1", "r": 154, "w": 7, "o": 20}]},
+            {"id": "ambiguous", "teams": ["Pakistan Women", "Ireland Women"],
+             "dateTimeGMT": "2026-11-20T09:15:00Z", "matchStarted": True, "matchEnded": True,
+             "status": "Ireland Women won by 9 wickets",
+             "score": [{"inning": "Pakistan Women Inning 1", "r": 107, "w": 10, "o": 18.4},
+                       {"inning": "Pakistan Women,Ireland Women Inning 1", "r": 111, "w": 1, "o": 13.2}]},
+            {"id": "unknown", "teams": ["Tbc", "Tbc"],
+             "dateTimeGMT": "2026-11-21T10:00:00Z", "matchStarted": False, "matchEnded": False}
+        ]
+        with patch.dict(os.environ, {"CRICKETDATA_API_KEY":"test-secret"}), \
+             patch.object(fetch, "urlopen", return_value=Response({"status":"success","data":rows})):
+            matches, reason = fetch.read_cricketdata()
+        self.assertIsNone(reason)
+        self.assertEqual(len(matches), 2)
+        good = next(x for x in matches if x["id"]=="good")
+        self.assertEqual((good["homeScore"],good["awayScore"]), (154,155))
+        self.assertEqual(good["winner"],"Netherlands Women")
+        self.assertEqual(good["resultText"],"Netherlands Women won by 7 wickets")
+        ambiguous = next(x for x in matches if x["id"]=="ambiguous")
+        self.assertEqual((ambiguous["homeScore"],ambiguous["awayScore"]), (None,None))
+        self.assertEqual(ambiguous["winner"],"Ireland Women")
+
+    def test_provider_id_duplicate_keeps_real_teams_not_tbc(self):
+        rows = [
+            {"id":"same", "source":"CricketData","homeTeam":"Bangladesh","awayTeam":"India","startTime":"2026-11-21T08:00:00Z","status":"scheduled"},
+            {"id":"same", "source":"CricketData","homeTeam":"Tbc","awayTeam":"Tbc","startTime":"2026-11-21T08:00:00Z","status":"scheduled"}
+        ]
+        result=fetch.dedupe_events(rows)
+        self.assertEqual(len(result),1)
+        self.assertEqual(result[0]["homeTeam"],"Bangladesh")
+
+    def test_outage_downgrades_old_live_and_elapsed_schedules(self):
+        rows = [{"id":"a","status":"live","homeTeam":"A","awayTeam":"B","startTime":"2026-11-20T09:00:00Z"},
+                {"id":"b","status":"scheduled","homeTeam":"C","awayTeam":"D","startTime":"2026-11-20T09:00:00Z"},
+                {"id":"c","status":"finished","homeTeam":"E","awayTeam":"F","startTime":"2026-11-20T09:00:00Z"}]
+        result=fetch.safe_outage_matches(rows)
+        self.assertEqual([x["status"] for x in result],["stale","stale","finished"])
+
+
 if __name__ == "__main__":
     unittest.main()

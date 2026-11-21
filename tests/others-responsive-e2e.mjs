@@ -44,6 +44,7 @@ const storyPaths=[
   "/others/history/saladin/",
   "/others/history/bengal-sultanate/",
   "/others/history/mughal-empire/",
+  "/others/history/mongol-empire/",
   "/others/history/mamluk-sultanate/",
   "/others/history/joan-of-arc/",
 ];
@@ -71,6 +72,7 @@ try{
           heading:document.querySelector("h1")?.textContent?.trim(),
           cardCount:cards.length,cardRects:cards.map(visibleRect),
           chapterCount:chapters.length,
+          tocChapterCount:document.querySelectorAll('.others-toc a[href^="#chapter-"]').length,
           emptyChapters:chapters.filter(node=>node.querySelectorAll("p").length<5).length,
           hasSidebar:!!document.querySelector(".others-toc-trigger"),
         };
@@ -88,6 +90,13 @@ try{
       }
       if(cardsCount===0){
         assert(layout.chapterCount>=12,path+" lost book chapters");
+        if(path==="/others/history/mongol-empire/"){
+          assert.equal(layout.chapterCount,29,"Mongol reader must have exactly 29 chapters");
+          assert.equal(layout.tocChapterCount,29,"Mongol sidebar must have 29 chapter links");
+          const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));
+          const tocIds=await page.locator(".others-toc a[href^='#chapter-']").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href").slice(1)));
+          assert.deepEqual(tocIds,ids,"Mongol chapter and TOC anchors should match");
+        }
         if(path==="/others/history/bengal-sultanate/"){
           assert.equal(layout.chapterCount,15,"Bengal Sultanate must contain 15 chronological chapters");
           const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));

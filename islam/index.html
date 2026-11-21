@@ -29,15 +29,15 @@
 .prayer-gps{display:block;width:100%;margin-top:9px}
 #prayer-gps-status{display:block;text-align:center;color:#637c6c;margin-top:5px}
 .prayer-primary{text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 0 7px}
-.prayer-spark{display:grid;place-items:center;margin-bottom:2px}
+.prayer-spark{display:grid;place-items:center;margin-bottom:8px;min-height:72px}.prayer-spark svg{display:block;width:72px;height:72px;filter:drop-shadow(0 3px 9px rgba(29,53,70,.13))}
 .prayer-primary h2{font-size:clamp(1.3rem,4vw,1.85rem);line-height:1.45;margin:0}
 .prayer-primary p{font-size:.9rem;margin:0!important;color:#5e7567}
 #prayer-countdown{font-family:"SolaimanLipi","Noto Sans Bengali",sans-serif;font-variant-numeric:tabular-nums;font-weight:750;letter-spacing:.035em;font-size:clamp(2.25rem,8vw,3.45rem);line-height:1.32}
 .prayer-warning{display:flex;gap:10px;align-items:flex-start;border:1px solid #e8c793;border-radius:10px;padding:9px 12px;background:#fff7e9;color:#78501d;margin:8px 0}
 .prayer-warning strong{display:block;font-size:.92rem}.prayer-warning p{margin:0!important;font-size:.82rem;color:#78501d!important}
 
-@media(max-width:620px){.islam-hub-header{padding:12px!important}.islam-hub-header h1{margin:2px 0 12px}.prayer-widget{padding:12px;border-radius:13px}.prayer-heading{font-size:.89rem}.prayer-location{padding:5px 9px;font-size:.8rem}.prayer-primary{padding:9px 0 3px}.prayer-spark svg{width:31px;height:31px}}
-</style><script defer src="/islam/prayer-widget.js?v=20261121b"></script></head>
+@media(max-width:620px){.islam-hub-header{padding:12px!important}.islam-hub-header h1{margin:2px 0 12px}.prayer-widget{padding:12px;border-radius:13px}.prayer-heading{font-size:.89rem}.prayer-location{padding:5px 9px;font-size:.8rem}.prayer-primary{padding:9px 0 3px}.prayer-spark{min-height:60px;margin-bottom:5px}.prayer-spark svg{width:60px;height:60px}}
+</style><script defer src="/islam/prayer-widget.js?v=20261121c"></script></head>
 <body><main class="shell"><a href="/" aria-label="Walid AI home"><img class="islam-brand" src="/walid-ai-approved-logo.png" alt="Walid AI"></a><header class="page-head islam-hub-header"><h1>আল-কুরআন ও ইসলাম</h1>
 <section id="prayer-widget" class="prayer-widget" aria-label="চলমান নামাজের ওয়াক্ত">
   <div class="prayer-top"><span class="prayer-heading">নামাজের সময়সূচি</span><div class="prayer-location-holder">
@@ -47,7 +47,7 @@
     </div><button id="prayer-gps" type="button" class="prayer-gps">⌖ GPS দিয়ে বর্তমান অবস্থান</button><small id="prayer-gps-status" role="status"></small></div>
   </div></div>
   <div class="prayer-primary">
-    <span class="prayer-spark" aria-hidden="true"><svg viewBox="0 0 48 48" width="42" height="42" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="crescent-gold" x1="7" y1="4" x2="42" y2="45" gradientUnits="userSpaceOnUse"><stop stop-color="#DCC48D"/><stop offset=".55" stop-color="#B38B43"/><stop offset="1" stop-color="#7E612D"/></linearGradient></defs><path d="M35.2 38.6A19 19 0 0 1 28.8 3.2 19.6 19.6 0 1 0 44 30.1a19 19 0 0 1-8.8 8.5Z" fill="url(#crescent-gold)" stroke="#927239" stroke-width=".45" stroke-linejoin="round"/></svg></span>
+    <span class="prayer-spark" aria-hidden="true"></span>
     <h2 id="prayer-current">ওয়াক্তের সময় নির্ণয় হচ্ছে…</h2>
     <p id="prayer-countdown-caption">বাংলাদেশ সময়</p>
     <output id="prayer-countdown" aria-live="off">--:--:--</output>

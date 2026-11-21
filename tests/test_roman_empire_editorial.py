@@ -117,4 +117,61 @@ require("এই অধ্যায়ে" not in late and "পরের অধ্�
         "reader-facing meta-narration has returned")
 print("ROMAN_CONTEXT_PASS: women, armies, primary-source caution and final chronology")
 
+# QA hardening: editorial depth is checked together with narrative events, not as a
+# substitute for source criticism or a human editorial reading.
+require(len(all_paragraphs) >= 300, "Roman narrative unexpectedly lost developed passages")
+total_words = sum(len(p.split()) for p in all_paragraphs)
+require(total_words >= 19000, "Roman narrative unexpectedly abbreviated after editorial revision")
+require("সেলজুক-পূর্ব" not in content, "anachronistic Pompey-era description returned")
+require("উৎস ও পরবর্তী পাঠ" not in content, "removed end-of-book source block returned")
+
+detail_anchors = {
+    1: ("লুক্রেশিয়া", "সেসেসিও", "প্লেবিয়ান"),
+    2: ("ত্রেবিয়া", "ত্রাসিমেন", "কান্নাই", "কার্থেজ"),
+    3: ("গ্রাক্কুস", "মিত্রযুদ্ধ", "নিষিদ্ধ তালিকায়"),
+    4: ("রুবিকন", "পম্পেই", "সেলিউকীয়", "সিজার"),
+    5: ("ফিলিপি", "অ্যাক্টিয়ামের", "অক্টাভিয়া", "লিভিয়া"),
+    6: ("পিসোর বিচার", "ক্যাপ্রি", "আগ্রিপিনা", "সেজানুস"),
+    7: ("মেসালিনা", "নার্সিসুস", "আউলুস প্লাউতিয়ুস"),
+    8: ("আগ্রিপিনা", "করবুলো", "ভিন্ডেক্স"),
+    9: ("যোসেফুস", "ডেসেবালুস", "ডোমিশিয়ান"),
+    10: ("ডেসেবালুস", "প্লোতিনা", "প্লিনি"),
+    11: ("আন্তিনোয়ুস", "বার কোখবা", "সাবিনা"),
+    12: ("লুসিল্লা", "মারকোমান্নি", "আভিডিয়ুস"),
+    13: ("লুসিল্লা", "পার্টিনাক্স", "নাইগার", "আলবিনুস"),
+    14: ("জুলিয়া ডোমনা", "মায়েসা", "মামায়েয়া", "প্লাউতিল্লা"),
+    15: ("জেনোবিয়া", "ওয়াবাল্লাথুস", "পোস্টুমুস", "অরেলিয়ান"),
+    16: ("ভ্যালেরিয়া", "প্রিস্কার", "৩০১", "৩০৩"),
+    17: ("ক্রিসপাস", "ফাউস্তা", "সলিডুস", "৩৩০"),
+    18: ("ইউসেবিয়া", "শাপুর", "ম্যাগনেন্তিয়ুস", "জুলিয়ান"),
+    19: ("ফ্রিতিগের্ন", "লুপিসিনুস", "৩৭৮"),
+    20: ("ফ্লাকিল্লা", "গাল্লা", "অ্যামব্রোস", "ফ্রিগিদুস"),
+    21: ("সেরেনা", "স্তিলিখো", "আলারিক", "প্লাসিদিয়া"),
+    22: ("হনোরিয়া", "আত্তিলা", "বোনিফাসিয়ুস", "গাইসেরিক"),
+    23: ("মেজোরিয়ান", "নেপোস", "ওদোআকর", "৪৭৬"),
+    24: ("থিওদোরা", "মার্তিনা", "ইয়ারমুক", "হেরাক্লিয়ুস"),
+    25: ("আইরিন", "থিওদোরা", "১০৪২", "১০৭১", "১২০৪", "১২৬১", "১৪৫৩"),
+}
+for chapter, terms in detail_anchors.items():
+    narrative = chapters[chapter - 1][2]
+    for term in terms:
+        require(term in narrative, f"Roman chapter {chapter} lost historical detail: {term}")
+
+# Ordered first-occurrence milestones guard against moving a later event
+# ahead of its cause while reorganizing a chapter.
+milestones = {
+    2: ("৩২১ সালের", "২৮০", "২৪১", "২১৬", "২০২", "১৪৬"),
+    5: ("ফিলিপি", "অ্যাক্টিয়ামের", "২৭ সালে", "১৪ খ্রিস্টাব্দে"),
+    16: ("২৯৩", "৩০৩", "৩০৫"),
+    17: ("৩০৬ সালে", "৩১২ সালে", "৩২৪ সালের", "৩২৬ সালে", "৩৩০ সালে", "৩৩৭ সালে"),
+    21: ("৪০২ সালের", "৪০৮ সালে", "৪১০ সালে", "৪২৩ সালে"),
+    23: ("৪৫৫", "৪৫৭", "৪৬১", "৪৬৮", "৪৭৬"),
+    25: ("৭১৭", "৭৮৭", "১০১৮", "১০২৫", "১০৭১", "১২০৪", "১২৬১", "১৪৫৩"),
+}
+for chapter, sequence in milestones.items():
+    narrative = chapters[chapter - 1][2]
+    positions = [narrative.find(token) for token in sequence]
+    require(all(p >= 0 for p in positions), f"Roman chapter {chapter} lost chronology milestone")
+    require(positions == sorted(positions) and len(set(positions)) == len(positions),
+            f"Roman chapter {chapter} has out-of-order first-occurrence milestones")
 print(f"ROMAN_EDITORIAL_PASS: {len(chapters)} chapters, {len(all_paragraphs)} paragraphs, {sum(len(p.split()) for p in all_paragraphs)} words, {len(toc)} TOC links")

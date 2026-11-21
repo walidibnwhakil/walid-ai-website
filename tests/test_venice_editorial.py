@@ -21,6 +21,21 @@ class VeniceStaticTests(unittest.TestCase):
         self.assertEqual(headings, links)
         self.assertEqual([int(number) for number, _ in headings], list(range(1, 27)))
 
+    def test_caterina_cornaro_dynastic_claims_and_life_outcome(self):
+        sections = dict(
+            (int(n), body)
+            for n, body in re.findall(
+                r'<section class="others-chapter" id="chapter-(\d+)"><h2>[^<]+</h2>(.*?)</section>',
+                HTML, re.S,
+            )
+        )
+        for term in ("ক্যাটেরিনা কর্নারো", "শার্লট", "তৃতীয় জেমস",
+                     "নেপলস", "সাইপ্রাস", "১৪৮৯ সালে", "কৃষক", "সেনেট"):
+            self.assertIn(term, sections[16], "Missing contested queenship: " + term)
+        for term in ("আসোলো", "ক্যাটেরিনা কর্নারো", "১৫১০ সালে"):
+            self.assertIn(term, sections[17], "Missing Caterina's final life: " + term)
+        self.assertIn("venice-source-metadata", HTML)
+
     def test_chronology_and_editorial_merge(self):
         headings = re.findall(r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>', HTML)
         title = [name for _, name in headings]

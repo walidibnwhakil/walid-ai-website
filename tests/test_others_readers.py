@@ -42,7 +42,7 @@ def validate_book(path):
             fail(path, "Mughal TOC count does not match revised editorial plan")
         if content.count("<p>") < 200:
             fail(path, "Mughal reader unexpectedly lost narrative detail")
-        titles = re.findall(r'<section class="others-chapter" id="chapter-\\d+"><h2>(.*?)</h2>', content)
+        titles = re.findall(r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>', content)
         for emperor in (
             "বাবর", "হুমায়ুন", "আকবর", "জাহাঙ্গীর", "শাহজাহান",
             "ঔরঙ্গজেব", "আজম শাহ", "বাহাদুর শাহ", "জাহান্দার শাহ",

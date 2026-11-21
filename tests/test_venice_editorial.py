@@ -14,15 +14,15 @@ HTML = PAGE.read_text(encoding="utf-8")
 
 class VeniceStaticTests(unittest.TestCase):
     def test_chapter_count_and_toc(self):
-        headings = re.findall(r'<section class="others-chapter" id="chapter-(\\d+)"><h2>(.*?)</h2>', HTML)
-        links = re.findall(r'<li><a href="#chapter-(\\d+)">(.*?)</a></li>', HTML)
+        headings = re.findall(r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>', HTML)
+        links = re.findall(r'<li><a href="#chapter-(\d+)">(.*?)</a></li>', HTML)
         self.assertEqual(len(headings), 23)
         self.assertEqual(len(links), 23)
         self.assertEqual(headings, links)
         self.assertEqual([int(number) for number, _ in headings], list(range(1, 24)))
 
     def test_chronology_and_editorial_merge(self):
-        headings = re.findall(r'<section class="others-chapter" id="chapter-(\\d+)"><h2>(.*?)</h2>', HTML)
+        headings = re.findall(r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>', HTML)
         title = [name for _, name in headings]
         index = lambda phrase: next(i for i, x in enumerate(title) if phrase in x)
         self.assertLess(index("১৩৪৮"), index("মারিনো ফালিয়েরো"))
@@ -37,7 +37,7 @@ class VeniceStaticTests(unittest.TestCase):
         self.assertNotIn("উৎস ও পরবর্তী পাঠ", HTML)
 
     def test_every_chapter_substantive(self):
-        chapters = re.findall(r'<section class="others-chapter" id="chapter-\\d+"><h2>.*?</h2>(.*?)</section>', HTML)
+        chapters = re.findall(r'<section class="others-chapter" id="chapter-\d+"><h2>.*?</h2>(.*?)</section>', HTML)
         self.assertEqual(len(chapters), 23)
         for number, chapter in enumerate(chapters, 1):
             self.assertGreaterEqual(chapter.count("<p>"), 5, f"chapter {number}")
@@ -104,7 +104,7 @@ class VeniceBrowserTests(unittest.TestCase):
         self.assertTrue(page.locator("footer.legal-footer").is_visible())
         artifact_dir = ROOT / "artifacts" / "venice-editorial"
         artifact_dir.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(artifact_dir / f"{name}.png"), full_page=True)
+        page.screenshot(path=str(artifact_dir / f"{name}.png"), full_page=False)
         context.close()
 
     def test_desktop(self):

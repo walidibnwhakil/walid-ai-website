@@ -37,7 +37,7 @@ for category, count in CATEGORIES.items():
             check("<a " not in intro.group(2), f"{slug}: clickable book subtitle")
             check(30 <= len(intro.group(2)) <= 175, f"{slug}: overly long or thin subtitle")
         seo = re.search(r'<meta name="description" content="([^"]+)"', doc)
-        check(seo is not None and 30 <= len(seo.group(1)) <= 175, f"{slug}: SEO summary length")
+        check(seo is not None and 65 <= len(seo.group(1)) <= 175, f"{slug}: SEO summary length")
         check("?v=20261122-symbols" in doc, f"{slug}: stale reader assets")
     check(len(icon_contents) == len(set(icon_contents)), f"{category}: duplicate illustrations")
 

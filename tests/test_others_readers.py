@@ -34,6 +34,134 @@ def validate_book(path):
         fail(path, "obsolete source or previous/next book block present")
     if ">undefined<" in content or 'content="undefined"' in content:
         fail(path, "undefined text appears in reader")
+    if path.relative_to(ROOT).as_posix() == "others/history/mughal-empire/index.html":
+        # Book-scoped editorial contract: other books retain their original tests.
+        if len(chapters) != 25:
+            fail(path, f"Mughal reader expected 25 integrated chapters; found {len(chapters)}")
+        if "অধ্যায়সূচি — ২৫টি অধ্যায়" not in content:
+            fail(path, "Mughal TOC count does not match revised editorial plan")
+        if content.count("<p>") < 200:
+            fail(path, "Mughal reader unexpectedly lost narrative detail")
+        titles = re.findall(r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>', content)
+        for emperor in (
+            "বাবর", "হুমায়ুন", "আকবর", "জাহাঙ্গীর", "শাহজাহান",
+            "ঔরঙ্গজেব", "আজম শাহ", "বাহাদুর শাহ", "জাহান্দার শাহ",
+            "ফররুখসিয়ার", "রফি-উদ-দারাজাত", "দ্বিতীয় শাহজাহান",
+            "মুহাম্মদ শাহ", "আহমদ শাহ বাহাদুর", "দ্বিতীয় আলমগীর",
+            "তৃতীয় শাহজাহান", "দ্বিতীয় শাহ আলম", "দ্বিতীয় আকবর",
+            "দ্বিতীয় বাহাদুর শাহ জাফর",
+        ):
+            if not any(emperor in title for title in titles):
+                fail(path, f"Mughal emperor missing from TOC: {emperor}")
+        for removed in ("হুমায়ুনের ভাইয়েরা ও নির্বাসিত পরিবার",
+                        "আকবরের পুত্ররা, বৈরাম খান",
+                        "নূরজাহানের উত্থান ও পতন",
+                        "ঔরঙ্গজেবের সন্তান, স্ত্রী ও সেনাপতি"):
+            if any(removed in title for title in titles):
+                fail(path, f"orphaned Mughal family chapter: {removed}")
+        final_section = re.search(
+            r'<section class="others-chapter" id="chapter-25">(.*?)</section>',
+            content, re.S)
+        if not final_section or not all(item in final_section.group(1)
+          for item in ("১৮৫৭", "হডসন", "জাফর", "বিচার", "রেঙ্গুন", "১৮৬২")):
+            fail(path, "Mughal final reign is missing the 1857–1862 sequence")
+        if content.count('class="legal-footer"') != 1:
+            fail(path, "Mughal reader lost the shared legal footer")
+        if 'href="https://walid-ai.com/others/history/mughal-empire/"' not in content:
+            fail(path, "Mughal canonical URL changed")
+        if '/walid-ai-approved-logo.png' not in content or '/others/assets/books.css' not in content:
+            fail(path, "Mughal branding or reader styles changed")
+
+
+
+
+def validate_mamluk_chronology(path):
+    """Scope-specific chronology, editorial fullness, and unchanged reader chrome."""
+    content = path.read_text(encoding="utf-8")
+    titles = re.findall(
+        r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>',
+        content
+    )
+    if len(titles) != 17:
+        fail(path, f"expected 17 carefully integrated chapters; found {len(titles)}")
+        return
+    expected = {
+        2: ("শাজার আদ-দুর", "আইবেক"),
+        4: ("আইন জালুত", "কুতুজ"),
+        5: ("বায়বার্স", "ক্রুসেডার"),
+        6: ("কালাউন", "১২৭৭"),
+        7: ("খলিল", "আক্কার"),
+        8: ("আল-নাসির", "তিন রাজত্ব"),
+        10: ("বারকুক", "বুরজি"),
+        14: ("কায়তবাই", "১৪৬৮"),
+        15: ("আল-গাওরি", "১৫১৬"),
+        16: ("তুমান বায়", "১৫১৭"),
+    }
+    for n, phrases in expected.items():
+        if not all(phrase in titles[n - 1] for phrase in phrases):
+            fail(path, f"chapter {n} has lost its historical period or main ruler")
+    section_bodies = re.findall(
+        r'<section class="others-chapter" id="chapter-\d+">.*?</h2>(.*?)</section>',
+        content, re.S
+    )
+    for n, section in enumerate(section_bodies, 1):
+        paragraphs = re.findall(r'<p>(.*?)</p>', section, re.S)
+        if len(paragraphs) < 6:
+            fail(path, f"chapter {n} is too abbreviated ({len(paragraphs)} paragraphs)")
+        if any(len(re.sub(r'<[^>]+>', '', paragraph).strip()) < 90
+               for paragraph in paragraphs):
+            fail(path, f"chapter {n} contains a thin filler paragraph")
+    for phrase in ("উৎস ও পরবর্তী পাঠ", "Walid AI Reading Library", "এই অধ্যায়ে আলোচনা", "পরের অধ্যায়ে"):
+        if phrase in content:
+            fail(path, f"obsolete or meta editorial text: {phrase}")
+    for invariant in (
+        'href="https://walid-ai.com/others/history/mamluk-sultanate/"',
+        '/walid-ai-approved-logo.png',
+        '/others/assets/books.css',
+        '/others/assets/reader.js',
+        'class="legal-footer"',
+    ):
+        if invariant not in content:
+            fail(path, "reader chrome/SEO invariant missing: " + invariant)
+
+def validate_joan_chronology(path):
+    """Joan's life must be a continuous documented narrative, not a recap followed by a restart."""
+    content = path.read_text(encoding="utf-8")
+    titles = re.findall(r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>', content)
+    expected = [
+        "ভাঙা রাজ্য", "ডমরেমি", "ভকুল্যুর", "অরলিয়াঁ", "লোয়ার",
+        "প্যারিস", "১৪৩০", "বার্গান্ডীয়", "১৪৩১ সালের রুয়াঁ",
+        "২৪–৩০ মে", "জোয়ানের মৃত্যুর পরে", "১৪৫০–১৪৫৬", "পরবর্তী শতাব্দীতে"
+    ]
+    if len(titles) != len(expected) or any(token not in title for token, title in zip(expected, titles)):
+        fail(path, "Joan of Arc chapters lost their single chronological progression")
+
+    sections = re.findall(
+        r'<section class="others-chapter" id="chapter-\d+">(.*?)</section>',
+        content, re.S
+    )
+    for i, section in enumerate(sections, 1):
+        paragraphs = re.findall(r'<p>(.*?)</p>', section, re.S)
+        if len(paragraphs) < 6 or sum(len(p) for p in paragraphs) < 1700:
+            fail(path, f"Joan chapter {i} has insufficient developed narrative")
+    milestones = {
+        1: ("১৪২০", "১৪২২"), 2: ("১৪১২", "ডমরেমি"),
+        3: ("১৪২৯", "শিনোঁ"), 4: ("২৯ এপ্রিল", "৮ মে"),
+        5: ("১৮ জুন", "১৭ জুলাই"), 6: ("৮ সেপ্টেম্বর", "প্যারিস"),
+        7: ("২৩ মে ১৪৩০", "কম্পিয়েন"),
+        8: ("২১ ফেব্রুয়ারি", "কোশোঁ"),
+        9: ("বারোটি", "বিচার"),
+        10: ("২৪ মে", "৩০ মে ১৪৩১"),
+        11: ("১৪৩৫", "১৪৫৩"), 12: ("৭ জুলাই", "১৪৫৬"),
+        13: ("১৯২০", "১৯০৯"),
+    }
+    for index, words in milestones.items():
+        if index <= len(sections) and not all(word in sections[index - 1] for word in words):
+            fail(path, f"Joan chapter {index} missing expected historical milestone")
+    if 'অধ্যায়সূচি — ১৩টি অধ্যায়' not in content:
+        fail(path, "Joan chapter TOC count does not match edited text")
+    if "এই অধ্যায়ের শেষে" in content or "উৎস ও পরবর্তী পাঠ" in content:
+        fail(path, "Joan book contains an obsolete editorial label")
 
 
 
@@ -82,6 +210,50 @@ def validate_editorial_metadata(path):
             fail(path, f"SEO description says {stated} stories/chapters; found {len(sections)}")
 
 
+def validate_saladin_timeline():
+    """Saladin's entire narrative must stay chronological, complete, and linked."""
+    path = BASE / "history" / "saladin" / "index.html"
+    content = path.read_text(encoding="utf-8")
+    parts = re.findall(
+        r'<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)</h2>(.*?)</section>',
+        content, re.S
+    )
+    toc = re.search(r'<nav class="others-toc" aria-label="অধ্যায় তালিকা">(.*?)</nav>',
+                    content, re.S)
+    if len(parts) != 27 or not toc:
+        fail(path, "expected 27 chronological chapters and a chapter TOC")
+        return
+    links = re.findall(r'<li><a href="#chapter-(\d+)">(.*?)</a></li>', toc.group(1))
+    if links != [(num, title) for num, title, _ in parts]:
+        fail(path, "Saladin chapter titles and TOC entries differ")
+    if "অধ্যায়সূচি — 27টি অধ্যায়" not in toc.group(1):
+        fail(path, "Saladin TOC chapter count is stale")
+    for n, title, body in parts:
+        paragraphs = [re.sub(r"<[^>]+>", "", p).strip()
+                      for p in re.findall(r"<p>(.*?)</p>", body, re.S)]
+        if len(paragraphs) < 6 or any(len(p) < 120 for p in paragraphs):
+            fail(path, f"Saladin chapter {n} has thin or incomplete narrative")
+    expected = {
+        1: "তাকরিত", 3: "প্রথম মিসর অভিযান", 6: "ফাতিমীয়",
+        8: "নূরুদ্দিনের মৃত্যু", 13: "হাত্তিন", 15: "জেরুজালেম",
+        17: "আক্কার দীর্ঘ অবরোধ", 19: "জাফফা",
+        20: "মৃত্যু", 21: "পুত্রদের দ্বন্দ্ব",
+        22: "আল-আদিল", 23: "আল-কামিল",
+        26: "শাজার আদ-দুর", 27: "সিরিয়ার শেষ আইয়ুবীয়রা",
+    }
+    for number, keyword in expected.items():
+        if keyword not in parts[number - 1][1]:
+            fail(path, f"Saladin chapter {number} is out of historical order")
+    if "উৎস ও পরবর্তী পাঠ" in content or 'class="others-sources"' in content:
+        fail(path, "obsolete sources/next-reading block returned")
+    if content.count('class="legal-footer"') != 1:
+        fail(path, "Saladin must preserve one shared footer")
+    for token in ("/walid-ai-approved-logo.png", "/others/assets/books.css",
+                  "/others/assets/reader.js", 'href="https://walid-ai.com/others/history/saladin/"'):
+        if token not in content:
+            fail(path, f"Saladin branding/canonical element missing: {token}")
+
+
 def validate_index(path):
     content = path.read_text(encoding="utf-8")
     cards = re.findall(r'<a class="others-card" href="[^"]+">(.*?)</a>', content, re.S)
@@ -101,8 +273,13 @@ def main():
     books = sorted(path for category in CATEGORIES for path in (BASE / category).glob("*/index.html"))
     if len(books) != 32:
         errors.append(f"Expected 32 Others books; found {len(books)}")
+    validate_saladin_timeline()
     for book in books:
         validate_book(book)
+        if book.as_posix().endswith("/history/joan-of-arc/index.html"):
+            validate_joan_chronology(book)
+        if book.as_posix().endswith("/history/mamluk-sultanate/index.html"):
+            validate_mamluk_chronology(book)
         if "/history/" not in book.as_posix():
             validate_editorial_metadata(book)
 

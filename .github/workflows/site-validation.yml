@@ -18,6 +18,8 @@ jobs:
         run: python3 scripts/validate_site.py
       - name: Validate Others books, sidebar and distinctive icons
         run: python3 tests/test_others_readers.py
+      - name: Verify British Empire editorial chronology and book shell
+        run: python3 tests/test_british_empire_editorial.py
       - name: Validate Quran, translations, routes, stories and source checksums
         run: python3 tests/test_islam_quran.py
       - name: Check current Quran header, Basmala and verse layout

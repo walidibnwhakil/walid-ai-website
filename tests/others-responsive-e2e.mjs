@@ -28,6 +28,8 @@ const indexes=[
   ["/others/islamic-literature/",5],
 ];
 const storyPaths=[
+  "/others/history/alexander/",
+  "/others/history/ottoman-empire/",
   "/others/folklore/ramayana/",
   "/others/folklore/mahabharata/",
   "/others/folklore/behula-lakhindar/",
@@ -38,7 +40,13 @@ const storyPaths=[
   "/others/islamic-literature/hatim-tai/",
   "/others/islamic-literature/aladdin/",
   "/others/islamic-literature/ali-baba/",
+  "/others/history/british-empire/",
+  "/others/history/saladin/",
+  "/others/history/bengal-sultanate/",
+  "/others/history/mughal-empire/",
   "/others/history/mongol-empire/",
+  "/others/history/mamluk-sultanate/",
+  "/others/history/joan-of-arc/",
 ];
 const widths=[320,375,768,1280];
 let browser,checks=0,sidebarChecks=0;
@@ -83,9 +91,19 @@ try{
       if(cardsCount===0){
         assert(layout.chapterCount>=12,path+" lost book chapters");
         if(path==="/others/history/mongol-empire/"){
-          assert.equal(layout.chapterCount,29,"Mongol book must retain 29 chapters");
-          assert.equal(layout.tocChapterCount,29,"Mongol TOC must contain 29 anchors");
+          assert.equal(layout.chapterCount,29,"Mongol reader must have exactly 29 chapters");
+          assert.equal(layout.tocChapterCount,29,"Mongol sidebar must have 29 chapter links");
+          const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));
+          const tocIds=await page.locator(".others-toc a[href^='#chapter-']").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href").slice(1)));
+          assert.deepEqual(tocIds,ids,"Mongol chapter and TOC anchors should match");
         }
+        if(path==="/others/history/bengal-sultanate/"){
+          assert.equal(layout.chapterCount,15,"Bengal Sultanate must contain 15 chronological chapters");
+          const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));
+          const tocIds=await page.locator(".others-toc a[href^='#chapter-']").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href").slice(1)));
+          assert.deepEqual(tocIds,ids,"Bengal Sultanate chapter links must match the document sections");
+        }
+        if(path.includes("ottoman-empire")) assert.equal(layout.chapterCount,38,"Ottoman book lost its revised chapters");
         assert.equal(layout.emptyChapters,0,path+" has empty/short chapters");
         assert.equal(layout.hasSidebar,true,path+" missing chapter drawer");
         if(width===375||width===1280){

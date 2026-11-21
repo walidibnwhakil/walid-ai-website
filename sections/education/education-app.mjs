@@ -63,7 +63,7 @@ async function fetchNotes(){
   if(baseNotes)return baseNotes;
   if(!notesPromise)notesPromise=fetch("/sections/education/notes.json")
     .then(r=>{if(!r.ok)throw Error("Study Notes unavailable");return r.json()})
-    .then(data=>{if(!Array.isArray(data.notes)||data.notes.length<200)throw Error("Invalid study notes");baseNotes=data.notes;return baseNotes})
+    .then(data=>{if(!Array.isArray(data.notes)||data.notes.length<170)throw Error("Invalid study notes");baseNotes=data.notes;return baseNotes})
     .finally(()=>{notesPromise=null});
   return notesPromise;
 }

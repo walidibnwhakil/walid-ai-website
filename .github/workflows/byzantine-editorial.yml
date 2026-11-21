@@ -1,0 +1,25 @@
+name: Byzantine editorial and browser regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/byzantine-empire/index.html"
+      - "tests/byzantine-reader-e2e.mjs"
+      - ".github/workflows/byzantine-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  byzantine-reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Validate Byzantine chronology, TOC, branding and responsive browser
+        run: node tests/byzantine-reader-e2e.mjs

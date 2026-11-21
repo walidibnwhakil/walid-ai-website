@@ -132,3 +132,11 @@ html[lang="bn"] body,html[lang="bn"] button,html[lang="bn"] .others-book-title,h
   .others-chapter-bookmark{grid-column:1/-1;grid-row:2;justify-self:center}
   .others-reader-toast{bottom:76px}
 }
+
+/* Restrained bookmark icon and persistent selected state. */
+.others-chapter-bookmark::before,.others-toc-bookmark-save::before{
+  content:"";display:inline-block;width:11px;height:14px;margin-right:8px;
+  vertical-align:-2px;background:currentColor;
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 74%,0 100%)
+}
+.others-chapter-bookmark.is-bookmarked{background:#edf6ee;border-color:#a9c8b0;color:#276b48}

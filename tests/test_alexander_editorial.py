@@ -60,6 +60,46 @@ class AlexanderEditorialTests(unittest.TestCase):
         for word in ["মতভেদ","প্রাচীন","নির্ভরযোগ্য","অনিশ্চিত"]:
             self.assertIn(word,HTML)
 
+    def test_chapters_have_no_repeated_paragraphs_or_shortcuts(self):
+        # Duplicate long passages can survive counts-based CI, so check the actual prose.
+        paragraphs = []
+        for chapter_number, _, body in CHAPTERS:
+            chapter_paragraphs = [
+                re.sub(r"<[^>]*>", "", text).strip()
+                for text in re.findall(r"<p>(.*?)</p>", body, re.S)
+            ]
+            self.assertGreaterEqual(len(chapter_paragraphs), 8, chapter_number)
+            self.assertTrue(all(len(text) >= 210 for text in chapter_paragraphs),
+                            f"chapter {chapter_number}: abbreviated narrative")
+            paragraphs.extend(chapter_paragraphs)
+        self.assertEqual(len(paragraphs), len(set(paragraphs)),
+                         "long paragraphs are repeated verbatim")
+        self.assertEqual(len(paragraphs), 247)
+
+    def test_events_follow_a_single_narrative_sequence(self):
+        # These anchors prevent the same campaign being previewed and then
+        # fully restarted, including Diadochi deaths before earlier treaties.
+        sequences = {
+            2: ("বুসেফালাস নামের ঘোড়াকে", "কাইরোনিয়ার সংঘর্ষে"),
+            6: ("গ্রানিকাস নদীর তীরে", "সার্দিসের দুর্গ", "মিলেটাসের লড়াই", "হালিকারনাসাসের প্রতিরক্ষা"),
+            10: ("গগামেলার আগে", "মাজাইয়ুসের অশ্বারোহীরা", "ব্যাবিলনের প্রধান কর্মকর্তা",
+                 "সুসার কোষাগার", "পারস্য গেটের সংকীর্ণ", "পার্সেপোলিসের অগ্নিকাণ্ডে"),
+            14: ("ম্যাসাগার", "আওরনোস", "সিন্ধু পারাপারের"),
+            15: ("তক্ষশিলায়", "ঝিলমের পূর্ব তীরে", "নিকাইয়া ও বুসেফালা"),
+            17: ("মল্লদের দুর্গে", "সিন্ধুর মোহনায়", "মরুভূমিতে জল"),
+            18: ("সুসার বিবাহে", "সুসায় রাজবংশীয় বিবাহের", "নতুন করে প্রশিক্ষণ পাওয়া",
+                 "ওপিসে অবসরপ্রাপ্ত", "ওপিসের সংঘাতের পরে"),
+            20: ("মেলেয়াগ্রোসের", "লামিয়ান যুদ্ধ", "ত্রিপারাদেইসোসে", "৩১৯ সালে", "৩১৭ সালে", "৩১৬ সালে"),
+            21: ("৩১১ সালের", "৩১০–৩০৯", "৩০৮ সালের", "৩০৬ সালে", "৩০১ সালে", "২৮১ সালে"),
+        }
+        for n, anchors in sequences.items():
+            text = SECTIONS[n]
+            indices = [text.find(anchor) for anchor in anchors]
+            self.assertTrue(all(i >= 0 for i in indices),
+                            f"chapter {n} chronology anchor missing: {list(zip(anchors, indices))}")
+            self.assertEqual(indices, sorted(indices),
+                             f"chapter {n} chronologically backtracks: {list(zip(anchors, indices))}")
+
     def test_unchanged_site_brand_navigation_and_footer(self):
         self.assertIn('<html lang="bn">',HTML)
         self.assertIn('rel="canonical" href="https://walid-ai.com/others/history/alexander/"',HTML)

@@ -111,6 +111,12 @@ try{
           const ids=await page.locator(".others-chapter[id]").evaluateAll(nodes=>nodes.map(node=>node.id));
           const tocIds=await page.locator(".others-toc a[href^='#chapter-']").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("href").slice(1)));
           assert.deepEqual(tocIds,ids,"Bengal Sultanate chapter links must match the document sections");
+          const paragraphs=await page.locator(".others-chapter p").count();
+          assert.ok(paragraphs>=200,"Bengal Sultanate reader should retain its expanded chronological narrative");
+          const readerText=await page.locator(".others-reader").innerText();
+          for(const subject of ["ফখরুদ্দিন","ইলিয়াস শাহ","সিকন্দর শাহ","গিয়াসউদ্দিন আজম শাহ","রাজা গণেশ","হাবশি","হুসেন শাহ","নসরত শাহ","শের শাহ","কররানি","দাউদ খান","ঈসা খান","মুসা খান"]){
+            assert.ok(readerText.includes(subject),"Bengal Sultanate missing historical subject: "+subject);
+          }
         }
         if(path.includes("ottoman-empire")) assert.equal(layout.chapterCount,38,"Ottoman book lost its revised chapters");
         assert.equal(layout.emptyChapters,0,path+" has empty/short chapters");

@@ -50,7 +50,7 @@ class CharacterContextEditorialTests(unittest.TestCase):
         text = read_section("history/roman-empire", 8)
         for term in ("বৌদিকা", "প্রসুতাগুস", "আইসেনি", "ত্রিনোভান্তেস",
                      "দুই কন্যা", "সুয়েতোনিয়ুস", "ট্যাসিটাস",
-                     "বিদ্রোহী", "নগরবাসী", "বন্দি", "৬১"):
+                     "বিদ্রোহী", "নগরবাসী", "সহিংসতার", "৬১"):
             self.assertIn(term, text)
 
     def test_wellesley_and_tipu_are_both_agents_in_india(self):

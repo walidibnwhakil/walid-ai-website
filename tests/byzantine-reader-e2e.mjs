@@ -71,6 +71,33 @@ for (const [n, terms] of Object.entries({
   for (const term of terms) assert.ok(section.includes(term),
     "Missing expanded Byzantine narrative: chapter " + n + " / " + term);
 }
+// Keep the researched additions in their proper reigns rather than restoring
+// repeated thematic summaries or moving a ruler's family to a later appendix.
+const chronologyEvidence = {
+  3: ["হেনোতিকন", "আকাকীয়"],
+  4: ["কার্থেজ", "ত্রিবোনিয়ানের"],
+  6: ["৬২৬", "বোনোস", "সের্গিয়ুস"],
+  7: ["৬৮০–৬৮১", "টাগমা"],
+  8: ["৭৯০", "৭৯২", "থিওডোত"],
+  9: ["বারি", "৮৪৭"],
+  10: ["৯৮৬", "ত্রায়ানের", "ওহরিদের"],
+  11: ["১০৪৩", "১০৪৭", "লিও তোরনিকিওস"],
+  12: ["১০৬৪", "তারখানেইওতেস"],
+  13: ["আন্না দালাসেনা", "আইরিন দুকাইনা", "ব্রিয়েন্নিওস"],
+  14: ["সিরমিয়ামের", "ফ্রিডরিখ"],
+  15: ["১২৩০", "১২৩৫", "ক্লোকোতনিত্সার"],
+  16: ["বাফেয়ুস", "১৩২৬"],
+  17: ["১৩৪৬", "ওরহানের", "হেলেনার", "মনফেরাতের"],
+  18: ["হেক্সামিলিয়ন", "নোতারাস", "গেন্নাদিওস"],
+};
+for (const [index, terms] of Object.entries(chronologyEvidence)) {
+  const body = chapters[Number(index) - 1][3];
+  for (const term of terms) assert.ok(body.includes(term),
+    "Missing chronologically integrated evidence: chapter " + index + " / " + term);
+}
+const minimumParagraphs = [9,9,9,13,8,11,10,10,9,11,11,10,12,12,12,11,15,17];
+assert.deepEqual(chapters.map(c => (c[3].match(/<p>/g) || []).length), minimumParagraphs,
+  "Historical passages were removed or chapter depth regressed");
 assert.ok(html.includes('rel="canonical" href="https://walid-ai.com/others/history/byzantine-empire/"'));
 assert.ok(html.includes("/walid-ai-approved-logo.png"));
 assert.ok(html.includes("/others/assets/books.css"));

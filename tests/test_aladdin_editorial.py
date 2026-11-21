@@ -149,8 +149,8 @@ class AladdinEditorial(unittest.TestCase):
         self.assertIn("সন্তানসন্ততি", texts[12])
 
     def test_reader_html_anchors_and_scoped_metadata(self):
-        anchors = re.findall(r'id="(chapter-\\d+)"', self.page)
-        targets = re.findall(r'href="#(chapter-\\d+)"', self.page)
+        anchors = re.findall(r'id="(chapter-\d+)"', self.page)
+        targets = re.findall(r'href="#(chapter-\d+)"', self.page)
         self.assertEqual(anchors, [f"chapter-{n}" for n in range(1, 13)])
         self.assertEqual(targets, anchors)
         self.assertEqual(self.page.count('<link rel="canonical"'), 1)

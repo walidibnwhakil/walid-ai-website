@@ -1,8 +1,85 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-21T01:04:15.261980+00:00",
+  "updatedAt": "2026-11-21T06:33:42.982503+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "7,000 medical technologists, pharmacists to be recruited; circular likely in December",
+      "url": "https://en.prothomalo.com/youth/employment/aypu9nfsh8",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T06:25:21+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Alves now a preacher: Leaving behind multi-million life, he seeks happiness on 113 euro",
+      "url": "https://en.prothomalo.com/sports/football/f795jla1cg",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T06:24:37+00:00",
+      "category": "World"
+    },
+    {
+      "title": "PM pays tribute to Armed Forces martyrs",
+      "url": "https://en.prothomalo.com/bangladesh/vuko4t0rko",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T06:00:54+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Zelensky says Putin is a 'killer' after Trump calls Russian leader a friend",
+      "url": "https://www.bbc.co.uk/news/articles/cxnv4zvmdy0jo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-21T05:15:41+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Man convicted of starting Palisades fire in Los Angeles",
+      "url": "https://www.bbc.co.uk/news/articles/c64gn0gy8rj3o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-21T04:34:00+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Cyclone Akvan weakens, how much rain is likely today",
+      "url": "https://en.prothomalo.com/environment/s4zzo67sp0",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T04:30:22+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Wild elephant herds descend from hills to the plains",
+      "url": "https://en.prothomalo.com/photo/bangladesh/854h1kp9xo",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T04:19:00+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "India 344-2 at tea as Rahul 124 leads push for huge total against NZ",
+      "url": "https://en.prothomalo.com/sports/cricket/aqrw902sbb",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T03:52:02+00:00",
+      "category": "Bangladesh"
+    },
+    {
+      "title": "Gold: Why prices are falling rapidly at home and abroad",
+      "url": "https://en.prothomalo.com/business/local/ov823da03x",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T03:38:18+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Buy a house in Japan without living there, here’s how",
+      "url": "https://en.prothomalo.com/lifestyle/7n5b63aq1v",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T02:31:39+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Foreigners involved in ‘scam centres’ and smuggling; Bangladesh emerging as a new crime hub",
+      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/z39x1ph4dr",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-21T02:29:29+00:00",
+      "category": "Bangladesh"
+    },
     {
       "title": "Mamdani announces plan to close New York's Rikers Island jail by 2032",
       "url": "https://www.bbc.co.uk/news/articles/cmjeqv89egylo?at_medium=RSS&at_campaign=rss",
@@ -67,13 +144,6 @@
       "category": "World"
     },
     {
-      "title": "Russian missile hits Poland as Ukraine's allies hold military exercise, says Tusk",
-      "url": "https://www.bbc.co.uk/news/articles/cqx2x9dklxnro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T16:54:29+00:00",
-      "category": "Technology"
-    },
-    {
       "title": "Nearly 600 women killed in South Africa within three months",
       "url": "https://www.bbc.co.uk/news/articles/c69vwyjp0339o?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -81,11 +151,11 @@
       "category": "World"
     },
     {
-      "title": "Russia targets Kyiv crossings days after Ukraine hits Crimean Bridge",
-      "url": "https://www.bbc.co.uk/news/articles/c6x29gn4pdn9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-20T13:01:16+00:00",
-      "category": "Technology"
+      "title": "Doing business with the junta, helps to sustain atrocities in Myanmar",
+      "url": "https://en.prothomalo.com/opinion/interview/pslqrnmyly",
+      "source": "Prothom Alo English",
+      "publishedAt": "2026-11-20T12:49:11+00:00",
+      "category": "Bangladesh"
     }
   ],
   "sources": [
@@ -99,7 +169,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": false
+      "ok": true
     },
     {
       "name": "BBC World",

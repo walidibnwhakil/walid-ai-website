@@ -1,8 +1,22 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-21T01:04:15.660693+00:00",
+  "updatedAt": "2026-11-21T06:33:43.358236+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Jeers, injuries and doubters - White's journey back to the top",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cv7028xeler2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T06:17:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Antonelli fastest but penalty leaves Verstappen on pole",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/cqlyj4yg366wo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-21T05:54:10+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Price beats Kotaskova to become undisputed champion",
       "url": "https://www.bbc.co.uk/sport/boxing/articles/cw808y2lrkzxo?at_medium=RSS&at_campaign=rss",
@@ -102,13 +116,6 @@
       "category": "Sports"
     },
     {
-      "title": "'Right time' for Smith exit - but Murray not ready for role",
-      "url": "https://www.bbc.co.uk/sport/tennis/articles/cvze7d03880ko?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T17:47:38+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Pochettino’s fiery start, plus England v All Blacks and ATP Finals finale – follow with us",
       "url": "https://www.theguardian.com/sport/2026/nov/20/pochettinos-fiery-start-plus-england-v-all-blacks-and-atp-finals-finale-follow-with-us",
       "source": "The Guardian Football",
@@ -116,24 +123,10 @@
       "category": "Sports"
     },
     {
-      "title": "Man Utd fan criticism has gone too far at times - Berrada",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cwz0k32j9kr9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T16:55:11+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Stacked England aim to pile on style and add to All Black misery",
       "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cqrmgjpp0l48o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-20T16:51:17+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Filming training by drones should be illegal - Iraola",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cqdr1xmekmg5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-20T15:08:51+00:00",
       "category": "Sports"
     },
     {
@@ -148,6 +141,13 @@
       "url": "https://www.theguardian.com/football/2026/nov/20/arsenal-lisa-baum-germany-brother-dennis",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-20T13:00:29+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Cummins retains Cricket Australia support as captain",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c6808y17r0l0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-20T10:13:23+00:00",
       "category": "Sports"
     },
     {
@@ -4029,146 +4029,46 @@
       "source": "CricketData",
       "matches": [
         {
-          "id": "1be1dad9-088a-4850-97db-eeae45113ba1",
-          "homeTeam": "Rwanda Women",
-          "awayTeam": "United States of America Women",
-          "homeScore": 100,
-          "awayScore": 86,
+          "id": "71b7c704-0528-4858-a98e-7bbc3ba50ae0",
+          "homeTeam": "China Women",
+          "awayTeam": "Indonesia Women",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "China Women vs Indonesia Women, 2nd Match, Malaysia Womens T20I Tri-Series, 2026",
+          "matchType": "t20",
+          "startTime": "2026-01-01T00:00:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "74293804-c2a4-4a56-844d-474dcb395470",
+          "homeTeam": "Western Australia",
+          "awayTeam": "England",
+          "homeScore": null,
+          "awayScore": null,
           "innings": [
             {
-              "team": "rwanda women Inning 1",
-              "runs": 100,
-              "wickets": 8,
-              "overs": 20
-            },
-            {
-              "team": "Rwanda Women,United States of America Women Inning 1",
-              "runs": 86,
+              "team": "england Inning 1",
+              "runs": 251,
               "wickets": 10,
-              "overs": 19.2
-            }
-          ],
-          "winner": "Rwanda Women",
-          "competition": "Rwanda Women vs United States of America Women, 2nd Match, Womens Victoria T20I Series, 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-06T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "4c686081-388c-4951-8d91-3571a4d0f2f7",
-          "homeTeam": "Uganda Women",
-          "awayTeam": "Namibia Women",
-          "homeScore": 73,
-          "awayScore": 74,
-          "innings": [
-            {
-              "team": "Namibia Women Inning 1",
-              "runs": 73,
-              "wickets": 9,
-              "overs": 20
+              "overs": 48
             },
             {
-              "team": "Uganda Women Inning 1",
-              "runs": 74,
-              "wickets": 6,
-              "overs": 19.3
+              "team": "Western Australia,England Inning 1",
+              "runs": 159,
+              "wickets": 10,
+              "overs": 32.3
             }
           ],
-          "winner": "Uganda Women",
-          "competition": "Uganda Women vs Namibia Women, 1st Match, Womens Victoria T20I Series, 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-06T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "c71cf924-d8c6-435a-9179-bd1f0a67a8ee",
-          "homeTeam": "Namibia Women",
-          "awayTeam": "United States of America Women",
-          "homeScore": 116,
-          "awayScore": 108,
-          "innings": [
-            {
-              "team": "Namibia Women Inning 1",
-              "runs": 116,
-              "wickets": 8,
-              "overs": 20
-            },
-            {
-              "team": "United States of America Women Inning 1",
-              "runs": 108,
-              "wickets": 9,
-              "overs": 20
-            }
-          ],
-          "winner": "Namibia Women",
-          "competition": "Namibia Women vs United States of America Women, 3rd Match, Womens Victoria T20I Series, 2026",
-          "matchType": "t20",
-          "overs": 20,
+          "winner": "England",
+          "resultText": "England won by 92 runs",
+          "competition": "Western Australia vs England, Tour Match, England tour of Australia, 2026",
+          "matchType": "",
           "startTime": "2026-11-07T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "2c0a034c-ca68-415b-80c5-2d44e637dbb3",
-          "homeTeam": "Namibia Women",
-          "awayTeam": "Rwanda Women",
-          "homeScore": 58,
-          "awayScore": 59,
-          "innings": [
-            {
-              "team": "namibia women Inning 1",
-              "runs": 58,
-              "wickets": 10,
-              "overs": 17
-            },
-            {
-              "team": "Namibia Women,Rwanda Women Inning 1",
-              "runs": 59,
-              "wickets": 6,
-              "overs": 15.5
-            }
-          ],
-          "winner": "Rwanda Women",
-          "competition": "Namibia Women vs Rwanda Women, 12th Match, Womens Victoria T20I Series, 2026",
-          "matchType": "t20",
-          "overs": 17,
-          "startTime": "2026-11-12T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "636398cc-cf9c-40e6-a5dd-d6885e622e8c",
-          "homeTeam": "Uganda Women",
-          "awayTeam": "United States of America Women",
-          "homeScore": 105,
-          "awayScore": 91,
-          "innings": [
-            {
-              "team": "Uganda Women Inning 1",
-              "runs": 105,
-              "wickets": 6,
-              "overs": 20
-            },
-            {
-              "team": "United States of America Women Inning 1",
-              "runs": 91,
-              "wickets": 9,
-              "overs": 20
-            }
-          ],
-          "winner": "Uganda Women",
-          "competition": "Uganda Women vs United States of America Women, 11th Match, Womens Victoria T20I Series, 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-12T00:00:00Z",
           "finishedAt": null,
           "status": "finished",
           "source": "CricketData"
@@ -4177,8 +4077,8 @@
           "id": "65020a6f-3d79-4812-a16d-d54f28ed40a7",
           "homeTeam": "Uganda Women",
           "awayTeam": "Rwanda Women",
-          "homeScore": 94,
-          "awayScore": 75,
+          "homeScore": null,
+          "awayScore": null,
           "innings": [
             {
               "team": "uganda women Inning 1",
@@ -4194,9 +4094,9 @@
             }
           ],
           "winner": "Uganda Women",
+          "resultText": "Uganda Women won by 19 runs",
           "competition": "Uganda Women vs Rwanda Women, Final, Womens Victoria T20I Series, 2026",
           "matchType": "t20",
-          "overs": 20,
           "startTime": "2026-11-14T00:00:00Z",
           "finishedAt": null,
           "status": "finished",
@@ -4206,8 +4106,8 @@
           "id": "82bb57d2-11e1-42f6-b2b4-2f3c6dba165e",
           "homeTeam": "Namibia Women",
           "awayTeam": "United States of America Women",
-          "homeScore": 111,
-          "awayScore": 83,
+          "homeScore": 83,
+          "awayScore": 111,
           "innings": [
             {
               "team": "United States of America Women Inning 1",
@@ -4223,97 +4123,10 @@
             }
           ],
           "winner": "United States of America Women",
+          "resultText": "United States of America Women won by 28 runs",
           "competition": "Namibia Women vs United States of America Women, 3rd Place Play-off, Womens Victoria T20I Series, 2026",
           "matchType": "t20",
-          "overs": 20,
           "startTime": "2026-11-14T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "82585c58-d4b2-4d3e-b343-13f17cebcd4d",
-          "homeTeam": "Kathmandu Gorkhas",
-          "awayTeam": "Pokhara Avengers",
-          "homeScore": 224,
-          "awayScore": 169,
-          "innings": [
-            {
-              "team": "Pokhara Avengers Inning 1",
-              "runs": 224,
-              "wickets": 3,
-              "overs": 20
-            },
-            {
-              "team": "Kathmandu Gorkhas Inning 1",
-              "runs": 169,
-              "wickets": 10,
-              "overs": 19.5
-            }
-          ],
-          "winner": "Pokhara Avengers",
-          "competition": "Kathmandu Gorkhas vs Pokhara Avengers, 28th Match, Nepal Premier League 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-15T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "81ec0634-4749-430e-b481-c7a57c88c00a",
-          "homeTeam": "Chitwan Rhinos",
-          "awayTeam": "Karnali Yaks",
-          "homeScore": 153,
-          "awayScore": 129,
-          "innings": [
-            {
-              "team": "karnali yaks Inning 1",
-              "runs": 153,
-              "wickets": 8,
-              "overs": 20
-            },
-            {
-              "team": "Chitwan Rhinos,Karnali Yaks Inning 1",
-              "runs": 129,
-              "wickets": 10,
-              "overs": 19.1
-            }
-          ],
-          "winner": "Karnali Yaks",
-          "competition": "Chitwan Rhinos vs Karnali Yaks, 27th Match, Nepal Premier League 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-15T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "3e16916c-f32d-4dda-ac36-bfeff833ce83",
-          "homeTeam": "Lumbini Lions",
-          "awayTeam": "Sudur Paschim Royals",
-          "homeScore": 105,
-          "awayScore": 108,
-          "innings": [
-            {
-              "team": "Sudur Paschim Royals Inning 1",
-              "runs": 105,
-              "wickets": 8,
-              "overs": 20
-            },
-            {
-              "team": "Lumbini Lions Inning 1",
-              "runs": 108,
-              "wickets": 4,
-              "overs": 16.4
-            }
-          ],
-          "winner": "Lumbini Lions",
-          "competition": "Lumbini Lions vs Sudur Paschim Royals, Qualifier 1, Nepal Premier League 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-17T00:00:00Z",
           "finishedAt": null,
           "status": "finished",
           "source": "CricketData"
@@ -4406,6 +4219,64 @@
           "source": "CricketData"
         },
         {
+          "id": "b143ee8f-6faa-48bd-a69e-dc7aa65494ba",
+          "homeTeam": "Sri Lanka A",
+          "awayTeam": "Afghanistan A",
+          "homeScore": 144,
+          "awayScore": 139,
+          "innings": [
+            {
+              "team": "Afghanistan A Inning 1",
+              "runs": 139,
+              "wickets": 10,
+              "overs": 35.3
+            },
+            {
+              "team": "Sri Lanka A Inning 1",
+              "runs": 144,
+              "wickets": 4,
+              "overs": 21.4
+            }
+          ],
+          "winner": "Sri Lanka A",
+          "resultText": "Sri Lanka A won by 6 wkts",
+          "competition": "Sri Lanka A vs Afghanistan A, 2nd Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-19T00:00:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "6e68f8dd-bcb7-49fc-a3ee-7e58ebff2d67",
+          "homeTeam": "Bangladesh A",
+          "awayTeam": "Hong Kong",
+          "homeScore": 220,
+          "awayScore": 219,
+          "innings": [
+            {
+              "team": "Hong Kong Inning 1",
+              "runs": 219,
+              "wickets": 8,
+              "overs": 50
+            },
+            {
+              "team": "Bangladesh A Inning 1",
+              "runs": 220,
+              "wickets": 2,
+              "overs": 41
+            }
+          ],
+          "winner": "Bangladesh A",
+          "resultText": "Bangladesh A won by 8 wkts",
+          "competition": "Bangladesh A vs Hong Kong, China, 1st Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-19T00:00:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
           "id": "5a550de1-4b29-4109-bee2-7415416929a1",
           "homeTeam": "Sudur Paschim Royals",
           "awayTeam": "Chitwan Rhinos",
@@ -4430,6 +4301,93 @@
           "matchType": "t20",
           "overs": 20,
           "startTime": "2026-11-19T10:45:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "2ccadc74-616d-40d4-9931-d03a39313ada",
+          "homeTeam": "Malaysia Women",
+          "awayTeam": "Indonesia Women",
+          "homeScore": 93,
+          "awayScore": 95,
+          "innings": [
+            {
+              "team": "Malaysia Women Inning 1",
+              "runs": 93,
+              "wickets": 6,
+              "overs": 20
+            },
+            {
+              "team": "Indonesia Women Inning 1",
+              "runs": 95,
+              "wickets": 3,
+              "overs": 18.4
+            }
+          ],
+          "winner": "Indonesia Women",
+          "resultText": "Indonesia Women won by 7 wkts",
+          "competition": "Malaysia Women vs Indonesia Women, 1st Match, Malaysia Womens T20I Tri-Series, 2026",
+          "matchType": "t20",
+          "startTime": "2026-11-20T00:00:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "39bb2cbe-5c92-4892-99ad-4f49a5b1e51b",
+          "homeTeam": "India A",
+          "awayTeam": "Nepal",
+          "homeScore": 332,
+          "awayScore": 26,
+          "innings": [
+            {
+              "team": "India A Inning 1",
+              "runs": 332,
+              "wickets": 9,
+              "overs": 50
+            },
+            {
+              "team": "Nepal Inning 1",
+              "runs": 26,
+              "wickets": 10,
+              "overs": 11.3
+            }
+          ],
+          "winner": "India A",
+          "resultText": "India A won by 306 runs",
+          "competition": "India A vs Nepal, 4th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-20T00:00:00Z",
+          "finishedAt": null,
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "72455080-e167-4dfe-8f30-120a5fa644a4",
+          "homeTeam": "Pakistan A",
+          "awayTeam": "United Arab Emirates",
+          "homeScore": 245,
+          "awayScore": 184,
+          "innings": [
+            {
+              "team": "Pakistan A Inning 1",
+              "runs": 245,
+              "wickets": 10,
+              "overs": 46.4
+            },
+            {
+              "team": "United Arab Emirates Inning 1",
+              "runs": 184,
+              "wickets": 10,
+              "overs": 40.5
+            }
+          ],
+          "winner": "Pakistan A",
+          "resultText": "Pakistan A won by 61 runs",
+          "competition": "Pakistan A vs United Arab Emirates, 3rd Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-20T00:00:00Z",
           "finishedAt": null,
           "status": "finished",
           "source": "CricketData"
@@ -4522,6 +4480,45 @@
           "source": "CricketData"
         },
         {
+          "id": "0560de5e-4b94-4527-ba9e-26036fc10df2",
+          "homeTeam": "Sri Lanka A",
+          "awayTeam": "Hong Kong",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [
+            {
+              "team": "sri lanka a Inning 1",
+              "runs": 26,
+              "wickets": 1,
+              "overs": 5
+            }
+          ],
+          "winner": null,
+          "resultText": null,
+          "competition": "Sri Lanka A vs Hong Kong, China, 5th Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-21T06:00:00Z",
+          "finishedAt": null,
+          "status": "live",
+          "source": "CricketData"
+        },
+        {
+          "id": "92cae33c-1743-488c-aa5e-dce5d1887a91",
+          "homeTeam": "Bangladesh A",
+          "awayTeam": "Afghanistan A",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Bangladesh A vs Afghanistan A, 6th Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-21T10:00:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
           "id": "38961c95-3cdb-4559-9a4b-f4b59e7aab03",
           "homeTeam": "Lumbini Lions",
           "awayTeam": "Sudur Paschim Royals",
@@ -4538,97 +4535,161 @@
           "source": "CricketData"
         },
         {
-          "id": "38961c95-3cdb-4559-9a4b-f4b59e7aab03",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
+          "id": "8e97677f-1eae-440e-bb87-d0c6153c4c84",
+          "homeTeam": "Malaysia Women",
+          "awayTeam": "China Women",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
           "winner": null,
-          "competition": "Tbc vs Tbc, Final, Nepal Premier League 2026",
+          "resultText": null,
+          "competition": "Malaysia Women vs China Women, 3rd Match, Malaysia Womens T20I Tri-Series, 2026",
           "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-21T10:45:00Z",
+          "startTime": "2026-11-22T02:00:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"
         },
         {
-          "id": "43bc3831-3f8d-4c84-bd00-839b2b53bc2c",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
+          "id": "fbb92c7e-d888-454b-9f21-cff468b527ea",
+          "homeTeam": "United Arab Emirates",
+          "awayTeam": "Nepal",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
           "winner": null,
-          "competition": "Tbc vs Tbc, 25th Match, Super Six (B1 v A2), ICC Womens Emerging Nations Trophy, 2026",
-          "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-22T05:00:00Z",
+          "resultText": null,
+          "competition": "United Arab Emirates vs Nepal, 7th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-22T06:00:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"
         },
         {
-          "id": "05c61325-eade-4489-8af5-0ce99f56be6b",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
+          "id": "41baa734-f7a7-4dcf-95c0-544026630c44",
+          "homeTeam": "India A",
+          "awayTeam": "Pakistan A",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
           "winner": null,
-          "competition": "Tbc vs Tbc, 26th Match, Super Six (A3 v B3), ICC Womens Emerging Nations Trophy, 2026",
-          "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-22T09:15:00Z",
+          "resultText": null,
+          "competition": "India A vs Pakistan A, 8th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-22T10:00:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"
         },
         {
-          "id": "dd5a2c21-8582-400f-83d9-69b4cebbd8f5",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
+          "id": "cc5fbd79-6d33-4ae8-be50-5be987be9110",
+          "homeTeam": "Malaysia Women",
+          "awayTeam": "Indonesia Women",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
           "winner": null,
-          "competition": "Tbc vs Tbc, 27th Match, Super Six (A1 v B1), ICC Womens Emerging Nations Trophy, 2026",
+          "resultText": null,
+          "competition": "Malaysia Women vs Indonesia Women, 4th Match, Malaysia Womens T20I Tri-Series, 2026",
           "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-23T05:00:00Z",
+          "startTime": "2026-11-23T02:00:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"
         },
         {
-          "id": "e402c771-289a-47b1-9a2a-733eec27ac01",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
+          "id": "011b83cc-8535-4b5f-9366-bc6f89100a7e",
+          "homeTeam": "Afghanistan A",
+          "awayTeam": "Hong Kong",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
           "winner": null,
-          "competition": "Tbc vs Tbc, 29th Match, Super Six (A3 v B2), ICC Womens Emerging Nations Trophy, 2026",
-          "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-23T09:15:00Z",
+          "resultText": null,
+          "competition": "Afghanistan A vs Hong Kong, China, 9th Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-23T06:00:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"
         },
         {
-          "id": "c49f2ce6-af5c-446d-8790-c1968209af3a",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
+          "id": "f666c7b1-fe23-4213-a2b4-3685f784a958",
+          "homeTeam": "Sri Lanka A",
+          "awayTeam": "Bangladesh A",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
           "winner": null,
-          "competition": "Tbc vs Tbc, Final, ICC Womens Emerging Nations Trophy, 2026",
+          "resultText": null,
+          "competition": "Sri Lanka A vs Bangladesh A, 10th Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-23T10:00:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "55d8876a-0e3e-44df-9826-dece3fe4d219",
+          "homeTeam": "China Women",
+          "awayTeam": "Indonesia Women",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "China Women vs Indonesia Women, 5th Match, Malaysia Womens T20I Tri-Series, 2026",
           "matchType": "t20",
-          "overs": null,
-          "startTime": "2026-11-25T05:00:00Z",
+          "startTime": "2026-11-24T02:00:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "34838ce0-fb99-4126-a4e4-2f1557abc8c1",
+          "homeTeam": "India A",
+          "awayTeam": "United Arab Emirates",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "India A vs United Arab Emirates, 11th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-24T06:00:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "3d6289f5-71db-4917-8de3-9872ba0437e9",
+          "homeTeam": "Pakistan A",
+          "awayTeam": "Nepal",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Pakistan A vs Nepal, 12th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-24T10:00:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "20c5f3c7-3f93-46c7-a445-e4bcb2322ab4",
+          "homeTeam": "Malaysia Women",
+          "awayTeam": "China Women",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Malaysia Women vs China Women, 6th Match, Malaysia Womens T20I Tri-Series, 2026",
+          "matchType": "t20",
+          "startTime": "2026-11-25T02:00:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"
@@ -4645,86 +4706,6 @@
           "matchType": "odi",
           "overs": null,
           "startTime": "2026-12-29T03:30:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "5a49bf46-9d93-458c-87e7-846b8f4d0174",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, 2nd Quarter-Final (B1 v D2), Vijay Hazare Trophy Elite 2026-27",
-          "matchType": "odi",
-          "overs": null,
-          "startTime": "2027-01-02T03:30:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "1e7fcb1c-1a02-487f-bf5c-85f56bb67024",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, 3rd Quarter-Final (C1 v A2), Vijay Hazare Trophy Elite 2026-27",
-          "matchType": "odi",
-          "overs": null,
-          "startTime": "2027-01-03T03:30:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "7f4287dd-1e96-4231-9fa3-c08828af7e0b",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, 1st Semi Final Winner of (Q1 v Q4), Vijay Hazare Trophy Elite 2026-27",
-          "matchType": "odi",
-          "overs": null,
-          "startTime": "2027-01-05T03:30:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "16851fe9-d7b8-4ba6-b587-aecb878b2a43",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, 2nd Semi Final Winner of (Q2 v Q3), Vijay Hazare Trophy Elite 2026-27",
-          "matchType": "odi",
-          "overs": null,
-          "startTime": "2027-01-06T03:30:00Z",
-          "finishedAt": null,
-          "status": "scheduled",
-          "source": "CricketData"
-        },
-        {
-          "id": "6a250c41-5f65-4ac1-aef3-cce2eda491d6",
-          "homeTeam": "Tbc",
-          "awayTeam": "Tbc",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "competition": "Tbc vs Tbc, Final, Vijay Hazare Trophy Elite 2026-27",
-          "matchType": "odi",
-          "overs": null,
-          "startTime": "2027-01-08T03:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"

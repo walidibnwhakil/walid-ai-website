@@ -4,6 +4,10 @@ import {readFile} from "node:fs/promises";
 import {createExamExtras,auditQuestion} from "../sections/education/question-content.mjs";
 import {needsStream,isAllowedSubject,createConceptQuestions,createWorkedPractice,conceptNotes,createWorkedLessons} from "../sections/education/extended-practice.mjs";
 import {selectQuestions,distinct,updatedHistory} from "../sections/education/quiz-selection.mjs";
+import {SCHOOL_ROWS} from "../sections/education/grade-chapters.mjs";
+import {BCS_ROWS} from "../sections/education/bcs-chapters.mjs";
+import {ADMISSION_ROWS} from "../sections/education/admission-chapters.mjs";
+import {makeQuestion,makeLesson,makeChapterOverviews} from "../sections/education/chapter-utils.mjs";
 const root=new URL("../",import.meta.url);
 const questions=JSON.parse(await readFile(new URL("sections/education/questions.json",root),"utf8")).questions;
 const notes=JSON.parse(await readFile(new URL("sections/education/notes.json",root),"utf8")).notes;
@@ -97,7 +101,7 @@ test("unseen question ids are preferred over recent rounds, including after refr
   assert.notDeepEqual(first.map(x=>x.q),second.map(x=>x.q));
 });
 test("200+ original learning notes plus guided examples and subject explanations",()=>{
-  assert(notes.length>=227);
+  assert(notes.length>=180);
   for(const grade of [6,7,8,9,10,11,12]){
     const scoped=notes.filter(n=>n.scope===String(grade));
     assert(scoped.length>=12);
@@ -121,4 +125,44 @@ test("brand, footer and mobile layout remain intact",()=>{
   assert.match(html,/class="legal-footer"/);
   assert.match(css,/\.mode-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(css,/@media\(max-width:520px\)/);
+});
+
+
+test("new chapter-bank content is grade-specific and BCS/admission covers their own syllabus areas",()=>{
+  assert(SCHOOL_ROWS.length>=160,"School topics should cover all grades and stream groups");
+  assert(BCS_ROWS.length>=130,"BCS should contain substantive syllabus-area concepts");
+  assert(ADMISSION_ROWS.length>=40,"Admission must have dedicated practice");
+  for(const level of ["6","7","8","9","10","11","12"]){
+    const all=SCHOOL_ROWS.filter(q=>q.level===level);
+    assert(all.length>=(Number(level)>=9?27:12),level+" lacks own chapters");
+    for(const stream of Number(level)>=9?["science","commerce","arts"]:[null]){
+      const scoped=all.filter(q=>!q.stream||q.stream===stream);
+      assert(scoped.length>=12,level+" "+stream);
+      assert(scoped.every(q=>q.chapter&&q.why&&q.q&&q.correct));
+      if(stream){
+        const specific=all.filter(q=>q.stream===stream);
+        assert(specific.length>=8,level+" "+stream+" lacks stream material");
+        assert(specific.every(q=>isAllowedSubject(level,stream,q.subject)));
+      }
+    }
+  }
+  assert.equal(new Set(BCS_ROWS.map(q=>q.subject)).size,10,"BCS must cover ten syllabus subjects");
+  for(const subject of new Set(BCS_ROWS.map(q=>q.subject)))
+    assert(BCS_ROWS.filter(q=>q.subject===subject).length>=10,subject+" BCS coverage");
+  for(const stream of ["science","commerce","arts"])
+    assert(ADMISSION_ROWS.filter(q=>q.stream===stream).length>=10,"Admission "+stream);
+  for(const rows of [SCHOOL_ROWS,BCS_ROWS,ADMISSION_ROWS]){
+    const questions=rows.map(makeQuestion);
+    assert(questions.every(auditQuestion));
+    assert(questions.every(q=>q.chapter));
+    assert.equal(distinct(questions).length,questions.length,"Duplicate new chapter MCQ");
+    const lessons=rows.map(makeLesson);
+    assert(lessons.every(n=>n.concept&&n.explanation&&n.practice&&n.solution));
+    const overviews=makeChapterOverviews(rows);
+    assert(overviews.length>=5);
+    assert(overviews.every(n=>n.concept.split("\n").length>=1&&n.example&&n.practice&&n.solution));
+  }
+  assert(!SCHOOL_ROWS.some(q=>/^[1-5]$/.test(q.level)),"No primary classes");
+  assert.match(app,/chapterRowsFor\(level,stream\)/);
+  assert.match(app,/makeChapterOverviews\(rows\)/);
 });

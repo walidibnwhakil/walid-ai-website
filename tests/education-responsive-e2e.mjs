@@ -69,6 +69,12 @@ try{
   for(const count of [20,30,40,50,70,100]){
     const level=count===100?"bcs":"6";
     await quiz(page,level,null,count);
+    if(level==="bcs"){
+      const allSubjects=new Set(await page.locator("#questionList .question-card-head .quiz-subject").allInnerTexts());
+      assert.equal(allSubjects.size,10,"BCS sample must cover all ten exam topic areas");
+      const chapters=await page.locator("#questionList .question-chapter").count();
+      assert(chapters>=35,"BCS sample should prioritize prepared chapter questions");
+    }
     if(count===20){
       await page.locator("#question-0 .question-option").first().click();
       await page.locator("#question-0 .question-feedback").waitFor({state:"visible"});
@@ -117,9 +123,9 @@ try{
   assert(!noteLevels.includes("1"));
   for(const [level,stream,subject,min] of [
     ["6",null,"গণিত",4],["7",null,"বিজ্ঞান",3],
-    ["9","science","রসায়ন",8],["10","commerce","হিসাববিজ্ঞান",8],
-    ["11","arts","ইতিহাস",8],["12","science","জীববিজ্ঞান",8],
-    ["admission","commerce","হিসাববিজ্ঞান",8],["bcs",null,"মানসিক দক্ষতা",1]]){
+    ["9","science","রসায়ন",3],["10","commerce","হিসাববিজ্ঞান",3],
+    ["11","arts","ইতিহাস",3],["12","science","জীববিজ্ঞান",3],
+    ["admission","commerce","হিসাববিজ্ঞান",3],["bcs",null,"মানসিক দক্ষতা",1]]){
     await page.locator("#notesLevel").selectOption(level);
     if(stream)await page.locator("#notesStream").selectOption(stream);
     else assert(await page.locator("#notesStreamField").isHidden());

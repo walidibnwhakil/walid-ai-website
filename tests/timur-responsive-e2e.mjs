@@ -20,6 +20,13 @@ const server = createServer(async (req,res) => {
 server.listen(0,"127.0.0.1");
 await once(server,"listening");
 const origin = "http://127.0.0.1:" + server.address().port;
+const ottoman = await readFile(new URL("others/history/ottoman-empire/index.html",root),"utf8");
+const ottomanBayezid = ottoman.match(/<section class="others-chapter" id="chapter-5">([\\s\\S]*?)<\\/section>/)?.[1];
+const ottomanCivilWar = ottoman.match(/<section class="others-chapter" id="chapter-6">([\\s\\S]*?)<\\/section>/)?.[1];
+assert(ottomanBayezid && ottomanCivilWar,"Ottoman counterpart sections missing");
+for (const term of ["১৩৮৯","১৪০২","১৪০৩","আংকারা"]) assert(ottomanBayezid.includes(term),"Ottoman Bayezid chronology mismatch: "+term);
+assert(ottomanCivilWar.includes("১৪১৩"),"Ottoman succession timeline mismatch");
+
 let browser, checks = 0, drawerChecks = 0;
 try {
   browser = await chromium.launch({headless:true});
@@ -62,8 +69,13 @@ try {
     assert.ok(state.rotation.includes("others-flower-spin"),"Flower rotation must remain");
     assert.ok(state.font.includes("SolaimanLipi"),"SolaimanLipi reader font must remain");
     assert.equal(state.obsoleteBlocks,0,"Obsolete source/next blocks must stay absent");
-    assert.equal(state.chapters.length,18,"Timur must retain 18 rewritten chapters");
-    assert.equal(state.totalParagraphs,132,"Timur editorial paragraphs missing");
+    const ankaraText = await page.locator("#chapter-12").textContent();
+    for (const term of ["কারা ইউসুফ","সুলতান আহমদ","মুতাহহারতেন","স্তেফান লাজারেভিচ","আকশেহির","১৪১৩"]) {
+      assert(ankaraText.includes(term),"Missing key Ankara person or consequence: "+term);
+    }
+    assert(ankaraText.includes("বন্দি"),"Ankara must cover captivity");
+        assert.equal(state.chapters.length,18,"Timur must retain 18 rewritten chapters");
+    assert.equal(state.totalParagraphs,191,"Timur editorial paragraphs missing");
     assert.deepEqual(state.chapters.map(x=>x.id),Array.from({length:18},(_,i)=>"chapter-"+(i+1)));
     assert.deepEqual(state.toc,state.chapters.map(x=>({id:x.id,name:x.name})),"TOC links and titles must match sections");
     assert(state.chapters.every(x=>x.paragraphs>=5),"A chapter is too short");
@@ -83,7 +95,7 @@ try {
     checks++;
     await page.close();
   }
-  console.log("TIMUR_READER_E2E_PASS",JSON.stringify({widths:checks,drawerChecks,chapters:18,paragraphs:132}));
+  console.log("TIMUR_READER_E2E_PASS",JSON.stringify({widths:checks,drawerChecks,chapters:18,paragraphs:191}));
 } finally {
   await browser?.close();
   const closed = new Promise(resolve=>server.close(resolve));

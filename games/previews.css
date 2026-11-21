@@ -114,3 +114,20 @@ main { max-width: 1050px; }
 .games-subheading { text-align: center; }
 .games-heading { margin: 0.35em 0 0; }
 .games-subheading { margin: 0.35em 0 1.2em; }
+
+/* Phones: show two artwork cards per row without changing the desktop layout.
+   The artwork already includes each game's title and Play Now action. */
+@media (max-width: 600px) {
+  .games {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-block: 18px 24px;
+  }
+  .games .artwork-tile {
+    padding: 4px;
+    border-radius: 14px;
+  }
+  .games .artwork-tile .preview {
+    border-radius: 10px;
+  }
+}

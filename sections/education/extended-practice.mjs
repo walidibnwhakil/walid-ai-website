@@ -307,7 +307,13 @@ export function createWorkedPractice(level,stream,perTemplate=130){
   return types.flatMap(([subject,kind])=>Array.from({length:perTemplate},(_,i)=>arithmetic(subject,numeric,kind,i)));
 }
 export function createWorkedLessons(level,stream){
-  const all=createWorkedPractice(level,stream,1);
+  const all=createWorkedPractice(level,stream,2);
+  const practiceByType=new Map();
+  for(const question of all){
+    const key=question.topic+"|"+question.subject;
+    if(!practiceByType.has(key))practiceByType.set(key,[]);
+    practiceByType.get(key).push(question);
+  }
   const seen=new Set();
   return all.filter(q=>{
     const kind=q.topic+"|"+q.subject;
@@ -325,9 +331,9 @@ export function createWorkedLessons(level,stream){
     })[q.topic]+" — উদাহরণসহ",
     concept:q.why,
     explanation:"প্রশ্নের প্রদত্ত রাশি, একক ও সূত্র আগে আলাদা করুন। তারপর গাণিতিক ক্রম মেনে হিসাব করুন এবং বিপরীত পদ্ধতিতে ফল যাচাই করুন।",
-    example:q.q+" সঠিক উত্তর: "+q.options[q.answer]+"।",
-    steps:q.why,
-    practice:"একই নিয়ম ব্যবহার করে সংখ্যাগুলো পরিবর্তন করে আরেকটি উদাহরণ সমাধান করুন।",
-    solution:"উদাহরণের নির্ণীত উত্তর: "+q.options[q.answer]+"।"
+    example:"উদাহরণ: "+q.q+"\nসমাধানের ধাপ: "+q.why+"\nউত্তর: "+q.options[q.answer]+"।",
+    steps:"১) প্রশ্নে দেওয়া মান ও নির্ণেয় রাশি লিখুন।\n২) প্রয়োজনীয় সূত্র বা নিয়ম নির্বাচন করুন।\n৩) "+q.why+"\n৪) ফলটি প্রশ্নের সঙ্গে মিলিয়ে যাচাই করুন।",
+    practice:(practiceByType.get(q.topic+"|"+q.subject)?.[1]||q).q,
+    solution:(()=>{const p=practiceByType.get(q.topic+"|"+q.subject)?.[1]||q;return "সমাধান: "+p.why+"\nসঠিক উত্তর: "+p.options[p.answer]+"।";})()
   }));
 }

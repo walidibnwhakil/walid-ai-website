@@ -22,9 +22,9 @@ export function makeLesson(row,index){
     title:row.chapter+" — "+row.q.replace(/[?？]$/,""),
     concept:row.correct+"। "+row.why,
     explanation:row.why+" বিষয়টির পরিভাষা, প্রয়োগ এবং কাছাকাছি ধারণার পার্থক্য বুঝে তারপর উত্তর নির্বাচন করুন।",
-    example:"প্রশ্ন: "+row.q+" — সঠিক উত্তর: "+row.correct+"।",
-    steps:"প্রথমে প্রশ্নের মূল বিষয় শনাক্ত করুন; সংজ্ঞাটি উদাহরণে প্রয়োগ করুন; বিকল্পের মধ্যে অর্থের পার্থক্য মিলিয়ে নিন।",
-    practice:row.q,solution:row.correct+"। "+row.why};
+    example:"প্রশ্ন: "+row.q+"\nধারণা/কারণ: "+row.why+"\nসঠিক উত্তর: "+row.correct+"।",
+    steps:"১) প্রশ্নটি পড়ুন: "+row.q+"\n২) প্রাসঙ্গিক নিয়ম বা তথ্য: "+row.why+"\n৩) সেই কারণে সঠিক উত্তর: "+row.correct+"।\n৪) '"+row.wrong[0]+"' বিকল্পটি কেন এই প্রশ্নের জন্য উপযুক্ত নয়, মিলিয়ে দেখুন।",
+    practice:"ব্যাখ্যা করুন: '"+row.correct+"' কেন সঠিক এবং '"+row.wrong[0]+"' কেন নয়?\nমূল প্রশ্ন: "+row.q,solution:"সঠিক: "+row.correct+"। "+row.why+"\nবিকল্পের অর্থ মিলিয়ে দেখার সময় প্রশ্নের নির্দিষ্ট শর্ত খেয়াল করুন।"};
 }
 
 /* One multi-concept overview per chapter and subject, so students can
@@ -43,7 +43,7 @@ export function makeChapterOverviews(rows){
       chapter:first.chapter,title:first.chapter+" — বিষয়সংক্ষেপ",
       concept:items.map((item,i)=>(i+1)+". "+item.correct+" — "+item.why).join("\n"),
       explanation:"এই পাঠে "+items.length+"টি ধারণা একসঙ্গে তুলনা করা হয়েছে। প্রতিটি ধারণার সংজ্ঞা, প্রয়োগ ও মূল পার্থক্য বুঝে পড়ুন। বিষয়গুলো একই পাঠক্ষেত্রের হলেও তাদের অর্থ এক নয়; তাই প্রশ্নের মূল শব্দের সঙ্গে সঠিক ধারণা মিলিয়ে উত্তর নির্বাচন করুন।",
-      example:"উদাহরণ: "+first.q+"\nউত্তর: "+first.correct+"। "+first.why,
+      example:"উদাহরণ ১: "+first.q+"\nব্যাখ্যা: "+first.why+"\nউত্তর: "+first.correct+"।"+(items.length>1?"\n\nউদাহরণ ২: "+items[1].q+"\nব্যাখ্যা: "+items[1].why+"\nউত্তর: "+items[1].correct+"।":""),
       steps:"১) উপরের ধারণাগুলো আলাদা করে পড়ুন। ২) প্রতিটির সঙ্গে বাস্তব বা পাঠ্য উদাহরণ মিলিয়ে দেখুন। ৩) নিচের অনুশীলনটি সমাধান করুন এবং উত্তরের কারণ ব্যাখ্যা করুন।",
       practice:last.q,solution:last.correct+"। "+last.why
     };

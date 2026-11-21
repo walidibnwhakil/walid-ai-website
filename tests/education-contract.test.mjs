@@ -187,3 +187,28 @@ test("new chapter-bank content is grade-specific and BCS/admission covers their 
   assert.match(app,/chapterRowsFor\(level,stream\)/);
   assert.match(app,/makeChapterOverviews\(rows\)/);
 });
+
+test("education academic icons are centered and all 133 standalone lessons teach with worked examples",async()=>{
+  assert.match(css,/align-items:center;justify-content:center;gap:12px;width:100%/);
+  assert.match(css,/\.card-symbol\{display:grid;place-items:center/);
+  assert.doesNotMatch(JSON.stringify(notes),/a\^m|a\^n|a\^\(/);
+  for(const grade of [6,7,8,9,10,11,12]){
+    const page=await readFile(new URL("sections/education/study-notes/class-"+grade+"/index.html",root),"utf8");
+    assert.equal((page.match(/<article class="note"/g)||[]).length,19,"Class "+grade+" count");
+    assert.equal((page.match(/class="practice-answer"/g)||[]).length,19,"Class "+grade+" answers");
+    assert.equal((page.match(/<h3>সমাধানসহ উদাহরণ<\/h3>/g)||[]).length,19,"Class "+grade+" worked examples");
+    assert.doesNotMatch(page,/a\^m|a\^n|a\^\(/,"Use proper exponent typography");
+    assert.match(page,/study-notes-enhance\.mjs/);
+  }
+  for(const n of notes){
+    assert(n.example?.trim()&&n.practice?.trim()&&n.solution?.trim());
+    assert(n.steps?.trim());
+  }
+  for(const stream of ["science","commerce","arts"]){
+    const worked=createWorkedLessons("9",stream);
+    for(const n of worked){
+      assert.notEqual(n.practice,n.example,"Practice must be a fresh problem");
+      assert.match(n.solution,/সমাধান:/);
+    }
+  }
+});

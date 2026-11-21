@@ -367,7 +367,17 @@ function updateSubjects(){
 }
 function addPart(node,title,text,className){
   if(!text?.trim())return;
-  node.append(el("h4",title),el("p",text,className));
+  node.append(el("h4",title));
+  if(title==="শেখার ধাপ"){
+    const lines=String(text).split(/\n|(?=\s*[১-৯1-9][)\.][ \t])/).map(s=>s.replace(/^\s*[১-৯1-9][)\.][ \t]*/,"").trim()).filter(Boolean);
+    if(lines.length>1){
+      const list=el("ol",undefined,"note-steps");
+      for(const line of lines)list.append(el("li",line));
+      node.append(list);
+      return;
+    }
+  }
+  node.append(el("p",text,className));
 }
 function showNotes(){
   const level=byId("notesLevel").value,stream=byId("notesStream").value,subject=byId("notesSubject").value;
@@ -384,7 +394,7 @@ function showNotes(){
     article.append(el("span",levelAndStream(level,stream)+" · "+subject,"note-tag"),el("h3",note.title));
     addPart(article,"মূল ধারণা",note.concept);
     if(note.explanation!==note.concept)addPart(article,"বিস্তারিত ব্যাখ্যা",note.explanation);
-    addPart(article,"উদাহরণ",note.example,"note-example");
+    addPart(article,"সমাধানসহ উদাহরণ",note.example,"note-example");
     const illustration=buildStudyVisual(note);
     if(illustration)article.append(illustration);
     addPart(article,"শেখার ধাপ",note.steps);

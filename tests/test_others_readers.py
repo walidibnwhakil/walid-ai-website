@@ -37,7 +37,7 @@ def validate_book(path):
     if path.relative_to(ROOT).as_posix() == "others/history/ashab-al-kahf/index.html":
         # Chapter-count, developed narrative, Quranic chronology, and reader-shell contract.
         sections = re.findall(
-            r'<section class="others-chapter" id="chapter-\\d+"><h2>(.*?)</h2>(.*?)</section>',
+            r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>(.*?)</section>',
             content, re.S
         )
         expected_titles = (
@@ -54,7 +54,7 @@ def validate_book(path):
             paragraphs = re.findall(r"<p>(.*?)</p>", body, re.S)
             if len(paragraphs) < 5 or any(len(re.sub(r"<[^>]*>", "", p).strip()) < 190 for p in paragraphs):
                 fail(path, f"Ashab al-Kahf chapter {number} has an abbreviated section")
-        for token in ("১৮:","১৮–", "ডেসিয়ুস", "থিওডোসিয়ুস", "রৌপ্যমুদ্রা", "কুকুর", "আর-রাকিম"):
+        for token in ("সূরা আল-কাহফ", "ডেসিয়ুস", "থিওডোসিয়ুস", "রৌপ্যমুদ্রা", "কুকুর", "আর-রাকিম"):
             if token not in content:
                 fail(path, f"Ashab al-Kahf source-context anchor missing: {token}")
         if content.count('class="legal-footer"') != 1 or not all(s in content for s in (

@@ -139,6 +139,10 @@ test("brand, footer and mobile layout remain intact",()=>{
   assert.match(html,/class="legal-footer"/);
   assert.match(css,/\.mode-grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(css,/@media\(max-width:520px\)/);
+  assert.match(css,/\.mode-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\);gap:10px/);
+  assert.match(html,/viewBox="0 0 48 48"/);
+  assert.match(app,/buildStudyVisual\(note\)/);
+  assert.match(css,/\.lesson-illustration svg/);
 });
 
 

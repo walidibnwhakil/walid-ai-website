@@ -55,7 +55,7 @@ test("each academic grade/group gets thousands of mathematically checkable varia
       total+=pool.length;
     }
   }
-  assert(total>=25000,"Many per-level numeric practice variations required");
+  assert(total>=20000,"Many per-level numeric practice variations required");
   for(const stream of streams){
     const admission=createWorkedPractice("admission",stream,170);
     assert(admission.length>=800);

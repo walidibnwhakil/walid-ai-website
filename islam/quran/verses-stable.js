@@ -37,6 +37,10 @@ const attachPronunciation=async data=>{
     return data;
   }
 };
-fetchJSON(sourceURL).then(attachPronunciation).then(render).catch(e=>{if(status)status.textContent='আয়াত লোড হয়নি: '+e.message});
+fetchJSON(sourceURL).then(attachPronunciation).then(render).catch(e=>{
+  // Server-rendered verses remain readable when JSON or JavaScript enhancements fail.
+  if(status)status.textContent=root.querySelector('.ayah')?'সংরক্ষিত আরবি পাঠ ও বাংলা অনুবাদ দেখানো হচ্ছে।':'আয়াত লোড হয়নি: '+e.message;
+  console.warn('Quran enhancement unavailable',e);
+});
 toggle?.addEventListener('change',()=>root.querySelectorAll('.translation,.basmala-meaning').forEach(el=>el.hidden=!toggle.checked));
 })();

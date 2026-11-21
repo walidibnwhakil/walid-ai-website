@@ -54,7 +54,7 @@ try {
     assert(state.font.includes("SolaimanLipi"),"SolaimanLipi CSS family missing");
     assert.equal(state.ids.length,21,"Missing chapters");
     assert.deepEqual(state.links,state.ids,"Broken chapter TOC");
-    assert(state.paragraphs.every(n=>n>=6),"Short chapter");
+    assert(state.paragraphs.every(n=>n>=11),"Short chapter");
     if(width===375||width===1280){
       await page.locator(".others-toc-trigger").click();
       assert.equal(await page.locator(".others-toc-dialog").evaluate(n=>n.open),true,"TOC failed to open");
@@ -74,7 +74,7 @@ try {
     checks++;
     await page.close();
   }
-  console.log("CRUSADES_BROWSER_PASS",JSON.stringify({viewportChecks:checks,drawerChecks,chapterCount:21}));
+  console.log("CRUSADES_BROWSER_PASS",JSON.stringify({viewportChecks:checks,drawerChecks,chapterCount:21,minimumParagraphs:11}));
 } finally {
   await browser?.close();
   const closed=new Promise(resolve=>server.close(resolve));

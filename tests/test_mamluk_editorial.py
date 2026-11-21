@@ -122,9 +122,9 @@ class MamlukEditorialTests(unittest.TestCase):
         for token in (
             '<html lang="bn">',
             'rel="canonical" href="https://walid-ai.com/others/history/mamluk-sultanate/"',
-            'href="/others/assets/books.css?v=20261121-editorial"',
+            'href="/others/assets/books.css?v=20261122-symbols"',
             'src="/walid-ai-approved-logo.png"',
-            'src="/others/assets/reader.js?v=20261121-editorial"',
+            'src="/others/assets/reader.js?v=20261122-symbols"',
             'class="others-book-title"',
             'class="others-toc-dialog"',
             'class="others-toc-trigger"',

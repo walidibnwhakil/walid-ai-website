@@ -620,13 +620,13 @@
   {
     "id": "party_bnp",
     "group": "politics",
-    "en": "Are they in the BNP?",
+    "en": "Are they from the BNP?",
     "bn": "তিনি কি বিএনপির?"
   },
   {
     "id": "party_al",
     "group": "politics",
-    "en": "Are they in the Awami League?",
+    "en": "Are they from the Awami League?",
     "bn": "তিনি কি আওয়ামী লীগের?"
   },
   {
@@ -650,8 +650,8 @@
   {
     "id": "lives_abroad",
     "group": "politics",
-    "en": "Do they live abroad?",
-    "bn": "তিনি কি দেশের বাইরে থাকেন?"
+    "en": "Are they in exile, or living abroad?",
+    "bn": "তিনি কি নির্বাসনে, বা দেশের বাইরে আছেন?"
   },
   {
     "id": "daily_use",
@@ -674,50 +674,50 @@
   {
     "id": "been_minister",
     "group": "politics",
-    "en": "Have they been a minister?",
-    "bn": "তিনি কি মন্ত্রী ছিলেন?"
+    "en": "Have they held a government post (minister, prime minister, or president)?",
+    "bn": "তিনি কি কোনো সরকারি পদে ছিলেন (মন্ত্রী, প্রধানমন্ত্রী বা রাষ্ট্রপতি)?"
   },
   {
     "id": "been_premier",
     "group": "politics",
-    "en": "Have they been president or prime minister?",
-    "bn": "তিনি কি রাষ্ট্রপতি বা প্রধানমন্ত্রী ছিলেন?"
+    "en": "Have they been Prime Minister?",
+    "bn": "তিনি কি প্রধানমন্ত্রী ছিলেন?"
   },
   {
     "id": "head_of_state",
     "group": "politics",
-    "en": "Have they been head of state?",
-    "bn": "তিনি কি রাষ্ট্রপ্রধান ছিলেন?"
+    "en": "Have they been President?",
+    "bn": "তিনি কি রাষ্ট্রপতি ছিলেন?"
   },
   {
     "id": "party_jp",
     "group": "politics",
-    "en": "Are they in the Jatiya Party?",
+    "en": "Are they from the Jatiya Party?",
     "bn": "তিনি কি জাতীয় পার্টির?"
   },
   {
     "id": "party_jamaat",
     "group": "politics",
-    "en": "Are they in Jamaat-e-Islami?",
-    "bn": "তিনি কি জামায়াতে ইসলামীর?"
+    "en": "Are they from Jamaat?",
+    "bn": "তিনি কি জামায়াতের?"
   },
   {
     "id": "party_chief",
     "group": "politics",
-    "en": "Are they the leader of their party?",
-    "bn": "তিনি কি নিজের দলের প্রধান?"
+    "en": "Are they the chief or leader of a political party?",
+    "bn": "তিনি কি কোনো রাজনৈতিক দলের প্রধান?"
   },
   {
     "id": "party_secretary",
     "group": "politics",
-    "en": "Are they the secretary general of their party?",
-    "bn": "তিনি কি নিজের দলের মহাসচিব?"
+    "en": "Are they the secretary-general of a political party?",
+    "bn": "তিনি কি কোনো দলের মহাসচিব?"
   },
   {
     "id": "in_government",
     "group": "politics",
-    "en": "Are they in the government now?",
-    "bn": "তিনি কি এখন সরকারে আছেন?"
+    "en": "Are they currently in power, or part of the current government?",
+    "bn": "তিনি কি এখন ক্ষমতায় আছেন, বা বর্তমান সরকারের অংশ?"
   },
   {
     "id": "from_south_america",

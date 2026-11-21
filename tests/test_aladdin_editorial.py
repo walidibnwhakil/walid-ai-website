@@ -61,7 +61,7 @@ class AladdinEditorial(unittest.TestCase):
         self.assertIn("পুনর্মিলন", TITLES[8])
         self.assertNotIn("পুরো প্রাসাদকে আগের জায়গায়", texts[8])
         self.assertIn("পুরো প্রাসাদকে আগের জায়গায়", texts[9])
-        self.assertIn("সুলতান সকালে", texts[9])
+        self.assertIn("পরদিন ভোরে সুলতান", texts[9])
         self.assertIn("ফাতিমা", texts[10])
         self.assertIn("রোখ", texts[10])
         self.assertIn("সুলতানের মৃত্যু", texts[11])
@@ -117,6 +117,47 @@ class AladdinEditorial(unittest.TestCase):
         for n in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12):
             self.assertNotIn("এই অধ্যায়ে", chapter[n])
         self.assertNotIn("উৎস ও পরবর্তী পাঠ", self.page)
+
+
+    def test_no_premature_rescue_and_version_order(self):
+        """Plot beats stay in their original chapters; retrieval is not moved into reunion."""
+        texts = {int(n): re.sub(r"<[^>]+>", "", body)
+                 for n, _, body in self.chapters}
+        chapter_order = {
+            2: ("তিনটি বড় কক্ষ", "প্রদীপ", "দরজা বন্ধ"),
+            3: ("আংটি", "গুহা থেকে", "মা"),
+            5: ("রত্ন", "তিন মাস", "উজিরপুত্রের"),
+            6: ("প্রথম রাতে", "দ্বিতীয় রাতেও", "চল্লিশটি সোনার পাত্র"),
+            8: ("ফেরিওয়ালার", "প্রাসাদটি আফ্রিকার", "চল্লিশ দিনের", "আংটিটি"),
+            9: ("আংটি ঘষে", "প্রাসাদটি দাঁড়িয়ে", "আলাদিন শহরে", "পরদিনের ভোজ"),
+            10: ("জাদুকর আমন্ত্রণ", "পানীয় গ্রহণ", "প্রদীপটি খুঁজে",
+                 "পুরো প্রাসাদকে আগের জায়গায়", "পরদিন ভোরে সুলতান"),
+            11: ("ফাতিমা", "রোখ", "মাথাব্যথার ভান", "জাদুকর নিহত"),
+        }
+        for ch, markers in chapter_order.items():
+            last = -1
+            for marker in markers:
+                current = texts[ch].find(marker)
+                self.assertGreater(current, last,
+                                   f"Chapter {ch}: {marker} missing or out of order")
+                last = current
+        self.assertNotIn("জাদুকর নিহত", texts[9])
+        self.assertNotIn("প্রদীপটি খুঁজে পেল", texts[9])
+        self.assertNotIn("পুরো প্রাসাদকে আগের জায়গায়", texts[9])
+        self.assertEqual(self.page.count("পুরো প্রাসাদকে আগের জায়গায়"), 1)
+        self.assertIn("বৈধ উত্তরাধিকারী", texts[12])
+        self.assertIn("সন্তানসন্ততি", texts[12])
+
+    def test_reader_html_anchors_and_scoped_metadata(self):
+        anchors = re.findall(r'id="(chapter-\\d+)"', self.page)
+        targets = re.findall(r'href="#(chapter-\\d+)"', self.page)
+        self.assertEqual(anchors, [f"chapter-{n}" for n in range(1, 13)])
+        self.assertEqual(targets, anchors)
+        self.assertEqual(self.page.count('<link rel="canonical"'), 1)
+        self.assertEqual(self.page.count('<meta name="description"'), 1)
+        self.assertEqual(self.page.count('<h1>আলাদিন ও জাদুর প্রদীপ</h1>'), 1)
+        self.assertNotIn('<script async src="//pagead2.googlesyndication.com',
+                         self.page)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

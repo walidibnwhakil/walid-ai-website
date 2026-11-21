@@ -42,6 +42,7 @@ const storyPaths=[
   "/others/history/bengal-sultanate/",
   "/others/history/mughal-empire/",
   "/others/history/mamluk-sultanate/",
+  "/others/history/joan-of-arc/",
 ];
 const widths=[320,375,768,1280];
 let browser,checks=0,sidebarChecks=0;

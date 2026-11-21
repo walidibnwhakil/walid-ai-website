@@ -124,6 +124,47 @@ def validate_mamluk_chronology(path):
         if invariant not in content:
             fail(path, "reader chrome/SEO invariant missing: " + invariant)
 
+def validate_joan_chronology(path):
+    """Joan's life must be a continuous documented narrative, not a recap followed by a restart."""
+    content = path.read_text(encoding="utf-8")
+    titles = re.findall(r'<section class="others-chapter" id="chapter-\d+"><h2>(.*?)</h2>', content)
+    expected = [
+        "ভাঙা রাজ্য", "ডমরেমি", "ভকুল্যুর", "অরলিয়াঁ", "লোয়ার",
+        "প্যারিস", "১৪৩০", "বার্গান্ডীয়", "১৪৩১ সালের রুয়াঁ",
+        "২৪–৩০ মে", "জোয়ানের মৃত্যুর পরে", "১৪৫০–১৪৫৬", "পরবর্তী শতাব্দীতে"
+    ]
+    if len(titles) != len(expected) or any(token not in title for token, title in zip(expected, titles)):
+        fail(path, "Joan of Arc chapters lost their single chronological progression")
+
+    sections = re.findall(
+        r'<section class="others-chapter" id="chapter-\d+">(.*?)</section>',
+        content, re.S
+    )
+    for i, section in enumerate(sections, 1):
+        paragraphs = re.findall(r'<p>(.*?)</p>', section, re.S)
+        if len(paragraphs) < 6 or sum(len(p) for p in paragraphs) < 1700:
+            fail(path, f"Joan chapter {i} has insufficient developed narrative")
+    milestones = {
+        1: ("১৪২০", "১৪২২"), 2: ("১৪১২", "ডমরেমি"),
+        3: ("১৪২৯", "শিনোঁ"), 4: ("২৯ এপ্রিল", "৮ মে"),
+        5: ("১৮ জুন", "১৭ জুলাই"), 6: ("৮ সেপ্টেম্বর", "প্যারিস"),
+        7: ("২৩ মে ১৪৩০", "কম্পিয়েন"),
+        8: ("২১ ফেব্রুয়ারি", "কোশোঁ"),
+        9: ("বারোটি", "বিচার"),
+        10: ("২৪ মে", "৩০ মে ১৪৩১"),
+        11: ("১৪৩৫", "১৪৫৩"), 12: ("৭ জুলাই", "১৪৫৬"),
+        13: ("১৯২০", "১৯০৯"),
+    }
+    for index, words in milestones.items():
+        if index <= len(sections) and not all(word in sections[index - 1] for word in words):
+            fail(path, f"Joan chapter {index} missing expected historical milestone")
+    if 'অধ্যায়সূচি — ১৩টি অধ্যায়' not in content:
+        fail(path, "Joan chapter TOC count does not match edited text")
+    if "এই অধ্যায়ের শেষে" in content or "উৎস ও পরবর্তী পাঠ" in content:
+        fail(path, "Joan book contains an obsolete editorial label")
+
+
+
 def validate_editorial_metadata(path):
     """Check published folklore/fiction readers for stale or cut-off metadata."""
     content = path.read_text(encoding="utf-8")
@@ -190,6 +231,8 @@ def main():
         errors.append(f"Expected 32 Others books; found {len(books)}")
     for book in books:
         validate_book(book)
+        if book.as_posix().endswith("/history/joan-of-arc/index.html"):
+            validate_joan_chronology(book)
         if book.as_posix().endswith("/history/mamluk-sultanate/index.html"):
             validate_mamluk_chronology(book)
         if "/history/" not in book.as_posix():

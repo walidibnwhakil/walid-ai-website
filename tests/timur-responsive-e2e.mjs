@@ -75,7 +75,7 @@ try {
     }
     assert(ankaraText.includes("বন্দি"),"Ankara must cover captivity");
         assert.equal(state.chapters.length,18,"Timur must retain 18 rewritten chapters");
-    assert.equal(state.totalParagraphs,191,"Timur editorial paragraphs missing");
+    assert.equal(state.totalParagraphs,192,"Timur editorial paragraphs missing");
     assert.deepEqual(state.chapters.map(x=>x.id),Array.from({length:18},(_,i)=>"chapter-"+(i+1)));
     assert.deepEqual(state.toc,state.chapters.map(x=>({id:x.id,name:x.name})),"TOC links and titles must match sections");
     assert(state.chapters.every(x=>x.paragraphs>=5),"A chapter is too short");
@@ -95,7 +95,7 @@ try {
     checks++;
     await page.close();
   }
-  console.log("TIMUR_READER_E2E_PASS",JSON.stringify({widths:checks,drawerChecks,chapters:18,paragraphs:191}));
+  console.log("TIMUR_READER_E2E_PASS",JSON.stringify({widths:checks,drawerChecks,chapters:18,paragraphs:192}));
 } finally {
   await browser?.close();
   const closed = new Promise(resolve=>server.close(resolve));

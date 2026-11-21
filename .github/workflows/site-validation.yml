@@ -20,3 +20,7 @@ jobs:
         run: python3 tests/test_others_readers.py
       - name: Validate Quran, translations, routes, stories and source checksums
         run: python3 tests/test_islam_quran.py
+      - name: Check current Quran header, Basmala and verse layout
+        run: python3 -m unittest discover -s tests -p 'test_quran_layout.py' -v
+      - name: Verify usage browser test syntax
+        run: node --check tests/test_usage_browser.cjs

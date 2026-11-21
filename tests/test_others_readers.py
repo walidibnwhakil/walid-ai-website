@@ -94,6 +94,54 @@ def validate_book(path):
         if not final_section or not all(item in final_section.group(1)
           for item in ("১৮৫৭", "হডসন", "জাফর", "বিচার", "রেঙ্গুন", "১৮৬২")):
             fail(path, "Mughal final reign is missing the 1857–1862 sequence")
+        # Expanded content is substantial and free of pasted filler.
+        sections = re.findall(
+            r'<section class="others-chapter" id="chapter-\d+"><h2>.*?</h2>(.*?)</section>',
+            content, re.S)
+        chapter_paras = [[re.sub(r'<[^>]+>', '', item).strip()
+                          for item in re.findall(r'<p>(.*?)</p>', sec, re.S)]
+                         for sec in sections]
+        if sum(len(part) for part in chapter_paras) < 270:
+            fail(path, "Mughal historical narratives unexpectedly abbreviated")
+        if any(len(item) < 175 for part in chapter_paras for item in part):
+            fail(path, "Mughal reader has underdeveloped paragraphs")
+        paragraphs = [item for part in chapter_paras for item in part]
+        long_paragraphs = [item for item in paragraphs if len(item) > 100]
+        if len(set(long_paragraphs)) != len(long_paragraphs):
+            fail(path, "identical long paragraphs were repeated")
+        important = {
+            2: ("দিলদার বেগম", "পানিপথ", "উস্তাদ আলি"),
+            4: ("শের শাহ", "ইসলাম শাহ", "কামরান", "হিন্দাল"),
+            6: ("বৈরাম খান", "মাহম আঙ্গা", "আধম খান", "চিতোর"),
+            7: ("রুকাইয়া", "মরিয়ম-উজ-জামানি", "আবুল ফজল", "মুরাদ"),
+            9: ("নূরজাহান", "পারভেজ", "দাওয়ার বখশ", "মহাবত খান"),
+            10: ("মুমতাজ", "গওহর আরা", "জাহানারা", "কান্দাহার"),
+            11: ("দারা শিকোহ", "শাহ সুজা", "মুরাদ", "ঔরঙ্গজেব", "নাদিরা"),
+            13: ("দিলরাস", "নবাব বাই", "জেবুন্নিসা", "তারাবাই"),
+            18: ("নিকুসিয়ার", "রফি-উদ-দারাজাত", "দ্বিতীয় শাহজাহান"),
+            19: ("সৈয়দ", "নাদির শাহ", "মুহাম্মদ ইব্রাহিম"),
+            21: ("জাহান্দার শাহ ও অনুপ বাইয়ের পুত্র", "পলাশী", "আলি গওহর"),
+            23: ("বক্সার", "দেওয়ানি", "বিদার বখত", "গুলাম কাদির"),
+            25: ("জওয়ান বখত", "মির্জা মুঘল", "হডসন", "বিচার", "রেঙ্গুন"),
+        }
+        for n, names in important.items():
+            if not all(name in " ".join(chapter_paras[n - 1]) for name in names):
+                fail(path, f"Mughal chapter {n} lost people/events: {names}")
+        for n, events in {
+            4: ("১৫৪২", "১৫৪৫ সালে কালিঞ্জর", "হিন্দালের ১৫৫১", "১৫৫৫ সালের"),
+            9: ("১৬১১ সালে", "১৬২৬ সালে মহাবত", "১৬২৭ সালে কাশ্মীর", "দাওয়ার বখশ", "১৬৪৫"),
+            11: ("২৬ এপ্রিল ১৬৫৮", "১৬৫৯ সালে বন্দি", "১৬৬৬ সালে"),
+            23: ("১৭৬১ সালের", "২৩ অক্টোবর ১৭৬৪", "১৭৬৫ সালের আলাহাবাদের", "১৭৭০ সালের", "১৭৮৮ সালে", "১৮০৩ সালে"),
+            25: ("১০ মে মীরাট", "২১ সেপ্টেম্বর", "১৮৫৮ সালের ২৭ জানুয়ারি", "৭ নভেম্বর ১৮৬২"),
+        }.items():
+            section_text = " ".join(chapter_paras[n - 1])
+            prior = -1
+            for event in events:
+                position = section_text.find(event, prior + 1)
+                if position < 0:
+                    fail(path, f"Mughal chapter {n} lost historical order near {event}")
+                    break
+                prior = position
         if content.count('class="legal-footer"') != 1:
             fail(path, "Mughal reader lost the shared legal footer")
         if 'href="https://walid-ai.com/others/history/mughal-empire/"' not in content:

@@ -46,7 +46,7 @@ for chapter_num, lead in ((6, "১৬৩০ সালে জন্ম"), (15, "�
     check(first is not None and first.group(1).startswith(lead),
           f"chapter {chapter_num}: reign biography must precede later-era context")
 
-check(sections[18][1].count("১৯৪৮ সালে বার্মা ও সিলন স্বাধীন") == 1,
+check(sections[18][1].count("১৯৪৮ সালের জানুয়ারিতে বার্মা") == 1,
       "George VI narrative must not repeat 1948 independence transition")
 
 required = {
@@ -54,8 +54,8 @@ required = {
     6: ("রয়্যাল আফ্রিকান", "১৬৭২"),
     11: ("২৩ জুন ১৭৫৭", "সিরাজউদ্দৌলা", "মীর জাফর"),
     12: ("১৭৬৪", "১৭৬৫", "১৭৬৯–৭০", "১৭৯৩", "১৮০৭"),
-    14: ("১৮৩৩", "১৮৩৪", "১৮৩৮"),
-    15: ("১৮৫৭", "১৮৫৮", "লক্ষ্মীবাই", "হাজরত মহল", "নীলবিদ্রোহ"),
+    14: ("১৮৩৩", "১৮৩৪", "চার্টার"),
+    15: ("১৮৩৮", "১৮৫৭", "১৮৫৮", "লক্ষ্মীবাই", "হাজরত মহল", "নীলবিদ্রোহ"),
     16: ("১৯০৫", "স্বদেশি"),
     17: ("১৯১১", "১৯১৯", "১৯৩০", "১৯৩৫"),
     19: ("১৯৪৩", "১৯৪৭", "পাকিস্তান", "ভারত"),
@@ -66,6 +66,59 @@ for number, terms in required.items():
     body = sections[number - 1][1]
     for term in terms:
         check(term in body, f"chapter {number}: missing period-relevant {term}")
+
+
+# In-depth editorial contract: historical coverage and period-specific chronology.
+paragraph_counts = [len(re.findall(r"<p>", body)) for _, body in sections]
+check(sum(paragraph_counts) >= 220,
+      f"book is still too thin: only {sum(paragraph_counts)} chapter paragraphs")
+min_paragraphs = {1: 9, 11: 12, 12: 17, 15: 30, 17: 12, 19: 17, 20: 22, 21: 8}
+for number, minimum in min_paragraphs.items():
+    check(paragraph_counts[number - 1] >= minimum,
+          f"chapter {number}: expected at least {minimum} developed paragraphs")
+
+coverage_by_chapter = {
+    1: ("১৭০৭", "১৮০১", "১৯২৭"),
+    2: ("১৫৮৮", "রোয়ানোক", "১৬০০"),
+    3: ("জেমসটাউন", "মুঘল", "পোহাটান"),
+    4: ("পিটিশন অব রাইট", "নেসবির"),
+    5: ("আয়ারল্যান্ড", "জ্যামাইকা"),
+    6: ("রয়্যাল আফ্রিকান", "হাডসনস বে", "বার্বাডোস"),
+    8: ("বিল অব রাইটস", "ডারিয়েন"),
+    9: ("১৭০৭", "উট্রেখট"),
+    11: ("পলাশী", "সিরাজউদ্দৌলা", "কুইবেক"),
+    12: ("বক্সারের", "দেওয়ানি", "১৭৬৯–৭০", "১৭৮৮", "টিপু", "ট্রাফালগার", "ওয়াটারলু"),
+    13: ("ইয়ান্দাবু", "ডেমেরারা"),
+    14: ("স্লেভারি অ্যাবলিশন", "চার্টার"),
+    15: ("অ্যাংলো-শিখ", "আফিম", "মাওরি", "আয়ারল্যান্ড", "ইসান্দলওয়ানা", "ওমদুরমান", "বার্মা", "সুয়েজ", "১৮৮৫"),
+    16: ("১৯০৫", "সলিমুল্লাহ", "স্বদেশি"),
+    17: ("প্রথম বিশ্বযুদ্ধ", "জালিয়ানওয়ালাবাগ", "চট্টগ্রাম", "স্ট্যাটিউট অব ওয়েস্টমিনস্টার"),
+    19: ("সিঙ্গাপুর", "ফ্যামিন ইনকোয়ারি", "র‌্যাডক্লিফ", "লন্ডন ঘোষণা"),
+    20: ("মাউ মাউ", "ঘানা", "মালয়া", "নাইজেরিয়া", "কেনিয়া", "জিম্বাবুয়ে", "হংকং", "বাংলাদেশ"),
+    21: ("সাংবিধানিক", "কমনওয়েলথ"),
+}
+for chapter, motifs in coverage_by_chapter.items():
+    for motif in motifs:
+        check(motif in sections[chapter - 1][1],
+              f"chapter {chapter}: missing necessary history: {motif}")
+
+def in_order(chapter, *markers):
+    body = sections[chapter - 1][1]
+    offsets = [body.find(m) for m in markers]
+    check(all(i >= 0 for i in offsets) and offsets == sorted(offsets)
+          and len(set(offsets)) == len(offsets),
+          f"chapter {chapter}: chronological milestones misplaced: {markers}")
+
+in_order(11, "২৩ জুন ১৭৫৭", "১৭৫৯ সালে কুইবেক", "১৭৬০ সালে মারা")
+in_order(12, "১৭৬৩ সালের প্যারিস", "১৭৬৪", "১৭৬৯–৭০", "১৭৮৮ সালে",
+         "১৮০১ সালের ইউনিয়নে", "১৮০৫ সালের ট্রাফালগার", "১৮০৭ সালে ব্রিটিশ")
+in_order(15, "১৮৩৮", "১৮৪০ সালের ওয়াইতাঙ্গি", "১৮৫৭–৫৮", "১৮৬৭",
+         "১৮৭৯ সালে", "১৮৮৪–৮৫", "১৮৯৯ সালে")
+in_order(19, "১৯৪৩ সালের দুর্ভিক্ষ", "১৯৪৬ সালে ক্যাবিনেট", "১৮ জুলাই ১৯৪৭",
+         "১৭ আগস্ট ১৯৪৭", "১৯৪৮ সালের জানুয়ারিতে", "১৯৪৯ সালের লন্ডন ঘোষণা",
+         "৬ ফেব্রুয়ারি ১৯৫২")
+check("১৮৩৮" not in sections[13][1], "1838 apprenticeship must follow William IV's death")
+check("১৯৪৭ সালের" not in sections[20][1], "post-colonial king must not restart 1947 narrative")
 
 check('href="https://walid-ai.com/others/history/british-empire/"' in HTML,
       "canonical URL changed")

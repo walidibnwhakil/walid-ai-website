@@ -57,6 +57,32 @@ def validate_book(path):
         for token in ("সূরা আল-কাহফ", "ডেসিয়ুস", "থিওডোসিয়ুস", "রৌপ্যমুদ্রা", "কুকুর", "আর-রাকিম"):
             if token not in content:
                 fail(path, f"Ashab al-Kahf source-context anchor missing: {token}")
+        # The only direct Arabic excerpt is Quran 18:10; the Bengali rendering is original.
+        verified_prayer = "رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحۡمَةٗ وَهَيِّئۡ لَنَا مِنۡ أَمۡرِنَا رَشَدٗا"
+        if content.count(verified_prayer) != 1:
+            fail(path, "Quran 18:10 prayer was altered or duplicated")
+        if not all(token in content for token in (
+            "বাংলা ভাবার্থ", "স্বতন্ত্রভাবে রচিত",
+            'href="/islam/quran/al-kahf/"',
+            'href="https://www.iranicaonline.org/articles/ephesus/"',
+            "আটজন", "৩০০ বছরের সঙ্গে আরও নয়",
+        )):
+            fail(path, "Ashab al-Kahf source attribution or variant caution missing")
+        for index, requirements in {
+            1: ("১৪ নম্বর আয়াতে", "প্রতিপালক", "সমাজ"),
+            3: ("১৮:১০", "আরবি", "প্রার্থনা"),
+            4: ("১১–১২ নম্বর আয়াতে", "১৭ নম্বর আয়াত", "১৮ নম্বর আয়াত", "কুকুর"),
+            5: ("১৯ নম্বর আয়াতে", "দিন", "সময়"),
+            6: ("১৯ নম্বর আয়াতে", "২০ নম্বর আয়াতে", "খাদ্য", "রৌপ্য"),
+            7: ("২১ নম্বর আয়াতে", "পুনরুত্থান"),
+            9: ("২২ নম্বর আয়াতে", "তিনজন", "পাঁচজন", "সাতজন"),
+            10: ("২৫ নম্বর আয়াতে", "২৬ নম্বর আয়াতে", "ব্যাখ্যা"),
+            11: ("ডেসিয়ুস", "থিওডোসিয়ুস", "পৃথক"),
+        }.items():
+            if len(sections) >= index and not all(
+                requirement in sections[index - 1][1] for requirement in requirements
+            ):
+                fail(path, f"Ashab al-Kahf chapter {index} lost Quran or source anchors")
         if content.count('class="legal-footer"') != 1 or not all(s in content for s in (
             'href="https://walid-ai.com/others/history/ashab-al-kahf/"',
             '/walid-ai-approved-logo.png', '/others/assets/books.css',
@@ -94,6 +120,54 @@ def validate_book(path):
         if not final_section or not all(item in final_section.group(1)
           for item in ("১৮৫৭", "হডসন", "জাফর", "বিচার", "রেঙ্গুন", "১৮৬২")):
             fail(path, "Mughal final reign is missing the 1857–1862 sequence")
+        # Expanded content is substantial and free of pasted filler.
+        sections = re.findall(
+            r'<section class="others-chapter" id="chapter-\d+"><h2>.*?</h2>(.*?)</section>',
+            content, re.S)
+        chapter_paras = [[re.sub(r'<[^>]+>', '', item).strip()
+                          for item in re.findall(r'<p>(.*?)</p>', sec, re.S)]
+                         for sec in sections]
+        if sum(len(part) for part in chapter_paras) < 270:
+            fail(path, "Mughal historical narratives unexpectedly abbreviated")
+        if any(len(item) < 175 for part in chapter_paras for item in part):
+            fail(path, "Mughal reader has underdeveloped paragraphs")
+        paragraphs = [item for part in chapter_paras for item in part]
+        long_paragraphs = [item for item in paragraphs if len(item) > 100]
+        if len(set(long_paragraphs)) != len(long_paragraphs):
+            fail(path, "identical long paragraphs were repeated")
+        important = {
+            2: ("দিলদার বেগম", "পানিপথ", "উস্তাদ আলি"),
+            4: ("শের শাহ", "ইসলাম শাহ", "কামরান", "হিন্দাল"),
+            6: ("বৈরাম খান", "মাহম আঙ্গা", "আধম খান", "চিতোর"),
+            7: ("রুকাইয়া", "মরিয়ম-উজ-জামানি", "আবুল ফজল", "মুরাদ"),
+            9: ("নূরজাহান", "পারভেজ", "দাওয়ার বখশ", "মহাবত খান"),
+            10: ("মুমতাজ", "গওহর আরা", "জাহানারা", "কান্দাহার"),
+            11: ("দারা শিকোহ", "শাহ সুজা", "মুরাদ", "ঔরঙ্গজেব", "নাদিরা"),
+            13: ("দিলরাস", "নবাব বাই", "জেবুন্নিসা", "তারাবাই"),
+            18: ("নিকুসিয়ার", "রফি-উদ-দারাজাত", "দ্বিতীয় শাহজাহান"),
+            19: ("সৈয়দ", "নাদির শাহ", "মুহাম্মদ ইব্রাহিম"),
+            21: ("জাহান্দার শাহ ও অনুপ বাইয়ের পুত্র", "পলাশী", "আলি গওহর"),
+            23: ("বক্সার", "দেওয়ানি", "বিদার বখত", "গুলাম কাদির"),
+            25: ("জওয়ান বখত", "মির্জা মুঘল", "হডসন", "বিচার", "রেঙ্গুন"),
+        }
+        for n, names in important.items():
+            if not all(name in " ".join(chapter_paras[n - 1]) for name in names):
+                fail(path, f"Mughal chapter {n} lost people/events: {names}")
+        for n, events in {
+            4: ("১৫৪২", "১৫৪৫ সালে কালিঞ্জর", "হিন্দালের ১৫৫১", "১৫৫৫ সালের"),
+            9: ("১৬১১ সালে", "১৬২৬ সালে মহাবত", "১৬২৭ সালে কাশ্মীর", "দাওয়ার বখশ", "১৬৪৫"),
+            11: ("২৬ এপ্রিল ১৬৫৮", "১৬৫৯ সালে বন্দি", "১৬৬৬ সালে"),
+            23: ("১৭৬১ সালের", "২৩ অক্টোবর ১৭৬৪", "১৭৬৫ সালের আলাহাবাদের", "১৭৭০ সালের", "১৭৮৮ সালে", "১৮০৩ সালে"),
+            25: ("১০ মে মীরাট", "২১ সেপ্টেম্বর", "১৮৫৮ সালের ২৭ জানুয়ারি", "৭ নভেম্বর ১৮৬২"),
+        }.items():
+            section_text = " ".join(chapter_paras[n - 1])
+            prior = -1
+            for event in events:
+                position = section_text.find(event, prior + 1)
+                if position < 0:
+                    fail(path, f"Mughal chapter {n} lost historical order near {event}")
+                    break
+                prior = position
         if content.count('class="legal-footer"') != 1:
             fail(path, "Mughal reader lost the shared legal footer")
         if 'href="https://walid-ai.com/others/history/mughal-empire/"' not in content:
@@ -191,6 +265,48 @@ def validate_joan_chronology(path):
         fail(path, "Joan chapter TOC count does not match edited text")
     if "এই অধ্যায়ের শেষে" in content or "উৎস ও পরবর্তী পাঠ" in content:
         fail(path, "Joan book contains an obsolete editorial label")
+
+    # Regression contract for the expanded, research-led biography (not just 13 headings).
+    essential_people = {
+        1: ("বেডফোর্ড", "ইজাবো", "ফিলিপ দ্য গুড"),
+        2: ("জাকমাঁ", "ক্যাথরিন", "ইজাবেল রোমে"),
+        3: ("রবার্ট দ্য বোদ্রিকুর", "পুয়াতিয়ের", "জঁ দ্য অলোঁ"),
+        4: ("দুনোয়া", "সাফোক", "লে তুরেল"),
+        5: ("ট্যালবট", "পাতে", "রেনো দ্য শার্ত্র"),
+        6: ("লা ত্রেমুইয়", "বার্গান্ডি", "সাঁ-পিয়ের"),
+        7: ("গিয়োম দ্য ফ্লাভি", "জঁ দ্য লুক্সেমবুর্গ", "২৩ মে ১৪৩০"),
+        8: ("পিয়ের কোশোঁ", "মঁশোঁ", "ওয়ারউইকের"),
+        9: ("দে স্তিভে", "মাশিয়ু", "বারোটি"),
+        10: ("২৪ মে", "৩০ মে ১৪৩১", "মার্তাঁ লাদভেনু"),
+        11: ("আরাস", "ট্যালবট", "১৪৬১"),
+        12: ("ব্রেয়াল", "ক্যালিক্সটাস", "১৪৫৬"),
+        13: ("মিশলে", "কিশেরা", "১৯২০"),
+    }
+    for chapter, required in essential_people.items():
+        if chapter > len(sections):
+            continue
+        plain = re.sub(r"<[^>]+>", " ", sections[chapter - 1])
+        paragraphs = re.findall(r"<p>(.*?)</p>", sections[chapter - 1], re.S)
+        if len(paragraphs) < 12 or len(plain) < 3600:
+            fail(path, f"Joan chapter {chapter} lost developed biographical coverage")
+        for person_or_event in required:
+            if person_or_event not in plain:
+                fail(path, f"Joan chapter {chapter} lost {person_or_event}")
+    if content.count('class="legal-footer"') != 1:
+        fail(path, "Joan must retain exactly one footer")
+    for expected_asset in (
+        "/walid-ai-approved-logo.png",
+        "/others/assets/books.css",
+        "/others/assets/reader.js",
+        "/walid-legal.css",
+        'rel="canonical" href="https://walid-ai.com/others/history/joan-of-arc/"',
+    ):
+        if expected_asset not in content:
+            fail(path, f"Joan reader lost branding/navigation/SEO asset: {expected_asset}")
+
+
+
+
 
 
 

@@ -1,0 +1,19 @@
+name: Aladdin scoped editorial regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/islamic-literature/aladdin/index.html"
+      - "tests/test_aladdin_editorial.py"
+      - ".github/workflows/aladdin-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  aladdin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Aladdin plot, TOC, original reader chrome and scoped content
+        run: python3 tests/test_aladdin_editorial.py

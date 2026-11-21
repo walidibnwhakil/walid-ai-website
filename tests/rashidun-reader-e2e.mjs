@@ -28,8 +28,8 @@ for (const [index, c] of chapters.entries()) {
     words += p.split(/\s+/).length;
   }
 }
-assert.ok(paragraphs >= 230, "History was shortened: " + paragraphs);
-assert.ok(words >= 12000, "Book reverted to an abbreviated synopsis: " + words);
+assert.ok(paragraphs >= 280, "History was shortened: " + paragraphs);
+assert.ok(words >= 16000, "Book reverted to an abbreviated synopsis: " + words);
 const facts = {
   1:["৬৩২","ফাতিমা","সুন্নি","শিয়া"],
   2:["সাকিফা","আলী","আবু বকর","ফাদাক"],
@@ -71,6 +71,27 @@ assert.equal((html.match(/class="legal-footer"/g)||[]).length,1);
 assert.ok(!/class="others-(sources|next)"/.test(html));
 assert.ok(!html.includes("উৎস ও পরবর্তী পাঠ"));
 assert.ok(!html.includes("RASHIDUN_DRAFT_NEXT"));
+assert.ok(chapters.every(c => [...c[3].matchAll(/<p>([\s\S]*?)<\/p>/g)].length >= 8), "A chapter has reverted to brief formulaic coverage");
+const evidence = {
+  2: ["বুখারির ৪২৪০", "ফাতিমা", "সাকিফা"],
+  4: ["মালিক ইবন নুওয়াইরা", "লায়লা বিনতে মিনহাল"],
+  5: ["বুখারির ৪৯৮৬", "হাফসা", "যায়েদ"],
+  10: ["রুস্তম", "সেতুর যুদ্ধ", "তেসিফন"],
+  11: ["শুরূত উমর", "সোফ্রোনিয়ুস"],
+  12: ["প্যাপিরাস", "ফুস্তাত", "আমর ইবনুল আস"],
+  14: ["দিওয়ান", "জিজিয়া", "খারাজ", "প্যাপিরাস"],
+  17: ["বুখারির ৪৯৮৭", "হুযাইফা", "মুসহাফ"],
+  20: ["নায়িলা", "মুহাম্মদ ইবন আবি বকর", "মারওয়ান"],
+  24: ["আম্মার", "সালিশ", "ইউফ্রেটিস"],
+  25: ["সালিশচুক্তির আধুনিক গবেষণায়", "আবু মুসা", "আমর ইবনুল আস"],
+  26: ["হারুরা", "নাহরাওয়ান", "নাগরিক নিরাপত্তা"],
+  28: ["হাসান", "মুয়াবিয়া", "৬৬১", "শর্ত"]
+};
+for (const [index, anchors] of Object.entries(evidence))
+  for (const token of anchors) assert.ok(chapters[Number(index) - 1][3].includes(token), "Lost evidence anchor in chapter " + index + ": " + token);
+for (const source of ["https://sunnah.com/bukhari:4240","https://sunnah.com/bukhari:4986","https://sunnah.com/bukhari:4987","https://doi.org/10.1093/jis/etac001"])
+  assert.ok(html.includes('href="' + source + '"'), "Missing accessible inline evidence link: " + source);
+
 
 const contentTypes={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".png":"image/png",".ico":"image/x-icon",".ttf":"font/ttf",".woff2":"font/woff2"};
 const server=createServer(async(req,res)=>{

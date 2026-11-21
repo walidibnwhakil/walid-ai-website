@@ -1,0 +1,33 @@
+name: Bengal Sultanate editorial and responsive regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/bengal-sultanate/index.html"
+      - "tests/test_bengal_sultanate_editorial.py"
+      - "tests/bengal-sultanate-reader-e2e.mjs"
+      - ".github/workflows/bengal-sultanate-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify chapters, chronology, source metadata and site shell
+        run: python3 tests/test_bengal_sultanate_editorial.py
+  responsive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 20}
+      - name: Install browser runner
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify Bengali book at four viewport widths and interactive TOC
+        run: node tests/bengal-sultanate-reader-e2e.mjs

@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "others/history/karbala/**"
+      - "others/history/ali-hasan-husayn-karbala/**"
       - "tests/karbala-editorial-e2e.mjs"
       - ".github/workflows/karbala-editorial.yml"
   workflow_dispatch:

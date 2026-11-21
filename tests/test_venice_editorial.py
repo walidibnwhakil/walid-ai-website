@@ -35,7 +35,7 @@ class VeniceStaticTests(unittest.TestCase):
         self.assertLess(index("ক্রিটের দীর্ঘ যুদ্ধ"), index("মোরিয়ার অভিযান"))
         self.assertLess(index("মোরিয়ার অভিযান"), index("স্থবির শাসন"))
         self.assertIn("১২ মে ১৭৯৭", HTML)
-        self.assertIn("১৭৮৯ সালের মার্চে", HTML)
+        self.assertIn("১৭৮৯ সালের ৯ মার্চ", HTML)
         self.assertIn("১৫১৭ সালে উসমানীয় সুলতান প্রথম সেলিম", HTML)
         self.assertIn("১৪ মে ১৫০৯", HTML)
         self.assertIn("২৭ নভেম্বর ১৫৬০", HTML)
@@ -73,6 +73,55 @@ class VeniceStaticTests(unittest.TestCase):
         self.assertEqual(HTML.count('class="legal-footer"'), 1)
         self.assertEqual(HTML.count('class="others-book-title"'), 1)
 
+
+
+    def test_source_sensitive_historical_details(self):
+        """Specific historical repairs must survive later narrative edits."""
+        chapters = {
+            int(number): body for number, body in re.findall(
+                r'<section class="others-chapter" id="chapter-(\d+)"><h2>.*?</h2>(.*?)</section>',
+                HTML, re.S,
+            )
+        }
+        markers = {
+            4: ("ওরসো", "ওত্তোন", "১০২৬"),
+            5: ("১০৮২", "১০৯২", "লাতিন অনুলিপি"),
+            7: ("১২০২", "১২০৩", "১২০৪", "কনস্টান্টিনোপল"),
+            8: ("ক্রিট", "গ্রিকভাষী", "১২৬১"),
+            9: ("১২৬৮", "একচল্লিশজন", "পঁচিশ"),
+            10: ("আর্সেনাল", "নাবিকের মজুরি"),
+            11: ("১৩৪৮", "উত্তরাধিকার"),
+            13: ("১৬ আগস্ট ১৩৭৯", "কার্লো জেনো", "তুরিন", "তেনেদোস"),
+            14: ("কারার্রা", "ভেরোনা", "১৪২৩"),
+            15: ("জাকোপো", "১৪৫৪", "স্ফোর্ৎসা", "১৪৫৭"),
+            16: ("ক্যাটেরিনা", "দ্বিতীয় জেমস", "তৃতীয় জেমস", "১৪৮৯"),
+            17: ("১৪ মে ১৫০৯", "১৫১৬ সালের মার্চে", "মসলাবাণিজ্য"),
+            19: ("ফামাগুস্তা", "লেপান্তো", "১৫৭৩"),
+            20: ("২৭ নভেম্বর ১৫৬০", "১৫৯৭", "মোরোসিনা"),
+            22: ("১৬৩০", "১৬৪৫", "১৬৬৯"),
+            23: ("১৬৮৭", "১৭১৫", "২১ জুলাই ১৭১৮"),
+            25: ("১৭৮৯ সালের ৯ মার্চ", "১২ মে ১৭৯৭", "১৭ অক্টোবর ১৭৯৭"),
+            26: ("১৮৪৮", "১৮৬৬", "২০২০", "MOSE"),
+        }
+        self.assertEqual(sorted(chapters), list(range(1, 27)))
+        for number, terms in markers.items():
+            for term in terms:
+                with self.subTest(chapter=number, term=term):
+                    self.assertIn(term, chapters[number])
+
+    def test_repeated_scene_regressions(self):
+        chapters = dict(
+            (int(number), body) for number, body in re.findall(
+                r'<section class="others-chapter" id="chapter-(\d+)"><h2>.*?</h2>(.*?)</section>',
+                HTML, re.S,
+            )
+        )
+        self.assertEqual(chapters[13].count("১৩৭৯ সালে পোলার কাছে"), 1)
+        self.assertIn("৮ আগস্ট ১৩৮১ সালের তুরিন", chapters[13])
+        self.assertEqual(chapters[25].count("১৭৯৬ সালের ইতালীয় অভিযানে"), 0)
+        self.assertNotIn("সমকালীন প্রমাণে নিশ্চিত", chapters[5])
+        self.assertEqual(HTML.count('<link rel="canonical"'), 1)
+        self.assertEqual(HTML.count('<footer class="legal-footer">'), 1)
 
 class VeniceBrowserTests(unittest.TestCase):
     @classmethod

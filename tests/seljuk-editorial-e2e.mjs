@@ -44,11 +44,18 @@ for (const [number, needle] of [
   [14, "১০৯৭"], [16, "১১৭৬"], [20, "১২৪৩"], [22, "১৩০৮"],
   [2, "১০৪১"], [5, "ইউদোকিয়া"], [5, "মিখাইল সপ্তম"],
   [7, "জুবাইদা খাতুন"], [8, "মাহমুদের শৈশব"], [11, "ইয়েলু দাশি"],
-  [12, "ইলদেগিজ"], [13, "সময়রেখা ইচ্ছাকৃতভাবে"],
+  [12, "ইলদেগিজ"], [13, "একাদশ শতকের সত্তরের দশকে"],
   [15, "তৃতীয় কনরাড"], [18, "ট্রেবিজন্দের"],
-  [19, "মাহপেরি"], [20, "১২৫৬"], [21, "কারাতাই"],
+  [19, "মাহপেরি"], [21, "১২৫৬"], [21, "কারাতাই"],
   [22, "ইলখানীয়"], [23, "প্রাথমিক বিবরণের সঙ্গে আধুনিক গবেষণা"]
 ]) assert(chapters[number - 1][3].includes(needle), "Chronological event missing from chapter " + number);
+
+// Editorial chronology guards: avoid projecting the Il-khanate backward into 1243.
+assert.doesNotMatch(chapters[19][3], /১২৫৬/, "Köse Dağ chapter must not jump ahead to the founding of the Il-khanate");
+assert.match(chapters[19][3], /বৃহত্তর মোঙ্গল সাম্রাজ্যের প্রতিনিধি/, "1243 Mongol command needs its contemporary political context");
+assert.doesNotMatch(source, /জঙ্গি শাসক নূরুদ্দিন/, "The Zengid dynasty must not be misidentified in Bengali");
+assert.doesNotMatch(source, /সময়রেখা ইচ্ছাকৃতভাবে/, "Avoid editorial instructions within historical narrative");
+assert.match(chapters[15][3], /জেঙ্গি শাসক নূরুদ্দিন/, "Nūr al-Dīn Zengid's dynasty must be named correctly");
 
 const types = {".html":"text/html; charset=utf-8",".css":"text/css",".js":"text/javascript",
   ".svg":"image/svg+xml",".png":"image/png",".jpg":"image/jpeg",".webp":"image/webp",

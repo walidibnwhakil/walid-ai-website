@@ -94,6 +94,42 @@ class CrusadesEditorialTests(unittest.TestCase):
         self.assertIn("কিংবদন্তি", self.page)
         self.assertIn("১২৯৩", self.chapters[19][2])
 
+    def test_chronology_nuance_and_no_repeated_sentences(self):
+        """Protect editorial distinctions without treating word count as historical QA."""
+        contextual_terms = {
+            2: ("১০৯২", "রিদওয়ান", "দুকাক"),
+            3: ("স্পাইয়ার", "ভর্মস", "মাইন্‌ৎস"),
+            4: ("থোরোস", "ইয়াগি-সিয়ান", "কেরবোগা"),
+            9: ("মানুয়েল", "এলেনর", "দামেস্ক"),
+            10: ("আল-বাবাইন", "আল-ফাদিল", "আল-আদিদ"),
+            11: ("কেরেসোঁ", "এসকিভা", "হাত্তিন"),
+            13: ("সিসিলি", "জোয়ান", "জাফফা"),
+            14: ("জারা", "পঞ্চম আলেক্সিওস", "১২৬১"),
+            15: ("মারিয়া", "দামিয়েত্তা", "১২২১"),
+            16: ("আল-মুয়াজ্জাম", "ইসাবেলা", "জাফফা"),
+            17: ("লম্বার্ডদের যুদ্ধ", "খাওয়ারিজমীয়", "লা ফরবি"),
+            18: ("শাজার", "তুরানশাহ", "আক্কা"),
+            19: ("জঁ ত্রিস্তাঁ", "এডওয়ার্ড", "তিউনিস"),
+            20: ("আল-আশরাফ খলিল", "ত্রিপোলি", "১২৯১"),
+        }
+        for number, terms in contextual_terms.items():
+            body = self.chapters[number - 1][2]
+            for term in terms:
+                self.assertIn(term, body, f"Missing contextual detail {term} in chapter {number}")
+        chapter14 = self.chapters[13][2]
+        self.assertLess(chapter14.find("১২১২ সালে"), chapter14.find("১২৬১ সালে"))
+        for number, title, body in self.chapters:
+            paragraphs = re.findall(r"<p>(.*?)</p>", body, re.S)
+            sentences = [
+                sentence.strip() for paragraph in paragraphs
+                for sentence in re.split(r"[।!?]", re.sub(r"<[^>]+>", "", paragraph))
+                if len(sentence.strip()) > 95
+            ]
+            self.assertEqual(
+                len(sentences), len(set(sentences)),
+                f"Repeated long sentences in chapter {number}: {title}"
+            )
+
     def test_preserved_site_shell(self):
         text = self.page
         self.assertIn('<html lang="bn">', text)

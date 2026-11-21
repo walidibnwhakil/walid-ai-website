@@ -1,0 +1,39 @@
+name: Mamluk history editorial and responsive regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/mamluk-sultanate/index.html"
+      - "tests/test_mamluk_editorial.py"
+      - ".github/workflows/mamluk-editorial.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mamluk-reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate all Others reader contracts
+        run: python3 tests/test_others_readers.py
+      - name: Install Chromium browser test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify Mamluk chapters, citations, and 4 responsive browser viewports
+        run: python3 tests/test_mamluk_editorial.py
+      - name: Upload reader viewport screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mamluk-editorial-browser-screenshots
+          path: artifacts/mamluk-editorial/
+          if-no-files-found: ignore

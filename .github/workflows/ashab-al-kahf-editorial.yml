@@ -1,0 +1,21 @@
+name: Ashab al-Kahf Quran/editorial contract
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/history/ashab-al-kahf/**"
+      - "tests/test_ashab_al_kahf_editorial.py"
+      - ".github/workflows/ashab-al-kahf-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quran-editorial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify the twelve chapters, ayah anchors and source boundaries
+        run: python3 tests/test_ashab_al_kahf_editorial.py
+      - name: Verify the existing Others reader compatibility contract
+        run: python3 tests/test_others_readers.py

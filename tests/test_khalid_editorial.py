@@ -64,3 +64,38 @@ assert not re.search(r'class="others-(sources|next)"', html)
 assert html.count("<article") == html.count("</article>") == 1
 assert html.count("<section") == html.count("</section>") == 12
 print(f"KHALID_EDITORIAL_PASS chapters={len(parts)} paragraphs={len(all_paragraphs)} toc={len(links)}")
+
+
+# Source-sensitive contracts belong to the event being discussed, not a detached
+# bibliography. These checks deliberately do not treat legend as verified history.
+by_chapter = {int(n): title + " " + body for n, title, body in parts}
+event_evidence = {
+    3: ("সহিহ বুখারি ৪২৬২", "সহিহ বুখারি ৪২৬৫", "স্থায়ী মুসলিম শাসন"),
+    4: ("সহিহ বুখারি ৪৩৩৯", "ইবন উমর", "আলী ইবন আবি তালিব"),
+    5: ("মালিক ইবন নুওয়াইরা", "লায়লা বিনতুল মিনহাল", "উমর"),
+    6: ("সহিহ বুখারি ৪৯৮৬", "জায়েদ ইবন সাবিত", "বনু হানিফা"),
+    7: ("হিউ কেনেডি", "হরমুজ", "উল্লাইস"),
+    8: ("ফিরাজ", "আইনুত তামর", "দৌমাতুল জানদাল"),
+    9: ("রাফি ইবন আমর", "ফ্রেড ডোনার", "আজানাদায়ন"),
+    10: ("দামেস্ক", "ইয়ারমুক", "ভাহান", "আবু উবায়দা"),
+    11: ("১৭ হিজরি", "আশআস ইবন কায়স", "অব্যাহতি"),
+    12: ("২১ হিজরি", "হিমস", "মদিনা", "রবার্ট হোয়ল্যান্ড"),
+}
+for chapter, phrases in event_evidence.items():
+    for phrase in phrases:
+        assert phrase in by_chapter[chapter], f"Chapter {chapter} missing evidence/context: {phrase}"
+
+# Repetition catches are intentionally conservative: substantive developments may
+# share names, but should not copy a long consecutive phrase verbatim.
+body_paragraphs = [
+    re.sub(r"<[^>]+>", "", p).strip() for p in all_paragraphs
+]
+ngrams = set()
+for paragraph in body_paragraphs:
+    tokens = paragraph.split()
+    for start in range(max(0, len(tokens) - 11)):
+        phrase = tuple(tokens[start:start + 12])
+        assert phrase not in ngrams, "Long prose segment repeated between paragraphs"
+        ngrams.add(phrase)
+assert all("কিংবদন্তি" not in by_chapter[ch] or "প্রমাণ" in by_chapter[ch] for ch in (7, 8, 9)), "Legend lacks a source caution"
+print("KHALID_SOURCE_QA_PASS primary_report_markers=4 historical_disputes=verified")

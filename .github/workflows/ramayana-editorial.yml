@@ -5,6 +5,7 @@ on:
     paths:
       - "others/folklore/ramayana/**"
       - "tests/test_ramayana_editorial.py"
+      - "tests/ramayana-responsive-e2e.mjs"
       - ".github/workflows/ramayana-editorial.yml"
 permissions:
   contents: read
@@ -15,3 +16,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate Ramayana narrative, TOC, chronology, and reader chrome
         run: python3 tests/test_ramayana_editorial.py
+  ramayana-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Verify mobile and desktop Ramayana reading interactions
+        run: node tests/ramayana-responsive-e2e.mjs

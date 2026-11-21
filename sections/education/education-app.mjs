@@ -125,7 +125,7 @@ function syncStream(levelSelect,streamSelect,wrapper){
   byId(streamSelect).disabled=!needed;
   if(!needed)byId(streamSelect).value="";
 }
-function quizSetupChanged(){syncStream("quizLevel","quizStream","quizStreamField")}
+function quizSetupChanged(){syncStream("quizLevel","quizStream","quizStreamField");byId("bcsNotice").hidden=byId("quizLevel").value!=="bcs"}
 const questionTotal=()=>activeTest?.questions.length||0;
 function refreshProgress(){
   if(!activeTest)return;

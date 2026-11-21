@@ -45,6 +45,7 @@ class PageParser(HTMLParser):
         self.robots: list[str] = []
         self.hreflangs: dict[str, str] = {}
         self.viewport = False
+        self.base_href: str | None = None
         self.description = False
         self.title = False
         self._title = False
@@ -55,6 +56,8 @@ class PageParser(HTMLParser):
             self.ids.add(a["id"] or "")
         if tag == "title":
             self._title = True
+        if tag == "base":
+            self.base_href = a.get("href")
         if tag == "meta":
             name = (a.get("name") or "").lower()
             if name == "viewport":
@@ -129,7 +132,7 @@ def audit_pages() -> int:
                     if anchor not in parser.ids:
                         note(f"{rel}: anchor #{anchor} is not in initial HTML")
                 continue
-            target = urlsplit(urljoin(url, ref))
+            target = urlsplit(urljoin(urljoin(url, parser.base_href or url), ref))
             if target.netloc != DOMAIN or target.scheme not in ("https", "http"):
                 continue
             if target.path.startswith("/api/"):

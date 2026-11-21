@@ -51,7 +51,8 @@ test("each academic grade/group gets thousands of mathematically checkable varia
       assert(pool.length>=750,grade+" "+stream);
       assert(pool.every(auditQuestion),grade+" "+stream+" invalid question");
       assert.equal(distinct(pool).length,pool.length,grade+" "+stream+" duplicate stem");
-      assert(new Set(pool.map(q=>q.subject)).size>=2,grade+" "+stream);
+      assert(new Set(pool.map(q=>q.subject)).size>=(stream?2:1),grade+" "+stream);
+      if(!stream)assert(new Set(questions.filter(q=>q.grade===grade).map(q=>q.subject)).size>=5,grade+" curated diversity");
       total+=pool.length;
     }
   }

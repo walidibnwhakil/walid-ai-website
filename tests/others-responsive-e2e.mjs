@@ -38,6 +38,7 @@ const storyPaths=[
   "/others/islamic-literature/hatim-tai/",
   "/others/islamic-literature/aladdin/",
   "/others/islamic-literature/ali-baba/",
+  "/others/history/mongol-empire/",
 ];
 const widths=[320,375,768,1280];
 let browser,checks=0,sidebarChecks=0;
@@ -63,6 +64,7 @@ try{
           heading:document.querySelector("h1")?.textContent?.trim(),
           cardCount:cards.length,cardRects:cards.map(visibleRect),
           chapterCount:chapters.length,
+          tocChapterCount:document.querySelectorAll('.others-toc a[href^="#chapter-"]').length,
           emptyChapters:chapters.filter(node=>node.querySelectorAll("p").length<5).length,
           hasSidebar:!!document.querySelector(".others-toc-trigger"),
         };
@@ -80,6 +82,10 @@ try{
       }
       if(cardsCount===0){
         assert(layout.chapterCount>=12,path+" lost book chapters");
+        if(path==="/others/history/mongol-empire/"){
+          assert.equal(layout.chapterCount,29,"Mongol book must retain 29 chapters");
+          assert.equal(layout.tocChapterCount,29,"Mongol TOC must contain 29 anchors");
+        }
         assert.equal(layout.emptyChapters,0,path+" has empty/short chapters");
         assert.equal(layout.hasSidebar,true,path+" missing chapter drawer");
         if(width===375||width===1280){

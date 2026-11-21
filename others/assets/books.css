@@ -100,3 +100,43 @@ html[lang="bn"] body,html[lang="bn"] button,html[lang="bn"] .others-book-title,h
 .others-chapter p,.others-book-title p{font-variant-ligatures:common-ligatures;overflow-wrap:break-word}
 .others-toc-dialog .others-toc a{min-width:0}
 @media(max-width:620px){.others-card{grid-template-columns:52px minmax(0,1fr) 12px;gap:12px}.others-card-copy{min-width:0}.others-book-title{padding:20px 16px}.others-hero h1,.others-book-title h1{overflow-wrap:break-word}}
+
+/* Device-only reading position, bookmark and chapter navigation. */
+.others-chapter-counter{display:block;color:#728475;font-size:.88rem;font-weight:700;letter-spacing:.01em;margin:1px 0 7px}
+.others-chapter-with-navigation{margin-bottom:10px;padding-bottom:6px;border-bottom:0}
+.others-chapter-navigation{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;margin:0 4px 38px;padding:0 0 25px;border-bottom:1px solid #e5eadd}
+.others-chapter-nav-link{min-width:0;display:flex;flex-direction:column;gap:3px;padding:11px 14px;border:1px solid #cadfcf;border-radius:12px;background:#f8fff9;color:#1c6546;text-decoration:none;line-height:1.4}
+.others-chapter-nav-link strong{font-size:.96rem;line-height:1.4}
+.others-chapter-nav-link small{display:block;max-width:100%;font-size:.83rem;line-height:1.35;color:#596f62;overflow-wrap:break-word}
+.others-nav-next{text-align:right;grid-column:3}
+.others-chapter-bookmark{grid-column:2;align-self:center;white-space:nowrap;padding:9px 12px;border:1px solid #d8caac;border-radius:999px;background:#fffdf5;color:#785c27;font:700 .9rem/1.4 "SolaimanLipi","Walid Bengali",sans-serif;cursor:pointer}
+.others-chapter-navigation a:hover,.others-chapter-navigation button:hover{background:#eef7ef}
+.others-chapter-navigation a:focus-visible,.others-chapter-navigation button:focus-visible,.others-reading-progress a:focus-visible,.others-reading-progress button:focus-visible,.others-toc-bookmark-actions button:focus-visible{outline:3px solid #bf9b54;outline-offset:2px}
+.others-reading-progress{margin:0 0 19px;padding:14px 17px;border:1px solid #d4e6d7;border-radius:12px;background:#f8fcf7;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.others-reading-progress[hidden]{display:none}
+.others-reading-progress>strong{font-size:.95rem;color:#325c42}
+.others-reading-resume-link{font-size:.94rem;line-height:1.55;color:#17694b;overflow-wrap:break-word;text-decoration:underline;text-underline-offset:3px}
+.others-reading-bookmark-row{width:100%;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+.others-remove-bookmark{font:inherit;font-size:.83rem;border:0;background:transparent;color:#886345;text-decoration:underline;cursor:pointer;padding:4px}
+.others-toc-bookmark-actions{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 14px}
+.others-toc-bookmark-actions button{font:700 .91rem/1.45 "SolaimanLipi","Walid Bengali",sans-serif;color:#18563b;cursor:pointer;border:1px solid #c5d9ca;border-radius:9px;background:#f3faf3;padding:9px 11px}
+.others-toc-bookmark-actions button[hidden]{display:none}
+.others-reader-toast{position:fixed;z-index:125;left:50%;bottom:85px;transform:translateX(-50%);max-width:min(90vw,420px);width:max-content;border:1px solid #bcd8c4;border-radius:12px;padding:10px 14px;background:#f5fcf5;color:#174d32;box-shadow:0 8px 25px #102a2029;text-align:center;font-size:.94rem}
+.others-reader-toast[hidden]{display:none}
+.others-reader-toast-error{border-color:#debf9e;background:#fff9f3;color:#754529}
+@media(max-width:620px){
+  .others-chapter-navigation{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0 2px 30px;padding-bottom:23px}
+  .others-chapter-navigation .others-chapter-nav-link{padding:10px;min-height:60px}
+  .others-chapter-nav-link small{font-size:.8rem}
+  .others-nav-next{grid-column:2;grid-row:1}
+  .others-chapter-bookmark{grid-column:1/-1;grid-row:2;justify-self:center}
+  .others-reader-toast{bottom:76px}
+}
+
+/* Restrained bookmark icon and persistent selected state. */
+.others-chapter-bookmark::before,.others-toc-bookmark-save::before{
+  content:"";display:inline-block;width:11px;height:14px;margin-right:8px;
+  vertical-align:-2px;background:currentColor;
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 74%,0 100%)
+}
+.others-chapter-bookmark.is-bookmarked{background:#edf6ee;border-color:#a9c8b0;color:#276b48}

@@ -5,6 +5,7 @@ on:
     paths:
       - "others/**"
       - "tests/others-responsive-e2e.mjs"
+      - "tests/others-reader-progress-e2e.mjs"
       - ".github/workflows/others-responsive.yml"
   workflow_dispatch:
 permissions:
@@ -28,4 +29,6 @@ jobs:
       - name: Audit 30 canonical books, sitemap and retired chapter hashes
         run: python3 tests/test_others_library_contract.py
       - name: Verify all Others books and catalog pages at mobile and desktop widths
-        run: node tests/others-responsive-e2e.mjs
+        run: |
+          node tests/others-responsive-e2e.mjs
+          node tests/others-reader-progress-e2e.mjs

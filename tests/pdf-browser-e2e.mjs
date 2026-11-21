@@ -110,6 +110,14 @@ await compress.waitForFunction(() => document.querySelector("#status")?.textCont
 await compress.locator("#applyCompress").click();
 await compress.locator("#download").waitFor({state:"visible",timeout:20000});
 const compressed = await download(compress, "#download"); assert.equal(compressed[0], 37); assert.equal((await withTimeout(inspect(compressed), 15000, "compressed PDF inspection")).length, 2);
+mark("reject malformed PDF after successful compression");
+await compress.setInputFiles("#file", {
+  name: "mislabeled.pdf", mimeType: "application/pdf", buffer: Buffer.from("not a real PDF")
+});
+await compress.locator("#dropStatus").filter({hasText: "not a valid PDF"}).waitFor({state: "visible", timeout: 15000});
+assert.equal(await compress.locator("#download").isVisible(), false,
+  "A failed new PDF upload must not show a stale successful download");
+
 
 const word = await context.newPage();
 mark("open pdf-to-word");

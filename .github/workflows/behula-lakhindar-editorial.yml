@@ -1,0 +1,19 @@
+name: Behula–Lakhindar editorial integrity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/folklore/behula-lakhindar/index.html"
+      - "tests/test_behula_lakhindar_editorial.py"
+      - ".github/workflows/behula-lakhindar-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify 13 chapters, chronology, source caveats and reader contracts
+        run: python3 tests/test_behula_lakhindar_editorial.py

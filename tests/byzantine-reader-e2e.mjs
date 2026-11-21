@@ -46,6 +46,31 @@ for (const [n, terms] of Object.entries({
   const section = chapters[Number(n) - 1][3];
   for (const term of terms) assert.ok(section.includes(term), "Missing " + term + " in chapter " + n);
 }
+assert.equal(paragraphs, 199, "Byzantine chronology lost historical or social context");
+for (const [n, terms] of Object.entries({
+  1: ["সলিদুস", "রোমাইওই"],
+  2: ["আমব্রোস", "৩৮১"],
+  3: ["কোডেক্স থিওডোসিয়ানুস", "পুলখেরিয়া"],
+  4: ["জন অব ক্যাপাডোসিয়া", "বেলিসারিয়ুস", "নারসেস", "মহামারির"],
+  5: ["সোফিয়ার", "স্ট্রাতেগিকন"],
+  6: ["সের্গিয়ুস", "ইয়ারমুক"],
+  7: ["থিম ব্যবস্থা", "স্ত্রাতেগোস"],
+  8: ["আইরিন", "৭৮৭", "৭৯৭"],
+  9: ["ফোটিওস", "থিওডোরা"],
+  10: ["রেশমশিল্প", "দ্বিতীয় বাসিল", "১০২৫"],
+  11: ["ফিলিওকুয়ে", "জোয়ে", "থিওডোরা"],
+  12: ["মানজিকার্ট", "আলপ আরসলান"],
+  13: ["আন্না দালাসেনা", "নিকেফোরোস ব্রিয়েন্নিওস", "প্রথম ক্রুসেড"],
+  14: ["১১৩৭", "মিরিওকেফালন", "অ্যাঞ্জেলোস"],
+  15: ["১২০৪", "নাইসিয়া", "১২৬১"],
+  16: ["কাতালান", "সিসিলিয়ান ভেস্পার্স"],
+  17: ["আন্না অব সাভয়", "কান্তাকুজেনোস", "ফ্লোরেন্স"],
+  18: ["দ্বিতীয় মেহমেদ", "২৯ মে", "১৪৫৩"]
+})) {
+  const section = chapters[Number(n) - 1][3];
+  for (const term of terms) assert.ok(section.includes(term),
+    "Missing expanded Byzantine narrative: chapter " + n + " / " + term);
+}
 assert.ok(html.includes('rel="canonical" href="https://walid-ai.com/others/history/byzantine-empire/"'));
 assert.ok(html.includes("/walid-ai-approved-logo.png"));
 assert.ok(html.includes("/others/assets/books.css"));

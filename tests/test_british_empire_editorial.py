@@ -131,4 +131,40 @@ check(not re.search(r'class="others-(sources|next)"', HTML),
       "removed source or related-book panel restored")
 check(not re.search(r'href="#chapter-(22|23|24|25|26|27)"', HTML),
       "retired out-of-chronology chapter links still visible")
-print("BRITISH_EMPIRE_EDITORIAL_PASS: 21 chapters, 21 TOC links, chronology and shell")
+
+# Final-depth checks: these protect narrative substance, not a five-paragraph template.
+plain_paragraphs = [
+    unescape(re.sub(r"<[^>]+>", "", paragraph)).strip()
+    for _, chapter in sections
+    for paragraph in re.findall(r"<p>(.*?)</p>", chapter, re.DOTALL)
+]
+check(len(plain_paragraphs) >= 285,
+      f"British Empire editorial expansion regressed: {len(plain_paragraphs)} paragraphs")
+check(len(" ".join(plain_paragraphs).split()) >= 16000,
+      "integrated political, social, and economic historical narrative was truncated")
+check(all(len(paragraph) >= 170 for paragraph in plain_paragraphs),
+      "found an isolated, unfinished narrative paragraph")
+check(len(set(plain_paragraphs)) == len(plain_paragraphs),
+      "an identical paragraph appears more than once")
+for number, markers in {
+    2: ("হকিন্স", "মেরি স্টুয়ার্ট"),
+    5: ("পাটনি", "আয়ারল্যান্ড"),
+    9: ("আসিয়েন্তো", "১৭০৭"),
+    11: ("উমিচাঁদ", "মীর জাফর", "২৩ জুন ১৭৫৭"),
+    12: ("চিরস্থায়ী বন্দোবস্ত", "ওয়াশিংটন", "১৭৬৯–৭০"),
+    14: ("দাসমালিকদের", "অ্যাপ্রেন্টিসশিপ"),
+    15: ("ওয়াইতাঙ্গি", "লক্ষ্মীবাই", "হাজরত মহল", "বার্লিন"),
+    16: ("মুসলিম লীগ", "সলিমুল্লাহ"),
+    17: ("ডায়ারের", "গান্ধী", "আইরিশ ফ্রি স্টেট"),
+    19: ("ফ্যামিন ইনকোয়ারি", "৩ জুন ১৯৪৭", "র‌্যাডক্লিফ"),
+    20: ("উইন্ডরাশ", "বাংলাদেশ", "মাউ মাউ"),
+    21: ("সাংবিধানিক", "কমনওয়েলথ"),
+}.items():
+    for marker in markers:
+        check(marker in sections[number - 1][1],
+              f"chapter {number} lost integral people, policy, or social context: {marker}")
+check("১৮৩৮" not in sections[13][1], "apprenticeship ended under Victoria, not William IV")
+check("১৯৭১ সালে বাংলাদেশের স্বাধীনতার যুদ্ধ" not in sections[18][1],
+      "Bangladesh 1971 belongs in the decolonial aftermath, not the 1947 reign chapter")
+
+print("BRITISH_EMPIRE_EDITORIAL_PASS: 21 chapters, 21 TOC links, historical depth, chronology, no duplicate prose, and reader shell")

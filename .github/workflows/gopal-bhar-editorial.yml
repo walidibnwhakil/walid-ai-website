@@ -1,0 +1,21 @@
+name: Gopal Bhar book editorial regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/folklore/gopal-bhar/index.html"
+      - "tests/test_gopal_bhar_editorial.py"
+      - ".github/workflows/gopal-bhar-editorial.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify all 17 standalone tales, exact TOC and preserved reader
+        run: python3 tests/test_gopal_bhar_editorial.py

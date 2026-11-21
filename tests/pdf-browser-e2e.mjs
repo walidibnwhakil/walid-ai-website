@@ -114,7 +114,7 @@ mark("reject malformed PDF after successful compression");
 await compress.setInputFiles("#file", {
   name: "mislabeled.pdf", mimeType: "application/pdf", buffer: Buffer.from("not a real PDF")
 });
-await compress.locator("#status").filter({hasText: "not a valid PDF"}).waitFor({state: "visible", timeout: 15000});
+await compress.locator("#dropStatus").filter({hasText: "not a valid PDF"}).waitFor({state: "visible", timeout: 15000});
 assert.equal(await compress.locator("#download").isVisible(), false,
   "A failed new PDF upload must not show a stale successful download");
 

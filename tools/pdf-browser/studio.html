@@ -23,6 +23,7 @@ if(window.parent!==window||new URLSearchParams(location.search).has('embedded'))
   <button class="select-file" type="button" id="choose"><span id="chooseLabel">Select PDF file</span></button>
   <input id="file" type="file" hidden>
   <p class="drop-hint" id="dropHint">or drop a PDF here</p>
+  <p class="status" id="dropStatus" role="status" hidden></p>
 </div>
 <section class="work" id="work" hidden>
   <div class="summary">

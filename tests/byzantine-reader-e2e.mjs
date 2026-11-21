@@ -96,7 +96,7 @@ for (const [index, terms] of Object.entries(chronologyEvidence)) {
     "Missing chronologically integrated evidence: chapter " + index + " / " + term);
 }
 const minimumParagraphs = [9,9,9,13,8,11,10,10,9,11,11,10,12,12,12,11,15,17];
-assert.deepEqual(chapters.map(c => (c[3].match(/<p>/g) || []).length), minimumParagraphs,
+assert.ok(chapters.every((c, i) => (c[3].match(/<p>/g) || []).length >= minimumParagraphs[i]),
   "Historical passages were removed or chapter depth regressed");
 assert.ok(html.includes('rel="canonical" href="https://walid-ai.com/others/history/byzantine-empire/"'));
 assert.ok(html.includes("/walid-ai-approved-logo.png"));

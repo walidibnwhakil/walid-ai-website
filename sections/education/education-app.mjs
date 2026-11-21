@@ -7,6 +7,7 @@ import {ADMISSION_ROWS} from "./admission-chapters.mjs";
 import {selectQuestions,selectBcsQuestions,updatedHistory} from "./quiz-selection.mjs";
 import {createSkillPractice,createSkillNotes} from "./skill-practice.mjs";
 import {createFactQuestions,createFactNotes,FACT_CHECKED_ON} from "./factual-bank.mjs";
+import {buildStudyVisual} from "./study-visuals.mjs";
 
 const byId=id=>document.getElementById(id);
 const views=["modeSelection","quizSetup","quizRunning","quizResults","notesSetup"];
@@ -384,6 +385,8 @@ function showNotes(){
     addPart(article,"মূল ধারণা",note.concept);
     if(note.explanation!==note.concept)addPart(article,"বিস্তারিত ব্যাখ্যা",note.explanation);
     addPart(article,"উদাহরণ",note.example,"note-example");
+    const illustration=buildStudyVisual(note);
+    if(illustration)article.append(illustration);
     addPart(article,"শেখার ধাপ",note.steps);
     addPart(article,"নিজে অনুশীলন",note.practice,"note-exercise");
     if(note.sourceUrl){const link=el("a","উৎস যাচাই করুন","question-source");link.href=note.sourceUrl;link.target="_blank";link.rel="noopener noreferrer";article.append(link);if(note.contentKind==="dated-current-affairs")article.append(el("span"," · সর্বশেষ যাচাই: "+(note.checkedOn||FACT_CHECKED_ON),"source-date"));}

@@ -19,8 +19,8 @@ def verify():
     for n, title, section in sections:
         paras = [re.sub(r"<[^>]+>", "", p).strip()
                  for p in re.findall(r"<p>(.*?)</p>", section, re.S)]
-        assert len(paras) >= 6, f"Chapter {n} too abbreviated: {len(paras)} paragraphs"
-        assert sum(map(len, paras)) >= 1450, f"Chapter {n} lost essential detail"
+        assert len(paras) >= 10, f"Chapter {n} too abbreviated: {len(paras)} paragraphs"
+        assert sum(map(len, paras)) >= 3000, f"Chapter {n} lost essential detail"
         for p in paras:
             assert len(p) >= 140, f"Chapter {n} contains a thin paragraph"
             assert p not in seen, f"Repeated full paragraph: {n}"
@@ -74,7 +74,53 @@ def verify():
     for prohibited in ("উৎস ও পরবর্তী পাঠ", "এই অধ্যায়", "পরের অধ্যায়ে",
                        'class="others-sources"', 'class="others-next"'):
         assert prohibited not in html, f"Orphan editorial/source block: {prohibited}"
-    print("RAMAYANA_EDITORIAL_PASS: 41 detailed, linked, chronological chapters; style/footer/SEO intact.")
+    # Character biographies, relationships and battle source sequence must remain readable.
+    expanded = {
+        2: ("বশিষ্ঠ", "সুমন্ত্র", "কৌশল্যা", "কৈকেয়ী", "সুমিত্রা"),
+        3: ("বিশ্বামিত্র", "বশিষ্ঠ", "তাড়কা", "মারীচ"),
+        4: ("গৌতম", "অহল্যা", "ইন্দ্র", "জনক"),
+        5: ("উর্মিলা", "মাণ্ডবী", "শ্রুতকীর্তি", "কুশধ্বজ"),
+        6: ("পরশুরাম", "জমদগ্নি", "রেণুকা"),
+        7: ("মন্থরা", "কৈকেয়ী", "দশরথ"),
+        9: ("উর্মিলা", "লক্ষ্মণ", "সীতা"),
+        14: ("অগস্ত্য", "জটায়ু", "সম্পাতি"),
+        15: ("পুলস্ত্য", "বিশ্রবা", "কৈকসী", "সুমালী",
+             "কুবের", "মন্দোদরী", "বিভীষণ", "কুম্ভকর্ণ", "ইন্দ্রজিৎ"),
+        16: ("মারীচ", "সীতা", "লক্ষ্মণরেখা"),
+        19: ("অঞ্জনা", "কেশরী", "বায়ু", "ইন্দ্র", "বজ্র", "হনুমান"),
+        20: ("বালি", "তারা", "অঙ্গদ", "রুমা"),
+        21: ("সুগ্রীব", "জাম্ববান", "তারা"),
+        22: ("জাম্ববান", "সম্পাতি", "সূর্য", "অঞ্জনা"),
+        24: ("অশোকবন", "ত্রিজটা", "মন্দোদরী"),
+        28: ("বিভীষণ", "মাল্যবান", "ইন্দ্রজিৎ", "মন্দোদরী"),
+        29: ("নল", "নীল", "অঙ্গদ", "অকালবোধন"),
+        30: ("নাগপাশ", "গরুড়", "ত্রিজটা"),
+        31: ("প্রহস্ত", "রাবণ", "নীল"),
+        32: ("কুম্ভকর্ণ", "বিভীষণ", "রাবণ", "সুগ্রীব"),
+        33: ("অতিকায়", "ব্রহ্মাস্ত্র", "সুষেণ", "জাম্ববান"),
+        34: ("নিকুম্ভিলা", "লক্ষ্মণ", "ইন্দ্রজিৎ", "বিভীষণ"),
+        35: ("মন্দোদরী", "মাতলি", "অগস্ত্য", "আদিত্যহৃদয়"),
+        36: ("বিভীষণ", "সীতা", "হনুমান", "অগ্নিদেব"),
+        38: ("ভদ্র", "লক্ষ্মণ", "সীতা", "বাল্মীকি"),
+        39: ("লবণ", "শত্রুঘ্ন", "শম্বূক", "লব", "কুশ"),
+        40: ("অশ্বমেধ", "বাল্মীকি", "সীতা"),
+        41: ("তক্ষশিলা", "পুষ্কল", "চন্দ্রকেতু", "লক্ষ্মণ", "সরযূ"),
+    }
+    for n, terms in expanded.items():
+        for term in terms:
+            assert term in sections[n - 1][2], f"Chapter {n} lost deep context: {term}"
+
+    assert html.count('class="ramayana-variants"') == 1
+    assert html.index('class="ramayana-variants"') > html.index('id="chapter-41"')
+    assert "মহীরাবণ" in html and "আদিত্যহৃদয়" in html
+    assert "কৃত্তিবাসী" in html and "বাল্মীকি" in html
+    assert "<summary" in html and "</details>" in html
+
+    stylesheet = (ROOT / "others/assets/books.css").read_text(encoding="utf-8")
+    for signature in ("SolaimanLipi", "others-flower-spin", "/walid-ai-approved-flower.png"):
+        assert signature in stylesheet, f"Missing shared design invariant: {signature}"
+
+    print("RAMAYANA_EDITORIAL_PASS: 41 full epic chapters, verified biographies, source variants and unchanged reader design.")
 
 if __name__ == "__main__":
     verify()

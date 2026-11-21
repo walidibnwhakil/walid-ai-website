@@ -56,7 +56,7 @@ try {
     assert.equal(state.width <= width+2, true, "horizontal overflow at "+width);
     assert.deepEqual(state.ids, ids, "Roman chapters are missing or out of order");
     assert.deepEqual(state.tocIds, ids, "Roman chapter TOC mismatches document order");
-    assert.ok(state.paragraphCounts.every(n => n >= 7), "a chapter contains thin prose");
+    assert.ok(state.paragraphCounts.every(n => n >= 9), "a chapter contains thin prose");
     assert.equal(state.footerCount, 1, "shared footer missing/duplicated");
     assert.equal(state.logoLoaded, true, "approved Walid AI logo did not load");
     assert.equal(state.flower, true, "rotating Kathgolap background missing");

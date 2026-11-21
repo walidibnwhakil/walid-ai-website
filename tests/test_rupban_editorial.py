@@ -91,6 +91,8 @@ class RupbanEditorialTest(unittest.TestCase):
         self.assertIsNotNone(note)
         for word in ("মঞ্চপালার", "১৯৬৫", "তাজেলের", "একাব্বরের", "শিশুবিবাহ"):
             self.assertIn(word, note.group(1))
+        self.assertIn("সাহিত্যিক সংযোজন", note.group(1))
+        self.assertIn("উল্লিখিত মঞ্চ ও চলচ্চিত্র প্রতিবেদনে তা নিশ্চিত নয়", note.group(1))
         self.assertIn("https://www.kaliokalam.com/", note.group(1))
         self.assertIn("https://anyadinbd.com/article/22027", note.group(1))
         for forbidden in ("উৎস ও পরবর্তী পাঠ", "এই অধ্যায়ে আমরা", "পাঠক শিখবেন",

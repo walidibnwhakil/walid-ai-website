@@ -36,6 +36,52 @@ def validate_book(path):
         fail(path, "undefined text appears in reader")
 
 
+
+def validate_editorial_metadata(path):
+    """Check published folklore/fiction readers for stale or cut-off metadata."""
+    content = path.read_text(encoding="utf-8")
+    description = re.search(r'<meta name="description" content="([^"]*)">', content)
+    if not description:
+        fail(path, "missing SEO description")
+        return
+    summary = description.group(1).strip()
+    if not 65 <= len(summary) <= 220 or not summary.endswith(("।", ".", "!", "?")):
+        fail(path, "SEO description is too short/long or ends mid-sentence")
+
+    canonical = re.search(r'<link rel="canonical" href="([^"]+)">', content)
+    expected = f"https://walid-ai.com/{path.relative_to(ROOT).parent.as_posix()}/"
+    if not canonical or canonical.group(1) != expected:
+        fail(path, "SEO canonical is missing or does not match the book URL")
+    if re.search(r'<meta[^>]+noindex', content, re.I):
+        fail(path, "public reading page must not be noindex")
+    if content.count('class="legal-footer"') != 1:
+        fail(path, "expected exactly one legal footer")
+
+    sections = re.findall(
+        r'<section class="others-chapter" id="chapter-\d+"[^>]*>(.*?)</section>',
+        content, re.S
+    )
+    seen = set()
+    for chapter, section in enumerate(sections, 1):
+        paragraphs = [re.sub(r'<[^>]+>', "", p).strip()
+                      for p in re.findall(r'<p>(.*?)</p>', section, re.S)]
+        if len(paragraphs) < 5:
+            fail(path, f"chapter {chapter} has fewer than five paragraphs")
+        for paragraph in paragraphs:
+            if len(paragraph) >= 100 and paragraph in seen:
+                fail(path, f"duplicate long paragraph in chapter {chapter}")
+            seen.add(paragraph)
+
+    bengali_digits = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+    for match in re.finditer(
+        r'([০-৯0-9]+)টি\s+(?:নির্বাচিত\s+)?(?:কৌতুকগল্প|কৌতুককাহিনি|অধ্যায়)',
+        summary
+    ):
+        stated = int(match.group(1).translate(bengali_digits))
+        if stated != len(sections):
+            fail(path, f"SEO description says {stated} stories/chapters; found {len(sections)}")
+
+
 def validate_index(path):
     content = path.read_text(encoding="utf-8")
     cards = re.findall(r'<a class="others-card" href="[^"]+">(.*?)</a>', content, re.S)
@@ -57,6 +103,8 @@ def main():
         errors.append(f"Expected 32 Others books; found {len(books)}")
     for book in books:
         validate_book(book)
+        if "/history/" not in book.as_posix():
+            validate_editorial_metadata(book)
 
     indexes = [BASE / "index.html", *(BASE / category / "index.html" for category in CATEGORIES)]
     card_count = sum(validate_index(index) for index in indexes)

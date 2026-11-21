@@ -47,6 +47,15 @@
   const chapters = Array.from(reader.querySelectorAll(".others-chapter[id^='chapter-']"));
   if (!chapters.length) return;
 
+  // A refresh is not a request to resume. A freshly opened direct chapter
+  // link still works, while a refresh starts calmly at the book's beginning.
+  const navigation = performance.getEntriesByType?.("navigation")?.[0];
+  const isPageReload = navigation?.type === "reload";
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if (isPageReload && location.hash) {
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
   const byId = new Map(chapters.map((node, index) => [node.id, {node, index, heading: node.querySelector("h2")}]));
   const bn = (number) => String(number).replace(/\d/g, (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]);
   const cleanPath = location.pathname.replace(/index\.html$/, "").replace(/\/?$/, "/");
@@ -328,6 +337,11 @@
     const target = byId.get(initialChapter)?.node;
     if (target) window.scrollTo({top: Math.max(0, window.scrollY + target.getBoundingClientRect().top - 22), behavior: "instant"});
   });
+  if (isPageReload) {
+    const resetScroll = () => window.scrollTo({top: 0, behavior: "instant"});
+    resetScroll();
+    window.addEventListener("pageshow", () => requestAnimationFrame(resetScroll), {once: true});
+  }
 
   // Fiction chapters remain uninterrupted prose. Keep source text as plain text
   // rather than clickable distractions; retain all real navigation and citations.
@@ -370,14 +384,11 @@
   const drawPanel = () => {
     if (!panel) return;
     panel.replaceChildren();
-    const heading = document.createElement("strong");
-    heading.textContent = "এই ডিভাইসে আপনার পড়ার জায়গা";
-    panel.appendChild(heading);
-    if (progress) panel.appendChild(createResume(progress, "যেখান থেকে পড়েছিলেন"));
+    if (progress) panel.appendChild(createResume(progress, "আগের জায়গা থেকে পড়ুন"));
     if (bookmark) {
       const line = document.createElement("div");
       line.className = "others-reading-bookmark-row";
-      line.appendChild(createResume(bookmark, "বুকমার্কে যান"));
+      line.appendChild(createResume(bookmark, "বুকমার্ক থেকে পড়ুন"));
       const del = document.createElement("button");
       del.type = "button";
       del.className = "others-remove-bookmark";
@@ -454,24 +465,47 @@
 
   drawPanel();
 
-  // Save at most once after a pause in scrolling; never send reading data online.
+  // Save progress only when the reader scrolls intentionally. Browser
+  // restoration and auto-scroll to toolbar buttons are not reading progress.
+  let lastReadingGestureAt = 0;
+  const markReadingGesture = () => { lastReadingGestureAt = Date.now(); };
+  window.addEventListener("wheel", markReadingGesture, {passive: true});
+  window.addEventListener("touchmove", markReadingGesture, {passive: true});
+  window.addEventListener("keydown", (event) => {
+    if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " ", "Home", "End"].includes(event.key))
+      markReadingGesture();
+  });
+  // Capture scroll position when scrolling occurs, not while unloading:
+  // on refresh the browser can move the viewport during pagehide.
   let scrollTimer = null;
-  let readerScrolled = false;
+  let pendingPosition = null;
   let recordedChapter = progress?.chapterId || null;
   const rememberPosition = () => {
-    const current = positionInView();
+    const current = pendingPosition;
+    pendingPosition = null;
     if (!current || !store("progress", current)) return;
     progress = current;
-    if (panel && recordedChapter !== current.chapterId) drawPanel();
+    if (recordedChapter !== current.chapterId) drawPanel();
     recordedChapter = current.chapterId;
   };
   window.addEventListener("scroll", () => {
-    readerScrolled = true;
+    if (Date.now() - lastReadingGestureAt > 700) return;
+    pendingPosition = positionInView();
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(rememberPosition, 850);
   }, {passive: true});
+  document.addEventListener("pointerdown", (event) => {
+    if (!event.target.closest?.(".others-toc-trigger, .others-toc-dialog, .others-reading-progress, .others-chapter-navigation")) return;
+    // Preserve the last genuinely read paragraph before a toolbar interaction
+    // causes automatic scrolling to a button.
+    lastReadingGestureAt = 0;
+    if (pendingPosition) {
+      clearTimeout(scrollTimer);
+      rememberPosition();
+    }
+  }, {capture: true});
   window.addEventListener("pagehide", () => {
-    if (readerScrolled) {
+    if (pendingPosition) {
       clearTimeout(scrollTimer);
       rememberPosition();
     }

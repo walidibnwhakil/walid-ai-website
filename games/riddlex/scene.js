@@ -315,12 +315,30 @@ export function createScene(canvas) {
       const y = Math.min(held.y, limit - h);
       return { u, photo, photoH, nameH, w, h, x: (canvas.width - w) / 2, y: Math.max(8, y) };
     }
-    const w = photo ? view.w * 0.20 : view.w * 0.30;
-    const photoH = photo ? w * 0.78 : 0;
-    const nameH = photo ? view.h * 0.07 : view.h * 0.15;
-    const h = photoH + nameH;
-    const bottom = iy(0.50);
-    return { u, photo, photoH, nameH, w, h, x: ix(0.50) - w / 2, y: bottom - h };
+    // Sit the card under the chin so the hat and smile stay clear, and stop
+    // above the carved desk front so the buttons remain on the flat top.
+    const cssH = canvas.getBoundingClientRect().height || canvas.height;
+    const dpr = canvas.height / Math.max(1, cssH);
+    const top = iy(FACE.landscape.v + FACE.landscape.h) + 6 * dpr;
+    const stack = 108 * dpr;
+    const floor = Math.min(iy(0.72), canvas.height - 4 * dpr) - stack;
+    const avail = Math.max(64 * dpr, floor - top);
+    let w;
+    let photoH = 0;
+    let nameH;
+    if (photo) {
+      nameH = Math.min(42 * dpr, Math.max(28 * dpr, avail * 0.28));
+      photoH = Math.max(32 * dpr, avail - nameH);
+      w = Math.min(view.w * 0.22, photoH / 0.66);
+      photoH = Math.min(photoH, w * 0.78);
+      if (top + photoH + nameH > floor) photoH = Math.max(32 * dpr, floor - top - nameH);
+    } else {
+      w = Math.min(view.w * 0.30, canvas.width * 0.46);
+      nameH = Math.min(view.h * 0.11, avail, 64 * dpr);
+    }
+    const h = Math.max(16, photoH + nameH);
+    const y = Math.max(8, Math.min(top, floor - h));
+    return { u, photo, photoH, nameH, w, h, x: ix(0.50) - w / 2, y };
   }
 
   function drawSheet(turn) {

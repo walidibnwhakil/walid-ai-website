@@ -73,7 +73,11 @@ try{
       const allSubjects=new Set(await page.locator("#questionList .question-card-head .quiz-subject").allInnerTexts());
       assert.equal(allSubjects.size,10,"BCS sample must cover all ten exam topic areas");
       const chapters=await page.locator("#questionList .question-chapter").count();
-      assert(chapters>=35,"BCS sample should prioritize prepared chapter questions");
+      assert(chapters>=35,"BCS sample must include topic-tagged questions");
+      const authored=await page.locator('#questionList .question-card[data-content-type="authored-concept"]').count();
+      assert(authored>=35,"BCS should prioritize authored questions ahead of numerical variations");
+      const computed=await page.locator('#questionList .question-card[data-content-type="worked-variant"]').count();
+      assert(computed>=1,"BCS should also include independently validated skill practice");
     }
     if(count===20){
       await page.locator("#question-0 .question-option").first().click();

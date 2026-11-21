@@ -129,5 +129,40 @@ class HatimTaiEditorialTests(unittest.TestCase):
         self.assertNotRegex(self.html, r'<meta[^>]+noindex')
 
 
+    def test_selected_romance_chronology_and_relationships(self):
+        book = {i: body for i, _, body in self.chapters}
+        self.assertIn("ডানকান ফোর্বসের ১৮৩০", self.html)
+        self.assertIn("শাম অঞ্চলের রাজপরিবারের যুবরাজ মুনির শামি", book[3])
+        self.assertNotIn("খোয়ারিজমের রাজপরিবার", self.html)
+        self.assertIn("বিবাহও ঘটে", book[4], "Bear princess relationship needs explicit resolution in quest 1")
+        self.assertIn("তাঁদের বিবাহ হলো", book[8], "Zarinposh's marriage must precede the final reunion")
+        self.assertIn("জারিনপোশের সঙ্গে তাঁর পুনর্মিলন", book[12])
+        self.assertIn("নিদার ডাককে শহরের গুজব থেকে মৃত্যুর প্রত্যক্ষ সংবাদ", book[9])
+
+    def test_seventh_quest_has_one_arrow_sequence_and_liberation(self):
+        seventh = self.chapters[10][2]
+        moments = ("প্রথম তীরের সঙ্গে", "দ্বিতীয়টির পরে", "তৃতীয়বার ধনুক", "জীবিত হয়ে ওঠে")
+        positions = [seventh.find(moment) for moment in moments]
+        self.assertTrue(all(p >= 0 for p in positions), "seventh quest missing a plot beat")
+        self.assertEqual(positions, sorted(positions), "three arrows and release must unfold in order")
+        self.assertEqual(seventh.count("প্রথম তীরের সঙ্গে"), 1)
+        self.assertEqual(seventh.count("তৃতীয়বার ধনুক"), 1)
+
+    def test_no_duplicated_extended_sentences_within_chapters(self):
+        for number, title, body in self.chapters:
+            paragraphs = re.findall(r"<p>(.*?)</p>", body, re.S)
+            seen = set()
+            for paragraph in paragraphs:
+                cleaned = re.sub(r"<[^>]+>", "", paragraph)
+                for sentence in re.split(r"(?<=[।!?])\s*", cleaned):
+                    normalized = " ".join(sentence.split())
+                    if len(normalized) < 110:
+                        continue
+                    self.assertNotIn(
+                        normalized, seen,
+                        f"chapter {number}: repeated extended sentence in {title}"
+                    )
+                    seen.add(normalized)
+
 if __name__ == "__main__":
     unittest.main()

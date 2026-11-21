@@ -1,0 +1,42 @@
+name: Mahabharata editorial and browser regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/folklore/mahabharata/**"
+      - "tests/test_mahabharata_editorial.py"
+      - "tests/mahabharata-editorial-e2e.mjs"
+      - ".github/workflows/mahabharata-editorial.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mahabharata-reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Validate 18-parva structure, 44 chapters and book chrome
+        run: python3 tests/test_mahabharata_editorial.py
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Test real mobile and desktop browser layout and chapter drawer
+        run: node tests/mahabharata-editorial-e2e.mjs
+      - name: Save responsive evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahabharata-browser-evidence
+          path: artifacts/mahabharata-*.png
+          if-no-files-found: ignore

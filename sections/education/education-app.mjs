@@ -5,6 +5,7 @@ import {SCHOOL_ROWS} from "./grade-chapters.mjs";
 import {BCS_ROWS} from "./bcs-chapters.mjs";
 import {ADMISSION_ROWS} from "./admission-chapters.mjs";
 import {selectQuestions,updatedHistory} from "./quiz-selection.mjs";
+import {createSkillPractice,createSkillNotes} from "./skill-practice.mjs";
 
 const byId=id=>document.getElementById(id);
 const views=["modeSelection","quizSetup","quizRunning","quizResults","notesSetup"];
@@ -81,11 +82,11 @@ function chapterQuestions(level,stream){
 function questionPool(level,stream,questions){
   if(["6","7","8"].includes(level))
     return questions.filter(q=>q.grade===Number(level)).map(q=>normalized(q,"base-"+q.id))
-      .concat(chapterQuestions(level,stream),createWorkedPractice(level,null,160));
+      .concat(chapterQuestions(level,stream),createWorkedPractice(level,null,160),createSkillPractice(level,stream));
   if(["9","10","11","12"].includes(level)){
     const base=questions.filter(q=>q.grade===Number(level)&&isAllowedSubject(level,stream,q.subject))
       .map(q=>normalized(q,"base-"+q.id));
-    return base.concat(chapterQuestions(level,stream),createWorkedPractice(level,stream,160));
+    return base.concat(chapterQuestions(level,stream),createWorkedPractice(level,stream,160),createSkillPractice(level,stream));
   }
   if(level==="admission"){
     const common=new Set(["বাংলা","ইংরেজি","বাংলাদেশ ও বিশ্বপরিচয়","তথ্য ও যোগাযোগ প্রযুক্তি"]);
@@ -95,7 +96,7 @@ function questionPool(level,stream,questions){
         গণিত:"গণিত ও যুক্তি",পদার্থবিজ্ঞান:"পদার্থবিজ্ঞান",বিজ্ঞান:"জীববিজ্ঞান",
         "বাংলাদেশ ও বিশ্বপরিচয়":"সাধারণ জ্ঞান"
       })[q.subject]||q.subject));
-    return base.concat(chapterQuestions(level,stream),createWorkedPractice(level,stream,170));
+    return base.concat(chapterQuestions(level,stream),createWorkedPractice(level,stream,170),createSkillPractice(level,stream));
   }
   if(level==="bcs"){
     const general={বাংলা:"বাংলা ভাষা ও সাহিত্য",ইংরেজি:"ইংরেজি ভাষা ও সাহিত্য",
@@ -104,7 +105,7 @@ function questionPool(level,stream,questions){
       "তথ্য ও যোগাযোগ প্রযুক্তি":"কম্পিউটার ও তথ্যপ্রযুক্তি"};
     return questions.filter(q=>q.grade>=9&&q.grade<=12&&general[q.subject])
       .map(q=>normalized(q,"bcs-"+q.id,general[q.subject]))
-      .concat(chapterQuestions(level,stream),createExamExtras(),createWorkedPractice(level,null,180));
+      .concat(chapterQuestions(level,stream),createExamExtras(),createWorkedPractice(level,null,180),createSkillPractice(level,stream));
   }
   return [];
 }
@@ -293,7 +294,7 @@ function notePool(level,stream){
       :isAllowedSubject(level,stream,n.subject)):true));
   const rows=chapterRowsFor(level,stream);
   const generated=makeChapterOverviews(rows).concat(
-    rows.map((row,i)=>makeLesson(row,i)),createWorkedLessons(level,stream));
+    rows.map((row,i)=>makeLesson(row,i)),createWorkedLessons(level,stream),createSkillNotes(level,stream));
   return fixed.concat(generated).filter(isValidNote);
 }
 let currentNotes=[];

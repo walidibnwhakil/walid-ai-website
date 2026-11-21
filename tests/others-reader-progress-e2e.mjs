@@ -55,6 +55,7 @@ try {
     await page.locator(".others-toc-bookmark-save").click();
     const bookmark = await page.evaluate(k => JSON.parse(localStorage.getItem(k)), key + "bookmark");
     assert.equal(bookmark?.chapterId, "chapter-4", "Drawer saves bookmark only to device");
+    assert.equal(await page.locator(".others-chapter-navigation").nth(3).locator(".others-chapter-bookmark").getAttribute("aria-pressed"), "true", "Saved chapter has a visible bookmark state");
 
     await page.reload({waitUntil:"load"});
     assert.equal(await page.locator(".others-reading-progress").count(), 1, "Saved position appears when reopening");
@@ -62,6 +63,9 @@ try {
     await page.locator(".others-reading-resume-link").first().click();
     assert.equal(new URL(page.url()).hash, "#chapter-4", "Continue Reading resumes in saved chapter");
     assert.ok(await page.evaluate(() => scrollY > 0), "Continue Reading restores scroll position");
+    await page.locator(".others-remove-bookmark").click();
+    assert.equal(await page.evaluate(k => localStorage.getItem(k), key + "bookmark"), null, "Bookmark can be removed from this device");
+    assert.equal(await page.locator(".others-chapter-navigation").nth(3).locator(".others-chapter-bookmark").getAttribute("aria-pressed"), "false", "Bookmark indicator clears after removal");
 
     await page.goto(base + "/others/folklore/ramayana/", {waitUntil:"load"});
     assert.equal(await page.locator(".others-reading-progress").count(), 0, "Bookmarks isolated per book");

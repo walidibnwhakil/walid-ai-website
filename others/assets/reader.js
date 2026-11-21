@@ -96,10 +96,11 @@
       }
     }
     if (!active) {
-      const current = chapters.find(node => !node.hidden);
-      if (!current) return null;
-      return current.getBoundingClientRect().bottom < readingLine
-        ? chapterEnd(current.id) : {chapterId: current.id, paragraphIndex: 0, fraction: 0};
+      const visible = groups[activeGroup];
+      const first = visible[0], last = visible[visible.length - 1];
+      if (!first) return null;
+      return last.getBoundingClientRect().bottom < readingLine
+        ? chapterEnd(last.id) : {chapterId: first.id, paragraphIndex: 0, fraction: 0};
     }
     const paragraphs = Array.from(active.querySelectorAll("p"));
     if (!paragraphs.length) return {chapterId: active.id, paragraphIndex: 0, fraction: 0};
@@ -190,7 +191,7 @@
     mark.setAttribute("aria-pressed", "false");
     mark.setAttribute("aria-label", "অধ্যায় " + bn(index + 1) + "-এ বুকমার্ক রাখুন");
     mark.addEventListener("click", () => {
-      if (bookmark?.chapterId === chapter.id) return clearBookmark();
+      if (bookmark && groupByChapter.get(bookmark.chapterId) === groupByChapter.get(chapter.id)) return clearBookmark();
       const visible = positionInView();
       saveBookmark(visible?.chapterId === chapter.id ? visible : chapterEnd(chapter.id));
     });
@@ -199,11 +200,68 @@
   });
 
 
-  // Only the selected chapter and its bottom navigation appear to readers.
-  let activeIndex = 0;
+  // A reading part contains whole, consecutive chapters totalling at least
+  // ~900 Bengali words, or about five minutes of reading for many readers.
+  // No editorial text, chapter anchor or original paragraph is modified.
+  const wordsIn = (chapter) => (Array.from(chapter.querySelectorAll("p"))
+    .map(node => node.textContent).join(" ").trim().match(/\S+/gu) || []).length;
+  const minimumWords = 900;
+  const groups = [];
+  let queue = [], wordTotal = 0;
+  chapters.forEach((chapter) => {
+    queue.push(chapter);
+    wordTotal += wordsIn(chapter);
+    if (wordTotal >= minimumWords) {
+      groups.push(queue);
+      queue = [];
+      wordTotal = 0;
+    }
+  });
+  if (queue.length) {
+    if (groups.length) groups[groups.length - 1].push(...queue);
+    else groups.push(queue);
+  }
+  const groupByChapter = new Map(groups.flatMap((group, index) =>
+    group.map(chapter => [chapter.id, index])));
+  const lastInGroup = new Set(groups.map(group => group[group.length - 1].id));
+
+  const readingLink = (chapter, next) => {
+    if (!chapter) {
+      const placeholder = document.createElement("span");
+      placeholder.className = "others-chapter-nav-empty";
+      placeholder.setAttribute("aria-hidden", "true");
+      return placeholder;
+    }
+    const link = document.createElement("a");
+    link.href = "#" + chapter.id;
+    link.className = "others-chapter-nav-link " + (next ? "others-nav-next" : "others-nav-previous");
+    const title = document.createElement("strong");
+    title.textContent = next ? "পরের পাঠপর্ব →" : "← আগের পাঠপর্ব";
+    const description = document.createElement("small");
+    description.textContent = chapter.querySelector("h2")?.textContent.trim() || "";
+    link.append(title, description);
+    return link;
+  };
+  groups.forEach((group, index) => {
+    const last = group[group.length - 1];
+    const nav = last.nextElementSibling;
+    const bookmarkAction = nav?.querySelector(".others-chapter-bookmark");
+    if (!bookmarkAction) return;
+    const prevStart = index ? groups[index - 1][0] : null;
+    const nextStart = groups[index + 1]?.[0] || null;
+    nav.setAttribute("aria-label", "পাঠপর্ব " + bn(index + 1) + " / " + bn(groups.length));
+    nav.replaceChildren(
+      readingLink(prevStart, false),
+      bookmarkAction,
+      readingLink(nextStart, true)
+    );
+  });
+
+  let activeGroup = 0;
+  let activeChapterId = chapters[0].id;
   const updateDrawerSelection = () => {
     document.querySelectorAll('.others-toc a[href^="#chapter-"]').forEach((link) => {
-      if (link.getAttribute("href") === "#" + chapters[activeIndex].id)
+      if (link.getAttribute("href") === "#" + activeChapterId)
         link.setAttribute("aria-current", "location");
       else link.removeAttribute("aria-current");
     });
@@ -212,20 +270,24 @@
     const found = byId.get(chapterId);
     if (!found) return;
     const {scroll = true, save = true, push = false} = options;
-    activeIndex = found.index;
-    chapters.forEach((chapter, index) => {
-      const hidden = index !== activeIndex;
+    activeGroup = groupByChapter.get(chapterId);
+    activeChapterId = chapterId;
+    const group = groups[activeGroup];
+    chapters.forEach((chapter) => {
+      const hidden = groupByChapter.get(chapter.id) !== activeGroup;
       chapter.hidden = hidden;
       chapter.setAttribute("aria-hidden", String(hidden));
+      chapter.classList.toggle("others-group-continuation", !hidden && chapter !== group[0]);
       if ("inert" in chapter) chapter.inert = hidden;
       const nav = chapter.nextElementSibling;
       if (nav?.classList.contains("others-chapter-navigation")) {
-        nav.hidden = hidden;
-        if ("inert" in nav) nav.inert = hidden;
+        const navHidden = hidden || !lastInGroup.has(chapter.id);
+        nav.hidden = navHidden;
+        if ("inert" in nav) nav.inert = navHidden;
       }
     });
     updateDrawerSelection();
-    const hash = "#" + found.node.id;
+    const hash = "#" + chapterId;
     if (push) history.pushState(null, "", hash);
     else if (scroll && location.hash !== hash) history.replaceState(null, "", hash);
     if (save) {
@@ -241,6 +303,7 @@
     }
   };
   reader.classList.add("others-single-chapter-reader");
+  reader.setAttribute("data-reading-parts", String(groups.length));
   reader.querySelectorAll(".others-chapter-navigation a[href^='#chapter-']").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
@@ -277,7 +340,7 @@
   const updateBookmarkButtons = () => {
     reader.querySelectorAll(".others-chapter-bookmark").forEach((button) => {
       const chapterId = button.closest(".others-chapter-navigation")?.previousElementSibling?.id;
-      const selected = Boolean(bookmark && bookmark.chapterId === chapterId);
+      const selected = Boolean(bookmark && groupByChapter.get(bookmark.chapterId) === groupByChapter.get(chapterId));
       button.setAttribute("aria-pressed", String(selected));
       button.classList.toggle("is-bookmarked", selected);
       button.textContent = selected ? "বুকমার্ক রাখা আছে" : "বুকমার্ক রাখুন";

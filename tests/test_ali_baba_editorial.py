@@ -50,6 +50,8 @@ assert "চার খণ্ড" in chapter_texts[3], "Cassim’s fate needs to e
 assert "চোখ-বাঁধা মুচি" in sections[4][1] and "মুচি" in chapter_texts[4], "Baba Mustafa is a blindfolded cobbler, not a blind tailor"
 assert "কয়েক মাস পরে" in chapter_texts[4], "Robbers’ return should not happen only days after the burial"
 assert "ডান হাতে খঞ্জর" in chapter_texts[10] and "বাঁ হাত" in chapter_texts[10], "Final dance requires two-hand continuity"
+assert "বাজারের পরিচিতেরা মরজিনার সাহসের কথা জানতেন" not in html, "Secret anti-robber defence wrongly became public knowledge"
+assert "কলসির রাতের কথা বাড়ির বাইরে" in chapter_texts[11], "Ending must preserve secrecy"
 assert "কাসিমের বিধবাকে বিয়ে" in chapter_texts[4], "Chapter 5: missing Galland-derived family transition"
 assert "আগের সেই তেল ব্যবসায়ীর" in chapter_texts[9], "Chapter 10: flashback timeline inconsistent"
 assert "দস্যুনেতার দেহও" in chapter_texts[11], "Chapter 12: captain's burial missing"

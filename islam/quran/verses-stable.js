@@ -14,7 +14,31 @@ const bengaliText=s=>{
     .replace(/সম্পপ্রদায়/g,'সম্প্রদায়')
     .normalize('NFC');
 };
-const render=data=>{if(data.surah!==n||!Array.isArray(data.verses)||!data.verses.length)throw Error('সূরার ডেটা সঠিক নয়');const fragment=document.createDocumentFragment();
+const render=data=>{if(data.surah!==n||!Array.isArray(data.verses)||!data.verses.length)throw Error('সূরার ডেটা সঠিক নয়');
+// The canonical verses are already in HTML. Reuse them rather than rebuilding hundreds of nodes.
+const existing=[...root.querySelectorAll('.ayah[data-verse]')];
+if(n!==1&&existing.length===data.verses.length&&
+   existing[0].querySelector('.arabic')?.textContent===data.verses[0].arabic&&
+   existing[existing.length-1].querySelector('.arabic')?.textContent===data.verses[data.verses.length-1].arabic){
+  for(let i=0;i<data.verses.length;i++){
+    const v=data.verses[i],card=existing[i];
+    if(v.verse!==i+1||!v.arabic||!v.translation)throw Error('আয়াত '+(i+1)+' অসম্পূর্ণ');
+    if(v.pronunciation&&!card.querySelector('.pronunciation')){
+      const p=document.createElement('p');p.className='pronunciation';p.dataset.verified='true';
+      p.textContent=bengaliText(v.pronunciation);p.hidden=true;
+      card.insertBefore(p,card.querySelector('.translation'));
+    }
+  }
+  const basmala=root.querySelector('.basmala');
+  if(basmala&&!basmala.querySelector('.basmala-pronunciation')){
+    const p=document.createElement('p');p.className='basmala-pronunciation';
+    p.textContent='বিসমিল্লাহির রাহমানির রাহীম।';p.hidden=true;
+    basmala.querySelector('.arabic')?.after(p);
+  }
+  if(status)status.textContent=digits(existing.length)+'টি আয়াত · আরবি পাঠ';
+  return;
+}
+const fragment=document.createDocumentFragment();
 if(n!==9){const b=document.createElement('article');b.className='ayah basmala';const a=document.createElement('div');a.className='arabic';a.lang='ar';a.dir='rtl';a.textContent='بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';const p=document.createElement('p');p.className='basmala-pronunciation';p.textContent='বিসমিল্লাহির রাহমানির রাহীম।';p.hidden=true;const t=document.createElement('p');t.className='basmala-meaning';t.textContent='পরম করুণাময়, অসীম দয়ালু আল্লাহর নামে।';t.hidden=!(toggle&&toggle.checked);b.append(a,p,t);fragment.append(b)}
 const displayed=n===1?(()=>{const last=data.verses[6];const split=last.arabic.indexOf('غَيۡرِ');if(split<0)throw Error('সূরা ফাতিহার শেষ আয়াত বিভাজন যাচাই করা যায়নি');const firstPath=last.translation.indexOf('তাদের পথ');const translationSplit=firstPath<0?-1:last.translation.indexOf('তাদের পথ',firstPath+1);if(translationSplit<0)throw Error('সূরা ফাতিহার বাংলা অর্থ বিভাজন যাচাই করা যায়নি');return [...data.verses.slice(1,6),{...last,arabic:last.arabic.slice(0,split).trim(),pronunciation:'সিরাতাল্লাযীনা আন‘আমতা ‘আলাইহিম।',translation:last.translation.slice(0,translationSplit).trim()},{...last,arabic:last.arabic.slice(split).trim(),pronunciation:'গইরিল মাগদূবি ‘আলাইহিম ওয়ালাদ্দল্লীন।',translation:last.translation.slice(translationSplit).trim()}].map((v,i)=>({...v,verse:i+1}))})():data.verses;
 displayed.forEach((v,i)=>{if(v.verse!==i+1||!v.arabic||!v.translation)throw Error('আয়াত '+(i+1)+' অসম্পূর্ণ');const card=document.createElement('article');card.className='ayah';card.id='ayah-'+v.verse;card.dataset.verse=String(v.verse);const number=document.createElement('div');number.className='ayah-number';number.textContent=digits(v.verse);const ar=document.createElement('div');ar.className='arabic';ar.lang='ar';ar.dir='rtl';ar.textContent=v.arabic;card.append(number,ar);if(v.pronunciation){const p=document.createElement('p');p.className='pronunciation';p.dataset.verified='true';p.textContent=bengaliText(v.pronunciation);p.hidden=true;card.append(p)}const t=document.createElement('p');t.className='translation';t.textContent=bengaliText(v.translation.replace(/\s*\[\s*[0-9০-৯]+\s*\]/g,''));t.hidden=!(toggle && toggle.checked);card.append(t);fragment.append(card)});root.replaceChildren(fragment);if(status)status.textContent=digits(displayed.length)+'টি আয়াত · আরবি পাঠ';};
@@ -37,6 +61,10 @@ const attachPronunciation=async data=>{
     return data;
   }
 };
-fetchJSON(sourceURL).then(attachPronunciation).then(render).catch(e=>{if(status)status.textContent='আয়াত লোড হয়নি: '+e.message});
+fetchJSON(sourceURL).then(attachPronunciation).then(render).catch(e=>{
+  // Server-rendered verses remain readable when JSON or JavaScript enhancements fail.
+  if(status)status.textContent=root.querySelector('.ayah')?'সংরক্ষিত আরবি পাঠ ও বাংলা অনুবাদ দেখানো হচ্ছে।':'আয়াত লোড হয়নি: '+e.message;
+  console.warn('Quran enhancement unavailable',e);
+});
 toggle?.addEventListener('change',()=>root.querySelectorAll('.translation,.basmala-meaning').forEach(el=>el.hidden=!toggle.checked));
 })();

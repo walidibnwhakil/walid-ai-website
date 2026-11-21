@@ -6,6 +6,8 @@
   const verses = document.getElementById('verses');
   const tools = document.querySelector('.reading-tools');
   const context = document.getElementById('surah-context');
+  // Keep source-backed HTML introduction accessible when optional JSON notes fail.
+  const htmlIntro = context?.querySelector('#chapter-note > p')?.textContent?.trim() || '';
   if (!Number.isInteger(n) || n < 1 || n > 114 || !head || !verses || !tools) return;
 
   document.body.classList.add('quran-reader-page');
@@ -24,9 +26,9 @@
   let activeSection = 'surah';
 
   const status = document.getElementById('load-status');
-  if (status) status.textContent = 'আরবি আয়াত লোড হচ্ছে…';
+  if (status) status.textContent = verses.querySelector('.ayah') ? 'আরবি পাঠ ও বাংলা অনুবাদ' : 'আরবি আয়াত লোড হচ্ছে…';
   const translation = document.getElementById('show-translation');
-  if (translation) translation.checked = false;
+  // Preserve the checked HTML default so Bengali meaning remains visible on first load.
   const oldNotes = document.getElementById('show-notes');
   if (oldNotes) oldNotes.closest('label')?.remove();
 
@@ -52,7 +54,7 @@
     pronunciationStatus.hidden = !pronunciation.checked || items.length > 0;
   }
   pronunciation.addEventListener('change', refreshPronunciation);
-  new MutationObserver(refreshPronunciation).observe(verses, {childList: true});
+  new MutationObserver(refreshPronunciation).observe(verses, {childList: true, subtree: true});
 
   const tabDefs = [
     ['surah', 'সূরা'],
@@ -217,6 +219,7 @@
       return;
     }
     if (key === 'intro') {
+      if (htmlIntro) simpleParagraph(panel, htmlIntro);
       if (surahMeta) simpleParagraph(panel, 'সূরা ' + (bengaliMeta?.title || surahMeta.transliteration) + ' — কুরআনের ' + digits(n) + ' নম্বর সূরা; ' + digits(surahMeta.verseCount) + 'টি আয়াত; ' + (surahMeta.revelation === 'meccan' ? 'মাক্কি' : 'মাদানি') + '।');
       const loading = simpleParagraph(panel, 'সূরা-সংক্রান্ত উৎস-নোট লোড হচ্ছে…');
       getNotes().then(notes => {

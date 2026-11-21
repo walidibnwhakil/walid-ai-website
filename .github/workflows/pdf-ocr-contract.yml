@@ -8,6 +8,7 @@ on:
       - "pdf/index.html"
       - "tools/*/index.html"
       - "tests/pdf-copy-audit.mjs"
+      - "tests/pdf-live-site-smoke.mjs"
       - "tests/pdf-mobile-layout-e2e.mjs"
       - "tool-workspace/index.html"
       - "tools/pdf-to-word/**"
@@ -57,6 +58,8 @@ jobs:
       - run: node tests/pdf-tool-regression-contract.mjs
       - run: node tests/pdf-merge-split-contract.mjs
       - run: node tests/pdf-copy-audit.mjs
+      - name: Check published PDF pages in a real browser
+        run: node tests/pdf-live-site-smoke.mjs
       - run: node tests/pdf-mobile-layout-e2e.mjs
       - run: node tests/pdf-browser-e2e.mjs
       - run: node tests/pdf-word-structure-e2e.mjs

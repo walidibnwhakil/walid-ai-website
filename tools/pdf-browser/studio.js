@@ -474,12 +474,12 @@ async function recognizeEditPageText() {
     return {ocr:true,str:word.text.trim(),box,size:Math.max(10,box.h)};
   });
   if(!info.ocrSpans.length){
-    setStatus("No words were recognized. Use Cover area and Add text manually.");
+    setStatus("No readable text was found on this page. Try a clearer scan or add text manually.");
     return;
   }
   markEditTool("replace");
   await renderPage();
-  setStatus("Recognized "+info.ocrSpans.length+" word(s). Select a highlighted word to edit it; OCR may contain spelling errors.");
+  setStatus("Text recognition complete. Select a highlighted word to edit it, and review the result for accuracy.");
 }
 
 function boundsOf(points) {
@@ -853,7 +853,7 @@ async function saveEdited(suffix) {
   setStatus("Preparing the PDF…");
   const bytes = await buildEditedPdf();
   downloadBlob(new Blob([bytes], { type: "application/pdf" }), baseName() + suffix + ".pdf");
-  setStatus("Done." + (state.encrypted ? " The download is not password protected." : ""));
+  setStatus("Your updated PDF is ready." + (state.encrypted ? " The downloaded copy is not password protected." : ""));
 }
 
 function bengaliDigits(value) {
@@ -1269,7 +1269,7 @@ function updateOcrDownload(text) {
   if(link.href)URL.revokeObjectURL(link.href);
   const value=String(text||"");
   link.href=URL.createObjectURL(new Blob([value],{type:"text/plain;charset=utf-8"}));
-  link.download=walidName(baseName()+"-bengali.txt");
+  link.download=walidName(baseName()+"-recognized-text.txt");
   link.textContent="Download "+link.download;
   link.hidden=!value.trim();
 }
@@ -1289,13 +1289,13 @@ async function runOcr() {
   let worker;
   const getWorker=async()=>{
     if(worker)return worker;
-    setStatus("Loading Bengali and English OCR…");
+    setStatus("Preparing Bengali and English text recognition…");
     const tesseractModule=await import("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.esm.min.js");
     const tesseract=tesseractModule.createWorker?tesseractModule:tesseractModule.default;
     worker=await tesseract.createWorker("ben+eng",1,{logger:message=>{
       if(!message?.status)return;
       const progress=typeof message.progress==="number"?" "+Math.round(message.progress*100)+"%":"";
-      setStatus(message.status+progress);
+      setStatus((/recogniz/i.test(message.status) ? "Recognizing text" : "Preparing text recognition")+"…"+progress);
     }});
     return worker;
   };
@@ -1487,7 +1487,7 @@ async function applyProtect() {
     const doc = await PDFDocument.load(state.bytes.slice(0));
     doc.encrypt({ userPassword: password });
     downloadBlob(new Blob([await doc.save()], { type: "application/pdf" }), baseName() + "-protected.pdf");
-    setStatus("Done. The password is required to open the PDF.");
+    setStatus("PDF protected. The password is required to open the downloaded file.");
     return;
   }
   if (!state.encrypted) {
@@ -1497,7 +1497,7 @@ async function applyProtect() {
   try {
     const doc = await PDFDocument.load(state.bytes.slice(0), { password });
     downloadBlob(new Blob([await doc.save()], { type: "application/pdf" }), baseName() + "-unlocked.pdf");
-    setStatus("Done. The download opens without a password.");
+    setStatus("PDF unlocked. The downloaded file can be opened without a password.");
   } catch (error) {
     setStatus(/password/i.test(error.message || "") ? "That password did not open the PDF." : (error.message || "The PDF could not be unlocked."));
   }
@@ -1664,5 +1664,5 @@ for (const [id, job] of [
   const button = $(id);
   button?.addEventListener("click", () => busy(button, job));
 }
-ensureFont().catch(() => setStatus("Noto Sans Bengali could not be loaded."));
+ensureFont().catch(() => setStatus("Bengali text support could not be loaded. Check your connection and refresh the page."));
 

@@ -87,7 +87,7 @@ for (const [chapter, keywords] of [
   assert(chapters[chapter - 1][3].includes(keyword), "Chapter " + chapter + " missing " + keyword);
 
 for (const required of [
-  'href="https://walid-ai.com/others/history/ali-hasan-husayn-karbala/"',
+  'href="https://walid-ai.com/others/history/karbala/"',
   "/walid-ai-approved-logo.png", "/others/assets/books.css",
   "/others/assets/reader.js", 'class="legal-footer"',
   'href="/about-us/"', 'href="/privacy-policy/"',

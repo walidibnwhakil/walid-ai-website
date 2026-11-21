@@ -80,6 +80,60 @@ class GopalBharEditorialTest(unittest.TestCase):
                 for token in tokens:
                     self.assertIn(token, body)
 
+
+    def test_all_punchlines_unique_and_folklore_not_pretended_history(self):
+        """Make the seventeen resolutions independent, with grounded and distinct joke mechanics."""
+        title = self.html.split('</header>', 1)[0]
+        self.assertIn("সমকালীন প্রমাণ প্রতিষ্ঠিত নয়", title)
+        self.assertIn("স্বাধীনভাবে রচিত কল্পকাহিনি", title)
+        self.assertIn("রাজা কৃষ্ণচন্দ্র", title)
+        motifs = {
+            1: ("আয়না", "কেরানি", "পাগড়ি"),
+            2: ("পাল্লা", "মুদ্রা", "বাটখারা"),
+            3: ("ছায়া", "মুদ্রার শব্দ", "পথিক"),
+            4: ("জামা", "পোলাও", "পাহারাদার"),
+            5: ("ঠাকুরদা", "দেনা", "মিথ্যে"),
+            6: ("কলসি", "জমি", "পুকুর"),
+            7: ("ছাগল", "ঘণ্টা", "খিল"),
+            8: ("পানের বাটি", "দান", "বৃদ্ধা"),
+            9: ("পণ্ডিত", "কম্বল", "গিঁট"),
+            10: ("খাতা", "রসিদ", "সই"),
+            11: ("স্বাদপরীক্ষা", "ময়রা", "ছেলেটি"),
+            12: ("ছিদ্র নেই", "বাঁশি", "সুর"),
+            13: ("আংটি", "পাগড়ি", "পরিচারক"),
+            14: ("স্বর্ণকার", "পিতল", "পরীক্ষা"),
+            15: ("সাতটি", "দর্জি", "রসিদ"),
+            16: ("ফলক", "মেঘ", "নালা"),
+            17: ("খালি কলসি", "কুয়ো", "কাজ"),
+        }
+        seen_paragraphs = set()
+        punchlines = set()
+        for num, _, body in self.sections:
+            story = int(num)
+            paras = re.findall(r'<p>(.*?)</p>', body, flags=re.S)
+            for token in motifs[story]:
+                with self.subTest(chapter=num, motif=token):
+                    self.assertIn(token, body, "Story lost its distinctive device")
+            for para in paras:
+                self.assertNotIn(para, seen_paragraphs, "Recycled paragraph across stories")
+                seen_paragraphs.add(para)
+            self.assertGreaterEqual(len(paras[-1]), 250, "Abrupt story ending")
+            self.assertNotIn(paras[-1], punchlines, "Reused punchline")
+            punchlines.add(paras[-1])
+            self.assertGreaterEqual(len(re.findall(r'‘[^’]{3,}’', body)), 3, "Needs lively dialogue")
+        self.assertEqual(len(punchlines), 17)
+
+    def test_folklore_catalog_has_a_distinct_gopal_icon(self):
+        catalog = (ROOT / "others/folklore/index.html").read_text(encoding="utf-8")
+        cards = re.findall(r'<a class="others-card" href="([^"]+)">(.*?)</a>', catalog, re.S)
+        graphics = {}
+        for href, card in cards:
+            match = re.search(r'<svg\b.*?</svg>', card, flags=re.S)
+            self.assertIsNotNone(match, "Missing icon for " + href)
+            graphics[href] = match.group()
+        gopal = graphics["/others/folklore/gopal-bhar/"]
+        self.assertNotIn(gopal, [v for k, v in graphics.items() if k != "/others/folklore/gopal-bhar/"])
+
     def test_walid_shell_and_seo_unchanged(self):
         required = (
             'href="https://walid-ai.com/others/folklore/gopal-bhar/"',

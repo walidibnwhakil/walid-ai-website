@@ -126,7 +126,7 @@
     const top = window.scrollY + target.getBoundingClientRect().top + offset -
       Math.max(60, Math.min(130, window.innerHeight * .16));
     history.replaceState(null, "", "#" + chapter.node.id);
-    window.scrollTo({top: Math.max(0, top), behavior: "auto"});
+    window.scrollTo({top: Math.max(0, top), behavior: "instant"});
   };
 
   let progress = findSaved("progress");

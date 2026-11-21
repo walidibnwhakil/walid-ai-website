@@ -110,6 +110,29 @@ class OttomanEditorialTests(unittest.TestCase):
         self.assertNotIn('noindex', TEXT)
 
 
+    def test_fatih_to_bayezid_transition_without_future_spoilers(self):
+        fatih = re.sub(r'<[^>]+>', '', SECTIONS[8][2])
+        bayezid = re.sub(r'<[^>]+>', '', SECTIONS[9][2])
+        self.assertNotIn("১৪৮২", fatih,
+            "Gedik Ahmed's later execution belongs to Bayezid II")
+        self.assertIn("১৪৮২ সালের নভেম্বরে গেদিককে মৃত্যুদণ্ড", bayezid)
+        for text, events in (
+            (fatih, ("১৪৭৩ সালের ওতলুকবেলি", "১৪৭৫ সালে কাফা",
+                     "১৪৮০ সালে গেদিক আহমেদ", "১৪৮১ সালে অভিযানের")),
+            (bayezid, ("১৪৮১ সালে জেমের বাহিনীর", "১৪৮২ সালের নভেম্বরে",
+                       "১৪৮৫–৯১ সালে", "১৪৯২ সালে", "১৪৯৫ সালে নেপলসে",
+                       "১৪৯৯–১৫০৩ সালের", "১৫১১ সালের শাহকুলু",
+                       "১৫১২ সালের এপ্রিলে")),
+        ):
+            previous = -1
+            for event in events:
+                pos = text.find(event)
+                self.assertGreater(pos, previous,
+                    f"Fatih/Bayezid chronology regressed: {event}")
+                previous = pos
+        self.assertEqual(bayezid.count("১৪৯৫ সালে নেপলসে"), 1)
+        self.assertEqual(fatih.count("১৪৭৩ সালের ওতলুকবেলি"), 1)
+
     def test_integrated_suleiman_sequence(self):
         """Each major Suleiman episode has one forward-moving narrative location."""
         prose = re.sub(r'<[^>]+>', '', SECTIONS[11][2])

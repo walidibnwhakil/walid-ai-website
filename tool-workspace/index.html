@@ -133,7 +133,7 @@ $('#runPdf').onclick=async()=>{
       const { convertPdfToDocx }=await import('/tools/pdf-to-word/converter.mjs');
       const result=await convertPdfToDocx(files[0],info=>setStatus(info?.page?'Converting page '+info.page+' of '+info.pages+'…':'Loading OCR…'));
       const url=URL.createObjectURL(new Blob([result.bytes],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}));
-      pdfLink.href=url;pdfLink.download=walidDownloadName(result.filename);pdfLink.textContent='Download '+pdfLink.download;pdfLink.hidden=false;setStatus('done');window.WalidUsage?.tool('tool_success',activeTool);return;
+      pdfLink.href=url;pdfLink.download=walidDownloadName(result.filename);pdfLink.textContent='Download '+pdfLink.download;pdfLink.hidden=false;if(result.stats?.unreadablePages?.length)setStatus('Word file created, but page(s) '+result.stats.unreadablePages.join(', ')+' contained no readable OCR text. Review the result.');else if(result.stats?.ocrPages)setStatus('Word file created using text recognition. Review spelling, Bengali text, tables and layout.');else setStatus('Done. Editable Word file created.');window.WalidUsage?.tool('tool_success',activeTool);return;
     }
     if(activeTool==='merge-pdf'||activeTool==='split-pdf'){
       const {processLocalPdf}=await import('/tools/pdf-browser/local-merge-split.mjs');

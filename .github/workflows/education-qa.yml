@@ -1,0 +1,40 @@
+name: Education MCQ and Study Notes QA
+
+on:
+  pull_request:
+    paths:
+      - "sections/education/**"
+      - "tests/education-contract.test.mjs"
+      - "tests/education-responsive-e2e.mjs"
+      - ".github/workflows/education-qa.yml"
+  push:
+    branches: [main]
+    paths:
+      - "sections/education/**"
+      - "tests/education-contract.test.mjs"
+      - "tests/education-responsive-e2e.mjs"
+      - ".github/workflows/education-qa.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  education:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Validate Education JavaScript
+        run: |
+          node --check sections/education/question-content.mjs
+          node --check sections/education/education-app.mjs
+      - name: Check question banks and lesson coverage
+        run: node --test tests/education-contract.test.mjs
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install chromium
+      - name: Test complete MCQ and Study Notes journeys on mobile and desktop
+        run: node tests/education-responsive-e2e.mjs

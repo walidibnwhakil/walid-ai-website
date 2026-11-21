@@ -2,7 +2,11 @@
 // life, real or fictional, human or not) outweighs fame. Probably stays soft.
 // Someone ruled out that way only returns if the player contradicts that fact.
 
-import { POLITICS_EXTRAS } from "./politics-extra.js";
+const politicsUrl = new URL(
+  import.meta.url.includes("?") ? "./politics-extra.js?v=akinator-30" : "./politics-extra.js",
+  import.meta.url,
+);
+const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -43,7 +47,7 @@ function ensureExtras(pool) {
   const extraBytes = Math.ceil(need / 4);
   if (pool.extraAttrs && pool.extraBytes === extraBytes && pool._extraCount === pool.count) return;
   const extra = new Uint8Array(pool.count * extraBytes);
-  for (const [id, spec] of Object.entries(POLITICS_EXTRAS)) {
+  for (const [id, spec] of Object.entries(POLITICS_FACTS)) {
     const index = pool.ids.indexOf(id);
     if (index < 0) continue;
     const write = (qid, value) => {
@@ -79,11 +83,60 @@ function regionBit(pool, index, members) {
   return 0;
 }
 
+// The real casebook is the one that already contains Fakhrul. Small test
+// pools keep the attributes they were built with.
+function applyPolitics(pool) {
+  if (!pool || pool._politicsApplied || !pool.ids?.includes("Q6874839")) return;
+  pool._politicsApplied = true;
+  for (const person of POLITICS_PEOPLE) {
+    if (pool.ids.includes(person.id)) continue;
+    const count = pool.count + 1;
+    const attrs = new Uint8Array(count * pool.attrBytes);
+    attrs.set(pool.attrs);
+    const packed = packAttrBytes(pool.questions.map((question) => question.id), person.yes, person.no);
+    attrs.set(packed.subarray(0, pool.attrBytes), pool.count * pool.attrBytes);
+    const pop = new Uint16Array(count);
+    pop.set(pool.pop);
+    pop[pool.count] = Math.min(65535, person.pop || 1);
+    const flags = new Uint8Array(count);
+    flags.set(pool.flags);
+    pool.attrs = attrs;
+    pool.pop = pop;
+    pool.flags = flags;
+    pool.ids.push(person.id);
+    pool.ens.push(person.en);
+    pool.bns.push(person.bn || "");
+    pool.images.push("");
+    pool.credits.push("");
+    pool.count = count;
+    pool.extraAttrs = null;
+    pool._extraCount = 0;
+  }
+  const byId = new Map();
+  for (const [id, spec] of Object.entries(POLITICS_FACTS)) {
+    const bits = new Uint8Array(pool.questions.length);
+    let any = false;
+    const write = (qid, value) => {
+      const qi = pool.qIndex.get(qid);
+      if (qi == null) return;
+      bits[qi] = value;
+      any = true;
+    };
+    for (const qid of spec.yes || []) write(qid, 2);
+    for (const qid of spec.no || []) write(qid, 1);
+    if (any) byId.set(id, bits);
+  }
+  pool._polById = byId;
+}
+
 export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
+  applyPolitics(pool);
+  const over = pool._polById?.get(pool.ids[index]);
+  if (over && over[qi]) return over[qi];
   ensureExtras(pool);
   const stored = pool.attrBytes * 4;
   if (qi < stored) return attrAt(pool.attrs, pool.attrBytes, index, qi);
@@ -132,6 +185,7 @@ export function inCategory(pool, index, category) {
 }
 
 export function createState(pool, options = {}) {
+  applyPolitics(pool);
   return {
     pool,
     answers: [],
@@ -222,6 +276,8 @@ function hardLog(answer, bit, conflicted) {
 }
 
 export function recompute(state) {
+  applyPolitics(state.pool);
+  if (state.weights.length !== state.pool.count) state.weights = new Float64Array(state.pool.count);
   const { pool, answers, rejected } = state;
   const n = pool.count;
   const logW = new Float64Array(n);
@@ -396,7 +452,7 @@ function gated(state, question, rows) {
     if (id === "all_rounder") return yesMass(state, "cricketer", rows) > 0.35;
     return real() > 0.42;
   }
-  if (group === "politics") return yesMass(state, "politician", rows) > 0.3;
+  if (group === "politics") return politicsBranch(state, rows);
   if (group === "person") return real() + fictional() > 0.32 || animal() > 0.55;
   if (group === "fiction") {
     if (fictional() < 0.28) return false;
@@ -590,6 +646,38 @@ function candidatesSplit(state, id, rows) {
   return total > 0 && yes / total >= 0.15 && no / total >= 0.15;
 }
 
+function politicsBranch(state, rows) {
+  if (said(state, "politician", ["no", "probably_not"])) return false;
+  if (said(state, "politician", ["yes", "probably"])) return true;
+  const use = rows || state.alive;
+  if (yesMass(state, "politician", use) > 0.3) return true;
+  if (!said(state, "from_bd", ["yes", "probably"])) return false;
+  if (said(state, "athlete", ["yes", "probably"]) || said(state, "cricketer", ["yes", "probably"]) || said(state, "footballer", ["yes", "probably"])) return false;
+  if (said(state, "athlete", ["no", "probably_not"])) return true;
+  if (said(state, "cricketer", ["no", "probably_not"]) && said(state, "footballer", ["no", "probably_not"])) return true;
+  const sport = Math.max(yesMass(state, "athlete", use), yesMass(state, "cricketer", use), yesMass(state, "footballer", use));
+  return sport < 0.22;
+}
+
+function politicsSplit(state, qi, rows) {
+  let yes = 0;
+  let no = 0;
+  let total = 0;
+  for (let k = 0; k < rows.length; k++) {
+    const weight = state.weights[rows[k]];
+    if (weight <= 0) continue;
+    total += weight;
+    const bit = factBit(state.pool, rows[k], qi);
+    if (bit === 2) yes += weight;
+    else if (bit === 1) no += weight;
+  }
+  if (total <= 0 || (yes <= 0 && no <= 0)) return 0;
+  const known = yes + no;
+  // Once Bangladesh is in and a sport is unlikely, ask these before another job.
+  if (yes > 0 && no > 0) return 1.05 + binaryEntropy(yes / known);
+  return known / total >= 0.008 ? 0.9 : 0;
+}
+
 function unrelatedJob(state, id) {
   const job = confirmedJob(state);
   if (!job || job === id) return false;
@@ -597,6 +685,7 @@ function unrelatedJob(state, id) {
   const politics = id === "politician" || state.pool.questions[state.pool.qIndex.get(id)]?.group === "politics";
   if (!primary && !(politics && job !== "politician")) return false;
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  if (politics && politicsBranch(state, rows)) return false;
   const probe = politics ? "politician" : id;
   return !candidatesSplit(state, probe, rows);
 }
@@ -688,6 +777,7 @@ function blockedQuestion(state, question, rows, cache) {
   const links = linksFor(state.pool);
   if (impliedYes(state, question.id, links) || ancestorRejected(state, question.id, links)) return true;
   for (const parent of links.massParents.get(question.id) || []) {
+    if (parent === "politician" && politicsBranch(state, rows)) continue;
     if (parentAbsent(state, parent, rows, cache)) return true;
   }
   return false;
@@ -766,6 +856,9 @@ export function chooseQuestion(state) {
       bdGain = gain;
       if (answers.length >= 3 && !openingLeft) gain *= 8;
       else if (answers.length >= 3) gain *= 2;
+    }
+    if (question.group === "politics" && answers.length >= 5 && politicsBranch(state, rows)) {
+      gain = Math.max(gain, politicsSplit(state, qi, rows));
     }
     if (gain > bestGain) {
       bestGain = gain;

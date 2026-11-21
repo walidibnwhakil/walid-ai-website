@@ -141,16 +141,16 @@ def main() -> None:
         cache[index] = parser
 
     expected_history = [
-        "roman-empire", "alexander", "ashab-al-kahf", "byzantine-empire",
-        "khalid-ibn-walid", "rashidun-caliphate", "karbala", "venice",
+        "roman-empire", "alexander", "byzantine-empire", "venice",
+        "khalid-ibn-walid", "rashidun-caliphate", "karbala",
         "seljuk-empire", "crusades", "saladin", "mongol-empire",
         "mamluk-sultanate", "ottoman-empire", "bengal-sultanate", "timur",
-        "joan-of-arc", "mughal-empire", "british-empire", "napoleon"
+        "joan-of-arc", "mughal-empire", "british-empire", "napoleon", "ashab-al-kahf"
     ]
     history_html = (OTHERS / "history/index.html").read_text(encoding="utf-8")
     cards = re.findall(r'<a class="others-card" href="/others/history/([^/]+)/">', history_html)
     check(cards == expected_history, "history index: books are not in chronology")
-    check("Alexander the Great" in history_html, "history index: recognizable Alexander name missing")
+    check("আলেকজান্ডার দ্য গ্রেট" in history_html, "history index: recognizable Bengali Alexander name missing")
     check("<strong>কারবালা</strong>" in history_html, "history index: Karbala title is not concise")
     for index in indexes:
         content = index.read_text(encoding="utf-8")

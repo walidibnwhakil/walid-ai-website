@@ -356,13 +356,11 @@
     window.addEventListener("pageshow", () => requestAnimationFrame(resetScroll), {once: true});
   }
 
-  // Fiction chapters remain uninterrupted prose. Keep source text as plain text
-  // rather than clickable distractions; retain all real navigation and citations.
-  if (/^\/others\/(?:folklore|islamic-literature)\//.test(cleanPath)) {
-    reader.querySelectorAll(".others-book-title p a, .others-chapter p a").forEach((link) => {
-      link.replaceWith(document.createTextNode(link.textContent));
-    });
-  }
+  // Body and subtitle references are ordinary reading text, never hyperlinks.
+  // Retain functional chapter navigation, footer links, source metadata and evidence pages.
+  reader.querySelectorAll(".others-book-title p a, .others-chapter p a").forEach((link) => {
+    link.replaceWith(document.createTextNode(link.textContent || ""));
+  });
 
   const updateBookmarkButtons = () => {
     reader.querySelectorAll(".others-chapter-bookmark").forEach((button) => {

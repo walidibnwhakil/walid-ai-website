@@ -26,6 +26,8 @@ jobs:
         run: python3 tests/test_ottoman_editorial.py
       - name: Verify Khalid ibn al-Walid chronology and content integrity
         run: python3 tests/test_khalid_editorial.py
+      - name: Verify catalog names, editorial subtitles and icon provenance
+        run: python3 tests/test_others_catalog_editorial.py
       - name: Audit 30 canonical books, sitemap and retired chapter hashes
         run: python3 tests/test_others_library_contract.py
       - name: Verify all Others books and catalog pages at mobile and desktop widths

@@ -26,8 +26,18 @@ const indexes=[
   ["/others/",3],
   ["/others/folklore/",5],
   ["/others/islamic-literature/",5],
+  ["/others/history/",20],
 ];
 const storyPaths=[
+  "/others/history/ali-hasan-husayn-karbala/",
+  "/others/history/byzantine-empire/",
+  "/others/history/crusades/",
+  "/others/history/napoleon/",
+  "/others/history/rashidun-caliphate/",
+  "/others/history/roman-empire/",
+  "/others/history/seljuk-empire/",
+  "/others/history/timur/",
+  "/others/history/venice/",
   "/others/history/alexander/",
   "/others/history/ashab-al-kahf/",
   "/others/history/ottoman-empire/",
@@ -51,7 +61,7 @@ const storyPaths=[
   "/others/history/khalid-ibn-walid/",
 ];
 const widths=[320,375,768,1280];
-let browser,checks=0,sidebarChecks=0;
+let browser,checks=0,sidebarChecks=0,legacyChecks=0;
 try{
   browser=await chromium.launch({headless:true});
   for(const [path,cardsCount] of [...indexes,...storyPaths.map(path=>[path,0])]){
@@ -71,9 +81,15 @@ try{
           logoLoaded:document.querySelector(".others-brand img")?.naturalWidth>0,
           footerCount:document.querySelectorAll(".legal-footer").length,
           flower:getComputedStyle(document.body,"::before").backgroundImage.includes("walid-ai-approved-flower"),
+          flowerRotation:getComputedStyle(document.body,"::before").animationDuration,
+          font:getComputedStyle(document.body).fontFamily,
+          canonical:document.querySelector('link[rel="canonical"]')?.href,
+          description:document.querySelector('meta[name="description"]')?.content,
           heading:document.querySelector("h1")?.textContent?.trim(),
           cardCount:cards.length,cardRects:cards.map(visibleRect),
           chapterCount:chapters.length,
+          chapterIds:chapters.map(node=>node.id),
+          tocIds:[...document.querySelectorAll('.others-toc a[href^="#chapter-"]')].map(node=>node.getAttribute("href").slice(1)),
           tocChapterCount:document.querySelectorAll('.others-toc a[href^="#chapter-"]').length,
           emptyChapters:chapters.filter(node=>node.querySelectorAll("p").length<5).length,
           hasSidebar:!!document.querySelector(".others-toc-trigger"),
@@ -84,6 +100,10 @@ try{
       assert.equal(layout.logoLoaded,true,path+" approved logo missing at "+width);
       assert.equal(layout.footerCount,1,path+" should have one footer");
       assert.equal(layout.flower,true,path+" Kathgolap background missing");
+      assert(layout.flowerRotation.includes("10s"),path+" Kathgolap rotation must remain 10s");
+      assert(layout.font.includes("SolaimanLipi"),path+" primary Bangla font changed");
+      assert.equal(layout.canonical,"https://walid-ai.com"+path,path+" SEO canonical mismatch");
+      assert.ok(layout.description?.length>15,path+" missing SEO description");
       assert.ok(layout.heading?.length>2,path+" missing readable heading");
       assert.equal(layout.cardCount,cardsCount,path+" unexpected card count");
       for(const rect of layout.cardRects){
@@ -92,6 +112,7 @@ try{
       }
       if(cardsCount===0){
         assert(layout.chapterCount>=12,path+" lost book chapters");
+        assert.deepEqual(layout.tocIds,layout.chapterIds,path+" all chapter IDs must match TOC anchors");
         if(path==="/others/history/mongol-empire/"){
           assert.equal(layout.chapterCount,29,"Mongol reader must have exactly 29 chapters");
           assert.equal(layout.tocChapterCount,29,"Mongol sidebar must have 29 chapter links");
@@ -148,8 +169,25 @@ try{
       await page.close();
     }
   }
+  const legacyRoutes=[
+    ["/others/history/hasan-ibn-ali/","chapter-11","chapter-25"],
+    ["/others/history/husayn-ibn-ali/","chapter-15","chapter-49"],
+    ["/others/history/karbala/","chapter-16","chapter-49"],
+  ];
+  for(const width of [375,1280]){
+    for(const [oldPath,oldHash,newHash] of legacyRoutes){
+      const page=await browser.newPage({viewport:{width,height:840}});
+      await page.route("**/*",r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
+      await page.goto(origin+oldPath+"?source=legacy#"+oldHash,{waitUntil:"load"});
+      await page.waitForURL(url=>url.pathname==="/others/history/ali-hasan-husayn-karbala/"&&url.hash==="#"+newHash);
+      assert.equal(new URL(page.url()).search,"?source=legacy",oldPath+" search params lost");
+      assert.equal(await page.locator("#"+newHash).count(),1,oldPath+" redirect target is missing");
+      legacyChecks++;
+      await page.close();
+    }
+  }
   console.log("OTHERS_RESPONSIVE_PASS",JSON.stringify({
-    pageWidthChecks:checks,interactiveSidebarChecks:sidebarChecks,
+    pageWidthChecks:checks,interactiveSidebarChecks:sidebarChecks,legacyRedirectChecks:legacyChecks,
     storyReaders:storyPaths.length,indexes:indexes.length,widths
   }));
 }finally{

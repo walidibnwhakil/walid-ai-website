@@ -35,7 +35,7 @@ class VeniceStaticTests(unittest.TestCase):
         self.assertLess(index("ক্রিটের দীর্ঘ যুদ্ধ"), index("মোরিয়ার অভিযান"))
         self.assertLess(index("মোরিয়ার অভিযান"), index("স্থবির শাসন"))
         self.assertIn("১২ মে ১৭৯৭", HTML)
-        self.assertIn("১৭৮৯ সালের মার্চে", HTML)
+        self.assertIn("১৭৮৯ সালের ৯ মার্চ", HTML)
         self.assertIn("১৫১৭ সালে উসমানীয় সুলতান প্রথম সেলিম", HTML)
         self.assertIn("১৪ মে ১৫০৯", HTML)
         self.assertIn("২৭ নভেম্বর ১৫৬০", HTML)

@@ -29,7 +29,7 @@ function alternatives(items,index,getValue){
  return out;
 }
 CAPITALS.forEach((row,i)=>add(
- "আন্তর্জাতিক বিষয়াবলি","আন্তর্জাতিক ভূগোল: দেশ ও রাজধানী",
+ "আন্তর্জাতিক বিষয়াবলি","বিশ্বের রাজধানী — "+row.continent,
  row.country+"-এর রাজধানী কোনটি?",row.capital,
  alternatives(CAPITALS,i,x=>x.capital),
  row.country+"-এর রাজধানী "+row.capital+"; অঞ্চল: "+row.continent+"।",

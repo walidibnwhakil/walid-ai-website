@@ -123,6 +123,39 @@ class GopalBharEditorialTest(unittest.TestCase):
             self.assertGreaterEqual(len(re.findall(r'‘[^’]{3,}’', body)), 3, "Needs lively dialogue")
         self.assertEqual(len(punchlines), 17)
 
+    def test_folktale_provenance_and_scene_continuity(self):
+        """The tale cycle is literary folklore, with no duplicated later outcome."""
+        preface = self.html.split("</header>", 1)[0]
+        for motif_title in (
+            "গাছের ছায়ার দাম", "ভোজে পোশাকের সম্মান",
+            "শহরের সবচেয়ে বড় মিথ্যুক", "পণ্ডিতের কঠিন প্রশ্ন"
+        ):
+            self.assertIn(motif_title, preface)
+        self.assertIn("বাকি গল্পগুলো এই সংকলনের স্বাধীন সাহিত্যিক নির্মাণ", preface)
+        self.assertIn("সমকালীন দলিল", preface)
+
+        bodies = {int(number): body for number, _, body in self.sections}
+        self.assertNotIn("শেষ মুদ্রাটি", bodies[2], "The merchant was paid twice")
+        self.assertIn("বাকি দুটি মুদ্রা", bodies[2])
+        self.assertIn("অন্য দাবিদার", bodies[6], "Buried gold cannot be ruled on without evidence")
+        self.assertIn("নিজের ইচ্ছায়", bodies[6], "The pond donation must be voluntary")
+        self.assertNotIn("দরজার বাইরে অপেক্ষা করা বৃদ্ধা এবার", bodies[8])
+        flute_paragraphs = re.findall(r"<p>(.*?)</p>", bodies[12], flags=re.S)
+        self.assertNotIn("পরদিন", flute_paragraphs[4], "Do not introduce an extra day in the verdict")
+        self.assertIn("পরদিন সন্ধ্যায়", flute_paragraphs[5], "The player returns the day after reversal")
+        self.assertIn("বাঁশটি নিজের বগলে", bodies[12], "Gopal must retain the flute")
+        self.assertNotIn("আংটি পাওয়া গেল ঠিকই", bodies[13], "The ring cannot be found again")
+        self.assertIn("আংটি যথাস্থানেই", bodies[13])
+        self.assertIn("সন্ধ্যায় মেরামত হওয়া কুয়োর ধারে", bodies[17])
+
+        # The original punchline must resolve the present scene, not trail off in moralizing.
+        endings = [re.findall(r"<p>(.*?)</p>", body, flags=re.S)[-1]
+                   for _, _, body in self.sections]
+        self.assertEqual(len(set(endings)), 17)
+        for ending in endings:
+            self.assertNotIn("শিক্ষা হলো", ending)
+            self.assertNotIn("পাঠকদের", ending)
+
     def test_folklore_catalog_has_a_distinct_gopal_icon(self):
         catalog = (ROOT / "others/folklore/index.html").read_text(encoding="utf-8")
         cards = re.findall(r'<a class="others-card" href="([^"]+)">(.*?)</a>', catalog, re.S)

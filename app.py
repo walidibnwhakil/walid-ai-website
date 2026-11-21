@@ -258,7 +258,7 @@ def small_talk_answer(question):
     normalized_greetings = {normalize_text(item) for item in greetings}
     if normalized in normalized_greetings:
         if normalized in {"hi", "hey", "hello", "howareyou"}:
-            return "Hi! How are you? What would you like to talk about?"
+            return "Hi! How are you? What would you like to talk about with Walid AI?"
         return "আমি ভালো আছি, ধন্যবাদ! তুমি কেমন আছো? Walid AI-কে কী জানতে চাও?"
     return None
 

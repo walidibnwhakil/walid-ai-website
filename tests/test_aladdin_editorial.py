@@ -98,7 +98,7 @@ class AladdinEditorial(unittest.TestCase):
             self.assertIn(item, intro)
         self.assertIn("মুস্তফা", chapter[1])
         self.assertIn("তিনটি বড় কক্ষ", chapter[2])
-        self.assertIn("আংটির জিনি", chapter[3])
+        self.assertIn("আংটির অধীন জিনি", chapter[3])
         self.assertIn("প্রদীপের জিনি", chapter[4])
         self.assertIn("তিন মাস", chapter[5])
         self.assertIn("তিন মাস", chapter[6])

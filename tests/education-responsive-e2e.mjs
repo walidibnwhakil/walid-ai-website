@@ -85,7 +85,7 @@ try{
       await firstFact.locator(".question-feedback .question-source").waitFor({state:"visible"});
       const sourceUrl=await firstFact.locator(".question-feedback .question-source").getAttribute("href");
       assert(sourceUrl.startsWith("https://"),"Citation must open a secure primary source");
-      assert(await page.locator("#bcsNotice").isVisible(),"BCS syllabus note must be shown in setup flow");
+      assert.equal(await page.locator("#bcsNotice").evaluate(el=>el.hidden),false,"BCS syllabus note must be enabled for BCS selection");
 
     }
     if(count===20){

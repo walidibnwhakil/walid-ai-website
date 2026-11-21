@@ -42,6 +42,19 @@ mustContain(7, ["প্রথম দরবেশ", "দ্বিতীয় দর
 mustContain(8, ["পাথর", "জুবাইদা", "পরি", "দুই বোন", "আমিনা", "দোকানদার"]);
 mustContain(9, ["দুই ভাই", "নূরুদ্দিন", "শামসুদ্দিন", "বদরুদ্দিন", "আজিব", "খলিফা"]);
 mustContain(10, ["খ্রিস্টান দালালের গল্প", "খাদ্যতত্ত্বাবধায়কের গল্প", "ইহুদি চিকিৎসকের গল্প", "দর্জির গল্প", "নাপিতের কথা", "প্রথম ভাই", "দ্বিতীয় ভাই", "তৃতীয় ভাই", "চতুর্থ ভাই", "পঞ্চম ভাই", "ষষ্ঠ ভাই", "কাঁটা", "সুস্থ"]);
+
+const plainChapter = n => chapterText(n).replace(/<[^>]*>/g, " ");
+const wordCount = n => plainChapter(n).trim().split(/\s+/).length;
+assert.ok(wordCount(3) >= 850, "Three old men's tales need full narrative arcs, not brief synopses");
+assert.ok(wordCount(12) >= 850, "Ebony horse needs its actual travels, abduction and rescue");
+mustContain(3, ["গাভিটিকেই জবাই", "রাখাল", "দশ বছর", "কসাই", "তৃতীয় অংশ", "মুক্ত"]);
+mustContain(12, ["সাবুর", "ভারতীয়", "গ্রিক", "পারস্যদেশীয়", "ডান পাশের", "অন্য পাশের", "কারিগর", "সানাআ", "শামস আল-নাহার", "অপহরণ", "চিকিৎসক", "মাঠে", "দূত", "আল-আকমার"]);
+assert.ok(!chapterText(12).includes("বঙ্গদেশের এক রাজকন্যার আবাসে"), "Galland and Payne/Burton recensions mixed");
+assert.ok(!chapterText(12).includes("কাশ্মীরের রাজদরবারে"), "Ebony Horse regional recensions mixed");
+assert.ok(chapterText(11).includes("কামার আল-জামান") && !chapterText(11).includes("কামার আল-আকমার"), "Two different Kamar princes were conflated");
+assert.ok(chapterText(12).includes("কামার আল-আকমার"), "Ebony-horse prince name lost");
+assert.ok((chapterText(13).match(/এক সন্ধ্যায়/g) || []).length <= 1, "Ali Cogia's olive jar incident repeated");
+assert.ok(html.includes("পেইন-পরম্পরার পাঠ"), "Recension identification removed");
 assert.ok(chapterText(10).length > 10000, "Hunchback nested cycle cut too short");
 assert.ok((chapterText(10).match(/<h3>/g) || []).length >= 5, "Hunchback substory navigation lost");
 assert.ok(html.includes("এই সংস্করণের পাঠ-পরিচয়"), "Editorial recension note absent");
@@ -59,7 +72,7 @@ const requirements = {
   9: ["সিন্দুক", "তিনটি", "বসরা", "দাস", "ছেলে", "জাফর"],
   10: ["দর্জি", "চিকিৎসক", "বণিক", "নাপিত", "কাঁটা", "সচেতন"],
   11: ["কামার আল-জামান", "বদুর", "আংটি", "মারজাওয়ান", "আরমানুস", "পুনর্মিলন"],
-  12: ["আবলুস", "ঘোড়া", "কাশ্মীর", "রাজকন্যা", "পারস্যে", "ধ্বংস"],
+  12: ["আবলুস", "ঘোড়া", "সানাআ", "গ্রিক", "রাজকন্যা", "পারস্যে", "ধ্বংস"],
   13: ["আলী কোজিয়া", "জলপাই", "সোনা", "শিশু", "প্রমাণ", "ফিরে পেলেন"],
   14: ["শেহেরজাদ", "শাহরিয়ার", "সন্তান", "ক্ষমার", "সংস্করণ", "পুনর্কথন"]
 };

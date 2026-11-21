@@ -155,3 +155,14 @@ html[lang="bn"] body,html[lang="bn"] button,html[lang="bn"] .others-book-title,h
   .others-single-chapter-reader .others-chapter-navigation{margin-top:36px;padding-top:28px}
   .others-single-chapter-reader .others-chapter-nav-link{min-height:76px}
 }
+
+/* Editorial pacing: each reading part includes complete adjacent chapters;
+   the next/previous controls appear only after a substantial reading block. */
+.others-single-chapter-reader .others-chapter.others-group-continuation{
+  margin-top:40px;padding-top:28px;border-top:1px solid #e9e3d3
+}
+.others-single-chapter-reader .others-chapter-navigation{margin-top:48px}
+@media(max-width:620px){
+  .others-single-chapter-reader .others-chapter.others-group-continuation{margin-top:34px;padding-top:26px}
+  .others-single-chapter-reader .others-chapter-navigation{margin-top:44px}
+}

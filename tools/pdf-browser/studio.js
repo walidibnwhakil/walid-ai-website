@@ -45,7 +45,16 @@ const panels = {
 };
 
 function setStatus(text) {
-  $("status").textContent = text || "";
+  const message = text || "";
+  $("status").textContent = message;
+  // The normal status lives inside a hidden processing panel until a valid PDF opens.
+  // Surface upload errors beside the chooser instead of silently hiding them.
+  const dropStatus = $("dropStatus");
+  if (dropStatus) {
+    const show = $("work").hidden && !!message;
+    dropStatus.textContent = show ? message : "";
+    dropStatus.hidden = !show;
+  }
 }
 
 function notifyEditor(active) {

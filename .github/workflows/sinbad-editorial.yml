@@ -1,0 +1,19 @@
+name: Sinbad seven-voyage editorial integrity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "others/islamic-literature/sinbad/**"
+      - "tests/test_sinbad_editorial.py"
+      - ".github/workflows/sinbad-editorial.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sinbad-editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate seven voyages, literary fullness, anchors and design shell
+        run: python3 tests/test_sinbad_editorial.py

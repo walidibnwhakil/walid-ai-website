@@ -4,7 +4,7 @@ const list=document.querySelector("#story-list");
 const input=document.querySelector("#story-search");
 const status=document.querySelector("#story-status");
 let stories=[];
-let surahs=[];
+let loaded=false;
 function ascii(value){return value.replace(/[০-৯]/g,function(ch){return String("০১২৩৪৫৬৭৮৯".indexOf(ch));});}
 function bracketRefs(refs){
   if(typeof refs!=="string")return "";
@@ -23,6 +23,13 @@ function paragraph(text, className){
 }
 function render(){
   const term=input.value.trim().toLocaleLowerCase();
+  if(!loaded){
+    const cards=[...list.querySelectorAll(".story-card")];
+    let count=0;
+    cards.forEach(card=>{const matched=card.textContent.toLocaleLowerCase().includes(term);card.hidden=!matched;if(matched)count++;});
+    status.textContent=term?(count?count+"টি মিল পাওয়া গেছে":"এই নামে কোনো কাহিনি পাওয়া যায়নি।"):cards.length+"টি বিষয় ও ঘটনা";
+    return;
+  }
   const found=stories.filter(function(s){
     const words=[s.title,s.refs].concat(s.paragraphs,s.lessons||"",...(s.additional||[]).map(function(a){return a.text+" "+a.source;}));
     return words.join(" ").toLocaleLowerCase().includes(term);
@@ -69,14 +76,11 @@ function render(){
   status.textContent=term?found.length+"টি মিল পাওয়া গেছে":stories.length+"টি বিষয় ও ঘটনা";
 }
 input.addEventListener("input",render);
-Promise.all([
-  fetch("/islam/stories/stories.json?v=20261120-expanded").then(function(response){if(!response.ok)throw Error("stories unavailable");return response.json();}),
-  fetch("/islam/quran/data/metadata.json").then(function(response){if(!response.ok)throw Error("surah list unavailable");return response.json();})
-]).then(function(values){
-  const data=values[0], chapters=values[1];
-  if(!Array.isArray(data)||data.length<60||!Array.isArray(chapters)||chapters.length!==114)throw Error("source coverage incomplete");
-  stories=data;surahs=chapters;render();
-}).catch(function(){
-  status.textContent="কাহিনির তালিকা লোড করা যায়নি। পরে আবার চেষ্টা করুন।";
-});
+fetch("/islam/stories/stories.json?v=20261120-expanded")
+  .then(function(response){if(!response.ok)throw Error("stories unavailable");return response.json();})
+  .then(function(data){
+    if(!Array.isArray(data)||data.length!==61)throw Error("story coverage incomplete");
+    stories=data;loaded=true;render();
+  })
+  .catch(function(){render();});
 })();

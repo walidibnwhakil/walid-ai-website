@@ -1,0 +1,23 @@
+name: Site quality and content integrity
+on:
+  pull_request:
+    paths:
+      - "sitemap.xml"
+      - "**/*.html"
+      - "islam/stories/stories.json"
+      - "islam/quran/data/*.json"
+      - "scripts/site_quality_audit.py"
+      - ".github/workflows/site-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check canonical URLs, internal links, and Quran/story integrity
+        run: python3 scripts/site_quality_audit.py

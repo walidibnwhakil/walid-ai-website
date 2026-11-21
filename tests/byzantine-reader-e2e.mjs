@@ -7,20 +7,20 @@ import { chromium } from "playwright";
 const root = new URL("../", import.meta.url);
 const bookPath = "others/history/byzantine-empire/index.html";
 const html = await readFile(new URL("../" + bookPath, import.meta.url), "utf8");
-const chapterRegex = /<section class="others-chapter" id="chapter-(\\d+)"><h2>(.*?)<\\/h2>([\\s\\S]*?)<\\/section>/g;
+const chapterRegex = /<section class="others-chapter" id="chapter-(\d+)"><h2>(.*?)<\/h2>([\s\S]*?)<\/section>/g;
 const chapters = [...html.matchAll(chapterRegex)];
 assert.equal(chapters.length, 18, "Expected 18 integrated Byzantine chapters");
 assert.deepEqual(chapters.map(c => Number(c[1])), Array.from({length: 18}, (_, i) => i + 1), "Chapter IDs out of sequence");
-const tocHtml = html.match(/<nav class="others-toc" aria-label="অধ্যায় তালিকা">([\\s\\S]*?)<\\/nav>/)?.[1];
+const tocHtml = html.match(/<nav class="others-toc" aria-label="অধ্যায় তালিকা">([\s\S]*?)<\/nav>/)?.[1];
 assert.ok(tocHtml, "Missing chapter drawer");
-const toc = [...tocHtml.matchAll(/<a href="#chapter-(\\d+)">(.*?)<\\/a>/g)];
+const toc = [...tocHtml.matchAll(/<a href="#chapter-(\d+)">(.*?)<\/a>/g)];
 assert.equal(toc.length, chapters.length, "TOC chapter count mismatch");
 const repeated = new Set();
 let paragraphs = 0;
 for (const [index, chapter] of chapters.entries()) {
   assert.equal(Number(toc[index][1]), Number(chapter[1]), "TOC is out of order");
   assert.equal(toc[index][2], chapter[2], "TOC title differs from chapter");
-  const ps = [...chapter[3].matchAll(/<p>([\\s\\S]*?)<\\/p>/g)].map(p => p[1].replace(/<[^>]*>/g, "").trim());
+  const ps = [...chapter[3].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(p => p[1].replace(/<[^>]*>/g, "").trim());
   assert.ok(ps.length >= 6, "Short chapter " + chapter[1]);
   for (const p of ps) {
     assert.ok(p.length >= 180, "Unfinished passage in chapter " + chapter[1] + ": " + p.length);
@@ -60,7 +60,7 @@ const server = createServer(async (req, res) => {
   if (pathname.includes("..")) { res.writeHead(400).end(); return; }
   try {
     const bytes = await readFile(new URL(pathname.slice(1), root));
-    const ext = pathname.match(/\\.[^.]+$/)?.[0] ?? "";
+    const ext = pathname.match(/\.[^.]+$/)?.[0] ?? "";
     res.writeHead(200, {"content-type":types[ext] ?? "application/octet-stream"});
     res.end(bytes);
   } catch { res.writeHead(404).end("not found"); }

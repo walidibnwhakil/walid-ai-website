@@ -63,7 +63,8 @@ try{
         footer:!!document.querySelector(".legal-footer")};
     });
     assert.equal(layout.cards.length,2);
-    assert.equal(layout.columns,width<=520?1:2);
+    assert.equal(layout.columns,2,"MCQ and Study Notes must remain side by side on all screens");
+    assert(Math.abs(layout.cards[0].top-layout.cards[1].top)<2,"The two study cards must share a row "+width);
     assert(layout.scrollWidth<=width+2,"horizontal overflow "+width);
     assert(layout.cards.every(c=>c.left>=-2&&c.right<=width+2));
     assert(layout.logo&&layout.footer);
@@ -176,6 +177,18 @@ try{
     await page.locator("#showNotes").click();
     await page.locator("#notesContent").waitFor({state:"visible"});
     assert((await page.locator(".note-article").count())>=min,level+" "+stream+" "+subject);
+    assert.equal(await page.locator("#noteList .note-article .note-example").count(),
+      await page.locator("#noteList .note-article").count(),
+      "Every lesson must show a worked example");
+    assert.equal(await page.locator("#noteList .note-article .note-exercise").count(),
+      await page.locator("#noteList .note-article").count(),
+      "Every lesson must include independent practice");
+    if(level==="6"&&subject==="গণিত"){
+      assert((await page.locator("#noteList .lesson-illustration svg").count())>=2,
+        "Class 6 math lessons must include subject-specific teaching diagrams");
+      assert((await page.locator("#noteList .lesson-illustration figcaption").count())>=2,
+        "Every diagram must have an explanatory caption");
+    }
     checks++;
   }
   assert.deepEqual(errors,[],"Browser runtime errors");

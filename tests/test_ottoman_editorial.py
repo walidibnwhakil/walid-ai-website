@@ -82,7 +82,7 @@ class OttomanEditorialTests(unittest.TestCase):
                 self.assertIn(term, chapters[num], f"Chapter {num} missing {term}")
 
     def test_external_attribution_and_time_order(self):
-        match = re.search(r'<script id="ottoman-source-metadata" type="application/ld\\+json">(.*?)</script>', TEXT, re.S)
+        match = re.search(r'<script id="ottoman-source-metadata" type="application/ld\+json">(.*?)</script>', TEXT, re.S)
         self.assertIsNotNone(match, "Bibliographic JSON-LD should stay outside prose")
         book = json.loads(match.group(1))
         self.assertEqual(book.get("inLanguage"), "bn")

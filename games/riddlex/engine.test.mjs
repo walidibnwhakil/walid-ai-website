@@ -703,6 +703,7 @@ test("politics augmentation survives spare array capacity after appending privat
   ];
   const first = poolFromEntries(qs, [
     { id: "Q6874839", en: "Political seed", yes: ["real"] },
+    { id: "ordinary-person", en: "Ordinary person", yes: ["real"] },
   ]);
   const more = poolFromEntries(qs, [
     { id: "riddlex-role-mother", en: "Your mother", yes: ["real", "female"] },

@@ -92,6 +92,29 @@ function play(pool, id, { flip = -1 } = {}) {
   return { ok: false, step: 28 };
 }
 
+test("male no does not lead to redundant female question", () => {
+  const state = createState(world, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "male", "no");
+  assert.equal(questionBlocked(state, "female"), true);
+  assert.notEqual(chooseQuestion(state), "female");
+  const uncertain = createState(world, { category: "character" });
+  recompute(uncertain);
+  answer(uncertain, "real", "yes");
+  answer(uncertain, "male", "unknown");
+  assert.equal(questionBlocked(uncertain, "female"), false);
+});
+
+test("four rejected guesses leave meaningful questions available", () => {
+  const state = createState(world, { category: "character", opening: "real" });
+  recompute(state);
+  for (const id of ["himu","misir","feluda","actor"])
+    rejectIndex(state, world.ids.indexOf(id));
+  assert.equal(state.guesses, 4);
+  assert.equal(decide(state).type, "ask");
+});
+
 test("Bangladesh is asked within the first five character questions", () => {
   const state = createState(world, { category: "character", opening: "real" });
   recompute(state);

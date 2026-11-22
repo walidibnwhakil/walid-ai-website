@@ -1130,6 +1130,12 @@ function sensibleFollowUp(state) {
 
 export function decide(state) {
   recompute(state);
+  // Only an explicit contradiction between the two broad character kinds
+  // warrants category correction. Ordinary "No" answers to occupation,
+  // politics and relationships must never trigger this state.
+  if (state.category === "character" &&
+      said(state, "real", ["no"]) && said(state, "fictional", ["no"]))
+    return { type: "reconsider" };
   if (!state.alive.length) return { type: "defeat" };
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state);

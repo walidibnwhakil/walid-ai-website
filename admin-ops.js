@@ -12,6 +12,8 @@
   ];
   const selected='manager';
   let currentTab='dashboard', busy=false, ready=false, previousManagerFocus=null;
+  // Private Help messages are displayed only for this session, never localStorage.
+  const transientHelp=new Map();
   const fmt = date => {try{return new Date(date).toLocaleString('en-BD',{timeZone:'Asia/Dhaka'})}catch{return String(date||'')}};
   const token = () => sessionStorage.getItem('walidAdminAccess') || '';
   const auth = () => ({Authorization:'Bearer '+token()});
@@ -111,6 +113,11 @@
       appendMessage(host,'answer',role+' · '+(task.status||'unknown'),
         result.answer||'No verifiable result is available.', result.limitation||
           (task.status==='running'?'Processing…':''));
+      const privateRows=transientHelp.get(task.id)||[];
+      for(const item of privateRows){
+        appendMessage(host,'answer','Admin Staff · '+fmt(item.received_at),item.message||'(Empty Help message)',
+          'Private: not saved in task history.');
+      }
     });
     host.scrollTop=host.scrollHeight;
   }
@@ -156,6 +163,10 @@
       });
       input.value='';
       const result=data.task?.result||{};
+      if(data.task?.id&&Array.isArray(result.private_messages)&&result.private_messages.length){
+        transientHelp.set(data.task.id,result.private_messages.slice(0,3));
+        if(transientHelp.size>10)transientHelp.delete(transientHelp.keys().next().value);
+      }
       status('Task: '+(data.task?.status||'unknown')+' · '+(result.delegated_to?'Assigned to '+result.delegated_to:'Processed by '+role));
       await loadHistory();
     }catch(error){status('Could not complete task: '+error.message,true)}
@@ -180,6 +191,7 @@
   }
   function logout(){
     closeManagerChat();
+    transientHelp.clear();
     ready=false;setSidebarOpen(false);
     $('#manager-chat-shortcut').disabled=true;$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=true);

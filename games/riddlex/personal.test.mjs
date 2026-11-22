@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { answer, chooseQuestion, createState, decide, factBit, inCategory, recompute } from "./engine.js";
+import { answer, chooseQuestion, createState, decide, factBit, inCategory, questionBlocked, recompute } from "./engine.js";
 import { appendShard, poolFromEntries } from "./kb.js";
 import { PERSONAL_FACTS, PERSONAL_QUESTIONS, PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 
@@ -159,4 +159,34 @@ test("crush is not among supported relationship questions or guesses", () => {
   assert.equal(pool.ids.some((id) => id.includes("crush")), false);
   assert.equal(PERSONAL_QUESTIONS.length, 11);
   assert.equal(PERSONAL_RELATIONS.length, 13);
+});
+
+test("a firm no to knowing the user closes every family and friend question", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "knows_you", "no");
+  for (const question of PERSONAL_QUESTIONS.slice(1)) {
+    assert.equal(questionBlocked(state, question.id), true, question.id);
+  }
+  for (let i = 0; i < 12; i++) {
+    const decision = decide(state);
+    if (decision.type !== "ask") break;
+    assert.ok(!decision.qid.startsWith("your_"), decision.qid);
+    answer(state, decision.qid, "unknown");
+  }
+});
+
+test("family no blocks siblings and family yes blocks unrelated partner questions", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "knows_you", "yes");
+  answer(state, "your_family", "no");
+  for (const id of ["your_parent", "your_sibling", "your_spouse", "your_child", "your_baby"]) {
+    assert.equal(questionBlocked(state, id), true, id);
+  }
+  assert.equal(questionBlocked(state, "your_partner"), false);
 });

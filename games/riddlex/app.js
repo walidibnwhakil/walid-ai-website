@@ -1,5 +1,5 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-39";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-41";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
@@ -309,7 +309,9 @@ async function step() {
     ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
     : null;
   let decision = decide(state);
-  if (decision.type === "guess" && pending) {
+  // Both a guess and a defeat must wait for relevant country shards.
+  // Otherwise an early, partial casebook can produce a spurious result.
+  if ((decision.type === "guess" || decision.type === "defeat") && pending) {
     await pending;
     if (loadToken !== session || state !== playingState) return;
     decision = decide(state);
@@ -386,11 +388,17 @@ async function onWrong() {
 
 async function onRetry() {
   if (mode !== "wrong") return;
+  const session = loadToken;
+  const previousState = state;
+  const rejectedGuess = guessIndex;
   mode = "retry";
   showOnly("none");
   scene.setMood("happy");
   await scene.playRetry();
-  rejectIndex(state, guessIndex);
+  // A new game or a menu switch during the animation must never modify
+  // another round. Keep every answer from the original round on a retry.
+  if (mode !== "retry" || session !== loadToken || state !== previousState) return;
+  rejectIndex(previousState, rejectedGuess);
   guessIndex = -1;
   $("credit").textContent = "";
   if (state.guesses >= 4 || state.answers.length >= 72) {

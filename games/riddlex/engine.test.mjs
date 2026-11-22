@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute } from "./engine.js";
+import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, guessMatchesAnswers, questionBlocked, rejectIndex, recompute } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 
@@ -369,7 +369,10 @@ test("parent nos block role questions, and a country yes implies its continent",
   const before = open();
   answer(before, "male", "yes");
   answer(before, "alive", "yes");
-  assert.equal(questionBlocked(before, "batsman"), false);
+  assert.equal(questionBlocked(before, "batsman"), true, "a sports role needs an affirmed sport");
+  const confirmedCricket = open("yes", "cricketer");
+  assert.equal(questionBlocked(confirmedCricket, "batsman"), false);
+  assert.equal(questionBlocked(confirmedCricket, "does_bowl"), false);
   answer(before, "cricketer", "probably_not");
   for (const id of CRICKET_ROLES) assert.equal(questionBlocked(before, id), true, id);
   for (let n = 0; n < 8; n++) {
@@ -713,4 +716,54 @@ test("politics augmentation survives spare array capacity after appending privat
     "test requires spare allocation capacity");
   assert.doesNotThrow(() => createState(combined, { category: "character" }),
     "political augmentation must not copy spare buffer capacity");
+});
+
+test("Bangladeshi answers survive a rejected guess and cannot reveal a US star", () => {
+  const qs = [
+    ["real", "kind"], ["knows_you", "personal"], ["from_bd", "country"],
+    ["from_us", "country"], ["actor", "job"], ["male", "person"],
+    ["alive", "life"], ["politician", "job"], ["cricketer", "job"],
+    ["does_bowl", "job"],
+  ].map(([id, group]) => ({ id, group, en: id, bn: id }));
+  const pool = poolFromEntries(qs, [
+    entry("brad", 65535, ["real", "from_us", "actor", "male", "alive"], {
+      no: ["knows_you", "cricketer", "politician"],
+    }),
+    entry("bangladeshi-1", 200, ["real", "from_bd", "actor", "male", "alive"], {
+      no: ["from_us", "cricketer", "politician"],
+    }),
+    entry("bangladeshi-2", 180, ["real", "from_bd", "actor", "male", "alive"], {
+      no: ["from_us", "cricketer", "politician"],
+    }),
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [id, value] of [
+    ["real", "yes"], ["knows_you", "no"], ["actor", "yes"], ["from_bd", "yes"],
+  ]) answer(state, id, value);
+
+  assert.equal(guessMatchesAnswers(state, 0), false, "a missing Bangladesh bit is not positive proof");
+  assert.equal(guessMatchesAnswers(state, 1), true);
+  assert.equal(guessMatchesAnswers(state, 2), true);
+  const first = decide(state);
+  if (first.type === "guess") {
+    assert.notEqual(first.index, 0, "Brad Pitt cannot be proposed as Bangladeshi");
+    rejectIndex(state, first.index);
+    assert.deepEqual(state.answers.map((row) => [row.qid, row.value]), [
+      ["real", "yes"], ["knows_you", "no"], ["actor", "yes"], ["from_bd", "yes"],
+    ]);
+  } else {
+    rejectIndex(state, 1);
+  }
+  for (let i = 0; i < 10; i++) {
+    const next = decide(state);
+    if (next.type === "guess") {
+      assert.notEqual(next.index, 0, "country must still hold after Try Again");
+      assert.equal(guessMatchesAnswers(state, next.index), true);
+      break;
+    }
+    if (next.type !== "ask") break;
+    assert.notEqual(next.qid, "does_bowl", "batting requires an affirmative cricket answer");
+    answer(state, next.qid, "unknown");
+  }
 });

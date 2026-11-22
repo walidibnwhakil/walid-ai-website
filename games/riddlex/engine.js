@@ -9,8 +9,6 @@ const politicsUrl = new URL(
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
-import { ACTOR_PROOFS, ACTOR_PROOF_FACTS, ACTOR_PROOF_IDS } from "./actor-proof.js";
-import { WRITER_PROOFS, WRITER_PROOF_FACTS, WRITER_PROOF_IDS } from "./writer-proof.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -143,8 +141,6 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
-  if (ACTOR_PROOF_IDS.has(id)) return ACTOR_PROOF_FACTS[pool.ids[index]]?.[id] || 0;
-  if (WRITER_PROOF_IDS.has(id)) return WRITER_PROOF_FACTS[pool.ids[index]]?.[id] || 0;
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   const members = id && REGIONS[id];
@@ -207,7 +203,6 @@ export function createState(pool, options = {}) {
     rejected: new Set(),
     guesses: 0,
     sinceGuess: 0,
-    pendingVerification: null,
     opening: options.opening || null,
     category: options.category || null,
     weights: new Float64Array(pool.count),
@@ -315,8 +310,6 @@ export function recompute(state) {
   const n = pool.count;
   const logW = new Float64Array(n);
   const conflicted = conflictedFamilies(answers);
-  const disprovenIds = new Set(answers.filter((row) =>
-    row.value === "no" && row.verifiedCandidateId).map((row) => row.verifiedCandidateId));
   const positive = (qid) => answers.some((entry) => entry.qid === qid &&
     (entry.value === "yes" || entry.value === "probably"));
   const localActor = positive("from_bd") && positive("actor");
@@ -325,8 +318,7 @@ export function recompute(state) {
     row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
-    if (rejected.has(i) || disprovenIds.has(pool.ids[i]) ||
-        pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
+    if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
@@ -361,14 +353,6 @@ export function recompute(state) {
   const weights = state.weights;
   const alive = [];
   let sum = 0;
-  // If every entry was explicitly excluded, max is -Infinity. Subtracting
-  // it from itself yields NaN, which previously resurrected every excluded
-  // entry as a fake "alive" candidate with NaN probabilities.
-  if (max === -Infinity) {
-    weights.fill(0);
-    state.alive = [];
-    return state;
-  }
   const floor = max - 14;
   for (let i = 0; i < n; i++) {
     if (logW[i] < floor) {
@@ -387,30 +371,6 @@ export function recompute(state) {
   return state;
 }
 
-// Questions and candidates remain available even when a particular person
-// has no documented film/book facts. Only a candidate with sourced proof gets
-// extra, optional final confirmation prompts.
-function fullPublicGame(state) {
-  return state.category === "character" && state.pool.questions.length >= 60 &&
-    said(state, "real", ["yes", "probably"]) &&
-    !said(state, "knows_you", ["yes", "probably"]);
-}
-
-function candidateContradicted(state, index) {
-  for (const row of state.answers) {
-    const bit = factBit(state.pool, index, row.qi);
-    // Verified film/book participation is affirmative evidence. If the
-    // player firmly denies it, that particular name cannot be the answer.
-    if ((ACTOR_PROOF_IDS.has(row.qid) || WRITER_PROOF_IDS.has(row.qid)) &&
-        row.value === "no" && bit === 2) return true;
-    // A known foreign nationality cannot override the player's confirmed
-    // country, even if the candidate happens to be very famous.
-    if (COUNTRIES.includes(row.qid) && row.value === "yes" && bit === 1)
-      return true;
-  }
-  return false;
-}
-
 function topTwo(state) {
   let best = -1;
   let second = -1;
@@ -419,7 +379,6 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
-    if (candidateContradicted(state, i)) continue;
     const w = weights[i];
     if (w > bestP) {
       second = best;
@@ -442,8 +401,7 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  if (bestP >= 0.8 && ratio >= 8 && !fullPublicGame(state)) return 0;
-  if (fullPublicGame(state)) return ratio < 2.5 ? 6 : 4;
+  if (bestP >= 0.8 && ratio >= 8) return 0;
   if (ratio < 2.5) return 6;
   return 4;
 }
@@ -455,18 +413,6 @@ export function shouldGuess(state) {
   if (!(bestP > 0)) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
-  // A negative answer to a candidate-specific verification rules out that
-  // hypothesis, but is not permission to immediately blurt out another name.
-  // Ask at least two new, distinguishable questions about alternatives.
-  const lastDisproof = state.answers.findLastIndex((row) =>
-    row.value === "no" && !!row.verifiedCandidateId);
-  if (lastDisproof >= 0 && state.answers.length - lastDisproof - 1 < 2)
-    return false;
-  // No guessed celebrity after four yes/no answers: the playable ranking stays
-  // unchanged, but an identity still needs a useful conversation.
-  // Published character/animal/object pools are much larger than synthetic
-  // test fixtures. On the real game, NO name can appear before 12 answers.
-  if (state.pool.count >= 100 && asked < 12) return false;
   if (asked >= 72) return true;
   const personal = state.answers.some((row) => row.qid === "knows_you" &&
     (row.value === "yes" || row.value === "probably"));
@@ -985,11 +931,7 @@ function firstAllowedQuestion(state) {
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if ((question.id === "fictional" && said(state, "real", ["yes", "probably"])) ||
-        (question.id === "real" && said(state, "fictional", ["yes", "probably"])) ||
-        !allowedInCategory(state, question) ||
-        blockedQuestion(state, question, rows, cache) ||
-        !gated(state, question, rows)) continue;
+    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
     return question.id;
   }
   return null;
@@ -1090,18 +1032,13 @@ export function chooseQuestion(state) {
 export function answer(state, qid, value) {
   const qi = state.pool.qIndex.get(qid);
   if (qi == null || !ANSWERS.includes(value)) return state;
-  const pending = state.pendingVerification;
-  const verifiedCandidateId = pending?.qid === qid ? pending.candidateId : undefined;
-  state.answers.push({ qid, qi, value, ...(verifiedCandidateId ? { verifiedCandidateId } : {}) });
-  state.pendingVerification = null;
+  state.answers.push({ qid, qi, value });
   state.sinceGuess += 1;
   return recompute(state);
 }
 
 export function rewind(state) {
-  const removed = state.answers.pop();
-  state.pendingVerification = removed?.verifiedCandidateId
-    ? { qid: removed.qid, candidateId: removed.verifiedCandidateId } : null;
+  state.answers.pop();
   state.sinceGuess = Math.max(0, state.sinceGuess - 1);
   return recompute(state);
 }
@@ -1113,156 +1050,18 @@ export function rejectIndex(state, index) {
   return recompute(state);
 }
 
-// Verify the CURRENT leading hypothesis through the candidate's recorded
-// traits. This is shared by all 3M+ entries, not hardcoded to selected names.
-// Ask as many useful questions as the casebook supports, not exactly 2 or 3.
-// Unknown is NOT equivalent to No, and missing records never block a guess.
-const PUBLIC_VERIFY_GROUPS = new Set([
-  "job", "politics", "fiction", "animal", "object", "look", "size",
-]);
-
-function finalWorkQuestion(state, index) {
-  if (index < 0 || !fullPublicGame(state) ||
-      state.answers.length < 12 || state.category == null) return null;
-  const pool = state.pool;
-  const id = pool.ids[index];
-  const answered = new Map(state.answers.map((answer) => [answer.qid, answer.value]));
-  const actorProof = ACTOR_PROOFS[id] || [];
-  const writerProof = WRITER_PROOFS[id] || [];
-  const actor = said(state, "actor", ["yes", "probably"]);
-  const writer = said(state, "writer", ["yes", "probably"]);
-  const proofs = actor ? actorProof : writer ? writerProof : [];
-  const unknownProofs = proofs.filter((qid) => answered.get(qid) === "unknown").length;
-  const remaining = [];
-  const otherRows = state.alive.length > 3000
-    ? sampleAlive(state, 3000) : state.alive;
-
-  for (let qi = 0; qi < pool.questions.length; qi++) {
-    const question = pool.questions[qi];
-    const qid = question.id;
-    if (answered.has(qid) || factBit(pool, index, qi) !== 2) continue;
-    const sourced = proofs.includes(qid);
-    if (sourced && (unknownProofs >= 2 || !said(state, "from_bd", ["yes"])))
-      continue;
-    if (!sourced) {
-      if (!PUBLIC_VERIFY_GROUPS.has(question.group)) continue;
-      if (qid === "named" || qid === "in_government" || qid === "adult_ent")
-        continue;
-      if (!allowedInCategory(state, question) || questionContradicts(state, qid))
-        continue;
-      if (questionBlocked(state, qid) ||
-          !gated(state, question, otherRows)) continue;
-      // A generic role ("does he act?") is appropriate only while still
-      // establishing the profession, not as a supposed identity proof.
-      if (PRIMARY_JOBS.includes(qid) && confirmedJob(state)) continue;
-    }
-    // A question about the person's *known* work is most useful when it
-    // distinguishes the suspected person from remaining alternatives.
-    let different = 0;
-    let compared = 0;
-    for (const other of otherRows) {
-      if (other === index) continue;
-      const w = state.weights[other];
-      if (w <= 0) continue;
-      compared += w;
-      const bit = factBit(pool, other, qi);
-      if (bit === 1) different += w;
-      else if (bit === 0) different += w * 0.3;
-    }
-    const contrast = compared ? different / compared : 0;
-    if (!sourced && contrast < 0.08) continue;
-    const score = (sourced ? 3 : 0) + contrast +
-      (question.group === "politics" || question.group === "fiction" ? 0.15 : 0);
-    remaining.push({ qid, score });
-  }
-  remaining.sort((a, b) => b.score - a.score);
-  return remaining[0]?.qid || null;
-}
-
-function askVerification(state, index) {
-  const qid = finalWorkQuestion(state, index);
-  if (!qid) return null;
-  state.pendingVerification = { qid, candidateId: state.pool.ids[index] };
-  return { type: "ask", qid };
-}
-
-function sensibleFollowUp(state) {
-  if (!fullPublicGame(state)) return null;
-  const asked = new Set(state.answers.map((a) => a.qid));
-  // Ask genuinely new, accessible facts; never "is fictional?" after
-  // the player already confirmed that the person is real.
-  const sequence = ["male", "female", "alive", "from_bd",
-    "actor", "cricketer", "footballer", "writer", "singer", "scientist",
-    "business", "youtube", "director", "musician", "athlete"];
-  const haveGender = asked.has("male") || asked.has("female");
-  const haveLife = asked.has("alive") || asked.has("dead");
-  const yes = (qid) => said(state, qid, ["yes", "probably"]);
-  for (const qid of sequence) {
-    if (asked.has(qid) || !state.pool.qIndex.has(qid)) continue;
-    if (haveGender && (qid === "male" || qid === "female")) continue;
-    if (haveLife && qid === "alive") continue;
-    if (qid === "from_bd" && COUNTRIES.some((country) => asked.has(country))) continue;
-    if (qid === "athlete" && (yes("footballer") || yes("cricketer"))) continue;
-    const question = state.pool.questions[state.pool.qIndex.get(qid)];
-    if (!allowedInCategory(state, question) || questionBlocked(state, qid)) continue;
-    if (unrelatedJob(state, qid)) continue;
-    return qid;
-  }
-  return null;
-}
-
 export function decide(state) {
   recompute(state);
-  // Only an explicit contradiction between the two broad character kinds
-  // warrants category correction. Ordinary "No" answers to occupation,
-  // politics and relationships must never trigger this state.
-  if (state.category === "character" &&
-      said(state, "real", ["no"]) && said(state, "fictional", ["no"]))
-    return { type: "reconsider" };
-  if (!state.alive.length) {
-    // Shards load progressively. A temporary empty shortlist is not proof
-    // that the person is unknowable or that the player's answers are wrong.
-    // Continue with plain, answerable facts while more casebook data arrives.
-    if (state.pool.count >= 100 && state.answers.length < 24) {
-      const next = sensibleFollowUp(state);
-      if (next) return { type: "ask", qid: next };
-    }
-    return { type: "defeat" };
-  }
+  if (!state.alive.length) return { type: "defeat" };
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
-  // A verified career fact can disprove a specific hypothesis. Immediately
-  // switch to checking the new leading person instead of persisting with the
-  // discredited name or asking unrelated generic questions.
-  const last = state.answers.at(-1);
-  const disproved = last?.value === "no" && (last.verifiedCandidateId ||
-    ACTOR_PROOF_IDS.has(last.qid) || WRITER_PROOF_IDS.has(last.qid));
-  if (disproved && fullPublicGame(state)) {
-    const next = askVerification(state, best);
-    if (next) return next;
-  }
-  if (!waiting && shouldGuess(state)) {
-    const next = askVerification(state, best);
-    return next || { type: "guess", index: best };
-  }
+  if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
   let qid = chooseQuestion(state);
-  if (!qid && (waiting || fullPublicGame(state))) {
-    qid = sensibleFollowUp(state) || firstAllowedQuestion(state);
-  }
+  if (!qid && waiting) qid = firstAllowedQuestion(state);
   if (!qid) {
-    if (best >= 0 && bestP > 0 &&
-        (state.pool.count < 100 || shouldGuess(state))) {
-      const next = askVerification(state, best);
-      return next || { type: "guess", index: best };
-    }
-    // A large knowledge pool without a winning candidate can still contain
-    // relevant unanswered distinctions. Never force an early give-up.
-    if (state.pool.count >= 100 && state.answers.length < 24) {
-      qid = sensibleFollowUp(state) || firstAllowedQuestion(state);
-      if (qid) return { type: "ask", qid };
-    }
+    if (best >= 0 && bestP > 0) return { type: "guess", index: best };
     return { type: "defeat" };
   }
   return { type: "ask", qid };

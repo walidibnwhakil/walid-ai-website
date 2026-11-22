@@ -1,7 +1,7 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-47";
-import { UI, guessFont } from "./i18n.js?v=riddlex-44";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-46";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-39";
+import { UI, guessFont } from "./i18n.js?v=riddlex-40";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
@@ -85,7 +85,7 @@ function showMenu() {
 }
 
 function gameInProgress() {
-  return mode === "ask" || mode === "reconsider" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
+  return mode === "ask" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
 }
 
 const LOAD_MS = 15000;
@@ -94,7 +94,7 @@ function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "riddlex-46";
+const BUILD = "akinator-35";
 
 function withTimeout(promise, ms) {
   let timer;
@@ -197,8 +197,7 @@ function showOnly(which) {
   $("again").hidden = which !== "solved";
   learnForm.hidden = which !== "learn";
   $("learn-again").hidden = true;
-  $("back").hidden = !(state && state.answers.length &&
-    (which === "ask" || which === "guess" || (which === "pick" && mode === "reconsider")));
+  $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
   $("credit").hidden = which === "pick" || which === "ask";
   scheduleUnderBubble();
 }
@@ -310,10 +309,7 @@ async function step() {
     ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
     : null;
   let decision = decide(state);
-  // Both a guess and a defeat must wait for relevant country shards.
-  // Otherwise an early, partial casebook can produce a spurious result.
-  if ((decision.type === "guess" || decision.type === "defeat" ||
-       decision.type === "reconsider") && pending) {
+  if (decision.type === "guess" && pending) {
     await pending;
     if (loadToken !== session || state !== playingState) return;
     decision = decide(state);
@@ -334,18 +330,6 @@ async function step() {
   }
   if (decision.type === "guess") {
     await beginGuess(decision.index);
-    return;
-  }
-  if (decision.type === "reconsider") {
-    // Neither surrender nor a blind guess is appropriate after a few
-    // negative or contradictory answers. Keep Back enabled, and let the
-    // player revise their answer or explicitly change the category.
-    mode = "reconsider";
-    currentQ = null;
-    setStatus(text().reconsider);
-    $("progress").textContent = "";
-    scene.setMood("thinking");
-    showOnly("pick");
     return;
   }
   await beginDefeat();
@@ -402,17 +386,11 @@ async function onWrong() {
 
 async function onRetry() {
   if (mode !== "wrong") return;
-  const session = loadToken;
-  const previousState = state;
-  const rejectedGuess = guessIndex;
   mode = "retry";
   showOnly("none");
   scene.setMood("happy");
   await scene.playRetry();
-  // A new game or a menu switch during the animation must never modify
-  // another round. Keep every answer from the original round on a retry.
-  if (mode !== "retry" || session !== loadToken || state !== previousState) return;
-  rejectIndex(previousState, rejectedGuess);
+  rejectIndex(state, guessIndex);
   guessIndex = -1;
   $("credit").textContent = "";
   if (state.guesses >= 4 || state.answers.length >= 72) {
@@ -529,8 +507,8 @@ function setLanguage(next) {
     const question = pool.questions[pool.qIndex.get(currentQ)];
     setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
     $("progress").textContent = text().progress(state.answers.length + 1);
-  } else if (mode === "pick" || mode === "reconsider") {
-    setStatus(mode === "reconsider" ? text().reconsider : text().pick);
+  } else if (mode === "pick") {
+    setStatus(text().pick);
     $("progress").textContent = "";
   } else if (guessIndex >= 0 && pool && ["reveal", "guess", "wrong", "solved"].includes(mode)) {
     const entity = entityView(pool, guessIndex);

@@ -506,8 +506,7 @@ test("truthful answers about Lionel Messi guess him, not Sergio Agüero", () => 
     answer(state, qid, value);
   }
   assert.equal(guessed, "Q615", asked.join(","));
-  assert.ok(asked.length >= 12 && asked.length <= 28,
-    "a real-person guess requires at least twelve useful questions; additional verification is welcome: " + asked.join(","));
+  assert.ok(asked.length <= 12, asked.join(","));
   const regions = new Set(["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"]);
   let run = 0;
   for (const qid of asked) {

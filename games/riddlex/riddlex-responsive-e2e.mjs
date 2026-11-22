@@ -99,55 +99,11 @@ try {
       assert.ok(art.goldenFrame > 50, "gold bottom frame must be preserved");
     }
     if (shotFolder) await page.screenshot({ path: join(shotFolder, "menu-" + orient + ".png") });
-    if (orient === "landscape") {
-      // The reported desktop bug appears on wide 16:8 displays, not only
-      // conventional 16:9 screenshots: the frame used to leave brown pillars.
-      await page.setViewportSize({ width: 1650, height: 820 });
-      const artLayout = await page.evaluate(() => {
-        const stage = document.querySelector(".menu-stage").getBoundingClientRect();
-        const frame = document.querySelector(".menu-frame").getBoundingClientRect();
-        const art = document.querySelector(".menu-card");
-        const play = document.getElementById("play").getBoundingClientRect();
-        return {
-          stageWidth: stage.width, frameWidth: frame.width,
-          frameLeft: frame.left - stage.left,
-          frameRight: stage.right - frame.right,
-          imageFit: getComputedStyle(art).objectFit,
-          playRight: play.right, playBottom: play.bottom,
-        };
-      });
-      assert.ok(Math.abs(artLayout.stageWidth - artLayout.frameWidth) <= 2,
-        "desktop menu should cover the scene, not be a centered poster: " +
-          JSON.stringify(artLayout));
-      assert.ok(Math.abs(artLayout.frameLeft) <= 2 &&
-        Math.abs(artLayout.frameRight) <= 2, "no wide brown side pillars");
-      assert.equal(artLayout.imageFit, "cover", "the original art fills the window");
-      assert.ok(artLayout.playRight <= 1651 && artLayout.playBottom <= 821,
-        "Play Now must remain inside wide menu");
-      if (shotFolder) await page.screenshot({
-        path: join(shotFolder, "menu-wide-desktop.png"),
-      });
-      await page.setViewportSize({ width, height });
-    }
 
     await page.click("#play");
     assert.equal(await page.locator("#game .lang-switch").isVisible(), true,
       "language option must be available after Play Now");
     await page.waitForFunction(() => !document.getElementById("categories").hidden);
-    const categoryLayout = await page.evaluate(() => {
-      const group = document.querySelector(".cat-row").getBoundingClientRect();
-      return {
-        groupWidth: group.width,
-        buttonWidths: [...document.querySelectorAll(".cat-row button")]
-          .map((button) => button.getBoundingClientRect().width),
-      };
-    });
-    if (orient === "landscape") {
-      assert.ok(categoryLayout.groupWidth <= 550,
-        "desktop category picker must not span most of the screen: " + categoryLayout.groupWidth);
-      assert.ok(categoryLayout.buttonWidths.every((w) => w >= 44 && w <= 190),
-        "Character, Object and Animal must be compact buttons: " + categoryLayout.buttonWidths);
-    }
     await page.click('[data-cat="animal"]');
     await page.waitForFunction(() =>
       !document.getElementById("answers").hidden
@@ -168,27 +124,6 @@ try {
       assert.ok(rect.width >= 44 && rect.height >= 44, "tiny answer control");
       assert.ok(rect.x >= -2 && rect.right <= width + 2, "answer outside screen horizontally");
       assert.ok(rect.y >= -2 && rect.bottom <= height + 2, "answer outside screen vertically");
-    }
-    if (orient === "landscape") {
-      const deskControls = await page.evaluate(() => {
-        const stage = document.querySelector(".stage-wrap").getBoundingClientRect();
-        const answers = document.getElementById("answers").getBoundingClientRect();
-        const yes = document.getElementById("answer-yes").getBoundingClientRect();
-        const no = document.getElementById("answer-no").getBoundingClientRect();
-        const bubble = document.getElementById("speech").getBoundingClientRect();
-        return {
-          deskRatio: (answers.top - stage.top) / stage.height,
-          yesWidth: yes.width,
-          noWidth: no.width,
-          bubbleWidth: bubble.width,
-        };
-      });
-      assert.ok(deskControls.deskRatio >= 0.45 && deskControls.deskRatio <= 0.83,
-        "desktop answers should float on the wooden desk, not hug the screen bottom");
-      assert.ok(deskControls.yesWidth < 180 && deskControls.noWidth < 180,
-        "Yes/No buttons must be sized to their labels");
-      assert.ok(deskControls.bubbleWidth <= 460,
-        "short question bubbles must not stretch across the stage");
     }
     await page.click("#answer-yes");
     await page.waitForFunction(() =>
@@ -274,152 +209,6 @@ try {
       if (shotFolder) await page.screenshot({ path: join(shotFolder, "personal-question-portrait.png") });
       console.log("RIDDLEX_PERSONAL_QUESTIONS_PASS");
     }
-    // Use a fresh browser page to reproduce the two-No path independently
-    // of the animation and photo tests above. This mirrors a real new visit
-    // and also prevents a prior scene/worker lifecycle from masking the test.
-    const negativePage = await browser.newPage({
-      viewport: { width, height }, deviceScaleFactor: 1,
-    });
-    try {
-      negativePage.on("pageerror", (error) => errors.push(error.message));
-      await negativePage.route("**/*", (route) => {
-        if (new URL(route.request().url()).origin === origin) return route.continue();
-        return route.abort();
-      });
-      await negativePage.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
-      // The deferred module can finish after the load event. Don't try
-      // interacting before its Play/Answer event handlers are installed.
-      await negativePage.waitForFunction(() =>
-        typeof window.__riddlex?.ready === "function",
-        null, { timeout: 30000 });
-      await negativePage.evaluate(() => window.__riddlex.ready());
-      await negativePage.click("#play");
-      await negativePage.waitForFunction(() =>
-        !document.getElementById("categories").hidden, null, { timeout: 20000 });
-      await negativePage.click('[data-cat="character"]');
-      try {
-        await negativePage.waitForFunction(() =>
-          !document.getElementById("answers").hidden &&
-          document.getElementById("progress").textContent.includes("Question 1"),
-          null, { timeout: 30000 });
-      } catch (error) {
-        const details = await negativePage.evaluate(() => ({
-          status: document.getElementById("status")?.textContent,
-          categoryVisible: !document.getElementById("categories")?.hidden,
-          answerVisible: !document.getElementById("answers")?.hidden,
-          retryVisible: !document.getElementById("load-retry")?.hidden,
-          state: window.__riddlex?.state?.(),
-          trace: window.__riddlexLoadTrace || [],
-        }));
-        throw new Error("Negative-case setup failed: " + JSON.stringify(details) +
-          " :: " + error.message);
-      }
-      await negativePage.click("#answer-no"); // Not a real person
-      await negativePage.waitForFunction(() =>
-        !document.getElementById("answers").hidden &&
-        document.getElementById("progress").textContent.includes("Question 2"),
-        null, { timeout: 30000 });
-      await negativePage.click("#answer-no"); // Nor a fictional character
-      await negativePage.waitForFunction(() =>
-        !document.getElementById("categories").hidden &&
-        !document.getElementById("back").hidden &&
-        /clues|উত্তরগুলোর/.test(document.getElementById("status").textContent),
-        null, { timeout: 30000 });
-      assert.equal(await negativePage.locator("#learn").isVisible(), false,
-        "No answers must not open the give-up/name/photo form");
-      if (shotFolder) await negativePage.screenshot({
-        path: join(shotFolder, "recover-negative-" + orient + ".png"),
-      });
-      await negativePage.click("#back");
-      await negativePage.waitForFunction(() =>
-        !document.getElementById("answers").hidden &&
-        document.getElementById("progress").textContent.includes("Question 2"),
-        null, { timeout: 12000 });
-      await negativePage.click("#answer-yes"); // Correct fictional category
-      await negativePage.waitForFunction(() =>
-        !document.getElementById("answers").hidden &&
-        document.getElementById("progress").textContent.includes("Question 3"),
-        null, { timeout: 30000 });
-      console.log("RIDDLEX_NEGATIVE_RECOVERY_PASS", orient);
-    } finally {
-      await negativePage.close();
-    }
-
-    // Play a truthful Bangladesh real-person path on the ACTUAL browser
-    // casebook. The previous user-reported failure wrongly showed a category
-    // restart after Real Yes / Knows You No / Politician No / Bangladesh Yes.
-    // This covers progressive shard loading and UI transitions, unlike a
-    // detached engine-only test.
-    const realPage = await browser.newPage({
-      viewport: { width, height }, deviceScaleFactor: 1,
-    });
-    try {
-      realPage.on("pageerror", (error) => errors.push(error.message));
-      await realPage.route("**/*", (route) => {
-        if (new URL(route.request().url()).origin === origin) return route.continue();
-        return route.abort();
-      });
-      await realPage.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
-      await realPage.waitForFunction(() =>
-        typeof window.__riddlex?.ready === "function", null, { timeout: 25000 });
-      await realPage.evaluate(() => window.__riddlex.ready());
-      await realPage.click("#play");
-      await realPage.waitForFunction(() =>
-        !document.getElementById("categories").hidden, null, { timeout: 25000 });
-      await realPage.click('[data-cat="character"]');
-      const history = [];
-      for (let number = 0; number < 11; number++) {
-        try {
-          await realPage.waitForFunction((expected) => {
-            const s = window.__riddlex?.state?.();
-            return s?.mode === "ask" && !!s.question &&
-              s.answers.length === expected;
-          }, number, { timeout: 25000 });
-        } catch (error) {
-          const snapshot = await realPage.evaluate(() => ({
-            session: window.__riddlex?.state?.(),
-            shards: window.__riddlex?.loaded?.()?.filter((x) => x.includes("r-bd-")),
-            trace: window.__riddlexLoadTrace || [],
-            status: document.getElementById("status")?.textContent,
-          }));
-          throw new Error("Truthful Bangladesh path stopped at question " +
-            (number + 1) + " after " + JSON.stringify(history) +
-            " / " + JSON.stringify(snapshot) + " / " + error.message);
-        }
-        const qid = await realPage.evaluate(() => window.__riddlex.state().question);
-        const answers = {
-          real: "yes", knows_you: "no", politician: "no", from_bd: "yes",
-          male: "yes", female: "no", alive: "yes", dead: "no",
-          actor: "yes", cricketer: "no", footballer: "no", writer: "no",
-          singer: "no", scientist: "no", business: "no",
-          screen_star_1990s: "yes", actor_film_dui_duari: "yes",
-          actor_film_daruchini_dwip: "yes", actor_air_force: "yes",
-        };
-        const response = answers[qid] || (
-          qid.startsWith("from_") ? "no" : "unknown");
-        history.push([qid, response]);
-        await realPage.click("#answer-" + (response === "unknown" ? "unknown" : response));
-      }
-      await realPage.waitForFunction(() => {
-        const current = window.__riddlex?.state?.();
-        return current?.mode === "ask" &&
-          current.answers.length === 11 && !!current.question;
-      }, null, { timeout: 25000 });
-      const gameState = await realPage.evaluate(() => window.__riddlex.state());
-      assert.equal(gameState.answers.length, 11, JSON.stringify(history));
-      assert.equal(gameState.mode, "ask",
-        "ordinary real-person clues must never trigger category reset: " +
-          JSON.stringify({ history, gameState }));
-      assert.ok(gameState.answers.includes("from_bd"),
-        "detective should establish Bangladeshi identity early: " + JSON.stringify(history));
-      if (shotFolder) await realPage.screenshot({
-        path: join(shotFolder, "bangladesh-12th-question-" + orient + ".png"),
-      });
-      console.log("RIDDLEX_BANGLADESH_CONTINUATION_PASS", orient, JSON.stringify(history));
-    } finally {
-      await realPage.close();
-    }
-
     assert.deepEqual(errors, [], "uncaught browser errors");
     console.log("RIDDLEX_GAMEPLAY_PASS", width, height, orient);
     await page.close();

@@ -14,7 +14,6 @@ export const SCREEN_STAR_1990S = Object.freeze({
   Q13059781: 2,  // Shabnaz, 1991
   Q6926134: 2,   // Moushumi, 1993
   Q7322180: 2,   // Riaz, recognition in late 1990s
-  Q21066842: 2,  // Amin Khan, recognition through 1996 film Soitan Manush (Daily Star)
   Q52149647: 1,  // Puja Cherry, became a lead film star in 2018
 });
 

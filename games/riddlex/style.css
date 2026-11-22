@@ -29,22 +29,11 @@ button { cursor: pointer; }
   object-fit: cover; transform: scale(1.08);
 }
 .menu-frame {
-  /* Full-bleed desktop artwork: no centered poster and brown side pillars. */
   position: relative; z-index: 1;
-  width: 100%; height: 100%; overflow: hidden;
-  aspect-ratio: auto;
+  width: min(100cqw, calc(100cqh * 1672 / 941));
+  aspect-ratio: 1672 / 941;
 }
-.menu-card {
-  display: block; width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
-}
-/* The full-size menu art is 1672×941. On extra-wide screens it is cropped
-   vertically, so pin the animated cat and Play button to the picture rather
-   than to the cropped viewport. */
-@media (min-aspect-ratio: 1672/941) {
-  .menu-cat { top: calc(50% + 9.57cqw); height: 5.40cqw; }
-  #play { top: calc(50% + 11.26cqw); }
-}
+.menu-card { display: block; width: 100%; height: 100%; object-fit: contain; }
 .menu-cat {
   position: absolute; z-index: 2; pointer-events: none;
   left: 32.6%; top: 67%; width: 8.1%; height: 9.6%;
@@ -107,8 +96,7 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   position: absolute; z-index: 5; display: flex; align-items: stretch;
   left: calc(var(--bubble-left, 0.63) * 100%);
   top: calc(var(--bubble-top, 0.04) * 100%);
-  width: max-content;
-  max-width: min(460px, calc(100% - var(--bubble-left, 0.63) * 100% - 16px));
+  width: min(420px, calc(100% - var(--bubble-left, 0.63) * 100% - 16px));
   margin: 0; padding: 0; border: 0; background: transparent;
   filter: drop-shadow(0 8px 14px rgba(32, 18, 9, 0.28));
   color: #1a1f26;
@@ -119,7 +107,7 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   border-radius: 16px 0 0 16px;
 }
 #status {
-  margin: 0; flex: 0 1 auto; padding: 10px 14px;
+  margin: 0; flex: 1; padding: 10px 14px;
   background: #f7f9fc; color: #1a1f26;
   border-radius: 20px; font-size: 22px; line-height: 1.25;
 }
@@ -181,68 +169,7 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   border: 1px solid #e6bd68; background: #24150dcc; color: #ffe6a4;
 }
 @media (min-aspect-ratio: 4/5) {
-  /* The initial category picker must never become three full-screen bars.
-     Each choice is a compact, readable button centered on the wooden desk. */
-  #categories {
-    left: 50%; right: auto; width: max-content;
-    max-width: calc(100% - 36px);
-    transform: translateX(-50%);
-  }
-  .cat-row {
-    display: flex; flex-wrap: wrap; align-items: center;
-    justify-content: center; gap: 12px;
-  }
-  .cat-row button {
-    flex: 0 0 auto; width: auto; min-width: 134px;
-    min-height: 46px; padding: 9px 20px;
-    font-size: 17px; line-height: 1.15;
-  }
-  /* Desktop: controls rest on the wooden desk instead of along the screen edge.
-     Each button sizes to its label rather than stretching across the viewport. */
-  #answers {
-    left: 50%; right: auto; bottom: auto;
-    top: calc(var(--desk-y, 0.62) * 100% + 8px);
-    transform: translateX(-50%);
-    width: max-content; max-width: calc(100% - 72px);
-    display: flex; justify-content: center; align-items: center;
-    flex-wrap: wrap; column-gap: 12px; row-gap: 10px;
-  }
-  #answers button {
-    min-width: 72px; min-height: 48px; width: auto;
-    padding: 10px 20px; border-radius: 11px;
-  }
-  .stage-wrap:has(#back:not([hidden])) #answers {
-    left: 50%;
-  }
-  /* Teaching the detective is an occasional secondary action, not a full
-     width form competing visually with the game art. */
-  #hud:has(#learn:not([hidden]), #learn-again:not([hidden])) {
-    top: calc(var(--desk-y, 0.62) * 100% + 6px);
-    bottom: auto; left: 50%; right: auto;
-    transform: translateX(-50%);
-    width: min(540px, calc(100% - 40px));
-    max-height: calc(100% - var(--desk-y, 0.62) * 100% - 14px);
-    overflow: auto;
-  }
-  #learn {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px; padding: 14px 16px;
-    margin: 0; border: 1px solid #a47b48;
-    background: rgba(35, 20, 12, .91);
-    box-shadow: 0 8px 22px rgba(0,0,0,.22);
-  }
-  #learn label { gap: 4px; }
-  #learn input { min-height: 40px; }
-  #learn input[type="file"] {
-    padding: 7px 8px; font-size: 13px;
-    color: #fff4d9; background: rgba(255, 246, 228, .08);
-  }
-  #learn-save {
-    justify-self: center;
-    min-width: 200px; min-height: 44px;
-    padding: 8px 20px;
-  }
-  #learn-note { margin: 0; }
+  .stage-wrap:has(#back:not([hidden])) #answers { left: 60px; }
 }
 html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-weight: 400; }
 #learn {
@@ -363,8 +290,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   }
 }
 @media (max-width: 520px) {
-  #learn { grid-template-columns: 1fr; padding: 10px; }
-  #learn input[type="file"] { font-size: 12px; }
+  #learn { grid-template-columns: 1fr; }
   #new { font-size: 13px; padding: 4px 8px; }
 }
 @media (prefers-reduced-motion: reduce) {

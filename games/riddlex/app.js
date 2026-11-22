@@ -1,7 +1,7 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-44";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-46";
 import { UI, guessFont } from "./i18n.js?v=riddlex-44";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-42";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-46";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
@@ -94,7 +94,7 @@ function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "akinator-35";
+const BUILD = "riddlex-46";
 
 function withTimeout(promise, ms) {
   let timer;

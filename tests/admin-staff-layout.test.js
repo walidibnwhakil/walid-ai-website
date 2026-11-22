@@ -1,15 +1,25 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+const original=fs.readFileSync('admin-staff.html','utf8');
+const portal=fs.readFileSync('admin.html','utf8');
+const ops=fs.readFileSync('admin-ops.js','utf8');
 
-const html=fs.readFileSync('admin.html','utf8');
-const js=fs.readFileSync('admin-ops.js','utf8');
-assert.match(html,/\.ops-desk-grid\{display:grid/);
-assert.match(html,/@media\(max-width:800px\)/);
-assert.match(html,/@media\(max-width:540px\)/);
-assert.match(html,/ops-history/);
-assert.match(html,/riddlex-pending/);
+// Never substitute the hand-crafted robot workstations with generic cards.
+assert.match(original,/Five desks\. One protected network\./);
+assert.match(original,/function robot\(color\)/);
+assert.match(original,/grid-template-rows:repeat\(3,minmax\(244px,auto\)\)/);
+assert.match(original,/min-height:732px/);
+assert.match(original,/\.manager\{grid-column:3\/5;grid-row:1\}/);
+assert.match(original,/\.it\{grid-column:2\/4;grid-row:2\}/);
+assert.match(original,/\.cyber\{grid-column:4\/6;grid-row:2\}/);
+assert.match(original,/\.cse\{grid-column:1\/3;grid-row:3\}/);
+assert.match(original,/\.admin\{grid-column:5\/7;grid-row:3\}/);
 for(const role of ['Manager','IT Technician','Cyber Security Engineer','CSE Engineer','Admin Staff'])
-  assert(js.includes(role),role);
-assert.match(js,/aria-pressed/);
-assert.match(js,/task\.result/);
-console.log('Unified staff portal has responsive desks, conversations and approvals.');
+  assert(original.includes(role),role);
+assert.match(original,/\.desk-grid\{height:auto;min-height:0/);
+assert.match(original,/id="selectedName"/);
+assert.match(original,/id="history"/);
+assert.match(portal,/id="preserved-staff-office"/);
+assert.match(portal,/data-src="\/admin-staff\.html"/);
+assert.match(ops,/originalOffice\.contentDocument/);
+console.log('Original five-desk SVG office preserved in unified portal.');

@@ -305,6 +305,10 @@ try {
         if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
         else if (q === "from_bd") a = "yes";
+        else if (policy === "shakib" && q !== "knows_you")
+          a = await page.evaluate(() =>
+            window.__riddlex.find("Q266104") >= 0
+              ? window.__riddlex.replyFor("Q266104") : "unknown");
         else if (q === "cricketer" || q === "does_bat" || q === "does_bowl") a = "no";
         else if (policy === "family" && q === "your_family") a = "yes";
         else if (policy === "family" && q === "your_parent") a = "yes";
@@ -312,10 +316,6 @@ try {
         else if (policy === "family" && q === "male") a = "no";
         else if (policy === "public" && ["politician","actor","singer","writer","footballer","scientist"].includes(q))
           a = "no";
-        else if (policy === "shakib" && q !== "knows_you")
-          a = await page.evaluate(() =>
-            window.__riddlex.find("Q266104") >= 0
-              ? window.__riddlex.replyFor("Q266104") : "unknown");
         if (q === "from_bd" && a === "yes") confirmedCountry = true;
         if (q === "knows_you" && a === "no") knowsNo = true;
         if (q === "cricketer" && a === "no") cricketNo = true;

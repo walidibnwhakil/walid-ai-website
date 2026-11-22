@@ -47,6 +47,7 @@
   function setSearchOpen(open, focus = false) {
     panel.hidden = !open;
     toggle.setAttribute("aria-expanded", String(open));
+    toggle.parentElement?.classList.toggle("is-open", open);
     toggle.setAttribute("aria-label", open ? "সার্চ বন্ধ করুন" : "সূরা খুঁজুন");
     toggle.title = open ? "সার্চ বন্ধ করুন" : "সূরা খুঁজুন";
     if (open) {

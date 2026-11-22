@@ -76,7 +76,7 @@ async function exercise(browser, width, height){
       {id:'daily-'+new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'}),
        kind:'daily_report',
        created_at:new Date(new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'})+'T00:06:00+06:00').toISOString(),
-       message:'আজকের অফিস রিপোর্ট: IT / Cyber / Admin / CSE প্রত্যেকে যাচাই করেছেন।',
+       message:'IT Department: ওয়েবসাইট ও ব্যাকএন্ড সচল।\nCyber Department: নিরাপত্তা পর্যালোচনা চলছে।\nAdmin: আজ Help inbox-এ কোনো মেসেজ পাওয়া যায়নি।\nEngineering Department: আজ কোনো recorded function error নেই।',
        daily_delegations:[
          {role:'monitor',instruction:'Daily website check',outcome:'Website and Backend HTTP 200',status:'ok'},
          {role:'security',instruction:'Daily security signals',outcome:'No proven hacking; limited evidence',status:'limited'},

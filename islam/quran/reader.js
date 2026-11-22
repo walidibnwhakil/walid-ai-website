@@ -438,3 +438,13 @@
   script.async = true;
   document.head.append(script);
 })();
+
+/* Load Quran-only auto-scroll independently of the source-text renderer. */
+(() => {
+  if (document.getElementById("walid-quran-autoscroll-script")) return;
+  const script = document.createElement("script");
+  script.id = "walid-quran-autoscroll-script";
+  script.src = "/islam/quran/auto-scroll.js?v=20261122";
+  script.async = true;
+  document.head.append(script);
+})();

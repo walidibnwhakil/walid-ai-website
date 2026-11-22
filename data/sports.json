@@ -1,41 +1,118 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-22T14:01:28.622250+00:00",
+  "updatedAt": "2026-11-22T21:31:53.000206+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Manchester City v Tottenham, Birmingham v Manchester United: WSL clockwatch – live",
-      "url": "https://www.theguardian.com/football/live/2026/nov/22/wsl-manchester-city-tottenham-birmingham-manchester-united-arsenal-west-ham-live",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-22T13:43:47+00:00",
+      "title": "Chaotic week, nightmare start and huge reality check for Pochettino",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cwd012903kvgo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T21:22:10+00:00",
       "category": "Sports"
     },
     {
-      "title": "Hull City v Brighton: Premier League – live",
-      "url": "https://www.theguardian.com/football/live/2026/nov/22/hull-city-v-brighton-premier-league-live",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-22T13:41:03+00:00",
+      "title": "Price wins Grand Slam to end major title wait",
+      "url": "https://www.bbc.co.uk/sport/darts/articles/cklye10j4z1yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T21:06:47+00:00",
       "category": "Sports"
     },
     {
-      "title": "England won't get carried away by All Blacks win",
+      "title": "Man Utd plotting Toney move - Monday's gossip",
+      "url": "https://www.bbc.co.uk/sport/football/articles/ck053nyl6399o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T21:04:15+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Alcaraz outplays Zverev for first ATP Finals triumph",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/c60evlendg0jo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T20:15:48+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "McBurnie stoppage-time double earns Hull win over 10-man Brighton",
+      "url": "https://www.bbc.co.uk/sport/football/videos/ck62pzzezqz2o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T19:59:38+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Ngumoha stars as Liverpool thrash 10-man Man Utd",
+      "url": "https://www.bbc.co.uk/sport/football/videos/c933g77knz00o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T19:59:35+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "European football: Barcelona roar back from two goals down to sink Villarreal",
+      "url": "https://www.theguardian.com/football/2026/nov/22/european-football-barcelona-villarreal-juventus-milan-inter",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T19:39:27+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "From conceding seven to Hull heroics - how Tzolakis recovered to defy Brighton",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm4gn7npqe8yo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T19:03:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Liverpool hand Pochettino nightmare Manchester United start after Yoro sees red",
+      "url": "https://www.theguardian.com/football/2026/nov/22/liverpool-manchester-united-premier-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T18:35:14+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Yoro sees red as Ngumoha shines - Liverpool v Man Utd player ratings",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c933gzxk66yyo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T18:28:51+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "The red card that changed Liverpool-Man Utd: correct call?",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cq7827p8emmxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T17:55:54+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "McBurnie’s added-time double snatches win for Hull to shock 10-man Brighton",
+      "url": "https://www.theguardian.com/football/2026/nov/22/hull-brighton-premier-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T16:10:48+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Blackburn earn derby draw for Mowbray and extend Burnley’s wait for home win",
+      "url": "https://www.theguardian.com/football/2026/nov/22/burnley-blackburn-championship-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T15:12:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Did beaten Wales still show they have come a long way?",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cjr4gn7yd9d5o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T15:07:06+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Manchester City’s WSL title bid hit by Spurs after Vinberg and Naz’s late double",
+      "url": "https://www.theguardian.com/football/2026/nov/22/manchester-city-tottenham-wsl-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T14:59:23+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England will not get carried away by beating All Blacks",
       "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ckr5gdpm1q5no?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-22T12:45:57+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Watford seek sixth manager in 18 months after sacking Dionisi",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cyvz6r4g1jqo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T12:00:45+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Bruno Fernandes reveals talks over new Manchester United contract are on hold",
-      "url": "https://www.theguardian.com/football/2026/nov/22/bruno-fernandes-reveals-talks-over-new-manchester-united-contract-are-on-hold",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-22T11:33:54+00:00",
       "category": "Sports"
     },
     {
@@ -46,38 +123,10 @@
       "category": "Sports"
     },
     {
-      "title": "Injured Jacks out of T20 Australia tour",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c8p3v1p45360o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T10:00:04+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Hamilton-Leclerc collision completely unacceptable, says Ferrari boss",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/c6j9mepj0j1go?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T09:07:15+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Robins ‘aims for the stars’ as Stoke dream of Premier League return",
       "url": "https://www.theguardian.com/football/2026/nov/22/mark-robins-stoke-birmingham-championship-premier-league-promotion",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-22T08:00:22+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "César Azpilicueta: ‘At Chelsea a draw was a catastrophe – if you can’t perform, you’re out’",
-      "url": "https://www.theguardian.com/football/2026/nov/22/cesar-azpilicueta-at-chelsea-a-draw-was-a-catastrophe-if-you-cant-perform-youre-out",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-22T08:00:21+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'He will see what Man Utd are made of' - Pulis on Pochettino's first game",
-      "url": "https://www.bbc.co.uk/sport/football/articles/ckqx5w58dgv7o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T06:21:55+00:00",
       "category": "Sports"
     },
     {
@@ -99,55 +148,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/21/david-raya-shoulder-injury-arsenal-newcastle-mikel-arteta",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-21T21:48:21+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Arsenal go six points clear after lively draw at Newcastle",
-      "url": "https://www.bbc.co.uk/sport/football/videos/cm702zzl66l6o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T19:59:35+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Evanilson strikes again as Bournemouth beat Forest",
-      "url": "https://www.bbc.co.uk/sport/football/videos/cm4gn997yry2o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T19:59:17+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Leeds dominate Chelsea for first Stamford Bridge win since 1999",
-      "url": "https://www.bbc.co.uk/sport/football/videos/c3ewvkk4qgxjo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T19:59:13+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Man City drop points to Fulham despite superb Anderson volley",
-      "url": "https://www.bbc.co.uk/sport/football/videos/c30rkq9xyk8eo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T19:59:08+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Teenager Williams-Barnett shines as Spurs beat Ipswich",
-      "url": "https://www.bbc.co.uk/sport/football/videos/c3174qq2j82zo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T19:59:02+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Coventry beat Palace in Frank's first game after late own goal",
-      "url": "https://www.bbc.co.uk/sport/football/videos/c8wy5ddky5n9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T19:58:52+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Aston Villa held at home as dogged Sunderland battle for Régis Le Bris",
-      "url": "https://www.theguardian.com/football/2026/nov/21/aston-villa-sunderland-premier-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T17:32:34+00:00",
       "category": "Sports"
     },
     {
@@ -318,13 +318,13 @@
           "id": "83240",
           "homeTeam": "FC Augsburg",
           "awayTeam": "1. FSV Mainz 05",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 3,
+          "awayScore": 1,
+          "winner": "FC Augsburg",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-22T14:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -335,13 +335,13 @@
           "id": "83243",
           "homeTeam": "SV Werder Bremen",
           "awayTeam": "Hamburger SV",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 4,
+          "awayScore": 0,
+          "winner": "SV Werder Bremen",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-22T16:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -4489,17 +4489,23 @@
             {
               "team": "pakistan a Inning 1",
               "runs": 313,
-              "wickets": 9,
+              "wickets": 10,
+              "overs": 49.2
+            },
+            {
+              "team": "India A,Pakistan A Inning 1",
+              "runs": 265,
+              "wickets": 10,
               "overs": 49.1
             }
           ],
-          "winner": null,
-          "resultText": null,
+          "winner": "Pakistan A",
+          "resultText": "Pakistan A won by 48 runs",
           "competition": "India A vs Pakistan A, 8th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
           "matchType": "odi",
           "startTime": "2026-11-22T10:00:00Z",
           "finishedAt": null,
-          "status": "live",
+          "status": "finished",
           "source": "CricketData"
         },
         {

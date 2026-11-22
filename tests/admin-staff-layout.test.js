@@ -1,7 +1,8 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const original=fs.readFileSync('admin-staff.html','utf8');
-const portal=fs.readFileSync('admin.html','utf8');
+const portal=fs.readFileSync('admin/index.html','utf8');
+assert(!fs.existsSync('admin.html'),'The old /admin.html must not exist');
 const ops=fs.readFileSync('admin-ops.js','utf8');
 
 // Never substitute the hand-crafted robot workstations with generic cards.

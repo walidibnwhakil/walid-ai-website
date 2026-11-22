@@ -641,8 +641,9 @@ if (new URLSearchParams(location.search).has("autotest")) {
     replyFor: (id, questionId = currentQ) => {
       const index = pool.ids.indexOf(id);
       const qi = pool.qIndex.get(questionId);
-      const base = index * pool.attrBytes + (qi >> 2);
-      const bit = (pool.attrs[base] >> ((qi & 3) << 1)) & 3;
+      // Sparse film-era and other overlay facts are not stored in the packed
+      // 28-byte rows. Test decisions through the same factBit as the engine.
+      const bit = index < 0 || qi == null ? 0 : factBit(pool, index, qi);
       return bit === 2 ? "yes" : bit === 1 ? "no" : "unknown";
     },
   };

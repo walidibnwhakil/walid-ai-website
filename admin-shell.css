@@ -258,3 +258,14 @@ details[open]>.section-summary .section-chevron{transform:rotate(225deg)}
 .top-five-list li strong{display:block;color:#eff9ff;overflow-wrap:anywhere;font-size:.95rem}
 .top-five-list li small{display:block;color:var(--adm-muted);margin-top:3px;font-size:.77rem}
 @media(max-width:520px){.top-feature-toggle{padding:11px;min-height:104px}.top-feature-toggle .big{font-size:1rem}.top-five-list li{padding:10px;gap:8px}}
+
+/* Compact, strictly observational automation signal beside audience geography. */
+.audience-automation{
+  display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;
+  margin-top:13px;padding:11px 13px;
+  background:#0b1d2c;border:1px solid var(--adm-border);border-radius:11px;
+  color:var(--adm-muted);font-size:.83rem;
+}
+.audience-automation strong{color:var(--adm-text);font-size:.87rem}
+.audience-automation span{color:var(--adm-accent);font-variant-numeric:tabular-nums}
+.audience-automation small{display:block;flex-basis:100%;font-size:.73rem}

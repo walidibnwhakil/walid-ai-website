@@ -823,7 +823,10 @@ function unrelatedJob(state, id) {
 function skippedAsDuplicate(state, id) {
   const yes = (qid) => said(state, qid, ["yes", "probably"]);
   const answered = (qid) => state.answers.some((answer) => answer.qid === qid && answer.value !== "unknown");
-  if ((id === "dead" && answered("alive")) || (id === "alive" && answered("dead"))) return true;
+  // Alive and dead are the same binary fact. An "unknown" answer should
+  // not trigger the opposite wording immediately afterwards.
+  if ((id === "dead" && state.answers.some((row) => row.qid === "alive")) ||
+      (id === "alive" && state.answers.some((row) => row.qid === "dead"))) return true;
   if ((id === "female" && yes("male")) || (id === "male" && yes("female"))) return true;
   if (id === "musician" && yes("singer")) return true;
   if (id === "screen_star_1990s" && said(state, "actor", ["no", "probably_not"])) return true;
@@ -1003,6 +1006,10 @@ function firstAllowedQuestion(state) {
     if (question.id === "fictional" && said(state, "real", ["yes", "probably"])) continue;
     if (question.id === "real" && said(state, "fictional", ["yes", "probably"])) continue;
     if (question.group === "fiction" && said(state, "real", ["yes", "probably"])) continue;
+    if ((question.id === "screen_star_1990s" ||
+         question.id === "screen_star_pre1990") &&
+        !said(state, "actor", ["yes", "probably"])) continue;
+    if (question.id === "adult_ent" && !adultAllowed(state)) continue;
     // Preserve broad fallbacks after a rejected guess, but never reopen
     // personal or child sport branches contrary to earlier answers.
     if (question.group === "personal" && !gated(state, question, rows)) continue;

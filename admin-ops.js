@@ -138,9 +138,12 @@
       const state=data.status||{},cap=state.capabilities||{};
       $('#ops-connect').textContent='Backend: authenticated · AI: '+(cap.ai_available?'configured':'unavailable')+
         ' · History: '+(state.persistence?.durable?'Firestore':'temporary');
-      $('#ops-capability').textContent=state.persistence?.durable?
-        'Task history is stored in Firestore. Code writes, merges and deployments require separate authorization.':
-        'Task history is temporary on Render. For durable history configure the server Firestore task store. Code changes are not automated.';
+      const coder=cap.coding||{};
+      $('#ops-capability').textContent=
+        'History: '+(state.persistence?.durable?'durable Firestore':'temporary Render filesystem')+
+        ' · CSE draft-PR runner: '+(coder.draft_pr_workflow_configured?'configured (subject to Actions access)':'not configured')+
+        ' · Approval-gated Merge: '+(coder.merge_executor_configured?'configured':'disabled')+
+        ' · Automatic Merge/Deploy: disabled.';
     }catch(error){status(error.message,true)}
   }
   async function loadHistory(){

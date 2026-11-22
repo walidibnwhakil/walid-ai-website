@@ -256,13 +256,16 @@ test("temporarily empty progressively loaded casebook never gives up at four", (
     id: "not-yet-loaded-person-" + i, en: "Temporary animal " + i,
     pop: 1, yes: ["animal"], no: ["real", "fictional"],
   })));
+  // The temporary shard has no eligible characters at all; the excluded
+  // flag represents entries withheld until another shard becomes available.
+  partial.flags.fill(128);
   const state = createState(partial, { category: "character" });
   recompute(state);
   for (const [qid, value] of [
     ["real", "yes"], ["knows_you", "no"],
     ["politician", "no"], ["from_bd", "yes"],
   ]) answer(state, qid, value);
-  assert.equal(state.alive.length, 0, "no character has arrived in the partial casebook yet");
+  assert.equal(state.alive.length, 0, "no eligible characters have arrived yet");
   const move = decide(state);
   assert.equal(move.type, "ask", JSON.stringify(move));
   assert.equal(move.qid, "male",

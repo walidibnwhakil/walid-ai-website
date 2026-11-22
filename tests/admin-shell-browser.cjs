@@ -147,7 +147,7 @@ async function exercise(browser, width, height){
   assert(!welcomeText.includes('আপনার কোনো নির্দেশ থাকলে বলুন'),
     'Unrequested command prompts must not appear in the daily greeting');
   const managerDate=await page.locator('.manager-chat-notice strong').first().textContent();
-  assert.match(managerDate,/Manager · \\d{2}-\\d{2}-\\d{4}, [A-Za-z]+, \\d{1,2}:\\d{2}:\\d{2} (AM|PM)/,
+  assert.match(managerDate,/Manager · \d{2}-\d{2}-\d{4}, [A-Za-z]+, \d{1,2}:\d{2}:\d{2} (AM|PM)/,
     'All Manager notices display DD-MM-YYYY, weekday and original Dhaka time with seconds');
   assert(!managerDate.includes('12:00:00 AM'),'No artificial midnight timestamp');
   const dailyReport=await page.locator('.manager-chat-notice')
@@ -156,8 +156,8 @@ async function exercise(browser, width, height){
   assert.match(dailyReport,/Cyber Department:/);
   assert.match(dailyReport,/Admin: আজ Help inbox/);
   assert.match(dailyReport,/Engineering Department:/);
-  assert.equal(dailyReport.split('\\n').length,4,'Four departments are separated by real line breaks');
-  assert(!dailyReport.includes('\\\\n'),'Literal backslash-n must never appear in office report');
+  assert.equal(dailyReport.split('\n').length,4,'Four departments are separated by real line breaks');
+  assert(!dailyReport.includes('\\n'),'Literal backslash-n must never appear in office report');
   await page.keyboard.press('Escape');
   await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
   assert.equal(await headButton.getAttribute('aria-expanded'),'false');

@@ -405,6 +405,9 @@ function topTwo(state) {
   const actorQi = state.pool.qIndex.get("actor");
   const confirmedActor = state.answers.some((row) =>
     row.qid === "actor" && row.value === "yes");
+  const knownFilmEraAnswers = state.answers.filter((row) =>
+    (row.qid === "screen_star_1990s" || row.qid === "screen_star_pre1990") &&
+    (row.value === "yes" || row.value === "no"));
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -412,6 +415,12 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
+    // Film-era facts are sparse, so unknown stays eligible. But an explicit
+    // known contradiction must not be guessed after the player said no/yes.
+    if (knownFilmEraAnswers.some((row) => {
+      const fact = factBit(state.pool, i, row.qi);
+      return row.value === "yes" ? fact === 1 : fact === 2;
+    })) continue;
     // Real people need explicit acting evidence. Player-relative roles are
     // allowed to have unknown occupations when personally confirmed.
     if (confirmedActor && actorQi != null &&

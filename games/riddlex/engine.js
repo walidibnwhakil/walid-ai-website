@@ -393,8 +393,14 @@ function topTwo(state) {
     const i = alive[k];
     if (chosenCountry) {
       const countryFact = factBit(state.pool, i, chosenCountry.qi);
-      if (countryFact === 1 || (countryFact !== 2 &&
-        otherCountryQIs.some((qi) => factBit(state.pool, i, qi) === 2))) continue;
+      // A public person with unknown country must be verified, not assumed
+      // Bangladeshi (or from any other confirmed country) by popularity.
+      const isPersonalRole = pool.ids[i]?.startsWith("riddlex-role-") &&
+        state.answers.some((row) => row.qid === "knows_you" &&
+          ["yes", "probably"].includes(row.value));
+      if (!isPersonalRole && countryFact !== 2) continue;
+      if (!isPersonalRole && otherCountryQIs.some((qi) =>
+        factBit(state.pool, i, qi) === 2)) continue;
     }
     const w = weights[i];
     if (w > bestP) {
@@ -423,8 +429,25 @@ export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   return 4;
 }
 
+// The public database is huge; a country, gender, a couple of "no"s,
+ // or a high fame prior do not identify one particular person.
+function supportedIdentity(state) {
+  if (state.category !== "character" || state.pool.count < 100) return true;
+  if (!said(state, "real", ["yes", "probably"])) return true;
+  if (said(state, "knows_you", ["yes", "probably"])) return true;
+  return state.answers.some((row) => {
+    if (!["yes", "probably"].includes(row.value)) return false;
+    const group = state.pool.questions[row.qi]?.group;
+    return ["job", "politics", "fiction", "adult"].includes(group);
+  });
+}
+
 export function shouldGuess(state) {
   const asked = state.answers.length;
+  if (!supportedIdentity(state)) return false;
+  // Never guess a publicly indexed character after only a few generic facts.
+  if (state.category === "character" && state.pool.count >= 100 &&
+      !said(state, "knows_you", ["yes", "probably"]) && asked < 10) return false;
   if (!state.alive.length) return false;
   const { bestP, secondP } = topTwo(state);
   if (!(bestP > 0)) return false;
@@ -1103,7 +1126,8 @@ export function decide(state) {
   let qid = chooseQuestion(state);
   if (!qid && waiting) qid = firstAllowedQuestion(state);
   if (!qid) {
-    if (best >= 0 && bestP > 0) return { type: "guess", index: best };
+    if (best >= 0 && bestP > 0 && supportedIdentity(state))
+      return { type: "guess", index: best };
     return { type: "defeat" };
   }
   return { type: "ask", qid };

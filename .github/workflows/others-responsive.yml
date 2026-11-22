@@ -9,6 +9,9 @@ on:
       - "tests/reading-session-e2e.mjs"
       - "assets/reading-session.js"
       - "islam/quran/reader.js"
+      - "islam/quran/reading-flow.js"
+      - "islam/quran/auto-scroll.js"
+      - "islam/quran/index.js"
       - "islam/stories/stories.js"
       - ".github/workflows/others-responsive.yml"
   workflow_dispatch:
@@ -39,4 +42,5 @@ jobs:
           node tests/others-responsive-e2e.mjs
           node tests/others-reader-progress-e2e.mjs
           node --check assets/reading-session.js
+          node --check islam/quran/reading-flow.js
           node tests/reading-session-e2e.mjs

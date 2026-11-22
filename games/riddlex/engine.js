@@ -399,6 +399,12 @@ function topTwo(state) {
       .map((id) => state.pool.qIndex.get(id)).filter((qi) => qi != null)
     : [];
   const hasOtherIdentityEvidence = supportedIdentity(state);
+  // A specific confirmed profession is evidence, not merely a popularity
+  // hint. In particular a yes to acting must never nominate someone whose
+  // record has no verified acting fact.
+  const actorQi = state.pool.qIndex.get("actor");
+  const confirmedActor = state.answers.some((row) =>
+    row.qid === "actor" && row.value === "yes");
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -406,6 +412,11 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
+    // Real people need explicit acting evidence. Player-relative roles are
+    // allowed to have unknown occupations when personally confirmed.
+    if (confirmedActor && actorQi != null &&
+        !state.pool.ids[i]?.startsWith("riddlex-role-") &&
+        factBit(state.pool, i, actorQi) !== 2) continue;
     if (chosenCountry) {
       const countryFact = factBit(state.pool, i, chosenCountry.qi);
       // Some verified local politicians have no packed country tag.

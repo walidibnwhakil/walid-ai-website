@@ -75,7 +75,7 @@ ul{padding-left:1.2em}li{margin:8px 0}
 <p>এই ডিভাইসে ঐচ্ছিক ব্রাউজারভিত্তিক ব্যবহার-পরিসংখ্যান সংগ্রহ বন্ধ করতে পারেন। এটি সাইন-ইন, নিরাপত্তার জন্য প্রয়োজনীয় প্রক্রিয়া বা তৃতীয় পক্ষের বিজ্ঞাপন প্রযুক্তি বন্ধ করে না।</p>
 <button type="button" id="usageOptOut" class="legal-action">ব্রাউজারভিত্তিক ব্যবহার-পরিসংখ্যান বন্ধ করুন</button><p id="usageChoice" role="status" aria-live="polite"></p>
 <h2>শিশুদের গোপনীয়তা</h2>
-<p>Walid AI সাধারণ ব্যবহারকারীদের জন্য তৈরি; বিশেষভাবে ১৩ বছরের কম বয়সী শিশুদের লক্ষ্য করে নয়। ওই বয়সের শিশুদের ব্যক্তিগত তথ্য জেনেশুনে সংগ্রহের উদ্দেশ্য নেই। শিশুদের অনলাইন সেবা ব্যবহারে অভিভাবকের তত্ত্বাবধান থাকা উচিত।</p>
+<p>Walid AI সাধারণ ব্যবহারকারী ও শিক্ষার্থীদের জন্য তথ্য ও শিক্ষামূলক সুবিধা প্রদান করে। শিশুদের অনলাইন সেবা ব্যবহারে অভিভাবকের তত্ত্বাবধান থাকা উচিত। কোনো শিশু উপযুক্ত অনুমতি ছাড়া ব্যক্তিগত তথ্য দিয়ে থাকলে আমাদের সঙ্গে যোগাযোগ করুন, যাতে বিষয়টি পর্যালোচনা করা যায়।</p>
 <h2>নীতির পরিবর্তন ও যোগাযোগ</h2>
 <p>ওয়েবসাইটের পরিবর্তনের সঙ্গে সামঞ্জস্য রাখতে এই নীতি হালনাগাদ করা হতে পারে। পরিবর্তিত নীতি ও কার্যকর তারিখ এখানেই প্রকাশ করা হবে। গোপনীয়তা বা তথ্যসংক্রান্ত প্রশ্নের জন্য <a href="mailto:support@walid-ai.com">support@walid-ai.com</a>-এ যোগাযোগ করুন।</p>
 <script>(()=>{const btn=document.getElementById("usageOptOut"),status=document.getElementById("usageChoice");const refresh=()=>{try{if(localStorage.getItem("walidUsageOptOut")==="1"){btn.disabled=true;status.textContent="এই ডিভাইসে ঐচ্ছিক ব্যবহার-পরিসংখ্যান সংগ্রহ বন্ধ আছে।";}}catch{status.textContent="ব্রাউজার স্টোরেজ পাওয়া যাচ্ছে না।"}};btn.addEventListener("click",()=>{try{localStorage.setItem("walidUsageOptOut","1");window.WalidUsage?.optOut?.();refresh()}catch{status.textContent="পছন্দটি সংরক্ষণ করা যায়নি।"}});refresh();})();</script>

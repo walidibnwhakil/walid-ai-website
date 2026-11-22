@@ -10,7 +10,8 @@
     {id:'code', name:'CSE Engineer', desc:'GitHub inspection and proposals', icon:'⌘'},
     {id:'mail', name:'Admin Staff', desc:'Read-only mail when authorized', icon:'✉'}
   ];
-  let selected='manager', currentTab='dashboard', busy=false, ready=false;
+  const selected='manager';
+  let currentTab='dashboard', busy=false, ready=false, previousManagerFocus=null;
   const fmt = date => {try{return new Date(date).toLocaleString('en-BD',{timeZone:'Asia/Dhaka'})}catch{return String(date||'')}};
   const token = () => sessionStorage.getItem('walidAdminAccess') || '';
   const auth = () => ({Authorization:'Bearer '+token()});
@@ -24,6 +25,28 @@
     button.setAttribute('aria-label',open?'Close sidebar':'Open sidebar');
     button.setAttribute('title',open?'Close menu':'Open menu');
     details.setAttribute('aria-hidden',String(!open));
+  }
+  function openManagerChat(){
+    if(!ready)return;
+    selectTab('staff');
+    const panel=$('#manager-chat-panel');if(!panel)return;
+    previousManagerFocus=document.activeElement;
+    panel.inert=false;
+    panel.setAttribute('aria-hidden','false');
+    panel.classList.add('is-open');
+    $('#manager-chat-backdrop').hidden=false;
+    document.body.classList.add('manager-chat-open');
+    $('#ops-input')?.focus();
+  }
+  function closeManagerChat(){
+    const panel=$('#manager-chat-panel');if(!panel)return;
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden','true');
+    panel.inert=true;
+    $('#manager-chat-backdrop').hidden=true;
+    document.body.classList.remove('manager-chat-open');
+    if(previousManagerFocus?.isConnected)previousManagerFocus.focus();
+    previousManagerFocus=null;
   }
   function status(text, bad=false) {
     const el=$('#ops-status'); if(el){el.textContent=text;el.dataset.error=bad?'true':'false'}
@@ -56,7 +79,7 @@
       const copy=document.createElement('span'),title=document.createElement('strong'),description=document.createElement('small');
       title.textContent=role.name;description.textContent=role.desc;copy.append(title,description);
       button.append(glyph,copy);
-      button.onclick=()=>{selected=role.id;updateSelected();void loadHistory()};
+      button.onclick=()=>openManagerChat();
       host.append(button);
     });
     updateSelected();
@@ -78,13 +101,13 @@
   }
   function renderHistory(tasks){
     const host=$('#ops-history');host.replaceChildren();
-    const filtered=tasks.filter(x=>selected==='manager'?x.role==='manager':x.role===selected);
+    const filtered=tasks.filter(x=>x.role==='manager');
     if(!filtered.length){const p=document.createElement('p');p.className='muted';p.textContent='No recorded conversation for this workstation.';host.append(p);return}
     filtered.slice(0,40).reverse().forEach(task=>{
       appendMessage(host,'question','You · '+fmt(task.created_at),task.instruction||task.title);
       const result=task.result||{};
-      const role=result.delegated_to ? 'Manager → '+(roles.find(x=>x.id===result.delegated_to)?.name||result.delegated_to)
-        : roles.find(x=>x.id===task.role)?.name||'Staff';
+      const delegates=Array.isArray(result.delegations)?result.delegations.map(d=>roles.find(x=>x.id===d.role)?.name||d.role):[];
+      const role=delegates.length?'Manager → '+delegates.join(', '):result.delegated_to?'Manager → '+(roles.find(x=>x.id===result.delegated_to)?.name||result.delegated_to):'Manager';
       appendMessage(host,'answer',role+' · '+(task.status||'unknown'),
         result.answer||'No verifiable result is available.', result.limitation||
           (task.status==='running'?'Processing…':''));
@@ -156,12 +179,15 @@
     finally{busy=false;button.disabled=false}
   }
   function logout(){
-    ready=false;setSidebarOpen(false);$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
+    closeManagerChat();
+    ready=false;setSidebarOpen(false);
+    $('#manager-chat-shortcut').disabled=true;$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=true);
     window.WalidAdminApprovals?.signOut();
   }
   addEventListener('walid-admin-authenticated',()=>{
     ready=true;setSidebarOpen(false);
+    $('#manager-chat-shortcut').disabled=false;
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=false);
     selectTab(currentTab,false);
   });
@@ -173,7 +199,15 @@
     setSidebarOpen(!$('#workspace-shell').classList.contains('nav-expanded'));
   });
   document.addEventListener('keydown',event=>{
+    const panel=$('#manager-chat-panel');
+    if(event.key==='Escape'&&panel?.classList.contains('is-open')){closeManagerChat();return}
     if(event.key==='Escape')setSidebarOpen(false);
+    if(event.key==='Tab'&&panel?.classList.contains('is-open')){
+      const controls=[...panel.querySelectorAll('button:not(:disabled),textarea:not(:disabled),input:not(:disabled),a[href]')].filter(el=>el.getClientRects().length);
+      const first=controls[0],last=controls.at(-1);if(!first||!last)return;
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+    }
   });
   document.addEventListener('click',event=>{
     if(!ready||!$('#workspace-shell').classList.contains('nav-expanded'))return;
@@ -205,12 +239,15 @@
         if(!desk)return;
         const mapping={manager:'manager',it:'monitor',cyber:'security',cse:'code',admin:'mail'};
         const match=Object.keys(mapping).find(name=>desk.classList.contains(name));
-        if(match){
-          selected=mapping[match];updateSelected();void loadHistory();
-        }
+        if(match==='manager')openManagerChat();
+        // Other desks remain selectable for their read-only details inside the original office.
       });
     }catch{ /* The original office remains functional if the host cannot inspect it. */ }
   });
+  $('#manager-chat-open')?.addEventListener('click',openManagerChat);
+  $('#manager-chat-shortcut')?.addEventListener('click',openManagerChat);
+  $('#manager-chat-close')?.addEventListener('click',closeManagerChat);
+  $('#manager-chat-backdrop')?.addEventListener('click',closeManagerChat);
   $('#ops-send')?.addEventListener('click',submit);
   $('#ops-input')?.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();void submit()}});
   $('#ops-checks')?.addEventListener('click',runChecks);

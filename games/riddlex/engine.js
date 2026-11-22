@@ -384,6 +384,21 @@ function fullPublicGame(state) {
     !said(state, "knows_you", ["yes", "probably"]);
 }
 
+function candidateContradicted(state, index) {
+  for (const row of state.answers) {
+    const bit = factBit(state.pool, index, row.qi);
+    // Verified film/book participation is affirmative evidence. If the
+    // player firmly denies it, that particular name cannot be the answer.
+    if ((ACTOR_PROOF_IDS.has(row.qid) || WRITER_PROOF_IDS.has(row.qid)) &&
+        row.value === "no" && bit === 2) return true;
+    // A known foreign nationality cannot override the player's confirmed
+    // country, even if the candidate happens to be very famous.
+    if (COUNTRIES.includes(row.qid) && row.value === "yes" && bit === 1)
+      return true;
+  }
+  return false;
+}
+
 function topTwo(state) {
   let best = -1;
   let second = -1;
@@ -392,6 +407,7 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
+    if (candidateContradicted(state, i)) continue;
     const w = weights[i];
     if (w > bestP) {
       second = best;

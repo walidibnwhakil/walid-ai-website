@@ -63,7 +63,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 @media(max-width:800px){main{padding:15px 13px 45px}.admin-shell{grid-template-columns:1fr;gap:18px}.admin-sidebar{position:static;padding:12px 14px}.admin-sidebar .site-logo-link{display:none}.admin-sidebar .side-heading{margin:0 0 10px}.admin-sidebar nav{grid-template-columns:repeat(3,1fr)}.admin-sidebar button{text-align:center;padding:9px 5px}.ops-grid{grid-template-columns:1fr}}
 @media(max-width:540px){.panel{padding:14px}.ops-desk-grid{grid-template-columns:repeat(2,1fr)}.ops-desk{min-height:110px}.admin-header h1{font-size:1.5rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.big{font-size:1.25rem}}
 </style>
-<link rel="stylesheet" href="/admin-shell.css?v=20261122c">
+<link rel="stylesheet" href="/admin-shell.css?v=20261122-centered-header">
 </head>
 <body class="admin-locked">
 <main>
@@ -81,7 +81,6 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 <aside id="admin-sidebar" class="admin-sidebar" aria-label="Private admin navigation">
   <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Open sidebar" aria-controls="sidebar-details" aria-expanded="false" title="Open menu"><span aria-hidden="true">☰</span></button>
   <div id="sidebar-details" class="sidebar-details">
-    <a class="site-logo-link" href="/" aria-label="Walid AI home"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a>
     <h2 class="side-heading">Operations Center</h2>
     <nav aria-label="Admin sections">
       <button type="button" data-admin-tab="dashboard" aria-current="page">Analytics</button>
@@ -92,7 +91,8 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 </aside>
 <div class="admin-content">
   <header class="admin-header">
-    <div><h1>Walid AI Admin</h1><p class="muted">Analytics, team operations and approvals — one protected portal.</p></div>
+    <a class="header-brand" href="/" aria-label="Walid AI homepage"><img src="/walid-ai-approved-logo.png" alt="Walid AI official logo" width="150" height="54"></a>
+    <div class="header-copy"><h1>Walid AI Admin</h1><p class="muted">Analytics, team operations and approvals — one protected portal.</p></div>
     <div class="top-actions"><span id="date" class="muted"></span><button id="exit" class="secondary-button hidden" type="button">Sign out</button></div>
   </header>
   <section id="dashboard" class="hidden" aria-label="Analytics">

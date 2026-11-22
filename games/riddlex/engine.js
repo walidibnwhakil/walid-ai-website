@@ -361,6 +361,14 @@ export function recompute(state) {
   const weights = state.weights;
   const alive = [];
   let sum = 0;
+  // If every entry was explicitly excluded, max is -Infinity. Subtracting
+  // it from itself yields NaN, which previously resurrected every excluded
+  // entry as a fake "alive" candidate with NaN probabilities.
+  if (max === -Infinity) {
+    weights.fill(0);
+    state.alive = [];
+    return state;
+  }
   const floor = max - 14;
   for (let i = 0; i < n; i++) {
     if (logW[i] < floor) {

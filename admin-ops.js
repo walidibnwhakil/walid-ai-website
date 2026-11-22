@@ -30,15 +30,18 @@
   }
   function openManagerChat(){
     if(!ready)return;
-    selectTab('staff');
+    // This is a Messenger-style overlay: opening it never changes the active Admin tab.
     const panel=$('#manager-chat-panel');if(!panel)return;
+    setSidebarOpen(false);
     previousManagerFocus=document.activeElement;
     panel.inert=false;
     panel.setAttribute('aria-hidden','false');
     panel.classList.add('is-open');
     $('#manager-chat-backdrop').hidden=false;
     document.body.classList.add('manager-chat-open');
+    $('#manager-chat-head')?.setAttribute('aria-expanded','true');
     $('#ops-input')?.focus();
+    void loadHistory();
   }
   function closeManagerChat(){
     const panel=$('#manager-chat-panel');if(!panel)return;
@@ -47,11 +50,14 @@
     panel.inert=true;
     $('#manager-chat-backdrop').hidden=true;
     document.body.classList.remove('manager-chat-open');
+    $('#manager-chat-head')?.setAttribute('aria-expanded','false');
     if(previousManagerFocus?.isConnected)previousManagerFocus.focus();
     previousManagerFocus=null;
   }
   function status(text, bad=false) {
-    const el=$('#ops-status'); if(el){el.textContent=text;el.dataset.error=bad?'true':'false'}
+    for(const selector of ['#ops-status','#manager-chat-status']){
+      const el=$(selector);if(el){el.textContent=text;el.dataset.error=bad?'true':'false'}
+    }
   }
   function selectTab(tab, writeHash=true) {
     if(!tabNames[tab])tab='dashboard';
@@ -196,13 +202,13 @@
     closeManagerChat();
     transientHelp.clear();
     ready=false;setSidebarOpen(false);
-    $('#manager-chat-shortcut').disabled=true;$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
+    $('#manager-chat-head').disabled=true;$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=true);
     window.WalidAdminApprovals?.signOut();
   }
   addEventListener('walid-admin-authenticated',()=>{
     ready=true;setSidebarOpen(false);
-    $('#manager-chat-shortcut').disabled=false;
+    $('#manager-chat-head').disabled=false;
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=false);
     selectTab(currentTab,false);
   });
@@ -259,8 +265,7 @@
       });
     }catch{ /* The original office remains functional if the host cannot inspect it. */ }
   });
-  $('#manager-chat-open')?.addEventListener('click',openManagerChat);
-  $('#manager-chat-shortcut')?.addEventListener('click',openManagerChat);
+  $('#manager-chat-head')?.addEventListener('click',openManagerChat);
   $('#manager-chat-close')?.addEventListener('click',closeManagerChat);
   $('#manager-chat-backdrop')?.addEventListener('click',closeManagerChat);
   $('#ops-send')?.addEventListener('click',submit);

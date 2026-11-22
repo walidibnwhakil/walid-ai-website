@@ -17,7 +17,23 @@ export const SCREEN_STAR_1990S = Object.freeze({
   Q52149647: 1,  // Puja Cherry, became a lead film star in 2018
 });
 
+// Historical film-career records; these are not live "still acting" claims.
+// The Daily Star: Shabana's career began in 1967; Alamgir began in 1972.
+export const SCREEN_STAR_PRE1990 = Object.freeze({
+  Q7460022: 2,    // Shabana
+  Q13057124: 2,   // Alamgir
+  Q7460127: 1,    // Shabnur rose to fame in the 1990s
+  Q7405420: 1,    // Salman Shah first appeared as film lead in 1993
+  Q52149647: 1,  // Puja Cherry became a leading actress in the 2010s
+});
+
 export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
+  {
+    id: "screen_star_pre1990",
+    group: "job",
+    en: "Were they already a well-known film star before the 1990s?",
+    bn: "তিনি কি নব্বইয়ের দশকের আগেই চলচ্চিত্রে পরিচিত তারকা হয়ে উঠেছিলেন?",
+  },
   {
     id: "screen_star_1990s",
     group: "job",

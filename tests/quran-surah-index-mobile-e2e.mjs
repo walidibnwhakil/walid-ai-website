@@ -57,6 +57,15 @@ try {
     assert.equal(await intro.locator("p").textContent(),"সূরা নির্বাচন করুন");
     assert.ok(await intro.evaluate(el=>el.getBoundingClientRect().height)<145,
       "Compact heading must not reserve a tall hero at "+width+"px");
+    const centered=await intro.evaluate(el=>{
+      const box=el.getBoundingClientRect();
+      const h=el.querySelector("h1").getBoundingClientRect();
+      const p=el.querySelector("p").getBoundingClientRect();
+      const mid=x=>x.left+x.width/2;
+      return {titleDelta:Math.abs(mid(h)-mid(box)),subtitleDelta:Math.abs(mid(p)-mid(box))};
+    });
+    assert.ok(centered.titleDelta<3 && centered.subtitleDelta<3,
+      "Quran section title and subtitle must be centered at "+width+"px: "+JSON.stringify(centered));
     assert.equal(await page.locator("#surah-search-panel").isVisible(),false,
       "Search input stays collapsed until requested");
     const searchButton=page.getByRole("button",{name:"সূরা খুঁজুন"});

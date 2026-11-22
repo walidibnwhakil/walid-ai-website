@@ -53,72 +53,96 @@ try {
     new URL(route.request().url()).origin === base ? route.continue() : route.abort());
 
   await page.goto(base + "/islam/quran/al-baqarah/", {waitUntil:"load"});
-  await page.locator(".walid-reading-controls").waitFor();
-  await page.locator(".walid-reading-progress").waitFor();
+  await page.locator("#ayah-27 .ayah-number[data-walid-bookmark]").waitFor();
   await page.waitForFunction(() => window.__wakeRequests > 0);
-  assert.match(await page.locator(".reading-status").textContent(), /জেগে থাকবে/);
+  assert.equal(await page.locator(".walid-reading-controls,.walid-reading-progress,.walid-quran-autoscroll").count(),0,
+    "No settings, bookmark panel or auto-scroll controls on Quran");
   await page.getByRole("tab", {name:"সূরা পরিচিতি"}).click();
   await page.getByRole("tab", {name:"সূরা", exact:true}).click();
-  assert.equal(await page.locator(".reading-tools .walid-reading-progress").count(), 1,
-    "Bookmark panel survives switching Quran tabs");
-  assert.equal(await page.locator(".reading-tools .walid-reading-controls").count(), 1,
-    "Wake lock toggle survives switching Quran tabs");
+  assert.equal(await page.locator("#ayah-27").count(),1,"Quran tabs preserve all ayahs");
 
-  await page.evaluate(() => document.getElementById("ayah-25").scrollIntoView({block:"start"}));
-  await page.mouse.wheel(0, 190);
+  // Manual reading saves separately for this surah.
+  await page.evaluate(() => document.getElementById("ayah-25").scrollIntoView({block:"start",behavior:"instant"}));
+  await page.mouse.wheel(0,190);
   await page.waitForFunction(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("walid-ai:quran:last-read:v1"));
-      return saved?.surah === 2 && saved.verse >= 20;
-    } catch { return false; }
+    const v=JSON.parse(localStorage.getItem("walid-ai:quran:last-read:2:v2") || "null");
+    return v?.surah===2 && v.verse>=20;
   }, null, {timeout:5500});
-  const verse = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("walid-ai:quran:last-read:v1")).verse);
-  await page.getByRole("button", {name:"শেষ পড়া আয়াতে বুকমার্ক"}).click();
-  assert.equal(await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("walid-ai:quran:bookmark:v1"))?.verse), verse);
-  // The verse number itself is an accessible, exact-ayah bookmark action.
-  await page.locator("#ayah-27 .ayah-number").click();
-  assert.equal(await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("walid-ai:quran:bookmark:v1"))?.verse), 27);
-  await page.goto(base + "/islam/quran/");
-  await page.locator(".walid-reading-progress").waitFor();
-  const resume = page.getByRole("link", {name:/সর্বশেষ পড়া:.*আয়াত/});
-  assert.match(await resume.getAttribute("href"), /\/al-baqarah\/#ayah-\d+/);
-  assert.equal(await page.getByRole("link", {name:/বুকমার্ক:.*আয়াত/}).count(), 1);
-  await resume.click();
-  await page.locator(".reading-tools .walid-reading-progress").waitFor();
-  assert.ok(await page.evaluate(() => scrollY > 100),
-    "Resume navigates to the saved Quran verse");
 
-  // Quran auto-scroll: explicit opt-in, one wrapped visual line at a time, easy pause/stop.
-  await page.locator(".walid-quran-autoscroll").waitFor();
-  assert.match(await page.locator(".walid-auto-scroll-status").textContent(), /একটি করে লাইনে/);
-  await page.locator("#walid-auto-scroll-speed").selectOption("6");
-  await page.getByRole("button", {name:"▶ অটো স্ক্রল শুরু"}).click();
-  await page.locator(".walid-quran-autoscroll-floating:visible").waitFor();
+  // Press-and-hold must bookmark the ayah itself, with persistent visual markings.
+  await page.evaluate(() => document.getElementById("ayah-27").scrollIntoView({block:"center",behavior:"instant"}));
+  await page.evaluate(() => {
+    const el=document.getElementById("ayah-27");
+    el.dispatchEvent(new PointerEvent("pointerdown",{bubbles:true,pointerId:102,clientX:100,clientY:220}));
+  });
+  await page.waitForTimeout(800);
+  await page.evaluate(() => {
+    document.getElementById("ayah-27").dispatchEvent(new PointerEvent("pointerup",{bubbles:true,pointerId:102,clientX:100,clientY:220}));
+  });
+  assert.equal(await page.locator("#ayah-27.walid-ayah-bookmarked").count(),1,
+    "Long press shows marked ayah with a distinctive gold accent");
+  assert.equal(await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("walid-ai:quran:bookmark:2:v2"))?.verse),27);
+  assert.equal(await page.locator("#ayah-26.walid-ayah-bookmarked").count(),0);
+
+  await page.goto(base + "/islam/quran/", {waitUntil:"load"});
+  await page.waitForTimeout(200);
+  assert.equal(await page.locator(".walid-reading-progress").count(),0,
+    "Quran index should not show a global last-read or bookmark panel");
+
+  await page.goto(base + "/islam/quran/al-baqarah/", {waitUntil:"load"});
+  await page.locator("#ayah-27.walid-ayah-bookmarked").waitFor();
+  await page.waitForFunction(() => window.scrollY > 400, null,{timeout:4500});
+  assert.match(await page.locator(".walid-quran-toast").textContent(),/সর্বশেষ পঠিত আয়াত/);
+  await page.waitForFunction(() => document.querySelector(".walid-quran-toast")?.hidden,
+    null,{timeout:4500});
+
+  // Another surah does not inherit the existing one’s bookmark or scroll point.
+  await page.goto(base + "/islam/quran/al-fatiha/", {waitUntil:"load"});
+  await page.locator("#ayah-1 .ayah-number[data-walid-bookmark]").waitFor();
+  assert.equal(await page.locator(".walid-ayah-bookmarked").count(),0);
+  assert.ok((await page.evaluate(() => scrollY)) < 450, "New surah begins near the top");
+  await page.locator("#ayah-2 .ayah-number").click();
+  assert.equal(await page.locator("#ayah-2.walid-ayah-bookmarked").count(),1);
+  assert.equal(await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("walid-ai:quran:bookmark:2:v2"))?.verse),27,
+    "Bookmarked ayah in earlier surah remains independently saved");
+  await page.goto(base + "/islam/quran/al-baqarah/");
+  await page.locator("#ayah-27.walid-ayah-bookmarked").waitFor();
+  assert.equal(await page.locator(".walid-ayah-bookmarked").count(),1);
+
+  // A wheel/drag begins quiet, continuous scroll; a plain touch pauses it.
   await page.evaluate(() => document.getElementById("ayah-40").scrollIntoView({block:"center",behavior:"instant"}));
-  const beforeAuto = await page.evaluate(() => scrollY);
-  await page.waitForFunction(before => scrollY > before + 5, beforeAuto, {timeout:8500});
-  const afterAuto = await page.evaluate(() => scrollY);
-  assert.ok(afterAuto - beforeAuto < 220,
-    "Line-by-line scrolling must not jump more than a few text lines");
-  const lastAuto = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("walid-ai:quran:last-read:v1"))?.verse);
-  assert.ok(lastAuto >= 39, "Automated reading updates the saved ayah");
-  await page.mouse.wheel(0, 90);
-  await page.waitForFunction(() =>
-    document.querySelector(".walid-quran-autoscroll-floating")?.textContent?.includes("স্ক্রল বিরতিতে"));
-  await page.locator(".walid-quran-autoscroll-floating").getByRole("button", {name:"■ বন্ধ"}).click();
-  assert.equal(await page.locator(".walid-quran-autoscroll-floating").isVisible(), false,
-    "Stop hides fixed controls");
-  await page.getByRole("tab", {name:"সূরা পরিচিতি"}).click();
-  assert.equal(await page.locator(".walid-quran-autoscroll-floating").isVisible(), false,
-    "Changing sections must never restart auto-scroll");
-  await page.getByRole("tab", {name:"সূরা",exact:true}).click();
+  await page.mouse.wheel(0,120);
+  await page.waitForTimeout(750);
+  const starting = await page.evaluate(() => scrollY);
+  await page.waitForFunction(y => scrollY > y + 7,starting,{timeout:4000});
+  await page.evaluate(() => {
+    const el=document.getElementById("ayah-40");
+    const t=new Touch({identifier:21,target:el,clientX:120,clientY:250});
+    el.dispatchEvent(new TouchEvent("touchstart",{bubbles:true,touches:[t],targetTouches:[t],changedTouches:[t]}));
+    el.dispatchEvent(new TouchEvent("touchend",{bubbles:true,touches:[],targetTouches:[],changedTouches:[t]}));
+  });
+  const stoppedAt = await page.evaluate(() => scrollY);
+  await page.waitForTimeout(600);
+  assert.ok(Math.abs((await page.evaluate(() => scrollY))-stoppedAt) < 2,
+    "Touch without dragging must pause all automatic scrolling");
+  // The next deliberate drag should reactivate, without a separate Start button.
+  await page.evaluate(() => {
+    const el=document.getElementById("ayah-40");
+    const a=new Touch({identifier:22,target:el,clientX:110,clientY:350});
+    const b=new Touch({identifier:22,target:el,clientX:110,clientY:275});
+    el.dispatchEvent(new TouchEvent("touchstart",{bubbles:true,touches:[a],targetTouches:[a],changedTouches:[a]}));
+    el.dispatchEvent(new TouchEvent("touchmove",{bubbles:true,touches:[b],targetTouches:[b],changedTouches:[b]}));
+    el.dispatchEvent(new TouchEvent("touchend",{bubbles:true,touches:[],targetTouches:[],changedTouches:[b]}));
+  });
+  const movingAgain=await page.evaluate(() => scrollY);
+  await page.waitForFunction(y=>scrollY>y+8,movingAgain,{timeout:4000});
+  assert.equal(await page.locator(".walid-quran-autoscroll-floating").count(),0,
+    "No floating scroll control is rendered");
 
   await page.goto(base + "/islam/stories/");
-  await page.locator(".walid-reading-controls").waitFor();
+  assert.equal(await page.locator(".walid-reading-controls").count(),0);
   await page.evaluate(() => document.getElementById("nuh").scrollIntoView({block:"start"}));
   await page.mouse.wheel(0, 180);
   await page.waitForFunction(() => {
@@ -130,13 +154,11 @@ try {
     JSON.parse(localStorage.getItem("walid-ai:quran-stories:bookmark:v1"))?.id), "nuh");
 
   await page.goto(base + "/others/folklore/ramayana/");
-  await page.locator(".walid-reading-controls").waitFor();
+  assert.equal(await page.locator(".walid-reading-controls").count(),0);
   assert.ok((await page.evaluate(() => window.__wakeRequests)) > 0);
   assert.equal(await page.locator(".others-reading-progress").count(), 1,
     "Existing Others reading progress still exists");
-  await page.getByRole("button", {name:"বন্ধ করুন"}).click();
-  assert.match(await page.locator(".reading-status").textContent(), /স্বাভাবিক নিয়মে বন্ধ/);
-  assert.ok((await page.evaluate(() => window.__wakeReleases)) >= 1);
+  assert.ok((await page.evaluate(() => window.__wakeRequests)) >= 1);
 
   const unsupported = await browser.newContext({viewport:{width:375,height:800}});
   await unsupported.addInitScript(() => {
@@ -144,13 +166,12 @@ try {
   });
   const noLockPage = await unsupported.newPage();
   await noLockPage.goto(base + "/islam/stories/", {waitUntil:"load"});
-  await noLockPage.locator(".walid-reading-controls").waitFor();
-  assert.match(await noLockPage.locator(".reading-status").textContent(), /সুবিধা নেই/);
-  assert.equal(await noLockPage.getByRole("button", {name:"সমর্থিত নয়"}).isDisabled(), true);
+  assert.equal(await noLockPage.locator(".walid-reading-controls").count(),0);
+  assert.equal(await noLockPage.evaluate(() => !!navigator.wakeLock),false);
   await unsupported.close();
   assert.deepEqual(errors, [], "No page JavaScript exceptions");
   await context.close();
-  console.log("PASS reading session: Quran last ayah/bookmark, stories, Others, wake lock and fallback");
+  console.log("PASS reading session: hands-free Quran, per-surah auto-resume, long-press bookmarks, stories, Others and wake lock");
 } finally {
   await browser?.close();
   server.close();

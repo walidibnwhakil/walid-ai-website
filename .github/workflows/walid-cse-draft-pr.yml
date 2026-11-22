@@ -1,4 +1,4 @@
-name: Walid AI CSE draft PR agent
+name: Walid AI CSE guarded PR agent
 
 # Explicitly dispatched by the authenticated owner Manager. Never on a timer.
 on:
@@ -57,7 +57,7 @@ jobs:
           print("CSE syntax checks passed for:", changed)
           PY
 
-      - name: Open draft PR for owner review (never merge or deploy)
+      - name: Open PR for owner review (never merge or deploy)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -71,6 +71,6 @@ jobs:
           git commit -m "CSE: propose bounded owner-requested code fix"
           gh auth setup-git
           git push -u origin "$branch"
-          gh pr create --base main --head "$branch" --draft \
+          gh pr create --base main --head "$branch" \
             --title "CSE Engineer: owner-requested website fix" \
             --body "AI-generated bounded patch. Only one non-protected source file changed. Syntax and office-invariant checks passed in the agent workflow. Repository PR CI and owner review are required before merge. No automatic deployment or merge is enabled."

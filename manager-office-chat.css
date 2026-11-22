@@ -107,6 +107,48 @@
 .manager-chat-panel .manager-workorder strong{display:block;font-size:.8rem;color:#dff4ff}
 .manager-chat-panel .manager-workorder p{font-size:.77rem;margin:5px 0;white-space:pre-wrap}
 .manager-chat-panel .manager-workorder small{display:block;font-size:.68rem}
+/* Separate, read-only conversations between Manager and each staff bot.
+   Never expand operational transcripts under the owner's replies. */
+.manager-chat-panel [hidden]{display:none!important}
+.manager-chat-panel .manager-chat-header-actions{display:flex;align-items:center;gap:9px}
+.manager-chat-panel .manager-chat-nav-button{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  min-height:39px;padding:6px 10px;margin:0;
+  border:1px solid #3b6176;border-radius:12px;background:#122c40;
+  color:#d5ecf7;font:inherit;font-size:.79rem;white-space:nowrap;
+}
+.manager-chat-panel .manager-chat-nav-button:hover,
+.manager-chat-panel .manager-chat-nav-button:focus-visible{border-color:#9adfff;background:#19455f;color:#fff}
+.manager-chat-panel #manager-thread-back{flex:0 0 38px;width:38px;font-size:1.4rem;padding:0}
+.manager-chat-panel .manager-chat-internal-view{
+  flex:1 1 auto;min-height:0;height:auto;width:100%;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  padding:20px clamp(14px,3vw,27px);scrollbar-color:#41667d #0b1927;
+}
+.manager-chat-panel .manager-chat-internal-view.manager-chat-thread{
+  display:flex;flex-direction:column;gap:14px;
+}
+.manager-chat-panel #manager-staff-thread > :first-child{margin-top:auto}
+.manager-chat-panel .manager-staff-choice{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  width:100%;margin:0 0 10px;padding:15px 14px;
+  background:#10283b;color:#eaf7ff;border:1px solid #2c5269;
+  border-radius:15px;text-align:left;
+}
+.manager-chat-panel .manager-staff-choice:hover,
+.manager-chat-panel .manager-staff-choice:focus-visible{border-color:#68cde9;background:#183b51}
+.manager-chat-panel .manager-staff-choice strong{font-size:.9rem;display:block}
+.manager-chat-panel .manager-staff-choice small{font-size:.71rem;display:block;margin-top:5px;color:#94b7ca}
+.manager-chat-panel .manager-staff-choice .chevron{font-size:1.2rem;color:#9bdff1}
+.manager-chat-panel .manager-chat-no-history{
+  margin:auto;text-align:center;color:#93aebd;font-size:.87rem;
+  line-height:1.65;padding:16px;max-width:350px;
+}
+.manager-chat-panel #manager-staff-thread .ops-message{max-width:88%}
+@media(max-width:620px){
+  .manager-chat-panel .manager-chat-nav-button span{display:none}
+  .manager-chat-panel .manager-chat-nav-button{padding:6px;min-width:41px}
+}
 .manager-chat-compose{
   flex:0 0 auto;padding:10px clamp(13px,3vw,22px) 15px;
   background:#091726;border-top:1px solid #233d51;

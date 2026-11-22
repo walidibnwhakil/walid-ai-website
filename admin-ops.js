@@ -14,7 +14,7 @@
   let currentTab='dashboard', busy=false, ready=false, previousManagerFocus=null;
   // Private Help messages are displayed only for this session, never localStorage.
   const transientHelp=new Map();
-  const CHAT_RETENTION_MS=5*24*60*60*1000;
+  const CHAT_RETENTION_MS=3*24*60*60*1000;
   let managerNotices=[],lastManagerTasks=[];
   const NOTICE_SEEN_KEY='walid-manager-notice-ids';
   function seenNotices(){
@@ -179,8 +179,9 @@
     messageItems.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
     if(!messageItems.length){
       const greeting=appendMessage(host,'answer','Manager',
-        'আসসালামু আলাইকুম, স্যার। Walid AI Office-এ স্বাগতম। আমি আপনার Manager। আপনার কী নির্দেশ আছে?');
+        'আসসালামু আলাইকুম, স্যার।');
       greeting.classList.add('manager-chat-greeting');
+      host.scrollTop=host.scrollHeight;
       return;
     }
     for(const item of messageItems){
@@ -208,7 +209,9 @@
           privateRow.message||'(Empty Help message)','শুধু এই সেশনে দৃশ্যমান; ইতিহাসে সংরক্ষিত নয়');
       }
     }
+    // Always open on the newest message; older messages remain scrollable above.
     host.scrollTop=host.scrollHeight;
+    requestAnimationFrame(()=>{if(host.isConnected)host.scrollTop=host.scrollHeight});
   }
   async function request(path,init={}){
     const controller=new AbortController();

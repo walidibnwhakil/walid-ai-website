@@ -620,6 +620,8 @@ if (new URLSearchParams(location.search).has("autotest")) {
         bdActorAlive:eligible.length,
         bdActor1990Alive:eligible.filter(i=>bit(i,"screen_star_1990s")===2).length,
         loadedCount:loadedNames.length, loaded:loadedNames.slice(0,20),
+        nextPlan:catalog ? planShardLoads(catalog,state.answers,loadedNames).slice(0,12) : [],
+        loadTrace:(window.__riddlexLoadTrace || []).slice(-28),
         bdActors, best:state.alive.slice().sort((a,b)=>state.weights[b]-state.weights[a]).slice(0,8).map(i=>({
           id:pool.ids[i],name:pool.ens[i],
           actor:bit(i,"actor"),bd:bit(i,"from_bd"),

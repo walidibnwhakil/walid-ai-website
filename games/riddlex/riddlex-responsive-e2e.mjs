@@ -315,6 +315,81 @@ try {
       await negativePage.close();
     }
 
+    // Play a truthful Bangladesh real-person path on the ACTUAL browser
+    // casebook. The previous user-reported failure wrongly showed a category
+    // restart after Real Yes / Knows You No / Politician No / Bangladesh Yes.
+    // This covers progressive shard loading and UI transitions, unlike a
+    // detached engine-only test.
+    const realPage = await browser.newPage({
+      viewport: { width, height }, deviceScaleFactor: 1,
+    });
+    try {
+      realPage.on("pageerror", (error) => errors.push(error.message));
+      await realPage.route("**/*", (route) => {
+        if (new URL(route.request().url()).origin === origin) return route.continue();
+        return route.abort();
+      });
+      await realPage.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
+      await realPage.waitForFunction(() =>
+        typeof window.__riddlex?.ready === "function", null, { timeout: 25000 });
+      await realPage.evaluate(() => window.__riddlex.ready());
+      await realPage.click("#play");
+      await realPage.waitForFunction(() =>
+        !document.getElementById("categories").hidden, null, { timeout: 25000 });
+      await realPage.click('[data-cat="character"]');
+      const history = [];
+      for (let number = 0; number < 9; number++) {
+        try {
+          await realPage.waitForFunction((expected) => {
+            const s = window.__riddlex?.state?.();
+            return s?.mode === "ask" && !!s.question &&
+              s.answers.length === expected;
+          }, number, { timeout: 25000 });
+        } catch (error) {
+          const snapshot = await realPage.evaluate(() => ({
+            session: window.__riddlex?.state?.(),
+            shards: window.__riddlex?.loaded?.()?.filter((x) => x.includes("r-bd-")),
+            trace: window.__riddlexLoadTrace || [],
+            status: document.getElementById("status")?.textContent,
+          }));
+          throw new Error("Truthful Bangladesh path stopped at question " +
+            (number + 1) + " after " + JSON.stringify(history) +
+            " / " + JSON.stringify(snapshot) + " / " + error.message);
+        }
+        const qid = await realPage.evaluate(() => window.__riddlex.state().question);
+        const answers = {
+          real: "yes", knows_you: "no", politician: "no", from_bd: "yes",
+          male: "yes", female: "no", alive: "yes", dead: "no",
+          actor: "yes", cricketer: "no", footballer: "no", writer: "no",
+          singer: "no", scientist: "no", business: "no",
+          screen_star_1990s: "yes", actor_film_dui_duari: "yes",
+          actor_film_daruchini_dwip: "yes", actor_air_force: "yes",
+        };
+        const response = answers[qid] || (
+          qid.startsWith("from_") ? "no" : "unknown");
+        history.push([qid, response]);
+        await realPage.click("#answer-" + (response === "unknown" ? "unknown" : response));
+      }
+      await realPage.waitForFunction(() => {
+        const current = window.__riddlex?.state?.();
+        return current?.mode === "ask" &&
+          current.answers.length === 9 && !!current.question;
+      }, null, { timeout: 25000 });
+      const gameState = await realPage.evaluate(() => window.__riddlex.state());
+      assert.equal(gameState.answers.length, 9, JSON.stringify(history));
+      assert.equal(gameState.mode, "ask",
+        "ordinary real-person clues must never trigger category reset: " +
+          JSON.stringify({ history, gameState }));
+      assert.ok(gameState.answers.includes("from_bd"),
+        "detective should establish Bangladeshi identity early: " + JSON.stringify(history));
+      if (shotFolder) await realPage.screenshot({
+        path: join(shotFolder, "bangladesh-9-questions-" + orient + ".png"),
+      });
+      console.log("RIDDLEX_BANGLADESH_CONTINUATION_PASS", orient, JSON.stringify(history));
+    } finally {
+      await realPage.close();
+    }
+
     assert.deepEqual(errors, [], "uncaught browser errors");
     console.log("RIDDLEX_GAMEPLAY_PASS", width, height, orient);
     await page.close();

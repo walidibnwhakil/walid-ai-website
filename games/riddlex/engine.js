@@ -1243,6 +1243,34 @@ export function rejectIndex(state, index) {
   return recompute(state);
 }
 
+// A thin or still-loading shard may have no statistically informative
+// split even though the answers are consistent. Keep collecting ordinary,
+// relevant identity facts instead of interpreting missing data as a wrong
+// category. The shortlist can be expanded as country shards arrive.
+function continuationQuestion(state) {
+  const asked = new Set(state.answers.map((row) => row.qid));
+  const available = (id) => state.pool.qIndex.has(id) && !asked.has(id);
+  if (state.category !== "character" || !said(state, "real", ["yes", "probably"]))
+    return null;
+  if (said(state, "knows_you", ["yes", "probably"])) return null;
+  const hasGender = asked.has("male") || asked.has("female");
+  const hasLife = asked.has("alive") || asked.has("dead");
+  if (!hasGender && available("male")) return "male";
+  if (!hasLife && available("alive")) return "alive";
+  if (!COUNTRIES.some((id) => asked.has(id)) && available("from_bd"))
+    return "from_bd";
+  if (confirmedJob(state)) return null;
+  // Broad professions are useful when no occupation is confirmed. Never
+  // ask profession-specific details unless the parent career is established.
+  for (const id of ["actor", "cricketer", "footballer", "writer",
+    "singer", "scientist", "business", "youtube", "director", "musician",
+    "athlete"]) {
+    if (available(id) && !questionContradicts(state, id) &&
+        !unrelatedJob(state, id)) return id;
+  }
+  return null;
+}
+
 export function decide(state) {
   recompute(state);
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
@@ -1258,21 +1286,27 @@ export function decide(state) {
   // When the selected pool genuinely has no plausible match, let the player
   // revise the last answer or choose a better category rather than displaying
   // the final surrender/teach form after just a handful of answers.
-  if (!state.alive.length)
-    return canReconsider && state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
+  if (!state.alive.length) {
+    const next = continuationQuestion(state);
+    if (next) return { type: "ask", qid: next };
+    return { type: "defeat" };
+  }
   const { best, bestP, secondP } = topTwo(state, true);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
   let qid = chooseQuestion(state);
-  if (!qid && (waiting || state.answers.length < 12)) qid = firstAllowedQuestion(state);
+  if (!qid && (waiting || state.answers.length < 18)) qid = firstAllowedQuestion(state);
+  if (!qid) qid = continuationQuestion(state);
   if (!qid) {
     // Running out of high-information questions is NOT evidence that the
     // database is empty. Never fabricate a guess or open the surrender form
     // after a few negative answers; offer a category/answer correction instead.
     if (best >= 0 && !waiting && enoughIdentityEvidence(state, best))
       return { type: "guess", index: best };
-    return canReconsider && state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
+    // A consistent real-person answer is never a category contradiction.
+    // Only the explicit real=no + fictional=no conflict above is reconsidered.
+    return { type: "defeat" };
   }
   return { type: "ask", qid };
 }

@@ -126,6 +126,53 @@ try{
     checks++;
     await page.close();
   }
+  // PWA popup: every new mobile visit until appinstalled, without blocking other pages.
+  const mobileContext=await browser.newContext({
+    viewport:{width:390,height:844},isMobile:true,hasTouch:true,
+    userAgent:"Mozilla/5.0 (Linux; Android 15; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
+  });
+  const mobilePage=await mobileContext.newPage();
+  await mobilePage.goto(origin+"/",{waitUntil:"load"});
+  await mobilePage.locator("#walid-pwa-invite").waitFor({state:"visible",timeout:5000});
+  assert.equal(await mobilePage.locator('#walid-pwa-invite img').getAttribute("src"),"/walid-ai-approved-flower.png");
+  assert.equal(await mobilePage.locator("#pwa-install").isVisible(),true);
+  await mobilePage.locator('[aria-label="Close install invitation"]').click();
+  assert.equal(await mobilePage.locator("#walid-pwa-invite").count(),0);
+  // Ordinary same-site navigation must not generate a second popup.
+  await mobilePage.goto(origin+"/games/index.html",{waitUntil:"load",referer:origin+"/"});
+  await mobilePage.waitForTimeout(900);
+  assert.equal(await mobilePage.locator("#walid-pwa-invite").count(),0);
+  // A new entry (new tab) should invite again when not installed.
+  const freshVisit=await mobileContext.newPage();
+  await freshVisit.goto(origin+"/",{waitUntil:"load"});
+  await freshVisit.locator("#walid-pwa-invite").waitFor({state:"visible",timeout:5000});
+  await freshVisit.evaluate(()=>window.dispatchEvent(new Event("appinstalled")));
+  assert.equal(await freshVisit.locator("#walid-pwa-invite").count(),0);
+  await freshVisit.reload({waitUntil:"load"});
+  await freshVisit.waitForTimeout(900);
+  assert.equal(await freshVisit.locator("#walid-pwa-invite").count(),0,
+    "Installed PWA must stop inviting");
+  await freshVisit.close();
+  await mobilePage.close();
+  await mobileContext.close();
+  // iPhone has no native beforeinstallprompt; manual instructions must work.
+  const iosContext=await browser.newContext({
+    viewport:{width:390,height:844},isMobile:true,hasTouch:true,
+    userAgent:"Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+  });
+  const iosPage=await iosContext.newPage();
+  await iosPage.goto(origin+"/",{waitUntil:"load"});
+  await iosPage.locator("#walid-pwa-invite").waitFor({state:"visible",timeout:5000});
+  await iosPage.locator('[data-action="install"]').click();
+  assert.match(await iosPage.locator(".walid-pwa-instructions").innerText(),/Add to Home Screen/);
+  await iosPage.locator('[data-action="installed"]').click();
+  await iosPage.reload({waitUntil:"load"});
+  await iosPage.waitForTimeout(900);
+  assert.equal(await iosPage.locator("#walid-pwa-invite").count(),0);
+  await iosContext.close();
+  console.log("PWA_INSTALL_POPUP_PASS",JSON.stringify({mobileFirstVisit:true,internalNavSuppressed:true,
+    newVisitRepeated:true,installedSuppressed:true,iosInstructions:true}));
+
   console.log("HOME_RESPONSIVE_PASS",JSON.stringify({
     viewports:[320,360,375,390,430,600,650,768,1024,1280],
     checks,sections:8,mobileColumns:2,desktopColumns:3,svgIcons:8

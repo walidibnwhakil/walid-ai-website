@@ -64,7 +64,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 @media(max-width:540px){.panel{padding:14px}.ops-desk-grid{grid-template-columns:repeat(2,1fr)}.ops-desk{min-height:110px}.admin-header h1{font-size:1.5rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.big{font-size:1.25rem}}
 </style>
 <link rel="stylesheet" href="/admin-shell.css?v=20261122-no-shift-sidebar">
-<link rel="stylesheet" href="/manager-office-chat.css?v=20261122-office-greeting">
+<link rel="stylesheet" href="/manager-office-chat.css?v=20261122-staff-threads">
 </head>
 <body class="admin-locked">
 <main>
@@ -135,6 +135,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
   <div id="manager-chat-backdrop" class="manager-chat-backdrop" hidden></div>
   <section id="manager-chat-panel" class="manager-chat-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ops-role-name" inert>
     <header class="manager-chat-header">
+      <button id="manager-thread-back" type="button" class="manager-chat-nav-button" aria-label="Back to Manager conversations" title="Back" hidden>←</button>
       <div class="manager-chat-identity">
         <span class="manager-chat-avatar" aria-hidden="true">
           <svg width="23" height="23" viewBox="0 0 32 32" fill="none">
@@ -151,9 +152,21 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
           <span id="ops-role-description" class="manager-chat-subtitle">Walid AI · Private Office</span>
         </div>
       </div>
-      <button type="button" id="manager-chat-close" class="secondary-button" aria-label="Close Manager chat" title="Close chat">✕</button>
+      <div class="manager-chat-header-actions">
+        <button type="button" id="manager-staff-chats" class="manager-chat-nav-button" aria-label="View staff conversations" title="Staff conversations">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="17" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M2.5 19c0-3 2.5-5.1 5.5-5.1s5.5 2.1 5.5 5.1M13.5 15.5c3.7-1.5 7.7.3 8 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>Staff chats</span>
+        </button>
+        <button type="button" id="manager-chat-close" class="secondary-button" aria-label="Close Manager chat" title="Close chat">✕</button>
+      </div>
     </header>
     <div id="ops-history" class="ops-history manager-chat-transcript" aria-label="Conversation with Manager" role="log" aria-live="polite"></div>
+    <div id="manager-staff-list" class="manager-chat-internal-view" aria-label="Team conversations" hidden></div>
+    <div id="manager-staff-thread" class="manager-chat-internal-view manager-chat-thread" aria-label="Selected staff conversation" role="log" hidden></div>
     <div class="manager-chat-compose">
       <p id="manager-chat-status" class="status" role="status"></p>
       <label class="manager-chat-visually-hidden" for="ops-input">Message Manager</label>
@@ -178,7 +191,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 <script src="/admin-analytics-catalog.js?v=20261122-sections"></script>
 <script src="/admin-section-metrics.js?v=20261122-context-columns"></script>
 <script src="/admin-usage.js?v=20261122-audience-clean"></script>
-<script src="/admin-ops.js?v=20261122-embed-footerfix"></script>
+<script src="/admin-ops.js?v=20261122-staff-threads"></script>
 <script src="/admin-approvals.js?v=20261122-ops"></script>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </body></html>

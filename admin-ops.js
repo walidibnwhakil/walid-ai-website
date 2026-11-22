@@ -16,6 +16,7 @@
   const transientHelp=new Map();
   const CHAT_RETENTION_MS=3*24*60*60*1000;
   let managerNotices=[],lastManagerTasks=[],chatView='manager',selectedStaffRole=null;
+  let noticeRetryTimer=null;
   const NOTICE_SEEN_KEY='walid-manager-notice-ids';
   function seenNotices(){
     try{
@@ -104,6 +105,7 @@
     $('#ops-input')?.focus();
     fitComposer();
     void loadHistory();
+    void refreshNotices(); // Refresh the newest real checks when Messenger opens.
   }
   function closeManagerChat(){
     const panel=$('#manager-chat-panel');if(!panel)return;
@@ -339,6 +341,14 @@
         if(chatView==='thread')renderStaffThread(selectedStaffRole);
         acknowledgeNotices();
       }
+      if(brief.daily_report?.checks_pending&&!noticeRetryTimer){
+        // Health/Security checks run on the server's worker. Poll once when
+        // their first snapshot is ready rather than blocking the chat UI.
+        noticeRetryTimer=setTimeout(()=>{
+          noticeRetryTimer=null;
+          if(ready)void refreshNotices();
+        },9000);
+      }
     }catch{/* A monitoring outage must not interrupt the owner's conversation. */}
   }
   async function submit(){
@@ -373,6 +383,7 @@
     }finally{busy=false;$('#ops-send').disabled=false}
   }
   function logout(){
+    if(noticeRetryTimer){clearTimeout(noticeRetryTimer);noticeRetryTimer=null}
     closeManagerChat();
     transientHelp.clear();
     managerNotices=[];lastManagerTasks=[];

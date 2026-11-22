@@ -14,7 +14,7 @@ import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));
 const questions = [
   ...manifest.questions, ...EXTRA_SCREEN_QUESTIONS,
-  ...ACTOR_PROOF_QUESTIONS, ...WRITER_PROOF_QUESTIONS,
+  ...PERSONAL_QUESTIONS, ...ACTOR_PROOF_QUESTIONS, ...WRITER_PROOF_QUESTIONS,
 ];
 function makePool() {
   return poolFromEntries(questions, [

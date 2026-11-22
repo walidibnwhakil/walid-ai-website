@@ -436,6 +436,7 @@ test("confirmed acting cannot nominate someone with unknown or negative acting e
   ];
   const pool = poolFromEntries(qs, [
     entry("wrong-star", 65000, ["real", "from_bd", "named"], { no: ["politician"] }),
+    entry("foreign-actor-unknown-country", 64000, ["real", "named", "actor"], { no: ["politician"] }),
     entry("real-actor", 50, ["real", "from_bd", "named", "actor"], { no: ["politician"] }),
     entry("explicit-non-actor", 60000, ["real", "from_bd", "named"], { no: ["actor", "politician"] }),
   ]);

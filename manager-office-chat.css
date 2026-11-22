@@ -14,6 +14,16 @@
   box-shadow:0 8px 24px #000b,0 0 0 5px #4de4ff4a;
 }
 #workspace-shell > #manager-chat-head:disabled{opacity:.45;cursor:not-allowed}
+#workspace-shell > #manager-chat-head[data-unread="true"]::after{
+  content:"";position:absolute;right:0;top:0;width:12px;height:12px;
+  border-radius:50%;background:#ff987e;border:2px solid #102639;
+  box-shadow:0 0 0 2px #ff987e35;
+}
+.manager-chat-panel .manager-chat-alert{border-color:#6d5551!important}
+.manager-chat-panel .manager-chat-alert a{
+  font-size:.78rem;color:#a8e9ff;text-decoration:underline;text-underline-offset:3px;
+  overflow-wrap:anywhere;
+}
 #workspace-shell > #manager-chat-head svg{display:block;width:29px;height:29px}
 .manager-chat-backdrop{position:fixed;inset:0;z-index:119;background:#010811b3}
 .manager-chat-backdrop[hidden]{display:none!important}
@@ -116,14 +126,16 @@
 }
 .manager-chat-panel #ops-input::placeholder{color:#90adbd}
 .manager-chat-panel #ops-send{
-  flex:0 0 39px;display:grid;place-items:center;
-  width:39px;height:39px;min-width:39px;padding:0;margin:0;
-  background:#4de4ff;color:#0a2635;border:0;border-radius:13px;
+  flex:0 0 42px;display:grid;place-items:center;
+  width:42px;height:42px;min-width:42px;padding:0;margin:0;
+  background:#4de4ff;color:#082938;border:1px solid #83edff;
+  border-radius:50%;font-size:0;line-height:0;white-space:nowrap;
+  box-shadow:0 2px 9px #0004;transition:background .15s ease,transform .15s ease;
 }
-.manager-chat-panel #ops-send:hover{background:#a0f2ff}
-.manager-chat-panel #ops-send:disabled{opacity:.5;cursor:progress}
-.manager-chat-retention{margin:7px 0 0;text-align:center;font-size:.69rem;color:#789cac}
-.manager-chat-history-note{margin:4px 0 0;text-align:center;font-size:.65rem;color:#708da2}
+.manager-chat-panel #ops-send svg{display:block;flex:none;width:21px;height:21px}
+.manager-chat-panel #ops-send:hover{background:#abf4ff;transform:translateY(-1px)}
+.manager-chat-panel #ops-send:focus-visible{outline:2px solid #b5f5ff;outline-offset:3px}
+.manager-chat-panel #ops-send:disabled{opacity:.55;cursor:progress;transform:none}
 .manager-chat-visually-hidden{
   position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
   overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;

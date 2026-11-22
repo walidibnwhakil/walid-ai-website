@@ -6,6 +6,8 @@ on:
       - codex/walid-ai-staff-team
   schedule:
     - cron: "17 */6 * * *"
+    # 00:05 Asia/Dhaka (18:05 UTC, previous calendar day).
+    - cron: "5 18 * * *"
   workflow_dispatch:
 
 permissions:

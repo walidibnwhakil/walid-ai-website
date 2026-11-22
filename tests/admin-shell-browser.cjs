@@ -68,6 +68,13 @@ async function exercise(browser, width, height){
     return route.fulfill({status:200,json:{tasks:liveTasks,persistence:'temporary_filesystem'}});
   });
   await context.route('**/api/admin/staff/checks',route=>route.fulfill({status:200,json:{checks:[]}}));
+  await context.route('**/api/admin/manager/notices',route=>route.fulfill({status:200,json:{
+    notices:[{id:'morning-'+new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'}),
+      kind:'morning',role:'Manager',
+      created_at:new Date(new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'})+'T00:05:00+06:00').toISOString(),
+      message:'আসসালামু আলাইকুম, স্যার। শুভ সকাল।'}],
+    scheduled_monitor_checked:true
+  }}));
   // Approval UI is tested for section isolation only, not external Firebase sign-in.
   await context.route('**/www.gstatic.com/firebasejs/**',route=>route.abort());
   const page=await context.newPage(),errors=[];
@@ -237,10 +244,27 @@ async function exercise(browser, width, height){
   const robotCount=await page.frameLocator('#preserved-staff-office').locator('.desk').count();
   assert.equal(robotCount,5,'all original five workstations remain');
   const heading=await page.frameLocator('#preserved-staff-office').locator('.intro h1').textContent();
-  assert.match(heading,/Five desks\. One protected network\./);
+  assert.equal(heading.trim(),'AI Staff Office','Office uses one professional, concise heading');
+  assert.equal(await page.frameLocator('#preserved-staff-office').locator('.intro p').count(),0,
+    'No redundant technical subtitle above the robots');
+  assert.equal(await page.locator('#ops-checks').count(),0,'No duplicate Run real checks button below robots');
+  assert.equal(await page.locator('#ops-reload').count(),0,'No duplicate Refresh history button below robots');
+  assert.equal(await page.frameLocator('#preserved-staff-office').locator('.details').count(),0,
+    'No redundant staff history panel underneath the original office');
+  for(const role of ['it','cyber','cse','admin']){
+    await page.frameLocator('#preserved-staff-office').locator('.desk.'+role).click();
+    assert.equal(await page.frameLocator('#preserved-staff-office').locator('.greeting-bubble').count(),1,
+      'Exactly one bubble after clicking '+role);
+    assert.equal(await page.frameLocator('#preserved-staff-office').locator('.desk.'+role+' .greeting-bubble').textContent(),
+      'Assalamu Alaykum, Sir');
+    assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,
+      'Subordinate desk greeting must not open Manager messenger');
+  }
   assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'Manager drawer initially closed');
   await page.frameLocator('#preserved-staff-office').locator('.desk.manager').click();
   await page.locator('#manager-chat-panel').waitFor({state:'visible'});
+  assert.equal(await page.frameLocator('#preserved-staff-office').locator('.desk.manager .greeting-bubble').textContent(),
+    'Assalamu Alaykum, Sir','Manager desk greets respectfully as well');
   assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'false');
   assert.equal(await page.locator('#ops-role-name').textContent(),'Manager');
   await page.locator('#ops-input').fill('আজকের visitor এবং সাইটের সমস্যা যাচাই করো');

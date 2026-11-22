@@ -797,7 +797,7 @@ test("Shabana and Alamgir are recognized as pre-1990 stars, not by birth year", 
   assert.equal(factBit(pool, 0, qi), 2);
   assert.equal(factBit(pool, 1, qi), 2);
   assert.equal(factBit(pool, 2, qi), 1);
-  assert.ok(qs.at(-2).en.includes("before the 1990s"));
+  assert.ok(qs.at(-2).en.includes("before 1990"));
   assert.ok(!qs.at(-2).bn.includes("জন্ম"));
 });
 

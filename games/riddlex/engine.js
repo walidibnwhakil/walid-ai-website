@@ -344,7 +344,11 @@ export function recompute(state) {
       const answer = answers[a];
       if (answer.value === "unknown") continue;
       const bit = factBit(pool, i, answer.qi);
-      const firm = hardLog(answer, bit, conflicted);
+      // A player's relative has no fixed nationality; a missing country
+      // fact must not overwhelm confirmed family information.
+      const unknownRoleCountry = relation && playerPersonal &&
+        COUNTRIES.includes(answer.qid) && bit === 0;
+      const firm = unknownRoleCountry ? null : hardLog(answer, bit, conflicted);
       score += firm == null ? LOG_MATCH[answer.value][bit] : firm;
     }
     logW[i] = score;
@@ -372,6 +376,14 @@ export function recompute(state) {
 }
 
 function topTwo(state) {
+  // Never guess a known foreign-country candidate after a firm country yes.
+  // An unknown country is not treated as a contradiction.
+  const chosenCountry = state.answers.find((row) =>
+    row.value === "yes" && COUNTRIES.includes(row.qid));
+  const otherCountryQIs = chosenCountry
+    ? COUNTRIES.filter((id) => id !== chosenCountry.qid)
+      .map((id) => state.pool.qIndex.get(id)).filter((qi) => qi != null)
+    : [];
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -379,6 +391,11 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
+    if (chosenCountry) {
+      const countryFact = factBit(state.pool, i, chosenCountry.qi);
+      if (countryFact === 1 || (countryFact !== 2 &&
+        otherCountryQIs.some((qi) => factBit(state.pool, i, qi) === 2))) continue;
+    }
     const w = weights[i];
     if (w > bestP) {
       second = best;
@@ -499,10 +516,26 @@ function gated(state, question, rows) {
   if (id === "adult_ent") return adultAllowed(state);
   if (group === "personal") {
     if (state.category !== "character") return false;
-    if (id === "knows_you") return state.answers.some((row) => row.qid === "real" &&
-      (row.value === "yes" || row.value === "probably"));
-    return state.answers.some((row) => row.qid === "knows_you" &&
-      (row.value === "yes" || row.value === "probably"));
+    const yes = (qid) => said(state, qid, ["yes", "probably"]);
+    const no = (qid) => said(state, qid, ["no", "probably_not"]);
+    if (id === "knows_you") return yes("real");
+    if (!yes("knows_you")) return false;
+    if (id === "your_family") return true;
+    if (yes("your_family")) {
+      if (id === "your_parent") return true;
+      if (id === "your_sibling") return no("your_parent");
+      if (id === "your_spouse") return no("your_parent") && no("your_sibling");
+      if (id === "your_child") return no("your_parent") && no("your_sibling") && no("your_spouse");
+      if (id === "your_baby") return yes("your_child");
+      return false;
+    }
+    if (no("your_family")) {
+      if (id === "your_partner") return true;
+      if (id === "your_ex") return no("your_partner");
+      if (id === "your_best_friend") return no("your_partner") && no("your_ex");
+      if (id === "your_friend") return no("your_partner") && no("your_ex") && no("your_best_friend");
+    }
+    return false;
   }
   if (id === "screen_star_1990s" || id === "screen_star_pre1990") {
     return state.answers.length >= 5 &&
@@ -895,6 +928,11 @@ export function questionContradicts(state, qid) {
 function blockedQuestion(state, question, rows, cache) {
   if (skippedAsDuplicate(state, question.id)) return true;
   const links = linksFor(state.pool);
+  // Sport-specific roles are not asked before confirming the sport.
+  for (const sport of ["cricketer", "footballer"]) {
+    if (links.parents.get(question.id)?.includes(sport) &&
+        !said(state, sport, ["yes", "probably"])) return true;
+  }
   if (impliedYes(state, question.id, links) || questionContradicts(state, question.id)) return true;
   for (const parent of links.massParents.get(question.id) || []) {
     if (parent === "politician" && politicsBranch(state)) continue;
@@ -907,7 +945,9 @@ export function questionBlocked(state, qid) {
   const qi = state.pool.qIndex.get(qid);
   if (qi == null) return false;
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
-  return blockedQuestion(state, state.pool.questions[qi], rows, new Map());
+  const question = state.pool.questions[qi];
+  if (question.group === "personal" && !gated(state, question, rows)) return true;
+  return blockedQuestion(state, question, rows, new Map());
 }
 
 function allowedInCategory(state, question) {
@@ -932,6 +972,8 @@ function firstAllowedQuestion(state) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
     if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
+    // Fallback questions must respect personal-relationship prerequisites too.
+    if (question.group === "personal" && !gated(state, question, rows)) continue;
     return question.id;
   }
   return null;

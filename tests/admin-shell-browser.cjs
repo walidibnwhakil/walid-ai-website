@@ -9,7 +9,18 @@ const usage={
   lifetime:{visitors:42},today:{visitors:3},
   period:{visitors:11,views:56,active_seconds:80},
   storage:{mode:'firestore',durable:true,last_error:'',dropped_server_events:0},
-  features:[{feature:'game_riddlex',visitors:2,views:3,starts:2,completions:0,answers:0,errors:0,active_seconds:66}],
+  features:[
+    {feature:'surah_al_fatiha',visitors:1,views:7,starts:0,completions:0,answers:0,errors:0,active_seconds:90},
+    {feature:'game_riddlex',visitors:2,views:3,starts:2,completions:0,answers:0,errors:0,active_seconds:66},
+    {feature:'tool_merge_pdf',visitors:2,views:4,starts:2,completions:1,answers:0,errors:0,active_seconds:35},
+    {feature:'book_history_roman_empire',visitors:3,views:4,starts:0,completions:0,answers:0,errors:0,active_seconds:30}
+  ],
+  sections:Object.fromEntries(['chat','pdf','image','games','education','islam','sports','others']
+    .map(key=>[key,{visitors:4,views:8,starts:2,active_seconds:80,completions:1,answers:0,errors:0}])),
+  subsections:{
+    islam:{quran:{visitors:1,views:7,active_seconds:90}},
+    others:{history:{visitors:3,views:4,active_seconds:30}}
+  },
   daily:[],countries:{},divisions:{},api:{},provider_snapshots:{},notes:[]
 };
 async function exercise(browser, width, height){
@@ -55,6 +66,30 @@ async function exercise(browser, width, height){
   await page.locator('#workspace-shell').waitFor({state:'visible'});
   assert.equal(await page.locator('#auth-screen').isVisible(),false,'sign-in card hidden after login');
   assert.equal(await page.locator('#dashboard').isVisible(),true);
+  const sections=page.locator('#features > details.analytics-section');
+  assert.equal(await sections.count(),8,'Current homepage sections only');
+  assert.deepEqual(await sections.locator('summary .section-title').allTextContents(),[
+    'AI Chat','PDF Tools','Image Tools','Games','Education','Al-Quran & Islam','Sports','Others'
+  ],'Dashboard section names and order must match the homepage');
+  assert.equal(await page.locator('#features details[open]').count(),0,'All details start closed');
+  await sections.nth(1).locator('summary').first().click();
+  assert.equal(await sections.nth(1).getAttribute('open'),'','PDF opens with the arrow');
+  assert.match(await sections.nth(1).textContent(),/Merge PDF/);
+  assert.match(await sections.nth(1).textContent(),/Bengali OCR/);
+  await sections.nth(1).locator('summary').first().click();
+  await sections.nth(5).locator('summary').first().click();
+  assert.match(await sections.nth(5).textContent(),/আল-কুরআন/);
+  assert.doesNotMatch(await sections.nth(5).textContent(),/আল-ফাতিহা|আল-বাকারা/,
+    'Quran must never show a 114-surah list in the section');
+  assert.match(await page.locator('#stats').textContent(),/সূরা আল-ফাতিহা/,
+    'Most Active Feature may identify one popular surah');
+  await sections.nth(7).locator('summary').first().click();
+  const history=sections.nth(7).locator('details.analytics-subsection').first();
+  await history.locator('summary').first().click();
+  assert.match(await history.textContent(),/রোমান সাম্রাজ্য/);
+  assert.equal(await page.locator('#notes').count(),0,'Technical privacy essay removed from admin dashboard');
+  await sections.nth(5).locator('summary').first().click();
+  await sections.nth(7).locator('summary').first().click();
   assert.equal(await page.locator('#sidebar-details').isVisible(),false,'sidebar items collapsed after login');
   assert.equal(await page.locator('#sidebar-toggle').getAttribute('aria-expanded'),'false');
   await page.locator('#sidebar-toggle').click();

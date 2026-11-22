@@ -221,12 +221,6 @@
         const rect = el.getBoundingClientRect();
         return rect.top <= line && rect.bottom >= line;
       });
-      if (!active) {
-        active = nodes.find(el => {
-          const rect = el.getBoundingClientRect();
-          return rect.top > line && rect.top < innerHeight * .85;
-        });
-      }
       if (!active) return null;
       const match = active.id.match(/^ayah-(\d+)-(\d+)$/);
       const number = match ? Number(match[1]) : surah;
@@ -274,9 +268,9 @@
       panel.replaceChildren();
       if (last) addLink(panel, "সর্বশেষ পড়া: " + qLabel(last), qUrl(last), event => resume(event, last));
       if (bookmark) addLink(panel, "বুকমার্ক: " + qLabel(bookmark), qUrl(bookmark), event => resume(event, bookmark));
-      addButton(panel, "বর্তমান আয়াতে বুকমার্ক", () => {
+      addButton(panel, "শেষ পড়া আয়াতে বুকমার্ক", () => {
         flush();
-        const value = currentPosition() || last;
+        const value = last || currentPosition();
         if (!value) {
           feedback.textContent = "প্রথমে আয়াতের কাছে গিয়ে বুকমার্ক রাখুন।";
         } else if (put(qBookmarkKey, value)) {
@@ -294,9 +288,13 @@
     renderPanel();
     // A short surah may fit the viewport without a scroll gesture.
     setTimeout(() => {
-      if (!document.hidden && (!last || last.surah !== surah)) {
-        const firstVisible = currentPosition();
-        if (firstVisible) saveLatest(firstVisible);
+      if (!document.hidden && (!last || last.surah !== surah) &&
+          document.getElementById("quran-tab-surah")?.getAttribute("aria-selected") === "true") {
+        saveLatest(currentPosition() || {
+          surah, verse: 1, slug,
+          title: (document.querySelector("#surah-title")?.textContent || surahTitle).trim(),
+          savedAt: Date.now()
+        });
       }
     }, 3000);
     let gestureAt = 0;
@@ -388,7 +386,7 @@
       if (last) addLink(panel, "সর্বশেষ পড়া: " + title(last), "#" + last.id, e => go(e, last));
       if (bookmark) addLink(panel, "বুকমার্ক: " + title(bookmark), "#" + bookmark.id, e => go(e, bookmark));
       addButton(panel, "বর্তমান কাহিনিতে বুকমার্ক", () => {
-        const value = select() || last;
+        const value = last || select();
         if (!value) feedback.textContent = "আগে কোনো কাহিনি পড়ুন।";
         else if (put(sBookmarkKey, value)) { bookmark = value; render(); feedback.textContent = "কাহিনির বুকমার্ক সংরক্ষিত হয়েছে।"; }
         else feedback.textContent = "এই ব্রাউজারে বুকমার্ক রাখা যাচ্ছে না।";

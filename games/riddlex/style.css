@@ -170,6 +170,22 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   border: 1px solid #e6bd68; background: #24150dcc; color: #ffe6a4;
 }
 @media (min-aspect-ratio: 4/5) {
+  /* The initial category picker must never become three full-screen bars.
+     Each choice is a compact, readable button centered on the wooden desk. */
+  #categories {
+    left: 50%; right: auto; width: max-content;
+    max-width: calc(100% - 36px);
+    transform: translateX(-50%);
+  }
+  .cat-row {
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: center; gap: 12px;
+  }
+  .cat-row button {
+    flex: 0 0 auto; width: auto; min-width: 134px;
+    min-height: 46px; padding: 9px 20px;
+    font-size: 17px; line-height: 1.15;
+  }
   /* Desktop: controls rest on the wooden desk instead of along the screen edge.
      Each button sizes to its label rather than stretching across the viewport. */
   #answers {

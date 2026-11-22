@@ -1,9 +1,13 @@
 // Compact little-endian knowledge shards. Names stay in one blob so the
 // first question can render before every shard has finished parsing.
 
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
+
+// The legacy binary shards store 28 attribute bytes while newer supported
+// questions are represented as sparse, fact-checked runtime overlays.
 export function poolFromEntries(questions, entries) {
   const qIndex = new Map(questions.map((question, index) => [question.id, index]));
-  const attrBytes = Math.ceil(questions.length / 4);
+  const attrBytes = questions.packedAttrBytes || Math.ceil(questions.length / 4);
   const count = entries.length;
   const attrs = new Uint8Array(count * attrBytes);
   const pop = new Uint16Array(count);
@@ -61,6 +65,7 @@ export function decodeShard(buffer, questions) {
   const version = view.getUint16(offset, true); offset += 2;
   if (version !== 1) throw new Error("Unsupported knowledge version");
   const attrBytes = view.getUint16(offset, true); offset += 2;
+  questions.packedAttrBytes = attrBytes;
   const count = view.getUint32(offset, true); offset += 4;
   const attrs = new Uint8Array(count * attrBytes);
   const pop = new Uint16Array(count);
@@ -269,9 +274,15 @@ export function categoryShards(manifest, category) {
 }
 
 export async function loadManifest(base = "./kb") {
-  const response = await fetch(`${base}/manifest.json?v=akinator-35`);
+  const response = await fetch(`${base}/manifest.json?v=riddlex-39`);
   if (!response.ok) throw new Error("Knowledge manifest failed");
-  return response.json();
+  const manifest = await response.json();
+  for (const question of EXTRA_SCREEN_QUESTIONS) {
+    if (!manifest.questions.some((row) => row.id === question.id)) {
+      manifest.questions.push({ ...question });
+    }
+  }
+  return manifest;
 }
 
 function grow(pool, need) {
@@ -326,6 +337,7 @@ export const traffic = { bytes: 0 };
 const shardCache = new Map();
 
 function poolFromDecoded(data, questions) {
+  questions.packedAttrBytes = data.attrBytes;
   return {
     questions,
     qIndex: new Map(questions.map((question, index) => [question.id, index])),

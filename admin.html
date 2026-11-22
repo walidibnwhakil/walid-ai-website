@@ -62,25 +62,38 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 @media(max-width:800px){main{padding:15px 13px 45px}.admin-shell{grid-template-columns:1fr;gap:18px}.admin-sidebar{position:static;padding:12px 14px}.admin-sidebar .site-logo-link{display:none}.admin-sidebar .side-heading{margin:0 0 10px}.admin-sidebar nav{grid-template-columns:repeat(3,1fr)}.admin-sidebar button{text-align:center;padding:9px 5px}.ops-grid{grid-template-columns:1fr}}
 @media(max-width:540px){.panel{padding:14px}.ops-desk-grid{grid-template-columns:repeat(2,1fr)}.ops-desk{min-height:110px}.admin-header h1{font-size:1.5rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.big{font-size:1.25rem}}
 </style>
+<link rel="stylesheet" href="/admin-shell.css?v=20261122c">
 </head>
-<body>
-<main><div class="admin-shell">
-<aside class="admin-sidebar" aria-label="Private admin navigation">
-  <a class="site-logo-link" href="/" aria-label="Walid AI home"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a>
-  <h2 class="side-heading">Operations Center</h2>
-  <nav aria-label="Admin sections">
-    <button type="button" data-admin-tab="dashboard" aria-current="page">Analytics</button>
-    <button type="button" data-admin-tab="staff">AI Staff &amp; Manager</button>
-    <button type="button" data-admin-tab="riddlex">Riddlex Approvals</button>
-  </nav>
-  <p><small>Private owner workspace · live records and verified capabilities</small></p>
+<body class="admin-locked">
+<main>
+<section id="auth-screen" class="auth-screen" aria-label="Private admin sign in">
+  <div id="login" class="auth-card">
+    <img class="login-logo" src="/walid-ai-approved-logo.png" alt="Walid AI official logo" width="270" height="90">
+    <h1>Walid AI Admin</h1>
+    <label for="key">Admin access key</label>
+    <input id="key" type="password" autocomplete="current-password" placeholder="Enter your access key">
+    <button id="enter" type="button">Sign in</button>
+    <p id="status" class="status" role="status"></p>
+  </div>
+</section>
+<div id="workspace-shell" class="admin-shell hidden">
+<aside id="admin-sidebar" class="admin-sidebar" aria-label="Private admin navigation">
+  <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Open sidebar" aria-controls="sidebar-details" aria-expanded="false" title="Open menu"><span aria-hidden="true">☰</span></button>
+  <div id="sidebar-details" class="sidebar-details">
+    <a class="site-logo-link" href="/" aria-label="Walid AI home"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a>
+    <h2 class="side-heading">Operations Center</h2>
+    <nav aria-label="Admin sections">
+      <button type="button" data-admin-tab="dashboard" aria-current="page">Analytics</button>
+      <button type="button" data-admin-tab="staff">AI Staff &amp; Manager</button>
+      <button type="button" data-admin-tab="riddlex">Riddlex Approvals</button>
+    </nav>
+  </div>
 </aside>
 <div class="admin-content">
   <header class="admin-header">
     <div><h1>Walid AI Admin</h1><p class="muted">Analytics, team operations and approvals — one protected portal.</p></div>
     <div class="top-actions"><span id="date" class="muted"></span><button id="exit" class="secondary-button hidden" type="button">Sign out</button></div>
   </header>
-  <section id="login" class="panel"><h2>Admin sign in</h2><label for="key">Owner access key</label><div class="toolbar"><input id="key" type="password" autocomplete="current-password" placeholder="Private key"><button id="enter" type="button">Sign in</button></div><p id="status" class="status" role="status"></p></section>
   <section id="dashboard" class="hidden" aria-label="Analytics">
     <div class="toolbar panel">
       <label>Reporting period <select id="period"><option value="1">Today</option><option value="7" selected>7 days</option><option value="14">14 days</option><option value="30">30 days</option><option value="90">90 days</option></select></label>
@@ -127,8 +140,8 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
   </section>
 </div></div></main>
 <script src="/backend-config.js"></script>
-<script src="/admin-usage.js?v=20261122-ops"></script>
-<script src="/admin-ops.js?v=20261122-ops"></script>
+<script src="/admin-usage.js?v=20261122c"></script>
+<script src="/admin-ops.js?v=20261122c"></script>
 <script src="/admin-approvals.js?v=20261122-ops"></script>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </body></html>

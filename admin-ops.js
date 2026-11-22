@@ -16,13 +16,22 @@
   const auth = () => ({Authorization:'Bearer '+token()});
   const panels = ['dashboard','staff-workspace','riddlex-workspace'];
   const tabNames = {dashboard:'dashboard',staff:'staff-workspace',riddlex:'riddlex-workspace'};
+  function setSidebarOpen(open){
+    const shell=$('#workspace-shell'),button=$('#sidebar-toggle'),details=$('#sidebar-details');
+    if(!shell||!button||!details)return;
+    shell.classList.toggle('nav-expanded',Boolean(open));
+    button.setAttribute('aria-expanded',String(Boolean(open)));
+    button.setAttribute('aria-label',open?'Close sidebar':'Open sidebar');
+    button.setAttribute('title',open?'Close menu':'Open menu');
+    details.setAttribute('aria-hidden',String(!open));
+  }
   function status(text, bad=false) {
     const el=$('#ops-status'); if(el){el.textContent=text;el.dataset.error=bad?'true':'false'}
   }
   function selectTab(tab, writeHash=true) {
     if(!tabNames[tab])tab='dashboard';
     currentTab=tab;
-    if(writeHash)history.replaceState(null,'','#'+tab);
+    if(writeHash){history.replaceState(null,'','#'+tab);setSidebarOpen(false)}
     if(!ready)return;
     panels.forEach(id=>$('#'+id)?.classList.toggle('hidden',tabNames[tab]!==id));
     document.querySelectorAll('[data-admin-tab]').forEach(button=>{
@@ -147,17 +156,30 @@
     finally{busy=false;button.disabled=false}
   }
   function logout(){
-    ready=false;$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
+    ready=false;setSidebarOpen(false);$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=true);
     window.WalidAdminApprovals?.signOut();
   }
   addEventListener('walid-admin-authenticated',()=>{
-    ready=true;
+    ready=true;setSidebarOpen(false);
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=false);
     selectTab(location.hash.slice(1)||currentTab,false);
   });
   addEventListener('walid-admin-signed-out',logout);
   addEventListener('hashchange',()=>selectTab(location.hash.slice(1),false));
+  $('#sidebar-toggle')?.addEventListener('click',()=>{
+    if(!ready)return;
+    setSidebarOpen(!$('#workspace-shell').classList.contains('nav-expanded'));
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape')setSidebarOpen(false);
+  });
+  document.addEventListener('click',event=>{
+    if(!ready||!$('#workspace-shell').classList.contains('nav-expanded'))return;
+    if(event.target.closest('#admin-sidebar'))return;
+    setSidebarOpen(false);
+  });
+
   document.querySelectorAll('[data-admin-tab]').forEach(b=>{
     b.disabled=true;b.addEventListener('click',()=>selectTab(b.dataset.adminTab));
   });

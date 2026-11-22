@@ -895,8 +895,9 @@ test("Shabana and Alamgir are recognized as pre-1990 stars, not by birth year", 
   assert.equal(factBit(pool, 0, qi), 2);
   assert.equal(factBit(pool, 1, qi), 2);
   assert.equal(factBit(pool, 2, qi), 1);
-  assert.ok(qs.at(-2).en.includes("before 1990"));
-  assert.ok(!qs.at(-2).bn.includes("জন্ম"));
+  const pre1990Question = qs.find((q) => q.id === "screen_star_pre1990");
+  assert.ok(pre1990Question.en.includes("before 1990"));
+  assert.ok(!pre1990Question.bn.includes("জন্ম"));
 });
 
 test("politics augmentation survives spare array capacity after appending private roles", () => {

@@ -1,6 +1,6 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-43";
-import { UI, guessFont } from "./i18n.js?v=riddlex-40";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-44";
+import { UI, guessFont } from "./i18n.js?v=riddlex-44";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-42";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
@@ -85,7 +85,7 @@ function showMenu() {
 }
 
 function gameInProgress() {
-  return mode === "ask" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
+  return mode === "ask" || mode === "reconsider" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
 }
 
 const LOAD_MS = 15000;
@@ -197,7 +197,8 @@ function showOnly(which) {
   $("again").hidden = which !== "solved";
   learnForm.hidden = which !== "learn";
   $("learn-again").hidden = true;
-  $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
+  $("back").hidden = !(state && state.answers.length &&
+    (which === "ask" || which === "guess" || (which === "pick" && mode === "reconsider")));
   $("credit").hidden = which === "pick" || which === "ask";
   scheduleUnderBubble();
 }
@@ -311,7 +312,8 @@ async function step() {
   let decision = decide(state);
   // Both a guess and a defeat must wait for relevant country shards.
   // Otherwise an early, partial casebook can produce a spurious result.
-  if ((decision.type === "guess" || decision.type === "defeat") && pending) {
+  if ((decision.type === "guess" || decision.type === "defeat" ||
+       decision.type === "reconsider") && pending) {
     await pending;
     if (loadToken !== session || state !== playingState) return;
     decision = decide(state);
@@ -332,6 +334,18 @@ async function step() {
   }
   if (decision.type === "guess") {
     await beginGuess(decision.index);
+    return;
+  }
+  if (decision.type === "reconsider") {
+    // Neither surrender nor a blind guess is appropriate after a few
+    // negative or contradictory answers. Keep Back enabled, and let the
+    // player revise their answer or explicitly change the category.
+    mode = "reconsider";
+    currentQ = null;
+    setStatus(text().reconsider);
+    $("progress").textContent = "";
+    scene.setMood("thinking");
+    showOnly("pick");
     return;
   }
   await beginDefeat();
@@ -515,8 +529,8 @@ function setLanguage(next) {
     const question = pool.questions[pool.qIndex.get(currentQ)];
     setStatus(lang === "bn" ? question.bn : question.en, state.answers.length + 1);
     $("progress").textContent = text().progress(state.answers.length + 1);
-  } else if (mode === "pick") {
-    setStatus(text().pick);
+  } else if (mode === "pick" || mode === "reconsider") {
+    setStatus(mode === "reconsider" ? text().reconsider : text().pick);
     $("progress").textContent = "";
   } else if (guessIndex >= 0 && pool && ["reveal", "guess", "wrong", "solved"].includes(mode)) {
     const entity = entityView(pool, guessIndex);

@@ -33,6 +33,9 @@ function makePool() {
     { id: "other-actor", en: "Famous United States actor", pop: 65000,
       yes: ["real", "male", "alive", "from_us", "actor"],
       no: ["knows_you", "from_bd", "cricketer", "writer", "politician"] },
+    { id: "Q7460127", en: "Shabnur", pop: 200,
+      yes: ["real", "female", "alive", "from_bd", "actor"],
+      no: ["knows_you", "male", "from_us", "cricketer", "writer", "politician"] },
   ]);
 }
 function session(pool, job = "actor", life = "alive") {
@@ -133,4 +136,27 @@ test("specific unanswered work records remain unknown; never invent a negative",
   assert.notEqual(decide(state).type, "guess");
   answer(state, "actor_walton_senior_exec", "unknown");
   assert.notEqual(decide(state).type, "guess");
+});
+
+test("a female Bangladeshi actor is verified using specific sourced films", () => {
+  const pool = makePool();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"], ["female", "yes"],
+    ["alive", "yes"], ["from_bd", "yes"], ["actor", "yes"],
+  ]) answer(state, qid, value);
+  assert.equal(chooseQuestion(state), "screen_star_1990s");
+  answer(state, "screen_star_1990s", "yes");
+  assert.equal(chooseQuestion(state), "actor_film_chandni_raate");
+  answer(state, "actor_film_chandni_raate", "yes");
+  assert.equal(chooseQuestion(state), "actor_film_tumi_amar");
+  answer(state, "actor_film_tumi_amar", "yes");
+  assert.equal(chooseQuestion(state), "actor_film_dui_noyoner_alo");
+  answer(state, "actor_film_dui_noyoner_alo", "yes");
+  assert.equal(state.answers.length, 10);
+  assert.equal(enoughIdentityEvidence(state, pool.ids.indexOf("Q7460127")), true);
+  const decision = decide(state);
+  assert.equal(decision.type, "guess");
+  assert.equal(pool.ids[decision.index], "Q7460127");
 });

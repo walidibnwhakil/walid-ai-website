@@ -1078,7 +1078,8 @@ function nextIdentityProofQuestion(state) {
         !guessMatchesAnswers(state, i)) continue;
     const yes = qids.filter((qid) => asked.get(qid) === "yes").length;
     const no = qids.filter((qid) => asked.get(qid) === "no").length;
-    if (no || yes >= 3 || (yes >= 2 && state.answers.length >= 12)) continue;
+    if (no || (yes >= 3 && state.answers.length >= 10) ||
+        (yes >= 2 && state.answers.length >= 12)) continue;
     const next = qids.find((qid) => state.pool.qIndex.has(qid) && !asked.has(qid));
     if (!next) continue;
     candidates.push({ next, yes, score: state.weights[i] });
@@ -1136,6 +1137,12 @@ export function chooseQuestion(state) {
   if (!state.category && saidYes("fictional") && !asked.has("animal") && yesMass(state, "animal", state.alive.length > 7000 ? sampleAlive(state, 4000) : state.alive) > 0.18 && answers.length < 8) {
     return "animal";
   }
+  // A film-career era is useful context before asking about an individual
+  // actor's movies. It is about the actor's career, never their birth decade.
+  if (isFullPublicCasebook(state) && state.answers.length >= 6 &&
+      saidYes("actor") && saidYes("from_bd") &&
+      pool.qIndex.has("screen_star_1990s") &&
+      !asked.has("screen_star_1990s")) return "screen_star_1990s";
   // Ask about the suspected individual's actual work before a name reveal.
   const proofQid = nextIdentityProofQuestion(state);
   if (proofQid) return proofQid;

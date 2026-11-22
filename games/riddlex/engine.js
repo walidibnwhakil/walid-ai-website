@@ -7,9 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js?v=riddlex-42";
-import { ACTOR_PROOFS, ACTOR_PROOF_FACTS, ACTOR_PROOF_IDS } from "./actor-proof.js";
-import { WRITER_PROOFS, WRITER_PROOF_FACTS, WRITER_PROOF_IDS } from "./writer-proof.js";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -143,8 +141,6 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
-  if (ACTOR_PROOF_IDS.has(id)) return ACTOR_PROOF_FACTS[pool.ids[index]]?.[id] || 0;
-  if (WRITER_PROOF_IDS.has(id)) return WRITER_PROOF_FACTS[pool.ids[index]]?.[id] || 0;
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   const members = id && REGIONS[id];
@@ -375,88 +371,15 @@ export function recompute(state) {
   return state;
 }
 
-// A definite country is a requirement for a name, not merely a small
-// probability penalty. Otherwise a globally famous US actor with a missing
-// Bangladesh bit can beat a less-famous verified Bangladeshi actor.
-export function guessMatchesAnswers(state, index) {
-  if (index < 0 || index >= state.pool.count) return false;
-  for (const row of state.answers) {
-    if (row.value === "yes" && COUNTRIES.includes(row.qid) &&
-        factBit(state.pool, index, row.qi) !== 2) return false;
-    // Generic family/friend templates are impossible after a firm "no".
-    if (row.qid === "knows_you" && row.value === "no" &&
-        factBit(state.pool, index, row.qi) === 2) return false;
-    // A sourced affirmative acting fact cannot survive a firm denial.
-    if (row.value === "no" &&
-        (ACTOR_PROOF_IDS.has(row.qid) || WRITER_PROOF_IDS.has(row.qid)) &&
-        factBit(state.pool, index, row.qi) === 2) return false;
-  }
-  return true;
-}
-
-// A likely name is a hypothesis, not proof. Two separate, independently
-// documented individual career facts must be confirmed before naming someone.
-// Broad answers such as "Bangladeshi", "acts", and "writes" do not count.
-const PUBLIC_MIN_QUESTIONS = 12;
-const VERIFIED_CAREER_TRAITS = new Set([
-  "screen_star_1990s", "screen_star_pre1990", "all_rounder",
-  "played_barcelona", "ballon_dor", "party_bnp", "party_al", "party_jp",
-  "party_jamaat", "led_gov", "been_minister", "been_premier",
-  "head_of_state", "party_chief", "party_secretary", "zia_family", "mujib_family",
-]);
-
-function isFullPublicCasebook(state) {
-  // Minimal synthetic test pools do not contain enough identity evidence.
-  // The actual published knowledge schema contains over 100 questions.
-  return state.category === "character" && state.pool.questions.length >= 60 &&
-    said(state, "real", ["yes", "probably"]) &&
-    !said(state, "knows_you", ["yes", "probably"]);
-}
-
-function confirmedEvidenceFor(state, index, permitted) {
-  return state.answers.filter((row) => row.value === "yes" &&
-    permitted.has(row.qid) && factBit(state.pool, index, row.qi) === 2).length;
-}
-
-export function enoughIdentityEvidence(state, index) {
-  if (index < 0 || !guessMatchesAnswers(state, index)) return false;
-  if (!isFullPublicCasebook(state)) return true;
-  const enoughQuestions = state.answers.length >= PUBLIC_MIN_QUESTIONS;
-  // Three independently sourced career facts permit a ten-question result.
-  // Otherwise, require twelve questions and two affirmative career facts.
-  if (said(state, "from_bd", ["yes"])) {
-    const careerFacts = said(state, "actor", ["yes"])
-      ? ACTOR_PROOFS[state.pool.ids[index]]
-      : said(state, "writer", ["yes"])
-        ? WRITER_PROOFS[state.pool.ids[index]] : null;
-    if (careerFacts) {
-      const proofs = confirmedEvidenceFor(state, index, new Set(careerFacts));
-      return (proofs >= 3 && state.answers.length >= 10) ||
-        (proofs >= 2 && enoughQuestions);
-    }
-    if (said(state, "actor", ["yes"]) || said(state, "writer", ["yes"]))
-      return false;
-  }
-  if (state.answers.length < 10) return false;
-  // A generic occupation or nationality alone never verifies a public name.
-  return confirmedEvidenceFor(state, index, VERIFIED_CAREER_TRAITS) >= 2;
-}
-
-function topTwo(state, requireVerified = false) {
+function topTwo(state) {
   let best = -1;
   let second = -1;
   let bestP = 0;
   let secondP = 0;
-  let eligibleTotal = 0;
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
-    // Keep plausible identities in the ranking before they are verified.
-    // Verification is only a gate on revealing a name, not on asking questions.
-    if (!guessMatchesAnswers(state, i) ||
-        (requireVerified && !enoughIdentityEvidence(state, i))) continue;
     const w = weights[i];
-    eligibleTotal += w;
     if (w > bestP) {
       second = best;
       secondP = bestP;
@@ -466,12 +389,6 @@ function topTwo(state, requireVerified = false) {
       second = i;
       secondP = w;
     }
-  }
-  // Confidence is relative to people who meet the confirmed identity facts.
-  // The question model itself still retains uncertain rows to gather evidence.
-  if (eligibleTotal > 0) {
-    bestP /= eligibleTotal;
-    secondP /= eligibleTotal;
   }
   return { best, second, bestP, secondP };
 }
@@ -484,14 +401,7 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  // An unsupported high score is not new proof. However, a second candidate
-  // already supported by multiple concrete political/career facts does not
-  // need irrelevant filler questions solely to satisfy a retry counter.
-  const sourceBacked = state.answers.length >= 12 &&
-    state.answers.filter((row) => row.value === "yes" &&
-      VERIFIED_CAREER_TRAITS.has(row.qid)).length >= 2;
-  if ((state.pool.count <= 2 && bestP >= 0.8 && ratio >= 8) ||
-      (sourceBacked && bestP >= 0.62 && ratio >= 3)) return 0;
+  if (bestP >= 0.8 && ratio >= 8) return 0;
   if (ratio < 2.5) return 6;
   return 4;
 }
@@ -499,11 +409,10 @@ export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
 export function shouldGuess(state) {
   const asked = state.answers.length;
   if (!state.alive.length) return false;
-  const { bestP, secondP } = topTwo(state, true);
+  const { bestP, secondP } = topTwo(state);
   if (!(bestP > 0)) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
-  if (isFullPublicCasebook(state) && asked < 10) return false;
   if (asked >= 72) return true;
   const personal = state.answers.some((row) => row.qid === "knows_you" &&
     (row.value === "yes" || row.value === "probably"));
@@ -588,10 +497,6 @@ function gated(state, question, rows) {
     // Still allowed once the matching topic is likely; the mass checks below do that.
   }
   if (id === "adult_ent") return adultAllowed(state);
-  if (group === "actor_proof" || group === "writer_proof") {
-    return state.category === "character" && said(state, "from_bd", ["yes"]) &&
-      said(state, group === "actor_proof" ? "actor" : "writer", ["yes"]);
-  }
   if (group === "personal") {
     if (state.category !== "character") return false;
     if (id === "knows_you") return state.answers.some((row) => row.qid === "real" &&
@@ -638,7 +543,7 @@ function gated(state, question, rows) {
 }
 
 const CATEGORY_GROUPS = {
-  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics", "personal", "actor_proof", "writer_proof"]),
+  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics", "personal"]),
   animal: new Set(["animal", "look", "size"]),
   object: new Set(["object", "look", "size"]),
 };
@@ -800,7 +705,7 @@ function confirmedJob(state) {
   return PRIMARY_JOBS.find((job) => said(state, job, ["yes", "probably"])) || "";
 }
 
-function candidatesSplit(state, id, rows, minimum = 0.15) {
+function candidatesSplit(state, id, rows) {
   const qi = state.pool.qIndex.get(id);
   if (qi == null || !rows?.length) return false;
   let yes = 0;
@@ -814,7 +719,7 @@ function candidatesSplit(state, id, rows, minimum = 0.15) {
     if (bit === 2) yes += weight;
     else if (bit === 1) no += weight;
   }
-  return total > 0 && yes / total >= minimum && no / total >= minimum;
+  return total > 0 && yes / total >= 0.15 && no / total >= 0.15;
 }
 
 function politicsBranch(state) {
@@ -851,10 +756,7 @@ function unrelatedJob(state, id) {
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   if (politics && politicsBranch(state, rows)) return false;
   const probe = politics ? "politician" : id;
-  // Acting can overlap sports or politics, but cross-career detours should
-  // need substantial evidence rather than a weak 15% minority.
-  const minimum = job === "actor" && job !== probe ? 0.45 : 0.15;
-  return !candidatesSplit(state, probe, rows, minimum);
+  return !candidatesSplit(state, probe, rows);
 }
 
 function skippedAsDuplicate(state, id) {
@@ -944,24 +846,6 @@ function parentAbsent(state, parentId, rows, cache) {
 // strict: the parent must already be yes (or implied). Otherwise a no or
 // probably-not is enough to close the branch; an unasked parent stays open.
 export const QUESTION_REQUIRES = {
-  // Relationship questions form one branch, not general celebrity trivia.
-  your_parent: [{ id: "your_family", value: "yes", strict: true }],
-  your_sibling: [{ id: "your_family", value: "yes", strict: true },
-    { id: "your_parent", value: "no", strict: true }],
-  your_spouse: [{ id: "your_family", value: "yes", strict: true },
-    { id: "your_parent", value: "no", strict: true },
-    { id: "your_sibling", value: "no", strict: true }],
-  your_child: [{ id: "your_family", value: "yes", strict: true },
-    { id: "your_spouse", value: "no", strict: true }],
-  your_baby: [{ id: "your_child", value: "yes", strict: true }],
-  your_partner: [{ id: "your_family", value: "no", strict: true }],
-  your_ex: [{ id: "your_family", value: "no", strict: true },
-    { id: "your_partner", value: "no", strict: true }],
-  your_best_friend: [{ id: "your_family", value: "no", strict: true },
-    { id: "your_partner", value: "no", strict: true },
-    { id: "your_ex", value: "no", strict: true }],
-  your_friend: [{ id: "your_family", value: "no", strict: true },
-    { id: "your_best_friend", value: "no", strict: true }],
   party_bnp: [{ id: "from_bd", value: "yes" }],
   party_al: [{ id: "from_bd", value: "yes" }],
   party_jp: [{ id: "from_bd", value: "yes" }],
@@ -972,9 +856,6 @@ export const QUESTION_REQUIRES = {
 
 const STRICT_PARENT = {
   politics: "politician",
-  personal: "knows_you",
-  actor_proof: "actor",
-  writer_proof: "writer",
 };
 
 function answerValue(state, qid) {
@@ -986,9 +867,6 @@ function answerValue(state, qid) {
 
 export function prerequisitesFor(question) {
   const list = [];
-  if (question.group === "actor_proof" || question.group === "writer_proof") {
-    list.push({ id: "from_bd", value: "yes", strict: true });
-  }
   const strictParent = STRICT_PARENT[question.group];
   if (strictParent && question.id !== strictParent) {
     list.push({ id: strictParent, value: "yes", strict: true });
@@ -999,13 +877,9 @@ export function prerequisitesFor(question) {
 
 function requirementFails(state, req, links) {
   const value = answerValue(state, req.id);
-  const expectsNo = req.value === "no";
-  const matches = expectsNo
-    ? value === "no" || value === "probably_not"
-    : value === "yes" || value === "probably" ||
-      (value == null && impliedYes(state, req.id, links));
-  if (matches) return false;
-  if (value && value !== "unknown") return true;
+  const affirmed = value === "yes" || value === "probably" || (value == null && impliedYes(state, req.id, links));
+  if (affirmed) return false;
+  if (value === "no" || value === "probably_not") return true;
   return !!req.strict;
 }
 
@@ -1015,12 +889,6 @@ export function questionContradicts(state, qid) {
   const question = state.pool.questions[qi];
   const links = linksFor(state.pool);
   if (prerequisitesFor(question).some((req) => requirementFails(state, req, links))) return true;
-  // Don't ask "does he bat/bowl?" before confirming he plays cricket.
-  // The same rule applies to football positions, acting and music subtypes.
-  for (const parent of links.massParents.get(qid) || []) {
-    if (["cricketer", "footballer", "actor", "singer"].includes(parent) &&
-        requirementFails(state, { id: parent, value: "yes", strict: true }, links)) return true;
-  }
   return ancestorRejected(state, qid, links);
 }
 
@@ -1043,9 +911,6 @@ export function questionBlocked(state, qid) {
 }
 
 function allowedInCategory(state, question) {
-  // Keep the all-ages detective game comfortable; adult-industry questions
-  // are unnecessary for sound identification, even when the database has them.
-  if (question.id === "adult_ent") return false;
   // Most players cannot know someone else's birth decade. The birth facts
   // remain available internally for indexing, but must not be asked aloud.
   if (question.group === "birth") return false;
@@ -1066,42 +931,10 @@ function firstAllowedQuestion(state) {
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if (question.group === "actor_proof" || question.group === "writer_proof" ||
-        !allowedInCategory(state, question) ||
-        blockedQuestion(state, question, rows, cache) ||
-        !gated(state, question, rows) ||
-        gainOn(state, qi, rows) < 0.003) continue;
+    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
     return question.id;
   }
   return null;
-}
-
-function nextIdentityProofQuestion(state) {
-  if (!isFullPublicCasebook(state) || state.answers.length < 6 ||
-      !said(state, "from_bd", ["yes"])) return null;
-  const proofs = said(state, "actor", ["yes"]) ? ACTOR_PROOFS
-    : said(state, "writer", ["yes"]) ? WRITER_PROOFS : null;
-  if (!proofs) return null;
-  const asked = new Map(state.answers.map((row) => [row.qid, row.value]));
-  const candidates = [];
-  for (const [id, qids] of Object.entries(proofs)) {
-    const i = state.pool.ids.indexOf(id);
-    if (i < 0 || state.weights[i] <= 0 ||
-        !guessMatchesAnswers(state, i)) continue;
-    const yes = qids.filter((qid) => asked.get(qid) === "yes").length;
-    const no = qids.filter((qid) => asked.get(qid) === "no").length;
-    const unknown = qids.filter((qid) => asked.get(qid) === "unknown").length;
-    // Don't pester players who don't recognise a title; change course after
-    // two "don't know" responses for the same suspected person.
-    if (no || (unknown >= 2 && yes === 0) ||
-        (yes >= 3 && state.answers.length >= 10) ||
-        (yes >= 2 && state.answers.length >= 12)) continue;
-    const next = qids.find((qid) => state.pool.qIndex.has(qid) && !asked.has(qid));
-    if (!next) continue;
-    candidates.push({ next, yes, score: state.weights[i] });
-  }
-  candidates.sort((a, b) => b.yes - a.yes || b.score - a.score);
-  return candidates[0]?.next || null;
 }
 
 export function chooseQuestion(state) {
@@ -1153,27 +986,6 @@ export function chooseQuestion(state) {
   if (!state.category && saidYes("fictional") && !asked.has("animal") && yesMass(state, "animal", state.alive.length > 7000 ? sampleAlive(state, 4000) : state.alive) > 0.18 && answers.length < 8) {
     return "animal";
   }
-  // A film-career era is useful context before asking about an individual
-  // actor's movies. It is about the actor's career, never their birth decade.
-  if (isFullPublicCasebook(state) && state.answers.length >= 6 &&
-      saidYes("actor") && saidYes("from_bd") &&
-      pool.qIndex.has("screen_star_1990s") &&
-      !asked.has("screen_star_1990s")) return "screen_star_1990s";
-
-  // For an identified football career, relevant achievements and teams are
-  // stronger evidence than asking multiple random continental questions.
-  if (saidYes("footballer") && !saidYes("from_bd")) {
-    const footballRows = state.alive.length > 7000
-      ? sampleAlive(state, 5000) : state.alive;
-    if (pool.qIndex.has("played_barcelona") && !asked.has("played_barcelona") &&
-        yesMass(state, "played_barcelona", footballRows) > 0) return "played_barcelona";
-    if (saidYes("played_barcelona") && pool.qIndex.has("ballon_dor") &&
-        !asked.has("ballon_dor")) return "ballon_dor";
-  }
-
-  // Ask about the suspected individual's actual work before a name reveal.
-  const proofQid = nextIdentityProofQuestion(state);
-  if (proofQid) return proofQid;
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   const absentCache = new Map();
   let best = null;
@@ -1185,10 +997,7 @@ export function chooseQuestion(state) {
   for (let qi = 0; qi < pool.questions.length; qi++) {
     const question = pool.questions[qi];
     if (asked.has(question.id)) continue;
-    // Only probe a film fact after a related actor is shortlisted.
-    if (question.group === "actor_proof" || question.group === "writer_proof" ||
-        !allowedInCategory(state, question) ||
-        blockedQuestion(state, question, rows, absentCache)) continue;
+    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, absentCache)) continue;
     if (!gated(state, question, rows)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
@@ -1217,9 +1026,7 @@ export function chooseQuestion(state) {
     }
   }
   if (boostBd && answers.length >= 4 && bdGain > 0.004) return "from_bd";
-  // Low but useful splits are better than quitting early; do not ask a
-  // nonsensical topic merely to pad the question count.
-  return bestGain > (answers.length < 12 ? 0.002 : 0.012) ? best : null;
+  return bestGain > 0.012 ? best : null;
 }
 
 export function answer(state, qid, value) {
@@ -1243,69 +1050,18 @@ export function rejectIndex(state, index) {
   return recompute(state);
 }
 
-// A thin or still-loading shard may have no statistically informative
-// split even though the answers are consistent. Keep collecting ordinary,
-// relevant identity facts instead of interpreting missing data as a wrong
-// category. The shortlist can be expanded as country shards arrive.
-function continuationQuestion(state) {
-  const asked = new Set(state.answers.map((row) => row.qid));
-  const available = (id) => state.pool.qIndex.has(id) && !asked.has(id);
-  if (state.category !== "character" || !said(state, "real", ["yes", "probably"]))
-    return null;
-  if (said(state, "knows_you", ["yes", "probably"])) return null;
-  const hasGender = asked.has("male") || asked.has("female");
-  const hasLife = asked.has("alive") || asked.has("dead");
-  if (!hasGender && available("male")) return "male";
-  if (!hasLife && available("alive")) return "alive";
-  if (!COUNTRIES.some((id) => asked.has(id)) && available("from_bd"))
-    return "from_bd";
-  if (confirmedJob(state)) return null;
-  // Broad professions are useful when no occupation is confirmed. Never
-  // ask profession-specific details unless the parent career is established.
-  for (const id of ["actor", "cricketer", "footballer", "writer",
-    "singer", "scientist", "business", "youtube", "director", "musician",
-    "athlete"]) {
-    if (available(id) && !questionContradicts(state, id) &&
-        !unrelatedJob(state, id)) return id;
-  }
-  return null;
-}
-
 export function decide(state) {
   recompute(state);
+  if (!state.alive.length) return { type: "defeat" };
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
-  // The real production casebook supports category recovery. Tiny synthetic
-  // pools used to test known top guesses must keep their established behavior.
-  const canReconsider = state.pool.questions.length >= 60 && state.category != null;
-  // A chosen character is either real or fictional. Two firm "no" replies
-  // to those categories mean the classification needs clarification, not
-  // that the detective has exhausted millions of available entries.
-  if (canReconsider && state.category === "character" &&
-      said(state, "real", ["no"]) && said(state, "fictional", ["no"]))
-    return { type: "reconsider" };
-  // When the selected pool genuinely has no plausible match, let the player
-  // revise the last answer or choose a better category rather than displaying
-  // the final surrender/teach form after just a handful of answers.
-  if (!state.alive.length) {
-    const next = continuationQuestion(state);
-    if (next) return { type: "ask", qid: next };
-    return { type: "defeat" };
-  }
-  const { best, bestP, secondP } = topTwo(state, true);
+  const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
   let qid = chooseQuestion(state);
-  if (!qid && (waiting || state.answers.length < 18)) qid = firstAllowedQuestion(state);
-  if (!qid) qid = continuationQuestion(state);
+  if (!qid && waiting) qid = firstAllowedQuestion(state);
   if (!qid) {
-    // Running out of high-information questions is NOT evidence that the
-    // database is empty. Never fabricate a guess or open the surrender form
-    // after a few negative answers; offer a category/answer correction instead.
-    if (best >= 0 && !waiting && enoughIdentityEvidence(state, best))
-      return { type: "guess", index: best };
-    // A consistent real-person answer is never a category contradiction.
-    // Only the explicit real=no + fictional=no conflict above is reconsidered.
+    if (best >= 0 && bestP > 0) return { type: "guess", index: best };
     return { type: "defeat" };
   }
   return { type: "ask", qid };

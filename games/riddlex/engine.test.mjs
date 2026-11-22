@@ -92,6 +92,29 @@ function play(pool, id, { flip = -1 } = {}) {
   return { ok: false, step: 28 };
 }
 
+test("male no does not lead to redundant female question", () => {
+  const state = createState(world, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "male", "no");
+  assert.equal(questionBlocked(state, "female"), true);
+  assert.notEqual(chooseQuestion(state), "female");
+  const uncertain = createState(world, { category: "character" });
+  recompute(uncertain);
+  answer(uncertain, "real", "yes");
+  answer(uncertain, "male", "unknown");
+  assert.equal(questionBlocked(uncertain, "female"), false);
+});
+
+test("four rejected guesses leave meaningful questions available", () => {
+  const state = createState(world, { category: "character", opening: "real" });
+  recompute(state);
+  for (const id of ["himu","misir","feluda","actor"])
+    rejectIndex(state, world.ids.indexOf(id));
+  assert.equal(state.guesses, 4);
+  assert.equal(decide(state).type, "ask");
+});
+
 test("Bangladesh is asked within the first five character questions", () => {
   const state = createState(world, { category: "character", opening: "real" });
   recompute(state);
@@ -774,7 +797,7 @@ test("Shabana and Alamgir are recognized as pre-1990 stars, not by birth year", 
   assert.equal(factBit(pool, 0, qi), 2);
   assert.equal(factBit(pool, 1, qi), 2);
   assert.equal(factBit(pool, 2, qi), 1);
-  assert.ok(qs.at(-2).en.includes("before the 1990s"));
+  assert.ok(qs.at(-2).en.includes("before 1990"));
   assert.ok(!qs.at(-2).bn.includes("জন্ম"));
 });
 

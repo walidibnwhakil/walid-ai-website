@@ -31,13 +31,13 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
   {
     id: "screen_star_pre1990",
     group: "job",
-    en: "Were they already a well-known film star before the 1990s?",
-    bn: "তিনি কি নব্বইয়ের দশকের আগেই চলচ্চিত্রে পরিচিত তারকা হয়ে উঠেছিলেন?",
+    en: "Did they become a known film star before 1990?",
+    bn: "তিনি কি ১৯৯০ সালের আগেই চলচ্চিত্রে পরিচিত তারকা হয়েছিলেন?",
   },
   {
     id: "screen_star_1990s",
     group: "job",
-    en: "Did they become a well-known film star in the 1990s?",
-    bn: "তিনি কি নব্বইয়ের দশকে চলচ্চিত্রের পরিচিত তারকা হয়ে ওঠেন?",
+    en: "Did they become a known film star during 1990–1999?",
+    bn: "তিনি কি ১৯৯০ থেকে ১৯৯৯ সালের মধ্যে চলচ্চিত্রে পরিচিত তারকা হন?",
   },
 ]);

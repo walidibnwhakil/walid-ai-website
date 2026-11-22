@@ -408,6 +408,14 @@ function topTwo(state) {
   const knownFilmEraAnswers = state.answers.filter((row) =>
     (row.qid === "screen_star_1990s" || row.qid === "screen_star_pre1990") &&
     (row.value === "yes" || row.value === "no"));
+  // Prioritize explicitly confirmed 1990-1999 film stars. When all such
+  // names are rejected, widen to incomplete records instead of giving up.
+  const confirmed1990s = knownFilmEraAnswers.find((row) =>
+    row.qid === "screen_star_1990s" && row.value === "yes");
+  const hasVerified1990sCandidate = confirmed1990s && state.alive.some((i) =>
+    factBit(state.pool, i, confirmed1990s.qi) === 2 &&
+    (!confirmedActor || actorQi == null || factBit(state.pool, i, actorQi) === 2) &&
+    (!chosenCountry || factBit(state.pool, i, chosenCountry.qi) === 2));
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -421,6 +429,8 @@ function topTwo(state) {
       const fact = factBit(state.pool, i, row.qi);
       return row.value === "yes" ? fact === 1 : fact === 2;
     })) continue;
+    if (hasVerified1990sCandidate &&
+        factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
     // Real people need explicit acting evidence. Player-relative roles are
     // allowed to have unknown occupations when personally confirmed.
     if (confirmedActor && actorQi != null &&
@@ -468,7 +478,10 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  if (bestP >= 0.8 && ratio >= 8) return 0;
+  // If there truly is only one unrejected candidate, don't invent a
+  // pointless extra round. Otherwise popularity alone is not new evidence.
+  if (state.alive.length === 1 && bestP >= 0.8 && ratio >= 8) return 0;
+  if (bestP >= 0.8 && ratio >= 8) return 2;
   if (ratio < 2.5) return 6;
   return 4;
 }
@@ -866,7 +879,10 @@ function skippedAsDuplicate(state, id) {
   // not trigger the opposite wording immediately afterwards.
   if ((id === "dead" && state.answers.some((row) => row.qid === "alive")) ||
       (id === "alive" && state.answers.some((row) => row.qid === "dead"))) return true;
-  if ((id === "female" && yes("male")) || (id === "male" && yes("female"))) return true;
+  // A definite yes or no to one binary gender question removes the
+  // redundant opposite wording; unknown still leaves a follow-up available.
+  if ((id === "female" && answered("male")) ||
+      (id === "male" && answered("female"))) return true;
   if (id === "musician" && yes("singer")) return true;
   if (id === "screen_star_1990s" && said(state, "actor", ["no", "probably_not"])) return true;
   if (id === "singer" && said(state, "musician", ["no", "probably_not"])) return true;
@@ -1173,7 +1189,7 @@ export function rejectIndex(state, index) {
 export function decide(state) {
   recompute(state);
   if (!state.alive.length) return { type: "defeat" };
-  if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
+  if (state.guesses >= 10 || state.answers.length >= 72) return { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);

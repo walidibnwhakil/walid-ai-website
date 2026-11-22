@@ -16,6 +16,7 @@
   const transientHelp=new Map();
   const CHAT_RETENTION_MS=3*24*60*60*1000;
   let managerNotices=[],lastManagerTasks=[],chatView='manager',selectedStaffRole=null;
+  let noticeRetryTimer=null;
   const NOTICE_SEEN_KEY='walid-manager-notice-ids';
   function seenNotices(){
     try{
@@ -62,7 +63,18 @@
     input.style.height='auto';
     input.style.height=Math.min(150,Math.max(40,input.scrollHeight))+'px';
   }
-  const fmt = date => {try{return new Date(date).toLocaleString('en-BD',{timeZone:'Asia/Dhaka'})}catch{return String(date||'')}};
+  const fmt = date => {
+    const instant=new Date(date);
+    if(!Number.isFinite(instant.getTime()))return String(date||'');
+    const format=new Intl.DateTimeFormat('en-GB',{
+      timeZone:'Asia/Dhaka',day:'2-digit',month:'2-digit',year:'numeric',
+      weekday:'long',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true
+    });
+    const parts=Object.fromEntries(format.formatToParts(instant)
+      .filter(part=>part.type!=='literal').map(part=>[part.type,part.value]));
+    return parts.day+'-'+parts.month+'-'+parts.year+', '+parts.weekday+', '+
+      parts.hour+':'+parts.minute+':'+parts.second+' '+(parts.dayPeriod||'').toUpperCase();
+  };
   const token = () => sessionStorage.getItem('walidAdminAccess') || '';
   const auth = () => ({Authorization:'Bearer '+token()});
   const panels = ['dashboard','staff-workspace','riddlex-workspace'];
@@ -93,6 +105,7 @@
     $('#ops-input')?.focus();
     fitComposer();
     void loadHistory();
+    void refreshNotices(); // Refresh the newest real checks when Messenger opens.
   }
   function closeManagerChat(){
     const panel=$('#manager-chat-panel');if(!panel)return;
@@ -260,7 +273,9 @@
       if(item.type==='notice'){
         const notice=item.notice;
         const bubble=appendMessage(host,'answer','Manager · '+fmt(notice.created_at),
-          notice.message||'একটি নতুন অফিস বার্তা এসেছে।');
+          (notice.kind==='daily_report'
+            ?String(notice.message||'').replace(/\\n/g,'\n')
+            :notice.message)||'একটি নতুন অফিস বার্তা এসেছে।');
         bubble.classList.add('manager-chat-notice');
         if(notice.kind==='alert')bubble.classList.add('manager-chat-alert');
         if(typeof notice.source_url==='string'&&/^https:\/\/github\.com\/walidibnwhakil\/walid-ai-(?:website|backend)\/actions\/runs\/\d+$/.test(notice.source_url)){
@@ -326,6 +341,14 @@
         if(chatView==='thread')renderStaffThread(selectedStaffRole);
         acknowledgeNotices();
       }
+      if(brief.daily_report?.checks_pending&&!noticeRetryTimer){
+        // Health/Security checks run on the server's worker. Poll once when
+        // their first snapshot is ready rather than blocking the chat UI.
+        noticeRetryTimer=setTimeout(()=>{
+          noticeRetryTimer=null;
+          if(ready)void refreshNotices();
+        },9000);
+      }
     }catch{/* A monitoring outage must not interrupt the owner's conversation. */}
   }
   async function submit(){
@@ -360,6 +383,7 @@
     }finally{busy=false;$('#ops-send').disabled=false}
   }
   function logout(){
+    if(noticeRetryTimer){clearTimeout(noticeRetryTimer);noticeRetryTimer=null}
     closeManagerChat();
     transientHelp.clear();
     managerNotices=[];lastManagerTasks=[];

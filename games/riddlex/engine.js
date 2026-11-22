@@ -925,7 +925,8 @@ export function chooseQuestion(state) {
   // Introduce the optional personal-relationship path early. It is never
   // used for animals/objects or famous people unless the user explicitly says
   // this person knows them.
-  if (state.category === "character" && saidYes("real") && !asked.has("knows_you"))
+  if (state.category === "character" && pool.qIndex.has("knows_you") &&
+      saidYes("real") && !asked.has("knows_you"))
     return "knows_you";
   if (state.category === "character" && saidYes("knows_you")) {
     const next = (qid) => pool.qIndex.has(qid) && !asked.has(qid);

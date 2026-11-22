@@ -80,6 +80,7 @@ function showMenu() {
   $("confirm").hidden = true;
   setGameInProgress(false);
   scene.stop();
+  scene.clearReveal();
 }
 
 function gameInProgress() {
@@ -197,6 +198,7 @@ function showOnly(which) {
 
 async function openPlay() {
   menu.hidden = true;
+  scene.clearReveal();
   menuCatController?.pause();
   ++loadToken;
   game.hidden = false;
@@ -409,6 +411,7 @@ async function onLearnSubmit(event) {
   const adult = answersImplyAdult(state?.answers || []) || nameMatchesAdult(pool, name);
   const file = adult ? null : $("learn-photo")?.files?.[0] || null;
   const save = $("learn-save");
+  const session = loadToken;
   if (save) save.disabled = true;
   try {
     await submitLearning({
@@ -419,10 +422,12 @@ async function onLearnSubmit(event) {
       answers: state?.answers || [],
       alreadyKnown: nameInPool(pool, name),
     });
+    if (session !== loadToken || mode !== "learn") return;
     showLearnMessage(text().saved);
     learnForm.hidden = true;
     $("learn-again").hidden = false;
   } catch {
+    if (session !== loadToken || mode !== "learn") return;
     showLearnMessage(text().failedSave);
     if (save) save.disabled = false;
   }

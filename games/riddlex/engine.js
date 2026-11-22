@@ -401,8 +401,10 @@ function topTwo(state) {
         state.answers.some((row) => row.qid === "knows_you" &&
           ["yes", "probably"].includes(row.value));
       if (!isPersonalRole && countryFact === 1) continue;
-      if (!isPersonalRole && otherCountryQIs.some((qi) =>
-        factBit(state.pool, i, qi) === 2)) continue;
+      // A confirmed matching country wins over extra nationalities or
+      // historical birthplace tags (several notable figures have both).
+      if (!isPersonalRole && countryFact !== 2 &&
+          otherCountryQIs.some((qi) => factBit(state.pool, i, qi) === 2)) continue;
       if (!isPersonalRole && countryFact === 0 && !hasOtherIdentityEvidence) continue;
     }
     const w = weights[i];

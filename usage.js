@@ -80,3 +80,14 @@ if(game){const selectors={'ludo':'#start-game','riddlex':'#play, #new','chess':'
 addEventListener('hashchange',()=>{if(path==='/zip.html'){heartbeat();feature='tool_'+(location.hash.includes('extract')?'extract_zip':'create_zip')}});
 (async()=>{try{const cached=JSON.parse(sessionStorage.getItem('walidUsageRegion')||'null');if(cached&&Date.now()-cached.time<86400000){country=cached.country;division=cached.division}else{const response=await fetch('https://get.geojs.io/v1/ip/geo.json',{credentials:'omit',signal:AbortSignal.timeout(2500)});if(response.ok){const data=await response.json();country=/^[A-Z]{2}$/.test(data.country_code)?data.country_code:'Unknown';division=country==='BD'?String(data.region||'Unknown').replace(/ Division$/i,''):'Unknown';sessionStorage.setItem('walidUsageRegion',JSON.stringify({country,division,time:Date.now()}))}}}catch{}event('page_view')})();
 })();
+
+
+/* Load the PWA invitation on deep links without changing their HTML or analytics. */
+(() => {
+  if (/^\/admin(?:\/|\.html$)/.test(location.pathname)) return;
+  if (document.querySelector('script[src^="/pwa.js"]')) return;
+  const script = document.createElement('script');
+  script.src = '/pwa.js';
+  script.defer = true;
+  document.head.append(script);
+})();

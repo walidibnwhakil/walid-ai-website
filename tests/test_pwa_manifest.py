@@ -44,6 +44,21 @@ class PwaManifestChecks(unittest.TestCase):
         self.assertIn('class="legal-footer"', home)
         self.assertIn('id="pwa-install"', home)
 
+    def test_mobile_install_invitation_contract(self):
+        js = (ROOT / "pwa.js").read_text(encoding="utf-8")
+        self.assertIn("beforeinstallprompt", js)
+        self.assertIn("appinstalled", js)
+        self.assertIn("walid-pwa-installed-v2", js)
+        self.assertIn("walid-pwa-invite-seen", js)
+        self.assertIn("isStandalone()", js)
+        self.assertIn("new URL(document.referrer).origin === location.origin", js)
+        self.assertIn("window.setTimeout(openInvite, 700)", js)
+        self.assertIn("Already installed?", js)
+        self.assertIn("Add to Home Screen", js)
+        self.assertIn('src="/walid-ai-approved-flower.png"', js)
+        self.assertIn('src="/pwa.js"', (ROOT / "islam/quran/index.html").read_text(encoding="utf-8"))
+        self.assertIn("script.src = '/pwa.js'", (ROOT / "usage.js").read_text(encoding="utf-8"))
+
     def test_offline_only_navigation_does_not_cache_api_or_ads(self):
         sw = (ROOT / "sw.js").read_text(encoding="utf-8")
         self.assertIn("event.request.mode !== 'navigate'", sw)

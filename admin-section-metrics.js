@@ -62,11 +62,26 @@
   const num=n=>Number(n||0).toLocaleString("en-BD");
   const duration=n=>{const total=Math.round(Number(n)||0);return Math.floor(total/3600)+"h "+Math.floor(total%3600/60)+"m"};
   const empty={visitors:0,views:0,starts:0,completions:0,answers:0,errors:0,active_seconds:0};
-  const fields=[
-    ["visitors","Visitors ≈",num],["views","Views",num],["starts","Starts",num],
-    ["completions","Completed",num],["answers","Answers",num],["errors","Errors",num],
-    ["active_seconds","Active time",duration],
-  ];
+  // Show only meaningful columns in each section. Keep every underlying counter unchanged.
+  const fields={
+    visitors:["Visitors ≈",num],
+    views:["Views",num],
+    starts:["Starts",num],
+    completions:["Completed",num],
+    answers:["Answers",num],
+    errors:["Errors",num],
+    active_seconds:["Active time",duration],
+  };
+  const sectionColumns={
+    chat:["visitors","views","answers","errors","active_seconds"],
+    pdf:["visitors","views","starts","completions","errors","active_seconds"],
+    image:["visitors","views","starts","completions","errors","active_seconds"],
+    games:["visitors","views","starts","completions","active_seconds"],
+    education:["visitors","views","starts","completions","active_seconds"],
+    islam:["visitors","views","active_seconds"],
+    sports:["visitors","views","active_seconds"],
+    others:["visitors","views","active_seconds"],
+  };
   const el=(tag,cls,text)=>{
     const node=document.createElement(tag);
     if(cls)node.className=cls;
@@ -81,18 +96,19 @@
       host.append(box);
     }
   }
-  function makeTable(items){
+  function makeTable(items,sectionId){
     if(!items.length)return el("p","muted","No recorded activity.");
+    const keys=sectionColumns[sectionId]||sectionColumns.others;
     const wrap=el("div","table-wrap"),table=el("table","section-metrics-table");
     const headings=el("tr");
-    for(const name of ["Feature","Visitors ≈","Views","Starts","Completed","Answers","Errors","Active time"]){
+    for(const name of ["Feature",...keys.map(key=>fields[key][0])]){
       const th=el("th",null,name);th.scope="col";headings.append(th);
     }
-    table.append(headings);
+    const thead=el("thead");thead.append(headings);table.append(thead);
     const body=el("tbody");
     for(const {name,metrics} of items){
       const tr=el("tr");
-      const textValues=[name,...fields.map(([key,,format])=>format(metrics[key]))];
+      const textValues=[name,...keys.map(key=>fields[key][1](metrics[key]))];
       for(const value of textValues)tr.append(el("td",null,value));
       body.append(tr);
     }
@@ -118,7 +134,7 @@
     const root=el("div","other-categories");
     const home=featureData.get("others");
     if(home?.views||home?.active_seconds||home?.starts){
-      root.append(makeTable([{name:"Others",metrics:home}]));
+      root.append(makeTable([{name:"Others",metrics:home}],"others"));
     }
     for(const [group,id,title] of [
       ["history","history","ইতিহাস"],
@@ -129,7 +145,7 @@
       const rows=[featureRow(featureData,id,title)];
       const bookEntries=catalog.books[group]||[];
       for(const book of bookEntries)rows.push(featureRow(featureData,book.id,book.name));
-      const inner=details(title,metrics,makeTable(rows),"analytics-subsection");
+      const inner=details(title,metrics,makeTable(rows,"others"),"analytics-subsection");
       inner.dataset.metricKey="others-"+group;
       root.append(inner);
     }
@@ -141,7 +157,7 @@
       if(id==="quran-group")return {name,metrics:data.subsections?.islam?.quran||empty};
       return featureRow(featureData,id,name);
     });
-    return makeTable(rows);
+    return makeTable(rows,def.id);
   }
   function render(host,data){
     if(!host)return;

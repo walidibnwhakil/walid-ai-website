@@ -137,7 +137,7 @@ try {
       ["tall-photo", 180, 690],
       ["wide-photo", 920, 160],
     ]) {
-      await page.evaluate(async ({ imageWidth, imageHeight }) => {
+      const pictureState = await page.evaluate(async ({ imageWidth, imageHeight }) => {
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${imageWidth}" height="${imageHeight}" viewBox="0 0 ${imageWidth} ${imageHeight}">
           <rect width="100%" height="100%" fill="#c1dde8"/>
           <rect x="3" y="3" width="${imageWidth - 6}" height="${imageHeight - 6}" rx="1" fill="none" stroke="#ef1c18" stroke-width="6"/>
@@ -146,8 +146,15 @@ try {
           <circle cx="${imageWidth / 2}" cy="${imageHeight / 2}" r="26" fill="#3b8021"/>
         </svg>`;
         const src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-        await window.__riddlex.reveal("সম্পূর্ণ ছবি", src);
+        const result = await window.__riddlex.reveal("সম্পূর্ণ ছবি", src);
+        return { result, bounds: window.__riddlex.expression().revealBounds };
       }, { imageWidth, imageHeight });
+      assert.equal(pictureState.result.printed, true, "test photo failed to load");
+      const bounds = pictureState.bounds;
+      assert.ok(bounds && bounds.w > 60 && bounds.h > 60, "missing photo card");
+      assert.ok(bounds.x >= -1 && bounds.y >= -1, "photo card starts outside stage");
+      assert.ok(bounds.x + bounds.w <= bounds.canvasW + 1, "photo card clipped horizontally");
+      assert.ok(bounds.y + bounds.h <= bounds.canvasH + 1, "photo card clipped vertically");
       if (shotFolder) await page.screenshot({
         path: join(shotFolder, "guess-" + orient + "-" + shape + ".png"),
       });

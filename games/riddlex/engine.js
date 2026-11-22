@@ -1067,7 +1067,7 @@ function firstAllowedQuestion(state) {
 
 function nextIdentityProofQuestion(state) {
   if (!isFullPublicCasebook(state) || state.answers.length < 6 ||
-      !said(state, "from_bd", ["yes"]) || said(state, "female", ["yes"])) return null;
+      !said(state, "from_bd", ["yes"])) return null;
   const proofs = said(state, "actor", ["yes"]) ? ACTOR_PROOFS
     : said(state, "writer", ["yes"]) ? WRITER_PROOFS : null;
   if (!proofs) return null;

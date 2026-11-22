@@ -286,6 +286,16 @@ try {
           trace.push("GUESS: " + name + " [" + state.best + "]");
           assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
             "A no-personal-contact answer guessed a personal role");
+          if (policy === "actor_1990s") {
+            const contradictedEra = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "screen_star_pre1990"), state.best);
+            assert.notEqual(contradictedEra, "yes",
+              "Known pre-1990s star guessed despite firm NO: " + state.best);
+            const denied1990s = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "screen_star_1990s"), state.best);
+            assert.notEqual(denied1990s, "no",
+              "Known NOT-1990s star guessed despite firm YES: " + state.best);
+          }
           if (policy === "actor" || policy === "actor_1990s") {
             const recordedActing = await page.evaluate((id) =>
               window.__riddlex.replyFor(id, "actor"), state.best);

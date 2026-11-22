@@ -104,6 +104,20 @@ try {
     assert.equal(await page.locator("#game .lang-switch").isVisible(), true,
       "language option must be available after Play Now");
     await page.waitForFunction(() => !document.getElementById("categories").hidden);
+    const categoryLayout = await page.evaluate(() => {
+      const group = document.querySelector(".cat-row").getBoundingClientRect();
+      return {
+        groupWidth: group.width,
+        buttonWidths: [...document.querySelectorAll(".cat-row button")]
+          .map((button) => button.getBoundingClientRect().width),
+      };
+    });
+    if (orient === "landscape") {
+      assert.ok(categoryLayout.groupWidth <= 550,
+        "desktop category picker must not span most of the screen: " + categoryLayout.groupWidth);
+      assert.ok(categoryLayout.buttonWidths.every((w) => w >= 44 && w <= 190),
+        "Character, Object and Animal must be compact buttons: " + categoryLayout.buttonWidths);
+    }
     await page.click('[data-cat="animal"]');
     await page.waitForFunction(() =>
       !document.getElementById("answers").hidden
@@ -230,6 +244,44 @@ try {
       if (shotFolder) await page.screenshot({ path: join(shotFolder, "personal-question-portrait.png") });
       console.log("RIDDLEX_PERSONAL_QUESTIONS_PASS");
     }
+    // Reproduce the reported all-negative character path in the real
+    // browser. It must never show the surrender/name/file-upload panel after
+    // just two contradictory broad answers, nor trap the player in a dead end.
+    await page.setViewportSize({ width, height });
+    await page.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
+    await page.click("#play");
+    await page.waitForFunction(() => !document.getElementById("categories").hidden);
+    await page.click('[data-cat="character"]');
+    await page.waitForFunction(() =>
+      !document.getElementById("answers").hidden &&
+      document.getElementById("progress").textContent.includes("Question 1"),
+      null, { timeout: 30000 });
+    await page.click("#answer-no"); // Not a real person
+    await page.waitForFunction(() =>
+      !document.getElementById("answers").hidden &&
+      document.getElementById("progress").textContent.includes("Question 2"),
+      null, { timeout: 30000 });
+    await page.click("#answer-no"); // Nor a fictional character
+    await page.waitForFunction(() =>
+      !document.getElementById("categories").hidden &&
+      !document.getElementById("back").hidden &&
+      /clues|উত্তরগুলোর/.test(document.getElementById("status").textContent),
+      null, { timeout: 30000 });
+    assert.equal(await page.locator("#learn").isVisible(), false,
+      "No answers must not open the give-up or teach-your-name form");
+    if (shotFolder) await page.screenshot({ path: join(shotFolder, "recover-negative-" + orient + ".png") });
+    await page.click("#back");
+    await page.waitForFunction(() =>
+      !document.getElementById("answers").hidden &&
+      document.getElementById("progress").textContent.includes("Question 2"),
+      null, { timeout: 12000 });
+    await page.click("#answer-yes"); // Correct the fictional-category answer
+    await page.waitForFunction(() =>
+      !document.getElementById("answers").hidden &&
+      document.getElementById("progress").textContent.includes("Question 3"),
+      null, { timeout: 30000 });
+    console.log("RIDDLEX_NEGATIVE_RECOVERY_PASS", orient);
+
     assert.deepEqual(errors, [], "uncaught browser errors");
     console.log("RIDDLEX_GAMEPLAY_PASS", width, height, orient);
     await page.close();

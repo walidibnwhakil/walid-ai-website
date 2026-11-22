@@ -16,14 +16,13 @@ test("a normal name is accepted and a rude or junk name is rejected", () => {
   assert.equal(reviewSubmission("A", answers).ok, false);
 });
 
-test("a confirmed write falls back to pending when the live rules refuse it", async () => {
+test("player-submitted names are pending without an auto-approval attempt", async () => {
   const writes = [];
   const denied = Object.assign(new Error("Missing or insufficient permissions."), { code: "permission-denied" });
   const status = await saveNewEntry(async (data) => {
     writes.push(data.status);
-    if (data.status === "confirmed") throw denied;
   }, { slug: "ada", nameEn: "Ada" });
-  assert.deepEqual(writes, ["confirmed", "pending"]);
+  assert.deepEqual(writes, ["pending"]);
   assert.equal(status, "pending");
   const updates = [];
   const saved = await saveMergedEntry(async (data) => {

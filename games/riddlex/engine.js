@@ -98,14 +98,16 @@ function applyPolitics(pool) {
     if (pool.ids.includes(person.id)) continue;
     const count = pool.count + 1;
     const attrs = new Uint8Array(count * pool.attrBytes);
-    attrs.set(pool.attrs);
+    // appendShard may reserve more capacity than its current count. Copy
+    // only populated records, never the unused capacity into a smaller array.
+    attrs.set(pool.attrs.subarray(0, pool.count * pool.attrBytes));
     const packed = packAttrBytes(pool.questions.map((question) => question.id), person.yes, person.no);
     attrs.set(packed.subarray(0, pool.attrBytes), pool.count * pool.attrBytes);
     const pop = new Uint16Array(count);
-    pop.set(pool.pop);
+    pop.set(pool.pop.subarray(0, pool.count));
     pop[pool.count] = Math.min(65535, person.pop || 1);
     const flags = new Uint8Array(count);
-    flags.set(pool.flags);
+    flags.set(pool.flags.subarray(0, pool.count));
     pool.attrs = attrs;
     pool.pop = pop;
     pool.flags = flags;

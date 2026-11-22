@@ -426,6 +426,39 @@ test("public candidates need a confirmed occupation or other distinctive yes at 
   assert.equal(shouldGuess(state), false, "country plus negatives do not identify a celebrity");
 });
 
+test("confirmed acting cannot nominate someone with unknown or negative acting evidence", () => {
+  const qs = [
+    { id: "real", group: "kind" },
+    { id: "from_bd", group: "country" },
+    { id: "actor", group: "job" },
+    { id: "politician", group: "job" },
+    { id: "named", group: "kind" },
+  ];
+  const pool = poolFromEntries(qs, [
+    entry("wrong-star", 65000, ["real", "from_bd", "named"], { no: ["politician"] }),
+    entry("real-actor", 50, ["real", "from_bd", "named", "actor"], { no: ["politician"] }),
+    entry("explicit-non-actor", 60000, ["real", "from_bd", "named"], { no: ["actor", "politician"] }),
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [id, value] of [["real", "yes"], ["from_bd", "yes"],
+    ["actor", "yes"], ["politician", "no"]]) answer(state, id, value);
+  const decision = decide(state);
+  if (decision.type === "guess")
+    assert.equal(pool.ids[decision.index], "real-actor", "actor=yes guessed a person with unknown acting");
+  else {
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const d = decide(state);
+      if (d.type === "guess") {
+        assert.equal(pool.ids[d.index], "real-actor");
+        break;
+      }
+      if (d.type === "defeat") break;
+      answer(state, d.qid, "unknown");
+    }
+  }
+});
+
 test("confirmed Bangladesh country never guesses an explicitly foreign celebrity", () => {
   const questions = [
     { id: "real", group: "kind" },

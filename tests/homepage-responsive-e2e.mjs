@@ -139,7 +139,7 @@ try{
   await mobilePage.locator('[aria-label="Close install invitation"]').click();
   assert.equal(await mobilePage.locator("#walid-pwa-invite").count(),0);
   // Ordinary same-site navigation must not generate a second popup.
-  await mobilePage.goto(origin+"/games/index.html",{waitUntil:"load"});
+  await mobilePage.goto(origin+"/games/index.html",{waitUntil:"load",referer:origin+"/"});
   await mobilePage.waitForTimeout(900);
   assert.equal(await mobilePage.locator("#walid-pwa-invite").count(),0);
   // A new entry (new tab) should invite again when not installed.

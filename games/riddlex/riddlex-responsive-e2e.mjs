@@ -264,6 +264,8 @@ try {
         const state = await page.evaluate(() => window.__riddlex.state());
         if (state.mode === "learn") {
           trace.push("END: learn / defeat");
+          if (policy === "actor_female_1990s") assert.ok(guesses > 4 || seen.size >= 24,
+            "Premature defeat after four guesses in actress case");
           if (policy === "public") assert.ok(seen.size >= 15,
             "The real knowledge engine surrendered before asking enough questions: " + seen.size);
           // A test with many deliberately unknown personal and career facts
@@ -272,7 +274,7 @@ try {
           // misleading celebrity guess from sparse facts.
           if (policy === "actor") assert.ok(seen.size >= 12,
             "The engine gave up immediately on actor=yes: " + seen.size);
-          if (policy === "actor_1990s") {
+          if ((policy === "actor_1990s" || policy === "actor_female_1990s")) {
             const info = await page.evaluate(() => window.__riddlex.diagnose());
             console.log("RIDDLEX_OWNER_ACTOR_1990S_DIAG " + JSON.stringify(info));
             assert.ok(info.loadedCount > 1, "regional Bangladesh shards were never loaded");
@@ -283,10 +285,15 @@ try {
         }
         if (state.mode === "guess") {
           const name = await page.locator("#guess-line").textContent();
+          if (policy === "actor_female_1990s") {
+            const maleBit = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "male"), state.best);
+            assert.notEqual(maleBit, "yes", "Guess contradicts male=no: " + state.best);
+          }
           trace.push("GUESS: " + name + " [" + state.best + "]");
           assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
             "A no-personal-contact answer guessed a personal role");
-          if (policy === "actor_1990s") {
+          if ((policy === "actor_1990s" || policy === "actor_female_1990s")) {
             const contradictedEra = await page.evaluate((id) =>
               window.__riddlex.replyFor(id, "screen_star_pre1990"), state.best);
             assert.notEqual(contradictedEra, "yes",
@@ -296,7 +303,7 @@ try {
             assert.notEqual(denied1990s, "no",
               "Known NOT-1990s star guessed despite firm YES: " + state.best);
           }
-          if (policy === "actor" || policy === "actor_1990s") {
+          if (policy === "actor" || policy === "actor_1990s" || policy === "actor_female_1990s") {
             const recordedActing = await page.evaluate((id) =>
               window.__riddlex.replyFor(id, "actor"), state.best);
             assert.equal(recordedActing, "yes",
@@ -319,7 +326,7 @@ try {
             break;
           }
           guesses++;
-          if (guesses >= 3) break;
+          if (guesses >= (policy === "actor_female_1990s" ? 5 : 3)) break;
           await page.click("#wrong");
           await page.waitForFunction(() => window.__riddlex?.state()?.mode === "wrong", null, { timeout: 20000 });
           await page.click("#retry");
@@ -329,6 +336,8 @@ try {
         }
         const q = state.question;
         if (seen.has(q)) throw new Error("Question repeated: " + q);
+        if (policy === "actor_female_1990s" && seen.has("male") && q === "female")
+          assert.fail("Redundant female question after male=no");
         assert.ok(!(q === "dead" && seen.has("alive")), "Alive/dead question duplicated");
         if (policy === "public" && seen.has("actor"))
           assert.ok(!q.startsWith("screen_star_"), "Actor-only trivia after actor NO");
@@ -343,8 +352,9 @@ try {
         if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
         else if (q === "from_bd") a = "yes";
-        else if (policy === "actor_1990s" && ["named","alive","actor","screen_star_1990s"].includes(q)) a = "yes";
-        else if (policy === "actor_1990s" && [
+        else if (policy === "actor_female_1990s" && q === "male") a = "no";
+        else if ((policy === "actor_1990s" || policy === "actor_female_1990s") && ["named","alive","actor","screen_star_1990s"].includes(q)) a = "yes";
+        else if ((policy === "actor_1990s" || policy === "actor_female_1990s") && [
           "politician","writer","singer","musician","director","athlete",
           "screen_star_pre1990","cricketer","footballer"
         ].includes(q)) a = "no";
@@ -396,6 +406,7 @@ try {
   await replay("Shakib Al Hasan with the real database answers", "shakib");
   await replay("Bangladeshi actor who does not know the player", "actor");
   await replay("1990s Bangladeshi actor, 12 real user answers", "actor_1990s");
+  await replay("Female Bangladesh actress with male=no", "actor_female_1990s");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

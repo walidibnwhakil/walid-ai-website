@@ -257,6 +257,11 @@ try {
         return route.abort();
       });
       await negativePage.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
+      // The deferred module can finish after the load event. Don't try
+      // interacting before its Play/Answer event handlers are installed.
+      await negativePage.waitForFunction(() =>
+        typeof window.__riddlex?.ready === "function",
+        null, { timeout: 30000 });
       await negativePage.evaluate(() => window.__riddlex.ready());
       await negativePage.click("#play");
       await negativePage.waitForFunction(() =>

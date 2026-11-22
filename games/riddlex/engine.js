@@ -9,6 +9,7 @@ const politicsUrl = new URL(
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js";
 import { ACTOR_PROOFS, ACTOR_PROOF_FACTS, ACTOR_PROOF_IDS } from "./actor-proof.js";
+import { WRITER_PROOFS, WRITER_PROOF_FACTS, WRITER_PROOF_IDS } from "./writer-proof.js";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -143,6 +144,7 @@ export function factBit(pool, index, qi) {
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (ACTOR_PROOF_IDS.has(id)) return ACTOR_PROOF_FACTS[pool.ids[index]]?.[id] || 0;
+  if (WRITER_PROOF_IDS.has(id)) return WRITER_PROOF_FACTS[pool.ids[index]]?.[id] || 0;
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   const members = id && REGIONS[id];
@@ -385,7 +387,8 @@ export function guessMatchesAnswers(state, index) {
     if (row.qid === "knows_you" && row.value === "no" &&
         factBit(state.pool, index, row.qi) === 2) return false;
     // A sourced affirmative acting fact cannot survive a firm denial.
-    if (row.value === "no" && ACTOR_PROOF_IDS.has(row.qid) &&
+    if (row.value === "no" &&
+        (ACTOR_PROOF_IDS.has(row.qid) || WRITER_PROOF_IDS.has(row.qid)) &&
         factBit(state.pool, index, row.qi) === 2) return false;
   }
   return true;
@@ -418,15 +421,24 @@ function confirmedEvidenceFor(state, index, permitted) {
 export function enoughIdentityEvidence(state, index) {
   if (index < 0 || !guessMatchesAnswers(state, index)) return false;
   if (!isFullPublicCasebook(state)) return true;
-  if (state.answers.length < PUBLIC_MIN_QUESTIONS) return false;
-
-  // For Bangladeshi actors, two *specific* sourced films or career events
-  // must agree with the candidate. Unknown information is never a denial.
-  if (said(state, "actor", ["yes"]) && said(state, "from_bd", ["yes"])) {
-    return confirmedEvidenceFor(state, index,
-      new Set(ACTOR_PROOFS[state.pool.ids[index]] || [])) >= 2;
+  const enoughQuestions = state.answers.length >= PUBLIC_MIN_QUESTIONS;
+  // Three independently sourced career facts permit a ten-question result.
+  // Otherwise, require twelve questions and two affirmative career facts.
+  if (said(state, "from_bd", ["yes"])) {
+    const careerFacts = said(state, "actor", ["yes"])
+      ? ACTOR_PROOFS[state.pool.ids[index]]
+      : said(state, "writer", ["yes"])
+        ? WRITER_PROOFS[state.pool.ids[index]] : null;
+    if (careerFacts) {
+      const proofs = confirmedEvidenceFor(state, index, new Set(careerFacts));
+      return (proofs >= 3 && state.answers.length >= 10) ||
+        (proofs >= 2 && enoughQuestions);
+    }
+    if (said(state, "actor", ["yes"]) || said(state, "writer", ["yes"]))
+      return false;
   }
-  // A writer's occupation or another basic category is not identity proof.
+  if (!enoughQuestions) return false;
+  // A generic occupation or nationality alone never verifies a public name.
   return confirmedEvidenceFor(state, index, VERIFIED_CAREER_TRAITS) >= 2;
 }
 
@@ -481,7 +493,7 @@ export function shouldGuess(state) {
   if (!(bestP > 0)) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
-  if (isFullPublicCasebook(state) && asked < PUBLIC_MIN_QUESTIONS) return false;
+  if (isFullPublicCasebook(state) && asked < 10) return false;
   if (asked >= 72) return true;
   const personal = state.answers.some((row) => row.qid === "knows_you" &&
     (row.value === "yes" || row.value === "probably"));
@@ -566,9 +578,9 @@ function gated(state, question, rows) {
     // Still allowed once the matching topic is likely; the mass checks below do that.
   }
   if (id === "adult_ent") return adultAllowed(state);
-  if (group === "actor_proof") {
-    return state.category === "character" &&
-      said(state, "actor", ["yes"]) && said(state, "from_bd", ["yes"]);
+  if (group === "actor_proof" || group === "writer_proof") {
+    return state.category === "character" && said(state, "from_bd", ["yes"]) &&
+      said(state, group === "actor_proof" ? "actor" : "writer", ["yes"]);
   }
   if (group === "personal") {
     if (state.category !== "character") return false;
@@ -616,7 +628,7 @@ function gated(state, question, rows) {
 }
 
 const CATEGORY_GROUPS = {
-  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics", "personal", "actor_proof"]),
+  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics", "personal", "actor_proof", "writer_proof"]),
   animal: new Set(["animal", "look", "size"]),
   object: new Set(["object", "look", "size"]),
 };
@@ -953,6 +965,7 @@ const STRICT_PARENT = {
   politics: "politician",
   personal: "knows_you",
   actor_proof: "actor",
+  writer_proof: "writer",
 };
 
 function answerValue(state, qid) {
@@ -964,7 +977,7 @@ function answerValue(state, qid) {
 
 export function prerequisitesFor(question) {
   const list = [];
-  if (question.group === "actor_proof") {
+  if (question.group === "actor_proof" || question.group === "writer_proof") {
     list.push({ id: "from_bd", value: "yes", strict: true });
   }
   const strictParent = STRICT_PARENT[question.group];
@@ -1041,7 +1054,7 @@ function firstAllowedQuestion(state) {
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if (question.group === "actor_proof" ||
+    if (question.group === "actor_proof" || question.group === "writer_proof" ||
         !allowedInCategory(state, question) ||
         blockedQuestion(state, question, rows, cache) ||
         !gated(state, question, rows) ||
@@ -1049,6 +1062,29 @@ function firstAllowedQuestion(state) {
     return question.id;
   }
   return null;
+}
+
+function nextIdentityProofQuestion(state) {
+  if (!isFullPublicCasebook(state) || state.answers.length < 6 ||
+      !said(state, "from_bd", ["yes"]) || said(state, "female", ["yes"])) return null;
+  const proofs = said(state, "actor", ["yes"]) ? ACTOR_PROOFS
+    : said(state, "writer", ["yes"]) ? WRITER_PROOFS : null;
+  if (!proofs) return null;
+  const asked = new Map(state.answers.map((row) => [row.qid, row.value]));
+  const candidates = [];
+  for (const [id, qids] of Object.entries(proofs)) {
+    const i = state.pool.ids.indexOf(id);
+    if (i < 0 || state.weights[i] <= 0 ||
+        !guessMatchesAnswers(state, i)) continue;
+    const yes = qids.filter((qid) => asked.get(qid) === "yes").length;
+    const no = qids.filter((qid) => asked.get(qid) === "no").length;
+    if (no || yes >= 3 || (yes >= 2 && state.answers.length >= 12)) continue;
+    const next = qids.find((qid) => state.pool.qIndex.has(qid) && !asked.has(qid));
+    if (!next) continue;
+    candidates.push({ next, yes, score: state.weights[i] });
+  }
+  candidates.sort((a, b) => b.yes - a.yes || b.score - a.score);
+  return candidates[0]?.next || null;
 }
 
 export function chooseQuestion(state) {
@@ -1100,6 +1136,9 @@ export function chooseQuestion(state) {
   if (!state.category && saidYes("fictional") && !asked.has("animal") && yesMass(state, "animal", state.alive.length > 7000 ? sampleAlive(state, 4000) : state.alive) > 0.18 && answers.length < 8) {
     return "animal";
   }
+  // Ask about the suspected individual's actual work before a name reveal.
+  const proofQid = nextIdentityProofQuestion(state);
+  if (proofQid) return proofQid;
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   const absentCache = new Map();
   let best = null;
@@ -1112,7 +1151,7 @@ export function chooseQuestion(state) {
     const question = pool.questions[qi];
     if (asked.has(question.id)) continue;
     // Only probe a film fact after a related actor is shortlisted.
-    if (question.group === "actor_proof" ||
+    if (question.group === "actor_proof" || question.group === "writer_proof" ||
         !allowedInCategory(state, question) ||
         blockedQuestion(state, question, rows, absentCache)) continue;
     if (!gated(state, question, rows)) continue;

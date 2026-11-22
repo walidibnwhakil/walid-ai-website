@@ -311,15 +311,22 @@ export function recompute(state) {
   const positive = (qid) => answers.some((entry) => entry.qid === qid &&
     (entry.value === "yes" || entry.value === "probably"));
   const localActor = positive("from_bd") && positive("actor");
+  const playerPersonal = positive("knows_you") || positive("your_crush");
+  const confirmedCrush = positive("your_crush");
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
     if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
-    const prior = localActor && REGIONAL_FAME.has(pool.ids[i])
+    let prior = localActor && REGIONAL_FAME.has(pool.ids[i])
       ? Math.max(pool.pop[i] || 1, REGIONAL_FAME.get(pool.ids[i]))
       : (pool.pop[i] || 1);
+    // Relative roles cannot be looked up in public celebrity databases.
+    // Give them a fair chance only after the player confirms a personal
+    // connection, without overpowering public-figure guesses beforehand.
+    if (playerPersonal && pool.ids[i]?.startsWith("riddlex-role-")) prior *= 3;
+    if (confirmedCrush && pool.ids[i] === "riddlex-role-crush") prior *= 4;
     let score = Math.log(prior + 1);
     for (let a = 0; a < answers.length; a++) {
       const answer = answers[a];

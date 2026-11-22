@@ -125,7 +125,9 @@
     const item=roles.find(x=>x.id===selected);
     $('#ops-role-name').textContent=item.name;
     $('#ops-role-description').textContent=item.desc;
-    $('#ops-send').textContent=selected==='manager'?'Ask Manager':'Ask '+item.name;
+    // Preserve the SVG send icon. TextContent would replace it with a wrapped label.
+    $('#ops-send').setAttribute('aria-label','Send message to Manager');
+    $('#ops-send').setAttribute('title','Send message');
     document.querySelectorAll('.ops-desk').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.role===selected)));
   }
   function appendMessage(container,kind,heading,body,extra=''){
@@ -170,9 +172,11 @@
       .filter(item=>item?.role==='manager'&&Date.parse(item.created_at||'')>=cutoff)
       .sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||'')).slice(-65);
     if(!filtered.length){
-      const text=document.createElement('p');text.className='manager-chat-empty';
-      text.textContent='Manager-কে আপনার নির্দেশ লিখুন। এখানেই কথোপকথন ও কর্মীদের যাচাইকৃত রিপোর্ট দেখা যাবে।';
-      host.append(text);return;
+      // A non-persisted greeting is shown only when there are no previous commands.
+      const greeting=appendMessage(host,'answer','Manager',
+        'আসসালামু আলাইকুম, স্যার। Walid AI Office-এ স্বাগতম। আমি আপনার Manager। আপনার কী নির্দেশ আছে?');
+      greeting.classList.add('manager-chat-greeting');
+      return;
     }
     for(const task of filtered){
       appendMessage(host,'question','আপনি · '+fmt(task.created_at),task.instruction||task.title||'');
@@ -216,9 +220,10 @@
   }
   async function loadHistory(){
     if(!ready)return;
-    try{const data=await request('/api/admin/tasks');renderHistory(data.tasks||[]);
-      $('#ops-history-note').textContent='History source: '+(data.persistence||'not reported');
-    }catch(error){status('History: '+error.message,true)}
+    try{
+      const data=await request('/api/admin/tasks');
+      renderHistory(data.tasks||[]);
+    }catch(error){status('চ্যাটের আগের বার্তা দেখানো যাচ্ছে না: '+error.message,true)}
   }
   async function submit(){
     if(!ready||busy)return;
@@ -228,7 +233,7 @@
     busy=true;$('#ops-send').disabled=true;
     input.value='';fitComposer();
     const host=$('#ops-history');
-    host.querySelector('.manager-chat-empty')?.remove();
+    host.querySelector('.manager-chat-greeting')?.remove();
     appendMessage(host,'question','আপনি · '+fmt(new Date().toISOString()),instruction);
     const pending=appendMessage(host,'answer','Manager','আপনার নির্দেশ যাচাই করা হচ্ছে…');
     host.scrollTop=host.scrollHeight;

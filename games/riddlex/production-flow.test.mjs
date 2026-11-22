@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, chooseQuestion, createState, decide, recompute } from "./engine.js";
-import { appendShard, decodeShard, planShardLoads } from "./kb.js";
+import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 import { ACTOR_PROOF_QUESTIONS } from "./actor-proof.js";
@@ -60,4 +60,25 @@ test("Bangladesh long-tail shards keep the same truthful game playable", () => {
     decision: result, question: chooseQuestion(state),
   }));
   assert.equal(result.type, "ask", "loaded Bangladeshi casebook must continue without false contradiction");
+});
+test("temporary thin casebook does not call consistent real-person clues a category mismatch", () => {
+  const sparse = poolFromEntries(questions, [
+    { id: "sparse-bangladeshi", en: "Sparse Person", pop: 1,
+      yes: ["real", "from_bd"], no: ["politician"] },
+  ]);
+  const state = createState(sparse, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"],
+    ["politician", "no"], ["from_bd", "yes"],
+  ]) answer(state, qid, value);
+  const first = decide(state);
+  assert.equal(first.type, "ask", JSON.stringify(first));
+  assert.ok(["male", "alive", "actor", "writer"].includes(first.qid),
+    "ask about a meaningful unconfirmed identity fact");
+  answer(state, first.qid, "yes");
+  const second = decide(state);
+  assert.equal(second.type, "ask", JSON.stringify(second));
+  assert.notEqual(second.qid, first.qid);
+  assert.notEqual(second.type, "reconsider");
 });

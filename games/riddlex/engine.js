@@ -426,6 +426,11 @@ function topTwo(state) {
         state.answers.some((row) => row.qid === "knows_you" &&
           ["yes", "probably"].includes(row.value));
       if (!isPersonalRole && countryFact === 1) continue;
+      // Sparse international records can have "actor" but no confirmed
+      // nationality. If the player says Bangladeshi AND actor, require
+      // both facts before guessing a public actor; don't nominate an
+      // unrelated foreign artist from a fame prior.
+      if (!isPersonalRole && confirmedActor && countryFact !== 2) continue;
       // A confirmed matching country wins over extra nationalities or
       // historical birthplace tags (several notable figures have both).
       if (!isPersonalRole && countryFact !== 2 &&

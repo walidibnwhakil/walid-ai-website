@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S } from "./career-facts.js";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -140,6 +140,7 @@ export function factBit(pool, index, qi) {
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
+  if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -291,7 +292,13 @@ function hardLog(answer, bit, conflicted) {
  // after the player confirms the relevant country, job and gender. Never
  // override an answer or artificially mark a missing fact as true.
 const REGIONAL_FAME = new Map([
-  ["Q7460127", 180], // Shabnur (শাবনূর), Bangladeshi film actress
+  ["Q7460127", 180], // Shabnur
+  ["Q7460022", 215], // Shabana
+  ["Q13057124", 210], // Alamgir
+  ["Q6926134", 175], // Moushumi
+  ["Q7405420", 180], // Salman Shah
+  ["Q13059781", 150], // Shabnaz
+  ["Q7322180", 165], // Riaz
 ]);
 
 export function recompute(state) {
@@ -303,15 +310,14 @@ export function recompute(state) {
   const conflicted = conflictedFamilies(answers);
   const positive = (qid) => answers.some((entry) => entry.qid === qid &&
     (entry.value === "yes" || entry.value === "probably"));
-  const localActress = positive("from_bd") && positive("actor") &&
-    (positive("female") || answers.some((entry) => entry.qid === "male" && entry.value === "no"));
+  const localActor = positive("from_bd") && positive("actor");
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
     if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
-    const prior = localActress && REGIONAL_FAME.has(pool.ids[i])
+    const prior = localActor && REGIONAL_FAME.has(pool.ids[i])
       ? Math.max(pool.pop[i] || 1, REGIONAL_FAME.get(pool.ids[i]))
       : (pool.pop[i] || 1);
     let score = Math.log(prior + 1);
@@ -479,7 +485,7 @@ function gated(state, question, rows) {
     return state.answers.some((row) => row.qid === "knows_you" &&
       (row.value === "yes" || row.value === "probably"));
   }
-  if (id === "screen_star_1990s") {
+  if (id === "screen_star_1990s" || id === "screen_star_pre1990") {
     return state.answers.length >= 5 &&
       yesMass(state, "actor", rows) > 0.45 &&
       yesMass(state, "from_bd", rows) > 0.40;

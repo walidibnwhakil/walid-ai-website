@@ -353,7 +353,10 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#ops-role-name').textContent(),'Manager');
   await page.locator('#ops-input').fill('আজকের visitor এবং সাইটের সমস্যা যাচাই করো');
   await page.locator('#ops-send').click();
-  await page.locator('#ops-history .ops-message.answer').last().waitFor({state:'visible'});
+  await page.waitForFunction(()=>{
+    const messages=[...document.querySelectorAll('#ops-history .ops-message.answer p')];
+    return Boolean(messages.at(-1)?.textContent.includes('verified test response'));
+  },null,{timeout:10000});
   assert.deepEqual(submittedRoles,['manager'],'only Manager receives owner commands');
   const question=await page.locator('#ops-history .ops-message.question').last().boundingBox();
   const answer=await page.locator('#ops-history .ops-message.answer').last().boundingBox();
@@ -366,6 +369,8 @@ async function exercise(browser, width, height){
     'Each new reply appears at bottom and earlier chat travels upward');
   assert.equal(await page.locator('.manager-delegations').count(),0,
     'Detailed staff tasks must never expand below owner Manager messages');
+  assert.equal(await page.locator('#ops-history').textContent().then(t=>t.includes('Check real website and backend HTTP status')),false,
+    'Manager must not narrate staff delegation in the owner conversation');
   assert.equal(await page.locator('#manager-staff-chats').isVisible(),true,
     'Dedicated Staff conversations are available only through the header');
   await page.locator('#manager-staff-chats').click();

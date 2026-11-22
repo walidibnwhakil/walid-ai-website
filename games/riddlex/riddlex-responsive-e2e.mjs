@@ -172,6 +172,23 @@ try {
     await page.waitForFunction((art) =>
       [...document.querySelectorAll("#menu img")].some((img) => img.getAttribute("src")?.includes(art)),
       opposite.art);
+    if (orient === "portrait") {
+      await page.setViewportSize({ width, height });
+      await page.goto(origin + "/games/riddlex/", { waitUntil: "load" });
+      await page.click("#play");
+      await page.waitForFunction(() => !document.getElementById("categories").hidden);
+      await page.click('[data-cat="character"]');
+      await page.waitForFunction(() => !document.getElementById("answers").hidden &&
+        document.getElementById("progress").textContent.includes("Question"));
+      await page.click("#answer-yes"); // Real person
+      await page.waitForFunction(() => /know you personally|ব্যক্তিগতভাবে চেনেন/i.test(
+        document.getElementById("status").textContent), null, { timeout: 18000 });
+      await page.click("#answer-yes"); // Knows the player
+      await page.waitForFunction(() => /member of your family|পরিবারের সদস্য/i.test(
+        document.getElementById("status").textContent), null, { timeout: 18000 });
+      if (shotFolder) await page.screenshot({ path: join(shotFolder, "personal-question-portrait.png") });
+      console.log("RIDDLEX_PERSONAL_QUESTIONS_PASS");
+    }
     assert.deepEqual(errors, [], "uncaught browser errors");
     console.log("RIDDLEX_GAMEPLAY_PASS", width, height, orient);
     await page.close();

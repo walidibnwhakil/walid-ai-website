@@ -26,6 +26,7 @@ let guessIndex = -1;
 let loading = null;
 let loadedNames = [];
 let loadChain = Promise.resolve();
+let menuCatController = null;
 
 function text() { return UI[lang] || UI.en; }
 
@@ -65,13 +66,16 @@ function applyLanguage() {
   $("learn-photo-text").textContent = copy.photo;
   $("learn-save").textContent = copy.save;
   $("play-label").textContent = copy.play;
+  $("learn-again").textContent = copy.playAgain;
   const retryLoad = $("load-retry");
   if (retryLoad) retryLoad.textContent = copy.tryLoad;
 }
 
 function showMenu() {
   mode = "menu";
+  ++loadToken;
   menu.hidden = false;
+  menuCatController?.resume();
   game.hidden = true;
   $("confirm").hidden = true;
   setGameInProgress(false);
@@ -109,7 +113,7 @@ function showLoadRetry() {
 
 async function boot() {
   applyLanguage();
-  startMenuCat($("menu-cat"));
+  if (!menuCatController) menuCatController = startMenuCat($("menu-cat"));
   loading = Promise.all([
     loadManifest("./kb"),
     fetch(`./kb/index.json?v=${BUILD}`).then((response) => {
@@ -185,6 +189,7 @@ function showOnly(which) {
   $("solved-line").hidden = which !== "solved";
   $("again").hidden = which !== "solved";
   learnForm.hidden = which !== "learn";
+  $("learn-again").hidden = true;
   $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
   $("credit").hidden = which === "pick" || which === "ask";
   scheduleUnderBubble();
@@ -192,6 +197,8 @@ function showOnly(which) {
 
 async function openPlay() {
   menu.hidden = true;
+  menuCatController?.pause();
+  ++loadToken;
   game.hidden = false;
   mode = "pick";
   category = null;
@@ -271,13 +278,15 @@ async function startGame(chosen) {
 
 async function step() {
   if (!state) return;
+  const session = loadToken;
+  const playingState = state;
   const pending = category === "character" && catalog
     ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
     : null;
   let decision = decide(state);
   if (decision.type === "guess" && pending) {
     await pending;
-    if (!state) return;
+    if (loadToken !== session || state !== playingState) return;
     decision = decide(state);
   }
   if (decision.type === "ask") {
@@ -302,6 +311,7 @@ async function step() {
 }
 
 async function beginGuess(index) {
+  const session = loadToken;
   guessIndex = index;
   mode = "reveal";
   const entity = entityView(pool, index);
@@ -312,18 +322,20 @@ async function beginGuess(index) {
   scene.setMood("confident");
   const font = guessFont(lang, name);
   if (document.fonts?.load) {
-    try { await document.fonts.load(font); } catch { /* the canvas falls back */ }
+    try { await withTimeout(document.fonts.load(font), 2500); } catch { /* use the fallback font */ }
+    if (loadToken !== session || mode !== "reveal") return;
   }
   const result = await scene.playReveal({
     name,
     font,
     imageUrl: printable ? imageSrc(entity.image) : "",
   });
-  if (mode !== "reveal") return;
+  if (loadToken !== session || mode !== "reveal") return;
   mode = "guess";
-  setStatus(text().prompt(name));
+  const shownName = displayName(entity, lang);
+  setStatus(text().prompt(shownName));
   const guessLine = $("guess-line");
-  if (guessLine) guessLine.textContent = text().prompt(name);
+  if (guessLine) guessLine.textContent = text().prompt(shownName);
   $("credit").textContent = result.printed && entity.credit ? `${text().credit}: ${entity.credit}` : "";
   showOnly("guess");
 }
@@ -369,6 +381,7 @@ async function beginDefeat() {
   const adult = answersImplyAdult(state?.answers || []);
   setStatus(text().defeat);
   learnForm.hidden = false;
+  $("learn-again").hidden = true;
   answers.hidden = true;
   guessBox.hidden = true;
   $("learn-photo-row").hidden = adult;
@@ -408,6 +421,7 @@ async function onLearnSubmit(event) {
     });
     showLearnMessage(text().saved);
     learnForm.hidden = true;
+    $("learn-again").hidden = false;
   } catch {
     showLearnMessage(text().failedSave);
     if (save) save.disabled = false;
@@ -456,6 +470,16 @@ function setLanguage(next) {
   } else if (mode === "pick") {
     setStatus(text().pick);
     $("progress").textContent = "";
+  } else if (guessIndex >= 0 && pool && ["reveal", "guess", "wrong", "solved"].includes(mode)) {
+    const entity = entityView(pool, guessIndex);
+    const name = displayName(entity, lang);
+    scene.relabel(name, guessFont(lang, name));
+    $("guess-line").textContent = text().prompt(name);
+    if (mode === "guess" || mode === "solved") setStatus(text().prompt(name));
+    if (mode === "wrong") setStatus(text().missed);
+    if ($("credit").textContent && entity.credit) $("credit").textContent = `${text().credit}: ${entity.credit}`;
+  } else if (mode === "learn" && !learnForm.hidden && !$("learn-note").textContent) {
+    setStatus(text().defeat);
   }
 }
 
@@ -484,6 +508,11 @@ $("load-retry")?.addEventListener("click", () => {
 $("to-menu").addEventListener("click", showMenu);
 $("correct").addEventListener("click", onCorrect);
 $("again").addEventListener("click", onPlayAgain);
+$("learn-again").addEventListener("click", () => {
+  if (mode !== "learn") return;
+  scene.clearReveal();
+  openPlay();
+});
 $("wrong").addEventListener("click", onWrong);
 $("retry").addEventListener("click", onRetry);
 $("back").addEventListener("click", onUndo);

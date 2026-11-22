@@ -279,6 +279,14 @@ function hardLog(answer, bit, conflicted) {
   return null;
 }
 
+// Local fame is underrepresented by global knowledge-source popularity.
+ // Give a verified Bangladeshi screen star a realistic *regional* prior only
+ // after the player confirms the relevant country, job and gender. Never
+ // override an answer or artificially mark a missing fact as true.
+const REGIONAL_FAME = new Map([
+  ["Q7460127", 180], // Shabnur (শাবনূর), Bangladeshi film actress
+]);
+
 export function recompute(state) {
   applyPolitics(state.pool);
   if (state.weights.length !== state.pool.count) state.weights = new Float64Array(state.pool.count);
@@ -286,13 +294,20 @@ export function recompute(state) {
   const n = pool.count;
   const logW = new Float64Array(n);
   const conflicted = conflictedFamilies(answers);
+  const positive = (qid) => answers.some((entry) => entry.qid === qid &&
+    (entry.value === "yes" || entry.value === "probably"));
+  const localActress = positive("from_bd") && positive("actor") &&
+    (positive("female") || answers.some((entry) => entry.qid === "male" && entry.value === "no"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
     if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
-    let score = Math.log((pool.pop[i] || 1) + 1);
+    const prior = localActress && REGIONAL_FAME.has(pool.ids[i])
+      ? Math.max(pool.pop[i] || 1, REGIONAL_FAME.get(pool.ids[i]))
+      : (pool.pop[i] || 1);
+    let score = Math.log(prior + 1);
     for (let a = 0; a < answers.length; a++) {
       const answer = answers[a];
       if (answer.value === "unknown") continue;

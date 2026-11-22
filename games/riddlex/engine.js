@@ -1000,8 +1000,11 @@ function firstAllowedQuestion(state) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
     if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
-    // Fallback questions must respect personal-relationship prerequisites too.
-    if (question.group === "personal" && !gated(state, question, rows)) continue;
+    if (question.id === "fictional" && said(state, "real", ["yes", "probably"])) continue;
+    if (question.id === "real" && said(state, "fictional", ["yes", "probably"])) continue;
+    // Low-confidence fallback cannot bypass the same relevance checks as the
+    // normal question picker, including sport and personal relationships.
+    if (!gated(state, question, rows)) continue;
     return question.id;
   }
   return null;
@@ -1129,7 +1132,9 @@ export function decide(state) {
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
   let qid = chooseQuestion(state);
-  if (!qid && waiting) qid = firstAllowedQuestion(state);
+  // If posterior probabilities are diffuse, ask a useful remaining question
+  // instead of conceding or guessing a random celebrity after eight clues.
+  if (!qid) qid = firstAllowedQuestion(state);
   if (!qid) {
     if (best >= 0 && bestP > 0 && supportedIdentity(state))
       return { type: "guess", index: best };

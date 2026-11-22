@@ -44,3 +44,9 @@ jobs:
           node --check admin-ops.js
           node --check admin-approvals.js
           node --check usage.js
+      - name: Validate privacy-safe section analytics and current catalog tracking
+        run: |
+          python3 -m unittest discover -s tests -p 'test_analytics_sections.py' -v
+          node --check admin-section-metrics.js
+          node --check admin-analytics-catalog.js
+          node --check usage.js

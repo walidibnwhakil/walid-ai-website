@@ -1200,6 +1200,11 @@ body.quran-reader-page .quran-sidebar .side-ayah-count{display:none!important}
 /* Quran index: quiet compact introduction and opt-in magnifier search.
    Scoped so individual surah readers, stories and the site chrome stay intact. */
 body:not(.quran-reader-page) .quran-index-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-height: 0;
   height: auto;
   margin: 17px 0 12px;

@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js?v=riddlex-42";
 import { ACTOR_PROOFS, ACTOR_PROOF_FACTS, ACTOR_PROOF_IDS } from "./actor-proof.js";
 import { WRITER_PROOFS, WRITER_PROOF_FACTS, WRITER_PROOF_IDS } from "./writer-proof.js";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";

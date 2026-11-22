@@ -1,9 +1,10 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-35";
-import { UI, guessFont } from "./i18n.js?v=riddlex-menu-36";
-import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-35";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-39";
+import { UI, guessFont } from "./i18n.js?v=riddlex-40";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
+import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
-import { createScene, startMenuCat } from "./scene.js?v=akinator-35";
+import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -88,6 +89,11 @@ function gameInProgress() {
 }
 
 const LOAD_MS = 15000;
+const debugLoad = new URLSearchParams(location.search).has("autotest");
+function loadEvent(event, detail = "") {
+  if (!debugLoad) return;
+  (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
+}
 const BUILD = "akinator-35";
 
 function withTimeout(promise, ms) {
@@ -219,19 +225,31 @@ async function openPlay() {
 }
 
 async function loadNamed(entries, token, begin) {
+  loadEvent("loadNamed.enter", JSON.stringify({ count: entries.length, category }));
   const names = entries.map((item) => item.file).filter((name) => !loadedNames.includes(name));
   if (!names.length || token !== loadToken) return;
   loadedNames.push(...names);
   let started = !begin;
   try {
   await loadShards("./kb", manifest, names, (partial) => {
+    loadEvent("loadShards.onPool", JSON.stringify({ count: partial.count, category }));
     if (token !== loadToken) return;
-    adoptPool(partial);
+    // Extend the initial casebook only once per character game. These are
+    // relationship templates, never actual people's names or account data.
+    if (category === "character" && !partial.ids.includes("riddlex-role-mother")) {
+      const roles = poolFromEntries(manifest.questions, [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER]);
+      adoptPool(appendShard(partial, roles));
+      loadEvent("roles.appended", pool?.count);
+    } else {
+      adoptPool(partial);
+    }
     if (started || !begin) return;
     started = true;
     state = createState(pool, { opening: "real", category });
+    loadEvent("state.created", state?.pool?.count);
     mode = "ask";
     step();
+    loadEvent("step.called", currentQ);
     const learnLater = () => loadLearned(manifest.questions).then((rows) => {
       if (!rows.length || token !== loadToken || !pool) return;
       adoptPool(mergePools([pool, poolFromEntries(manifest.questions, rows)]));
@@ -239,8 +257,11 @@ async function loadNamed(entries, token, begin) {
     if (typeof requestIdleCallback === "function") requestIdleCallback(() => learnLater());
     else setTimeout(learnLater, 400);
   }, pool);
+  loadEvent("loadShards.completed", pool?.count);
   } catch (error) {
     loadedNames = loadedNames.filter((name) => !names.includes(name));
+    console.error("Riddlex knowledge loading failed", error);
+    loadEvent("loadNamed.error", error?.stack || error);
     throw error;
   }
 }
@@ -271,7 +292,9 @@ async function startGame(chosen) {
   job.catch(() => {});
   try {
     await withTimeout(job, LOAD_MS);
-  } catch {
+    loadEvent("startGame.loaded", category);
+  } catch (error) {
+    loadEvent("startGame.failed", error?.stack || error);
     if (token !== loadToken) return;
     loadToken += 1;
     showLoadRetry();
@@ -380,6 +403,18 @@ async function onRetry() {
 async function beginDefeat() {
   mode = "learn";
   scene.playDefeat();
+  const personal = state?.answers.some((row) =>
+    row.qid === "knows_you" &&
+    (row.value === "yes" || row.value === "probably"));
+  if (personal) {
+    // A friend or family member's real name must never enter the shared
+    // learning submissions. Let the player start a fresh round instead.
+    showOnly("learn");
+    learnForm.hidden = true;
+    $("learn-again").hidden = false;
+    setStatus(text().privatePeople);
+    return;
+  }
   const adult = answersImplyAdult(state?.answers || []);
   setStatus(text().defeat);
   learnForm.hidden = false;

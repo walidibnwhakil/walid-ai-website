@@ -45,6 +45,10 @@ try {
     const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (message) => {
+      if (message.type() === "error" && message.text().includes("Riddlex knowledge"))
+        errors.push(message.text());
+    });
     await page.route("**/*", (route) => {
       if (new URL(route.request().url()).origin === origin) return route.continue();
       return route.abort();
@@ -128,6 +132,42 @@ try {
     await page.click('#game [data-set-lang="bn"]');
     assert.equal(await page.locator("html").getAttribute("lang"), "bn");
     assert.equal(await page.locator("#answer-yes").textContent(), "হ্যাঁ");
+
+    // Render actual canvas guess photos in both extreme aspect ratios. The
+    // synthetic picture has a bright border and edge markers, making cropping
+    // or oversized cards immediately visible in the captured screenshot.
+    console.log("PHOTO_TEST_START", orient);
+    await page.evaluate(() => { document.getElementById("answers").hidden = true; });
+    for (const [shape, imageWidth, imageHeight] of [
+      ["tall-photo", 180, 690],
+      ["wide-photo", 920, 160],
+    ]) {
+      const pictureState = await page.evaluate(async ({ imageWidth, imageHeight }) => {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${imageWidth}" height="${imageHeight}" viewBox="0 0 ${imageWidth} ${imageHeight}">
+          <rect width="100%" height="100%" fill="#c1dde8"/>
+          <rect x="3" y="3" width="${imageWidth - 6}" height="${imageHeight - 6}" rx="1" fill="none" stroke="#ef1c18" stroke-width="6"/>
+          <rect x="8" y="8" width="${imageWidth - 16}" height="20" fill="#fadd1c"/>
+          <rect x="8" y="${imageHeight - 28}" width="${imageWidth - 16}" height="20" fill="#2343ff"/>
+          <circle cx="${imageWidth / 2}" cy="${imageHeight / 2}" r="26" fill="#3b8021"/>
+        </svg>`;
+        const src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+        const result = await Promise.race([
+          window.__riddlex.reveal("সম্পূর্ণ ছবি", src),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Guess reveal stalled")), 12000)),
+        ]);
+        return { result, bounds: window.__riddlex.expression().revealBounds };
+      }, { imageWidth, imageHeight });
+      assert.equal(pictureState.result.printed, true, "test photo failed to load");
+      const bounds = pictureState.bounds;
+      assert.ok(bounds && bounds.w > 60 && bounds.h > 60, "missing photo card");
+      assert.ok(bounds.x >= -1 && bounds.y >= -1, "photo card starts outside stage");
+      assert.ok(bounds.x + bounds.w <= bounds.canvasW + 1, "photo card clipped horizontally");
+      assert.ok(bounds.y + bounds.h <= bounds.canvasH + 1, "photo card clipped vertically");
+      console.log("PHOTO_TEST_PASS", orient, shape, pictureState.bounds.w, pictureState.bounds.h);
+      if (shotFolder) await page.screenshot({
+        path: join(shotFolder, "guess-" + orient + "-" + shape + ".png"),
+      });
+    }
     await page.click("#to-menu");
     assert.equal(await page.locator("#menu").isVisible(), true);
     const opposite = orient === "portrait" ? { width: 1366, height: 768, art: "menu-desk" }
@@ -136,6 +176,39 @@ try {
     await page.waitForFunction((art) =>
       [...document.querySelectorAll("#menu img")].some((img) => img.getAttribute("src")?.includes(art)),
       opposite.art);
+    if (orient === "portrait") {
+      await page.setViewportSize({ width, height });
+      await page.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
+      await page.click("#play");
+      await page.waitForFunction(() => !document.getElementById("categories").hidden);
+      await page.click('[data-cat="character"]');
+      console.log("CHARACTER_START", orient);
+      try {
+        await page.waitForFunction(() => !document.getElementById("answers").hidden &&
+          /Question|প্রশ্ন/.test(document.getElementById("progress").textContent),
+          null, { timeout: 18000 });
+      } catch (error) {
+        const snapshot = await page.evaluate(() => ({
+          status: document.getElementById("status")?.textContent,
+          progress: document.getElementById("progress")?.textContent,
+          loadRetry: !document.getElementById("load-retry")?.hidden,
+          answersHidden: document.getElementById("answers")?.hidden,
+          categoriesHidden: document.getElementById("categories")?.hidden,
+          loadTrace: window.__riddlexLoadTrace || [],
+        }));
+        throw new Error("Character gameplay did not open: " + JSON.stringify(snapshot) +
+          "; pageErrors=" + errors.join(" | ") + "; " + error.message);
+      }
+      console.log("CHARACTER_FIRST_QUESTION_PASS");
+      await page.click("#answer-yes"); // Real person
+      await page.waitForFunction(() => /know you personally|ব্যক্তিগতভাবে চেনেন/i.test(
+        document.getElementById("status").textContent), null, { timeout: 18000 });
+      await page.click("#answer-yes"); // Knows the player
+      await page.waitForFunction(() => /member of your family|পরিবারের সদস্য/i.test(
+        document.getElementById("status").textContent), null, { timeout: 18000 });
+      if (shotFolder) await page.screenshot({ path: join(shotFolder, "personal-question-portrait.png") });
+      console.log("RIDDLEX_PERSONAL_QUESTIONS_PASS");
+    }
     assert.deepEqual(errors, [], "uncaught browser errors");
     console.log("RIDDLEX_GAMEPLAY_PASS", width, height, orient);
     await page.close();

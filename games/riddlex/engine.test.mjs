@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute } from "./engine.js";
-import { appendShard, decodeShard, poolFromEntries } from "./kb.js";
+import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -589,4 +590,127 @@ test("animal and object rounds do not repeatedly scan all IDs for politics data"
   appendShard(animals, poolFromEntries(smallQuestions, [entry("dog-only", 10, ["animal"])]));
   recompute(state);
   assert.equal(fullScans, 2, "a newly appended shard should allow one recheck");
+});
+
+test("Shabnur exists in real BD female acting knowledge and is loaded by regional answers", () => {
+  const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));
+  const index = JSON.parse(readFileSync(new URL("./kb/index.json", import.meta.url), "utf8"));
+  const filename = "ix/r-bd-f-a-7079-p00.bin";
+  const buf = readFileSync(new URL("./kb/" + filename, import.meta.url));
+  const actual = decodeShard(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), manifest.questions);
+  const target = actual.ids.indexOf("Q7460127");
+  assert.ok(target >= 0, "Shabnur must not disappear from the real packed knowledge base");
+  assert.equal(actual.bns[target], "শাবনূর");
+  for (const countryAnswer of ["yes", "probably"]) {
+    const plan = planShardLoads(index, [
+      { qid: "real", value: "yes" },
+      { qid: "from_bd", value: countryAnswer },
+      { qid: "female", value: "yes" },
+      { qid: "alive", value: "yes" },
+      { qid: "actor", value: "yes" },
+    ], [index.top]);
+    assert.ok(plan.some((bucket) => bucket.file === filename),
+      "Bangladeshi actresses must be discoverable even with a probable country");
+  }
+});
+
+test("Shabnur's local screen fame is considered when BD, actress and female are confirmed", () => {
+  const qs = [
+    ["real", "kind"], ["female", "person"], ["alive", "life"],
+    ["from_bd", "country"], ["actor", "job"],
+  ].map(([id, group]) => ({ id, group, en: id, bn: id }));
+  const pool = poolFromEntries(qs, [
+    { id: "Q7460127", en: "Shabnur", bn: "শাবনূর", pop: 10, yes: qs.map((q) => q.id) },
+    { id: "other_local_actress", en: "Another local actress", pop: 110, yes: qs.map((q) => q.id) },
+    { id: "male_actor", en: "Actor", pop: 500, yes: ["real", "alive", "from_bd", "actor"], no: ["female"] },
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  assert.ok(state.weights[1] > state.weights[0], "global prior starts low for Shabnur");
+  for (const qid of ["real", "female", "alive", "from_bd", "actor"]) answer(state, qid, "yes");
+  assert.ok(state.weights[0] > state.weights[1],
+    "regional film recognition should help Shabnur once matching facts are known");
+});
+
+test("the game skips birth-year questions and stale current-government questions", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "Real?", bn: "বাস্তব?" },
+    { id: "female", group: "person", en: "Female?", bn: "নারী?" },
+    { id: "born_1970_1979", group: "birth", en: "Born in 1970s?", bn: "সত্তরে জন্ম?" },
+    { id: "in_government", group: "politics", en: "In government?", bn: "সরকারে?" },
+  ];
+  const pool = poolFromEntries(qs, [
+    { id: "politician1", en: "Politician one", pop: 100, yes: ["real","female","born_1970_1979","in_government"] },
+    { id: "politician2", en: "Politician two", pop: 80, yes: ["real"], no: ["female","born_1970_1979","in_government"] },
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  assert.equal(questionBlocked(state, "born_1970_1979"), false,
+    "stored birth information may still help the engine internally");
+  for (let i = 0; i < 4; i++) {
+    const decision = decide(state);
+    if (decision.type !== "ask") break;
+    assert.ok(!decision.qid.startsWith("born_"), "do not quiz players on a stranger's birth year");
+    assert.notEqual(decision.qid, "in_government", "do not rely on stale live office information");
+    answer(state, decision.qid, "unknown");
+  }
+});
+
+test("1990s screen-star question refers to film careers, never birth decade", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "Real?", bn: "বাস্তব?" },
+    { id: "actor", group: "job", en: "Actor?", bn: "অভিনয়শিল্পী?" },
+    { id: "from_bd", group: "country", en: "From BD?", bn: "বাংলাদেশ?" },
+    ...EXTRA_SCREEN_QUESTIONS,
+  ];
+  const pool = poolFromEntries(qs, [
+    { id: "Q7460127", en: "Shabnur", bn: "শাবনূর", pop: 10, yes: ["real","actor","from_bd"] },
+    { id: "Q7405420", en: "Salman Shah", pop: 10, yes: ["real","actor","from_bd"] },
+    { id: "Q52149647", en: "Puja Cherry", pop: 10, yes: ["real","actor","from_bd"] },
+  ]);
+  const qi = pool.qIndex.get("screen_star_1990s");
+  assert.equal(factBit(pool, 0, qi), 2, "Shabnur became a film star in the 1990s");
+  assert.equal(factBit(pool, 1, qi), 2, "Salman Shah became a film star in the 1990s");
+  assert.equal(factBit(pool, 2, qi), 1, "Puja Cherry became a lead star much later");
+  assert.equal(qs.at(-1).bn.includes("জন্ম"), false, "career decade must not be birth decade");
+});
+
+test("Shabana and Alamgir are recognized as pre-1990 stars, not by birth year", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "real?", bn: "মানুষ?" },
+    { id: "actor", group: "job", en: "actor?", bn: "অভিনয়?" },
+    { id: "from_bd", group: "country", en: "BD?", bn: "বাংলাদেশ?" },
+    ...EXTRA_SCREEN_QUESTIONS,
+  ];
+  const pool = poolFromEntries(qs, [
+    { id: "Q7460022", en: "Shabana", pop: 17, yes: ["real", "actor", "from_bd"] },
+    { id: "Q13057124", en: "Alamgir", pop: 8, yes: ["real", "actor", "from_bd"] },
+    { id: "Q7460127", en: "Shabnur", pop: 10, yes: ["real", "actor", "from_bd"] },
+  ]);
+  const qi = pool.qIndex.get("screen_star_pre1990");
+  assert.equal(factBit(pool, 0, qi), 2);
+  assert.equal(factBit(pool, 1, qi), 2);
+  assert.equal(factBit(pool, 2, qi), 1);
+  assert.ok(qs.at(-2).en.includes("before the 1990s"));
+  assert.ok(!qs.at(-2).bn.includes("জন্ম"));
+});
+
+test("politics augmentation survives spare array capacity after appending private roles", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "Real?", bn: "বাস্তব?" },
+    { id: "female", group: "person", en: "Female?", bn: "নারী?" },
+  ];
+  const first = poolFromEntries(qs, [
+    { id: "Q6874839", en: "Political seed", yes: ["real"] },
+    { id: "ordinary-person", en: "Ordinary person", yes: ["real"] },
+  ]);
+  const more = poolFromEntries(qs, [
+    { id: "riddlex-role-mother", en: "Your mother", yes: ["real", "female"] },
+  ]);
+  const combined = appendShard(first, more);
+  assert.ok(combined.attrs.length > combined.count * combined.attrBytes,
+    "test requires spare allocation capacity");
+  assert.doesNotThrow(() => createState(combined, { category: "character" }),
+    "political augmentation must not copy spare buffer capacity");
 });

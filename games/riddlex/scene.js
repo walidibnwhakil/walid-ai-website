@@ -75,6 +75,22 @@ function flickCover(remaining) {
   return Math.sin(Math.PI * u);
 }
 
+// Contain the complete source photo (portrait, square or landscape), never crop
+// a person's head or image edges. This pure helper is also used by unit tests.
+export function fitPhotoInside(photoWidth, photoHeight, boxX, boxY, boxWidth, boxHeight) {
+  if (!(photoWidth > 0 && photoHeight > 0 && boxWidth > 0 && boxHeight > 0)) {
+    return { x: boxX, y: boxY, w: 0, h: 0 };
+  }
+  const scale = Math.min(boxWidth / photoWidth, boxHeight / photoHeight);
+  const w = photoWidth * scale;
+  const h = photoHeight * scale;
+  return {
+    x: boxX + (boxWidth - w) / 2,
+    y: boxY + (boxHeight - h) / 2,
+    w, h,
+  };
+}
+
 export function createScene(canvas) {
   const ctx = canvas.getContext("2d", { alpha: false });
   const images = {};
@@ -297,7 +313,8 @@ export function createScene(canvas) {
     }
     const textW = g.measureText(name).width;
     const textX = (w - textW) / 2;
-    g.fillText(name, w / 2, h / 2);
+    // Long English/Bangla names must not paint outside their printed label.
+    g.fillText(name, w / 2, h / 2, w * 0.92);
     mask.getContext("2d").clearRect(0, 0, w, h);
     return { w, h, width: Math.max(20, textW), textX };
   }
@@ -327,15 +344,30 @@ export function createScene(canvas) {
     if (portraitMode) {
       const held = paperBox();
       const chrome = phoneChrome();
-      const w = photo ? Math.min(canvas.width * 0.62, held.w * 1.35) : held.w;
-      let photoH = photo ? w * 0.72 : 0;
-      const nameH = photo ? w * 0.28 : held.h;
-      // Two stacked 52px buttons plus the credit sit under the note.
-      const reserve = Math.round(140 * chrome.dpr);
-      const limit = canvas.height - reserve;
-      let y = Math.min(held.y, limit - (photoH + nameH));
-      const h = Math.max(16, photoH + nameH);
-      return { u, photo, photoH, nameH, w, h, x: (canvas.width - w) / 2, y: Math.max(8, y) };
+      if (!photo) {
+        const w = held.w;
+        return { u, photo, photoH: 0, nameH: held.h, w, h: held.h,
+          x: (canvas.width - w) / 2, y: held.y, pad: 8 * chrome.dpr };
+      }
+      // Unlike the original fixed-ratio portrait crop, the complete photo fits
+      // inside a larger card. Keep room below it for both guess buttons.
+      const dpr = chrome.dpr;
+      // A full-height portrait needs more vertical room than a landscape
+      // photograph. Grow upwards as needed, leaving the answer buttons
+      // reachable below the card on small phone displays.
+      const reserve = 148 * dpr;
+      const minimumTop = Math.max(28 * dpr, canvas.height * 0.33);
+      const maxHeight = Math.max(110 * dpr, canvas.height - reserve - minimumTop - 10 * dpr);
+      const w = Math.min(canvas.width * 0.80, Math.max(210 * dpr, held.w * 1.85));
+      const nameH = Math.min(w * 0.22, 68 * dpr);
+      const pad = 10 * dpr;
+      const naturalPhotoH = (w - pad * 2) * photo.height / Math.max(1, photo.width) + pad * 2;
+      const photoH = Math.max(50 * dpr, Math.min(maxHeight - nameH, naturalPhotoH));
+      const h = photoH + nameH;
+      const y = Math.max(minimumTop, Math.min(held.y,
+        canvas.height - reserve - h - 8 * dpr));
+      return { u, photo, photoH, nameH, w, h,
+        x: (canvas.width - w) / 2, y, pad };
     }
     // A photo card shows the whole picture, large, in the space to the right of
     // the detective's face. It may cover the shelves, cat, lamp and desk.
@@ -374,7 +406,9 @@ export function createScene(canvas) {
       }
       photoH = frameH + pad;
       w = photoW + pad * 2;
-      x = Math.max(faceRight + gap, canvas.width - margin - w);
+      // Anchor to the right edge, but never place the photo card off-screen.
+      x = Math.max(8 * dpr, Math.min(canvas.width - margin - w,
+        Math.max(faceRight + gap, canvas.width - margin - w)));
       y = top;
     } else {
       w = Math.min(view.w * 0.32, canvas.width * 0.46);
@@ -383,6 +417,7 @@ export function createScene(canvas) {
       y = iy(0.50) - nameH;
     }
     const h = Math.max(16, photoH + nameH);
+    if (photo) y = Math.max(8 * dpr, Math.min(y, canvas.height - 164 * dpr - h));
     return { u, photo, photoH, nameH, w, h, x, y, pad, namePx };
   }
 
@@ -419,25 +454,17 @@ export function createScene(canvas) {
     const pad = box.pad || 8;
     if (photo && photoH > 0) {
       ctx.save();
+      const frameW = Math.max(1, w - pad * 2);
+      const frameH = Math.max(1, photoH - pad * 2);
       ctx.beginPath();
-      ctx.roundRect(pad, pad, w - pad * 2, photoH - pad, 8);
+      ctx.roundRect(pad, pad, frameW, frameH, 8);
       ctx.clip();
-      const frameW = w - pad * 2;
-      const frameH = photoH - pad;
-      // Phone keeps the previous top-aligned cover. Desktop shows the whole picture.
-      const fit = portraitMode
-        ? Math.max(frameW / photo.width, frameH / photo.height)
-        : Math.min(frameW / photo.width, frameH / photo.height);
-      const dw = photo.width * fit;
-      const dh = photo.height * fit;
-      const posY = portraitMode ? 0 : 0.5;
-      ctx.drawImage(
-        photo,
-        pad + (frameW - dw) * 0.5,
-        pad + (frameH - dh) * posY,
-        dw,
-        dh,
-      );
+      // Letterboxing is intentional: the full original source image stays
+      // visible, including its edges, on BOTH desktop and phone.
+      ctx.fillStyle = "#eee9e0";
+      ctx.fillRect(pad, pad, frameW, frameH);
+      const fit = fitPhotoInside(photo.width, photo.height, pad, pad, frameW, frameH);
+      if (fit.w > 0 && fit.h > 0) ctx.drawImage(photo, fit.x, fit.y, fit.w, fit.h);
       ctx.restore();
     }
     if (reveal?.page) {
@@ -526,7 +553,10 @@ export function createScene(canvas) {
       ctx.beginPath();
       ctx.roundRect(w * 0.05, -ph / 2, pw, ph, 6);
       ctx.fill();
-      ctx.drawImage(reveal.photo, w * 0.08, -ph / 2 + 6, pw - 12, ph * 0.72);
+      // The small transition card must also retain the complete photograph.
+      const inset = fitPhotoInside(reveal.photo.width, reveal.photo.height,
+        w * 0.08, -ph / 2 + 6, pw - 12, ph * 0.72);
+      ctx.drawImage(reveal.photo, inset.x, inset.y, inset.w, inset.h);
     }
     ctx.restore();
   }
@@ -835,6 +865,10 @@ export function createScene(canvas) {
         plates: Object.keys(images.overlays || {}),
         orient: images.baseOrient || "",
         portrait: portraitMode,
+        revealBounds: reveal?.photo ? (() => {
+          const { x, y, w, h, photoH } = noteMetrics(1);
+          return { x, y, w, h, photoH, canvasW: canvas.width, canvasH: canvas.height };
+        })() : null,
       };
     },
     playReveal, relabel, playWrong, playRetry, playDefeat, clearReveal,

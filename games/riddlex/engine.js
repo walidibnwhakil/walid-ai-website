@@ -7,6 +7,8 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js";
+import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -96,14 +98,16 @@ function applyPolitics(pool) {
     if (pool.ids.includes(person.id)) continue;
     const count = pool.count + 1;
     const attrs = new Uint8Array(count * pool.attrBytes);
-    attrs.set(pool.attrs);
+    // appendShard may reserve more capacity than its current count. Copy
+    // only populated records, never the unused capacity into a smaller array.
+    attrs.set(pool.attrs.subarray(0, pool.count * pool.attrBytes));
     const packed = packAttrBytes(pool.questions.map((question) => question.id), person.yes, person.no);
     attrs.set(packed.subarray(0, pool.attrBytes), pool.count * pool.attrBytes);
     const pop = new Uint16Array(count);
-    pop.set(pool.pop);
+    pop.set(pool.pop.subarray(0, pool.count));
     pop[pool.count] = Math.min(65535, person.pop || 1);
     const flags = new Uint8Array(count);
-    flags.set(pool.flags);
+    flags.set(pool.flags.subarray(0, pool.count));
     pool.attrs = attrs;
     pool.pop = pop;
     pool.flags = flags;
@@ -136,6 +140,9 @@ function applyPolitics(pool) {
 export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
+  if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
+  if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
+  if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -235,6 +242,9 @@ function hardFacts() {
     ["party_chief"],
     ["party_secretary"],
     ["in_government"],
+    // Personal relationships are player-relative and sometimes uncertain:
+    // missing facts or an ambiguous ex must NOT receive
+    // HARD_MISSING scores. Keep these likelihoods soft.
     ...PRIMARY_JOBS.map((job) => [job]),
     ["played_barcelona"],
     ["ballon_dor"],
@@ -279,6 +289,20 @@ function hardLog(answer, bit, conflicted) {
   return null;
 }
 
+// Local fame is underrepresented by global knowledge-source popularity.
+ // Give a verified Bangladeshi screen star a realistic *regional* prior only
+ // after the player confirms the relevant country, job and gender. Never
+ // override an answer or artificially mark a missing fact as true.
+const REGIONAL_FAME = new Map([
+  ["Q7460127", 180], // Shabnur
+  ["Q7460022", 215], // Shabana
+  ["Q13057124", 210], // Alamgir
+  ["Q6926134", 175], // Moushumi
+  ["Q7405420", 180], // Salman Shah
+  ["Q13059781", 150], // Shabnaz
+  ["Q7322180", 165], // Riaz
+]);
+
 export function recompute(state) {
   applyPolitics(state.pool);
   if (state.weights.length !== state.pool.count) state.weights = new Float64Array(state.pool.count);
@@ -286,13 +310,36 @@ export function recompute(state) {
   const n = pool.count;
   const logW = new Float64Array(n);
   const conflicted = conflictedFamilies(answers);
+  const positive = (qid) => answers.some((entry) => entry.qid === qid &&
+    (entry.value === "yes" || entry.value === "probably"));
+  const localActor = positive("from_bd") && positive("actor");
+  const playerPersonal = positive("knows_you");
+  const confirmedRelationships = answers.filter((row) =>
+    row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
     if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
-    let score = Math.log((pool.pop[i] || 1) + 1);
+    let prior = localActor && REGIONAL_FAME.has(pool.ids[i])
+      ? Math.max(pool.pop[i] || 1, REGIONAL_FAME.get(pool.ids[i]))
+      : (pool.pop[i] || 1);
+    // Relative roles cannot be looked up in public celebrity databases.
+    // Give them a fair chance only after the player confirms a personal
+    // connection, without overpowering public-figure guesses beforehand.
+    if (playerPersonal && pool.ids[i]?.startsWith("riddlex-role-")) prior *= 3;
+    const relation = PERSONAL_FACTS[pool.ids[i]];
+    if (relation) {
+      // Recognized personal relationships have no global fame score. Strong,
+      // specific player-provided facts should carry more weight than celebrity
+      // popularity or ambiguous family membership alone.
+      for (const row of confirmedRelationships) {
+        if (relation[row.qid] === 2)
+          prior *= row.value === "yes" ? 2.5 : 1.6;
+      }
+    }
+    let score = Math.log(prior + 1);
     for (let a = 0; a < answers.length; a++) {
       const answer = answers[a];
       if (answer.value === "unknown") continue;
@@ -367,6 +414,9 @@ export function shouldGuess(state) {
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
   if (asked >= 72) return true;
+  const personal = state.answers.some((row) => row.qid === "knows_you" &&
+    (row.value === "yes" || row.value === "probably"));
+  if (personal && asked >= 4 && bestP >= 0.72 && ratio >= 4) return true;
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;
   // Shared facts such as country and job are not enough. Wait until one person stands clear.
@@ -447,6 +497,18 @@ function gated(state, question, rows) {
     // Still allowed once the matching topic is likely; the mass checks below do that.
   }
   if (id === "adult_ent") return adultAllowed(state);
+  if (group === "personal") {
+    if (state.category !== "character") return false;
+    if (id === "knows_you") return state.answers.some((row) => row.qid === "real" &&
+      (row.value === "yes" || row.value === "probably"));
+    return state.answers.some((row) => row.qid === "knows_you" &&
+      (row.value === "yes" || row.value === "probably"));
+  }
+  if (id === "screen_star_1990s" || id === "screen_star_pre1990") {
+    return state.answers.length >= 5 &&
+      yesMass(state, "actor", rows) > 0.45 &&
+      yesMass(state, "from_bd", rows) > 0.40;
+  }
   const real = () => yesMass(state, "real", rows);
   const fictional = () => yesMass(state, "fictional", rows);
   const animal = () => yesMass(state, "animal", rows);
@@ -481,7 +543,7 @@ function gated(state, question, rows) {
 }
 
 const CATEGORY_GROUPS = {
-  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics"]),
+  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics", "personal"]),
   animal: new Set(["animal", "look", "size"]),
   object: new Set(["object", "look", "size"]),
 };
@@ -703,6 +765,7 @@ function skippedAsDuplicate(state, id) {
   if ((id === "dead" && answered("alive")) || (id === "alive" && answered("dead"))) return true;
   if ((id === "female" && yes("male")) || (id === "male" && yes("female"))) return true;
   if (id === "musician" && yes("singer")) return true;
+  if (id === "screen_star_1990s" && said(state, "actor", ["no", "probably_not"])) return true;
   if (id === "singer" && said(state, "musician", ["no", "probably_not"])) return true;
   if (id === "athlete" && (yes("cricketer") || yes("footballer"))) return true;
   if ((id === "played_barcelona" || id === "ballon_dor") && !yes("footballer")) return true;
@@ -848,6 +911,12 @@ export function questionBlocked(state, qid) {
 }
 
 function allowedInCategory(state, question) {
+  // Most players cannot know someone else's birth decade. The birth facts
+  // remain available internally for indexing, but must not be asked aloud.
+  if (question.group === "birth") return false;
+  // A current-government answer requires regularly refreshed official data,
+  // which this static knowledge snapshot does not provide.
+  if (question.id === "in_government") return false;
   if (!state.category) return true;
   if (!CATEGORY_GROUPS[state.category]?.has(question.group)) return false;
   if (state.category === "character" && (question.id === "animal" || question.id === "object")) return false;
@@ -878,6 +947,40 @@ export function chooseQuestion(state) {
     if (!asked.has("real")) return "real";
   }
   if ((state.category === "character" || !state.category) && saidNo("real") && !asked.has("fictional")) return "fictional";
+  // Introduce the optional personal-relationship path early. It is never
+  // used for animals/objects or famous people unless the user explicitly says
+  // this person knows them.
+  if (state.category === "character" && pool.qIndex.has("knows_you") &&
+      saidYes("real") && !asked.has("knows_you"))
+    return "knows_you";
+  if (state.category === "character" && pool.qIndex.has("knows_you")) {
+    const next = (qid) => pool.qIndex.has(qid) && !asked.has(qid);
+    if (saidYes("knows_you")) {
+      if (next("your_family")) return "your_family";
+      if (saidYes("your_family")) {
+        if (next("your_parent")) return "your_parent";
+        if (saidNo("your_parent") && next("your_sibling")) return "your_sibling";
+        if (saidNo("your_parent") && saidNo("your_sibling")) {
+          if (next("your_spouse")) return "your_spouse";
+          if (saidNo("your_spouse") && next("your_child")) return "your_child";
+          if (saidYes("your_child") && next("your_baby")) return "your_baby";
+        }
+        const gendered = saidYes("your_parent") || saidYes("your_sibling") ||
+          saidYes("your_spouse");
+        if (gendered && next("female") && next("male")) return "female";
+      } else if (saidNo("your_family")) {
+        if (next("your_partner")) return "your_partner";
+        if (saidYes("your_partner") && next("female") && next("male")) return "female";
+        if (saidNo("your_partner")) {
+          if (next("your_ex")) return "your_ex";
+          if (saidNo("your_ex")) {
+            if (next("your_best_friend")) return "your_best_friend";
+            if (saidNo("your_best_friend") && next("your_friend")) return "your_friend";
+          }
+        }
+      }
+    }
+  }
   if (!state.category && saidNo("real") && saidNo("fictional") && !asked.has("animal")) return "animal";
   if (!state.category && saidNo("real") && saidNo("fictional") && saidNo("animal") && !asked.has("object")) return "object";
   if (!state.category && saidYes("fictional") && !asked.has("animal") && yesMass(state, "animal", state.alive.length > 7000 ? sampleAlive(state, 4000) : state.alive) > 0.18 && answers.length < 8) {

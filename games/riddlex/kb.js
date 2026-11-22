@@ -1,9 +1,14 @@
 // Compact little-endian knowledge shards. Names stay in one blob so the
 // first question can render before every shard has finished parsing.
 
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
+import { PERSONAL_QUESTIONS } from "./personal-facts.js";
+
+// The legacy binary shards store 28 attribute bytes while newer supported
+// questions are represented as sparse, fact-checked runtime overlays.
 export function poolFromEntries(questions, entries) {
   const qIndex = new Map(questions.map((question, index) => [question.id, index]));
-  const attrBytes = Math.ceil(questions.length / 4);
+  const attrBytes = questions.packedAttrBytes || Math.ceil(questions.length / 4);
   const count = entries.length;
   const attrs = new Uint8Array(count * attrBytes);
   const pop = new Uint16Array(count);
@@ -61,6 +66,7 @@ export function decodeShard(buffer, questions) {
   const version = view.getUint16(offset, true); offset += 2;
   if (version !== 1) throw new Error("Unsupported knowledge version");
   const attrBytes = view.getUint16(offset, true); offset += 2;
+  questions.packedAttrBytes = attrBytes;
   const count = view.getUint32(offset, true); offset += 4;
   const attrs = new Uint8Array(count * attrBytes);
   const pop = new Uint16Array(count);
@@ -136,6 +142,7 @@ export function mergePools(pools) {
 export function imageSrc(image) {
   if (!image) return "";
   if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) return image;
+  if (image.startsWith("./images/approved/") && !image.includes("..", 2)) return image;
   return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(image) + "?width=320";
 }
 
@@ -195,10 +202,14 @@ export function planShardLoads(index, answers, loadedNames, budget = index?.budg
   add(index.top, index.topBytes || 0);
   const firm = firmMap(answers);
   const yes = (id) => firm.get(id) === "yes";
+  const likelyYes = (id) => yes(id) || (answers || []).some((row) =>
+    row.qid === id && row.value === "probably");
   const no = (id) => firm.get(id) === "no";
   const wantsFiction = (no("real") || yes("fictional")) && !(yes("real") && !yes("fictional"));
   if (wantsFiction) add(index.fiction, index.fictionBytes || 0);
-  const yesCountries = Object.keys(COUNTRY_CODE).filter(yes);
+  // A "probably" country answer should still make those names discoverable,
+  // while the existing cumulative byte budget protects low-memory phones.
+  const yesCountries = Object.keys(COUNTRY_CODE).filter(likelyYes);
   const yesBirths = Object.keys(BIRTH_CODE).filter(yes);
   const gender = yes("male") && !yes("female") ? "m" : yes("female") && !yes("male") ? "f"
     : no("male") && !yes("female") ? "not-m" : no("female") && !yes("male") ? "not-f" : "";
@@ -265,9 +276,15 @@ export function categoryShards(manifest, category) {
 }
 
 export async function loadManifest(base = "./kb") {
-  const response = await fetch(`${base}/manifest.json?v=akinator-35`);
+  const response = await fetch(`${base}/manifest.json?v=riddlex-39`);
   if (!response.ok) throw new Error("Knowledge manifest failed");
-  return response.json();
+  const manifest = await response.json();
+  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...PERSONAL_QUESTIONS]) {
+    if (!manifest.questions.some((row) => row.id === question.id)) {
+      manifest.questions.push({ ...question });
+    }
+  }
+  return manifest;
 }
 
 function grow(pool, need) {
@@ -322,6 +339,7 @@ export const traffic = { bytes: 0 };
 const shardCache = new Map();
 
 function poolFromDecoded(data, questions) {
+  questions.packedAttrBytes = data.attrBytes;
   return {
     questions,
     qIndex: new Map(questions.map((question, index) => [question.id, index])),

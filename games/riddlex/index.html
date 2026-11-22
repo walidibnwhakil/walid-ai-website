@@ -39,12 +39,18 @@
         <img class="menu-port" alt="" width="720" height="1280" data-portrait="./images/approved/menu-portrait.webp">
         <script>
           (function () {
-            var portrait = matchMedia("(max-aspect-ratio: 4/5)").matches;
-            document.documentElement.dataset.orient = portrait ? "portrait" : "landscape";
-            document.querySelectorAll("#menu img").forEach(function (img) {
-              var src = portrait ? img.getAttribute("data-portrait") : img.getAttribute("data-landscape");
-              if (src) img.src = src;
-            });
+            var orientation = matchMedia("(max-aspect-ratio: 4/5)");
+            function syncMenuArt() {
+              var portrait = orientation.matches;
+              document.documentElement.dataset.orient = portrait ? "portrait" : "landscape";
+              document.querySelectorAll("#menu img").forEach(function (img) {
+                var src = portrait ? img.getAttribute("data-portrait") : img.getAttribute("data-landscape");
+                if (src && img.getAttribute("src") !== src) img.src = src;
+              });
+            }
+            syncMenuArt();
+            if (orientation.addEventListener) orientation.addEventListener("change", syncMenuArt);
+            else orientation.addListener(syncMenuArt);
           })();
         </script>
         <a class="menu-privacy" href="/privacy-policy.html">Privacy</a>
@@ -108,6 +114,7 @@
         <p id="learn-note" role="status"></p>
         <button id="learn-save" type="submit">Teach the detective</button>
       </form>
+      <button id="learn-again" type="button" hidden>Play again</button>
     </div>
     <button id="back" type="button" hidden aria-label="Previous question" title="Previous question">←</button>
     <span id="progress"></span>
@@ -120,17 +127,6 @@
     </div>
     </div>
   </div>
-  <script>
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.getRegistrations().then(function (regs) {
-        if (!regs.length) return;
-        regs.forEach(function (reg) { reg.unregister(); });
-        if (window.caches) caches.keys().then(function (keys) {
-          keys.forEach(function (key) { caches.delete(key); });
-        });
-      }).catch(function () {});
-    }
-  </script>
   <script type="module" src="./app.js?v=akinator-35"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>

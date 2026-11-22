@@ -322,14 +322,28 @@ export function recompute(state) {
       logW[i] = -Infinity;
       continue;
     }
+    const relation = PERSONAL_FACTS[pool.ids[i]];
+    if (relation) {
+      // Family, friend, spouse and child candidates describe THIS PLAYER'S
+      // personal connections, not famous people. They are ineligible unless
+      // the player positively confirms personal acquaintance. A "no" or
+      // "don't know" cannot be outweighed by role popularity.
+      const contradictsRelation = answers.some(({ qid, value }) => {
+        const fact = relation[qid];
+        return (value === "yes" && fact === 1) ||
+          (value === "no" && fact === 2);
+      });
+      if (!playerPersonal || contradictsRelation) {
+        logW[i] = -Infinity;
+        continue;
+      }
+    }
     let prior = localActor && REGIONAL_FAME.has(pool.ids[i])
       ? Math.max(pool.pop[i] || 1, REGIONAL_FAME.get(pool.ids[i]))
       : (pool.pop[i] || 1);
-    // Relative roles cannot be looked up in public celebrity databases.
-    // Give them a fair chance only after the player confirms a personal
-    // connection, without overpowering public-figure guesses beforehand.
-    if (playerPersonal && pool.ids[i]?.startsWith("riddlex-role-")) prior *= 3;
-    const relation = PERSONAL_FACTS[pool.ids[i]];
+    // Positive personal acquaintance admits generic private roles. Their
+    // relationship-specific yes/no traits remain independently decisive.
+    if (relation) prior *= 3;
     if (relation) {
       // Recognized personal relationships have no global fame score. Strong,
       // specific player-provided facts should carry more weight than celebrity

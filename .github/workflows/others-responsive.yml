@@ -6,6 +6,10 @@ on:
       - "others/**"
       - "tests/others-responsive-e2e.mjs"
       - "tests/others-reader-progress-e2e.mjs"
+      - "tests/reading-session-e2e.mjs"
+      - "assets/reading-session.js"
+      - "islam/quran/reader.js"
+      - "islam/stories/stories.js"
       - ".github/workflows/others-responsive.yml"
   workflow_dispatch:
 permissions:
@@ -34,3 +38,5 @@ jobs:
         run: |
           node tests/others-responsive-e2e.mjs
           node tests/others-reader-progress-e2e.mjs
+          node --check assets/reading-session.js
+          node tests/reading-session-e2e.mjs

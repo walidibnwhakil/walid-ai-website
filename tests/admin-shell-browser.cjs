@@ -28,7 +28,7 @@ const usage={
     CL:{views:5,active_seconds:20},ID:{views:4,active_seconds:15},
     BD:{views:8,active_seconds:90},Unknown:{views:2,active_seconds:0}
   },
-  divisions:{Unknown:{views:8,active_seconds:90}},
+  divisions:{Unknown:{views:5,active_seconds:60},Dhaka:{views:3,active_seconds:30}},
   suspected_automated:{views:3,visitors:2,active_seconds:12,countries:{US:{views:3,active_seconds:12}}},
   api:{},provider_snapshots:{},notes:[]
 };
@@ -76,9 +76,16 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#auth-screen').isVisible(),false,'sign-in card hidden after login');
   assert.equal(await page.locator('#dashboard').isVisible(),true);
   const regionText=await page.locator('#regions').textContent();
-  for(const fullName of ['United States (US)','Canada (CA)','Chile (CL)','Indonesia (ID)','Bangladesh (BD)','Unknown country','Bangladesh · Division unknown']){
+  for(const fullName of ['United States','Canada','Chile','Indonesia','Bangladesh','Unknown country','Dhaka Division']){
     assert(regionText.includes(fullName),'Full audience location label missing: '+fullName);
   }
+  assert(!regionText.includes('Division unknown'),'Unknown Bangladesh division must not be a duplicate audience row');
+  assert.equal((regionText.match(/Bangladesh/g)||[]).length,1,'Bangladesh must appear just once');
+  for(const code of ['(US)','(BD)','(CA)','(CL)','(ID)'])assert(!regionText.includes(code),'No country abbreviations: '+code);
+  assert.equal(await page.locator('#regions tbody tr').count(),7,'Six country entries and one known division; no unknown duplicate');
+  assert.equal(await page.locator('#stats .card').count(),7,'Dashboard must show seven KPI cards after removing redundant Most Played Game');
+  assert(!await page.locator('#stats').textContent().then(text=>text.includes('Most played game')),
+    'Most Played Game must be removed; Top 5 remains available');
   const automatedText=await page.locator('#automation-summary').textContent();
   assert.match(automatedText,/Possible automated traffic/);
   assert.match(automatedText,/3 views/);

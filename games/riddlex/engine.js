@@ -451,7 +451,9 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
-    if (!guessMatchesAnswers(state, i) || !enoughIdentityEvidence(state, i)) continue;
+    // Keep plausible identities in the ranking before they are verified.
+    // Verification is only a gate on revealing a name, not on asking questions.
+    if (!guessMatchesAnswers(state, i)) continue;
     const w = weights[i];
     eligibleTotal += w;
     if (w > bestP) {
@@ -498,6 +500,8 @@ export function shouldGuess(state) {
   if (!state.alive.length) return false;
   const { bestP, secondP } = topTwo(state);
   if (!(bestP > 0)) return false;
+  const { best } = topTwo(state);
+  if (!enoughIdentityEvidence(state, best)) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
   if (isFullPublicCasebook(state) && asked < 10) return false;
@@ -1067,7 +1071,7 @@ function firstAllowedQuestion(state) {
         !allowedInCategory(state, question) ||
         blockedQuestion(state, question, rows, cache) ||
         !gated(state, question, rows) ||
-        gainOn(state, qi, rows) < 0.05) continue;
+        gainOn(state, qi, rows) < 0.003) continue;
     return question.id;
   }
   return null;
@@ -1214,7 +1218,9 @@ export function chooseQuestion(state) {
     }
   }
   if (boostBd && answers.length >= 4 && bdGain > 0.004) return "from_bd";
-  return bestGain > 0.012 ? best : null;
+  // Low but useful splits are better than quitting early; do not ask a
+  // nonsensical topic merely to pad the question count.
+  return bestGain > (answers.length < 12 ? 0.002 : 0.012) ? best : null;
 }
 
 export function answer(state, qid, value) {
@@ -1247,11 +1253,11 @@ export function decide(state) {
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
   let qid = chooseQuestion(state);
-  if (!qid && waiting) qid = firstAllowedQuestion(state);
+  if (!qid && (waiting || state.answers.length < 12)) qid = firstAllowedQuestion(state);
   if (!qid) {
-    // No evidence-backed question remains. Never circumvent the retry gap or
-    // identity requirements just to print another guess.
-    if (!waiting && best >= 0 && bestP > 0)
+    // Running out of high-information questions is NOT evidence that the
+    // database is empty. Ask remaining eligible questions while useful.
+    if (best >= 0 && !waiting && enoughIdentityEvidence(state, best))
       return { type: "guess", index: best };
     return { type: "defeat" };
   }

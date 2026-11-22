@@ -409,6 +409,14 @@ function topTwo(state) {
   const knownFilmEraAnswers = state.answers.filter((row) =>
     (row.qid === "screen_star_1990s" || row.qid === "screen_star_pre1990") &&
     (row.value === "yes" || row.value === "no"));
+  const verifiedRoleClues = state.answers.filter((row) =>
+    row.value === "yes" && [
+      "screen_role_lead", "screen_role_villain", "screen_role_comedy",
+      "screen_role_supporting", "screen_silent_comedy",
+      "screen_physical_comedy", "screen_short_moustache",
+      "screen_bowler_cane", "screen_hitler_resemblance",
+      "screen_great_dictator", "screen_comedy_award",
+    ].includes(row.qid));
   // Prioritize explicitly confirmed 1990-1999 film stars. When all such
   // names are rejected, widen to incomplete records instead of giving up.
   const confirmed1990s = knownFilmEraAnswers.find((row) =>
@@ -432,6 +440,11 @@ function topTwo(state) {
       const fact = factBit(state.pool, i, row.qi);
       return row.value === "yes" ? fact === 1 : fact === 2;
     })) continue;
+    // An explicit confirmed acting role must be positively supported for
+    // a name to be announced. Missing role classifications cannot justify
+    // guessing a famous lead when the player described a comic performer.
+    if (verifiedRoleClues.some((row) =>
+      factBit(state.pool, i, row.qi) !== 2)) continue;
     // A definitive player-supplied decade must have an affirmative career
     // record. A missing date is not evidence that a celebrity was famous
     // in the 1990s; keep that person in the question pool, not the guesses.
@@ -978,8 +991,28 @@ export const QUESTION_REQUIRES = {
   zia_family: [{ id: "from_bd", value: "yes" }],
   mujib_family: [{ id: "from_bd", value: "yes" }],
   ...Object.fromEntries(Object.keys(SCREEN_CAREER_DETAILS).map((id) => [
-    id, [{ id: "from_bd", value: "yes", strict: true },
-         { id: "actor", value: "yes", strict: true }],
+    id, [
+      { id: "actor", value: "yes", strict: true },
+      ...([
+        "screen_film_debut_pre1995", "screen_over_100_films",
+        "screen_films_after_2000", "screen_national_film_award",
+        "screen_air_force_before_films", "screen_first_film_keyamat",
+        "screen_first_film_banglar_nayok", "screen_comedy_award",
+      ].includes(id) ? [{ id: "from_bd", value: "yes", strict: true }] : []),
+      ...([
+        "screen_silent_comedy", "screen_physical_comedy",
+        "screen_comedy_award", "screen_short_moustache",
+        "screen_bowler_cane", "screen_hitler_resemblance",
+        "screen_great_dictator", "screen_world_famous",
+      ].includes(id) ? [{ id: "screen_role_comedy", value: "yes", strict: true }] : []),
+      ...([
+        "screen_short_moustache", "screen_bowler_cane",
+        "screen_hitler_resemblance", "screen_great_dictator",
+      ].includes(id) ? [{ id: "screen_silent_comedy", value: "yes", strict: true }] : []),
+      ...(id === "screen_hitler_resemblance" ? [
+        { id: "screen_short_moustache", value: "yes", strict: true },
+      ] : []),
+    ],
   ])),
 };
 
@@ -1112,10 +1145,48 @@ function chooseConfirmationQuestion(state, leader) {
 
 // Profession-specific facts must be checked before a public name is shown.
 // The 1990s film question is different from birth decade or acting debut.
+// General, evidence-led actor taxonomy. No assumption that the person is
+// famous, a lead hero, a star of the 1990s, or even Bangladeshi.
+function pendingActorRoleQuestion(state) {
+  if (state.category !== "character" ||
+      !said(state, "actor", ["yes", "probably"]) ||
+      said(state, "knows_you", ["yes", "probably"])) return null;
+  const known = new Set(state.answers.map((row) => row.qid));
+  const next = (id) => state.pool.qIndex.has(id) && !known.has(id);
+  const yes = (id) => said(state, id, ["yes", "probably"]);
+  const no = (id) => said(state, id, ["no", "probably_not"]);
+
+  if (next("screen_role_lead")) return "screen_role_lead";
+  if (no("screen_role_lead") && next("screen_role_villain"))
+    return "screen_role_villain";
+  if (next("screen_role_comedy")) return "screen_role_comedy";
+  if (yes("screen_role_comedy")) {
+    if (no("screen_role_lead") && next("screen_role_supporting"))
+      return "screen_role_supporting";
+    if (next("screen_silent_comedy")) return "screen_silent_comedy";
+    if (yes("screen_silent_comedy")) {
+      for (const id of [
+        "screen_physical_comedy", "screen_short_moustache",
+        "screen_hitler_resemblance", "screen_bowler_cane",
+        "screen_great_dictator", "screen_world_famous",
+      ]) {
+        if (id === "screen_hitler_resemblance" &&
+            !yes("screen_short_moustache")) continue;
+        if (next(id)) return id;
+      }
+    } else if (no("screen_silent_comedy") &&
+        yes("from_bd") && next("screen_comedy_award"))
+      return "screen_comedy_award";
+  }
+  return null;
+}
+
 function pendingFilmEraQuestion(state) {
   if (state.category !== "character" ||
       !said(state, "actor", ["yes", "probably"]) ||
-      !said(state, "from_bd", ["yes", "probably"])) return null;
+      !said(state, "from_bd", ["yes", "probably"]) ||
+      !said(state, "screen_role_lead", ["yes", "probably"]) ||
+      said(state, "screen_role_comedy", ["yes", "probably"])) return null;
   const answered = new Set(state.answers.map((row) => row.qid));
   if (state.pool.qIndex.has("screen_star_pre1990") &&
       !answered.has("screen_star_pre1990")) return "screen_star_pre1990";
@@ -1268,8 +1339,11 @@ export function decide(state) {
   if (state.guesses >= 10 || state.answers.length >= 72) return { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
-  // When an actor from Bangladesh is confirmed, first establish WHEN they
-  // were known as a film star; generic occupation and fame are not enough.
+  // First determine their usual role (lead, antagonist or comic performer).
+  // Career era and signature props are follow-up branches, not universal
+  // prerequisites to finding an actor or anyone else.
+  const roleQuestion = pendingActorRoleQuestion(state);
+  if (roleQuestion) return { type: "ask", qid: roleQuestion };
   const filmEra = pendingFilmEraQuestion(state);
   if (filmEra) return { type: "ask", qid: filmEra };
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);

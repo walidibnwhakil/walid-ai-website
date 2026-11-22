@@ -286,7 +286,19 @@ function grow(pool, need) {
 }
 
 export function appendShard(pool, shard) {
-  if (!pool) return shard;
+  // The cached decoded shard is a template, not a mutable game state.
+  if (!pool) return {
+    ...shard,
+    attrs: shard.attrs.slice(),
+    pop: shard.pop.slice(),
+    flags: shard.flags.slice(),
+    ids: shard.ids.slice(),
+    ens: shard.ens.slice(),
+    bns: shard.bns.slice(),
+    images: shard.images.slice(),
+    credits: shard.credits.slice(),
+    aliasMap: new Map(shard.aliasMap || []),
+  };
   const need = pool.count + shard.count;
   grow(pool, need);
   pool.attrs.set(shard.attrs, pool.count * pool.attrBytes);

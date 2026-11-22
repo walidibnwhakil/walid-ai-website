@@ -384,6 +384,7 @@ function topTwo(state) {
     ? COUNTRIES.filter((id) => id !== chosenCountry.qid)
       .map((id) => state.pool.qIndex.get(id)).filter((qi) => qi != null)
     : [];
+  const hasOtherIdentityEvidence = supportedIdentity(state);
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -393,14 +394,16 @@ function topTwo(state) {
     const i = alive[k];
     if (chosenCountry) {
       const countryFact = factBit(state.pool, i, chosenCountry.qi);
-      // A public person with unknown country must be verified, not assumed
-      // Bangladeshi (or from any other confirmed country) by popularity.
+      // Some verified local politicians have no packed country tag.
+      // Accept unknown nationality only with corroborating positive identity
+      // evidence; explicit foreign nationality is never accepted.
       const isPersonalRole = state.pool.ids[i]?.startsWith("riddlex-role-") &&
         state.answers.some((row) => row.qid === "knows_you" &&
           ["yes", "probably"].includes(row.value));
-      if (!isPersonalRole && countryFact !== 2) continue;
+      if (!isPersonalRole && countryFact === 1) continue;
       if (!isPersonalRole && otherCountryQIs.some((qi) =>
         factBit(state.pool, i, qi) === 2)) continue;
+      if (!isPersonalRole && countryFact === 0 && !hasOtherIdentityEvidence) continue;
     }
     const w = weights[i];
     if (w > bestP) {

@@ -230,9 +230,46 @@ async function exercise(browser, width, height){
   await sections.nth(7).locator('summary').first().click();
   assert.equal(await page.locator('#sidebar-details').isVisible(),false,'sidebar items collapsed after login');
   assert.equal(await page.locator('#sidebar-toggle').getAttribute('aria-expanded'),'false');
+  // The menu opens over the document like a chapter drawer. Neither the content
+  // grid nor any analytics card may get squeezed/pushed horizontally.
+  const beforeMenu=await page.evaluate(()=>{
+    const box=selector=>{
+      const el=document.querySelector(selector),rect=el.getBoundingClientRect();
+      return {x:rect.x,width:rect.width};
+    };
+    return {content:box('.admin-content'),dashboard:box('#dashboard'),
+      header:box('.admin-header'),
+      grid:getComputedStyle(document.querySelector('#workspace-shell')).gridTemplateColumns};
+  });
   await page.locator('#sidebar-toggle').click();
   assert.equal(await page.locator('#sidebar-details').isVisible(),true,'menu items expand on click');
   assert.equal(await page.locator('#sidebar-toggle').getAttribute('aria-expanded'),'true');
+  const expandedMenu=await page.evaluate(()=>{
+    const box=selector=>{
+      const rect=document.querySelector(selector).getBoundingClientRect();
+      return {x:rect.x,width:rect.width};
+    };
+    return {content:box('.admin-content'),dashboard:box('#dashboard'),
+      header:box('.admin-header'),sidebar:box('#admin-sidebar'),
+      grid:getComputedStyle(document.querySelector('#workspace-shell')).gridTemplateColumns,
+      overflow:document.documentElement.scrollWidth-innerWidth};
+  });
+  for(const selector of ['content','dashboard','header']){
+    assert(Math.abs(expandedMenu[selector].x-beforeMenu[selector].x)<1,
+      'Opening the sidebar must not move '+selector+' horizontally');
+    assert(Math.abs(expandedMenu[selector].width-beforeMenu[selector].width)<1,
+      'Opening the sidebar must not reduce '+selector+' width');
+  }
+  assert.equal(expandedMenu.grid,beforeMenu.grid,'Sidebar must never resize the Admin CSS grid');
+  assert(expandedMenu.sidebar.width>=225,'Expanded navigation displays a readable overlay menu');
+  assert(expandedMenu.sidebar.x+expandedMenu.sidebar.width>expandedMenu.content.x+20,
+    'The expanded sidebar overlaps content instead of pushing it');
+  assert(expandedMenu.overflow<=3,'Expanded sidebar must not cause horizontal overflow');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#sidebar-details').isVisible(),false,'Escape closes overlay');
+  const closedContent=await page.locator('.admin-content').boundingBox();
+  assert(Math.abs(closedContent.x-beforeMenu.content.x)<1,'Closing sidebar does not shift content');
+  await page.locator('#sidebar-toggle').click();
   await page.locator('[data-admin-tab="staff"]').click();
   assert.equal(await page.locator('#sidebar-details').isVisible(),false,'menu collapses when section chosen');
   assert.equal(await page.locator('#dashboard').isVisible(),false,'analytics hidden in staff tab');
@@ -350,6 +387,7 @@ async function exercise(browser, width, height){
 (async()=>{
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{
+    await exercise(browser,1649,928);
     await exercise(browser,1366,768);
     await exercise(browser,390,844);
   }finally{await browser.close()}

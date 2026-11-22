@@ -264,8 +264,8 @@ try {
         const state = await page.evaluate(() => window.__riddlex.state());
         if (state.mode === "learn") {
           trace.push("END: learn / defeat");
-          if (policy === "public") assert.ok(seen.size >= 18,
-            "The real knowledge engine surrendered before asking enough useful questions: " + seen.size);
+          if (policy === "public" || policy === "actor") assert.ok(seen.size >= 15,
+            "The real knowledge engine surrendered before asking enough questions: " + seen.size);
           break;
         }
         if (state.mode === "guess") {

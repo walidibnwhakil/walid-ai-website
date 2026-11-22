@@ -481,7 +481,9 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  if (bestP >= 0.8 && ratio >= 8) return 0;
+  // A high score after being wrong is not new proof. Only a tiny synthetic
+  // two-person game can shortcut the second-round questioning.
+  if (bestP >= 0.8 && ratio >= 8 && state.pool.count <= 2) return 0;
   if (ratio < 2.5) return 6;
   return 4;
 }
@@ -1153,7 +1155,7 @@ export function chooseQuestion(state) {
     const footballRows = state.alive.length > 7000
       ? sampleAlive(state, 5000) : state.alive;
     if (pool.qIndex.has("played_barcelona") && !asked.has("played_barcelona") &&
-        yesMass(state, "played_barcelona", footballRows) > 0.1) return "played_barcelona";
+        yesMass(state, "played_barcelona", footballRows) > 0) return "played_barcelona";
     if (saidYes("played_barcelona") && pool.qIndex.has("ballon_dor") &&
         !asked.has("ballon_dor")) return "ballon_dor";
   }

@@ -58,15 +58,16 @@ service cloud.firestore {
           "confirmations", "confirmers", "createdBy", "createdAt", "updatedAt", "slot"
         ])
         && request.resource.data.nameEn is string
-        && request.resource.data.nameEn.size() > 0
-        && request.resource.data.nameEn.size() <= 80
+        && request.resource.data.nameEn.size() >= 2
+        && request.resource.data.nameEn.size() <= 60
+        && request.resource.data.nameEn.matches('^[^<>@:/]{2,60}$')
         && request.resource.data.nameBn is string
         && request.resource.data.nameBn.size() <= 80
         && request.resource.data.adult is bool
         && request.resource.data.answers is list
         && request.resource.data.answers.size() > 0
         && request.resource.data.answers.size() <= 36
-        && request.resource.data.status in ["pending", "confirmed"]
+        && request.resource.data.status == "pending"
         && request.resource.data.confirmations == 1
         && request.resource.data.confirmers == [request.auth.uid]
         && request.resource.data.createdBy == request.auth.uid
@@ -103,7 +104,6 @@ service cloud.firestore {
         && request.resource.data.confirmations <= 12
         && (
           request.resource.data.status == resource.data.status
-          || (resource.data.status == "pending" && request.resource.data.status == "confirmed" && request.resource.data.confirmations >= 3)
         )
         && request.resource.size() < 220000
         || owner()

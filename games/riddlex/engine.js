@@ -86,7 +86,11 @@ function regionBit(pool, index, members) {
 // The real casebook is the one that already contains Fakhrul. Small test
 // pools keep the attributes they were built with.
 function applyPolitics(pool) {
-  if (!pool || pool._politicsApplied || !pool.ids?.includes("Q6874839")) return;
+  // The test for a politics-capable pool must not rescan every ID for every
+  // animal/object candidate. Recheck only when another shard changed the size.
+  if (!pool || pool._politicsApplied || pool._politicsChecked === pool.count) return;
+  pool._politicsChecked = pool.count;
+  if (!pool.ids?.includes("Q6874839")) return;
   pool._politicsApplied = true;
   for (const person of POLITICS_PEOPLE) {
     if (pool.ids.includes(person.id)) continue;

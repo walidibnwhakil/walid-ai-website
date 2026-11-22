@@ -35,12 +35,26 @@ const FACE = {
   portrait: { u: 0.23889, v: 0.13047, w: 0.52222, h: 0.25938 },
 };
 
-function loadImage(src) {
+function loadImage(src, timeoutMs = 5000) {
   return new Promise((resolve) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => resolve(null);
-    image.src = src;
+    const picture = new Image();
+    let settled = false;
+    let timer;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      picture.onload = null;
+      picture.onerror = null;
+      resolve(value);
+    };
+    picture.onload = () => finish(picture);
+    picture.onerror = () => finish(null);
+    timer = setTimeout(() => {
+      picture.src = "";
+      finish(null);
+    }, timeoutMs);
+    picture.src = src;
   });
 }
 
@@ -86,6 +100,7 @@ export function createScene(canvas) {
   let reveal = null;
   let view = { x: 0, y: 0, w: 1, h: 1 };
   let logoSprite = null;
+  let layoutDirty = true;
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
@@ -113,8 +128,12 @@ export function createScene(canvas) {
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
+      layoutDirty = true;
     }
-    layoutRoom();
+    if (layoutDirty) {
+      layoutDirty = false;
+      layoutRoom();
+    }
   }
 
   function currentArt() {
@@ -672,6 +691,7 @@ export function createScene(canvas) {
     if (!pack?.base) return;
     images.base = pack.base;
     images.baseOrient = orient;
+    layoutDirty = true;
     images.overlays = pack.overlays || {};
     if (orient === "portrait") images.portrait = pack.base;
     else images.room = pack.base;
@@ -688,7 +708,7 @@ export function createScene(canvas) {
 
   async function loadPack(orient) {
     const pack = { base: null, overlays: {} };
-    pack.base = await loadImage(BASE[orient]);
+    pack.base = await loadImage(BASE[orient], 12000);
     loadOverlaySet(orient).then((overlays) => {
       pack.overlays = overlays || {};
       if (images.baseOrient === orient) images.overlays = pack.overlays;
@@ -714,6 +734,10 @@ export function createScene(canvas) {
   function stop() {
     running = false;
     cancelAnimationFrame(raf);
+    if (reveal && !reveal.done) {
+      reveal.done = true;
+      reveal.resolve({ printed: false });
+    }
   }
 
   async function playReveal(options) {
@@ -740,12 +764,33 @@ export function createScene(canvas) {
     faces.setMood("confident");
     if (reduce) {
       reveal.printed = !!photo;
+      reveal.page = { canvas: ink, w: ink.width, h: ink.height };
       reveal.done = true;
       return { printed: !!photo };
     }
     return new Promise((resolve) => {
       reveal.resolve = resolve;
     });
+  }
+
+  // Reprint an already-revealed answer in the selected language.
+  function relabel(name, font) {
+    if (!reveal || !name) return;
+    const prepared = prepareInk(name, font);
+    const paper = document.createElement("canvas");
+    paper.width = ink.width;
+    paper.height = ink.height;
+    paper.getContext("2d").drawImage(ink, 0, 0);
+    reveal.name = name;
+    reveal.font = font;
+    reveal.inkWidth = prepared.width;
+    reveal.textX = prepared.textX;
+    reveal.page = { canvas: paper, w: paper.width, h: paper.height };
+    if (reveal.phase === "write") {
+      reveal.phase = "present";
+      reveal.t = 0;
+      reveal.printed = !!reveal.photo;
+    }
   }
 
   function playWrong() {
@@ -792,18 +837,22 @@ export function createScene(canvas) {
         portrait: portraitMode,
       };
     },
-    playReveal, playWrong, playRetry, playDefeat, clearReveal,
+    playReveal, relabel, playWrong, playRetry, playDefeat, clearReveal,
   };
 }
 
 export function startMenuCat(canvas) {
-  if (!canvas || canvas.dataset.catLive) return;
+  if (!canvas) return null;
+  if (canvas._riddlexCatController) return canvas._riddlexCatController;
   canvas.dataset.catLive = "1";
   const life = { blink: 0, nextBlink: rand(0.6, 1.4), flick: 0, nextFlick: rand(1.2, 2.2) };
   let blinkImg = null;
   loadImage("./images/approved/menu-cat-blink.webp?v=akinator-27").then((img) => { blinkImg = img; });
   let last = 0;
+  let running = false;
+  let raf = 0;
   const frame = (now) => {
+    if (!running) return;
     const dt = Math.min(0.034, (now - (last || now)) / 1000 || 0.016);
     last = now;
     life.nextBlink -= dt;
@@ -834,7 +883,22 @@ export function startMenuCat(canvas) {
       g.drawImage(blinkImg, 0, 0, canvas.width, canvas.height);
     }
     g.globalAlpha = 1;
-    requestAnimationFrame(frame);
+    raf = requestAnimationFrame(frame);
   };
-  requestAnimationFrame(frame);
+  const controller = {
+    pause() {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(raf);
+    },
+    resume() {
+      if (running) return;
+      running = true;
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    },
+  };
+  canvas._riddlexCatController = controller;
+  controller.resume();
+  return controller;
 }

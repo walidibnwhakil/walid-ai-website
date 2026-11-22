@@ -170,15 +170,27 @@ function firmMap(answers) {
 
 // Popular people load first. A firm country (and gender, life, birth) then
 // pulls only the matching long-tail buckets, capped so one round stays small.
+// A small, cumulative transfer budget protects low-memory phones. Already
+// loaded files count towards the budget; do not repeatedly request the same
+// leading buckets after an answer changes.
 export function planShardLoads(index, answers, loadedNames, budget = index?.budget || 4500000) {
   if (!index?.top) return [];
   const loaded = new Set(loadedNames || []);
+  const buckets = index.buckets || [];
+  const sizes = new Map(buckets.map((bucket) => [bucket.file, bucket.bytes || 0]));
+  sizes.set(index.top, index.topBytes || 0);
+  if (index.fiction) sizes.set(index.fiction, index.fictionBytes || 0);
+  let spent = [...loaded].reduce((total, file) => total + (sizes.get(file) || 0), 0);
   const chosen = [];
   const seen = new Set();
   const add = (file, bytes) => {
-    if (!file || seen.has(file)) return;
+    if (!file || loaded.has(file) || seen.has(file)) return false;
+    const size = bytes || 0;
+    if (spent + size > budget) return false;
     seen.add(file);
-    chosen.push({ file, bytes: bytes || 0 });
+    chosen.push({ file, bytes: size });
+    spent += size;
+    return true;
   };
   add(index.top, index.topBytes || 0);
   const firm = firmMap(answers);
@@ -187,39 +199,59 @@ export function planShardLoads(index, answers, loadedNames, budget = index?.budg
   const wantsFiction = (no("real") || yes("fictional")) && !(yes("real") && !yes("fictional"));
   if (wantsFiction) add(index.fiction, index.fictionBytes || 0);
   const yesCountries = Object.keys(COUNTRY_CODE).filter(yes);
-  let buckets = [];
-  if (yesCountries.length === 1 && index.buckets) {
-    buckets = index.buckets.filter((bucket) => bucket.c === COUNTRY_CODE[yesCountries[0]]);
-    if (yes("male") && !yes("female")) buckets = buckets.filter((bucket) => bucket.g === "m");
-    else if (yes("female") && !yes("male")) buckets = buckets.filter((bucket) => bucket.g === "f");
-    else if (no("male") && !yes("female")) buckets = buckets.filter((bucket) => bucket.g !== "m");
-    else if (no("female") && !yes("male")) buckets = buckets.filter((bucket) => bucket.g !== "f");
-    if (yes("alive") && !yes("dead")) buckets = buckets.filter((bucket) => bucket.l === "a");
-    else if (yes("dead") && !yes("alive")) buckets = buckets.filter((bucket) => bucket.l === "d");
-    else if (no("alive") && !yes("dead")) buckets = buckets.filter((bucket) => bucket.l !== "a");
-    else if (no("dead") && !yes("alive")) buckets = buckets.filter((bucket) => bucket.l !== "d");
-    const yesBirths = Object.keys(BIRTH_CODE).filter(yes);
-    if (yesBirths.length === 1) buckets = buckets.filter((bucket) => bucket.b === BIRTH_CODE[yesBirths[0]]);
-    else if (!yesBirths.length) {
-      const blocked = new Set(Object.keys(BIRTH_CODE).filter(no).map((id) => BIRTH_CODE[id]));
-      if (blocked.size) buckets = buckets.filter((bucket) => !blocked.has(bucket.b));
+  const yesBirths = Object.keys(BIRTH_CODE).filter(yes);
+  const gender = yes("male") && !yes("female") ? "m" : yes("female") && !yes("male") ? "f"
+    : no("male") && !yes("female") ? "not-m" : no("female") && !yes("male") ? "not-f" : "";
+  const life = yes("alive") && !yes("dead") ? "a" : yes("dead") && !yes("alive") ? "d"
+    : no("alive") && !yes("dead") ? "not-a" : no("dead") && !yes("alive") ? "not-d" : "";
+  const match = (bucket, includeUnknown = false) => {
+    const any = (actual, expected) => includeUnknown && actual === "u" || actual === expected;
+    if (gender === "m" && !any(bucket.g, "m")) return false;
+    if (gender === "f" && !any(bucket.g, "f")) return false;
+    if (gender === "not-m" && bucket.g === "m") return false;
+    if (gender === "not-f" && bucket.g === "f") return false;
+    if (life === "a" && !any(bucket.l, "a")) return false;
+    if (life === "d" && !any(bucket.l, "d")) return false;
+    if (life === "not-a" && bucket.l === "a") return false;
+    if (life === "not-d" && bucket.l === "d") return false;
+    if (yesBirths.length === 1 && !any(bucket.b, BIRTH_CODE[yesBirths[0]])) return false;
+    if (!yesBirths.length) {
+      const blocked = Object.keys(BIRTH_CODE).filter(no).map((id) => BIRTH_CODE[id]);
+      if (blocked.includes(bucket.b)) return false;
     }
-    const total = buckets.reduce((sum, bucket) => sum + (bucket.bytes || 0), 0);
-    const spent = chosen.reduce((sum, item) => sum + item.bytes, 0);
-    const room = Math.max(0, budget - spent);
-    const narrow = yesBirths.length === 1 || (answers || []).length >= 12;
-    const ordered = buckets.slice().sort((a, b) => (a.part || 0) - (b.part || 0) || (b.bytes || 0) - (a.bytes || 0));
-    if (total <= room || narrow) {
-      let used = 0;
-      for (const bucket of ordered) {
-        const size = bucket.bytes || 0;
-        if (total > room && used + size > room) continue;
-        add(bucket.file, size);
-        used += size;
-      }
+    return true;
+  };
+  const ordered = (rows) => rows.slice().sort((a, b) =>
+    (a.part || 0) - (b.part || 0) || (b.bytes || 0) - (a.bytes || 0) || a.file.localeCompare(b.file));
+  if (yesCountries.length === 1 && !wantsFiction) {
+    const country = COUNTRY_CODE[yesCountries[0]];
+    const primary = ordered(buckets.filter((bucket) => bucket.c === country && match(bucket)));
+    const needed = primary.filter((bucket) => !loaded.has(bucket.file));
+    const total = needed.reduce((sum, bucket) => sum + (bucket.bytes || 0), 0);
+    // Avoid fetching a very broad country's pool until more facts narrow it.
+    if (total <= budget - spent || yesBirths.length === 1 || (answers || []).length >= 12) {
+      for (const bucket of primary) add(bucket.file, bucket.bytes);
     }
   }
-  return chosen.filter((item) => !loaded.has(item.file));
+  // Records without a single citizenship (or with missing citizenship) used to
+  // be unreachable. Expand into the matching fallback buckets after the opening
+  // questions, without downloading millions of records onto a phone.
+  if (!wantsFiction && (answers || []).length >= 8) {
+    const fallback = buckets.filter((bucket) =>
+      (bucket.c === "xx" || bucket.c === "multi") && match(bucket, true));
+    const prioritize = (bucket) => {
+      let score = bucket.c === "multi" ? 0 : 1;
+      if (gender && bucket.g === "u") score += 2;
+      if (life && bucket.l === "u") score += 2;
+      if (yesBirths.length && bucket.b === "u") score += 2;
+      return score;
+    };
+    fallback.sort((a, b) => prioritize(a) - prioritize(b)
+      || (a.part || 0) - (b.part || 0)
+      || (a.bytes || 0) - (b.bytes || 0));
+    for (const bucket of fallback) add(bucket.file, bucket.bytes);
+  }
+  return chosen;
 }
 
 export function categoryShards(manifest, category) {
@@ -254,7 +286,19 @@ function grow(pool, need) {
 }
 
 export function appendShard(pool, shard) {
-  if (!pool) return shard;
+  // The cached decoded shard is a template, not a mutable game state.
+  if (!pool) return {
+    ...shard,
+    attrs: shard.attrs.slice(),
+    pop: shard.pop.slice(),
+    flags: shard.flags.slice(),
+    ids: shard.ids.slice(),
+    ens: shard.ens.slice(),
+    bns: shard.bns.slice(),
+    images: shard.images.slice(),
+    credits: shard.credits.slice(),
+    aliasMap: new Map(shard.aliasMap || []),
+  };
   const need = pool.count + shard.count;
   grow(pool, need);
   pool.attrs.set(shard.attrs, pool.count * pool.attrBytes);

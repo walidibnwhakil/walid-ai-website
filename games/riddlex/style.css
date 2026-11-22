@@ -129,7 +129,7 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
 }
 #load-retry { width: 100%; margin-top: 8px; }
 .cat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.cat-row button, #guess button, #learn-save, #back, .confirm button {
+.cat-row button, #guess button, #learn-save, #learn-again, #back, .confirm button {
   min-height: 42px; border-radius: 10px; border: 1px solid #bd9969;
   background: linear-gradient(#fff0cb, #dfbb81); color: #392417; padding: 6px 4px;
 }
@@ -147,8 +147,8 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
 }
 #answers button:hover, #answers button:focus-visible { background: #d7e4f2; }
 #hud { color: #fff6e4; pointer-events: auto; }
-#hud:not(:has(#guess:not([hidden]), #learn:not([hidden]))) { display: none; }
-#hud:has(#learn:not([hidden])) {
+#hud:not(:has(#guess:not([hidden]), #learn:not([hidden]), #learn-again:not([hidden]))) { display: none; }
+#hud:has(#learn:not([hidden]), #learn-again:not([hidden])) {
   top: auto; bottom: 8px; z-index: 6; max-height: calc(100% - 12px); overflow: auto;
 }
 #progress {
@@ -182,6 +182,15 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 #learn label { display: grid; gap: 2px; font-size: 13px; }
 #learn input { min-height: 36px; padding: 4px 8px; border-radius: 8px; border: 1px solid #e6bd68; width: 100%; }
 #learn-note { grid-column: 1 / -1; }
+#learn-again {
+  display: block;
+  width: min(320px, 100%);
+  min-height: 52px;
+  margin: 0 auto 8px;
+  padding: 10px 20px;
+  font-size: 18px;
+}
+
 .confirm {
   position: absolute; z-index: 5; left: 50%; top: 42%; transform: translate(-50%, -50%);
   width: min(280px, 88%); padding: 14px 14px 12px; text-align: center;

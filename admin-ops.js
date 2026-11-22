@@ -133,7 +133,7 @@
     const bubble=document.createElement('article');
     bubble.className='ops-message '+kind;
     const name=document.createElement('strong');name.textContent=heading;
-    const text=document.createElement('p');text.textContent=body||'No verified response was returned.';
+    const text=document.createElement('p');text.textContent=body||'যাচাই করা উত্তর পাওয়া যায়নি।';
     bubble.append(name,text);
     if(extra){const meta=document.createElement('small');meta.textContent=extra;bubble.append(meta)}
     container.append(bubble);return bubble;
@@ -205,6 +205,7 @@
     $('#manager-staff-thread').hidden=view!=='thread';
     $('.manager-chat-compose').hidden=view!=='manager';
     $('#manager-thread-back').hidden=view==='manager';
+    $('#manager-thread-back').setAttribute('aria-label',view==='thread'?'Back to Staff chats':'Back to Manager');
     $('#manager-staff-chats').hidden=view!=='manager';
     const role=roles.find(item=>item.id===roleId);
     $('#ops-role-name').textContent=view==='manager'?'Manager':view==='list'?'Staff chats':role?.name||'Staff';

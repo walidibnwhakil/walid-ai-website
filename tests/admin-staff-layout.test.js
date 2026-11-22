@@ -24,6 +24,8 @@ assert(!original.includes('Run read-only checks'),'Unnecessary action above orig
 assert.match(original,/function showGreeting\(role\)/);
 assert.match(original,/Assalamu Alaykum, Sir/);
 assert.match(original,/\.greeting-bubble/);
+assert.match(original,/\.desk \.desk-name,\.desk \.desk-role\{text-align:center\}/,
+  'Both staff title and subtitle must be centered without moving robot desks');
 assert(!original.includes('Five desks. One protected network.'),'Verbose office slogan removed');
 assert.match(portal,/id="preserved-staff-office"/);
 assert.match(portal,/data-src="\/admin-staff\.html"/);
@@ -63,4 +65,15 @@ assert.match(portal,/class="manager-chat-compose"/,
 assert(!portal.includes('Your instruction to Manager'),
   'No separate boxed question form remains in the overlay');
 
+assert.match(portal,/id="manager-staff-chats"/,
+  'Staff conversations must be opened from a separate chat navigation control');
+assert.match(portal,/id="manager-staff-list"/);
+assert.match(portal,/id="manager-staff-thread"/);
+assert.match(portal,/id="manager-thread-back"/);
+assert(!ops.includes("function appendDelegations("),
+  'No staff delegation details may expand directly inside Manager messages');
+assert.match(ops,/function renderStaffThread\(roleId\)/);
+assert.match(ops,/function staffMessages\(roleId\)/);
+assert.match(ops,/\.manager-chat-compose'\)\.hidden=view!=='manager'/,
+  'Staff conversations must remain read-only; only Manager accepts messages');
 console.log('Original five-desk SVG office preserved in unified portal.');

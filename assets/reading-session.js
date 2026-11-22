@@ -247,6 +247,13 @@
         if (changed) renderPanel();
       }
     }
+    // Auto-scroll reads visual lines; keep the existing last-read ayah synchronized.
+    document.addEventListener("walid:quran-auto-position", event => {
+      const card = event.detail?.card;
+      if (card?.matches?.(".ayah[id^='ayah-']") && !card.closest("[hidden]")) {
+        saveLatest(positionOfCard(card));
+      }
+    });
     function flush() {
       clearTimeout(timer);
       if (pending) saveLatest(pending);

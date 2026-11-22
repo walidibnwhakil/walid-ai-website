@@ -1072,6 +1072,12 @@ function chooseConfirmationQuestion(state, leader) {
     if (asked.has(question.id) || !allowedInCategory(state, question) ||
         blockedQuestion(state, question, rows, absentCache) ||
         !gated(state, question, rows)) continue;
+    // A confirmation must not reopen a mutually exclusive category.
+    // Re-asking "fictional?" after the player confirmed "real" isn't
+    // clarification, even if the candidate's packed fictional fact is "no".
+    if (question.id === "fictional" && said(state, "real", ["yes","probably"])) continue;
+    if (question.id === "real" && said(state, "fictional", ["yes","probably"])) continue;
+    if (question.group === "fiction" && said(state, "real", ["yes","probably"])) continue;
     const leaderFact = factBit(pool, leader, qi);
     if (leaderFact === 0) continue;
     let distinctWeight = 0;

@@ -8,7 +8,7 @@ on:
       - "firestore.rules"
       - ".github/workflows/riddlex-audit-regression.yml"
   push:
-    branches: [main, fix/riddlex-audit-20261122]
+    branches: [main, fix/riddlex-clean-menu-playnow-20261122]
     paths:
       - "games/riddlex/**"
       - "firestore.rules"
@@ -41,3 +41,12 @@ jobs:
           npx playwright install chromium
       - name: Play the real game on phone and desktop layouts
         run: node games/riddlex/riddlex-responsive-e2e.mjs
+        env:
+          RIDDLEX_SCREENSHOT_DIR: ${{ runner.temp }}/riddlex-visual
+      - name: Save phone and desktop visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-menu-and-game-evidence
+          path: ${{ runner.temp }}/riddlex-visual/*.png
+          if-no-files-found: warn

@@ -57,17 +57,15 @@ try {
     assert.equal(await page.locator("#menu .lang-switch").count(), 0, "language selector must not appear on the landing screen");
     assert.equal(await page.locator("#menu .menu-privacy").count(), 0, "privacy belongs on the site's legal pages");
     assert.equal((await page.locator("#play").innerText()).trim(), "Play Now");
+    assert.equal(await page.locator("#menu-floor").count(), 0,
+      "the old translucent retouch overlay must not return");
+    if (orient === "portrait") {
+      await page.locator(".menu-port").evaluate((img) => img.decode());
+    }
     const menuLayout = await page.evaluate(() => {
       const play = document.getElementById("play").getBoundingClientRect();
-      const floor = document.getElementById("menu-floor");
-      const ctx = floor.getContext("2d");
-      const x = Math.floor(floor.width * 0.5);
-      const y = Math.floor(floor.height * 0.93);
-      const painted = floor.width && floor.height ? ctx.getImageData(x, y, 1, 1).data[3] : 0;
       return {
         play: { x: play.x, y: play.y, right: play.right, bottom: play.bottom, width: play.width, height: play.height },
-        floorDisplay: getComputedStyle(floor).display,
-        floorAlpha: painted,
         scrollWidth: document.documentElement.scrollWidth,
       };
     });
@@ -76,15 +74,24 @@ try {
     assert.ok(menuLayout.play.y >= -1 && menuLayout.play.bottom <= height + 1, "Play Now clipped vertically");
     assert.ok(menuLayout.scrollWidth <= width + 2, "menu horizontal overflow");
     if (orient === "portrait") {
-      assert.equal(menuLayout.floorDisplay, "block", "portrait should repair the striped desk band");
-      await page.waitForFunction(() => {
-        const floor = document.getElementById("menu-floor");
-        if (!floor.width || !floor.height) return false;
-        return floor.getContext("2d").getImageData(
-          Math.floor(floor.width * 0.5), Math.floor(floor.height * 0.93), 1, 1).data[3] >= 180;
-      }, null, { timeout: 8000 });
-    } else {
-      assert.equal(menuLayout.floorDisplay, "none", "desktop must retain its distinct original artwork");
+      const art = await page.evaluate(() => {
+        const img = document.querySelector(".menu-port");
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+        const measure = (y) => {
+          const data = ctx.getImageData(80, y, 570, 1).data;
+          let total = 0;
+          for (let i = 0; i < data.length; i += 4)
+            total += data[i] + data[i+1] + data[i+2];
+          return total / (data.length / 4) / 3;
+        };
+        return { bands: [1195, 1225, 1235].map(measure), goldenFrame: measure(1270) };
+      });
+      assert.ok(art.bands.every((luma) => luma < 45), "portrait still contains baked-in gold stripes: " + art.bands);
+      assert.ok(art.goldenFrame > 50, "gold bottom frame must be preserved");
     }
     if (shotFolder) await page.screenshot({ path: join(shotFolder, "menu-" + orient + ".png") });
 

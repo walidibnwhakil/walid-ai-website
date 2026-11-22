@@ -38,11 +38,7 @@ button { cursor: pointer; }
   position: absolute; z-index: 2; pointer-events: none;
   left: 32.6%; top: 67%; width: 8.1%; height: 9.6%;
 }
-/* Only the narrow portrait illustration needs the desk retouch canvas.
-   It mirrors the artwork's object-fit:cover scaling; it never intercepts taps. */
 .menu-port { display: none; }
-.menu-floor { display: none; position: absolute; inset: 0; z-index: 2;
-  pointer-events: none; width: 100%; height: 100%; }
 /* Menu controls are deliberately separate from the in-game language switch. */
 .menu-back {
   position: absolute; z-index: 3; top: 3%;
@@ -207,7 +203,6 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   .menu-blur, .menu-card { display: none; }
   .menu-frame { width: 100%; height: 100%; aspect-ratio: auto; }
   .menu-port { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center center; }
-  .menu-floor { display: block; }
   .menu-back { top: 10px; }
   #play {
     left: 50%; top: auto; bottom: 8%; transform: translateX(-50%);

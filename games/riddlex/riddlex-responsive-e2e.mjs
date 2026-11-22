@@ -178,8 +178,23 @@ try {
       await page.click("#play");
       await page.waitForFunction(() => !document.getElementById("categories").hidden);
       await page.click('[data-cat="character"]');
-      await page.waitForFunction(() => !document.getElementById("answers").hidden &&
-        document.getElementById("progress").textContent.includes("Question"));
+      console.log("CHARACTER_START", orient);
+      try {
+        await page.waitForFunction(() => !document.getElementById("answers").hidden &&
+          document.getElementById("progress").textContent.includes("Question"),
+          null, { timeout: 18000 });
+      } catch (error) {
+        const snapshot = await page.evaluate(() => ({
+          status: document.getElementById("status")?.textContent,
+          progress: document.getElementById("progress")?.textContent,
+          loadRetry: !document.getElementById("load-retry")?.hidden,
+          answersHidden: document.getElementById("answers")?.hidden,
+          categoriesHidden: document.getElementById("categories")?.hidden,
+        }));
+        throw new Error("Character gameplay did not open: " + JSON.stringify(snapshot) +
+          "; pageErrors=" + errors.join(" | ") + "; " + error.message);
+      }
+      console.log("CHARACTER_FIRST_QUESTION_PASS");
       await page.click("#answer-yes"); // Real person
       await page.waitForFunction(() => /know you personally|ব্যক্তিগতভাবে চেনেন/i.test(
         document.getElementById("status").textContent), null, { timeout: 18000 });

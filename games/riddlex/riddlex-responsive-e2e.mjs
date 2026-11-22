@@ -314,6 +314,12 @@ try {
           a = await page.evaluate(() =>
             window.__riddlex.find("Q266104") >= 0
               ? window.__riddlex.replyFor("Q266104") : "unknown");
+        else if (policy === "actor" && q === "actor") a = "yes";
+        else if (policy === "actor" && [
+          "politician", "singer", "writer", "athlete", "cricketer",
+          "footballer", "director", "musician", "business", "youtube",
+          "does_bat", "does_bowl"
+        ].includes(q)) a = "no";
         else if (q === "cricketer" || q === "does_bat" || q === "does_bowl") a = "no";
         else if (policy === "family" && q === "your_family") a = "yes";
         else if (policy === "family" && q === "your_parent") a = "yes";
@@ -331,7 +337,12 @@ try {
       console.log("RIDDLEX_OWNER_REPLAY_" + policy.toUpperCase() + " " + JSON.stringify(trace));
       assert.ok(seen.has("knows_you"), "Personal-contact question was not asked");
       if (policy === "family") assert.ok(parentYes, "The family/parent route was not reached");
-      if (policy === "public") assert.ok(confirmedCountry, "Bangladesh question was not asked");
+      if (policy === "public" || policy === "actor")
+        assert.ok(confirmedCountry, "Bangladesh question was not asked");
+      if (policy === "actor") {
+        assert.ok(seen.has("actor"), "Actor yes was never exercised");
+        assert.ok(knowsNo, "Personal acquaintance no was never exercised");
+      }
       if (policy === "shakib") assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
         "The real Shakib entry was not guessed after real answers");
       return trace;
@@ -345,6 +356,7 @@ try {
   await replay("Bangladeshi ordinary person", "public");
   await replay("Bangladeshi family member", "family");
   await replay("Shakib Al Hasan with the real database answers", "shakib");
+  await replay("Bangladeshi actor who does not know the player", "actor");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

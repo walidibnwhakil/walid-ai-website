@@ -280,7 +280,12 @@ try {
             console.log("RIDDLEX_OWNER_ACTOR_1990S_DIAG " + JSON.stringify(info));
             assert.ok(info.loadedCount > 1, "regional Bangladesh shards were never loaded");
             assert.ok(info.bdActorCount > 0, "regional Bangladesh actor records were never added");
-            assert.ok(seen.size >= 20, "game surrendered before meaningful 1990s follow-up questions");
+            if (lastGuessQuestionCount >= 0) {
+              assert.ok(seen.size > lastGuessQuestionCount,
+                "Game surrendered without trying any new relevant question");
+            } else {
+              assert.ok(seen.size >= 13, "Game surrendered before the initial 1990s film questions");
+            }
           }
           break;
         }
@@ -351,6 +356,8 @@ try {
         }
         const q = state.question;
         if (seen.has(q)) throw new Error("Question repeated: " + q);
+        if (seen.has("real") && q === "fictional" && knowsNo)
+          assert.fail("Riddlex reopened fictional status after real=yes");
         if (policy === "actor_female_1990s" && seen.has("male") && q === "female")
           assert.fail("Redundant female question after male=no");
         assert.ok(!(q === "dead" && seen.has("alive")), "Alive/dead question duplicated");

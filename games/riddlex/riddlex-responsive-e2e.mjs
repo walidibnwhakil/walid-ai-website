@@ -368,7 +368,7 @@ try {
         !document.getElementById("categories").hidden, null, { timeout: 25000 });
       await realPage.click('[data-cat="character"]');
       const history = [];
-      for (let number = 0; number < 9; number++) {
+      for (let number = 0; number < 11; number++) {
         try {
           await realPage.waitForFunction((expected) => {
             const s = window.__riddlex?.state?.();
@@ -403,17 +403,17 @@ try {
       await realPage.waitForFunction(() => {
         const current = window.__riddlex?.state?.();
         return current?.mode === "ask" &&
-          current.answers.length === 9 && !!current.question;
+          current.answers.length === 11 && !!current.question;
       }, null, { timeout: 25000 });
       const gameState = await realPage.evaluate(() => window.__riddlex.state());
-      assert.equal(gameState.answers.length, 9, JSON.stringify(history));
+      assert.equal(gameState.answers.length, 11, JSON.stringify(history));
       assert.equal(gameState.mode, "ask",
         "ordinary real-person clues must never trigger category reset: " +
           JSON.stringify({ history, gameState }));
       assert.ok(gameState.answers.includes("from_bd"),
         "detective should establish Bangladeshi identity early: " + JSON.stringify(history));
       if (shotFolder) await realPage.screenshot({
-        path: join(shotFolder, "bangladesh-9-questions-" + orient + ".png"),
+        path: join(shotFolder, "bangladesh-12th-question-" + orient + ".png"),
       });
       console.log("RIDDLEX_BANGLADESH_CONTINUATION_PASS", orient, JSON.stringify(history));
     } finally {

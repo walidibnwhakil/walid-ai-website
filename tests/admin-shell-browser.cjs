@@ -67,7 +67,7 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#riddlex-workspace').isVisible(),false);
   assert.equal(new URL(page.url()).pathname,'/admin/','menu must not change URL');
   assert.equal(new URL(page.url()).hash,'','no section hash');
-  await page.frameLocator('#preserved-staff-office'.locator('.desk-grid').waitFor({state:'visible',timeout:20000});
+  await page.frameLocator('#preserved-staff-office').locator('.desk-grid').waitFor({state:'visible',timeout:20000});
   const robotCount=await page.frameLocator('#preserved-staff-office').locator('.desk').count();
   assert.equal(robotCount,5,'all original five workstations remain');
   const heading=await page.frameLocator('#preserved-staff-office').locator('.intro h1').textContent();

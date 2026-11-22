@@ -212,3 +212,23 @@ test("education academic icons are centered and all 133 standalone lessons teach
     }
   }
 });
+
+// Curated examples must give genuine calculations rather than restating MCQ answers.
+test("worked Study Notes show distinct solved and practice examples",()=>{
+  const samples=[
+    ["ভগ্নাংশ ১/২-এর সমতুল্য কোনটি?","৬/১০"],
+    ["ত্রিভুজের ক্ষেত্রফল কীভাবে নির্ণয় হয়?","৪২"],
+    ["২x+৪=১০ হলে x কত?","x=৫"],
+    ["ওহমের সূত্র কোনটি?","৩ A"],
+    ["ধ্রুব ভরে নিউটনের দ্বিতীয় সূত্র কোনটি?","১০ N"],
+    ["ফোটনের শক্তির সূত্র?","১.৩২৫২"]
+  ];
+  for(const [question,solutionPart] of samples){
+    const row=SCHOOL_ROWS.find(item=>item.q===question);
+    assert(row,"missing curriculum question "+question);
+    const note=makeLesson(row,0);
+    assert(note.example.length>45 && note.steps.includes("১)"),"missing worked explanation "+question);
+    assert(note.practice!==question,"practice must be an independent exercise "+question);
+    assert(note.solution.includes(solutionPart),"answer must solve practice "+question);
+  }
+});

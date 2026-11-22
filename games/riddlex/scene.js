@@ -855,6 +855,10 @@ export function createScene(canvas) {
         plates: Object.keys(images.overlays || {}),
         orient: images.baseOrient || "",
         portrait: portraitMode,
+        revealBounds: reveal?.photo ? (() => {
+          const { x, y, w, h, photoH } = noteMetrics(1);
+          return { x, y, w, h, photoH, canvasW: canvas.width, canvasH: canvas.height };
+        })() : null,
       };
     },
     playReveal, relabel, playWrong, playRetry, playDefeat, clearReveal,

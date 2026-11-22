@@ -1089,20 +1089,70 @@ export function rejectIndex(state, index) {
   return recompute(state);
 }
 
+// Verify the CURRENT leading hypothesis through the candidate's recorded
+// traits. This is shared by all 3M+ entries, not hardcoded to selected names.
+// Ask as many useful questions as the casebook supports, not exactly 2 or 3.
+// Unknown is NOT equivalent to No, and missing records never block a guess.
+const PUBLIC_VERIFY_GROUPS = new Set([
+  "job", "politics", "fiction", "animal", "object", "look", "size",
+]);
+
 function finalWorkQuestion(state, index) {
-  if (!fullPublicGame(state) || index < 0 || state.answers.length < 9 ||
-      !said(state, "from_bd", ["yes"])) return null;
-  const ids = state.pool.ids[index];
-  const listed = said(state, "actor", ["yes"]) ? ACTOR_PROOFS[ids] :
-    said(state, "writer", ["yes"]) ? WRITER_PROOFS[ids] : null;
-  if (!listed?.length) return null;
-  const answered = new Set(state.answers.map((answer) => answer.qid));
-  // A fact about this actual candidate, not an arbitrary celebrity, is used
-  // only when the candidate is already leading and known by country and job.
-  // Two such questions are enough; do not bother players with endless titles.
-  const askedProofs = listed.filter((qid) => answered.has(qid)).length;
-  if (askedProofs >= 2) return null;
-  return listed.find((qid) => state.pool.qIndex.has(qid) && !answered.has(qid)) || null;
+  if (index < 0 || state.pool.count < 100 ||
+      state.answers.length < 12 || state.category == null) return null;
+  const pool = state.pool;
+  const id = pool.ids[index];
+  const answered = new Map(state.answers.map((answer) => [answer.qid, answer.value]));
+  const actorProof = ACTOR_PROOFS[id] || [];
+  const writerProof = WRITER_PROOFS[id] || [];
+  const actor = said(state, "actor", ["yes", "probably"]);
+  const writer = said(state, "writer", ["yes", "probably"]);
+  const proofs = actor ? actorProof : writer ? writerProof : [];
+  const unknownProofs = proofs.filter((qid) => answered.get(qid) === "unknown").length;
+  const remaining = [];
+  const otherRows = state.alive.length > 3000
+    ? sampleAlive(state, 3000) : state.alive;
+
+  for (let qi = 0; qi < pool.questions.length; qi++) {
+    const question = pool.questions[qi];
+    const qid = question.id;
+    if (answered.has(qid) || factBit(pool, index, qi) !== 2) continue;
+    const sourced = proofs.includes(qid);
+    if (sourced && (unknownProofs >= 2 || !said(state, "from_bd", ["yes"])))
+      continue;
+    if (!sourced) {
+      if (!PUBLIC_VERIFY_GROUPS.has(question.group)) continue;
+      if (qid === "named" || qid === "in_government" || qid === "adult_ent")
+        continue;
+      if (!allowedInCategory(state, question) || questionContradicts(state, qid))
+        continue;
+      if (questionBlocked(state, qid) ||
+          !gated(state, question, otherRows)) continue;
+      // A generic role ("does he act?") is appropriate only while still
+      // establishing the profession, not as a supposed identity proof.
+      if (PRIMARY_JOBS.includes(qid) && confirmedJob(state)) continue;
+    }
+    // A question about the person's *known* work is most useful when it
+    // distinguishes the suspected person from remaining alternatives.
+    let different = 0;
+    let compared = 0;
+    for (const other of otherRows) {
+      if (other === index) continue;
+      const w = state.weights[other];
+      if (w <= 0) continue;
+      compared += w;
+      const bit = factBit(pool, other, qi);
+      if (bit === 1) different += w;
+      else if (bit === 0) different += w * 0.3;
+    }
+    const contrast = compared ? different / compared : 0;
+    if (!sourced && contrast < 0.08) continue;
+    const score = (sourced ? 3 : 0) + contrast +
+      (question.group === "politics" || question.group === "fiction" ? 0.15 : 0);
+    remaining.push({ qid, score });
+  }
+  remaining.sort((a, b) => b.score - a.score);
+  return remaining[0]?.qid || null;
 }
 
 function sensibleFollowUp(state) {

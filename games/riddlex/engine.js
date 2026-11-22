@@ -395,7 +395,7 @@ function topTwo(state) {
       const countryFact = factBit(state.pool, i, chosenCountry.qi);
       // A public person with unknown country must be verified, not assumed
       // Bangladeshi (or from any other confirmed country) by popularity.
-      const isPersonalRole = pool.ids[i]?.startsWith("riddlex-role-") &&
+      const isPersonalRole = state.pool.ids[i]?.startsWith("riddlex-role-") &&
         state.answers.some((row) => row.qid === "knows_you" &&
           ["yes", "probably"].includes(row.value));
       if (!isPersonalRole && countryFact !== 2) continue;

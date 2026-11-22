@@ -253,7 +253,7 @@
     return Boolean(readingRoot()?.contains(target) && onSurahTab());
   }
   document.addEventListener("touchstart", event => {
-    stopAuto(); cancelHold();
+    stopAuto();
     touching = true;
     const finger = event.touches[0];
     touchY = finger?.clientY || 0;

@@ -1,0 +1,177 @@
+/* Private Admin Portal shell only.
+   The separate five-robot Virtual AI Office is never restyled by this file. */
+:root{
+  color-scheme:dark;
+  --adm-bg:#07111d;--adm-panel:#0d1d2c;--adm-surface:#11273a;
+  --adm-border:#294a60;--adm-text:#e8f4ff;--adm-muted:#a3bdce;
+  --adm-accent:#4de4ff;--adm-success:#9cf58c;
+  font:16px/1.5 Inter,ui-sans-serif,system-ui,SolaimanLipi,sans-serif;
+  color:var(--adm-text);
+  background:var(--adm-bg);
+}
+html{min-height:100%}
+body{
+  min-height:100vh;min-height:100dvh;margin:0;display:flex;flex-direction:column;
+  color:var(--adm-text);
+  background:radial-gradient(circle at 50% -9%,#15334c 0,#07111d 60rem);
+}
+body::before{opacity:.035!important}
+main{
+  width:100%;max-width:1600px;margin:0 auto;
+  flex:1;display:flex;flex-direction:column;
+  padding:24px clamp(14px,2.7vw,46px) 32px;
+}
+body.admin-locked main{justify-content:center;padding-bottom:24px}
+.hidden{display:none!important}
+
+/* Zero navigation or content is rendered before successful owner authentication. */
+.auth-screen{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  min-height:min(670px,calc(100dvh - 112px));padding:20px 0 26px;
+}
+.auth-card{
+  width:min(100%,460px);margin:auto;
+  padding:clamp(24px,4vw,40px);
+  background:linear-gradient(145deg,#122c41,#0a1927);
+  border:1px solid #30526a;border-radius:24px;
+  box-shadow:0 24px 80px #0008;
+  text-align:center;
+}
+.auth-card .login-logo{
+  display:block;width:min(270px,70vw);height:auto;max-height:132px;
+  margin:0 auto 14px;object-fit:contain;
+  filter:none;animation:none;transform:none;
+}
+.auth-card h1{font-size:clamp(1.65rem,3.1vw,2.15rem);line-height:1.17;margin:8px 0 27px;letter-spacing:-.025em;color:#f1f9ff}
+.auth-card label{display:block;margin-bottom:9px;text-align:left;font-size:.91rem;font-weight:600;color:var(--adm-muted)}
+.auth-card input{
+  width:100%;min-height:50px;padding:12px 14px;background:#071522;
+  border:1px solid #3a5870;border-radius:12px;color:var(--adm-text);
+}
+.auth-card input:focus-visible{border-color:var(--adm-accent);outline:3px solid #4de4ff40}
+.auth-card #enter{
+  width:100%;min-height:50px;margin-top:13px;
+  font-size:1rem;font-weight:700;border-radius:12px;
+  background:#4de4ff;color:#081a28;border-color:#4de4ff;
+}
+.auth-card #enter:hover{background:#8aeeff;border-color:#8aeeff}
+.auth-card #status{margin:12px 0 0;text-align:center;color:#ffb0b0;min-height:0}
+.auth-card #status:empty{display:none}
+
+/* A narrow, collapsed menu rail is the only sidebar initially visible after sign-in. */
+.admin-shell{display:grid;grid-template-columns:66px minmax(0,1fr);gap:20px;align-items:start;width:100%}
+.admin-shell.nav-expanded{grid-template-columns:252px minmax(0,1fr)}
+.admin-sidebar{
+  position:sticky;top:18px;z-index:11;align-self:start;
+  min-height:64px;width:100%;padding:10px;
+  background:linear-gradient(145deg,#10283b,#091723);
+  border:1px solid var(--adm-border);border-radius:17px;color:var(--adm-text);
+  box-shadow:0 12px 28px #0003;
+}
+.sidebar-toggle{
+  width:44px;height:44px;display:grid;place-items:center;margin:0;
+  padding:0;background:#14344a;border:1px solid #36627b;
+  border-radius:11px;font:24px/1 ui-sans-serif,system-ui,sans-serif;color:var(--adm-accent);
+}
+.sidebar-toggle:hover,.sidebar-toggle:focus-visible{background:#1b435b;border-color:var(--adm-accent);box-shadow:0 0 0 3px #4de4ff24}
+.sidebar-details{display:none}
+.admin-shell.nav-expanded .sidebar-details{display:block;padding:4px 2px 10px}
+.admin-sidebar .side-heading{font-size:1rem;color:#e8f4ff;margin:15px 4px 10px}
+.admin-sidebar .site-logo-link{background:none;padding:0;margin:14px 0 4px;max-width:100%}
+.admin-sidebar .site-logo-link>img{background:#f9fcff;border-radius:8px;padding:4px}
+.admin-sidebar nav{display:grid;gap:8px}
+.admin-sidebar nav button{
+  width:100%;padding:12px 10px;display:block;text-align:left;
+  background:transparent;border:1px solid transparent;border-radius:10px;
+  color:#d0e1ed;font-weight:600;font-size:.91rem;line-height:1.3;
+}
+.admin-sidebar nav button[aria-current="page"]{
+  background:#1b445b;border-color:#3b7187;color:var(--adm-accent);
+}
+.admin-sidebar nav button:hover{background:#1a3b51;color:#fff}
+.admin-sidebar small{display:block;margin:16px 2px 2px;font-size:.79rem;color:var(--adm-muted)}
+.admin-content{min-width:0}
+.admin-header{
+  margin:0 0 16px;padding:4px 2px 12px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  border-bottom:1px solid #284254;
+}
+.admin-header h1{color:#f1f8ff;font-size:clamp(1.5rem,2.5vw,2.05rem);margin:0}
+.admin-header p{color:var(--adm-muted);font-size:.88rem;margin:5px 0 0}
+.top-actions{display:flex;align-items:center;gap:11px}
+.top-actions #date{color:var(--adm-muted);font-size:.8rem}
+button,.button{
+  border:1px solid #375c72;background:#12324a;color:var(--adm-text);
+  padding:10px 14px;border-radius:10px;font-weight:600;
+}
+button:hover,.button:hover{background:#1c4760;color:#fff}
+button:focus-visible,a:focus-visible{outline:3px solid #4de4ff80;outline-offset:2px}
+.secondary-button,.button.secondary-button{background:#12283a;color:#dfedf6;border-color:#52758a}
+.secondary-button:hover{background:#23435a;color:white}
+a{color:var(--adm-accent)}
+.panel,.card{
+  border:1px solid var(--adm-border);
+  background:linear-gradient(150deg,#102638f7,#0b1b2af7);
+  border-radius:16px;
+  box-shadow:0 8px 24px #0002;
+  color:var(--adm-text);
+}
+.panel{padding:20px;margin:13px 0}
+.card{padding:16px;margin:0;min-height:112px}
+.panel h2,.panel h3{color:#f0f8ff}
+.label,.muted{color:var(--adm-muted)}
+.big{color:var(--adm-accent);font-size:1.5rem}
+.grid{grid-template-columns:repeat(auto-fit,minmax(176px,1fr))}
+.toolbar{gap:10px}
+input,select,textarea{
+  border:1px solid #375a70;background:#081725;color:#e8f4ff;
+  border-radius:10px;padding:10px;
+}
+input::placeholder,textarea::placeholder{color:#829eae}
+input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #4de4ff36;border-color:var(--adm-accent)}
+table{color:var(--adm-text);font-size:.9rem}
+th{color:#b7d9e4}
+th,td{border-color:#294357}
+.report,.ops-check{border-color:#294357}
+.warning{background:#2b291e;border-color:#806b43}
+.status[data-error="true"]{color:#ffb0b0}
+.status[data-error="false"]{color:var(--adm-success)}
+.ops-history{background:#081725;border-color:#355068}
+.ops-message.question{background:#123e55;color:#ebf9ff}
+.ops-message.answer{background:#11283b;border-color:#2b5068}
+.ops-message small{color:var(--adm-muted)}
+.riddlex-item{background:#102537;border-color:#375568;color:#f1f8ff}
+.riddlex-item h3{color:#fff}
+#preserved-staff-office{border:1px solid #24465b!important}
+.legal-footer{
+  width:100%;margin-top:auto;padding:16px 12px 22px!important;
+  background:transparent!important;border-top:1px solid #294357!important;color:#b1c7d6!important;
+}
+.legal-footer a,.legal-footer p{color:#b1c7d6!important}
+
+/* The sidebar's sections are never displayed together; JS controls the hidden class. */
+@media(max-width:850px){
+  main{padding:15px 12px 22px}
+  .admin-shell,.admin-shell.nav-expanded{grid-template-columns:55px minmax(0,1fr);gap:10px}
+  .admin-sidebar{padding:5px;min-height:54px;top:10px;border-radius:12px}
+  .sidebar-toggle{height:44px;width:44px}
+  .admin-shell.nav-expanded .admin-sidebar{position:sticky;z-index:25;width:245px;max-width:calc(100vw - 25px)}
+  .admin-shell.nav-expanded .sidebar-details{display:block}
+  .admin-header{align-items:start;gap:8px}
+  .admin-header p{font-size:.79rem}
+  .panel{padding:14px}
+}
+@media(max-width:520px){
+  .auth-card{padding:26px 22px}
+  .auth-screen{min-height:calc(100dvh - 102px)}
+  .admin-header h1{font-size:1.4rem}
+  .top-actions{gap:5px}
+  .top-actions #date{font-size:.7rem}
+  .top-actions button{padding:8px 9px;font-size:.8rem}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .card{padding:11px;min-height:104px}
+  .big{font-size:1.22rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important}
+}

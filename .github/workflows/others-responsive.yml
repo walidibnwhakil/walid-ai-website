@@ -15,6 +15,7 @@ on:
       - "islam/quran/index.html"
       - "islam/quran/quran.css"
       - "tests/quran-surah-index-mobile-e2e.mjs"
+      - "tests/quran-ayah-desktop-alignment-e2e.mjs"
       - "islam/stories/stories.js"
       - ".github/workflows/others-responsive.yml"
   workflow_dispatch:
@@ -48,3 +49,4 @@ jobs:
           node --check islam/quran/reading-flow.js
           node tests/reading-session-e2e.mjs
           node tests/quran-surah-index-mobile-e2e.mjs
+          node tests/quran-ayah-desktop-alignment-e2e.mjs

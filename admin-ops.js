@@ -31,7 +31,7 @@
   function selectTab(tab, writeHash=true) {
     if(!tabNames[tab])tab='dashboard';
     currentTab=tab;
-    if(writeHash){history.replaceState(null,'','#'+tab);setSidebarOpen(false)}
+    if(writeHash)setSidebarOpen(false); // Section state is internal; the URL always stays /admin/.
     if(!ready)return;
     panels.forEach(id=>$('#'+id)?.classList.toggle('hidden',tabNames[tab]!==id));
     document.querySelectorAll('[data-admin-tab]').forEach(button=>{
@@ -163,10 +163,11 @@
   addEventListener('walid-admin-authenticated',()=>{
     ready=true;setSidebarOpen(false);
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=false);
-    selectTab(location.hash.slice(1)||currentTab,false);
+    selectTab(currentTab,false);
   });
   addEventListener('walid-admin-signed-out',logout);
-  addEventListener('hashchange',()=>selectTab(location.hash.slice(1),false));
+  // No section hashes or alternate admin URLs.
+  if(location.pathname==='/admin/'&&(location.hash||location.search))history.replaceState(null,'','/admin/');
   $('#sidebar-toggle')?.addEventListener('click',()=>{
     if(!ready)return;
     setSidebarOpen(!$('#workspace-shell').classList.contains('nav-expanded'));

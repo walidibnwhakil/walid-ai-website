@@ -91,6 +91,32 @@ try {
   assert.ok(await page.evaluate(() => scrollY > 100),
     "Resume navigates to the saved Quran verse");
 
+  // Quran auto-scroll: explicit opt-in, one wrapped visual line at a time, easy pause/stop.
+  await page.locator(".walid-quran-autoscroll").waitFor();
+  assert.match(await page.locator(".walid-auto-scroll-status").textContent(), /একটি করে লাইনে/);
+  await page.locator("#walid-auto-scroll-speed").selectOption("6");
+  await page.getByRole("button", {name:"▶ অটো স্ক্রল শুরু"}).click();
+  await page.locator(".walid-quran-autoscroll-floating:visible").waitFor();
+  await page.evaluate(() => document.getElementById("ayah-40").scrollIntoView({block:"center",behavior:"instant"}));
+  const beforeAuto = await page.evaluate(() => scrollY);
+  await page.waitForFunction(before => scrollY > before + 5, beforeAuto, {timeout:8500});
+  const afterAuto = await page.evaluate(() => scrollY);
+  assert.ok(afterAuto - beforeAuto < 220,
+    "Line-by-line scrolling must not jump more than a few text lines");
+  const lastAuto = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("walid-ai:quran:last-read:v1"))?.verse);
+  assert.ok(lastAuto >= 39, "Automated reading updates the saved ayah");
+  await page.mouse.wheel(0, 90);
+  await page.waitForFunction(() =>
+    document.querySelector(".walid-quran-autoscroll-floating")?.textContent?.includes("স্ক্রল বিরতিতে"));
+  await page.locator(".walid-quran-autoscroll-floating").getByRole("button", {name:"■ বন্ধ"}).click();
+  assert.equal(await page.locator(".walid-quran-autoscroll-floating").isVisible(), false,
+    "Stop hides fixed controls");
+  await page.getByRole("tab", {name:"সূরা পরিচিতি"}).click();
+  assert.equal(await page.locator(".walid-quran-autoscroll-floating").isVisible(), false,
+    "Changing sections must never restart auto-scroll");
+  await page.getByRole("tab", {name:"সূরা",exact:true}).click();
+
   await page.goto(base + "/islam/stories/");
   await page.locator(".walid-reading-controls").waitFor();
   await page.evaluate(() => document.getElementById("nuh").scrollIntoView({block:"start"}));

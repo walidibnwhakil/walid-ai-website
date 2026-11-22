@@ -77,6 +77,10 @@ try {
   await page.getByRole("button", {name:"শেষ পড়া আয়াতে বুকমার্ক"}).click();
   assert.equal(await page.evaluate(() =>
     JSON.parse(localStorage.getItem("walid-ai:quran:bookmark:v1"))?.verse), verse);
+  // The verse number itself is an accessible, exact-ayah bookmark action.
+  await page.locator("#ayah-27 .ayah-number").click();
+  assert.equal(await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("walid-ai:quran:bookmark:v1"))?.verse), 27);
   await page.goto(base + "/islam/quran/");
   await page.locator(".walid-reading-progress").waitFor();
   const resume = page.getByRole("link", {name:/সর্বশেষ পড়া:.*আয়াত/});

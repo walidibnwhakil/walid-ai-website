@@ -412,10 +412,12 @@ function topTwo(state) {
   // names are rejected, widen to incomplete records instead of giving up.
   const confirmed1990s = knownFilmEraAnswers.find((row) =>
     row.qid === "screen_star_1990s" && row.value === "yes");
-  const hasVerified1990sCandidate = confirmed1990s && state.alive.some((i) =>
-    factBit(state.pool, i, confirmed1990s.qi) === 2 &&
-    (!confirmedActor || actorQi == null || factBit(state.pool, i, actorQi) === 2) &&
-    (!chosenCountry || factBit(state.pool, i, chosenCountry.qi) === 2));
+  const confirmedMale = state.answers.some((row) => row.qid === "male" && row.value === "yes");
+  const confirmedFemale = state.answers.some((row) => row.qid === "female" && row.value === "yes");
+  const deniedMale = state.answers.some((row) => row.qid === "male" && row.value === "no");
+  const deniedFemale = state.answers.some((row) => row.qid === "female" && row.value === "no");
+  const maleQi = state.pool.qIndex.get("male");
+  const femaleQi = state.pool.qIndex.get("female");
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -429,8 +431,14 @@ function topTwo(state) {
       const fact = factBit(state.pool, i, row.qi);
       return row.value === "yes" ? fact === 1 : fact === 2;
     })) continue;
-    if (hasVerified1990sCandidate &&
-        factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
+    // A definitive player-supplied decade must have an affirmative career
+    // record. A missing date is not evidence that a celebrity was famous
+    // in the 1990s; keep that person in the question pool, not the guesses.
+    if (confirmed1990s && factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
+    if (maleQi != null && confirmedMale && factBit(state.pool, i, maleQi) !== 2) continue;
+    if (femaleQi != null && confirmedFemale && factBit(state.pool, i, femaleQi) !== 2) continue;
+    if (maleQi != null && deniedMale && factBit(state.pool, i, maleQi) === 2) continue;
+    if (femaleQi != null && deniedFemale && factBit(state.pool, i, femaleQi) === 2) continue;
     // Real people need explicit acting evidence. Player-relative roles are
     // allowed to have unknown occupations when personally confirmed.
     if (confirmedActor && actorQi != null &&
@@ -478,12 +486,9 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  // If there truly is only one unrejected candidate, don't invent a
-  // pointless extra round. Otherwise popularity alone is not new evidence.
-  if (state.alive.length === 1 && bestP >= 0.8 && ratio >= 8) return 0;
-  if (bestP >= 0.8 && ratio >= 8) return 2;
-  if (ratio < 2.5) return 6;
-  return 4;
+  // A rejected name is new negative evidence. Popularity and a near-100%
+  // posterior do not permit immediately announcing another celebrity.
+  return ratio < 2.5 ? 6 : 5;
 }
 
 // The public database is huge; a country, gender, a couple of "no"s,
@@ -1050,6 +1055,50 @@ function allowedInCategory(state, question) {
   return true;
 }
 
+// Before proposing another name, confirm distinguishing facts about the
+// current leader against surviving alternatives. Never spend this round on
+// already answered, contradictory, or unrelated category questions.
+function chooseConfirmationQuestion(state, leader) {
+  if (leader < 0 || !state.alive.length) return null;
+  const { pool, weights } = state;
+  const asked = new Set(state.answers.map((row) => row.qid));
+  const rows = state.alive.length > 1200 ? sampleAlive(state, 1200) : state.alive;
+  const absentCache = new Map();
+  const focusJob = confirmedJob(state);
+  let bestQid = null;
+  let bestScore = -Infinity;
+  for (let qi = 0; qi < pool.questions.length; qi++) {
+    const question = pool.questions[qi];
+    if (asked.has(question.id) || !allowedInCategory(state, question) ||
+        blockedQuestion(state, question, rows, absentCache) ||
+        !gated(state, question, rows)) continue;
+    const leaderFact = factBit(pool, leader, qi);
+    if (leaderFact === 0) continue;
+    let distinctWeight = 0;
+    let comparableWeight = 0;
+    for (const i of rows) {
+      if (i === leader) continue;
+      const fact = factBit(pool, i, qi);
+      if (fact === 0) continue;
+      comparableWeight += weights[i];
+      if (fact !== leaderFact) distinctWeight += weights[i];
+    }
+    const relatedJob = focusJob && question.group === "job";
+    const relatedPolitics = focusJob === "politician" && question.group === "politics";
+    const related = relatedJob || relatedPolitics;
+    // Prefer questions that distinguish candidates; a verified trait of
+    // the leader is still a useful confirmation when the other records are
+    // incomplete. Job-specific questions get a relevance preference.
+    const score = distinctWeight * 8 + comparableWeight * 0.2 +
+      (related ? 0.4 : 0) + (leaderFact === 2 ? 0.1 : 0);
+    if (score > bestScore) {
+      bestScore = score;
+      bestQid = question.id;
+    }
+  }
+  return bestQid;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -1193,7 +1242,24 @@ export function decide(state) {
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
-  if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
+  // After any wrong guess, force a fresh evidence-gathering round.
+  // In particular, do NOT bypass it through the no-question fallback.
+  if (waiting) {
+    const qid = chooseConfirmationQuestion(state, best) ||
+      chooseQuestion(state) || firstAllowedQuestion(state);
+    return qid ? { type: "ask", qid } : { type: "defeat" };
+  }
+  if (shouldGuess(state)) {
+    // A famous person can dominate the prior long before we have enough
+    // independent information. Ask a target-specific confirmation first.
+    const personal = said(state, "knows_you", ["yes", "probably"]);
+    if (state.guesses === 0 && !personal && state.category === "character" &&
+        state.answers.length < 12) {
+      const verify = chooseConfirmationQuestion(state, best);
+      if (verify) return { type: "ask", qid: verify };
+    }
+    return { type: "guess", index: best };
+  }
   let qid = chooseQuestion(state);
   // With sparse ordinary-person clues, continue questioning rather than
   // surrendering at eight. Preserve confident well-supported guesses and
@@ -1201,7 +1267,7 @@ export function decide(state) {
   // Missing verified candidates in the currently loaded shard is not
   // proof that an actor or other person is absent from the whole casebook.
   // Ask remaining relevant questions rather than surrender immediately.
-  if (!qid && (waiting || !supportedIdentity(state) || best < 0))
+  if (!qid && (!supportedIdentity(state) || best < 0))
     qid = firstAllowedQuestion(state);
   if (!qid) {
     if (best >= 0 && bestP > 0 && supportedIdentity(state))

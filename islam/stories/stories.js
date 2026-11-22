@@ -29,3 +29,13 @@
   input.addEventListener('input', search);
   search();
 })();
+
+/* Shared reading-session enhancement: device-only bookmarks + best-effort screen wake lock. */
+(() => {
+  if (document.getElementById("walid-reading-session-script")) return;
+  const script = document.createElement("script");
+  script.id = "walid-reading-session-script";
+  script.src = "/assets/reading-session.js?v=20261122";
+  script.async = true;
+  document.head.append(script);
+})();

@@ -35,7 +35,7 @@ test("progressive quiz settings support grade-first streams and BCS 100/200",()=
   assert.match(html,/id="quizStartActions" hidden/);
   assert.match(html,/<select class="field-select" id="questionCount"/);
   assert.doesNotMatch(html,/name="questionCount"/,"Do not render six number chips");
-  assert.match(app,/STANDARD_QUIZ_COUNTS=Object\.freeze\(\[20,30,40,50,70,100\]\)/);
+  assert.match(app,/STANDARD_QUIZ_COUNTS=Object\.freeze\(\[20,50,100\]\)/);
   assert.match(app,/BCS_QUIZ_COUNTS=Object\.freeze\(\[100,200\]\)/);
   assert.match(app,/if\(level==="bcs"\)return BCS_QUIZ_COUNTS/);
   assert.match(app,/function updateQuizCount\(\)/);

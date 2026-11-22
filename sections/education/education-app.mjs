@@ -126,7 +126,7 @@ function syncStream(levelSelect,streamSelect,wrapper){
   byId(streamSelect).disabled=!needed;
   if(!needed)byId(streamSelect).value="";
 }
-const STANDARD_QUIZ_COUNTS=Object.freeze([20,30,40,50,70,100]);
+const STANDARD_QUIZ_COUNTS=Object.freeze([20,50,100]);
 const BCS_QUIZ_COUNTS=Object.freeze([100,200]);
 function availableQuizCounts(level,stream){
   if(level==="bcs")return BCS_QUIZ_COUNTS;

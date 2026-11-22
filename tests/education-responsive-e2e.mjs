@@ -92,7 +92,7 @@ try{
   assert(await page.locator("#quizCountField").isHidden(),"Cleared level hides count");
   const levels=await page.locator("#quizLevel option").evaluateAll(options=>options.map(o=>o.value));
   assert(!["1","2","3","4","5"].some(v=>levels.includes(v)));
-  for(const count of [20,30,40,50,70,100,200]){
+  for(const count of [20,50,100,200]){
     const level=count>=100?"bcs":"6";
     await quiz(page,level,null,count);
     if(level==="bcs"){
@@ -193,7 +193,7 @@ try{
   }
   assert.deepEqual(errors,[],"Browser runtime errors");
   await page.close();
-  console.log("EDUCATION_STREAMED_E2E_PASS",JSON.stringify({checks,viewports:8,questionCounts:[20,30,40,50,70,100,200],streams:["science","commerce","arts"],notesExamples:9}));
+  console.log("EDUCATION_STREAMED_E2E_PASS",JSON.stringify({checks,viewports:8,questionCounts:[20,50,100,200],streams:["science","commerce","arts"],notesExamples:9}));
 }finally{
   await browser?.close();
   const closed=new Promise(resolve=>server.close(resolve));

@@ -1040,6 +1040,9 @@ export function questionBlocked(state, qid) {
 }
 
 function allowedInCategory(state, question) {
+  // Keep the all-ages detective game comfortable; adult-industry questions
+  // are unnecessary for sound identification, even when the database has them.
+  if (question.id === "adult_ent") return false;
   // Most players cannot know someone else's birth decade. The birth facts
   // remain available internally for indexing, but must not be asked aloud.
   if (question.group === "birth") return false;

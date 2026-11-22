@@ -154,6 +154,22 @@
         });
       }
     }
+    // Read-only daily audits are actual role checks, not fabricated AI dialogue.
+    for(const notice of managerNotices){
+      if(notice?.kind!=='daily_report'||!Array.isArray(notice.daily_delegations)||
+         Date.parse(notice.created_at||'')<cutoff)continue;
+      for(const work of notice.daily_delegations){
+        if(!work||work.role!==roleId)continue;
+        messages.push({
+          sent:notice.created_at,
+          received:work.checked_at||notice.created_at,
+          command:work.instruction||'Read-only daily verification',
+          outcome:work.outcome||'যাচাইয়ের ফল পাওয়া যায়নি।',
+          status:work.status||'unknown',
+          daily:true,
+        });
+      }
+    }
     return messages.sort((a,b)=>String(a.sent).localeCompare(String(b.sent)));
   }
   function renderStaffList(){
@@ -187,7 +203,7 @@
     }
     for(const entry of entries){
       if(entry.command){
-        appendMessage(host,'question','Manager · '+fmt(entry.sent),entry.command);
+        appendMessage(host,'question',(entry.daily?'Manager · দৈনিক পর্যবেক্ষণ · ':'Manager · ')+fmt(entry.sent),entry.command);
       }
       appendMessage(host,'answer',(role?.name||'Staff')+' · '+fmt(entry.received),
         entry.outcome||'এই কাজের যাচাইকৃত ফল এখনো পাওয়া যায়নি।',
@@ -306,6 +322,8 @@
       updateNoticeHead();
       if($('#manager-chat-panel')?.classList.contains('is-open')){
         renderHistory(lastManagerTasks,managerNotices);
+        if(chatView==='list')renderStaffList();
+        if(chatView==='thread')renderStaffThread(selectedStaffRole);
         acknowledgeNotices();
       }
     }catch{/* A monitoring outage must not interrupt the owner's conversation. */}

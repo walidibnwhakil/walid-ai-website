@@ -45,6 +45,10 @@ try {
     const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (message) => {
+      if (message.type() === "error" && message.text().includes("Riddlex knowledge"))
+        errors.push(message.text());
+    });
     await page.route("**/*", (route) => {
       if (new URL(route.request().url()).origin === origin) return route.continue();
       return route.abort();

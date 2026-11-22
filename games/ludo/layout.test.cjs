@@ -99,9 +99,15 @@ fs.mkdirSync(output, { recursive: true });
         bodyHeight: document.body.scrollHeight,
         viewportWidth: innerWidth,
         scrollWidth: document.documentElement.scrollWidth,
+        menuTop: document.getElementById("ludo-setup").getBoundingClientRect().top,
+        menuBottom: document.getElementById("ludo-setup").getBoundingClientRect().bottom,
+        footerHeight: document.querySelector("footer")?.getBoundingClientRect().height || 0,
       }));
       console.log("LUDO_MENU_VIEWPORT_METRICS", tag, JSON.stringify(menuMetrics));
-      check(menuMetrics.scrollHeight <= menuMetrics.viewportHeight + 1, `desktop menu fits ${tag}`);
+      // The legal footer deliberately sits after <main>; document scrollHeight includes it.
+      // Verify that the *game menu*, not the whole legal/footer page, fits without scrolling.
+      check(menuMetrics.menuTop >= -1 && menuMetrics.menuBottom <= menuMetrics.viewportHeight + 1,
+        `desktop menu fits ${tag}`);
     }
     check(
       await page.evaluate(

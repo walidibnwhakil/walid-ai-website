@@ -57,10 +57,36 @@ try {
     assert.equal(response.status(), 200);
     assert.equal(await page.locator("html").getAttribute("data-orient"), orient);
     const menuArt = await page.locator(orient === "portrait" ? ".menu-port" : ".menu-card").getAttribute("src");
-    assert.ok(menuArt?.includes(orient === "portrait" ? "menu-portrait" : "menu-desk"), menuArt);
+    assert.ok(menuArt?.includes(orient === "portrait" ? "menu-portrait" : "menu-user-approved"), menuArt);
     assert.equal(await page.locator("#menu .lang-switch").count(), 0, "language selector must not appear on the landing screen");
     assert.equal(await page.locator("#menu .menu-privacy").count(), 0, "privacy belongs on the site's legal pages");
-    assert.equal((await page.locator("#play").innerText()).trim(), "Play Now");
+    assert.equal(await page.locator("#play").getAttribute("aria-label"), "Play Now");
+    if (orient === "portrait")
+      assert.equal((await page.locator("#play").innerText()).trim(), "Play Now");
+    else {
+      const art = await page.evaluate(async () => {
+        const img = document.querySelector(".menu-card");
+        await img.decode();
+        const picture = img.getBoundingClientRect();
+        const button = document.getElementById("play").getBoundingClientRect();
+        return {
+          naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
+          fit: getComputedStyle(img).objectFit,
+          imageAspect: picture.width / picture.height,
+          playCenterX: (button.left + button.width/2 - picture.left) / picture.width,
+          playCenterY: (button.top + button.height/2 - picture.top) / picture.height,
+          decorationHidden: getComputedStyle(document.getElementById("play-label")).visibility,
+        };
+      });
+      assert.deepEqual([art.naturalWidth, art.naturalHeight], [1670, 942],
+        "the uploaded menu illustration is used unchanged in composition");
+      assert.equal(art.fit, "contain", "show the complete gold frame, artwork and Play Game button");
+      assert.ok(Math.abs(art.playCenterX - .642) < .035 &&
+        Math.abs(art.playCenterY - .7695) < .035,
+        "transparent Play hit target must align with painted button: " + JSON.stringify(art));
+      assert.equal(art.decorationHidden, "hidden",
+        "do not draw a second Play Now button over the supplied artwork");
+    }
     assert.equal(await page.locator("#menu-floor").count(), 0,
       "the old translucent retouch overlay must not return");
     if (orient === "portrait") {
@@ -170,7 +196,7 @@ try {
     }
     await page.click("#to-menu");
     assert.equal(await page.locator("#menu").isVisible(), true);
-    const opposite = orient === "portrait" ? { width: 1366, height: 768, art: "menu-desk" }
+    const opposite = orient === "portrait" ? { width: 1366, height: 768, art: "menu-user-approved" }
       : { width: 390, height: 844, art: "menu-portrait" };
     await page.setViewportSize({ width: opposite.width, height: opposite.height });
     await page.waitForFunction((art) =>

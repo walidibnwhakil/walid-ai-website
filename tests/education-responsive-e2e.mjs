@@ -37,7 +37,7 @@ async function quiz(page,level,stream,count){
     await page.locator("#quizStream").selectOption(stream);
   }else assert(await page.locator("#quizStreamField").isHidden(),"Stream picker should be hidden "+level);
   await page.locator("#quizCountField").waitFor({state:"visible"});
-  const expected=level==="bcs"?["100","200"]:["20","30","40","50","70","100"];
+  const expected=level==="bcs"?["100","200"]:["20","50","100"];
   const options=await page.locator("#questionCount option").evaluateAll(elements=>elements.filter(e=>e.value).map(e=>e.value));
   assert.deepEqual(options,expected,"Question-count options must match level "+level);
   assert(await page.locator("#quizStartActions").isHidden(),"Start only appears after count selection");

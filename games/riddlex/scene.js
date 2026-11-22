@@ -410,7 +410,7 @@ export function createScene(canvas) {
       y = iy(0.50) - nameH;
     }
     const h = Math.max(16, photoH + nameH);
-    if (photo) y = Math.max(8 * dpr, Math.min(y, canvas.height - buttonStack - h));
+    if (photo) y = Math.max(8 * dpr, Math.min(y, canvas.height - 164 * dpr - h));
     return { u, photo, photoH, nameH, w, h, x, y, pad, namePx };
   }
 

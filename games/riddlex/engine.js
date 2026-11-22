@@ -445,7 +445,9 @@ export function shouldGuess(state) {
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
   // No guessed celebrity after four yes/no answers: the playable ranking stays
   // unchanged, but an identity still needs a useful conversation.
-  if (fullPublicGame(state) && asked < 10) return false;
+  // Published character/animal/object pools are much larger than synthetic
+  // test fixtures. On the real game, NO name can appear before 12 answers.
+  if (state.pool.count >= 100 && asked < 12) return false;
   if (asked >= 72) return true;
   const personal = state.answers.some((row) => row.qid === "knows_you" &&
     (row.value === "yes" || row.value === "probably"));
@@ -1151,10 +1153,17 @@ export function decide(state) {
     qid = sensibleFollowUp(state) || firstAllowedQuestion(state);
   }
   if (!qid) {
-    if (best >= 0 && bestP > 0 && shouldGuess(state)) {
+    if (best >= 0 && bestP > 0 &&
+        (state.pool.count < 100 || shouldGuess(state))) {
       const verification = finalWorkQuestion(state, best);
       return verification ? { type: "ask", qid: verification } :
         { type: "guess", index: best };
+    }
+    // A large knowledge pool without a winning candidate can still contain
+    // relevant unanswered distinctions. Never force an early give-up.
+    if (state.pool.count >= 100 && state.answers.length < 24) {
+      qid = sensibleFollowUp(state) || firstAllowedQuestion(state);
+      if (qid) return { type: "ask", qid };
     }
     return { type: "defeat" };
   }

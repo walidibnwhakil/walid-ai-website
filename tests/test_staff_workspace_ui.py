@@ -43,18 +43,23 @@ class StaffWorkspaceUiTests(unittest.TestCase):
         staff = (ROOT / "admin-staff.html").read_text(encoding="utf-8")
         portal = (ROOT / "admin/index.html").read_text(encoding="utf-8")
         ops = (ROOT / "admin-ops.js").read_text(encoding="utf-8")
-        self.assertIn('Five desks. One protected network.', staff)
+        self.assertIn('<div class="intro"><h1>AI Staff Office</h1></div>', staff)
+        self.assertNotIn('Five desks. One protected network.', staff)
+        self.assertIn("showGreeting(p.id)", staff)
+        self.assertIn("Assalamu Alaykum, Sir", staff)
         self.assertIn('function robot(color)', staff)
         self.assertIn('grid-template-rows:repeat(3,minmax(244px,auto))', staff)
         for selector in ('manager', 'it', 'cyber', 'cse', 'admin'):
             self.assertIn(selector, staff)
         self.assertIn('id="desks"', staff)
-        self.assertIn('id="selectedName"', staff)
-        self.assertIn('id="history"', staff)
+        self.assertNotIn('id="selectedName"', staff)
+        self.assertNotIn('id="history"', staff)
+        self.assertNotIn('id="ops-checks"', portal)
+        self.assertNotIn('id="ops-reload"', portal)
         self.assertIn('id="preserved-staff-office"', portal)
         self.assertIn('data-src="/admin-staff.html"', portal)
         self.assertIn("originalOffice.contentDocument", ops)
-        self.assertIn('<a href="/admin/">Analytics</a>', staff)
+        self.assertIn('<a href="/admin/">Admin Dashboard</a>', staff)
         self.assertNotIn('/admin.html', staff)
 
     def test_riddlex_approval_redirect_remains_unchanged(self):
@@ -66,8 +71,10 @@ class StaffWorkspaceUiTests(unittest.TestCase):
     def test_staff_actions_use_protected_server_records(self):
         ops = (ROOT / "admin-ops.js").read_text(encoding="utf-8")
         approvals = (ROOT / "admin-approvals.js").read_text(encoding="utf-8")
-        for route in ('/api/admin/staff', '/api/admin/staff/checks', '/api/admin/tasks'):
+        for route in ('/api/admin/tasks', '/api/admin/manager/notices'):
             self.assertIn(route, ops)
+        self.assertIn('/api/admin/staff', (ROOT / 'admin-staff.html').read_text(encoding='utf-8'))
+        self.assertNotIn('createRoleCards()', ops)
         self.assertIn('Authorization:', ops)
         self.assertIn("walid-admin-authenticated", ops)
         self.assertNotIn("location.hash.slice(1)", ops)

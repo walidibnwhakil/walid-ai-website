@@ -100,32 +100,58 @@ try {
     }
     if (shotFolder) await page.screenshot({ path: join(shotFolder, "menu-" + orient + ".png") });
     if (orient === "landscape") {
-      // The reported desktop bug appears on wide 16:8 displays, not only
-      // conventional 16:9 screenshots: the frame used to leave brown pillars.
+      // At the user's actual wide-desktop aspect ratio the foreground must
+      // show the *entire* original 1672x941 picture: no magnified portrait,
+      // missing library shelves, or clipped top/bottom golden frame.
       await page.setViewportSize({ width: 1650, height: 820 });
+      await page.locator(".menu-card").evaluate((img) => img.decode());
       const artLayout = await page.evaluate(() => {
         const stage = document.querySelector(".menu-stage").getBoundingClientRect();
         const frame = document.querySelector(".menu-frame").getBoundingClientRect();
         const art = document.querySelector(".menu-card");
+        const image = art.getBoundingClientRect();
+        const blur = document.querySelector(".menu-blur");
         const play = document.getElementById("play").getBoundingClientRect();
+        const style = getComputedStyle(art);
+        const blurStyle = getComputedStyle(blur);
         return {
-          stageWidth: stage.width, frameWidth: frame.width,
+          stageWidth: stage.width,
+          stageHeight: stage.height,
+          frameWidth: frame.width,
+          frameHeight: frame.height,
           frameLeft: frame.left - stage.left,
-          frameRight: stage.right - frame.right,
-          imageFit: getComputedStyle(art).objectFit,
+          frameTop: frame.top - stage.top,
+          imageWidth: image.width,
+          imageHeight: image.height,
+          naturalWidth: art.naturalWidth,
+          naturalHeight: art.naturalHeight,
+          imageFit: style.objectFit,
+          blurOpacity: blurStyle.opacity,
+          blurVisible: blurStyle.display !== "none",
+          playX: play.x, playY: play.y,
           playRight: play.right, playBottom: play.bottom,
+          frameRight: frame.right, frameBottom: frame.bottom,
         };
       });
-      assert.ok(Math.abs(artLayout.stageWidth - artLayout.frameWidth) <= 2,
-        "desktop menu should cover the scene, not be a centered poster: " +
-          JSON.stringify(artLayout));
-      assert.ok(Math.abs(artLayout.frameLeft) <= 2 &&
-        Math.abs(artLayout.frameRight) <= 2, "no wide brown side pillars");
-      assert.equal(artLayout.imageFit, "cover", "the original art fills the window");
-      assert.ok(artLayout.playRight <= 1651 && artLayout.playBottom <= 821,
-        "Play Now must remain inside wide menu");
+      assert.equal(artLayout.naturalWidth, 1672, "original desktop illustration retained");
+      assert.equal(artLayout.naturalHeight, 941, "original landscape artwork retained");
+      assert.equal(artLayout.imageFit, "contain",
+        "never crop away the top/bottom gold border, library or detective");
+      assert.ok(Math.abs(artLayout.frameWidth / artLayout.frameHeight - 1672/941) < 0.005,
+        "image frame must keep its original aspect ratio: " + JSON.stringify(artLayout));
+      assert.ok(artLayout.frameWidth <= artLayout.stageWidth + 2 &&
+        artLayout.frameHeight <= artLayout.stageHeight + 2,
+        "the whole artwork must fit inside the window");
+      assert.ok(artLayout.frameLeft >= -2 && artLayout.frameTop >= -2,
+        "full original gold frame must stay visible");
+      assert.ok(artLayout.blurVisible,
+        "background should continue the artwork into sidebands, not blank brown pillars");
+      assert.ok(artLayout.playX >= 0 && artLayout.playY >= 0 &&
+        artLayout.playRight <= artLayout.frameRight + 1 &&
+        artLayout.playBottom <= artLayout.frameBottom + 1,
+        "Play Now must remain anchored inside the original foreground art");
       if (shotFolder) await page.screenshot({
-        path: join(shotFolder, "menu-wide-desktop.png"),
+        path: join(shotFolder, "menu-wide-uncropped-desktop.png"),
       });
       await page.setViewportSize({ width, height });
     }

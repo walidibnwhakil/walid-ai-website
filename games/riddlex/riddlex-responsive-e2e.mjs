@@ -99,6 +99,36 @@ try {
       assert.ok(art.goldenFrame > 50, "gold bottom frame must be preserved");
     }
     if (shotFolder) await page.screenshot({ path: join(shotFolder, "menu-" + orient + ".png") });
+    if (orient === "landscape") {
+      // The reported desktop bug appears on wide 16:8 displays, not only
+      // conventional 16:9 screenshots: the frame used to leave brown pillars.
+      await page.setViewportSize({ width: 1650, height: 820 });
+      const artLayout = await page.evaluate(() => {
+        const stage = document.querySelector(".menu-stage").getBoundingClientRect();
+        const frame = document.querySelector(".menu-frame").getBoundingClientRect();
+        const art = document.querySelector(".menu-card");
+        const play = document.getElementById("play").getBoundingClientRect();
+        return {
+          stageWidth: stage.width, frameWidth: frame.width,
+          frameLeft: frame.left - stage.left,
+          frameRight: stage.right - frame.right,
+          imageFit: getComputedStyle(art).objectFit,
+          playRight: play.right, playBottom: play.bottom,
+        };
+      });
+      assert.ok(Math.abs(artLayout.stageWidth - artLayout.frameWidth) <= 2,
+        "desktop menu should cover the scene, not be a centered poster: " +
+          JSON.stringify(artLayout));
+      assert.ok(Math.abs(artLayout.frameLeft) <= 2 &&
+        Math.abs(artLayout.frameRight) <= 2, "no wide brown side pillars");
+      assert.equal(artLayout.imageFit, "cover", "the original art fills the window");
+      assert.ok(artLayout.playRight <= 1651 && artLayout.playBottom <= 821,
+        "Play Now must remain inside wide menu");
+      if (shotFolder) await page.screenshot({
+        path: join(shotFolder, "menu-wide-desktop.png"),
+      });
+      await page.setViewportSize({ width, height });
+    }
 
     await page.click("#play");
     assert.equal(await page.locator("#game .lang-switch").isVisible(), true,
@@ -338,7 +368,7 @@ try {
         !document.getElementById("categories").hidden, null, { timeout: 25000 });
       await realPage.click('[data-cat="character"]');
       const history = [];
-      for (let number = 0; number < 9; number++) {
+      for (let number = 0; number < 11; number++) {
         try {
           await realPage.waitForFunction((expected) => {
             const s = window.__riddlex?.state?.();
@@ -373,17 +403,17 @@ try {
       await realPage.waitForFunction(() => {
         const current = window.__riddlex?.state?.();
         return current?.mode === "ask" &&
-          current.answers.length === 9 && !!current.question;
+          current.answers.length === 11 && !!current.question;
       }, null, { timeout: 25000 });
       const gameState = await realPage.evaluate(() => window.__riddlex.state());
-      assert.equal(gameState.answers.length, 9, JSON.stringify(history));
+      assert.equal(gameState.answers.length, 11, JSON.stringify(history));
       assert.equal(gameState.mode, "ask",
         "ordinary real-person clues must never trigger category reset: " +
           JSON.stringify({ history, gameState }));
       assert.ok(gameState.answers.includes("from_bd"),
         "detective should establish Bangladeshi identity early: " + JSON.stringify(history));
       if (shotFolder) await realPage.screenshot({
-        path: join(shotFolder, "bangladesh-9-questions-" + orient + ".png"),
+        path: join(shotFolder, "bangladesh-12th-question-" + orient + ".png"),
       });
       console.log("RIDDLEX_BANGLADESH_CONTINUATION_PASS", orient, JSON.stringify(history));
     } finally {

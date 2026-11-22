@@ -1,5 +1,5 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-46";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-47";
 import { UI, guessFont } from "./i18n.js?v=riddlex-44";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-46";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";

@@ -278,6 +278,10 @@ try {
               window.__riddlex.replyFor(id, "actor"), state.best);
             assert.equal(recordedActing, "yes",
               "actor YES guessed someone with no acting evidence: " + state.best);
+            const recordedBangladesh = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "from_bd"), state.best);
+            assert.equal(recordedBangladesh, "yes",
+              "Bangladesh YES guessed an actor without verified Bangladesh fact: " + state.best);
           }
           if (policy === "family") {
             assert.equal(state.best, "riddlex-role-mother",

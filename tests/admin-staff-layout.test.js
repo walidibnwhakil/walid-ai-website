@@ -1,12 +1,15 @@
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
 
-const html = fs.readFileSync('admin-staff.html', 'utf8');
-
-assert.match(html, /grid-template-rows:repeat\(3,minmax\(244px,auto\)\)/);
-assert.match(html, /min-height:732px/);
-assert.match(html, /padding:12px 12px 20px/);
-assert.match(html, /\.desk-grid\{height:auto;min-height:0/);
-assert.match(html, /\.desk-meta\{[^}]*min-height:2\.2em/);
-
-console.log('Virtual AI Office cards reserve space for robot artwork and all text.');
+const html=fs.readFileSync('admin.html','utf8');
+const js=fs.readFileSync('admin-ops.js','utf8');
+assert.match(html,/\.ops-desk-grid\{display:grid/);
+assert.match(html,/@media\(max-width:800px\)/);
+assert.match(html,/@media\(max-width:540px\)/);
+assert.match(html,/ops-history/);
+assert.match(html,/riddlex-pending/);
+for(const role of ['Manager','IT Technician','Cyber Security Engineer','CSE Engineer','Admin Staff'])
+  assert(js.includes(role),role);
+assert.match(js,/aria-pressed/);
+assert.match(js,/task\.result/);
+console.log('Unified staff portal has responsive desks, conversations and approvals.');

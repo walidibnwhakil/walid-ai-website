@@ -99,16 +99,18 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
     <div class="toolbar panel">
       <label>Reporting period <select id="period"><option value="1">Today</option><option value="7" selected>7 days</option><option value="14">14 days</option><option value="30">30 days</option><option value="90">90 days</option></select></label>
       <button id="refresh" type="button">Refresh data</button><a href="/chat/" class="secondary-button button">Open AI Chat</a>
-      <span class="muted">Counts reflect recorded events, not an estimate of all website visitors.</span>
     </div>
     <p id="storage" class="panel" role="status"></p>
     <div class="grid" id="stats"></div>
+    <section id="top-five-features" class="panel top-five-panel hidden" aria-label="Top 5 most active features">
+      <div class="toolbar top-five-header"><h2>Top 5 most active features</h2><button id="top-five-close" class="secondary-button" type="button">Close</button></div>
+      <ol id="top-five-list" class="top-five-list"></ol>
+    </section>
     <section class="panel"><h2>Daily visitors</h2><div id="daily"></div></section>
-    <section class="panel"><h2>Current website sections, games and tools</h2><p class="muted">New category tracking starts when its code is deployed; past events remain historical. Active page time includes menus.</p><div id="features"></div></section>
+    <section class="panel"><h2>Website sections</h2><div id="features" class="analytics-sections"></div></section>
     <section class="panel"><h2>Audience region</h2><p class="muted">Coarse estimates only. VPNs and blocked lookups affect accuracy. Views are not unique people.</p><div id="regions"></div></section>
     <section class="panel"><h2>API usage and quota</h2><p class="muted">Requests may include retries and failures. Provider quota snapshots are not guaranteed account balances.</p><div id="api"></div></section>
     <section class="panel"><h2>Recent help messages</h2><p class="muted notice">Protected inbox; reports are retained for up to 30 days.</p><div id="helpInbox"></div></section>
-    <p id="notes" class="muted notice"></p>
   </section>
   <section id="staff-workspace" class="hidden" aria-label="AI staff workspace">
     <!-- Render the exact original Virtual AI Office in its own style context.
@@ -141,7 +143,9 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
   </section>
 </div></div></main>
 <script src="/backend-config.js"></script>
-<script src="/admin-usage.js?v=20261122c"></script>
+<script src="/admin-analytics-catalog.js?v=20261122-sections"></script>
+<script src="/admin-section-metrics.js?v=20261122-sections"></script>
+<script src="/admin-usage.js?v=20261122-sections"></script>
 <script src="/admin-ops.js?v=20261122c"></script>
 <script src="/admin-approvals.js?v=20261122-ops"></script>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>

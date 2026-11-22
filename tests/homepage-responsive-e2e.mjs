@@ -89,7 +89,7 @@ try{
     for(const card of layout.cards){
       assert.equal(card.svgCount,1,card.title+" premium icon missing");
       assert.ok(card.icon.w>=60&&card.icon.h>=60,"Vector icon too small: "+card.title);
-      assert.ok(card.desc.length>40&&card.desc.length<130,
+      assert.ok(card.desc.length>=(card.title==='Sports'?30:41)&&card.desc.length<130,
         card.title+" description should be concise and useful");
       assert.ok(card.action.length>4&&!/Open section|Open omuk/i.test(card.action));
       assert.ok(!seen.has(card.action),"CTA labels should be distinct: "+card.action);

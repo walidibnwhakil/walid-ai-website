@@ -275,6 +275,9 @@ try {
           if (policy === "actor_1990s") {
             const info = await page.evaluate(() => window.__riddlex.diagnose());
             console.log("RIDDLEX_OWNER_ACTOR_1990S_DIAG " + JSON.stringify(info));
+            assert.ok(info.loadedCount > 1, "regional Bangladesh shards were never loaded");
+            assert.ok(info.bdActorCount > 0, "regional Bangladesh actor records were never added");
+            assert.ok(seen.size >= 20, "game surrendered before meaningful 1990s follow-up questions");
           }
           break;
         }
@@ -283,7 +286,7 @@ try {
           trace.push("GUESS: " + name + " [" + state.best + "]");
           assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
             "A no-personal-contact answer guessed a personal role");
-          if (policy === "actor") {
+          if (policy === "actor" || policy === "actor_1990s") {
             const recordedActing = await page.evaluate((id) =>
               window.__riddlex.replyFor(id, "actor"), state.best);
             assert.equal(recordedActing, "yes",

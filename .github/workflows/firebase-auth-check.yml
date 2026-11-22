@@ -1,0 +1,37 @@
+name: Check Firebase deployment credentials (no secrets disclosed)
+on:
+  push:
+    branches: [ops/firebase-auth-check-20261122]
+    paths:
+      - .github/workflows/firebase-auth-check.yml
+permissions:
+  contents: read
+jobs:
+  credentials:
+    runs-on: ubuntu-latest
+    env:
+      TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SERVICE_ACCOUNT_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_WALID_AI_511908 }}
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      WIF_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+    steps:
+      - name: Report only which credentials are configured
+        shell: bash
+        run: |
+          found=0
+          for key in TOKEN SERVICE_ACCOUNT SERVICE_ACCOUNT_ALT GOOGLE_CREDENTIALS GCP_SA_KEY; do
+            if [[ -n "${!key}" ]]; then
+              echo "::notice::Firebase credential type ${key} is configured (secret value never displayed)."
+              found=1
+            fi
+          done
+          if [[ -n "$WIF_PROVIDER" && -n "$WIF_SERVICE_ACCOUNT" ]]; then
+            echo "::notice::Google workload identity is configured."
+            found=1
+          fi
+          if [[ "$found" == 0 ]]; then
+            echo "::warning::No known Firebase deployment credential is configured in GitHub Actions."
+          fi

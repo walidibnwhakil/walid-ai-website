@@ -195,10 +195,14 @@ export function planShardLoads(index, answers, loadedNames, budget = index?.budg
   add(index.top, index.topBytes || 0);
   const firm = firmMap(answers);
   const yes = (id) => firm.get(id) === "yes";
+  const likelyYes = (id) => yes(id) || (answers || []).some((row) =>
+    row.qid === id && row.value === "probably");
   const no = (id) => firm.get(id) === "no";
   const wantsFiction = (no("real") || yes("fictional")) && !(yes("real") && !yes("fictional"));
   if (wantsFiction) add(index.fiction, index.fictionBytes || 0);
-  const yesCountries = Object.keys(COUNTRY_CODE).filter(yes);
+  // A "probably" country answer should still make those names discoverable,
+  // while the existing cumulative byte budget protects low-memory phones.
+  const yesCountries = Object.keys(COUNTRY_CODE).filter(likelyYes);
   const yesBirths = Object.keys(BIRTH_CODE).filter(yes);
   const gender = yes("male") && !yes("female") ? "m" : yes("female") && !yes("male") ? "f"
     : no("male") && !yes("female") ? "not-m" : no("female") && !yes("male") ? "not-f" : "";

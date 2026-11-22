@@ -1,7 +1,7 @@
 // Compact little-endian knowledge shards. Names stay in one blob so the
 // first question can render before every shard has finished parsing.
 
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-42";
 import { ACTOR_PROOF_QUESTIONS } from "./actor-proof.js";
 import { WRITER_PROOF_QUESTIONS } from "./writer-proof.js";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";

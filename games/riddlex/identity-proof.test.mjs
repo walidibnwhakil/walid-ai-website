@@ -160,3 +160,35 @@ test("a female Bangladeshi actor is verified using specific sourced films", () =
   assert.equal(decision.type, "guess");
   assert.equal(pool.ids[decision.index], "Q7460127");
 });
+
+test("four public-person answers keep the detective questioning, not giving up", () => {
+  const state = createState(makePool(), { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"], ["male", "yes"], ["alive", "yes"],
+  ]) answer(state, qid, value);
+  const first = decide(state);
+  assert.equal(first.type, "ask", JSON.stringify(first));
+  assert.ok(first.qid, "a specific next question should be selected");
+  assert.equal(state.answers.length, 4);
+});
+
+test("unverified actors remain candidates for questions but are not revealed", () => {
+  const state = session(makePool());
+  const decision = decide(state);
+  assert.equal(decision.type, "ask", JSON.stringify(decision));
+  const possible = state.pool.ids.indexOf("Q7322180");
+  assert.ok(state.alive.includes(possible), "candidate stays available for evidence search");
+  assert.equal(enoughIdentityEvidence(state, possible), false, "not enough confirmed films");
+});
+
+test("missing evidence cannot trigger a guess after only four answers", () => {
+  const state = createState(makePool(), { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"],
+    ["male", "yes"], ["alive", "unknown"],
+  ]) answer(state, qid, value);
+  const move = decide(state);
+  assert.equal(move.type, "ask", JSON.stringify(move));
+});

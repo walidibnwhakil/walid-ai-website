@@ -3,7 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-47";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -129,6 +129,32 @@ test("a Bangladesh actor must answer film-era questions before the first guess",
   assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_pre1990"});
   answer(state,"screen_star_pre1990","no");
   assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_1990s"});
+});
+
+test("a rejected 1990s male movie star is followed by verified career questions", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q7405420", 800, ["real","male","actor","from_bd","named"]),
+    entry("Q7322180", 700, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category:"character" });
+  recompute(state);
+  for (const [qid,value] of [["real","yes"],["male","yes"],["from_bd","yes"],
+    ["actor","yes"],["screen_star_pre1990","no"],["screen_star_1990s","yes"]])
+    answer(state,qid,value);
+  rejectIndex(state, 0); // Salman Shah was not the intended actor
+  const careerQuestions = [];
+  for (let i=0;i<5;i++) {
+    const decision=decide(state);
+    assert.equal(decision.type,"ask",
+      "No five-question verification after a rejected star: "+JSON.stringify(decision));
+    careerQuestions.push(decision.qid);
+    const qi=pool.qIndex.get(decision.qid);
+    const fact=factBit(pool,1,qi);
+    answer(state,decision.qid,fact===2?"yes":fact===1?"no":"unknown");
+  }
+  assert.ok(careerQuestions.filter(q=>q.startsWith("screen_")).length >= 4,
+    "Expected relevant film questions, not unrelated celebrity trivia: "+careerQuestions.join(", "));
 });
 
 test("a confident second name must wait for additional evidence", () => {

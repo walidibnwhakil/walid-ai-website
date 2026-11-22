@@ -30,6 +30,9 @@
     ".walid-reading-progress a,.walid-reading-progress button{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border:1px solid #afc9b6;border-radius:8px;color:#185740;background:#fff;font:inherit;font-size:.9rem;text-decoration:none;cursor:pointer}",
     ".walid-reading-progress a:focus-visible,.walid-reading-progress button:focus-visible{outline:2px solid #21775a;outline-offset:2px}",
     ".walid-reading-progress .reading-feedback{flex:1 1 100%;margin:0;font-size:.82rem}",
+    ".walid-reading-progress .reading-hint{flex:1 1 100%;margin:0;color:#52685b;font-size:.84rem}",
+    ".ayah-number[data-reading-bookmark]{cursor:pointer}",
+    ".ayah-number[data-reading-bookmark]:focus-visible{outline:2px solid #21775a;outline-offset:2px}",
     "[hidden].walid-reading-progress,[hidden].walid-reading-controls{display:none!important}",
     "@media(max-width:600px){.walid-reading-progress,.walid-reading-controls{gap:7px;padding:9px}.walid-reading-progress a,.walid-reading-progress button,.walid-reading-controls button{font-size:.86rem}}"
   ].join("\n");
@@ -213,15 +216,7 @@
       return root && !root.hidden ? [...root.querySelectorAll(".ayah[data-verse],.ayah[id^='ayah-']")]
         .filter(node => !node.classList.contains("basmala")) : [];
     }
-    function currentPosition() {
-      const nodes = cards();
-      if (!nodes.length) return null;
-      const line = Math.max(120, Math.min(innerHeight * .36, 320));
-      let active = nodes.find(el => {
-        const rect = el.getBoundingClientRect();
-        return rect.top <= line && rect.bottom >= line;
-      });
-      if (!active) return null;
+    function positionOfCard(active) {
       const match = active.id.match(/^ayah-(\d+)-(\d+)$/);
       const number = match ? Number(match[1]) : surah;
       const verse = match ? Number(match[2]) : Number(active.dataset.verse || active.id.replace("ayah-", ""));
@@ -234,6 +229,16 @@
       };
       if (page) value.page = page;
       return validQ(value) ? value : null;
+    }
+    function currentPosition() {
+      const nodes = cards();
+      if (!nodes.length) return null;
+      const line = Math.max(120, Math.min(innerHeight * .36, 320));
+      const active = nodes.find(el => {
+        const rect = el.getBoundingClientRect();
+        return rect.top <= line && rect.bottom >= line;
+      });
+      return active ? positionOfCard(active) : null;
     }
     function saveLatest(value) {
       if (value && put(qProgressKey, value)) {
@@ -264,28 +269,63 @@
         setTimeout(() => observer.disconnect(), 6000);
       }
     }
+    function saveBookmarkPosition(value) {
+      if (!value) {
+        feedback.textContent = "প্রথমে আয়াতের কাছে গিয়ে বুকমার্ক রাখুন।";
+      } else if (put(qBookmarkKey, value)) {
+        bookmark = value;
+        renderPanel();
+        feedback.textContent = "আয়াত " + bn(value.verse) + " বুকমার্ক হয়েছে।";
+      } else feedback.textContent = "এই ব্রাউজারে সংরক্ষণের অনুমতি নেই।";
+    }
     function renderPanel() {
       panel.replaceChildren();
       if (last) addLink(panel, "সর্বশেষ পড়া: " + qLabel(last), qUrl(last), event => resume(event, last));
       if (bookmark) addLink(panel, "বুকমার্ক: " + qLabel(bookmark), qUrl(bookmark), event => resume(event, bookmark));
       addButton(panel, "শেষ পড়া আয়াতে বুকমার্ক", () => {
         flush();
-        const value = last || currentPosition();
-        if (!value) {
-          feedback.textContent = "প্রথমে আয়াতের কাছে গিয়ে বুকমার্ক রাখুন।";
-        } else if (put(qBookmarkKey, value)) {
-          bookmark = value;
-          renderPanel();
-          feedback.textContent = "বুকমার্ক এই ডিভাইসে সংরক্ষিত হয়েছে।";
-        } else feedback.textContent = "এই ব্রাউজারে সংরক্ষণের অনুমতি নেই।";
+        saveBookmarkPosition(last || currentPosition());
       });
       if (bookmark) addButton(panel, "বুকমার্ক মুছুন", () => {
         try { localStorage.removeItem(qBookmarkKey); bookmark = null; renderPanel(); feedback.textContent = "বুকমার্ক মুছে দেওয়া হয়েছে।"; }
         catch { feedback.textContent = "বুকমার্ক মুছে দেওয়া যাচ্ছে না।"; }
       });
-      panel.append(feedback);
+      const hint = document.createElement("p");
+      hint.className = "reading-hint";
+      hint.textContent = "নির্দিষ্ট আয়াত বুকমার্ক করতে আয়াত নম্বরে চাপ দিন।";
+      panel.append(hint, feedback);
     }
     renderPanel();
+    // Existing/static or asynchronously generated verses both get keyboard-accessible bookmark controls.
+    function tagVerseNumbers() {
+      document.querySelectorAll("#verses .ayah[data-verse] .ayah-number, #mushaf-verses .ayah .ayah-number")
+        .forEach(number => {
+          if (number.hasAttribute("data-reading-bookmark")) return;
+          number.dataset.readingBookmark = "true";
+          number.setAttribute("role", "button");
+          number.tabIndex = 0;
+          number.setAttribute("aria-label", "আয়াত " + number.textContent.trim() + " বুকমার্ক করুন");
+          number.title = "এই আয়াতে বুকমার্ক রাখুন";
+        });
+    }
+    tagVerseNumbers();
+    let needsTagging = false;
+    new MutationObserver(() => {
+      if (needsTagging) return;
+      needsTagging = true;
+      requestAnimationFrame(() => { needsTagging = false; tagVerseNumbers(); });
+    }).observe(document.body, {childList: true, subtree: true});
+    document.addEventListener("click", event => {
+      const number = event.target.closest?.(".ayah-number[data-reading-bookmark]");
+      const card = number?.closest(".ayah");
+      if (!card || card.closest("[hidden]")) return;
+      saveBookmarkPosition(positionOfCard(card));
+    });
+    document.addEventListener("keydown", event => {
+      if (!["Enter", " "].includes(event.key) || !event.target.matches?.(".ayah-number[data-reading-bookmark]")) return;
+      event.preventDefault();
+      event.target.click();
+    });
     // A short surah may fit the viewport without a scroll gesture.
     setTimeout(() => {
       if (!document.hidden && (!last || last.surah !== surah) &&

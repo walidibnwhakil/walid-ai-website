@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 concurrency:
@@ -29,6 +30,28 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+          # A rerun must never create duplicate artifacts with the same name.
+          name: pages-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Wait for GitHub Pages artifact indexing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGES_ARTIFACT: pages-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          # The upload response can precede artifact visibility in GitHub's API.
+          # Poll for the exact attempt-specific artifact before deploying.
+          for attempt in $(seq 1 18); do
+            if gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?per_page=100" \
+                --jq '.artifacts[].name' | grep -Fxq "${PAGES_ARTIFACT}"; then
+              echo "Pages artifact indexed: ${PAGES_ARTIFACT}"
+              exit 0
+            fi
+            echo "Waiting for Pages artifact metadata (${attempt}/18)"
+            sleep 5
+          done
+          echo "::error::Pages artifact was uploaded but did not become visible."
+          exit 1
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: pages-${{ github.run_id }}-${{ github.run_attempt }}

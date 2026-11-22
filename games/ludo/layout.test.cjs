@@ -146,10 +146,20 @@ fs.mkdirSync(output, { recursive: true });
 
     check(Math.abs(board.width - board.height) < 1, `square board ${tag}`);
     if (width >= 900) {
+      const playMetrics = await page.evaluate(() => {
+        const toolbar = document.querySelector(".play-toolbar").getBoundingClientRect();
+        const stage = document.querySelector(".ludo-stage").getBoundingClientRect();
+        return {
+          viewportHeight: innerHeight,
+          toolbarTop: toolbar.top,
+          stageBottom: stage.bottom,
+          pageHeight: document.documentElement.scrollHeight,
+        };
+      });
+      console.log("LUDO_PLAY_VIEWPORT_METRICS", tag, JSON.stringify(playMetrics));
+      // The global legal footer is below the playable screen, not a gameplay control.
       check(
-        await page.evaluate(
-          () => document.documentElement.scrollHeight <= innerHeight + 1,
-        ),
+        playMetrics.toolbarTop >= -1 && playMetrics.stageBottom <= playMetrics.viewportHeight + 1,
         `desktop full game fits ${tag}`,
       );
       for (const color of ["red", "green", "blue", "yellow"]) {

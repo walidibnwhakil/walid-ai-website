@@ -396,9 +396,20 @@ try {
         else if (policy === "chaplin" && q !== "from_bd")
           a = await page.evaluate((qid) =>
             window.__riddlex.replyFor("Q882", qid), q);
-        else if (policy === "dildar" && q !== "from_bd")
-          a = await page.evaluate((qid) =>
+        else if (policy === "dildar") {
+          // User-supplied true clues must remain truthful BEFORE the
+          // relevant regional shard has downloaded the person. Do not
+          // derive the user's answers from an unloaded pool entry.
+          const clues = {
+            real:"yes", male:"yes", female:"no", alive:"no", dead:"yes",
+            actor:"yes", politician:"no",
+            screen_role_lead:"no", screen_role_villain:"no",
+            screen_role_comedy:"yes", screen_role_supporting:"yes",
+            screen_silent_comedy:"no", screen_comedy_award:"yes",
+          };
+          a = clues[q] || await page.evaluate((qid) =>
             window.__riddlex.replyFor("Q18987612", qid), q);
+        }
         else if (q === "from_bd") a = "yes";
         else if (policy === "actor_male_1990s" && q === "male") a = "yes";
         else if (policy === "actor_male_1990s" && ["real","alive","named","actor","screen_star_1990s"].includes(q)) a = "yes";
@@ -448,9 +459,13 @@ try {
       if (policy === "actor_male_1990s" && guesses >= 2)
         assert.ok(filmFollowUpsAfterGuess >= 3,
           "After wrong guesses, Riddlex did not ask meaningful cinema follow-ups");
-      if (policy === "chaplin" || policy === "dildar")
+      if (policy === "chaplin" || policy === "dildar") {
+        const loadedTarget = await page.evaluate((id) =>
+          window.__riddlex.find(id) >= 0, policy==="chaplin" ? "Q882" : "Q18987612");
+        if (!loadedTarget) console.error("RIDDLEX_OWNER_TARGET_MISSING "+policy);
         assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
           "Target not recognized in the real game: "+label);
+      }
       if (policy === "shakib") assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
         "The real Shakib entry was not guessed after real answers");
       return trace;

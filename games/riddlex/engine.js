@@ -1246,17 +1246,20 @@ export function rejectIndex(state, index) {
 export function decide(state) {
   recompute(state);
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
+  // The real production casebook supports category recovery. Tiny synthetic
+  // pools used to test known top guesses must keep their established behavior.
+  const canReconsider = state.pool.questions.length >= 60 && state.category != null;
   // A chosen character is either real or fictional. Two firm "no" replies
   // to those categories mean the classification needs clarification, not
   // that the detective has exhausted millions of available entries.
-  if (state.category === "character" &&
+  if (canReconsider && state.category === "character" &&
       said(state, "real", ["no"]) && said(state, "fictional", ["no"]))
     return { type: "reconsider" };
   // When the selected pool genuinely has no plausible match, let the player
   // revise the last answer or choose a better category rather than displaying
   // the final surrender/teach form after just a handful of answers.
   if (!state.alive.length)
-    return state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
+    return canReconsider && state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state, true);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
@@ -1269,7 +1272,7 @@ export function decide(state) {
     // after a few negative answers; offer a category/answer correction instead.
     if (best >= 0 && !waiting && enoughIdentityEvidence(state, best))
       return { type: "guess", index: best };
-    return state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
+    return canReconsider && state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
   }
   return { type: "ask", qid };
 }

@@ -207,6 +207,7 @@ export function createState(pool, options = {}) {
     rejected: new Set(),
     guesses: 0,
     sinceGuess: 0,
+    pendingVerification: null,
     opening: options.opening || null,
     category: options.category || null,
     weights: new Float64Array(pool.count),
@@ -314,6 +315,8 @@ export function recompute(state) {
   const n = pool.count;
   const logW = new Float64Array(n);
   const conflicted = conflictedFamilies(answers);
+  const disprovenIds = new Set(answers.filter((row) =>
+    row.value === "no" && row.verifiedCandidateId).map((row) => row.verifiedCandidateId));
   const positive = (qid) => answers.some((entry) => entry.qid === qid &&
     (entry.value === "yes" || entry.value === "probably"));
   const localActor = positive("from_bd") && positive("actor");
@@ -322,7 +325,8 @@ export function recompute(state) {
     row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
-    if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
+    if (rejected.has(i) || disprovenIds.has(pool.ids[i]) ||
+        pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
@@ -1071,13 +1075,18 @@ export function chooseQuestion(state) {
 export function answer(state, qid, value) {
   const qi = state.pool.qIndex.get(qid);
   if (qi == null || !ANSWERS.includes(value)) return state;
-  state.answers.push({ qid, qi, value });
+  const pending = state.pendingVerification;
+  const verifiedCandidateId = pending?.qid === qid ? pending.candidateId : undefined;
+  state.answers.push({ qid, qi, value, ...(verifiedCandidateId ? { verifiedCandidateId } : {}) });
+  state.pendingVerification = null;
   state.sinceGuess += 1;
   return recompute(state);
 }
 
 export function rewind(state) {
-  state.answers.pop();
+  const removed = state.answers.pop();
+  state.pendingVerification = removed?.verifiedCandidateId
+    ? { qid: removed.qid, candidateId: removed.verifiedCandidateId } : null;
   state.sinceGuess = Math.max(0, state.sinceGuess - 1);
   return recompute(state);
 }
@@ -1155,6 +1164,13 @@ function finalWorkQuestion(state, index) {
   return remaining[0]?.qid || null;
 }
 
+function askVerification(state, index) {
+  const qid = finalWorkQuestion(state, index);
+  if (!qid) return null;
+  state.pendingVerification = { qid, candidateId: state.pool.ids[index] };
+  return { type: "ask", qid };
+}
+
 function sensibleFollowUp(state) {
   if (!fullPublicGame(state)) return null;
   const asked = new Set(state.answers.map((a) => a.qid));
@@ -1197,16 +1213,15 @@ export function decide(state) {
   // switch to checking the new leading person instead of persisting with the
   // discredited name or asking unrelated generic questions.
   const last = state.answers.at(-1);
-  const disproved = last?.value === "no" &&
-    (ACTOR_PROOF_IDS.has(last.qid) || WRITER_PROOF_IDS.has(last.qid));
+  const disproved = last?.value === "no" && (last.verifiedCandidateId ||
+    ACTOR_PROOF_IDS.has(last.qid) || WRITER_PROOF_IDS.has(last.qid));
   if (disproved && fullPublicGame(state)) {
-    const nextVerification = finalWorkQuestion(state, best);
-    if (nextVerification) return { type: "ask", qid: nextVerification };
+    const next = askVerification(state, best);
+    if (next) return next;
   }
   if (!waiting && shouldGuess(state)) {
-    const verification = finalWorkQuestion(state, best);
-    return verification ? { type: "ask", qid: verification } :
-      { type: "guess", index: best };
+    const next = askVerification(state, best);
+    return next || { type: "guess", index: best };
   }
   let qid = chooseQuestion(state);
   if (!qid && (waiting || fullPublicGame(state))) {
@@ -1215,9 +1230,8 @@ export function decide(state) {
   if (!qid) {
     if (best >= 0 && bestP > 0 &&
         (state.pool.count < 100 || shouldGuess(state))) {
-      const verification = finalWorkQuestion(state, best);
-      return verification ? { type: "ask", qid: verification } :
-        { type: "guess", index: best };
+      const next = askVerification(state, best);
+      return next || { type: "guess", index: best };
     }
     // A large knowledge pool without a winning candidate can still contain
     // relevant unanswered distinctions. Never force an early give-up.

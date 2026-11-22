@@ -479,9 +479,12 @@ function gated(state, question, rows) {
   }
   if (id === "adult_ent") return adultAllowed(state);
   if (group === "personal") {
-    if (id === "knows_you") return state.category === "character" &&
-      state.answers.some((row) => row.qid === "real" &&
-        (row.value === "yes" || row.value === "probably"));
+    if (state.category !== "character") return false;
+    if (id === "knows_you") return state.answers.some((row) => row.qid === "real" &&
+      (row.value === "yes" || row.value === "probably"));
+    // Crushes need not be mutual or even known to the person in question.
+    if (id === "your_crush") return state.answers.some((row) =>
+      row.qid === "knows_you" && row.value !== "unknown");
     return state.answers.some((row) => row.qid === "knows_you" &&
       (row.value === "yes" || row.value === "probably"));
   }
@@ -934,17 +937,38 @@ export function chooseQuestion(state) {
   if (state.category === "character" && pool.qIndex.has("knows_you") &&
       saidYes("real") && !asked.has("knows_you"))
     return "knows_you";
-  if (state.category === "character" && saidYes("knows_you")) {
+  if (state.category === "character" && pool.qIndex.has("knows_you")) {
     const next = (qid) => pool.qIndex.has(qid) && !asked.has(qid);
-    if (next("your_family")) return "your_family";
-    if (saidYes("your_family")) {
-      if (next("your_parent")) return "your_parent";
-      if (saidNo("your_parent") && next("your_sibling")) return "your_sibling";
-      const familyRole = saidYes("your_parent") || saidYes("your_sibling");
-      if (familyRole && next("female") && next("male")) return "female";
-    } else if (saidNo("your_family")) {
-      if (next("your_best_friend")) return "your_best_friend";
-      if (saidNo("your_best_friend") && next("your_friend")) return "your_friend";
+    if (saidYes("knows_you")) {
+      if (next("your_family")) return "your_family";
+      if (saidYes("your_family")) {
+        if (next("your_parent")) return "your_parent";
+        if (saidNo("your_parent") && next("your_sibling")) return "your_sibling";
+        if (saidNo("your_parent") && saidNo("your_sibling")) {
+          if (next("your_spouse")) return "your_spouse";
+          if (saidNo("your_spouse") && next("your_child")) return "your_child";
+          if (saidYes("your_child") && next("your_baby")) return "your_baby";
+        }
+        const gendered = saidYes("your_parent") || saidYes("your_sibling") ||
+          saidYes("your_spouse");
+        if (gendered && next("female") && next("male")) return "female";
+      } else if (saidNo("your_family")) {
+        if (next("your_partner")) return "your_partner";
+        if (saidYes("your_partner") && next("female") && next("male")) return "female";
+        if (saidNo("your_partner")) {
+          if (next("your_ex")) return "your_ex";
+          if (saidNo("your_ex")) {
+            if (next("your_crush")) return "your_crush";
+            if (saidNo("your_crush")) {
+              if (next("your_best_friend")) return "your_best_friend";
+              if (saidNo("your_best_friend") && next("your_friend")) return "your_friend";
+            }
+          }
+        }
+      }
+    } else if (saidNo("knows_you") && next("your_crush")) {
+      // A one-sided crush must remain guessable.
+      return "your_crush";
     }
   }
   if (!state.category && saidNo("real") && saidNo("fictional") && !asked.has("animal")) return "animal";

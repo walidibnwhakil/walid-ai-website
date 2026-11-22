@@ -88,9 +88,10 @@ try {
             total += data[i] + data[i+1] + data[i+2];
           return total / (data.length / 4) / 3;
         };
-        return { bands: [1195, 1225, 1235].map(measure), goldenFrame: measure(1270) };
+        return { woodRows: [1195, 1225, 1235, 1250].map(measure), goldenFrame: measure(1270) };
       });
-      assert.ok(art.bands.every((luma) => luma < 45), "portrait still contains baked-in gold stripes: " + art.bands);
+      assert.ok(art.woodRows.every((luma) => luma > 42 && luma < 105),
+        "table has returned to a black patch or gold stripes: " + art.woodRows);
       assert.ok(art.goldenFrame > 50, "gold bottom frame must be preserved");
     }
     if (shotFolder) await page.screenshot({ path: join(shotFolder, "menu-" + orient + ".png") });

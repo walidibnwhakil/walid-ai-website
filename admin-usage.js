@@ -53,10 +53,10 @@ function countryLabel(code){
  if(!/^[A-Z]{2}$/.test(code))return String(code);
  const fallback={BD:'Bangladesh',US:'United States',CA:'Canada',CL:'Chile',ID:'Indonesia'};
  const name=regionDisplay?.of(code)||fallback[code]||code;
- return name===code?code:name+' ('+code+')';
+ return name;
 }
 function divisionLabel(code){
- return 'Bangladesh · '+(code==='Unknown'?'Division unknown':code+' Division');
+ return code+' Division';
 }
 function renderAutomation(data){
  const host=$('#automation-summary');if(!host)return;
@@ -77,7 +77,14 @@ async function load(){if(busy)return;busy=true;const requestToken=token;$('#stat
 ].forEach(x=>card(...x));renderTopFive(ranked);const storage=$('#storage');storage.classList.toggle('warning',!d.storage.durable||!!d.storage.last_error);storage.textContent=d.storage.durable?'Persistent storage: Firebase Firestore.':'Temporary storage: Render can erase these counts on redeploy/restart. Configure the server Firebase credential to retain analytics.';if(d.storage.mode==='temporary_invalid_firebase_configuration')storage.textContent+=' Firebase credential configuration is invalid.';if(d.storage.last_error)storage.textContent+=' Storage error: '+d.storage.last_error;if(d.storage.dropped_server_events)storage.textContent+=' Dropped server events: '+d.storage.dropped_server_events;
 table($('#daily'),['Date','Estimated visitors','Views','Active time'],d.daily.map(x=>[x.date,number(x.visitors),number(x.views),duration(x.active_seconds)]));
 window.WalidSectionMetrics.render($('#features'),d);
-const regionRows=Object.entries(d.countries).sort((a,b)=>b[1].views-a[1].views).map(([name,x])=>[countryLabel(name),number(x.views),duration(x.active_seconds)]);for(const [name,x]of Object.entries(d.divisions))regionRows.push([divisionLabel(name),number(x.views),duration(x.active_seconds)]);table($('#regions'),['Region','Views','Active time'],regionRows);renderAutomation(d);
+const regionRows=Object.entries(d.countries).sort((a,b)=>b[1].views-a[1].views).map(([name,x])=>[countryLabel(name),number(x.views),duration(x.active_seconds)]);
+// Countries are displayed once; recognized Bangladesh divisions can be viewed without repeating
+// the country row. Unknown division does not represent a second country or additional visitors.
+for(const [name,x] of Object.entries(d.divisions||{})){
+ if(name==='Unknown'||!name)continue;
+ regionRows.push([divisionLabel(name),number(x.views),duration(x.active_seconds)]);
+}
+table($('#regions'),['Region','Views','Active time'],regionRows);renderAutomation(d);
 table($('#api'),['Provider','Calls','Errors','Reported input tokens','Reported output tokens','Latest quota headers'],Object.entries(d.api).map(([name,x])=>{const snap=d.provider_snapshots[name],remaining=snap?.rate_limits||{};return[name,number(x.calls),number(x.errors),x.token_usage_reported_calls?number(x.input_tokens)+' ('+x.token_usage_reported_calls+'/'+x.calls+' calls)':'Unknown',x.token_usage_reported_calls?number(x.output_tokens)+' ('+x.token_usage_reported_calls+'/'+x.calls+' calls)':'Unknown',Object.keys(remaining).length?Object.entries(remaining).map(([k,v])=>k.replace('x-ratelimit-','').replaceAll('-',' ')+': '+v).join(' · ')+' (observed '+snap.observed_at+')':'Remaining quota unknown']}));$('#status').textContent='';
 window.dispatchEvent(new CustomEvent('walid-admin-authenticated'));
 try{const help=await fetch(base+'/api/admin/help',{headers});if(help.ok&&token===requestToken){const data=await help.json();if(token!==requestToken)return;renderHelp(data.reports||[])}}catch{$('#helpInbox').textContent='Help inbox temporarily unavailable.'}

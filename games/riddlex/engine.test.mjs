@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute, shouldGuess } from "./engine.js";
+import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 
@@ -115,6 +115,47 @@ test("four rejected guesses leave meaningful questions available", () => {
   assert.equal(decide(state).type, "ask");
 });
 
+test("a confident second name must wait for additional evidence", () => {
+  const pool = poolFromEntries(questions, [
+    entry("lead", 1000, ["real", "male", "named", "alive", "from_bd", "actor"]),
+    entry("runner-up", 8, ["real", "male", "named", "alive", "from_bd", "actor", "writer"]),
+    entry("third", 5, ["real", "named", "female", "from_in", "singer"]),
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [id, value] of [["real", "yes"], ["male", "yes"],
+    ["from_bd", "yes"], ["actor", "yes"]]) answer(state, id, value);
+  rejectIndex(state, pool.ids.indexOf("third"));
+  for (let step = 0; step < 3; step++) {
+    const decision = decide(state);
+    assert.equal(decision.type, "ask", "Name spam after wrong guess: " + JSON.stringify(decision));
+    answer(state, decision.qid, "unknown");
+  }
+});
+
+test("a confirmed male and 1990s star cannot nominate a woman or an unverified-era actor", () => {
+  const qs = [...questions, { id:"screen_star_1990s", group:"job", en:"1990s actor", bn:"৯০ এর অভিনেতা" }];
+  const pool = poolFromEntries(qs, [
+    entry("Q7322180", 100, ["real","male","actor","from_bd","named"]),
+    entry("Q13059781", 9000, ["real","female","actor","from_bd","named"], { no:["male"] }),
+    entry("unverified-man", 9500, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category:"character" });
+  recompute(state);
+  for (const [id,value] of [["real","yes"],["male","yes"],["from_bd","yes"],
+    ["actor","yes"],["screen_star_1990s","yes"]]) answer(state,id,value);
+  for (let attempt=0;attempt<4;attempt++) {
+    const decision=decide(state);
+    if (decision.type==="guess") {
+      assert.equal(pool.ids[decision.index],"Q7322180",
+        "gender or career decade was disregarded");
+      break;
+    }
+    if (decision.type==="defeat") break;
+    answer(state,decision.qid,"unknown");
+  }
+});
+
 test("Bangladesh is asked within the first five character questions", () => {
   const state = createState(world, { category: "character", opening: "real" });
   recompute(state);
@@ -192,7 +233,7 @@ test("a wrong guess asks more questions before the next name", () => {
   assert.ok(gaps[1] >= 4, `only ${gaps[1]} questions between guesses`);
 });
 
-test("one remaining name that is far ahead can be guessed without a long extra round", () => {
+test("a wrong guess cannot immediately become another guess, even with one name left", () => {
   const pair = poolFromEntries(questions, [
     entry("keeper", 400, ["real", "named", "male", "alive", "from_bd", "cricketer", "all_rounder"], { no: ["fictional", "animal", "object", "female", "from_in", "writer", "actor", "adult_ent"] }),
     entry("other", 40, ["real", "named", "female", "alive", "from_in", "actor"], { no: ["from_bd", "cricketer", "male", "fictional", "animal", "object", "adult_ent"] }),
@@ -209,7 +250,8 @@ test("one remaining name that is far ahead can be guessed without a long extra r
         guesses = 1;
         since = 0;
         const again = decide(state);
-        assert.equal(again.type, "guess", JSON.stringify(again));
+        assert.equal(again.type, "ask", JSON.stringify(again));
+        assert.ok(questionsBeforeRetry(state, 0.99, 99) >= 4);
         return;
       }
     }

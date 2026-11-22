@@ -128,6 +128,30 @@ try {
     await page.click('#game [data-set-lang="bn"]');
     assert.equal(await page.locator("html").getAttribute("lang"), "bn");
     assert.equal(await page.locator("#answer-yes").textContent(), "হ্যাঁ");
+
+    // Render actual canvas guess photos in both extreme aspect ratios. The
+    // synthetic picture has a bright border and edge markers, making cropping
+    // or oversized cards immediately visible in the captured screenshot.
+    await page.evaluate(() => { document.getElementById("answers").hidden = true; });
+    for (const [shape, imageWidth, imageHeight] of [
+      ["tall-photo", 180, 690],
+      ["wide-photo", 920, 160],
+    ]) {
+      await page.evaluate(async ({ imageWidth, imageHeight }) => {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${imageWidth}" height="${imageHeight}" viewBox="0 0 ${imageWidth} ${imageHeight}">
+          <rect width="100%" height="100%" fill="#c1dde8"/>
+          <rect x="3" y="3" width="${imageWidth - 6}" height="${imageHeight - 6}" rx="1" fill="none" stroke="#ef1c18" stroke-width="6"/>
+          <rect x="8" y="8" width="${imageWidth - 16}" height="20" fill="#fadd1c"/>
+          <rect x="8" y="${imageHeight - 28}" width="${imageWidth - 16}" height="20" fill="#2343ff"/>
+          <circle cx="${imageWidth / 2}" cy="${imageHeight / 2}" r="26" fill="#3b8021"/>
+        </svg>`;
+        const src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+        await window.__riddlex.reveal("সম্পূর্ণ ছবি", src);
+      }, { imageWidth, imageHeight });
+      if (shotFolder) await page.screenshot({
+        path: join(shotFolder, "guess-" + orient + "-" + shape + ".png"),
+      });
+    }
     await page.click("#to-menu");
     assert.equal(await page.locator("#menu").isVisible(), true);
     const opposite = orient === "portrait" ? { width: 1366, height: 768, art: "menu-desk" }

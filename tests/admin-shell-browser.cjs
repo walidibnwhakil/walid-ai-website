@@ -47,17 +47,25 @@ async function exercise(browser, width, height){
     },
     tasks:[]
   }}));
-  const submittedRoles=[];
+  const submittedRoles=[],liveTasks=[{
+    id:'expired-mock',role:'manager',created_at:'2020-01-01T00:00:00Z',
+    instruction:'Old private conversation',status:'completed',result:{answer:'outdated private response'}
+  }];
   await context.route('**/api/admin/tasks',route=>{
     if(route.request().method()==='POST'){
       const request=route.request().postDataJSON();
       submittedRoles.push(request.role);
-      return route.fulfill({status:202,json:{
-        task:{id:'test-manager-1',role:request.role,status:'completed',
-          result:{answer:'জি স্যার, verified test response.',delegations:[{role:'monitor',status:'completed'}]}}
-      }});
+      const when=new Date().toISOString();
+      const task={id:'test-manager-1',role:request.role,created_at:when,updated_at:when,
+        instruction:request.instruction,status:'completed',
+        result:{answer:'জি স্যার, verified test response.',checked_at:when,
+          delegations:[{role:'monitor',section:'monitor',status:'completed',checked_at:when,
+            instruction:'Check real website and backend HTTP status.',
+            outcome:'Website HTTP 200 and backend HTTP 200 were verified.'}]}};
+      liveTasks.unshift(task);
+      return route.fulfill({status:202,json:{task}});
     }
-    return route.fulfill({status:200,json:{tasks:[],persistence:'temporary_filesystem'}});
+    return route.fulfill({status:200,json:{tasks:liveTasks,persistence:'temporary_filesystem'}});
   });
   await context.route('**/api/admin/staff/checks',route=>route.fulfill({status:200,json:{checks:[]}}));
   // Approval UI is tested for section isolation only, not external Firebase sign-in.
@@ -88,7 +96,11 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#auth-screen').isVisible(),false,'sign-in card hidden after login');
   assert.equal(await page.locator('#dashboard').isVisible(),true);
   const headButton=page.locator('#manager-chat-head');
-  assert.equal(await headButton.isVisible(),true,'robot chat head is visible in the collapsed sidebar');
+  assert.equal(await headButton.isVisible(),true,'independent robot chat head is available after sign-in');
+  assert.equal(await headButton.evaluate(el=>el.parentElement.id),'workspace-shell','floating bot must not be attached to the sidebar');
+  assert.equal(await headButton.evaluate(el=>getComputedStyle(el).position),'fixed','bot chat head floats independently');
+  const headRect=await headButton.boundingBox(),menuRect=await page.locator('#sidebar-toggle').boundingBox();
+  assert(headRect.y>menuRect.y+90,'bot head must be clearly below the sidebar menu button');
   assert.equal(await headButton.isEnabled(),true,'authenticated owner can open Manager');
   assert.equal(await headButton.locator('svg').count(),1,'sidebar uses a small bot icon, not a text link');
   assert.equal((await headButton.textContent()).trim(),'','bot head has no visible label');
@@ -100,6 +112,14 @@ async function exercise(browser, width, height){
   assert.equal(await headButton.getAttribute('aria-expanded'),'true');
   assert.equal(await page.locator('#dashboard').isVisible(),true,'sidebar chat head overlays Analytics without switching sections');
   assert.equal(await page.locator('#staff-workspace').isVisible(),false,'staff office stays hidden behind sidebar chat opened from Analytics');
+  assert.equal(await page.locator('#manager-chat-panel > .panel').count(),0,'no boxed Manager card above the chat');
+  assert.equal(await page.locator('#manager-chat-panel .manager-chat-compose').count(),1,'one bottom-anchored message composer');
+  const composer=await page.locator('.manager-chat-compose').boundingBox();
+  const transcript=await page.locator('.manager-chat-transcript').boundingBox();
+  assert(composer.y>=transcript.y+transcript.height-3,'message composer stays below the conversation');
+  assert(composer.y+composer.height>height-35,'composer is near the bottom of the viewport');
+  assert.equal(await page.locator('#ops-history').textContent().then(s=>s.includes('Old private conversation')),false,
+    'messages older than five days are hidden from the conversation');
   await page.keyboard.press('Escape');
   await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
   assert.equal(await headButton.getAttribute('aria-expanded'),'false');
@@ -225,7 +245,17 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#ops-role-name').textContent(),'Manager');
   await page.locator('#ops-input').fill('আজকের visitor এবং সাইটের সমস্যা যাচাই করো');
   await page.locator('#ops-send').click();
+  await page.locator('.manager-delegations summary').waitFor({state:'visible'});
   assert.deepEqual(submittedRoles,['manager'],'only Manager receives owner commands');
+  const question=await page.locator('#ops-history .ops-message.question').last().boundingBox();
+  const answer=await page.locator('#ops-history .ops-message.answer').last().boundingBox();
+  assert(question.x>answer.x+25,'owner messages are aligned right of Manager replies');
+  assert.match(await page.locator('#ops-history .ops-message.question').last().textContent(),/আজকের visitor/);
+  assert.match(await page.locator('#ops-history .ops-message.answer').last().textContent(),/জি স্যার/);
+  await page.locator('.manager-delegations summary').click();
+  assert.match(await page.locator('.manager-delegations').textContent(),/IT Technician/);
+  assert.match(await page.locator('.manager-delegations').textContent(),/Check real website and backend HTTP status/);
+  assert.match(await page.locator('.manager-delegations').textContent(),/Website HTTP 200/);
   await page.locator('#manager-chat-close').click();
   await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
   assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'true','drawer closes without changing office');

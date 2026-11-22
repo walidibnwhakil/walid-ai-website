@@ -185,7 +185,7 @@ try {
       console.log("CHARACTER_START", orient);
       try {
         await page.waitForFunction(() => !document.getElementById("answers").hidden &&
-          document.getElementById("progress").textContent.includes("Question"),
+          /Question|প্রশ্ন/.test(document.getElementById("progress").textContent),
           null, { timeout: 18000 });
       } catch (error) {
         const snapshot = await page.evaluate(() => ({

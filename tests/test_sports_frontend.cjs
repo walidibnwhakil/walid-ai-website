@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
 
-const source=fs.readFileSync(path.join(__dirname,"../sports/sports.js"),"utf8");
+const source=fs.readFileSync(path.join(__dirname,"../sports/sports.js"),"utf8").split("/* Anonymous aggregate page-view and active-time counters; never inspect reading content. */")[0].trimEnd();
 assert(source.trimEnd().endsWith("})();"),"sports IIFE shape changed");
 const exposed=source.replace(/\}\)\(\);\s*$/, "globalThis.__sportsTest={statusOf,verifiedStatus,cricketFigures,footballScoreValid,timeLabel,pickFeatured,matchRow,flag};})();");
 const context={

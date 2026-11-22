@@ -227,3 +227,34 @@ details[open]>.section-summary .section-chevron{transform:rotate(225deg)}
   .section-body{padding:8px}
   .analytics-subsection .section-summary{padding:10px 7px}
 }
+
+
+/* Expand the Most Active Feature metric only when explicitly clicked. */
+.top-feature-card{padding:0;min-width:0;overflow:hidden}
+.top-feature-toggle{
+  position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;
+  width:100%;height:100%;min-height:110px;margin:0;padding:16px;
+  background:transparent;border:0;border-radius:inherit;box-shadow:none;
+  color:inherit;text-align:left;cursor:pointer;gap:8px;
+}
+.top-feature-toggle:hover{background:#173c51;color:inherit}
+.top-feature-toggle .label{color:var(--adm-muted)}
+.top-feature-toggle .big{color:var(--adm-accent);font-size:1.15rem}
+.top-feature-arrow{color:var(--adm-accent);font-size:.76rem;font-weight:700}
+.top-five-panel{border-color:#46778c}
+.top-five-header{justify-content:space-between;margin-bottom:10px}
+.top-five-header h2{margin:0!important}
+.top-five-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.top-five-list li{
+  display:grid;grid-template-columns:42px minmax(0,1fr);
+  gap:12px;align-items:center;padding:12px;
+  border:1px solid var(--adm-border);border-radius:11px;background:#0b1d2c;
+}
+.top-five-list .rank-number{
+  display:grid;place-items:center;width:38px;height:38px;border-radius:10px;
+  color:var(--adm-accent);background:#173b50;font-size:1rem;font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.top-five-list li strong{display:block;color:#eff9ff;overflow-wrap:anywhere;font-size:.95rem}
+.top-five-list li small{display:block;color:var(--adm-muted);margin-top:3px;font-size:.77rem}
+@media(max-width:520px){.top-feature-toggle{padding:11px;min-height:104px}.top-feature-toggle .big{font-size:1rem}.top-five-list li{padding:10px;gap:8px}}

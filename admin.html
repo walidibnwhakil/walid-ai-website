@@ -1,33 +1,130 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Admin Portal | Walid AI</title>
-  <link rel="stylesheet" href="/walid-branding.css">
-  <style>
-    :root{font:16px/1.5 "Times New Roman",Times,serif;color:#17211a;background:#f5f7f5}*{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:0 auto;padding:28px 20px 60px}.admin-shell{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:start}.admin-sidebar{position:sticky;top:20px;background:#18231b;color:#fff;border-radius:16px;padding:16px}.admin-sidebar h2{font-size:1rem;margin:0 0 12px;color:#fff}.admin-sidebar a{display:block;color:#d9f0df;text-decoration:none;padding:10px 12px;border-radius:9px}.admin-sidebar a[aria-current="page"],.admin-sidebar a:hover{background:#2d5d3d;color:#fff}@media(max-width:760px){.admin-shell{display:block}.admin-sidebar{position:static;margin:16px 0}.admin-sidebar nav{display:grid;grid-template-columns:1fr 1fr;gap:4px}.admin-sidebar a{padding:9px 8px}}h1{margin:10px 0 2px}h2{font-size:1.25rem}a{color:#235c39}button,input{font:inherit;padding:11px 14px;border:1px solid #ccd5ce;border-radius:10px}button{cursor:pointer;background:#18231b;color:#fff}.muted{color:#627066}.panel,.card{background:#fff;border:1px solid #dce4dd;border-radius:15px;padding:18px;margin:14px 0}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px}.card{margin:0}.label{color:#627066}.big{font-size:1.55rem;font-weight:700;overflow-wrap:anywhere}.hidden{display:none!important}input{width:min(100%,420px)}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:15px/1.55 "Times New Roman",Times,serif}.report{border-top:1px solid #e5e9e5;padding:14px 0}.report:first-child{border-top:0}.report time,.report small{display:block;color:#68746c}.report-message{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0}.notice{font-size:.92rem}.status{min-height:1.5em;color:#9a301f}
-  table{border-collapse:collapse;width:100%;font-size:15px}th,td{text-align:left;padding:10px;border-bottom:1px solid #e5e9e5}th{color:#627066}td:first-child{min-width:130px}.table-wrap{overflow:auto}select{font:inherit;padding:9px;border:1px solid #ccd5ce;border-radius:8px}.warning{border-color:#d5a53c;background:#fff9e9}</style>
-
-<link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Walid AI | Private Operations Center</title>
+<link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/walid-branding.css">
 <link rel="stylesheet" href="/walid-legal.css">
+<style>
+:root{font:16px/1.5 "Times New Roman",SolaimanLipi,serif;color:#1c3025;background:#f5f8f5}
+*{box-sizing:border-box}body{margin:0}button,textarea,input,select{font:inherit}button{cursor:pointer}
+.hidden{display:none!important}main{max-width:1450px;margin:auto;padding:26px 22px 60px}
+.admin-shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;align-items:start}
+.admin-sidebar{position:sticky;top:24px;background:#182b20;color:#fff;padding:20px;border-radius:18px}
+.admin-sidebar .side-heading{margin:14px 0 20px;font-size:1.1rem}
+.admin-sidebar .site-logo-link{background:#fff;padding:6px;border-radius:10px}
+.admin-sidebar nav{display:grid;gap:7px}
+.admin-sidebar button{display:block;width:100%;background:transparent;color:#dceee1;border:1px solid transparent;text-align:left;padding:12px;border-radius:11px}
+.admin-sidebar button[aria-current="page"],.admin-sidebar button:hover{background:#356046;color:#fff}
+.admin-sidebar button:disabled{opacity:.65;cursor:not-allowed}
+.admin-sidebar small{color:#b6cebf}
+.admin-content{min-width:0}
+.admin-header{display:flex;align-items:start;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:0 0 12px}
+.admin-header h1{margin:0;font-size:clamp(1.6rem,2.5vw,2.3rem)}
+.admin-header p{margin:4px 0 0}
+.top-actions{display:flex;align-items:center;gap:12px}
+a{color:#2b6542}button,.button{border:1px solid #244734;background:#244734;color:white;border-radius:10px;padding:10px 14px;text-decoration:none}
+button:hover,.button:hover{background:#356247;color:white}
+.secondary-button{background:#fff;color:#234c35}
+.secondary-button:hover{background:#eaf2eb;color:#234c35}
+.panel,.card{border:1px solid #d9e5dc;background:#ffffffed;border-radius:16px;padding:20px;margin:13px 0}
+.panel h2{margin:0 0 12px;font-size:1.32rem}
+.label,.muted{color:#61786a}.big{font-size:1.5rem;font-weight:700;overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(174px,1fr));gap:10px}
+.card{margin:0;min-height:96px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+input,textarea,select{border:1px solid #c5d4c9;background:white;color:#172f21;border-radius:9px;padding:10px}
+input{width:min(100%,430px)}
+select{padding:8px}textarea{display:block;width:100%;min-height:110px;resize:vertical}
+.status{min-height:1.4em;color:#a04032}.status[data-error="false"]{color:#246844}
+.warning{border-color:#d0a449;background:#fff9ea}
+.notice{font-size:.93rem}
+table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text-align:left;border-bottom:1px solid #e7ece7}th{color:#557062}td:first-child{min-width:105px}
+.table-wrap{overflow-x:auto}
+.report{padding:12px 0;border-top:1px solid #e6ece8}.report:first-child{border-top:0}.report time{color:#66766b}.report-message{white-space:pre-wrap;overflow-wrap:anywhere}
+.ops-intro{margin:8px 0 18px}.ops-intro h2{font-size:1.6rem}
+.ops-desk-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.ops-desk{display:flex;align-items:center;flex-direction:column;gap:7px;min-height:124px;border-radius:14px;border:1px solid #d3e2d7;background:#fff;color:#253e30;text-align:center;padding:16px 10px}
+.ops-desk:hover{color:#234c35;background:#e8f4ed}.ops-desk[aria-pressed="true"]{outline:3px solid #2e7850;border-color:#2e7850;background:#eff9f1}
+.ops-desk strong{display:block;font-size:1rem}.ops-desk small{display:block;font-size:.77rem;color:#6b8072}
+.ops-desk-icon{display:grid;place-items:center;font:1.45rem/1 serif;background:#e5f1e8;color:#286842;width:44px;height:44px;border-radius:13px}
+.ops-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.75fr);gap:16px}
+.ops-history{height:min(48vh,420px);min-height:220px;overflow-y:auto;padding:12px;border:1px solid #dce6df;border-radius:12px;background:#f8faf8}
+.ops-message{max-width:92%;border-radius:12px;padding:12px 14px;margin-bottom:10px;overflow-wrap:anywhere}
+.ops-message.question{margin-left:auto;background:#dff1e4}.ops-message.answer{background:#fff;border:1px solid #dce4de}
+.ops-message strong{display:block;font-size:.92rem}.ops-message p{white-space:pre-wrap;margin:7px 0}
+.ops-message small{color:#63776b}.ops-check{border-top:1px solid #dce6df;padding:10px 0}
+.ops-check pre{max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 ui-monospace,monospace}
+.riddlex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.riddlex-item{border:1px solid #d8e4da;border-radius:13px;padding:16px;background:white}
+.riddlex-item h3{font-size:1.13rem;margin:0}.riddlex-item img{max-width:155px;max-height:180px;object-fit:contain;display:block;margin:12px 0;border-radius:9px}
+@media(max-width:1080px){.ops-desk-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){main{padding:15px 13px 45px}.admin-shell{grid-template-columns:1fr;gap:18px}.admin-sidebar{position:static;padding:12px 14px}.admin-sidebar .site-logo-link{display:none}.admin-sidebar .side-heading{margin:0 0 10px}.admin-sidebar nav{grid-template-columns:repeat(3,1fr)}.admin-sidebar button{text-align:center;padding:9px 5px}.ops-grid{grid-template-columns:1fr}}
+@media(max-width:540px){.panel{padding:14px}.ops-desk-grid{grid-template-columns:repeat(2,1fr)}.ops-desk{min-height:110px}.admin-header h1{font-size:1.5rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.big{font-size:1.25rem}}
+</style>
 </head>
-<body><main><div class="admin-shell"><aside class="admin-sidebar" aria-label="Admin navigation"><h2>Walid AI Admin</h2><nav><a href="/admin.html" aria-current="page">Analytics</a><a href="/admin-staff.html">Staff Team</a></nav></aside><div class="admin-content">
+<body>
+<main><div class="admin-shell">
+<aside class="admin-sidebar" aria-label="Private admin navigation">
   <a class="site-logo-link" href="/" aria-label="Walid AI home"><img src="/walid-ai-approved-logo.png" alt="Walid AI"></a>
-  <a href="/">← Walid AI</a><h1>Admin Portal</h1><p class="muted">Private usage, service health, and help inbox.</p>
-  <section id="login" class="panel"><label>Admin access key<br><input id="key" type="password" autocomplete="current-password"></label> <button id="enter" type="button">Sign in</button><p id="status" class="status" role="status"></p></section>
-  <section id="dashboard" class="hidden">
-    <div class="toolbar panel"><a href="/" class="button">Open Walid AI chat as admin</a><label>Period <select id="period"><option value="1">Today</option><option value="7" selected>7 days</option><option value="30">30 days</option><option value="90">90 days</option></select></label><button id="refresh" type="button">Refresh</button><button id="exit" type="button">Sign out</button><span id="date" class="muted"></span></div>
-    <p id="storage" class="panel" role="status"></p><div class="grid" id="stats"></div>
+  <h2 class="side-heading">Operations Center</h2>
+  <nav aria-label="Admin sections">
+    <button type="button" data-admin-tab="dashboard" aria-current="page">Analytics</button>
+    <button type="button" data-admin-tab="staff">AI Staff &amp; Manager</button>
+    <button type="button" data-admin-tab="riddlex">Riddlex Approvals</button>
+  </nav>
+  <p><small>Private owner workspace · live records and verified capabilities</small></p>
+</aside>
+<div class="admin-content">
+  <header class="admin-header">
+    <div><h1>Walid AI Admin</h1><p class="muted">Analytics, team operations and approvals — one protected portal.</p></div>
+    <div class="top-actions"><span id="date" class="muted"></span><button id="exit" class="secondary-button hidden" type="button">Sign out</button></div>
+  </header>
+  <section id="login" class="panel"><h2>Admin sign in</h2><label for="key">Owner access key</label><div class="toolbar"><input id="key" type="password" autocomplete="current-password" placeholder="Private key"><button id="enter" type="button">Sign in</button></div><p id="status" class="status" role="status"></p></section>
+  <section id="dashboard" class="hidden" aria-label="Analytics">
+    <div class="toolbar panel">
+      <label>Reporting period <select id="period"><option value="1">Today</option><option value="7" selected>7 days</option><option value="14">14 days</option><option value="30">30 days</option><option value="90">90 days</option></select></label>
+      <button id="refresh" type="button">Refresh data</button><a href="/chat/" class="secondary-button button">Open AI Chat</a>
+      <span class="muted">Counts reflect recorded events, not an estimate of all website visitors.</span>
+    </div>
+    <p id="storage" class="panel" role="status"></p>
+    <div class="grid" id="stats"></div>
     <section class="panel"><h2>Daily visitors</h2><div id="daily"></div></section>
-<section class="panel"><h2>Games, tools and chat</h2><p class="muted">Sorted by active page time. Game-page time includes menus. Starts and completed tool operations are counted separately.</p><div id="features"></div></section>
-<section class="panel"><h2>Audience region</h2><p class="muted">Coarse network estimates; VPNs and blocked lookups affect accuracy. Counts are page views, not people.</p><div id="regions"></div></section>
-<section class="panel"><h2>API usage and quota</h2><p class="muted">Actual requests include planning, retries and failures. A missing token count means the provider did not report it. Quotas are the latest provider snapshot, not a balance guarantee.</p><div id="api"></div></section>
-    <section class="panel"><h2>Recent help messages</h2><p class="muted notice">Visible only in this protected portal. Reports and optional reply email are kept for up to 30 days.</p><div id="helpInbox"></div></section>
+    <section class="panel"><h2>Current website sections, games and tools</h2><p class="muted">New category tracking starts when its code is deployed; past events remain historical. Active page time includes menus.</p><div id="features"></div></section>
+    <section class="panel"><h2>Audience region</h2><p class="muted">Coarse estimates only. VPNs and blocked lookups affect accuracy. Views are not unique people.</p><div id="regions"></div></section>
+    <section class="panel"><h2>API usage and quota</h2><p class="muted">Requests may include retries and failures. Provider quota snapshots are not guaranteed account balances.</p><div id="api"></div></section>
+    <section class="panel"><h2>Recent help messages</h2><p class="muted notice">Protected inbox; reports are retained for up to 30 days.</p><div id="helpInbox"></div></section>
     <p id="notes" class="muted notice"></p>
   </section>
+  <section id="staff-workspace" class="hidden" aria-label="AI staff workspace">
+    <div class="ops-intro"><h2>Five specialists. One Manager.</h2><p class="muted">Talk with Manager or a specialist. Each action shows its evidence and limitations; no silent deploys.</p></div>
+    <div id="ops-desks" class="ops-desk-grid"></div>
+    <div class="panel"><div class="toolbar"><button id="ops-checks" type="button">Run real checks</button><button id="ops-reload" class="secondary-button" type="button">Refresh history</button></div>
+      <p id="ops-connect" class="muted">Checking authenticated backend…</p><p id="ops-capability" class="muted notice"></p>
+      <p id="ops-status" class="status" role="status"></p><div id="ops-check-results"></div>
+    </div>
+    <div class="ops-grid">
+      <section class="panel">
+        <h2 id="ops-role-name">Manager</h2><p id="ops-role-description" class="muted"></p>
+        <div id="ops-history" class="ops-history" aria-label="Staff conversation history"></div>
+        <p id="ops-history-note" class="muted notice"></p>
+        <label for="ops-input">Ask a question or assign a task</label>
+        <textarea id="ops-input" maxlength="2000" placeholder="Describe the issue, URL or feature you want checked."></textarea>
+        <div class="toolbar"><button id="ops-send" type="button">Ask Manager</button><span class="muted">Ctrl + Enter to send</span></div>
+      </section>
+      <aside class="panel"><h2>Operating boundaries</h2><p>IT checks the actual site and backend. Security inspects response headers. CSE reads repository status and prepares recommendations. Mail only reads an inbox after explicit authorization.</p><p>Manager can delegate those tasks and use a configured AI provider to explain findings.</p><p class="muted">Autonomous source edits, GitHub pull requests, CI, merge, deployment and mail sending are not yet enabled. They need dedicated permissions, a controlled execution environment and approval gates.</p></aside>
+    </div>
+  </section>
+  <section id="riddlex-workspace" class="hidden" aria-label="Riddlex name approvals">
+    <div class="panel"><h2>Riddlex Approvals</h2><p class="muted">Review community submissions in this same portal. Firebase enforces the owner account permissions.</p>
+      <div class="toolbar"><button id="riddlex-google" type="button">Sign in with Google</button><button id="riddlex-reload" type="button" class="secondary-button">Refresh pending</button></div>
+      <p id="riddlex-status" class="status" role="status">Open this section after signing in as admin.</p></div>
+    <div id="riddlex-pending" class="riddlex-grid"></div>
+  </section>
 </div></div></main>
-<script src="/backend-config.js"></script><script src="/admin-usage.js?v=20261111-1"></script><footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
+<script src="/backend-config.js"></script>
+<script src="/admin-usage.js?v=20261122-ops"></script>
+<script src="/admin-ops.js?v=20261122-ops"></script>
+<script src="/admin-approvals.js?v=20261122-ops"></script>
+<footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </body></html>

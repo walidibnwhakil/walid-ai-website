@@ -5,13 +5,34 @@ if(window.WalidUsage)return;
 if(['localhost','127.0.0.1','::1'].includes(location.hostname)&&window.WALID_USAGE_TEST_ENABLED!==true)return;
 const disabled=()=>navigator.doNotTrack==='1'||navigator.globalPrivacyControl===true||localStorage.getItem('walidUsageOptOut')==='1';
 try{if(disabled())return}catch{return}
-const toolMap={'merge-pdf':'merge_pdf','split-pdf':'split_pdf','compress-pdf':'compress_pdf','pdf-word':'pdf_to_word','pdf-to-word':'pdf_to_word','image-resize':'resize_image','image-compress':'compress_image','image-convert':'convert_image','background-remove':'background_remover','signature-remove':'signature_remover','watermark-remove':'watermark_remover'};
+const toolMap={'merge-pdf':'merge_pdf','split-pdf':'split_pdf','compress-pdf':'compress_pdf','pdf-word':'pdf_to_word','pdf-to-word':'pdf_to_word','edit-pdf':'edit_pdf','organize-pdf':'organize_pdf','page-numbers':'page_numbers','protect-pdf':'protect_pdf','sign-pdf':'sign_pdf','watermark-pdf':'watermark_pdf','bengali-ocr':'bengali_ocr','image-resize':'resize_image','image-compress':'compress_image','image-convert':'convert_image','background-remove':'background_remover','signature-remove':'signature_remover','watermark-remove':'watermark_remover','resize-image':'resize_image','compress-image':'compress_image','convert-image':'convert_image','background-remover':'background_remover','signature-remover':'signature_remover','watermark-remover':'watermark_remover'};
 const id=()=>crypto.randomUUID?.()||'event-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
 const toolFeature=t=>toolMap[t]?'tool_'+toolMap[t]:null;
 if(window.top!==window){let lastSignal=0;for(const name of ['pointerdown','keydown','scroll'])addEventListener(name,()=>{if(Date.now()-lastSignal>5000){lastSignal=Date.now();parent.postMessage({type:'walid-usage-activity'},location.origin)}},{passive:true});window.WalidUsage={tool(event,tool){const feature=toolFeature(tool);if(feature)parent.postMessage({type:'walid-usage-tool',event,feature},location.origin)}};return}
 let visitor;try{visitor=localStorage.getItem('walidGuestId');if(!visitor){visitor=id();localStorage.setItem('walidGuestId',visitor)}}catch{return}
 const path=location.pathname,game=path.match(/^\/games\/(riddlex|ludo|chess|penalty|tic-tac-toe|snakes-and-ladders|2048|snake)(?:\/|$)/)?.[1];
-let feature=path==='/tool-workspace.html'?(toolFeature(new URLSearchParams(location.search).get('tool'))||'tools'):game?'game_'+game.replaceAll('-','_'):path.includes('/tools/')?'tool_'+path.split('/')[2].replaceAll('-','_'):path==='/tools.html'?'tools':path==='/games.html'||path==='/games/'||path==='/games/index.html'?'games':path==='/zip.html'?'tool_'+(location.hash.includes('extract')?'extract_zip':'create_zip'):path==='/'||path==='/index.html'?'chat':'site_info';
+const pdfTool=path.match(/^\/(?:pdf|tools)\/([^/]+)(?:\/|$)/)?.[1],imageTool=path.match(/^\/image\/([^/]+)(?:\/|$)/)?.[1];
+const featureForPath=()=>{
+  if(path==='/tool-workspace.html')return toolFeature(new URLSearchParams(location.search).get('tool'))||'tools';
+  if(game)return 'game_'+game.replaceAll('-','_');
+  if(pdfTool&&toolFeature(pdfTool))return toolFeature(pdfTool);
+  if(imageTool&&toolFeature(imageTool))return toolFeature(imageTool);
+  if(path==='/games.html'||/^\/games(?:\/|$)/.test(path))return 'games';
+  if(path==='/zip.html'||/^\/zip(?:\/|$)/.test(path))return 'tool_'+(location.hash.includes('extract')?'extract_zip':'create_zip');
+  if(path==='/'||path==='/index.html')return 'home';
+  if(/^\/chat(?:\/|\.html|$)/.test(path))return 'chat';
+  if(/^\/sections\/education(?:\/|$)/.test(path))return 'education';
+  if(/^\/sections\/sports(?:\/|$)/.test(path)||/^\/sports(?:\/|$)/.test(path))return 'sports';
+  if(/^\/islam(?:\/|$)/.test(path))return 'islam';
+  if(/^\/others\/history(?:\/|$)/.test(path))return 'history';
+  if(/^\/others(?:\/|$)/.test(path))return 'others';
+  if(/^\/sections\/jobs(?:\/|$)/.test(path))return 'jobs';
+  if(/^\/pdf(?:\/|$)/.test(path))return 'tools_pdf';
+  if(/^\/image(?:\/|$)/.test(path))return 'tools_image';
+  if(/^\/sections(?:\/|$)/.test(path))return 'sections';
+  return 'site_info';
+};
+let feature=featureForPath();
 let country='Unknown',division='Unknown',queue=[],sending=false,retryAt=0,retryDelay=5000,seconds=0,lastTick=performance.now(),lastInteraction=Date.now();
 const endpoint=(window.WALID_AI_API||'https://walid-ai-backend.onrender.com').replace(/\/$/,'')+'/api/usage';
 function backoff(){retryAt=Date.now()+retryDelay;retryDelay=Math.min(300000,retryDelay*2)}

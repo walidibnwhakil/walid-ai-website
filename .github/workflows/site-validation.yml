@@ -36,3 +36,11 @@ jobs:
         run: node --check tests/test_usage_browser.cjs
       - name: Verify current canonical routes, icons and retired Quran workflows
         run: python3 -m unittest discover -s tests -p 'test_canonical_expectations.py' -v
+      - name: Validate unified admin sections, JS syntax and legacy redirects
+        run: |
+          python3 -m unittest discover -s tests -p 'test_staff_workspace_ui.py' -v
+          node tests/admin-staff-layout.test.js
+          node --check admin-usage.js
+          node --check admin-ops.js
+          node --check admin-approvals.js
+          node --check usage.js

@@ -132,6 +132,7 @@ try {
     // Render actual canvas guess photos in both extreme aspect ratios. The
     // synthetic picture has a bright border and edge markers, making cropping
     // or oversized cards immediately visible in the captured screenshot.
+    console.log("PHOTO_TEST_START", orient);
     await page.evaluate(() => { document.getElementById("answers").hidden = true; });
     for (const [shape, imageWidth, imageHeight] of [
       ["tall-photo", 180, 690],
@@ -146,7 +147,10 @@ try {
           <circle cx="${imageWidth / 2}" cy="${imageHeight / 2}" r="26" fill="#3b8021"/>
         </svg>`;
         const src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-        const result = await window.__riddlex.reveal("সম্পূর্ণ ছবি", src);
+        const result = await Promise.race([
+          window.__riddlex.reveal("সম্পূর্ণ ছবি", src),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Guess reveal stalled")), 12000)),
+        ]);
         return { result, bounds: window.__riddlex.expression().revealBounds };
       }, { imageWidth, imageHeight });
       assert.equal(pictureState.result.printed, true, "test photo failed to load");
@@ -155,6 +159,7 @@ try {
       assert.ok(bounds.x >= -1 && bounds.y >= -1, "photo card starts outside stage");
       assert.ok(bounds.x + bounds.w <= bounds.canvasW + 1, "photo card clipped horizontally");
       assert.ok(bounds.y + bounds.h <= bounds.canvasH + 1, "photo card clipped vertically");
+      console.log("PHOTO_TEST_PASS", orient, shape, pictureState.bounds.w, pictureState.bounds.h);
       if (shotFolder) await page.screenshot({
         path: join(shotFolder, "guess-" + orient + "-" + shape + ".png"),
       });

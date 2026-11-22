@@ -67,6 +67,8 @@ export const RIDDLEX_CHARACTER = Object.freeze({
   id: "riddlex-detective", en: "Riddlex", bn: "রিডলেক্স",
   pop: 260, yes: ["fictional", "named", "from_game", "detective_role"],
   no: ["real", "animal", "object"],
+  image: "./images/approved/detective.png",
+  credit: "Riddlex original game artwork",
 });
 
 export const PERSONAL_FACTS = Object.freeze(Object.fromEntries(

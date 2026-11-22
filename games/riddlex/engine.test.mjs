@@ -3,7 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-47";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-48";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -126,9 +126,67 @@ test("a Bangladesh actor must answer film-era questions before the first guess",
   for (const [id,value] of [
     ["real","yes"], ["male","yes"], ["from_bd","yes"], ["actor","yes"]
   ]) answer(state,id,value);
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_role_lead"});
+  answer(state,"screen_role_lead","yes");
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_role_comedy"});
+  answer(state,"screen_role_comedy","no");
   assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_pre1990"});
   answer(state,"screen_star_pre1990","no");
   assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_1990s"});
+});
+
+test("Chaplin is identified through comedy and distinctive screen appearance, not celebrity priors", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q882", 10, ["real","male","actor","named"]),
+    entry("Q18987612", 50000, ["real","male","actor","from_bd","named"]),
+    entry("Q5279795", 65000, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category:"character" });
+  recompute(state);
+  for (const [id,value] of [
+    ["real","yes"],["male","yes"],["from_bd","no"],["actor","yes"]
+  ]) answer(state,id,value);
+  const sequence = [
+    ["screen_role_lead","yes"],
+    ["screen_role_comedy","yes"],
+    ["screen_silent_comedy","yes"],
+    ["screen_physical_comedy","yes"],
+    ["screen_short_moustache","yes"],
+    ["screen_hitler_resemblance","yes"],
+    ["screen_bowler_cane","yes"],
+    ["screen_great_dictator","yes"],
+  ];
+  for (const [id,value] of sequence) {
+    assert.deepEqual(decide(state),{type:"ask",qid:id},"Missing Chaplin follow-up "+id);
+    answer(state,id,value);
+  }
+  for (const id of ["screen_role_comedy","screen_silent_comedy",
+    "screen_short_moustache","screen_hitler_resemblance"])
+    assert.equal(factBit(pool,0,pool.qIndex.get(id)),2,id);
+});
+
+test("Dildar can be investigated as a deceased supporting comedian, never presumed a lead hero", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q18987612", 10, ["real","male","actor","from_bd","named"]),
+    entry("Q5279795", 50000, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool,{category:"character"});
+  recompute(state);
+  for (const [id,value] of [
+    ["real","yes"],["male","yes"],["from_bd","yes"],["actor","yes"]
+  ]) answer(state,id,value);
+  for (const [qid,value] of [
+    ["screen_role_lead","no"],["screen_role_villain","no"],
+    ["screen_role_comedy","yes"],["screen_role_supporting","yes"],
+    ["screen_silent_comedy","no"],["screen_comedy_award","yes"],
+  ]) {
+    assert.deepEqual(decide(state),{type:"ask",qid},"Dildar branch skipped "+qid);
+    answer(state,qid,value);
+  }
+  assert.equal(factBit(pool,0,pool.qIndex.get("screen_role_comedy")),2);
+  assert.equal(factBit(pool,0,pool.qIndex.get("screen_role_lead")),1);
 });
 
 test("a rejected 1990s male movie star is followed by verified career questions", () => {

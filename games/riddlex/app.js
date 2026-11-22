@@ -309,7 +309,11 @@ async function step() {
     ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
     : null;
   let decision = decide(state);
-  if (decision.type === "guess" && pending) {
+  // A new clue can activate country/occupation shards that are not yet in
+  // memory. Neither a name guess NOR a defeat is final until those relevant
+  // knowledge shards have loaded. Otherwise the game gives up immediately
+  // despite millions of available records in later shards.
+  if ((decision.type === "guess" || decision.type === "defeat") && pending) {
     await pending;
     if (loadToken !== session || state !== playingState) return;
     decision = decide(state);

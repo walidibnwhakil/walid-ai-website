@@ -437,7 +437,7 @@ export function enoughIdentityEvidence(state, index) {
     if (said(state, "actor", ["yes"]) || said(state, "writer", ["yes"]))
       return false;
   }
-  if (!enoughQuestions) return false;
+  if (state.answers.length < 10) return false;
   // A generic occupation or nationality alone never verifies a public name.
   return confirmedEvidenceFor(state, index, VERIFIED_CAREER_TRAITS) >= 2;
 }
@@ -1146,6 +1146,18 @@ export function chooseQuestion(state) {
       saidYes("actor") && saidYes("from_bd") &&
       pool.qIndex.has("screen_star_1990s") &&
       !asked.has("screen_star_1990s")) return "screen_star_1990s";
+
+  // For an identified football career, relevant achievements and teams are
+  // stronger evidence than asking multiple random continental questions.
+  if (saidYes("footballer") && !saidYes("from_bd")) {
+    const footballRows = state.alive.length > 7000
+      ? sampleAlive(state, 5000) : state.alive;
+    if (pool.qIndex.has("played_barcelona") && !asked.has("played_barcelona") &&
+        yesMass(state, "played_barcelona", footballRows) > 0.1) return "played_barcelona";
+    if (saidYes("played_barcelona") && pool.qIndex.has("ballon_dor") &&
+        !asked.has("ballon_dor")) return "ballon_dor";
+  }
+
   // Ask about the suspected individual's actual work before a name reveal.
   const proofQid = nextIdentityProofQuestion(state);
   if (proofQid) return proofQid;
@@ -1227,7 +1239,10 @@ export function decide(state) {
   let qid = chooseQuestion(state);
   if (!qid && waiting) qid = firstAllowedQuestion(state);
   if (!qid) {
-    if (best >= 0 && bestP > 0) return { type: "guess", index: best };
+    // No evidence-backed question remains. Never circumvent the retry gap or
+    // identity requirements just to print another guess.
+    if (!waiting && best >= 0 && bestP > 0)
+      return { type: "guess", index: best };
     return { type: "defeat" };
   }
   return { type: "ask", qid };

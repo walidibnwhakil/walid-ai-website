@@ -92,13 +92,17 @@ fs.mkdirSync(output, { recursive: true });
     });
     await page.goto(`${base}/games/ludo/`);
     const tag = `${width}x${height}`;
-    if (width >= 900)
-      check(
-        await page.evaluate(
-          () => document.documentElement.scrollHeight <= innerHeight + 1,
-        ),
-        `desktop menu fits ${tag}`,
-      );
+    if (width >= 900) {
+      const menuMetrics = await page.evaluate(() => ({
+        scrollHeight: document.documentElement.scrollHeight,
+        viewportHeight: innerHeight,
+        bodyHeight: document.body.scrollHeight,
+        viewportWidth: innerWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      }));
+      console.log("LUDO_MENU_VIEWPORT_METRICS", tag, JSON.stringify(menuMetrics));
+      check(menuMetrics.scrollHeight <= menuMetrics.viewportHeight + 1, `desktop menu fits ${tag}`);
+    }
     check(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

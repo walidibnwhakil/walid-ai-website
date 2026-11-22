@@ -23,4 +23,14 @@ assert.match(original,/id="history"/);
 assert.match(portal,/id="preserved-staff-office"/);
 assert.match(portal,/data-src="\/admin-staff\.html"/);
 assert.match(ops,/originalOffice\.contentDocument/);
+
+// The only added access point is an icon-only bot in the original Admin sidebar.
+assert.match(portal,/id="manager-chat-head"/);
+assert.match(portal,/aria-label="Open Manager chat"/);
+assert.match(portal,/<svg viewBox="0 0 32 32"/);
+assert(!portal.includes('id="manager-chat-open"'),'No new action beside the Manager robot or Office');
+assert(!portal.includes('id="manager-chat-shortcut"'),'No extra text row in the existing sidebar menu');
+assert(!portal.includes('manager-office-actions'),'No layout-changing toolbar above the original five robots');
+assert.match(ops,/if\(match==='manager'\)openManagerChat\(\)/);
+assert.match(ops,/#manager-chat-head/);
 console.log('Original five-desk SVG office preserved in unified portal.');

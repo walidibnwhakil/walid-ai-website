@@ -1134,3 +1134,6 @@ body.quran-reader-page .quran-sidebar .side-ayah-count{display:none!important}
   body.quran-reader-page .shell>.quran-sidebar,
   body.quran-reader-page .quran-sidebar-backdrop{transition:none!important}
 }
+
+/* Bengali surah titles use the requested SolaimanLipi webfont; Arabic keeps its own script font. */
+.surah-card strong{font-family:"SolaimanLipi","Noto Sans Bengali",sans-serif;line-height:1.5}

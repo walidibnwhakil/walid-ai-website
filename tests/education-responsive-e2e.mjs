@@ -37,7 +37,7 @@ async function quiz(page,level,stream,count){
     await page.locator("#quizStream").selectOption(stream);
   }else assert(await page.locator("#quizStreamField").isHidden(),"Stream picker should be hidden "+level);
   await page.locator("#quizCountField").waitFor({state:"visible"});
-  const expected=level==="bcs"?["100","200"]:["20","30","40","50","70","100"];
+  const expected=level==="bcs"?["100","200"]:["20","50","100"];
   const options=await page.locator("#questionCount option").evaluateAll(elements=>elements.filter(e=>e.value).map(e=>e.value));
   assert.deepEqual(options,expected,"Question-count options must match level "+level);
   assert(await page.locator("#quizStartActions").isHidden(),"Start only appears after count selection");
@@ -92,7 +92,7 @@ try{
   assert(await page.locator("#quizCountField").isHidden(),"Cleared level hides count");
   const levels=await page.locator("#quizLevel option").evaluateAll(options=>options.map(o=>o.value));
   assert(!["1","2","3","4","5"].some(v=>levels.includes(v)));
-  for(const count of [20,30,40,50,70,100,200]){
+  for(const count of [20,50,100,200]){
     const level=count>=100?"bcs":"6";
     await quiz(page,level,null,count);
     if(level==="bcs"){
@@ -149,10 +149,10 @@ try{
   assert(!secondStems.some(s=>firstStems.includes(s)),"Immediate retest should prefer unseen questions after reload");
   await page.locator("#exitQuiz").click();
   for(const [level,stream,count,forbidden] of [
-    ["10","commerce",30,"পদার্থবিজ্ঞান"],
-    ["11","arts",40,"জীববিজ্ঞান"],
+    ["10","commerce",50,"পদার্থবিজ্ঞান"],
+    ["11","arts",50,"জীববিজ্ঞান"],
     ["12","science",50,"হিসাববিজ্ঞান"],
-    ["admission","commerce",70,"পদার্থবিজ্ঞান"],
+    ["admission","commerce",50,"পদার্থবিজ্ঞান"],
     ["admission","arts",20,"পদার্থবিজ্ঞান"],
     ["admission","science",20,"হিসাববিজ্ঞান"]]){
     await quiz(page,level,stream,count);
@@ -193,7 +193,7 @@ try{
   }
   assert.deepEqual(errors,[],"Browser runtime errors");
   await page.close();
-  console.log("EDUCATION_STREAMED_E2E_PASS",JSON.stringify({checks,viewports:8,questionCounts:[20,30,40,50,70,100,200],streams:["science","commerce","arts"],notesExamples:9}));
+  console.log("EDUCATION_STREAMED_E2E_PASS",JSON.stringify({checks,viewports:8,questionCounts:[20,50,100,200],streams:["science","commerce","arts"],notesExamples:9}));
 }finally{
   await browser?.close();
   const closed=new Promise(resolve=>server.close(resolve));

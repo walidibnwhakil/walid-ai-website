@@ -1,3 +1,4 @@
+import {GUIDED_WORKED_EXAMPLES} from "./curated-worked-examples.mjs";
 /* Supplementary subject-and-chapter preparation. These are original practice
    explanations, NOT official or exhaustive NCTB textbook chapter transcripts. */
 export function rowGroup(level,stream,chapter,body){
@@ -17,7 +18,7 @@ export function makeQuestion(row,index){
     q:row.q,answer:slot,options,why:row.why};
 }
 export function makeLesson(row,index){
-  return {id:"lesson-"+row.level+"-"+(row.stream||"common")+"-"+index,
+  const lesson={id:"lesson-"+row.level+"-"+(row.stream||"common")+"-"+index,
     scope:String(row.level),stream:row.stream||null,subject:row.subject,chapter:row.chapter,
     title:row.chapter+" — "+row.q.replace(/[?？]$/,""),
     concept:row.correct+"। "+row.why,
@@ -25,6 +26,7 @@ export function makeLesson(row,index){
     example:"প্রশ্ন: "+row.q+"\nধারণা/কারণ: "+row.why+"\nসঠিক উত্তর: "+row.correct+"।",
     steps:"১) প্রশ্নটি পড়ুন: "+row.q+"\n২) প্রাসঙ্গিক নিয়ম বা তথ্য: "+row.why+"\n৩) সেই কারণে সঠিক উত্তর: "+row.correct+"।\n৪) '"+row.wrong[0]+"' বিকল্পটি কেন এই প্রশ্নের জন্য উপযুক্ত নয়, মিলিয়ে দেখুন।",
     practice:"ব্যাখ্যা করুন: '"+row.correct+"' কেন সঠিক এবং '"+row.wrong[0]+"' কেন নয়?\nমূল প্রশ্ন: "+row.q,solution:"সঠিক: "+row.correct+"। "+row.why+"\nবিকল্পের অর্থ মিলিয়ে দেখার সময় প্রশ্নের নির্দিষ্ট শর্ত খেয়াল করুন।"};
+  return {...lesson,...(GUIDED_WORKED_EXAMPLES[row.q]||{})};
 }
 
 /* One multi-concept overview per chapter and subject, so students can

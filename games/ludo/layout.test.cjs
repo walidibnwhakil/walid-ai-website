@@ -92,13 +92,23 @@ fs.mkdirSync(output, { recursive: true });
     });
     await page.goto(`${base}/games/ludo/`);
     const tag = `${width}x${height}`;
-    if (width >= 900)
-      check(
-        await page.evaluate(
-          () => document.documentElement.scrollHeight <= innerHeight + 1,
-        ),
-        `desktop menu fits ${tag}`,
-      );
+    if (width >= 900) {
+      const menuMetrics = await page.evaluate(() => ({
+        scrollHeight: document.documentElement.scrollHeight,
+        viewportHeight: innerHeight,
+        bodyHeight: document.body.scrollHeight,
+        viewportWidth: innerWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+        menuTop: document.getElementById("ludo-setup").getBoundingClientRect().top,
+        menuBottom: document.getElementById("ludo-setup").getBoundingClientRect().bottom,
+        footerHeight: document.querySelector("footer")?.getBoundingClientRect().height || 0,
+      }));
+      console.log("LUDO_MENU_VIEWPORT_METRICS", tag, JSON.stringify(menuMetrics));
+      // The legal footer deliberately sits after <main>; document scrollHeight includes it.
+      // Verify that the *game menu*, not the whole legal/footer page, fits without scrolling.
+      check(menuMetrics.menuTop >= -1 && menuMetrics.menuBottom <= menuMetrics.viewportHeight + 1,
+        `desktop menu fits ${tag}`);
+    }
     check(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -136,10 +146,20 @@ fs.mkdirSync(output, { recursive: true });
 
     check(Math.abs(board.width - board.height) < 1, `square board ${tag}`);
     if (width >= 900) {
+      const playMetrics = await page.evaluate(() => {
+        const toolbar = document.querySelector(".play-toolbar").getBoundingClientRect();
+        const stage = document.querySelector(".ludo-stage").getBoundingClientRect();
+        return {
+          viewportHeight: innerHeight,
+          toolbarTop: toolbar.top,
+          stageBottom: stage.bottom,
+          pageHeight: document.documentElement.scrollHeight,
+        };
+      });
+      console.log("LUDO_PLAY_VIEWPORT_METRICS", tag, JSON.stringify(playMetrics));
+      // The global legal footer is below the playable screen, not a gameplay control.
       check(
-        await page.evaluate(
-          () => document.documentElement.scrollHeight <= innerHeight + 1,
-        ),
+        playMetrics.toolbarTop >= -1 && playMetrics.stageBottom <= playMetrics.viewportHeight + 1,
         `desktop full game fits ${tag}`,
       );
       for (const color of ["red", "green", "blue", "yellow"]) {
@@ -388,9 +408,11 @@ fs.mkdirSync(output, { recursive: true });
         );
         if (width >= 900)
           check(
-            await page.evaluate(
-              () => document.documentElement.scrollHeight <= innerHeight + 1,
-            ),
+            await page.evaluate(() => {
+              const toolbar = document.querySelector(".play-toolbar").getBoundingClientRect();
+              const stage = document.querySelector(".ludo-stage").getBoundingClientRect();
+              return toolbar.top >= -1 && stage.bottom <= innerHeight + 1;
+            }),
             `${tag} fits desktop`,
           );
         await screenshot(page, `board-${count}-${mode}-${width}`);

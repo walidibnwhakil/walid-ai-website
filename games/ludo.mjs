@@ -44,7 +44,6 @@ document.getElementById("setup-settings").addEventListener("click",()=>document.
 document.getElementById("menu-settings").addEventListener("click",()=>document.getElementById("settings-dialog").showModal());
 document.getElementById("close-settings").addEventListener("click",()=>document.getElementById("settings-dialog").close());
 document.getElementById("setup-colors").addEventListener("click",()=>{document.getElementById("notice-title").textContent="Choose Colors";document.getElementById("notice-message").textContent="After starting, tap your own player header to choose a color. Choose before the first dice roll.";document.getElementById("notice-dialog").showModal();});
-document.getElementById("online-coming").addEventListener("click",()=>document.getElementById("notice-dialog").showModal());
 document.getElementById("close-notice").addEventListener("click",()=>document.getElementById("notice-dialog").close());
 const playScreen=document.querySelector("#ludo-play");
 if(boardLaunch){

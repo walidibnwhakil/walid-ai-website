@@ -140,12 +140,15 @@ def main() -> None:
         parser.feed(html)
         cache[index] = parser
 
+    # Approximate chronology by the start of the subject's main historical period.
+    # Ashab al-Kahf has no verified absolute historical date and stays last.
     expected_history = [
-        "roman-empire", "alexander", "byzantine-empire", "venice",
+        "alexander", "roman-empire", "byzantine-empire",
         "khalid-ibn-walid", "rashidun-caliphate", "karbala",
-        "seljuk-empire", "crusades", "saladin", "mongol-empire",
-        "mamluk-sultanate", "ottoman-empire", "bengal-sultanate", "timur",
-        "joan-of-arc", "mughal-empire", "british-empire", "napoleon", "ashab-al-kahf"
+        "venice", "seljuk-empire", "crusades", "saladin",
+        "mongol-empire", "mamluk-sultanate", "ottoman-empire",
+        "bengal-sultanate", "timur", "joan-of-arc", "mughal-empire",
+        "british-empire", "napoleon", "ashab-al-kahf"
     ]
     history_html = (OTHERS / "history/index.html").read_text(encoding="utf-8")
     cards = re.findall(r'<a class="others-card" href="/others/history/([^/]+)/">', history_html)

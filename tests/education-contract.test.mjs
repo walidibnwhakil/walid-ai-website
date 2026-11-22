@@ -35,7 +35,7 @@ test("progressive quiz settings support grade-first streams and BCS 100/200",()=
   assert.match(html,/id="quizStartActions" hidden/);
   assert.match(html,/<select class="field-select" id="questionCount"/);
   assert.doesNotMatch(html,/name="questionCount"/,"Do not render six number chips");
-  assert.match(app,/STANDARD_QUIZ_COUNTS=Object\.freeze\(\[20,30,40,50,70,100\]\)/);
+  assert.match(app,/STANDARD_QUIZ_COUNTS=Object\.freeze\(\[20,50,100\]\)/);
   assert.match(app,/BCS_QUIZ_COUNTS=Object\.freeze\(\[100,200\]\)/);
   assert.match(app,/if\(level==="bcs"\)return BCS_QUIZ_COUNTS/);
   assert.match(app,/function updateQuizCount\(\)/);
@@ -210,5 +210,25 @@ test("education academic icons are centered and all 133 standalone lessons teach
       assert.notEqual(n.practice,n.example,"Practice must be a fresh problem");
       assert.match(n.solution,/সমাধান:/);
     }
+  }
+});
+
+// Curated examples must give genuine calculations rather than restating MCQ answers.
+test("worked Study Notes show distinct solved and practice examples",()=>{
+  const samples=[
+    ["ভগ্নাংশ ১/২-এর সমতুল্য কোনটি?","৬/১০"],
+    ["ত্রিভুজের ক্ষেত্রফল কীভাবে নির্ণয় হয়?","৪২"],
+    ["২x+৪=১০ হলে x কত?","১৫÷৩=৫"],
+    ["ওহমের সূত্র কোনটি?","৩ A"],
+    ["ধ্রুব ভরে নিউটনের দ্বিতীয় সূত্র কোনটি?","১০ N"],
+    ["ফোটনের শক্তির সূত্র?","১.৩২৫২"]
+  ];
+  for(const [question,solutionPart] of samples){
+    const row=SCHOOL_ROWS.find(item=>item.q===question);
+    assert(row,"missing curriculum question "+question);
+    const note=makeLesson(row,0);
+    assert(note.example.length>45 && note.steps.includes("১)"),"missing worked explanation "+question);
+    assert(note.practice!==question,"practice must be an independent exercise "+question);
+    assert(note.solution.includes(solutionPart),"answer must solve practice "+question);
   }
 });

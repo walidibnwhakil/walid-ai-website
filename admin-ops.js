@@ -122,7 +122,7 @@
     });
     if(tab==='staff'){
       const frame=$('#preserved-staff-office');
-      if(frame&&!frame.getAttribute('src'))frame.setAttribute('src',frame.dataset.src);
+      if(frame&&!frame.getAttribute('src'))frame.setAttribute('src',frame.dataset.src+'?embedded=20261122-footerfix');
       void loadHistory();
     }
     if(tab==='riddlex')window.WalidAdminApprovals?.activate();
@@ -329,9 +329,13 @@
       const doc=originalOffice.contentDocument;
       if(!doc)return;
       const synchronize=()=>{
-        const measured=doc.documentElement.scrollHeight;
-        if(measured>700&&measured<9000)originalOffice.style.height=measured+'px';
-        positionChatHead();
+        // The iframe viewport itself must not contribute to the measurement;
+        // otherwise a 1350px initial height traps the page in a blank scroll area.
+        const content=doc.querySelector('main');
+        const measured=Math.ceil(content?.getBoundingClientRect().height||0)+2;
+        if(measured>500&&measured<9000&&Math.abs(originalOffice.getBoundingClientRect().height-measured)>3){
+          originalOffice.style.height=measured+'px';
+        }
       };
       synchronize();
       if(typeof ResizeObserver!=='undefined'){
@@ -359,7 +363,7 @@
     }
   });
   addEventListener('resize',positionChatHead);
-  addEventListener('scroll',positionChatHead,{passive:true});
+  // Keep the floating bot head fixed on the screen while the Office scrolls.
   addEventListener('focus',()=>{if(ready)void refreshNotices()});
   document.addEventListener('visibilitychange',()=>{if(ready&&!document.hidden)void refreshNotices()});
   setInterval(()=>{if(ready&&!document.hidden)void refreshNotices()},4*60*1000);

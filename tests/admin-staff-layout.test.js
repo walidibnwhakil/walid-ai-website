@@ -28,6 +28,16 @@ assert(!original.includes('Five desks. One protected network.'),'Verbose office 
 assert.match(portal,/id="preserved-staff-office"/);
 assert.match(portal,/data-src="\/admin-staff\.html"/);
 assert.match(ops,/originalOffice\.contentDocument/);
+assert.match(original,/body\.in-portal \.topbar,body\.in-portal \.legal-footer\{display:none!important\}/,
+  'Embedded office must not duplicate the parent Admin footer');
+assert.match(original,/html\.embedded-office,html\.embedded-office body/,
+  'Embedded office must not size itself to the viewport');
+assert.match(portal,/scrolling="no"/,'The iframe must not create nested scrolling');
+assert.match(ops,/content\?\.getBoundingClientRect\(\)\.height/,
+  'Office frame height must be based on actual content, not its own viewport scrollHeight');
+assert(!ops.includes('doc.documentElement.scrollHeight'),
+  'Old viewport feedback loop must never return');
+
 
 // The only added access point is an icon-only bot in the original Admin sidebar.
 assert.match(portal,/id="manager-chat-head"/);

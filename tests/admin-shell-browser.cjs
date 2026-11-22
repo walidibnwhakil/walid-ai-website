@@ -241,6 +241,32 @@ async function exercise(browser, width, height){
   assert.equal(new URL(page.url()).pathname,'/admin/','menu must not change URL');
   assert.equal(new URL(page.url()).hash,'','no section hash');
   await page.frameLocator('#preserved-staff-office').locator('.desk-grid').waitFor({state:'visible',timeout:20000});
+  const officeFrame=page.locator('#preserved-staff-office');
+  assert.equal(await officeFrame.getAttribute('scrolling'),'no',
+    'Embedded Office cannot scroll independently of the authenticated Admin page');
+  await page.waitForFunction(()=>{
+    const frame=document.querySelector('#preserved-staff-office');
+    const doc=frame?.contentDocument;
+    const content=doc?.querySelector('main');
+    return content&&Math.abs(frame.getBoundingClientRect().height-content.getBoundingClientRect().height-2)<8;
+  },null,{timeout:12000});
+  const embedded=await officeFrame.evaluate(frame=>{
+    const doc=frame.contentDocument;
+    return {
+      footer:doc.defaultView.getComputedStyle(doc.querySelector('.legal-footer')).display,
+      header:doc.defaultView.getComputedStyle(doc.querySelector('.topbar')).display,
+      htmlClass:doc.documentElement.className,
+      frameHeight:frame.getBoundingClientRect().height,
+      contentHeight:doc.querySelector('main').getBoundingClientRect().height,
+      networkAnimation:doc.defaultView.getComputedStyle(doc.querySelector('.network path')).animationName
+    };
+  });
+  assert.equal(embedded.footer,'none','Embedded Office footer is hidden; only the parent Admin footer appears');
+  assert.equal(embedded.header,'none','Embedded Office cannot duplicate the Admin navigation');
+  assert.match(embedded.htmlClass,/embedded-office/);
+  assert.equal(embedded.networkAnimation,'none','Office network must not move by itself');
+  assert(Math.abs(embedded.frameHeight-embedded.contentHeight-2)<8,
+    'Embedded Office must fit actual content without a self-referential blank scroll area');
   const robotCount=await page.frameLocator('#preserved-staff-office').locator('.desk').count();
   assert.equal(robotCount,5,'all original five workstations remain');
   const heading=await page.frameLocator('#preserved-staff-office').locator('.intro h1').textContent();

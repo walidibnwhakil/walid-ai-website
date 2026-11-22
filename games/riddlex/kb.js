@@ -142,6 +142,7 @@ export function mergePools(pools) {
 export function imageSrc(image) {
   if (!image) return "";
   if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) return image;
+  if (image.startsWith("./images/approved/") && !image.includes("..", 2)) return image;
   return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(image) + "?width=320";
 }
 

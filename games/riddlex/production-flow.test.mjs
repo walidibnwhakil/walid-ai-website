@@ -147,18 +147,43 @@ test("candidate-specific confirmation is a prompt, never a hard requirement for 
     ["real", "yes"], ["knows_you", "no"], ["male", "yes"], ["alive", "yes"],
     ["from_bd", "yes"], ["actor", "yes"], ["politician", "no"],
     ["cricketer", "no"], ["singer", "no"], ["scientist", "no"],
-    ["screen_star_1990s", "yes"],
+    ["screen_star_1990s", "yes"], ["musician", "no"],
   ]) answer(state, qid, val);
+  assert.equal(state.answers.length, 12);
   assert.equal(shouldGuess(state), true);
-  const first = decide(state);
-  assert.equal(first.type, "ask");
-  assert.equal(first.qid, "actor_film_dui_duari");
-  answer(state, first.qid, "yes");
-  const second = decide(state);
-  assert.equal(second.type, "ask");
-  assert.equal(second.qid, "actor_film_daruchini_dwip");
-  answer(state, second.qid, "yes");
-  const third = decide(state);
-  assert.equal(third.type, "guess");
-  assert.equal(crowd.ids[third.index], "Q7322180");
+  const verified = [];
+  let move;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    move = decide(state);
+    if (move.type === "guess") break;
+    assert.equal(move.type, "ask", JSON.stringify(move));
+    assert.ok(move.qid.startsWith("actor_"), "confirm this actor's documented work: " + move.qid);
+    assert.ok(!verified.includes(move.qid), "do not repeat a confirmation");
+    verified.push(move.qid);
+    answer(state, move.qid, "yes");
+  }
+  assert.ok(verified.length >= 3, "verification must not be capped at two questions");
+  assert.equal(move?.type, "guess", JSON.stringify(move));
+  assert.equal(crowd.ids[move.index], "Q7322180");
+});
+
+test("published casebook never guesses before twelve answers", () => {
+  const state = createState(readShard(catalog.top), { category: "character" });
+  recompute(state);
+  const replies = [
+    ["real", "yes"], ["knows_you", "no"],
+    ["politician", "no"], ["from_bd", "yes"],
+    ["male", "yes"], ["alive", "yes"],
+    ["actor", "yes"], ["cricketer", "no"],
+    ["footballer", "no"], ["singer", "no"],
+    ["scientist", "no"],
+  ];
+  for (const [qid, val] of replies) {
+    answer(state, qid, val);
+    const move = decide(state);
+    assert.notEqual(move.type, "guess",
+      "question " + state.answers.length + " was too early: " + JSON.stringify(move));
+    assert.equal(move.type, "ask",
+      "actual 19k-entry casebook should continue: " + JSON.stringify(move));
+  }
 });

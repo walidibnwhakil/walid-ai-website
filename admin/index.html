@@ -64,7 +64,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 @media(max-width:540px){.panel{padding:14px}.ops-desk-grid{grid-template-columns:repeat(2,1fr)}.ops-desk{min-height:110px}.admin-header h1{font-size:1.5rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.big{font-size:1.25rem}}
 </style>
 <link rel="stylesheet" href="/admin-shell.css?v=20261122-centered-header">
-<link rel="stylesheet" href="/manager-office-chat.css?v=20261122-chathead">
+<link rel="stylesheet" href="/manager-office-chat.css?v=20261122-messenger">
 </head>
 <body class="admin-locked">
 <main>
@@ -81,6 +81,16 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 <div id="workspace-shell" class="admin-shell hidden">
 <aside id="admin-sidebar" class="admin-sidebar" aria-label="Private admin navigation">
   <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Open sidebar" aria-controls="sidebar-details" aria-expanded="false" title="Open menu"><span aria-hidden="true">☰</span></button>
+
+  <div id="sidebar-details" class="sidebar-details">
+    <h2 class="side-heading">Operations Center</h2>
+    <nav aria-label="Admin sections">
+      <button type="button" data-admin-tab="dashboard" aria-current="page">Analytics</button>
+      <button type="button" data-admin-tab="staff">AI Staff &amp; Manager</button>
+      <button type="button" data-admin-tab="riddlex">Riddlex Approvals</button>
+    </nav>
+  </div>
+</aside>
   <button type="button" id="manager-chat-head" class="manager-chat-head" disabled
     aria-label="Open Manager chat" aria-controls="manager-chat-panel" aria-expanded="false" title="Chat with Manager">
     <svg viewBox="0 0 32 32" width="27" height="27" aria-hidden="true" fill="none">
@@ -92,15 +102,6 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
       <path d="M12 22h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
   </button>
-  <div id="sidebar-details" class="sidebar-details">
-    <h2 class="side-heading">Operations Center</h2>
-    <nav aria-label="Admin sections">
-      <button type="button" data-admin-tab="dashboard" aria-current="page">Analytics</button>
-      <button type="button" data-admin-tab="staff">AI Staff &amp; Manager</button>
-      <button type="button" data-admin-tab="riddlex">Riddlex Approvals</button>
-    </nav>
-  </div>
-</aside>
 <div class="admin-content">
   <header class="admin-header">
     <a class="header-brand" href="/" aria-label="Walid AI homepage"><img src="/walid-ai-approved-logo.png" alt="Walid AI official logo" width="150" height="54"></a>
@@ -137,18 +138,42 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
     </div>
   </section>
   <div id="manager-chat-backdrop" class="manager-chat-backdrop" hidden></div>
-    <div class="ops-grid manager-chat-panel" id="manager-chat-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ops-role-name" inert>
-      <div class="manager-chat-header"><span>Walid AI · Private Manager Chat</span><button type="button" id="manager-chat-close" class="secondary-button" aria-label="Close Manager chat">✕</button></div>
-      <section class="panel">
-        <h2 id="ops-role-name">Manager</h2><p id="ops-role-description" class="muted"></p>
-        <p id="manager-chat-status" class="status" role="status"></p>
-        <div id="ops-history" class="ops-history" aria-label="Staff conversation history"></div>
-        <p id="ops-history-note" class="muted notice"></p>
-        <label for="ops-input">Your instruction to Manager</label>
-        <textarea id="ops-input" maxlength="2000" placeholder="স্যার, আজকের ভিজিটর, সাইটের সমস্যা, সাপোর্ট মেসেজ বা নিরাপত্তার খবর জানতে চাইতে পারেন।"></textarea>
-        <div class="toolbar"><button id="ops-send" type="button">Ask Manager</button><span class="muted">Ctrl + Enter to send</span></div>
-      </section>
+  <section id="manager-chat-panel" class="manager-chat-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ops-role-name" inert>
+    <header class="manager-chat-header">
+      <div class="manager-chat-identity">
+        <span class="manager-chat-avatar" aria-hidden="true">
+          <svg width="23" height="23" viewBox="0 0 32 32" fill="none">
+            <rect x="5" y="9" width="22" height="18" rx="7" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 4v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="16" cy="3.5" r="2" fill="currentColor"/>
+            <circle cx="12" cy="17" r="2" fill="currentColor"/>
+            <circle cx="20" cy="17" r="2" fill="currentColor"/>
+            <path d="M12 22h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div>
+          <h2 id="ops-role-name">Manager</h2>
+          <span id="ops-role-description" class="manager-chat-subtitle">Walid AI · Private Office</span>
+        </div>
+      </div>
+      <button type="button" id="manager-chat-close" class="secondary-button" aria-label="Close Manager chat" title="Close chat">✕</button>
+    </header>
+    <div id="ops-history" class="ops-history manager-chat-transcript" aria-label="Conversation with Manager" role="log" aria-live="polite"></div>
+    <div class="manager-chat-compose">
+      <p id="manager-chat-status" class="status" role="status"></p>
+      <label class="manager-chat-visually-hidden" for="ops-input">Message Manager</label>
+      <div class="manager-chat-compose-row">
+        <textarea id="ops-input" maxlength="2000" rows="1" placeholder="Message Manager…" aria-label="Message Manager"></textarea>
+        <button id="ops-send" type="button" aria-label="Send message to Manager" title="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 19V5m0 0L6.5 10.5M12 5l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <p class="manager-chat-retention">Messages disappear after 5 days · Enter to send · Shift+Enter for a new line</p>
+      <p id="ops-history-note" class="manager-chat-history-note" aria-live="polite"></p>
     </div>
+  </section>
   <section id="riddlex-workspace" class="hidden" aria-label="Riddlex name approvals">
     <div class="panel"><h2>Riddlex Approvals</h2><p class="muted">Review community submissions in this same portal. Firebase enforces the owner account permissions.</p>
       <div class="toolbar"><button id="riddlex-google" type="button">Sign in with Google</button><button id="riddlex-reload" type="button" class="secondary-button">Refresh pending</button></div>
@@ -160,7 +185,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 <script src="/admin-analytics-catalog.js?v=20261122-sections"></script>
 <script src="/admin-section-metrics.js?v=20261122-context-columns"></script>
 <script src="/admin-usage.js?v=20261122-audience-clean"></script>
-<script src="/admin-ops.js?v=20261122-chathead"></script>
+<script src="/admin-ops.js?v=20261122-messenger"></script>
 <script src="/admin-approvals.js?v=20261122-ops"></script>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </body></html>

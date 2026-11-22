@@ -1,11 +1,7 @@
 // Compact little-endian knowledge shards. Names stay in one blob so the
 // first question can render before every shard has finished parsing.
 
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-42";
-
-const KB_BUILD = "riddlex-46";
-import { ACTOR_PROOF_QUESTIONS } from "./actor-proof.js";
-import { WRITER_PROOF_QUESTIONS } from "./writer-proof.js";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported
@@ -280,10 +276,10 @@ export function categoryShards(manifest, category) {
 }
 
 export async function loadManifest(base = "./kb") {
-  const response = await fetch(`${base}/manifest.json?v=${KB_BUILD}`);
+  const response = await fetch(`${base}/manifest.json?v=riddlex-39`);
   if (!response.ok) throw new Error("Knowledge manifest failed");
   const manifest = await response.json();
-  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...PERSONAL_QUESTIONS, ...ACTOR_PROOF_QUESTIONS, ...WRITER_PROOF_QUESTIONS]) {
+  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...PERSONAL_QUESTIONS]) {
     if (!manifest.questions.some((row) => row.id === question.id)) {
       manifest.questions.push({ ...question });
     }
@@ -372,7 +368,7 @@ function decodeOffThread(buffer, questions) {
   return new Promise((resolve, reject) => {
     try {
       if (!worker) {
-        worker = new Worker(new URL(`./kb-worker.js?v=${KB_BUILD}`, import.meta.url), { type: "module" });
+        worker = new Worker(new URL("./kb-worker.js", import.meta.url), { type: "module" });
         worker.onmessage = (event) => {
           const job = workerJobs.get(event.data.id);
           if (!job) return;
@@ -397,7 +393,7 @@ function decodeOffThread(buffer, questions) {
 }
 
 async function fetchShard(base, name, questions) {
-  const key = `${base}/${name}?v=${KB_BUILD}`;
+  const key = `${base}/${name}`;
   if (shardCache.has(key)) return shardCache.get(key);
   const pending = (async () => {
     const response = await fetch(key);

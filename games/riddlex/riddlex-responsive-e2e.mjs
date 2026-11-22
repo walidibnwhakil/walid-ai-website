@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { once } from "node:events";
 import { chromium } from "playwright";
+import { join } from "node:path";
 
 // The test serves the actual Riddlex files. It does not replace mobile artwork
 // with desktop assets or mock the knowledge engine.
@@ -31,6 +32,9 @@ server.listen(0, "127.0.0.1");
 await once(server, "listening");
 const origin = "http://127.0.0.1:" + server.address().port;
 
+const shotFolder = process.env.RIDDLEX_SCREENSHOT_DIR || "";
+if (shotFolder) await mkdir(shotFolder, { recursive: true });
+
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
@@ -50,8 +54,43 @@ try {
     assert.equal(await page.locator("html").getAttribute("data-orient"), orient);
     const menuArt = await page.locator(orient === "portrait" ? ".menu-port" : ".menu-card").getAttribute("src");
     assert.ok(menuArt?.includes(orient === "portrait" ? "menu-portrait" : "menu-desk"), menuArt);
+    assert.equal(await page.locator("#menu .lang-switch").count(), 0, "language selector must not appear on the landing screen");
+    assert.equal(await page.locator("#menu .menu-privacy").count(), 0, "privacy belongs on the site's legal pages");
+    assert.equal((await page.locator("#play").innerText()).trim(), "Play Now");
+    const menuLayout = await page.evaluate(() => {
+      const play = document.getElementById("play").getBoundingClientRect();
+      const floor = document.getElementById("menu-floor");
+      const ctx = floor.getContext("2d");
+      const x = Math.floor(floor.width * 0.5);
+      const y = Math.floor(floor.height * 0.93);
+      const painted = floor.width && floor.height ? ctx.getImageData(x, y, 1, 1).data[3] : 0;
+      return {
+        play: { x: play.x, y: play.y, right: play.right, bottom: play.bottom, width: play.width, height: play.height },
+        floorDisplay: getComputedStyle(floor).display,
+        floorAlpha: painted,
+        scrollWidth: document.documentElement.scrollWidth,
+      };
+    });
+    assert.ok(menuLayout.play.width >= 150 && menuLayout.play.height >= 44, "Play Now should be comfortably tappable");
+    assert.ok(menuLayout.play.x >= -1 && menuLayout.play.right <= width + 1, "Play Now outside screen");
+    assert.ok(menuLayout.play.y >= -1 && menuLayout.play.bottom <= height + 1, "Play Now clipped vertically");
+    assert.ok(menuLayout.scrollWidth <= width + 2, "menu horizontal overflow");
+    if (orient === "portrait") {
+      assert.equal(menuLayout.floorDisplay, "block", "portrait should repair the striped desk band");
+      await page.waitForFunction(() => {
+        const floor = document.getElementById("menu-floor");
+        if (!floor.width || !floor.height) return false;
+        return floor.getContext("2d").getImageData(
+          Math.floor(floor.width * 0.5), Math.floor(floor.height * 0.93), 1, 1).data[3] >= 180;
+      }, null, { timeout: 8000 });
+    } else {
+      assert.equal(menuLayout.floorDisplay, "none", "desktop must retain its distinct original artwork");
+    }
+    if (shotFolder) await page.screenshot({ path: join(shotFolder, "menu-" + orient + ".png") });
 
     await page.click("#play");
+    assert.equal(await page.locator("#game .lang-switch").isVisible(), true,
+      "language option must be available after Play Now");
     await page.waitForFunction(() => !document.getElementById("categories").hidden);
     await page.click('[data-cat="animal"]');
     await page.waitForFunction(() =>
@@ -67,6 +106,7 @@ try {
       };
     });
     assert.ok(geometry.stage.width > 100 && geometry.stage.height > 100);
+    if (shotFolder) await page.screenshot({ path: join(shotFolder, "game-" + orient + ".png") });
     assert.ok(geometry.scrollWidth <= width + 2, "horizontal overflow");
     for (const rect of geometry.buttons) {
       assert.ok(rect.width >= 44 && rect.height >= 44, "tiny answer control");

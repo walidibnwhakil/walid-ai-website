@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="Riddlex — The Guessing Detective | Walid AI">
   <meta name="twitter:description" content="Think of a real person, character, animal or object. Riddlex asks one question at a time and tries to guess.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-preview.jpg">
-  <link rel="stylesheet" href="./style.css?v=akinator-35">
+  <link rel="stylesheet" href="./style.css?v=riddlex-menu-36">
   <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
@@ -30,13 +30,10 @@
       <img class="menu-blur" alt="" data-landscape="./images/approved/menu-blur.webp">
       <div class="menu-frame">
         <a class="menu-back" href="/games/">Back</a>
-        <div class="lang-switch" role="group" aria-label="Language">
-          <button type="button" data-set-lang="en" aria-pressed="true">English</button>
-          <button type="button" data-set-lang="bn">বাংলা</button>
-        </div>
         <img class="menu-card" alt="Riddlex — The Guessing Detective" width="1672" height="941" decoding="async" data-landscape="./images/approved/menu-desk.webp">
         <canvas id="menu-cat" class="menu-cat" aria-hidden="true"></canvas>
         <img class="menu-port" alt="" width="720" height="1280" data-portrait="./images/approved/menu-portrait.webp">
+        <canvas id="menu-floor" class="menu-floor" aria-hidden="true"></canvas>
         <script>
           (function () {
             var orientation = matchMedia("(max-aspect-ratio: 4/5)");
@@ -48,13 +45,62 @@
                 if (src && img.getAttribute("src") !== src) img.src = src;
               });
             }
+            // The original portrait painting has a striped band just above its
+            // bottom border. Fill only that band with a feathered sample of the
+            // same wooden desk. Keep the real artwork and golden border intact.
+            var portraitArt = document.querySelector("#menu .menu-port");
+            var floor = document.getElementById("menu-floor");
+            function paintFloor() {
+              if (!orientation.matches || !portraitArt.complete || !portraitArt.naturalWidth) return;
+              var w = portraitArt.clientWidth, h = portraitArt.clientHeight;
+              if (!w || !h) return;
+              var dpr = Math.min(2, window.devicePixelRatio || 1);
+              floor.width = Math.round(w * dpr);
+              floor.height = Math.round(h * dpr);
+              var ctx = floor.getContext("2d");
+              if (!ctx) return;
+              ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              var iw = portraitArt.naturalWidth, ih = portraitArt.naturalHeight;
+              var scale = Math.max(w / iw, h / ih);
+              var offsetX = (w - iw * scale) / 2;
+              var offsetY = (h - ih * scale) / 2;
+              var sx = iw * 0.07, sw = iw * 0.86;
+              var sy = ih * 0.848, sh = ih * 0.052;
+              var targetY = ih * 0.889, targetH = ih * 0.100;
+              var patch = document.createElement("canvas");
+              patch.width = 620;
+              patch.height = 116;
+              var p = patch.getContext("2d");
+              if (!p) return;
+              p.drawImage(portraitArt, sx, sy, sw, sh, 0, 0, 620, 116);
+              p.globalCompositeOperation = "destination-in";
+              var fade = p.createLinearGradient(0, 0, 0, 116);
+              fade.addColorStop(0, "rgba(0,0,0,0)");
+              fade.addColorStop(0.12, "rgba(0,0,0,1)");
+              fade.addColorStop(0.84, "rgba(0,0,0,1)");
+              fade.addColorStop(1, "rgba(0,0,0,0)");
+              p.fillStyle = fade;
+              p.fillRect(0, 0, 620, 116);
+              ctx.drawImage(patch, offsetX + sx * scale, offsetY + targetY * scale,
+                sw * scale, targetH * scale);
+            }
+            var resizeFrame = 0;
+            function scheduleFloor() {
+              cancelAnimationFrame(resizeFrame);
+              resizeFrame = requestAnimationFrame(paintFloor);
+            }
+            portraitArt.addEventListener("load", scheduleFloor);
+            window.addEventListener("resize", scheduleFloor);
             syncMenuArt();
-            if (orientation.addEventListener) orientation.addEventListener("change", syncMenuArt);
-            else orientation.addListener(syncMenuArt);
+            scheduleFloor();
+            if (orientation.addEventListener) orientation.addEventListener("change", function () {
+              syncMenuArt();
+              scheduleFloor();
+            });
+            else orientation.addListener(function () { syncMenuArt(); scheduleFloor(); });
           })();
         </script>
-        <a class="menu-privacy" href="/privacy-policy.html">Privacy</a>
-        <button id="play" type="button"><span class="play-glyph" aria-hidden="true"></span><span id="play-label">Play Game</span></button>
+        <button id="play" type="button" aria-label="Play Now"><span class="play-glyph" aria-hidden="true"></span><span id="play-label">Play Now</span></button>
       </div>
     </div>
   </div>
@@ -127,7 +173,7 @@
     </div>
     </div>
   </div>
-  <script type="module" src="./app.js?v=akinator-35"></script>
+  <script type="module" src="./app.js?v=riddlex-menu-36"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>
 </html>

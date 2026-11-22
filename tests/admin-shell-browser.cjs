@@ -73,10 +73,13 @@ async function exercise(browser, width, height){
       kind:'morning',role:'Manager',
       created_at:new Date(Date.now()-20000).toISOString(),
       message:'আসসালামু আলাইকুম, স্যার। শুভ সকাল।'},
+      {id:'monitor-report-67890',kind:'monitor_update',role:'Manager',
+       created_at:new Date(Date.now()-19500).toISOString(),
+       message:'স্যার, নির্ধারিত ৬ ঘণ্টার মনিটরিং সম্পন্ন হয়েছে। ওয়েবসাইট ও ব্যাকএন্ডের availability checks এবং নির্বাচিত Engineering tests সফল হয়েছে।'},
       {id:'daily-'+new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'}),
        kind:'daily_report',
        created_at:new Date(Date.now()-19000).toISOString(),
-       message:'IT Department: ওয়েবসাইট ও ব্যাকএন্ড সচল।\nCyber Department: নিরাপত্তা পর্যালোচনা চলছে।\nAdmin: আজ Help inbox-এ কোনো মেসেজ পাওয়া যায়নি।\nEngineering Department: আজ কোনো recorded function error নেই।',
+       message:'স্যার, আজকের সর্বশেষ অফিস রিপোর্ট:\nIT Department: ওয়েবসাইট ও ব্যাকএন্ড সচল।\nCyber Department: নিরাপত্তা পর্যালোচনা চলছে।\nAdmin: আজ Help inbox-এ কোনো মেসেজ পাওয়া যায়নি।\nEngineering Department: আজ কোনো recorded function error নেই।',
        daily_delegations:[
          {role:'monitor',instruction:'Daily website check',outcome:'Website and Backend HTTP 200',status:'ok'},
          {role:'security',instruction:'Daily security signals',outcome:'No proven hacking; limited evidence',status:'limited'},
@@ -152,11 +155,13 @@ async function exercise(browser, width, height){
   assert(!managerDate.includes('12:00:00 AM'),'No artificial midnight timestamp');
   const dailyReport=await page.locator('.manager-chat-notice')
     .filter({hasText:'IT Department:'}).locator('p').textContent();
+  assert.match(dailyReport,/স্যার, আজকের সর্বশেষ অফিস রিপোর্ট:/);
+  assert.equal(await page.locator('.manager-chat-notice').filter({hasText:'নির্ধারিত ৬ ঘণ্টার মনিটরিং'}).count(),1);
   assert.match(dailyReport,/IT Department:/);
   assert.match(dailyReport,/Cyber Department:/);
   assert.match(dailyReport,/Admin: আজ Help inbox/);
   assert.match(dailyReport,/Engineering Department:/);
-  assert.equal(dailyReport.split('\n').length,4,'Four departments are separated by real line breaks');
+  assert.equal(dailyReport.split('\n').length,5,'Report heading and four departments have real line breaks');
   assert(!dailyReport.includes('\\n'),'Literal backslash-n must never appear in office report');
   await page.keyboard.press('Escape');
   await page.locator('#manager-chat-panel').waitFor({state:'hidden'});

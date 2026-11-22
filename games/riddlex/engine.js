@@ -240,9 +240,9 @@ function hardFacts() {
     ["party_chief"],
     ["party_secretary"],
     ["in_government"],
-    // These are facts about the relationship, not about an individual's name.
-    ["knows_you"], ["your_family"], ["your_parent"], ["your_sibling"],
-    ["your_friend"], ["your_best_friend"],
+    // Personal relationships are player-relative and sometimes uncertain:
+    // missing facts, a one-sided crush or an ambiguous ex must NOT receive
+    // HARD_MISSING scores. Keep these likelihoods soft.
     ...PRIMARY_JOBS.map((job) => [job]),
     ["played_barcelona"],
     ["ballon_dor"],

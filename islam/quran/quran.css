@@ -1325,3 +1325,70 @@ body:not(.quran-reader-page) #surah-search:focus-visible {
     width: auto;
   }
 }
+
+
+/* Desktop Quran ayah alignment fix: keep the ayah number alongside the
+   first Arabic line, not stacked above the entire verse. Mobile is untouched.
+   This deliberately overrides older universal flex-column reading rules. */
+@media (min-width: 900px) {
+  body.quran-reader-page #verses > .ayah:not(.basmala) {
+    display: grid !important;
+    grid-template-columns: 60px minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    column-gap: 16px !important;
+    row-gap: 8px !important;
+    align-content: start !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 17px 22px !important;
+  }
+  body.quran-reader-page #verses > .ayah:not(.basmala) > .ayah-number {
+    display: grid !important;
+    grid-area: 1 / 1 / 2 / 2 !important;
+    position: static !important;
+    inset: auto !important;
+    align-self: start !important;
+    justify-self: center !important;
+    place-items: center !important;
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    min-height: 46px !important;
+    margin: 9px 0 0 !important;
+    padding: 0 !important;
+    font-size: 1.05rem !important;
+    line-height: 1 !important;
+  }
+  body.quran-reader-page #verses > .ayah:not(.basmala) > .arabic {
+    display: block !important;
+    grid-area: 1 / 2 / 2 / 3 !important;
+    align-self: start !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: right !important;
+    direction: rtl !important;
+    font-size: clamp(2rem, 3vw, 2.55rem) !important;
+    line-height: 1.65 !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+  body.quran-reader-page #verses > .ayah:not(.basmala) > :is(
+    .translation, .pronunciation, .ayah-note, .ayah-note-toggle
+  ) {
+    grid-area: auto !important;
+    grid-column: 2 !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+  }
+}

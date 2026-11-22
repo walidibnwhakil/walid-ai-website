@@ -99,6 +99,36 @@ try {
       assert.ok(art.goldenFrame > 50, "gold bottom frame must be preserved");
     }
     if (shotFolder) await page.screenshot({ path: join(shotFolder, "menu-" + orient + ".png") });
+    if (orient === "landscape") {
+      // The reported desktop bug appears on wide 16:8 displays, not only
+      // conventional 16:9 screenshots: the frame used to leave brown pillars.
+      await page.setViewportSize({ width: 1650, height: 820 });
+      const artLayout = await page.evaluate(() => {
+        const stage = document.querySelector(".menu-stage").getBoundingClientRect();
+        const frame = document.querySelector(".menu-frame").getBoundingClientRect();
+        const art = document.querySelector(".menu-card");
+        const play = document.getElementById("play").getBoundingClientRect();
+        return {
+          stageWidth: stage.width, frameWidth: frame.width,
+          frameLeft: frame.left - stage.left,
+          frameRight: stage.right - frame.right,
+          imageFit: getComputedStyle(art).objectFit,
+          playRight: play.right, playBottom: play.bottom,
+        };
+      });
+      assert.ok(Math.abs(artLayout.stageWidth - artLayout.frameWidth) <= 2,
+        "desktop menu should cover the scene, not be a centered poster: " +
+          JSON.stringify(artLayout));
+      assert.ok(Math.abs(artLayout.frameLeft) <= 2 &&
+        Math.abs(artLayout.frameRight) <= 2, "no wide brown side pillars");
+      assert.equal(artLayout.imageFit, "cover", "the original art fills the window");
+      assert.ok(artLayout.playRight <= 1651 && artLayout.playBottom <= 821,
+        "Play Now must remain inside wide menu");
+      if (shotFolder) await page.screenshot({
+        path: join(shotFolder, "menu-wide-desktop.png"),
+      });
+      await page.setViewportSize({ width, height });
+    }
 
     await page.click("#play");
     assert.equal(await page.locator("#game .lang-switch").isVisible(), true,

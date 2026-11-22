@@ -250,3 +250,21 @@ test("a denied sourced film switches the detective to a different candidate", ()
   assert.equal(next.qid, "actor_walton_senior_exec",
     "a disproved hypothesis must switch to the other person's evidence");
 });
+
+test("temporarily empty progressively loaded casebook never gives up at four", () => {
+  const partial = poolFromEntries(questions, Array.from({ length: 101 }, (_, i) => ({
+    id: "not-yet-loaded-person-" + i, en: "Temporary animal " + i,
+    pop: 1, yes: ["animal"], no: ["real", "fictional"],
+  })));
+  const state = createState(partial, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"],
+    ["politician", "no"], ["from_bd", "yes"],
+  ]) answer(state, qid, value);
+  assert.equal(state.alive.length, 0, "no character has arrived in the partial casebook yet");
+  const move = decide(state);
+  assert.equal(move.type, "ask", JSON.stringify(move));
+  assert.equal(move.qid, "male",
+    "continue with a simple new identity fact until country shards load");
+});

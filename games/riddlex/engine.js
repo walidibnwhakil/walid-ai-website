@@ -7,6 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
+import { SCREEN_STAR_1990S } from "./career-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -136,6 +137,7 @@ function applyPolitics(pool) {
 export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
+  if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -462,6 +464,11 @@ function gated(state, question, rows) {
     // Still allowed once the matching topic is likely; the mass checks below do that.
   }
   if (id === "adult_ent") return adultAllowed(state);
+  if (id === "screen_star_1990s") {
+    return state.answers.length >= 5 &&
+      yesMass(state, "actor", rows) > 0.45 &&
+      yesMass(state, "from_bd", rows) > 0.40;
+  }
   const real = () => yesMass(state, "real", rows);
   const fictional = () => yesMass(state, "fictional", rows);
   const animal = () => yesMass(state, "animal", rows);
@@ -718,6 +725,7 @@ function skippedAsDuplicate(state, id) {
   if ((id === "dead" && answered("alive")) || (id === "alive" && answered("dead"))) return true;
   if ((id === "female" && yes("male")) || (id === "male" && yes("female"))) return true;
   if (id === "musician" && yes("singer")) return true;
+  if (id === "screen_star_1990s" && said(state, "actor", ["no", "probably_not"])) return true;
   if (id === "singer" && said(state, "musician", ["no", "probably_not"])) return true;
   if (id === "athlete" && (yes("cricketer") || yes("footballer"))) return true;
   if ((id === "played_barcelona" || id === "ballon_dor") && !yes("footballer")) return true;

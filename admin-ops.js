@@ -30,7 +30,11 @@
       button.setAttribute('aria-current',on?'page':'false');
       button.setAttribute('aria-selected',String(on));
     });
-    if(tab==='staff'){void loadStaff();void loadHistory()}
+    if(tab==='staff'){
+      const frame=$('#preserved-staff-office');
+      if(frame&&!frame.getAttribute('src'))frame.setAttribute('src',frame.dataset.src);
+      void loadStaff();void loadHistory();
+    }
     if(tab==='riddlex')window.WalidAdminApprovals?.activate();
   }
   function createRoleCards(){
@@ -156,6 +160,33 @@
   addEventListener('hashchange',()=>selectTab(location.hash.slice(1),false));
   document.querySelectorAll('[data-admin-tab]').forEach(b=>{
     b.disabled=true;b.addEventListener('click',()=>selectTab(b.dataset.adminTab));
+  });
+  // Keep the original staff office HTML and SVG completely unchanged.
+  // Synchronize its selected desk with the existing conversation controls below.
+  const originalOffice=$('#preserved-staff-office');
+  originalOffice?.addEventListener('load',()=>{
+    try{
+      const doc=originalOffice.contentDocument;
+      if(!doc)return;
+      const synchronize=()=>{
+        const measured=doc.documentElement.scrollHeight;
+        if(measured>700&&measured<9000)originalOffice.style.height=measured+'px';
+      };
+      synchronize();
+      if(typeof ResizeObserver!=='undefined'){
+        const observer=new ResizeObserver(synchronize);
+        observer.observe(doc.body);
+      }
+      doc.addEventListener('click',event=>{
+        const desk=event.target.closest('.desk');
+        if(!desk)return;
+        const mapping={manager:'manager',it:'monitor',cyber:'security',cse:'code',admin:'mail'};
+        const match=Object.keys(mapping).find(name=>desk.classList.contains(name));
+        if(match){
+          selected=mapping[match];updateSelected();void loadHistory();
+        }
+      });
+    }catch{ /* The original office remains functional if the host cannot inspect it. */ }
   });
   $('#ops-send')?.addEventListener('click',submit);
   $('#ops-input')?.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();void submit()}});

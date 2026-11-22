@@ -97,8 +97,12 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
     <p id="notes" class="muted notice"></p>
   </section>
   <section id="staff-workspace" class="hidden" aria-label="AI staff workspace">
-    <div class="ops-intro"><h2>Five specialists. One Manager.</h2><p class="muted">Talk with Manager or a specialist. Each action shows its evidence and limitations; no silent deploys.</p></div>
-    <div id="ops-desks" class="ops-desk-grid"></div>
+    <!-- Render the exact original Virtual AI Office in its own style context.
+         Its original five robot SVGs, colors, network and layout stay untouched. -->
+    <iframe id="preserved-staff-office" title="Original Walid AI five-desk Virtual AI Office"
+      data-src="/admin-staff.html" loading="lazy" referrerpolicy="same-origin"
+      style="display:block;width:100%;height:1350px;max-width:none;border:0;border-radius:18px;background:#07111d"></iframe>
+    <div id="ops-desks" class="hidden" aria-hidden="true"></div>
     <div class="panel"><div class="toolbar"><button id="ops-checks" type="button">Run real checks</button><button id="ops-reload" class="secondary-button" type="button">Refresh history</button></div>
       <p id="ops-connect" class="muted">Checking authenticated backend…</p><p id="ops-capability" class="muted notice"></p>
       <p id="ops-status" class="status" role="status"></p><div id="ops-check-results"></div>

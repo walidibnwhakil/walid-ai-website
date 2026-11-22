@@ -1185,7 +1185,6 @@ function pendingFilmEraQuestion(state) {
   if (state.category !== "character" ||
       !said(state, "actor", ["yes", "probably"]) ||
       !said(state, "from_bd", ["yes", "probably"]) ||
-      !said(state, "screen_role_lead", ["yes", "probably"]) ||
       said(state, "screen_role_comedy", ["yes", "probably"])) return null;
   const answered = new Set(state.answers.map((row) => row.qid));
   if (state.pool.qIndex.has("screen_star_pre1990") &&

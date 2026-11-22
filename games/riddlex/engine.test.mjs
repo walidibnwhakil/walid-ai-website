@@ -115,6 +115,22 @@ test("four rejected guesses leave meaningful questions available", () => {
   assert.equal(decide(state).type, "ask");
 });
 
+test("a Bangladesh actor must answer film-era questions before the first guess", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q7322180", 900, ["real","male","actor","from_bd","named"]),
+    entry("Q7460127", 800, ["real","female","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [id,value] of [
+    ["real","yes"], ["male","yes"], ["from_bd","yes"], ["actor","yes"]
+  ]) answer(state,id,value);
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_pre1990"});
+  answer(state,"screen_star_pre1990","no");
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_1990s"});
+});
+
 test("a confident second name must wait for additional evidence", () => {
   const pool = poolFromEntries(questions, [
     entry("lead", 1000, ["real", "male", "named", "alive", "from_bd", "actor"]),

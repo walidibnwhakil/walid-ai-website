@@ -1245,8 +1245,18 @@ export function rejectIndex(state, index) {
 
 export function decide(state) {
   recompute(state);
-  if (!state.alive.length) return { type: "defeat" };
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
+  // A chosen character is either real or fictional. Two firm "no" replies
+  // to those categories mean the classification needs clarification, not
+  // that the detective has exhausted millions of available entries.
+  if (state.category === "character" &&
+      said(state, "real", ["no"]) && said(state, "fictional", ["no"]))
+    return { type: "reconsider" };
+  // When the selected pool genuinely has no plausible match, let the player
+  // revise the last answer or choose a better category rather than displaying
+  // the final surrender/teach form after just a handful of answers.
+  if (!state.alive.length)
+    return state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state, true);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
@@ -1255,10 +1265,11 @@ export function decide(state) {
   if (!qid && (waiting || state.answers.length < 12)) qid = firstAllowedQuestion(state);
   if (!qid) {
     // Running out of high-information questions is NOT evidence that the
-    // database is empty. Ask remaining eligible questions while useful.
+    // database is empty. Never fabricate a guess or open the surrender form
+    // after a few negative answers; offer a category/answer correction instead.
     if (best >= 0 && !waiting && enoughIdentityEvidence(state, best))
       return { type: "guess", index: best };
-    return { type: "defeat" };
+    return state.answers.length < 12 ? { type: "reconsider" } : { type: "defeat" };
   }
   return { type: "ask", qid };
 }

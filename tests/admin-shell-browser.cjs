@@ -75,6 +75,23 @@ async function exercise(browser, width, height){
   await page.locator('#workspace-shell').waitFor({state:'visible'});
   assert.equal(await page.locator('#auth-screen').isVisible(),false,'sign-in card hidden after login');
   assert.equal(await page.locator('#dashboard').isVisible(),true);
+  const header=await page.locator('.admin-header').boundingBox();
+  const brand=page.locator('.admin-header .header-brand img');
+  const brandBox=await brand.boundingBox();
+  const copy=page.locator('.admin-header .header-copy');
+  const copyBox=await copy.boundingBox();
+  const menuBox=await page.locator('#sidebar-toggle').boundingBox();
+  assert.equal(await brand.getAttribute('src'),'/walid-ai-approved-logo.png','Header uses the original approved logo');
+  assert.equal(await page.locator('#admin-sidebar .site-logo-link').count(),0,'Logo is on left of header, not duplicated in sidebar');
+  assert.equal(await page.locator('.admin-header h1').textContent(),'Walid AI Admin');
+  assert.match(await page.locator('.admin-header p').textContent(),/Analytics, team operations and approvals/);
+  assert(brandBox.width>=85,'Official header logo must remain visible');
+  assert(brandBox.x < copyBox.x+copyBox.width/2,'Logo placed to left of centered title');
+  assert(menuBox.x < brandBox.x,'Collapsible sidebar menu is preserved left of the admin header');
+  assert(Math.abs((copyBox.x+copyBox.width/2)-(header.x+header.width/2))<15,
+    'Admin title and subtitle must be horizontally centered');
+  const headerOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+  assert(headerOverflow<=3,'Header must not cause horizontal scrolling: '+headerOverflow);
   const regionText=await page.locator('#regions').textContent();
   for(const fullName of ['United States','Canada','Chile','Indonesia','Bangladesh','Unknown country','Dhaka Division']){
     assert(regionText.includes(fullName),'Full audience location label missing: '+fullName);

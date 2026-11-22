@@ -258,6 +258,7 @@ try {
       let parentYes = false;
       let guesses = 0;
       let lastGuessQuestionCount = -1;
+      let filmFollowUpsAfterGuess = 0;
       for (let turn = 0; turn < (policy === "actor_male_1990s" ? 55 : 32); turn++) {
         await page.waitForFunction(() =>
           ["ask", "guess", "learn"].includes(window.__riddlex?.state()?.mode),
@@ -364,6 +365,8 @@ try {
         }
         const q = state.question;
         if (seen.has(q)) throw new Error("Question repeated: " + q);
+        if (policy === "actor_male_1990s" && lastGuessQuestionCount >= 0 &&
+            q.startsWith("screen_")) filmFollowUpsAfterGuess++;
         if (seen.has("real") && q === "fictional" && knowsNo)
           assert.fail("Riddlex reopened fictional status after real=yes");
         if (policy === "actor_female_1990s" && seen.has("male") && q === "female")
@@ -427,6 +430,9 @@ try {
         assert.ok(seen.has("actor"), "Actor yes was never exercised");
         assert.ok(knowsNo, "Personal acquaintance no was never exercised");
       }
+      if (policy === "actor_male_1990s" && guesses >= 2)
+        assert.ok(filmFollowUpsAfterGuess >= 3,
+          "After wrong guesses, Riddlex did not ask meaningful cinema follow-ups");
       if (policy === "shakib") assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
         "The real Shakib entry was not guessed after real answers");
       return trace;

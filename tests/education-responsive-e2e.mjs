@@ -149,10 +149,10 @@ try{
   assert(!secondStems.some(s=>firstStems.includes(s)),"Immediate retest should prefer unseen questions after reload");
   await page.locator("#exitQuiz").click();
   for(const [level,stream,count,forbidden] of [
-    ["10","commerce",30,"পদার্থবিজ্ঞান"],
-    ["11","arts",40,"জীববিজ্ঞান"],
+    ["10","commerce",50,"পদার্থবিজ্ঞান"],
+    ["11","arts",50,"জীববিজ্ঞান"],
     ["12","science",50,"হিসাববিজ্ঞান"],
-    ["admission","commerce",70,"পদার্থবিজ্ঞান"],
+    ["admission","commerce",50,"পদার্থবিজ্ঞান"],
     ["admission","arts",20,"পদার্থবিজ্ঞান"],
     ["admission","science",20,"হিসাববিজ্ঞান"]]){
     await quiz(page,level,stream,count);

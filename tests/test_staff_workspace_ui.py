@@ -14,10 +14,25 @@ class StaffWorkspaceUiTests(unittest.TestCase):
         self.assertIn('/walid-ai-approved-logo.png', page)
         self.assertIn('/walid-branding.css', page)
 
-    def test_legacy_admin_urls_only_redirect_to_portal(self):
+    def test_original_office_is_restored_exactly_as_a_separate_visual_component(self):
         staff = (ROOT / "admin-staff.html").read_text(encoding="utf-8")
+        portal = (ROOT / "admin.html").read_text(encoding="utf-8")
+        ops = (ROOT / "admin-ops.js").read_text(encoding="utf-8")
+        self.assertIn('Five desks. One protected network.', staff)
+        self.assertIn('function robot(color)', staff)
+        self.assertIn('grid-template-rows:repeat(3,minmax(244px,auto))', staff)
+        for selector in ('manager', 'it', 'cyber', 'cse', 'admin'):
+            self.assertIn(selector, staff)
+        self.assertIn('id="desks"', staff)
+        self.assertIn('id="selectedName"', staff)
+        self.assertIn('id="history"', staff)
+        self.assertIn('id="preserved-staff-office"', portal)
+        self.assertIn('data-src="/admin-staff.html"', portal)
+        self.assertIn("originalOffice.contentDocument", ops)
+        self.assertNotIn('location.replace("/admin.html#staff")', staff)
+
+    def test_riddlex_approval_redirect_remains_unchanged(self):
         riddlex = (ROOT / "games/riddlex/approve.html").read_text(encoding="utf-8")
-        self.assertIn('/admin.html#staff', staff)
         self.assertIn('/admin.html#riddlex', riddlex)
         self.assertNotIn('firebase.firestore()', riddlex)
 

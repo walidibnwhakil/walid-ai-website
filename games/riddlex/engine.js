@@ -863,6 +863,12 @@ export function questionBlocked(state, qid) {
 }
 
 function allowedInCategory(state, question) {
+  // Most players cannot know someone else's birth decade. The birth facts
+  // remain available internally for indexing, but must not be asked aloud.
+  if (question.group === "birth") return false;
+  // A current-government answer requires regularly refreshed official data,
+  // which this static knowledge snapshot does not provide.
+  if (question.id === "in_government") return false;
   if (!state.category) return true;
   if (!CATEGORY_GROUPS[state.category]?.has(question.group)) return false;
   if (state.category === "character" && (question.id === "animal" || question.id === "object")) return false;

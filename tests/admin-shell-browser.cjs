@@ -47,7 +47,18 @@ async function exercise(browser, width, height){
     },
     tasks:[]
   }}));
-  await context.route('**/api/admin/tasks',route=>route.fulfill({status:200,json:{tasks:[],persistence:'temporary_filesystem'}}));
+  const submittedRoles=[];
+  await context.route('**/api/admin/tasks',route=>{
+    if(route.request().method()==='POST'){
+      const request=route.request().postDataJSON();
+      submittedRoles.push(request.role);
+      return route.fulfill({status:202,json:{
+        task:{id:'test-manager-1',role:request.role,status:'completed',
+          result:{answer:'জি স্যার, verified test response.',delegations:[{role:'monitor',status:'completed'}]}}
+      }});
+    }
+    return route.fulfill({status:200,json:{tasks:[],persistence:'temporary_filesystem'}});
+  });
   await context.route('**/api/admin/staff/checks',route=>route.fulfill({status:200,json:{checks:[]}}));
   // Approval UI is tested for section isolation only, not external Firebase sign-in.
   await context.route('**/www.gstatic.com/firebasejs/**',route=>route.abort());
@@ -189,6 +200,22 @@ async function exercise(browser, width, height){
   assert.equal(robotCount,5,'all original five workstations remain');
   const heading=await page.frameLocator('#preserved-staff-office').locator('.intro h1').textContent();
   assert.match(heading,/Five desks\. One protected network\./);
+  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'Manager drawer initially closed');
+  await page.frameLocator('#preserved-staff-office').locator('.desk.manager').click();
+  await page.locator('#manager-chat-panel').waitFor({state:'visible'});
+  assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'false');
+  assert.equal(await page.locator('#ops-role-name').textContent(),'Manager');
+  await page.locator('#ops-input').fill('আজকের visitor এবং সাইটের সমস্যা যাচাই করো');
+  await page.locator('#ops-send').click();
+  assert.deepEqual(submittedRoles,['manager'],'only Manager receives owner commands');
+  await page.locator('#manager-chat-close').click();
+  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'drawer closes without changing office');
+  await page.frameLocator('#preserved-staff-office').locator('.desk.it').click();
+  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'subordinate desk cannot open direct chat');
+  await page.locator('#manager-chat-open').click();
+  assert.equal(await page.locator('#manager-chat-panel').isVisible(),true,'office shortcut opens Manager');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'Escape closes drawer');
   await page.locator('#sidebar-toggle').click();
   await page.locator('[data-admin-tab="riddlex"]').click();
   assert.equal(await page.locator('#staff-workspace').isVisible(),false);

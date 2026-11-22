@@ -1002,9 +1002,10 @@ function firstAllowedQuestion(state) {
     if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
     if (question.id === "fictional" && said(state, "real", ["yes", "probably"])) continue;
     if (question.id === "real" && said(state, "fictional", ["yes", "probably"])) continue;
-    // Low-confidence fallback cannot bypass the same relevance checks as the
-    // normal question picker, including sport and personal relationships.
-    if (!gated(state, question, rows)) continue;
+    if (question.group === "fiction" && said(state, "real", ["yes", "probably"])) continue;
+    // Preserve broad fallbacks after a rejected guess, but never reopen
+    // personal or child sport branches contrary to earlier answers.
+    if (question.group === "personal" && !gated(state, question, rows)) continue;
     return question.id;
   }
   return null;
@@ -1132,9 +1133,11 @@ export function decide(state) {
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
   let qid = chooseQuestion(state);
-  // If posterior probabilities are diffuse, ask a useful remaining question
-  // instead of conceding or guessing a random celebrity after eight clues.
-  if (!qid) qid = firstAllowedQuestion(state);
+  // With sparse ordinary-person clues, continue questioning rather than
+  // surrendering at eight. Preserve confident well-supported guesses and
+  // keep the post-rejection gap used by the existing engine.
+  if (!qid && (waiting || !supportedIdentity(state)))
+    qid = firstAllowedQuestion(state);
   if (!qid) {
     if (best >= 0 && bestP > 0 && supportedIdentity(state))
       return { type: "guess", index: best };

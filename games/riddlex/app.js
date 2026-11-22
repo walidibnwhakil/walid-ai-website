@@ -3,7 +3,7 @@ import { answer as applyAnswer, canPrint, createState, decide, displayName, enti
 import { UI, guessFont } from "./i18n.js?v=riddlex-menu-36";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
-import { createScene, startMenuCat } from "./scene.js?v=akinator-35";
+import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");

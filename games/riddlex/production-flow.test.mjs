@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { answer, chooseQuestion, createState, decide, recompute } from "./engine.js";
+import { answer, chooseQuestion, createState, decide, recompute, rejectIndex, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
@@ -81,4 +81,81 @@ test("temporary thin casebook does not call consistent real-person clues a categ
   assert.equal(second.type, "ask", JSON.stringify(second));
   assert.notEqual(second.qid, first.qid);
   assert.notEqual(second.type, "reconsider");
+});
+
+test("a famous real person is not guessed at question four, even with a one-person lead", () => {
+  const lone = poolFromEntries(questions, [
+    { id: "Q7322180", en: "Riaz", pop: 1000,
+      yes: ["real", "male", "alive", "from_bd", "actor"],
+      no: ["politician", "knows_you", "cricketer"] },
+  ]);
+  const state = createState(lone, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"],
+    ["politician", "no"], ["from_bd", "yes"],
+  ]) answer(state, qid, value);
+  assert.equal(shouldGuess(state), false, "a clear front-runner is not identity proof");
+  const first = decide(state);
+  assert.equal(first.type, "ask", JSON.stringify(first));
+  assert.ok(!state.answers.some((a) => a.qid === first.qid));
+});
+
+test("wrong guesses preserve prior facts and do not immediately guess again", () => {
+  const crowd = poolFromEntries(questions, [
+    { id: "Q7322180", en: "Riaz", pop: 250,
+      yes: ["real", "male", "alive", "from_bd", "actor"],
+      no: ["politician", "knows_you", "cricketer"] },
+    { id: "Q21066842", en: "Amin Khan", pop: 220,
+      yes: ["real", "male", "alive", "from_bd", "actor"],
+      no: ["politician", "knows_you", "cricketer"] },
+  ]);
+  const state = createState(crowd, { category: "character" });
+  recompute(state);
+  const previouslyAnswered = [
+    ["real", "yes"], ["knows_you", "no"], ["politician", "no"],
+    ["from_bd", "yes"], ["male", "yes"], ["alive", "yes"],
+    ["actor", "yes"], ["cricketer", "no"],
+    ["singer", "no"], ["scientist", "no"],
+    ["screen_star_1990s", "yes"],
+  ];
+  for (const [qid, val] of previouslyAnswered) answer(state, qid, val);
+  rejectIndex(state, 0);
+  assert.deepEqual(state.answers.map((x) => [x.qid, x.value]), previouslyAnswered);
+  assert.equal(state.sinceGuess, 0);
+  const move = decide(state);
+  assert.equal(move.type, "ask", JSON.stringify(move));
+  assert.ok(!previouslyAnswered.some(([qid]) => qid === move.qid),
+    "the user should not be asked to repeat a previously recorded answer");
+});
+
+test("candidate-specific confirmation is a prompt, never a hard requirement for everybody", () => {
+  const crowd = poolFromEntries(questions, [
+    { id: "Q7322180", en: "Riaz", pop: 60000,
+      yes: ["real", "male", "alive", "from_bd", "actor"],
+      no: ["knows_you", "politician"] },
+    { id: "Q21066842", en: "Amin Khan", pop: 10,
+      yes: ["real", "male", "alive", "from_bd", "actor"],
+      no: ["knows_you", "politician"] },
+  ]);
+  const state = createState(crowd, { category: "character" });
+  recompute(state);
+  for (const [qid, val] of [
+    ["real", "yes"], ["knows_you", "no"], ["male", "yes"], ["alive", "yes"],
+    ["from_bd", "yes"], ["actor", "yes"], ["politician", "no"],
+    ["cricketer", "no"], ["singer", "no"], ["scientist", "no"],
+    ["screen_star_1990s", "yes"],
+  ]) answer(state, qid, val);
+  assert.equal(shouldGuess(state), true);
+  const first = decide(state);
+  assert.equal(first.type, "ask");
+  assert.equal(first.qid, "actor_film_dui_duari");
+  answer(state, first.qid, "yes");
+  const second = decide(state);
+  assert.equal(second.type, "ask");
+  assert.equal(second.qid, "actor_film_daruchini_dwip");
+  answer(state, second.qid, "yes");
+  const third = decide(state);
+  assert.equal(third.type, "guess");
+  assert.equal(crowd.ids[third.index], "Q7322180");
 });

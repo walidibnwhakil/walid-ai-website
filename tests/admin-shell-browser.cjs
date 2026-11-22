@@ -70,7 +70,8 @@ async function exercise(browser, width, height){
   await context.route('**/api/admin/staff/checks',route=>route.fulfill({status:200,json:{checks:[]}}));
   await context.route('**/api/admin/manager/notices',route=>route.fulfill({status:200,json:{
     notices:[{id:'morning-'+new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'}),
-      kind:'morning',role:'Manager',created_at:new Date().toISOString(),
+      kind:'morning',role:'Manager',
+      created_at:new Date(new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'})+'T00:05:00+06:00').toISOString(),
       message:'আসসালামু আলাইকুম, স্যার। শুভ সকাল।'}],
     scheduled_monitor_checked:true
   }}));

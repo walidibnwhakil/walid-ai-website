@@ -1211,7 +1211,16 @@ export function decide(state) {
   if (state.category === "character" &&
       said(state, "real", ["no"]) && said(state, "fictional", ["no"]))
     return { type: "reconsider" };
-  if (!state.alive.length) return { type: "defeat" };
+  if (!state.alive.length) {
+    // Shards load progressively. A temporary empty shortlist is not proof
+    // that the person is unknowable or that the player's answers are wrong.
+    // Continue with plain, answerable facts while more casebook data arrives.
+    if (state.pool.count >= 100 && state.answers.length < 24) {
+      const next = sensibleFollowUp(state);
+      if (next) return { type: "ask", qid: next };
+    }
+    return { type: "defeat" };
+  }
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);

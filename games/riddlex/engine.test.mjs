@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute } from "./engine.js";
-import { decodeShard, poolFromEntries } from "./kb.js";
+import { appendShard, decodeShard, poolFromEntries } from "./kb.js";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -575,4 +575,18 @@ test("truthful answers about Mirza Fakhrul guess him within 15 questions", () =>
     countryRun = qid.startsWith("from_") && qid !== "from_bd" ? countryRun + 1 : 0;
     assert.ok(countryRun < 5, asked.join(","));
   }
+});
+
+test("animal and object rounds do not repeatedly scan all IDs for politics data", () => {
+  const smallQuestions = questions.slice(0, 4);
+  const animals = poolFromEntries(smallQuestions, [entry("cat-only", 10, ["animal"])]);
+  const original = animals.ids.includes.bind(animals.ids);
+  let fullScans = 0;
+  animals.ids.includes = (id) => { fullScans += 1; return original(id); };
+  const state = createState(animals, { category: "animal" });
+  for (let repeat = 0; repeat < 5; repeat++) recompute(state);
+  assert.equal(fullScans, 1, "a stable pool should be inspected only once");
+  appendShard(animals, poolFromEntries(smallQuestions, [entry("dog-only", 10, ["animal"])]));
+  recompute(state);
+  assert.equal(fullScans, 2, "a newly appended shard should allow one recheck");
 });

@@ -322,14 +322,28 @@ export function recompute(state) {
       logW[i] = -Infinity;
       continue;
     }
+    const relation = PERSONAL_FACTS[pool.ids[i]];
+    if (relation) {
+      // Family, friend, spouse and child candidates describe THIS PLAYER'S
+      // personal connections, not famous people. They are ineligible unless
+      // the player positively confirms personal acquaintance. A "no" or
+      // "don't know" cannot be outweighed by role popularity.
+      const contradictsRelation = answers.some(({ qid, value }) => {
+        const fact = relation[qid];
+        return (value === "yes" && fact === 1) ||
+          (value === "no" && fact === 2);
+      });
+      if (!playerPersonal || contradictsRelation) {
+        logW[i] = -Infinity;
+        continue;
+      }
+    }
     let prior = localActor && REGIONAL_FAME.has(pool.ids[i])
       ? Math.max(pool.pop[i] || 1, REGIONAL_FAME.get(pool.ids[i]))
       : (pool.pop[i] || 1);
-    // Relative roles cannot be looked up in public celebrity databases.
-    // Give them a fair chance only after the player confirms a personal
-    // connection, without overpowering public-figure guesses beforehand.
-    if (playerPersonal && pool.ids[i]?.startsWith("riddlex-role-")) prior *= 3;
-    const relation = PERSONAL_FACTS[pool.ids[i]];
+    // Positive personal acquaintance admits generic private roles. Their
+    // relationship-specific yes/no traits remain independently decisive.
+    if (relation) prior *= 3;
     if (relation) {
       // Recognized personal relationships have no global fame score. Strong,
       // specific player-provided facts should carry more weight than celebrity
@@ -385,6 +399,12 @@ function topTwo(state) {
       .map((id) => state.pool.qIndex.get(id)).filter((qi) => qi != null)
     : [];
   const hasOtherIdentityEvidence = supportedIdentity(state);
+  // A specific confirmed profession is evidence, not merely a popularity
+  // hint. In particular a yes to acting must never nominate someone whose
+  // record has no verified acting fact.
+  const actorQi = state.pool.qIndex.get("actor");
+  const confirmedActor = state.answers.some((row) =>
+    row.qid === "actor" && row.value === "yes");
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -392,6 +412,11 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
+    // Real people need explicit acting evidence. Player-relative roles are
+    // allowed to have unknown occupations when personally confirmed.
+    if (confirmedActor && actorQi != null &&
+        !state.pool.ids[i]?.startsWith("riddlex-role-") &&
+        factBit(state.pool, i, actorQi) !== 2) continue;
     if (chosenCountry) {
       const countryFact = factBit(state.pool, i, chosenCountry.qi);
       // Some verified local politicians have no packed country tag.
@@ -401,6 +426,11 @@ function topTwo(state) {
         state.answers.some((row) => row.qid === "knows_you" &&
           ["yes", "probably"].includes(row.value));
       if (!isPersonalRole && countryFact === 1) continue;
+      // Sparse international records can have "actor" but no confirmed
+      // nationality. If the player says Bangladeshi AND actor, require
+      // both facts before guessing a public actor; don't nominate an
+      // unrelated foreign artist from a fame prior.
+      if (!isPersonalRole && confirmedActor && countryFact !== 2) continue;
       // A confirmed matching country wins over extra nationalities or
       // historical birthplace tags (several notable figures have both).
       if (!isPersonalRole && countryFact !== 2 &&
@@ -1143,7 +1173,10 @@ export function decide(state) {
   // With sparse ordinary-person clues, continue questioning rather than
   // surrendering at eight. Preserve confident well-supported guesses and
   // keep the post-rejection gap used by the existing engine.
-  if (!qid && (waiting || !supportedIdentity(state)))
+  // Missing verified candidates in the currently loaded shard is not
+  // proof that an actor or other person is absent from the whole casebook.
+  // Ask remaining relevant questions rather than surrender immediately.
+  if (!qid && (waiting || !supportedIdentity(state) || best < 0))
     qid = firstAllowedQuestion(state);
   if (!qid) {
     if (best >= 0 && bestP > 0 && supportedIdentity(state))

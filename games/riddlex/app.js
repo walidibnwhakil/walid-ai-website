@@ -1,5 +1,5 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-41";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-42";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
@@ -309,7 +309,11 @@ async function step() {
     ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
     : null;
   let decision = decide(state);
-  if (decision.type === "guess" && pending) {
+  // A new clue can activate country/occupation shards that are not yet in
+  // memory. Neither a name guess NOR a defeat is final until those relevant
+  // knowledge shards have loaded. Otherwise the game gives up immediately
+  // despite millions of available records in later shards.
+  if ((decision.type === "guess" || decision.type === "defeat") && pending) {
     await pending;
     if (loadToken !== session || state !== playingState) return;
     decision = decide(state);
@@ -599,9 +603,9 @@ if (new URLSearchParams(location.search).has("autotest")) {
     reveal: (name, imageUrl) => scene.playReveal({ name, imageUrl }),
     loaded: () => loadedNames.slice(),
     find: (id) => pool?.ids.indexOf(id) ?? -1,
-    replyFor: (id) => {
+    replyFor: (id, questionId = currentQ) => {
       const index = pool.ids.indexOf(id);
-      const qi = pool.qIndex.get(currentQ);
+      const qi = pool.qIndex.get(questionId);
       const base = index * pool.attrBytes + (qi >> 2);
       const bit = (pool.attrs[base] >> ((qi & 3) << 1)) & 3;
       return bit === 2 ? "yes" : bit === 1 ? "no" : "unknown";

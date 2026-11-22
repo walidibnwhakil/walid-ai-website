@@ -61,7 +61,12 @@
   margin:0;overflow-y:auto;overflow-x:hidden;
   display:flex;flex-direction:column;gap:15px;
   border:0;border-radius:0;background:transparent;
-  scroll-behavior:smooth;scrollbar-color:#41667d #0b1927;
+  scroll-behavior:auto;scrollbar-color:#41667d #0b1927;
+}
+/* Like a real Messenger thread: a short conversation sits immediately above
+   the composer; once messages exceed the viewport, they scroll upward. */
+.manager-chat-panel #ops-history.manager-chat-transcript > :first-child{
+  margin-top:auto;
 }
 .manager-chat-panel .manager-chat-empty{
   margin:auto;max-width:320px;text-align:center;color:#93aebd;

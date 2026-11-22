@@ -259,7 +259,7 @@ try {
       let guesses = 0;
       let lastGuessQuestionCount = -1;
       let filmFollowUpsAfterGuess = 0;
-      for (let turn = 0; turn < (policy === "actor_male_1990s" ? 55 : 32); turn++) {
+      for (let turn = 0; turn < (["actor_male_1990s","chaplin","dildar"].includes(policy) ? 55 : 32); turn++) {
         await page.waitForFunction(() =>
           ["ask", "guess", "learn"].includes(window.__riddlex?.state()?.mode),
           null, { timeout: 35000 });
@@ -342,6 +342,14 @@ try {
             assert.equal(recordedBangladesh, "yes",
               "Bangladesh YES guessed an actor without verified Bangladesh fact: " + state.best);
           }
+          if (policy === "chaplin" && state.best === "Q882") {
+            trace.push("CORRECT: Charlie Chaplin by silent comedy and moustache");
+            break;
+          }
+          if (policy === "dildar" && state.best === "Q18987612") {
+            trace.push("CORRECT: Dildar by supporting comedy role");
+            break;
+          }
           if (policy === "family") {
             assert.equal(state.best, "riddlex-role-mother",
               "A confirmed mother must not be replaced by a public celebrity or wrong relative");
@@ -384,6 +392,12 @@ try {
         let a = "unknown";
         if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
+        else if (policy === "chaplin" && q !== "from_bd")
+          a = await page.evaluate((qid) =>
+            window.__riddlex.replyFor("Q882", qid), q);
+        else if (policy === "dildar" && q !== "from_bd")
+          a = await page.evaluate((qid) =>
+            window.__riddlex.replyFor("Q18987612", qid), q);
         else if (q === "from_bd") a = "yes";
         else if (policy === "actor_male_1990s" && q === "male") a = "yes";
         else if (policy === "actor_male_1990s" && ["real","alive","named","actor","screen_star_1990s"].includes(q)) a = "yes";
@@ -433,6 +447,9 @@ try {
       if (policy === "actor_male_1990s" && guesses >= 2)
         assert.ok(filmFollowUpsAfterGuess >= 3,
           "After wrong guesses, Riddlex did not ask meaningful cinema follow-ups");
+      if (policy === "chaplin" || policy === "dildar")
+        assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
+          "Target not recognized in the real game: "+label);
       if (policy === "shakib") assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
         "The real Shakib entry was not guessed after real answers");
       return trace;
@@ -450,6 +467,8 @@ try {
   await replay("1990s Bangladeshi actor, 12 real user answers", "actor_1990s");
   await replay("Female Bangladesh actress with male=no", "actor_female_1990s");
   await replay("Male Bangladesh actor 1990–1999 with multiple rejected guesses", "actor_male_1990s");
+  await replay("Charlie Chaplin: global silent comic with moustache", "chaplin");
+  await replay("Dildar: late Bangladeshi supporting comedian", "dildar");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

@@ -14,6 +14,32 @@
   let currentTab='dashboard', busy=false, ready=false, previousManagerFocus=null;
   // Private Help messages are displayed only for this session, never localStorage.
   const transientHelp=new Map();
+  const CHAT_RETENTION_MS=5*24*60*60*1000;
+  function positionChatHead(){
+    const head=$('#manager-chat-head'),anchor=$('#sidebar-toggle');
+    if(!head||!anchor||!ready)return;
+    const anchorBox=anchor.getBoundingClientRect();
+    const headSize=head.getBoundingClientRect().width||52;
+    const x=Math.max(8,Math.min(innerWidth-headSize-8,anchorBox.left+anchorBox.width/2-headSize/2));
+    let centerY=innerHeight*.49;
+    if(currentTab==='staff'){
+      try{
+        const frame=$('#preserved-staff-office'),desk=frame?.contentDocument?.querySelector('.desk.manager');
+        if(desk){
+          const frameBox=frame.getBoundingClientRect(),deskBox=desk.getBoundingClientRect();
+          const measured=frameBox.top+deskBox.top+deskBox.height/2;
+          if(measured>115&&measured<innerHeight-65)centerY=measured;
+        }
+      }catch{/* Keep the independent floating head at its safe fallback position. */}
+    }
+    head.style.left=Math.round(x)+'px';
+    head.style.top=Math.round(Math.max(95,Math.min(innerHeight-headSize-12,centerY-headSize/2)))+'px';
+  }
+  function fitComposer(){
+    const input=$('#ops-input');if(!input)return;
+    input.style.height='auto';
+    input.style.height=Math.min(150,Math.max(40,input.scrollHeight))+'px';
+  }
   const fmt = date => {try{return new Date(date).toLocaleString('en-BD',{timeZone:'Asia/Dhaka'})}catch{return String(date||'')}};
   const token = () => sessionStorage.getItem('walidAdminAccess') || '';
   const auth = () => ({Authorization:'Bearer '+token()});
@@ -40,7 +66,9 @@
     $('#manager-chat-backdrop').hidden=false;
     document.body.classList.add('manager-chat-open');
     $('#manager-chat-head')?.setAttribute('aria-expanded','true');
+    positionChatHead();
     $('#ops-input')?.focus();
+    fitComposer();
     void loadHistory();
   }
   function closeManagerChat(){
@@ -76,6 +104,7 @@
       void loadStaff();void loadHistory();
     }
     if(tab==='riddlex')window.WalidAdminApprovals?.activate();
+    requestAnimationFrame(positionChatHead);
   }
   function createRoleCards(){
     const host=$('#ops-desks'); if(!host)return; host.replaceChildren();
@@ -100,31 +129,64 @@
     document.querySelectorAll('.ops-desk').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.role===selected)));
   }
   function appendMessage(container,kind,heading,body,extra=''){
-    const card=document.createElement('article');card.className='ops-message '+kind;
-    const h=document.createElement('strong');h.textContent=heading;
-    const p=document.createElement('p');p.textContent=body||'No response text was returned.';
-    card.append(h,p);
-    if(extra){const small=document.createElement('small');small.textContent=extra;card.append(small)}
-    container.append(card);return card;
+    const bubble=document.createElement('article');
+    bubble.className='ops-message '+kind;
+    const name=document.createElement('strong');name.textContent=heading;
+    const text=document.createElement('p');text.textContent=body||'No verified response was returned.';
+    bubble.append(name,text);
+    if(extra){const meta=document.createElement('small');meta.textContent=extra;bubble.append(meta)}
+    container.append(bubble);return bubble;
+  }
+  function appendDelegations(bubble,result){
+    const rows=Array.isArray(result?.delegations)?result.delegations.filter(item=>item&&typeof item==='object'):[];
+    if(!rows.length)return;
+    const details=document.createElement('details');details.className='manager-delegations';
+    const summary=document.createElement('summary');
+    summary.textContent='কাকে কী দায়িত্ব দেওয়া হয়েছে · '+rows.length+'টি রিপোর্ট';
+    details.append(summary);
+    for(const entry of rows){
+      const node=document.createElement('div');node.className='manager-workorder';
+      const role=roles.find(item=>item.id===entry.role);
+      const title=document.createElement('strong');
+      title.textContent=(role?.name||entry.role||'Staff')+' · '+(entry.status||'unknown');
+      node.append(title);
+      if(entry.instruction){
+        const work=document.createElement('p');work.textContent='Manager-এর নির্দেশ: '+entry.instruction;node.append(work);
+      }
+      if(entry.outcome){
+        const answer=document.createElement('p');answer.textContent='যাচাইয়ের ফল: '+entry.outcome;node.append(answer);
+      }
+      if(entry.checked_at){
+        const time=document.createElement('small');time.textContent='যাচাই: '+fmt(entry.checked_at);node.append(time);
+      }
+      details.append(node);
+    }
+    bubble.append(details);
   }
   function renderHistory(tasks){
     const host=$('#ops-history');host.replaceChildren();
-    const filtered=tasks.filter(x=>x.role==='manager');
-    if(!filtered.length){const p=document.createElement('p');p.className='muted';p.textContent='No recorded conversation for this workstation.';host.append(p);return}
-    filtered.slice(0,40).reverse().forEach(task=>{
-      appendMessage(host,'question','You · '+fmt(task.created_at),task.instruction||task.title);
+    const cutoff=Date.now()-CHAT_RETENTION_MS;
+    const filtered=(Array.isArray(tasks)?tasks:[])
+      .filter(item=>item?.role==='manager'&&Date.parse(item.created_at||'')>=cutoff)
+      .sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||'')).slice(-65);
+    if(!filtered.length){
+      const text=document.createElement('p');text.className='manager-chat-empty';
+      text.textContent='Manager-কে আপনার নির্দেশ লিখুন। এখানেই কথোপকথন ও কর্মীদের যাচাইকৃত রিপোর্ট দেখা যাবে।';
+      host.append(text);return;
+    }
+    for(const task of filtered){
+      appendMessage(host,'question','আপনি · '+fmt(task.created_at),task.instruction||task.title||'');
       const result=task.result||{};
-      const delegates=Array.isArray(result.delegations)?result.delegations.map(d=>roles.find(x=>x.id===d.role)?.name||d.role):[];
-      const role=delegates.length?'Manager → '+delegates.join(', '):result.delegated_to?'Manager → '+(roles.find(x=>x.id===result.delegated_to)?.name||result.delegated_to):'Manager';
-      appendMessage(host,'answer',role+' · '+(task.status||'unknown'),
-        result.answer||'No verifiable result is available.', result.limitation||
-          (task.status==='running'?'Processing…':''));
+      const bubble=appendMessage(host,'answer','Manager · '+fmt(result.checked_at||task.updated_at),
+        result.answer||(task.status==='running'?'আপনার নির্দেশ যাচাই করা হচ্ছে…':'এই অনুরোধের যাচাইকৃত উত্তর পাওয়া যায়নি।'),
+        result.limitation||(['queued','running'].includes(task.status)?'প্রক্রিয়াধীন':task.status||'unknown'));
+      appendDelegations(bubble,result);
       const privateRows=transientHelp.get(task.id)||[];
       for(const item of privateRows){
         appendMessage(host,'answer','Admin Staff · '+fmt(item.received_at),item.message||'(Empty Help message)',
-          'Private: not saved in task history.');
+          'শুধু এই সেশনে দৃশ্যমান; ইতিহাসে সংরক্ষিত নয়');
       }
-    });
+    }
     host.scrollTop=host.scrollHeight;
   }
   async function request(path,init={}){
@@ -161,25 +223,33 @@
   async function submit(){
     if(!ready||busy)return;
     const input=$('#ops-input'),instruction=input.value.trim();
-    if(!instruction){status('Write a question or task first.',true);return}
-    if(instruction.length>2000){status('Maximum 2,000 characters per task.',true);return}
-    busy=true;$('#ops-send').disabled=true;status('Working on the request using available tools…');
-    const role=selected;
+    if(!instruction){status('Manager-কে একটি নির্দেশ লিখুন।',true);return}
+    if(instruction.length>2000){status('প্রতি বার্তার সর্বোচ্চ দৈর্ঘ্য ২,০০০ অক্ষর।',true);return}
+    busy=true;$('#ops-send').disabled=true;
+    input.value='';fitComposer();
+    const host=$('#ops-history');
+    host.querySelector('.manager-chat-empty')?.remove();
+    appendMessage(host,'question','আপনি · '+fmt(new Date().toISOString()),instruction);
+    const pending=appendMessage(host,'answer','Manager','আপনার নির্দেশ যাচাই করা হচ্ছে…');
+    host.scrollTop=host.scrollHeight;
+    status('Manager যাচাই করছে…');
     try{
       const data=await request('/api/admin/tasks',{
         method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},
-        body:JSON.stringify({role,title:instruction.slice(0,100),instruction})
+        body:JSON.stringify({role:'manager',title:instruction.slice(0,100),instruction})
       });
-      input.value='';
       const result=data.task?.result||{};
       if(data.task?.id&&Array.isArray(result.private_messages)&&result.private_messages.length){
         transientHelp.set(data.task.id,result.private_messages.slice(0,3));
         if(transientHelp.size>10)transientHelp.delete(transientHelp.keys().next().value);
       }
-      status('Task: '+(data.task?.status||'unknown')+' · '+(result.delegated_to?'Assigned to '+result.delegated_to:'Processed by '+role));
+      status('');
       await loadHistory();
-    }catch(error){status('Could not complete task: '+error.message,true)}
-    finally{busy=false;$('#ops-send').disabled=false}
+    }catch(error){
+      pending.querySelector('p').textContent='নির্দেশটি সম্পন্ন হয়েছে বলে নিশ্চিত করা যায়নি।';
+      status('সংযোগ/প্রক্রিয়াকরণ সমস্যা: '+error.message,true);
+      input.value=instruction;fitComposer();
+    }finally{busy=false;$('#ops-send').disabled=false}
   }
   async function runChecks(){
     if(!ready||busy)return;
@@ -209,6 +279,7 @@
   addEventListener('walid-admin-authenticated',()=>{
     ready=true;setSidebarOpen(false);
     $('#manager-chat-head').disabled=false;
+    requestAnimationFrame(positionChatHead);
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=false);
     selectTab(currentTab,false);
   });
@@ -249,6 +320,7 @@
       const synchronize=()=>{
         const measured=doc.documentElement.scrollHeight;
         if(measured>700&&measured<9000)originalOffice.style.height=measured+'px';
+        positionChatHead();
       };
       synchronize();
       if(typeof ResizeObserver!=='undefined'){
@@ -269,7 +341,14 @@
   $('#manager-chat-close')?.addEventListener('click',closeManagerChat);
   $('#manager-chat-backdrop')?.addEventListener('click',closeManagerChat);
   $('#ops-send')?.addEventListener('click',submit);
-  $('#ops-input')?.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();void submit()}});
+  $('#ops-input')?.addEventListener('input',fitComposer);
+  $('#ops-input')?.addEventListener('keydown',event=>{
+    if(event.key==='Enter'&&!event.shiftKey){
+      event.preventDefault();void submit();
+    }
+  });
+  addEventListener('resize',positionChatHead);
+  addEventListener('scroll',positionChatHead,{passive:true});
   $('#ops-checks')?.addEventListener('click',runChecks);
   $('#ops-reload')?.addEventListener('click',()=>{void loadStaff();void loadHistory()});
   createRoleCards();

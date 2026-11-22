@@ -2,6 +2,7 @@
 // first question can render before every shard has finished parsing.
 
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
+import { ACTOR_PROOF_QUESTIONS } from "./actor-proof.js";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported
@@ -279,7 +280,7 @@ export async function loadManifest(base = "./kb") {
   const response = await fetch(`${base}/manifest.json?v=riddlex-39`);
   if (!response.ok) throw new Error("Knowledge manifest failed");
   const manifest = await response.json();
-  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...PERSONAL_QUESTIONS]) {
+  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...PERSONAL_QUESTIONS, ...ACTOR_PROOF_QUESTIONS]) {
     if (!manifest.questions.some((row) => row.id === question.id)) {
       manifest.questions.push({ ...question });
     }

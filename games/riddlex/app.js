@@ -1,6 +1,6 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
 import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=akinator-35";
-import { UI, guessFont } from "./i18n.js?v=akinator-35";
+import { UI, guessFont } from "./i18n.js?v=riddlex-menu-36";
 import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=akinator-35";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=akinator-35";

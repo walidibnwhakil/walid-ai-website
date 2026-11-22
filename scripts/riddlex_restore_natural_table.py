@@ -48,8 +48,11 @@ def main() -> None:
         if not 42 <= mean <= 105 or sample.std() < 20:
             raise AssertionError(f"Wood must be natural/grained, y={row}, mean={mean:.1f}")
     # Native original frame is outside the retouched area.
-    assert np.array_equal(checked[1272, 40:680] > 120,
-                          original[1272, 40:680] > 120) or True
+    frame_difference = np.abs(
+        checked[1268:1278, 50:670].astype(np.float32) -
+        original[1268:1278, 50:670]
+    ).mean()
+    assert frame_difference < 9, f"Original gold frame changed: {frame_difference:.1f}"
     assert ASSET.stat().st_size < 260_000
     print(f"Riddlex original wooden desk restored: {ASSET.stat().st_size} bytes")
 

@@ -3,6 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -629,4 +630,48 @@ test("Shabnur's local screen fame is considered when BD, actress and female are 
   for (const qid of ["real", "female", "alive", "from_bd", "actor"]) answer(state, qid, "yes");
   assert.ok(state.weights[0] > state.weights[1],
     "regional film recognition should help Shabnur once matching facts are known");
+});
+
+test("the game skips birth-year questions and stale current-government questions", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "Real?", bn: "বাস্তব?" },
+    { id: "female", group: "person", en: "Female?", bn: "নারী?" },
+    { id: "born_1970_1979", group: "birth", en: "Born in 1970s?", bn: "সত্তরে জন্ম?" },
+    { id: "in_government", group: "politics", en: "In government?", bn: "সরকারে?" },
+  ];
+  const pool = poolFromEntries(qs, [
+    { id: "politician1", en: "Politician one", pop: 100, yes: ["real","female","born_1970_1979","in_government"] },
+    { id: "politician2", en: "Politician two", pop: 80, yes: ["real"], no: ["female","born_1970_1979","in_government"] },
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  assert.equal(questionBlocked(state, "born_1970_1979"), false,
+    "stored birth information may still help the engine internally");
+  for (let i = 0; i < 4; i++) {
+    const decision = decide(state);
+    if (decision.type !== "ask") break;
+    assert.ok(!decision.qid.startsWith("born_"), "do not quiz players on a stranger's birth year");
+    assert.notEqual(decision.qid, "in_government", "do not rely on stale live office information");
+    answer(state, decision.qid, "unknown");
+  }
+});
+
+test("1990s screen-star question refers to film careers, never birth decade", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "Real?", bn: "বাস্তব?" },
+    { id: "actor", group: "job", en: "Actor?", bn: "অভিনয়শিল্পী?" },
+    { id: "from_bd", group: "country", en: "From BD?", bn: "বাংলাদেশ?" },
+    ...EXTRA_SCREEN_QUESTIONS,
+  ];
+  const pool = poolFromEntries(qs, [
+    { id: "Q7460127", en: "Shabnur", bn: "শাবনূর", pop: 10, yes: ["real","actor","from_bd"] },
+    { id: "Q7405420", en: "Salman Shah", pop: 10, yes: ["real","actor","from_bd"] },
+    { id: "Q52149647", en: "Puja Cherry", pop: 10, yes: ["real","actor","from_bd"] },
+  ]);
+  const qi = pool.qIndex.get("screen_star_1990s");
+  assert.equal(factBit(pool, 0, qi), 2, "Shabnur became a film star in the 1990s");
+  assert.equal(factBit(pool, 1, qi), 2, "Salman Shah became a film star in the 1990s");
+  assert.equal(factBit(pool, 2, qi), 1, "Puja Cherry became a lead star much later");
+  assert.equal(qs.at(-1).bn.includes("জন্ম"), false, "career decade must not be birth decade");
 });

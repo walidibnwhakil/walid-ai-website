@@ -309,6 +309,8 @@ try {
             assert.notEqual(maleBit, "yes", "Guess contradicts male=no: " + state.best);
           }
           if (policy === "actor_male_1990s") {
+            assert.ok(seen.has("screen_star_1990s"),
+              "Actor was guessed before confirming fame in 1990–1999");
             const maleBit = await page.evaluate((id) =>
               window.__riddlex.replyFor(id, "male"), state.best);
             assert.equal(maleBit, "yes", "Guessed a woman or unknown-gender actor after male=yes: "+state.best);

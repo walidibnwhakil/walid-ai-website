@@ -125,6 +125,27 @@ try {
       assert.ok(rect.x >= -2 && rect.right <= width + 2, "answer outside screen horizontally");
       assert.ok(rect.y >= -2 && rect.bottom <= height + 2, "answer outside screen vertically");
     }
+    if (orient === "landscape") {
+      const deskControls = await page.evaluate(() => {
+        const stage = document.querySelector(".stage-wrap").getBoundingClientRect();
+        const answers = document.getElementById("answers").getBoundingClientRect();
+        const yes = document.getElementById("answer-yes").getBoundingClientRect();
+        const no = document.getElementById("answer-no").getBoundingClientRect();
+        const bubble = document.getElementById("speech").getBoundingClientRect();
+        return {
+          deskRatio: (answers.top - stage.top) / stage.height,
+          yesWidth: yes.width,
+          noWidth: no.width,
+          bubbleWidth: bubble.width,
+        };
+      });
+      assert.ok(deskControls.deskRatio >= 0.45 && deskControls.deskRatio <= 0.83,
+        "desktop answers should float on the wooden desk, not hug the screen bottom");
+      assert.ok(deskControls.yesWidth < 180 && deskControls.noWidth < 180,
+        "Yes/No buttons must be sized to their labels");
+      assert.ok(deskControls.bubbleWidth <= 460,
+        "short question bubbles must not stretch across the stage");
+    }
     await page.click("#answer-yes");
     await page.waitForFunction(() =>
       document.getElementById("progress").textContent.includes("Question 2"),

@@ -33,7 +33,10 @@ async function exercise(browser, width, height){
   await context.route('**/www.gstatic.com/firebasejs/**',route=>route.abort());
   const page=await context.newPage(),errors=[];
   page.on('pageerror',error=>errors.push(error.message));
-  await page.goto(root+'/admin.html',{waitUntil:'domcontentloaded'});
+  const retired=await context.request.get(root+'/admin.html',{maxRedirects:0});
+  assert.equal(retired.status(),404,'The retired .html route must 404, without redirect');
+  await page.goto(root+'/admin/',{waitUntil:'domcontentloaded'});
+  assert.equal(new URL(page.url()).pathname,'/admin/');
   await page.locator('.login-logo').waitFor({state:'visible'});
   assert.equal(await page.locator('#workspace-shell').isVisible(),false,'all navigation hidden before auth');
   assert.equal(await page.locator('#sidebar-toggle').isVisible(),false,'menu button hidden before auth');
@@ -62,7 +65,9 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#dashboard').isVisible(),false,'analytics hidden in staff tab');
   assert.equal(await page.locator('#staff-workspace').isVisible(),true);
   assert.equal(await page.locator('#riddlex-workspace').isVisible(),false);
-  await page.frameLocator('#preserved-staff-office').locator('.desk-grid').waitFor({state:'visible',timeout:20000});
+  assert.equal(new URL(page.url()).pathname,'/admin/','menu must not change URL');
+  assert.equal(new URL(page.url()).hash,'','no section hash');
+  await page.frameLocator('#preserved-staff-office'.locator('.desk-grid').waitFor({state:'visible',timeout:20000});
   const robotCount=await page.frameLocator('#preserved-staff-office').locator('.desk').count();
   assert.equal(robotCount,5,'all original five workstations remain');
   const heading=await page.frameLocator('#preserved-staff-office').locator('.intro h1').textContent();
@@ -81,6 +86,8 @@ async function exercise(browser, width, height){
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
     assert(overflow<=3,'mobile layout must not overflow horizontally, overflow='+overflow);
   }
+  assert.equal(new URL(page.url()).pathname,'/admin/','navigating tabs keeps the clean URL');
+  assert.equal(new URL(page.url()).hash,'');
   await page.locator('#exit').click();
   assert.equal(await page.locator('#auth-screen').isVisible(),true,'sign-out returns to login');
   assert.equal(await page.locator('#workspace-shell').isVisible(),false,'no sidebar after sign-out');

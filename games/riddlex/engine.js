@@ -442,7 +442,7 @@ export function enoughIdentityEvidence(state, index) {
   return confirmedEvidenceFor(state, index, VERIFIED_CAREER_TRAITS) >= 2;
 }
 
-function topTwo(state) {
+function topTwo(state, requireVerified = false) {
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -453,7 +453,8 @@ function topTwo(state) {
     const i = alive[k];
     // Keep plausible identities in the ranking before they are verified.
     // Verification is only a gate on revealing a name, not on asking questions.
-    if (!guessMatchesAnswers(state, i)) continue;
+    if (!guessMatchesAnswers(state, i) ||
+        (requireVerified && !enoughIdentityEvidence(state, i))) continue;
     const w = weights[i];
     eligibleTotal += w;
     if (w > bestP) {
@@ -498,10 +499,8 @@ export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
 export function shouldGuess(state) {
   const asked = state.answers.length;
   if (!state.alive.length) return false;
-  const { bestP, secondP } = topTwo(state);
+  const { bestP, secondP } = topTwo(state, true);
   if (!(bestP > 0)) return false;
-  const { best } = topTwo(state);
-  if (!enoughIdentityEvidence(state, best)) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
   if (isFullPublicCasebook(state) && asked < 10) return false;
@@ -1248,7 +1247,7 @@ export function decide(state) {
   recompute(state);
   if (!state.alive.length) return { type: "defeat" };
   if (state.guesses >= 4 || state.answers.length >= 72) return { type: "defeat" };
-  const { best, bestP, secondP } = topTwo(state);
+  const { best, bestP, secondP } = topTwo(state, true);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   if (!waiting && shouldGuess(state)) return { type: "guess", index: best };

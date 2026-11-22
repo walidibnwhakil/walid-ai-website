@@ -481,9 +481,14 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  // A high score after being wrong is not new proof. Only a tiny synthetic
-  // two-person game can shortcut the second-round questioning.
-  if (bestP >= 0.8 && ratio >= 8 && state.pool.count <= 2) return 0;
+  // An unsupported high score is not new proof. However, a second candidate
+  // already supported by multiple concrete political/career facts does not
+  // need irrelevant filler questions solely to satisfy a retry counter.
+  const sourceBacked = state.answers.length >= 12 &&
+    state.answers.filter((row) => row.value === "yes" &&
+      VERIFIED_CAREER_TRAITS.has(row.qid)).length >= 2;
+  if ((state.pool.count <= 2 && bestP >= 0.8 && ratio >= 8) ||
+      (sourceBacked && bestP >= 0.62 && ratio >= 3)) return 0;
   if (ratio < 2.5) return 6;
   return 4;
 }

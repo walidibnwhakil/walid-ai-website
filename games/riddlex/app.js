@@ -599,9 +599,9 @@ if (new URLSearchParams(location.search).has("autotest")) {
     reveal: (name, imageUrl) => scene.playReveal({ name, imageUrl }),
     loaded: () => loadedNames.slice(),
     find: (id) => pool?.ids.indexOf(id) ?? -1,
-    replyFor: (id) => {
+    replyFor: (id, questionId = currentQ) => {
       const index = pool.ids.indexOf(id);
-      const qi = pool.qIndex.get(currentQ);
+      const qi = pool.qIndex.get(questionId);
       const base = index * pool.attrBytes + (qi >> 2);
       const bit = (pool.attrs[base] >> ((qi & 3) << 1)) & 3;
       return bit === 2 ? "yes" : bit === 1 ? "no" : "unknown";

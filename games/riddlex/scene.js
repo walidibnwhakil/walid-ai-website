@@ -402,7 +402,7 @@ export function createScene(canvas) {
       // Anchor to the right edge, but never place the photo card off-screen.
       x = Math.max(8 * dpr, Math.min(canvas.width - margin - w,
         Math.max(faceRight + gap, canvas.width - margin - w)));
-      y = Math.max(8 * dpr, Math.min(top, canvas.height - h - buttonStack));
+      y = top;
     } else {
       w = Math.min(view.w * 0.32, canvas.width * 0.46);
       nameH = Math.min(view.h * 0.11, 72 * dpr);

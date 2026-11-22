@@ -843,8 +843,7 @@ function unrelatedJob(state, id) {
   const probe = politics ? "politician" : id;
   // Acting can overlap sports or politics, but cross-career detours should
   // need substantial evidence rather than a weak 15% minority.
-  const minimum = job === "actor" && ["cricketer", "footballer", "politician"].includes(probe)
-    ? 0.30 : 0.15;
+  const minimum = job === "actor" && job !== probe ? 0.45 : 0.15;
   return !candidatesSplit(state, probe, rows, minimum);
 }
 
@@ -1078,7 +1077,11 @@ function nextIdentityProofQuestion(state) {
         !guessMatchesAnswers(state, i)) continue;
     const yes = qids.filter((qid) => asked.get(qid) === "yes").length;
     const no = qids.filter((qid) => asked.get(qid) === "no").length;
-    if (no || (yes >= 3 && state.answers.length >= 10) ||
+    const unknown = qids.filter((qid) => asked.get(qid) === "unknown").length;
+    // Don't pester players who don't recognise a title; change course after
+    // two "don't know" responses for the same suspected person.
+    if (no || (unknown >= 2 && yes === 0) ||
+        (yes >= 3 && state.answers.length >= 10) ||
         (yes >= 2 && state.answers.length >= 12)) continue;
     const next = qids.find((qid) => state.pool.qIndex.has(qid) && !asked.has(qid));
     if (!next) continue;

@@ -126,7 +126,16 @@ async function exercise(browser, width, height){
   assert(composer.y>=transcript.y+transcript.height-3,'message composer stays below the conversation');
   assert(composer.y+composer.height>height-35,'composer is near the bottom of the viewport');
   assert.equal(await page.locator('#ops-history').textContent().then(s=>s.includes('Old private conversation')),false,
-    'messages older than five days are hidden from the conversation');
+    'messages older than three days are hidden from the conversation');
+  await page.waitForFunction(()=>Boolean(document.querySelector('#ops-history .manager-chat-notice')));
+  const initialBubble=await page.locator('#ops-history .ops-message').last().boundingBox();
+  const initialTranscript=await page.locator('.manager-chat-transcript').boundingBox();
+  assert(initialBubble.y+initialBubble.height>initialTranscript.y+initialTranscript.height-47,
+    'When chat has one greeting, it must sit at bottom like Messenger, not at top');
+  const welcomeText=await page.locator('.manager-chat-notice').textContent();
+  assert.match(welcomeText,/আসসালামু আলাইকুম/);
+  assert(!welcomeText.includes('আপনার কোনো নির্দেশ থাকলে বলুন'),
+    'Unrequested command prompts must not appear in the daily greeting');
   await page.keyboard.press('Escape');
   await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
   assert.equal(await headButton.getAttribute('aria-expanded'),'false');
@@ -339,6 +348,10 @@ async function exercise(browser, width, height){
   assert(question.x>answer.x+25,'owner messages are aligned right of Manager replies');
   assert.match(await page.locator('#ops-history .ops-message.question').last().textContent(),/আজকের visitor/);
   assert.match(await page.locator('#ops-history .ops-message.answer').last().textContent(),/জি স্যার/);
+  const finalBubble=await page.locator('#ops-history .ops-message').last().boundingBox();
+  const fullTranscript=await page.locator('.manager-chat-transcript').boundingBox();
+  assert(finalBubble.y+finalBubble.height>fullTranscript.y+fullTranscript.height-47,
+    'Each new reply appears at bottom and earlier chat travels upward');
   await page.locator('.manager-delegations summary').click();
   assert.match(await page.locator('.manager-delegations').textContent(),/IT Technician/);
   assert.match(await page.locator('.manager-delegations').textContent(),/Check real website and backend HTTP status/);

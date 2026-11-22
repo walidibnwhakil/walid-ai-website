@@ -257,7 +257,8 @@ try {
       let cricketNo = false;
       let parentYes = false;
       let guesses = 0;
-      for (let turn = 0; turn < 32; turn++) {
+      let lastGuessQuestionCount = -1;
+      for (let turn = 0; turn < (policy === "actor_male_1990s" ? 55 : 32); turn++) {
         await page.waitForFunction(() =>
           ["ask", "guess", "learn"].includes(window.__riddlex?.state()?.mode),
           null, { timeout: 35000 });
@@ -285,10 +286,24 @@ try {
         }
         if (state.mode === "guess") {
           const name = await page.locator("#guess-line").textContent();
+          if (lastGuessQuestionCount >= 0) {
+            assert.ok(seen.size - lastGuessQuestionCount >= 5,
+              "Guessed another name without five new questions: " +
+              (seen.size-lastGuessQuestionCount));
+          }
+          lastGuessQuestionCount = seen.size;
           if (policy === "actor_female_1990s") {
             const maleBit = await page.evaluate((id) =>
               window.__riddlex.replyFor(id, "male"), state.best);
             assert.notEqual(maleBit, "yes", "Guess contradicts male=no: " + state.best);
+          }
+          if (policy === "actor_male_1990s") {
+            const maleBit = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "male"), state.best);
+            assert.equal(maleBit, "yes", "Guessed a woman or unknown-gender actor after male=yes: "+state.best);
+            const era = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "screen_star_1990s"), state.best);
+            assert.equal(era, "yes", "Guessed someone without verified 1990–1999 fame: "+state.best);
           }
           trace.push("GUESS: " + name + " [" + state.best + "]");
           assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
@@ -352,6 +367,12 @@ try {
         if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
         else if (q === "from_bd") a = "yes";
+        else if (policy === "actor_male_1990s" && q === "male") a = "yes";
+        else if (policy === "actor_male_1990s" && ["real","alive","named","actor","screen_star_1990s"].includes(q)) a = "yes";
+        else if (policy === "actor_male_1990s" && [
+          "politician","writer","singer","musician","director","athlete",
+          "screen_star_pre1990","cricketer","footballer"
+        ].includes(q)) a = "no";
         else if (policy === "actor_female_1990s" && q === "male") a = "no";
         else if ((policy === "actor_1990s" || policy === "actor_female_1990s") && ["named","alive","actor","screen_star_1990s"].includes(q)) a = "yes";
         else if ((policy === "actor_1990s" || policy === "actor_female_1990s") && [
@@ -407,6 +428,7 @@ try {
   await replay("Bangladeshi actor who does not know the player", "actor");
   await replay("1990s Bangladeshi actor, 12 real user answers", "actor_1990s");
   await replay("Female Bangladesh actress with male=no", "actor_female_1990s");
+  await replay("Male Bangladesh actor 1990–1999 with multiple rejected guesses", "actor_male_1990s");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

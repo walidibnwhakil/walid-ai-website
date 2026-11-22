@@ -478,7 +478,9 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  // High confidence is not new evidence after a rejected guess.
+  // If there truly is only one unrejected candidate, don't invent a
+  // pointless extra round. Otherwise popularity alone is not new evidence.
+  if (state.alive.length === 1 && bestP >= 0.8 && ratio >= 8) return 0;
   if (bestP >= 0.8 && ratio >= 8) return 2;
   if (ratio < 2.5) return 6;
   return 4;

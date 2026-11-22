@@ -73,8 +73,76 @@ test("non-personal celebrities are never incorrectly asserted to know the user",
   recompute(state);
   answer(state, "real", "yes");
   answer(state, "knows_you", "no");
-  for (const person of PERSONAL_RELATIONS)
-    assert.ok(state.weights[pool.ids.indexOf(person.id)] < state.weights[0]);
+  for (const person of PERSONAL_RELATIONS) {
+    const idx = pool.ids.indexOf(person.id);
+    assert.equal(state.weights[idx], 0, person.id + " was still a possible guess");
+    assert.ok(!state.alive.includes(idx), person.id + " survived 'knows you: no'");
+  }
+});
+
+test("actor yes, Bangladesh yes, knows-you NO can never nominate a private family role", () => {
+  const qs = [
+    ...baseQuestions,
+    { id: "actor", group: "job", en: "actor", bn: "actor" },
+    { id: "politician", group: "job", en: "politician", bn: "politician" },
+    { id: "singer", group: "job", en: "singer", bn: "singer" },
+    { id: "cricketer", group: "job", en: "cricketer", bn: "cricketer" },
+    { id: "writer", group: "job", en: "writer", bn: "writer" },
+    { id: "athlete", group: "job", en: "athlete", bn: "athlete" },
+  ];
+  const famous = poolFromEntries(qs, [
+    { id: "known-actor", en: "Known actor", pop: 65000, yes: ["real", "from_bd", "actor"], no: ["politician", "singer", "writer", "athlete", "cricketer"] },
+    { id: "unknown-actor", en: "Unknown actor", pop: 12, yes: ["real", "actor"] },
+  ]);
+  const pool = appendShard(famous, poolFromEntries(qs, PERSONAL_RELATIONS));
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["from_bd", "yes"], ["knows_you", "no"],
+    ["politician", "no"], ["actor", "yes"], ["singer", "no"],
+    ["cricketer", "no"], ["athlete", "no"], ["writer", "no"],
+  ]) answer(state, qid, value);
+  assert.ok(state.alive.length > 0, "public actors should remain eligible");
+  for (const role of PERSONAL_RELATIONS) {
+    const idx = pool.ids.indexOf(role.id);
+    assert.equal(state.weights[idx], 0, "private guess survived: " + role.id);
+    assert.ok(!state.alive.includes(idx), "private role still alive: " + role.id);
+  }
+  const decision = decide(state);
+  if (decision.type === "guess")
+    assert.ok(!pool.ids[decision.index].startsWith("riddlex-role-"), JSON.stringify(decision));
+});
+
+test("role suggestions require confirmed personal contact, even if it is unknown", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "knows_you", "unknown");
+  for (const role of PERSONAL_RELATIONS)
+    assert.equal(state.weights[pool.ids.indexOf(role.id)], 0, role.id);
+  answer(state, "knows_you", "no");
+  for (const role of PERSONAL_RELATIONS)
+    assert.equal(state.weights[pool.ids.indexOf(role.id)], 0, role.id);
+});
+
+test("no to being family excludes relatives, while yes to parent excludes siblings", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "yes"], ["your_family", "no"],
+  ]) answer(state, qid, value);
+  for (const role of ["mother", "father", "brother", "sister", "husband", "wife", "child", "baby"])
+    assert.equal(state.weights[roleIndex(pool, role)], 0, role);
+  assert.ok(state.weights[roleIndex(pool, "friend")] > 0);
+  const family = createState(pool, { category: "character" });
+  recompute(family);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "yes"], ["your_family", "yes"], ["your_parent", "yes"],
+  ]) answer(family, qid, value);
+  for (const role of ["brother", "sister", "husband", "wife", "child", "baby"])
+    assert.equal(family.weights[roleIndex(pool, role)], 0, role);
 });
 
 test("knows-you no closes family and relationship follow-ups", () => {

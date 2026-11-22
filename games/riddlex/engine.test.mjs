@@ -695,3 +695,21 @@ test("Shabana and Alamgir are recognized as pre-1990 stars, not by birth year", 
   assert.ok(qs.at(-2).en.includes("before the 1990s"));
   assert.ok(!qs.at(-2).bn.includes("জন্ম"));
 });
+
+test("politics augmentation survives spare array capacity after appending private roles", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "Real?", bn: "বাস্তব?" },
+    { id: "female", group: "person", en: "Female?", bn: "নারী?" },
+  ];
+  const first = poolFromEntries(qs, [
+    { id: "Q6874839", en: "Political seed", yes: ["real"] },
+  ]);
+  const more = poolFromEntries(qs, [
+    { id: "riddlex-role-mother", en: "Your mother", yes: ["real", "female"] },
+  ]);
+  const combined = appendShard(first, more);
+  assert.ok(combined.attrs.length > combined.count * combined.attrBytes,
+    "test requires spare allocation capacity");
+  assert.doesNotThrow(() => createState(combined, { category: "character" }),
+    "political augmentation must not copy spare buffer capacity");
+});

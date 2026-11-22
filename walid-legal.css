@@ -31,3 +31,17 @@ html[lang="bn"] .legal-page p,html[lang="bn"] .legal-page li{text-align:justify;
 .legal-page h2{letter-spacing:-.01em}
 .legal-footer nav a{white-space:normal;overflow-wrap:anywhere}
 @media(max-width:600px){.legal-page{padding:24px 17px 40px;line-height:1.75}.legal-page h2{font-size:21px;margin-top:26px}.legal-page .contact-email{font-size:19px}}
+
+/* Responsive, editorial legal pages: justify full paragraphs without stretching short lines. */
+.legal-page p,.legal-page li {text-align:justify;text-align-last:left;hyphens:auto;overflow-wrap:break-word}
+.legal-page .legal-short,.legal-page .legal-contact-line,.legal-page .legal-effective,.legal-page .legal-tagline,.legal-page [role="status"] {text-align:left!important;text-align-last:left!important;hyphens:none}
+.legal-page .legal-tagline {font-weight:700;font-size:1.13em;color:#225b47;margin-bottom:20px}
+.legal-page .legal-contact-line{margin:7px 0;overflow-wrap:anywhere}
+.legal-page .legal-action{font:700 15px/1.35 "Times New Roman",serif;color:#fff;background:#176b50;border:1px solid #176b50;border-radius:9px;padding:11px 16px;cursor:pointer;max-width:100%}
+.legal-page .legal-action:hover{background:#11503c}
+.legal-page .legal-action:focus-visible{outline:3px solid #80c4ab;outline-offset:3px}
+.legal-page .legal-action:disabled{background:#edf3f0;color:#425c51;border-color:#d6e5db;cursor:default}
+@media(max-width:650px){
+ .legal-page p,.legal-page li{text-align:left!important;text-align-last:left!important;hyphens:none;line-height:1.75}
+ .legal-page .legal-short,.legal-page .legal-contact-line{overflow-wrap:anywhere}
+}

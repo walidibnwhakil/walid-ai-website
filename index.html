@@ -151,10 +151,19 @@ footer p{margin:16px 0 0}
   .card h2{height:46px}
 }
 @media(prefers-reduced-motion:reduce){body::before{animation:none}.card,.card-visual{transition:none}}
+
+.pwa-install{margin:16px auto 0;padding:8px 20px;align-items:center;border:1px solid #b5d6c5;border-radius:999px;background:#f8fcfa;color:#146d54;font:700 15px/1.25 "Times New Roman",Times,serif;cursor:pointer}
+.pwa-install:not([hidden]){display:inline-flex}
+.pwa-install[hidden]{display:none}
+.pwa-install:focus-visible{outline:3px solid #146d54;outline-offset:3px}
 </style><link rel="stylesheet" href="/walid-legal.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/walid-ai-approved-flower.png">
+<script src="/pwa.js" defer></script>
 </head>
 <body><main class="shell">
-<section class="hero"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"><h1>Welcome to <span>Walid AI</span></h1><p>A refined space to think, create, learn, and explore—with practical tools for everyday life.</p><div class="floral-rule" aria-hidden="true"><span></span><img src="/walid-ai-approved-flower.png" alt=""><span></span></div></section>
+<section class="hero"><img class="logo" src="/walid-ai-approved-logo.png" alt="Walid AI"><h1>Welcome to <span>Walid AI</span></h1><p>A refined space to think, create, learn, and explore—with practical tools for everyday life.</p><div class="floral-rule" aria-hidden="true"><span></span><img src="/walid-ai-approved-flower.png" alt=""><span></span></div><button id="pwa-install" class="pwa-install" type="button" hidden>Install App</button></section>
 <nav class="menu" aria-label="Main menu">
 <a class="card blue" href="/chat/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M12 14h40a7 7 0 0 1 7 7v18a7 7 0 0 1-7 7H28l-13 8v-8h-3a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z" transform="translate(0 -1) scale(.96)"/><path d="m32 20 2.8 7.2L42 30l-7.2 2.8L32 40l-2.8-7.2L22 30l7.2-2.8L32 20Z"/><path d="M15 29h3m28 0h3"/></svg></span><h2>AI Chat</h2><p>A smarter space for questions, writing, and ideas.</p><span class="arrow">Start chatting</span></a>
 <a class="card rose" href="/pdf/"><span class="card-visual" aria-hidden="true"><svg class="card-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M19 10h20l9 9v32a4 4 0 0 1-4 4H19a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4Z"/><path d="M39 10v10h9M24 29h16M24 36h16M24 43h11"/><path d="M20 4h20" opacity=".4"/></svg></span><h2>PDF Tools</h2><p>Merge, convert, edit, and organize PDF documents in one convenient workspace.</p><span class="arrow">Manage PDFs</span></a>

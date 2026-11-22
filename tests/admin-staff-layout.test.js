@@ -33,4 +33,13 @@ assert(!portal.includes('id="manager-chat-shortcut"'),'No extra text row in the 
 assert(!portal.includes('manager-office-actions'),'No layout-changing toolbar above the original five robots');
 assert.match(ops,/if\(match==='manager'\)openManagerChat\(\)/);
 assert.match(ops,/#manager-chat-head/);
+assert.match(portal,/<\/aside>\s*<button type="button" id="manager-chat-head"/,
+  'The standalone bot head must not be a child of the sidebar');
+assert.match(portal,/class="ops-history manager-chat-transcript"/,
+  'Manager conversation is an open transcript, not a form inside nested panels');
+assert.match(portal,/class="manager-chat-compose"/,
+  'Manager input is anchored at the bottom like a messenger');
+assert(!portal.includes('Your instruction to Manager'),
+  'No separate boxed question form remains in the overlay');
+
 console.log('Original five-desk SVG office preserved in unified portal.');

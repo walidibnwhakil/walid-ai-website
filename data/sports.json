@@ -1,69 +1,104 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-22T05:00:36.298390+00:00",
+  "updatedAt": "2026-11-22T14:01:28.622250+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Can win over All Blacks finally break England's boom-bust cycle?",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6gregx71gjro?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T22:27:36+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Australia hold on for narrow win against Wales",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cwm25ev1z8y8o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T22:25:36+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "France secure Nations Championship final with Springboks",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c3zxv4e5g5g5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T22:22:36+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Scottish Premiership roundup: Dundee left reeling after 8-0 mauling by Hearts",
-      "url": "https://www.theguardian.com/football/2026/nov/21/scottish-premiership-roundup-celtic-sweep-st-mirren-aside-to-strengthen-grip-at-top",
+      "title": "Manchester City v Tottenham, Birmingham v Manchester United: WSL clockwatch – live",
+      "url": "https://www.theguardian.com/football/live/2026/nov/22/wsl-manchester-city-tottenham-birmingham-manchester-united-arsenal-west-ham-live",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T22:20:19+00:00",
+      "publishedAt": "2026-11-22T13:43:47+00:00",
       "category": "Sports"
     },
     {
-      "title": "Raya set to have scan on injury - how much would Arsenal miss him?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/ckx28w9ree9vo?at_medium=RSS&at_campaign=rss",
+      "title": "Hull City v Brighton: Premier League – live",
+      "url": "https://www.theguardian.com/football/live/2026/nov/22/hull-city-v-brighton-premier-league-live",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T13:41:03+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "England won't get carried away by All Blacks win",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ckr5gdpm1q5no?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-21T21:14:08+00:00",
+      "publishedAt": "2026-11-22T12:45:57+00:00",
       "category": "Sports"
     },
     {
-      "title": "WSL roundup: Chelsea thwarted by Liverpool keeper, London City move to third",
-      "url": "https://www.theguardian.com/football/2026/nov/21/liverpool-chelsea-london-city-lionesses-crystal-palace-wsl",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T20:54:39+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Ireland remind themselves that the best are beatable",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c820qxx2k7y2o?at_medium=RSS&at_campaign=rss",
+      "title": "Watford seek sixth manager in 18 months after sacking Dionisi",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cyvz6r4g1jqo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-21T20:39:51+00:00",
+      "publishedAt": "2026-11-22T12:00:45+00:00",
       "category": "Sports"
     },
     {
-      "title": "European football: Doué carried off for PSG while Kane vows to return fresh",
-      "url": "https://www.theguardian.com/football/2026/nov/21/european-football-borussia-dortmund-psg-real-madrid",
+      "title": "Bruno Fernandes reveals talks over new Manchester United contract are on hold",
+      "url": "https://www.theguardian.com/football/2026/nov/22/bruno-fernandes-reveals-talks-over-new-manchester-united-contract-are-on-hold",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T20:25:53+00:00",
+      "publishedAt": "2026-11-22T11:33:54+00:00",
       "category": "Sports"
     },
     {
-      "title": "Pochettino needs New Manager Bounce to break torrid Manchester United turnover | Jonathan Wilson",
-      "url": "https://www.theguardian.com/football/2026/nov/21/pochettino-needs-new-manager-bounce-to-break-torrid-manchester-united-turnover",
+      "title": "Verstappen a constant amid chaos as he says Russell is 'so far below my level'",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/c3n0l5p5x5x5o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T11:07:32+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Injured Jacks out of T20 Australia tour",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/c8p3v1p45360o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T10:00:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Hamilton-Leclerc collision completely unacceptable, says Ferrari boss",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/c6j9mepj0j1go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T09:07:15+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Robins ‘aims for the stars’ as Stoke dream of Premier League return",
+      "url": "https://www.theguardian.com/football/2026/nov/22/mark-robins-stoke-birmingham-championship-premier-league-promotion",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T20:00:06+00:00",
+      "publishedAt": "2026-11-22T08:00:22+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "César Azpilicueta: ‘At Chelsea a draw was a catastrophe – if you can’t perform, you’re out’",
+      "url": "https://www.theguardian.com/football/2026/nov/22/cesar-azpilicueta-at-chelsea-a-draw-was-a-catastrophe-if-you-cant-perform-youre-out",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T08:00:21+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'He will see what Man Utd are made of' - Pulis on Pochettino's first game",
+      "url": "https://www.bbc.co.uk/sport/football/articles/ckqx5w58dgv7o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T06:21:55+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Champion’s corner: KC Current win first NWSL Championship with 2-1 stunner over Spirit",
+      "url": "https://www.theguardian.com/football/2026/nov/21/nwsl-championship-washington-spirit-kansas-city-current",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T03:55:43+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Lionel Messi at center of red-card controversy as Inter Miami face early MLS playoff exit",
+      "url": "https://www.theguardian.com/football/2026/nov/21/lionel-messi-red-card-controversy-inter-miami-columbus-crew-mls-playoffs",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T03:01:55+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "‘Obviously it’s not good’: Arteta sweating over David Raya’s fitness after injury",
+      "url": "https://www.theguardian.com/football/2026/nov/21/david-raya-shoulder-injury-arsenal-newcastle-mikel-arteta",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-21T21:48:21+00:00",
       "category": "Sports"
     },
     {
@@ -109,27 +144,6 @@
       "category": "Sports"
     },
     {
-      "title": "Raya injured but Madueke rescues point for Arsenal in seesaw Newcastle draw",
-      "url": "https://www.theguardian.com/football/2026/nov/21/newcastle-arsenal-premier-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T19:47:11+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "‘Fragile’ Chelsea must toughen up after Leeds humiliation, admits Xabi Alonso",
-      "url": "https://www.theguardian.com/football/2026/nov/21/chelsea-leeds-premier-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T19:20:51+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'Fragile' and 'miles off it' - Alonso's Chelsea honeymoon is over",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cwe8944d004yo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-21T19:04:09+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Aston Villa held at home as dogged Sunderland battle for Régis Le Bris",
       "url": "https://www.theguardian.com/football/2026/nov/21/aston-villa-sunderland-premier-league-match-report",
       "source": "The Guardian Football",
@@ -155,20 +169,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/21/tottenham-ipswich-premier-league-match-report",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-21T16:58:31+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Elliot Anderson halts Manchester City’s losing run but boos greet Fulham draw",
-      "url": "https://www.theguardian.com/football/2026/nov/21/manchester-city-fulham-premier-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T14:34:03+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Elon Musk’s lawyer joining Tom Brady in buying Chelsea stake",
-      "url": "https://www.theguardian.com/football/2026/nov/21/elon-musk-lawyer-tom-brady-nfl-chelsea-stake",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T14:20:05+00:00",
       "category": "Sports"
     }
   ],
@@ -4190,35 +4190,6 @@
           "source": "CricketData"
         },
         {
-          "id": "5a550de1-4b29-4109-bee2-7415416929a1",
-          "homeTeam": "Sudur Paschim Royals",
-          "awayTeam": "Chitwan Rhinos",
-          "homeScore": 133,
-          "awayScore": 136,
-          "innings": [
-            {
-              "team": "chitwan rhinos Inning 1",
-              "runs": 133,
-              "wickets": 9,
-              "overs": 20
-            },
-            {
-              "team": "Sudur Paschim Royals,Chitwan Rhinos Inning 1",
-              "runs": 136,
-              "wickets": 7,
-              "overs": 19.5
-            }
-          ],
-          "winner": "Sudur Paschim Royals",
-          "competition": "Sudur Paschim Royals vs Chitwan Rhinos, Qualifier 2, Nepal Premier League 2026",
-          "matchType": "t20",
-          "overs": 20,
-          "startTime": "2026-11-19T10:45:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
           "id": "2ccadc74-616d-40d4-9931-d03a39313ada",
           "homeTeam": "Malaysia Women",
           "awayTeam": "Indonesia Women",
@@ -4483,16 +4454,29 @@
           "id": "fbb92c7e-d888-454b-9f21-cff468b527ea",
           "homeTeam": "United Arab Emirates",
           "awayTeam": "Nepal",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "resultText": null,
+          "homeScore": 122,
+          "awayScore": 123,
+          "innings": [
+            {
+              "team": "United Arab Emirates Inning 1",
+              "runs": 122,
+              "wickets": 10,
+              "overs": 39.5
+            },
+            {
+              "team": "Nepal Inning 1",
+              "runs": 123,
+              "wickets": 4,
+              "overs": 22
+            }
+          ],
+          "winner": "Nepal",
+          "resultText": "Nepal won by 6 wkts",
           "competition": "United Arab Emirates vs Nepal, 7th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
           "matchType": "odi",
           "startTime": "2026-11-22T06:00:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "CricketData"
         },
         {
@@ -4501,14 +4485,21 @@
           "awayTeam": "Pakistan A",
           "homeScore": null,
           "awayScore": null,
-          "innings": [],
+          "innings": [
+            {
+              "team": "pakistan a Inning 1",
+              "runs": 313,
+              "wickets": 9,
+              "overs": 49.1
+            }
+          ],
           "winner": null,
           "resultText": null,
           "competition": "India A vs Pakistan A, 8th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
           "matchType": "odi",
           "startTime": "2026-11-22T10:00:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "live",
           "source": "CricketData"
         },
         {

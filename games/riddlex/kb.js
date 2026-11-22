@@ -288,8 +288,18 @@ export async function loadManifest(base = "./kb") {
 }
 
 function grow(pool, need) {
-  if ((pool.capacity || pool.count) >= need) return;
-  const cap = Math.max(need, (pool.capacity || pool.count) * 2 || need);
+  // An overlay may reallocate packed arrays at their exact length. Never
+  // trust a stale pool.capacity: it can claim room that no longer exists.
+  const physicalCapacity = Math.min(
+    Math.floor(pool.attrs.length / pool.attrBytes),
+    pool.pop.length,
+    pool.flags.length,
+  );
+  if (physicalCapacity >= need) {
+    pool.capacity = physicalCapacity;
+    return;
+  }
+  const cap = Math.max(need, physicalCapacity * 2, pool.count * 2);
   const attrs = new Uint8Array(cap * pool.attrBytes);
   const pop = new Uint16Array(cap);
   const flags = new Uint8Array(cap);

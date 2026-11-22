@@ -708,7 +708,7 @@ export function createScene(canvas) {
 
   async function loadPack(orient) {
     const pack = { base: null, overlays: {} };
-    pack.base = await loadImage(BASE[orient]);
+    pack.base = await loadImage(BASE[orient], 12000);
     loadOverlaySet(orient).then((overlays) => {
       pack.overlays = overlays || {};
       if (images.baseOrient === orient) images.overlays = pack.overlays;
@@ -734,6 +734,10 @@ export function createScene(canvas) {
   function stop() {
     running = false;
     cancelAnimationFrame(raf);
+    if (reveal && !reveal.done) {
+      reveal.done = true;
+      reveal.resolve({ printed: false });
+    }
   }
 
   async function playReveal(options) {

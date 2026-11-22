@@ -319,6 +319,18 @@ async function exercise(browser, width, height){
   assert.equal(heading.trim(),'AI Staff Office','Office uses one professional, concise heading');
   assert.equal(await page.frameLocator('#preserved-staff-office').locator('.intro p').count(),0,
     'No redundant technical subtitle above the robots');
+  for(const selector of ['.desk.manager','.desk.it','.desk.cyber','.desk.cse','.desk.admin']){
+    const aligned=await page.frameLocator('#preserved-staff-office').locator(selector).evaluate(el=>{
+      const name=el.querySelector('.desk-name'),role=el.querySelector('.desk-role');
+      const desk=el.getBoundingClientRect(),nameBox=name.getBoundingClientRect();
+      return {title:getComputedStyle(name).textAlign,subtitle:getComputedStyle(role).textAlign,
+        centerDelta:Math.abs((nameBox.left+nameBox.width/2)-(desk.left+desk.width/2))};
+    });
+    assert.equal(aligned.title,'center','Staff desk title must be centered');
+    assert.equal(aligned.subtitle,'center','Staff desk subtitle must be centered');
+    assert(aligned.centerDelta<3,'Staff title box stays centered within the original desk');
+  }
+
   assert.equal(await page.locator('#ops-checks').count(),0,'No duplicate Run real checks button below robots');
   assert.equal(await page.locator('#ops-reload').count(),0,'No duplicate Refresh history button below robots');
   assert.equal(await page.frameLocator('#preserved-staff-office').locator('.details').count(),0,
@@ -341,21 +353,44 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#ops-role-name').textContent(),'Manager');
   await page.locator('#ops-input').fill('আজকের visitor এবং সাইটের সমস্যা যাচাই করো');
   await page.locator('#ops-send').click();
-  await page.locator('.manager-delegations summary').waitFor({state:'visible'});
+  await page.locator('#ops-history .ops-message.answer').last().waitFor({state:'visible'});
   assert.deepEqual(submittedRoles,['manager'],'only Manager receives owner commands');
   const question=await page.locator('#ops-history .ops-message.question').last().boundingBox();
   const answer=await page.locator('#ops-history .ops-message.answer').last().boundingBox();
   assert(question.x>answer.x+25,'owner messages are aligned right of Manager replies');
   assert.match(await page.locator('#ops-history .ops-message.question').last().textContent(),/আজকের visitor/);
-  assert.match(await page.locator('#ops-history .ops-message.answer').last().textContent(),/জি স্যার/);
+  assert.match(await page.locator('#ops-history .ops-message.answer').last().textContent(),/verified test response/);
   const finalBubble=await page.locator('#ops-history .ops-message').last().boundingBox();
   const fullTranscript=await page.locator('.manager-chat-transcript').boundingBox();
   assert(finalBubble.y+finalBubble.height>fullTranscript.y+fullTranscript.height-47,
     'Each new reply appears at bottom and earlier chat travels upward');
-  await page.locator('.manager-delegations summary').click();
-  assert.match(await page.locator('.manager-delegations').textContent(),/IT Technician/);
-  assert.match(await page.locator('.manager-delegations').textContent(),/Check real website and backend HTTP status/);
-  assert.match(await page.locator('.manager-delegations').textContent(),/Website HTTP 200/);
+  assert.equal(await page.locator('.manager-delegations').count(),0,
+    'Detailed staff tasks must never expand below owner Manager messages');
+  assert.equal(await page.locator('#manager-staff-chats').isVisible(),true,
+    'Dedicated Staff conversations are available only through the header');
+  await page.locator('#manager-staff-chats').click();
+  assert.equal(await page.locator('#ops-role-name').textContent(),'Staff chats');
+  assert.equal(await page.locator('#manager-staff-list').isVisible(),true);
+  assert.equal(await page.locator('.manager-chat-compose').isVisible(),false,
+    'Staff conversations are read-only, owner can only message Manager');
+  assert.equal(await page.locator('#ops-history').isVisible(),false,
+    'Team conversation list is a separate Messenger view');
+  await page.locator('.manager-staff-choice').filter({hasText:'IT Technician'}).click();
+  assert.equal(await page.locator('#ops-role-name').textContent(),'IT Technician');
+  assert.equal(await page.locator('#manager-staff-thread').isVisible(),true);
+  assert.match(await page.locator('#manager-staff-thread .ops-message.question').first().textContent(),
+    /Check real website and backend HTTP status/);
+  assert.match(await page.locator('#manager-staff-thread .ops-message.answer').first().textContent(),
+    /Website HTTP 200/);
+  const sent=await page.locator('#manager-staff-thread .ops-message.question').first().boundingBox();
+  const reported=await page.locator('#manager-staff-thread .ops-message.answer').first().boundingBox();
+  assert(sent.x>reported.x+25,'Manager commands are on the right, verified staff outcomes on the left');
+  await page.locator('#manager-thread-back').click();
+  assert.equal(await page.locator('#manager-staff-list').isVisible(),true);
+  await page.locator('#manager-thread-back').click();
+  assert.equal(await page.locator('#ops-history').isVisible(),true);
+  assert.equal(await page.locator('.manager-chat-compose').isVisible(),true);
+  assert.equal(await page.locator('#ops-role-name').textContent(),'Manager');
   await page.locator('#manager-chat-close').click();
   await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
   assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'true','drawer closes without changing office');

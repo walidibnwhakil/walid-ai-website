@@ -675,3 +675,23 @@ test("1990s screen-star question refers to film careers, never birth decade", ()
   assert.equal(factBit(pool, 2, qi), 1, "Puja Cherry became a lead star much later");
   assert.equal(qs.at(-1).bn.includes("জন্ম"), false, "career decade must not be birth decade");
 });
+
+test("Shabana and Alamgir are recognized as pre-1990 stars, not by birth year", () => {
+  const qs = [
+    { id: "real", group: "kind", en: "real?", bn: "মানুষ?" },
+    { id: "actor", group: "job", en: "actor?", bn: "অভিনয়?" },
+    { id: "from_bd", group: "country", en: "BD?", bn: "বাংলাদেশ?" },
+    ...EXTRA_SCREEN_QUESTIONS,
+  ];
+  const pool = poolFromEntries(qs, [
+    { id: "Q7460022", en: "Shabana", pop: 17, yes: ["real", "actor", "from_bd"] },
+    { id: "Q13057124", en: "Alamgir", pop: 8, yes: ["real", "actor", "from_bd"] },
+    { id: "Q7460127", en: "Shabnur", pop: 10, yes: ["real", "actor", "from_bd"] },
+  ]);
+  const qi = pool.qIndex.get("screen_star_pre1990");
+  assert.equal(factBit(pool, 0, qi), 2);
+  assert.equal(factBit(pool, 1, qi), 2);
+  assert.equal(factBit(pool, 2, qi), 1);
+  assert.ok(qs.at(-2).en.includes("before the 1990s"));
+  assert.ok(!qs.at(-2).bn.includes("জন্ম"));
+});

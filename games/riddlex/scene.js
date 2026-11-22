@@ -351,16 +351,23 @@ export function createScene(canvas) {
       }
       // Unlike the original fixed-ratio portrait crop, the complete photo fits
       // inside a larger card. Keep room below it for both guess buttons.
-      const reserve = 148 * chrome.dpr;
-      const top = Math.max(8 * chrome.dpr, Math.min(held.y, canvas.height - reserve - 110 * chrome.dpr));
-      const available = Math.max(68 * chrome.dpr, canvas.height - reserve - top - 8 * chrome.dpr);
-      const w = Math.min(canvas.width * 0.78, Math.max(210 * chrome.dpr, held.w * 1.85));
-      const nameH = Math.min(w * 0.23, available * 0.24);
-      const photoH = Math.max(1, Math.min(w * 1.04, available - nameH));
+      const dpr = chrome.dpr;
+      // A full-height portrait needs more vertical room than a landscape
+      // photograph. Grow upwards as needed, leaving the answer buttons
+      // reachable below the card on small phone displays.
+      const reserve = 148 * dpr;
+      const minimumTop = Math.max(28 * dpr, canvas.height * 0.33);
+      const maxHeight = Math.max(110 * dpr, canvas.height - reserve - minimumTop - 10 * dpr);
+      const w = Math.min(canvas.width * 0.80, Math.max(210 * dpr, held.w * 1.85));
+      const nameH = Math.min(w * 0.22, 68 * dpr);
+      const pad = 10 * dpr;
+      const naturalPhotoH = (w - pad * 2) * photo.height / Math.max(1, photo.width) + pad * 2;
+      const photoH = Math.max(50 * dpr, Math.min(maxHeight - nameH, naturalPhotoH));
       const h = photoH + nameH;
-      const y = Math.max(8 * chrome.dpr, Math.min(top, canvas.height - reserve - h - 8 * chrome.dpr));
+      const y = Math.max(minimumTop, Math.min(held.y,
+        canvas.height - reserve - h - 8 * dpr));
       return { u, photo, photoH, nameH, w, h,
-        x: (canvas.width - w) / 2, y, pad: 10 * chrome.dpr };
+        x: (canvas.width - w) / 2, y, pad };
     }
     // A photo card shows the whole picture, large, in the space to the right of
     // the detective's face. It may cover the shelves, cat, lamp and desk.
@@ -546,7 +553,10 @@ export function createScene(canvas) {
       ctx.beginPath();
       ctx.roundRect(w * 0.05, -ph / 2, pw, ph, 6);
       ctx.fill();
-      ctx.drawImage(reveal.photo, w * 0.08, -ph / 2 + 6, pw - 12, ph * 0.72);
+      // The small transition card must also retain the complete photograph.
+      const inset = fitPhotoInside(reveal.photo.width, reveal.photo.height,
+        w * 0.08, -ph / 2 + 6, pw - 12, ph * 0.72);
+      ctx.drawImage(reveal.photo, inset.x, inset.y, inset.w, inset.h);
     }
     ctx.restore();
   }

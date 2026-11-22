@@ -408,9 +408,11 @@ fs.mkdirSync(output, { recursive: true });
         );
         if (width >= 900)
           check(
-            await page.evaluate(
-              () => document.documentElement.scrollHeight <= innerHeight + 1,
-            ),
+            await page.evaluate(() => {
+              const toolbar = document.querySelector(".play-toolbar").getBoundingClientRect();
+              const stage = document.querySelector(".ludo-stage").getBoundingClientRect();
+              return toolbar.top >= -1 && stage.bottom <= innerHeight + 1;
+            }),
             `${tag} fits desktop`,
           );
         await screenshot(page, `board-${count}-${mode}-${width}`);

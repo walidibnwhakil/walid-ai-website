@@ -447,6 +447,13 @@ export function shouldGuess(state) {
   if (!(bestP > 0)) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
+  // A negative answer to a candidate-specific verification rules out that
+  // hypothesis, but is not permission to immediately blurt out another name.
+  // Ask at least two new, distinguishable questions about alternatives.
+  const lastDisproof = state.answers.findLastIndex((row) =>
+    row.value === "no" && !!row.verifiedCandidateId);
+  if (lastDisproof >= 0 && state.answers.length - lastDisproof - 1 < 2)
+    return false;
   // No guessed celebrity after four yes/no answers: the playable ranking stays
   // unchanged, but an identity still needs a useful conversation.
   // Published character/animal/object pools are much larger than synthetic

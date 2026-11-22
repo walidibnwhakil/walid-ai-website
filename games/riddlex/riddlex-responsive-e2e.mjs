@@ -272,6 +272,10 @@ try {
           // misleading celebrity guess from sparse facts.
           if (policy === "actor") assert.ok(seen.size >= 12,
             "The engine gave up immediately on actor=yes: " + seen.size);
+          if (policy === "actor_1990s") {
+            const info = await page.evaluate(() => window.__riddlex.diagnose());
+            console.log("RIDDLEX_OWNER_ACTOR_1990S_DIAG " + JSON.stringify(info));
+          }
           break;
         }
         if (state.mode === "guess") {
@@ -326,6 +330,11 @@ try {
         if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
         else if (q === "from_bd") a = "yes";
+        else if (policy === "actor_1990s" && ["named","alive","actor","screen_star_1990s"].includes(q)) a = "yes";
+        else if (policy === "actor_1990s" && [
+          "politician","writer","singer","musician","director","athlete",
+          "screen_star_pre1990","cricketer","footballer"
+        ].includes(q)) a = "no";
         else if (policy === "shakib" && q !== "knows_you")
           a = await page.evaluate(() =>
             window.__riddlex.find("Q266104") >= 0
@@ -373,6 +382,7 @@ try {
   await replay("Bangladeshi family member", "family");
   await replay("Shakib Al Hasan with the real database answers", "shakib");
   await replay("Bangladeshi actor who does not know the player", "actor");
+  await replay("1990s Bangladeshi actor, 12 real user answers", "actor_1990s");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

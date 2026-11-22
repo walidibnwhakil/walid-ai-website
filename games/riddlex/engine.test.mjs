@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute } from "./engine.js";
-import { appendShard, decodeShard, poolFromEntries } from "./kb.js";
+import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -589,4 +589,44 @@ test("animal and object rounds do not repeatedly scan all IDs for politics data"
   appendShard(animals, poolFromEntries(smallQuestions, [entry("dog-only", 10, ["animal"])]));
   recompute(state);
   assert.equal(fullScans, 2, "a newly appended shard should allow one recheck");
+});
+
+test("Shabnur exists in real BD female acting knowledge and is loaded by regional answers", () => {
+  const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));
+  const index = JSON.parse(readFileSync(new URL("./kb/index.json", import.meta.url), "utf8"));
+  const filename = "ix/r-bd-f-a-7079-p00.bin";
+  const buf = readFileSync(new URL("./kb/" + filename, import.meta.url));
+  const actual = decodeShard(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), manifest.questions);
+  const target = actual.ids.indexOf("Q7460127");
+  assert.ok(target >= 0, "Shabnur must not disappear from the real packed knowledge base");
+  assert.equal(actual.bns[target], "শাবনূর");
+  for (const countryAnswer of ["yes", "probably"]) {
+    const plan = planShardLoads(index, [
+      { qid: "real", value: "yes" },
+      { qid: "from_bd", value: countryAnswer },
+      { qid: "female", value: "yes" },
+      { qid: "alive", value: "yes" },
+      { qid: "actor", value: "yes" },
+    ], [index.top]);
+    assert.ok(plan.some((bucket) => bucket.file === filename),
+      "Bangladeshi actresses must be discoverable even with a probable country");
+  }
+});
+
+test("Shabnur's local screen fame is considered when BD, actress and female are confirmed", () => {
+  const qs = [
+    ["real", "kind"], ["female", "person"], ["alive", "life"],
+    ["from_bd", "country"], ["actor", "job"],
+  ].map(([id, group]) => ({ id, group, en: id, bn: id }));
+  const pool = poolFromEntries(qs, [
+    { id: "Q7460127", en: "Shabnur", bn: "শাবনূর", pop: 10, yes: qs.map((q) => q.id) },
+    { id: "other_local_actress", en: "Another local actress", pop: 110, yes: qs.map((q) => q.id) },
+    { id: "male_actor", en: "Actor", pop: 500, yes: ["real", "alive", "from_bd", "actor"], no: ["female"] },
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  assert.ok(state.weights[1] > state.weights[0], "global prior starts low for Shabnur");
+  for (const qid of ["real", "female", "alive", "from_bd", "actor"]) answer(state, qid, "yes");
+  assert.ok(state.weights[0] > state.weights[1],
+    "regional film recognition should help Shabnur once matching facts are known");
 });

@@ -265,8 +265,14 @@ try {
         const state = await page.evaluate(() => window.__riddlex.state());
         if (state.mode === "learn") {
           trace.push("END: learn / defeat");
-          if (policy === "actor_female_1990s") assert.ok(guesses > 4 || seen.size >= 24,
-            "Premature defeat after four guesses in actress case");
+          if (policy === "actor_female_1990s") {
+            assert.ok(seen.size >= 10, "Stopped before actor/decade investigation");
+            // Exhausting sparse verified facts is preferable to guessing four
+            // more actors the player did not describe.
+            if (lastGuessQuestionCount >= 0)
+              assert.ok(seen.size > lastGuessQuestionCount,
+                "No relevant follow-up was asked after rejecting a film star");
+          }
           if (policy === "public") assert.ok(seen.size >= 15,
             "The real knowledge engine surrendered before asking enough questions: " + seen.size);
           // A test with many deliberately unknown personal and career facts

@@ -65,6 +65,7 @@
       isBook ? document.querySelector(".others-book-title") : document.querySelector(".page-head");
     if (anchor) {
       const bar = newPanel("walid-reading-controls", "পড়ার সময় স্ক্রিন জাগিয়ে রাখা", anchor);
+      if (isSurah) anchor.append(bar); // Quran tabs move this container when sections change.
       const detail = document.createElement("span");
       detail.className = "reading-status";
       detail.setAttribute("role", "status");
@@ -196,6 +197,7 @@
     const tools = document.querySelector(".reading-tools");
     if (!tools) return;
     const panel = newPanel("walid-reading-progress", "কুরআনের শেষ পড়া ও বুকমার্ক", tools);
+    tools.append(panel); // Must remain inside tools as the tab switches between sections.
     const feedback = document.createElement("p");
     feedback.className = "reading-feedback";
     feedback.setAttribute("role", "status");
@@ -290,6 +292,13 @@
       panel.append(feedback);
     }
     renderPanel();
+    // A short surah may fit the viewport without a scroll gesture.
+    setTimeout(() => {
+      if (!document.hidden && (!last || last.surah !== surah)) {
+        const firstVisible = currentPosition();
+        if (firstVisible) saveLatest(firstVisible);
+      }
+    }, 3000);
     let gestureAt = 0;
     const gesture = () => { gestureAt = Date.now(); };
     window.addEventListener("wheel", gesture, {passive: true});

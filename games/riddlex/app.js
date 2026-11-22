@@ -389,7 +389,7 @@ async function beginDefeat() {
   mode = "learn";
   scene.playDefeat();
   const personal = state?.answers.some((row) =>
-    (row.qid === "knows_you" || row.qid === "your_crush") &&
+    row.qid === "knows_you" &&
     (row.value === "yes" || row.value === "probably"));
   if (personal) {
     // A friend or family member's real name must never enter the shared

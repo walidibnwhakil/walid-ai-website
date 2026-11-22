@@ -22,7 +22,15 @@ const usage={
     islam:{quran:{visitors:1,views:7,active_seconds:90}},
     others:{history:{visitors:3,views:4,active_seconds:30}}
   },
-  daily:[],countries:{},divisions:{},api:{},provider_snapshots:{},notes:[]
+  daily:[],
+  countries:{
+    US:{views:20,active_seconds:120},CA:{views:6,active_seconds:60},
+    CL:{views:5,active_seconds:20},ID:{views:4,active_seconds:15},
+    BD:{views:8,active_seconds:90},Unknown:{views:2,active_seconds:0}
+  },
+  divisions:{Unknown:{views:8,active_seconds:90}},
+  suspected_automated:{views:3,visitors:2,active_seconds:12,countries:{US:{views:3,active_seconds:12}}},
+  api:{},provider_snapshots:{},notes:[]
 };
 async function exercise(browser, width, height){
   const context=await browser.newContext({viewport:{width,height}});
@@ -67,6 +75,15 @@ async function exercise(browser, width, height){
   await page.locator('#workspace-shell').waitFor({state:'visible'});
   assert.equal(await page.locator('#auth-screen').isVisible(),false,'sign-in card hidden after login');
   assert.equal(await page.locator('#dashboard').isVisible(),true);
+  const regionText=await page.locator('#regions').textContent();
+  for(const fullName of ['United States (US)','Canada (CA)','Chile (CL)','Indonesia (ID)','Bangladesh (BD)','Unknown country','Bangladesh · Division unknown']){
+    assert(regionText.includes(fullName),'Full audience location label missing: '+fullName);
+  }
+  const automatedText=await page.locator('#automation-summary').textContent();
+  assert.match(automatedText,/Possible automated traffic/);
+  assert.match(automatedText,/3 views/);
+  assert.match(automatedText,/2 estimated browsers/);
+  assert.match(automatedText,/Older traffic cannot be reliably classified/);
   const topButton=page.locator('#top-feature-toggle');
   const topPanel=page.locator('#top-five-features');
   assert.equal(await topButton.count(),1,'Most Active Feature card is clickable');

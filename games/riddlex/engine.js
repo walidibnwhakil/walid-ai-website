@@ -313,6 +313,8 @@ export function recompute(state) {
   const localActor = positive("from_bd") && positive("actor");
   const playerPersonal = positive("knows_you") || positive("your_crush");
   const confirmedCrush = positive("your_crush");
+  const confirmedRelationships = answers.filter((row) =>
+    row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
     if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
@@ -326,6 +328,16 @@ export function recompute(state) {
     // Give them a fair chance only after the player confirms a personal
     // connection, without overpowering public-figure guesses beforehand.
     if (playerPersonal && pool.ids[i]?.startsWith("riddlex-role-")) prior *= 3;
+    const relation = PERSONAL_FACTS[pool.ids[i]];
+    if (relation) {
+      // Recognized personal relationships have no global fame score. Strong,
+      // specific player-provided facts should carry more weight than celebrity
+      // popularity or ambiguous family membership alone.
+      for (const row of confirmedRelationships) {
+        if (relation[row.qid] === 2)
+          prior *= row.value === "yes" ? 2.5 : 1.6;
+      }
+    }
     if (confirmedCrush && pool.ids[i] === "riddlex-role-crush") prior *= 4;
     let score = Math.log(prior + 1);
     for (let a = 0; a < answers.length; a++) {

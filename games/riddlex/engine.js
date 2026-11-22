@@ -241,7 +241,7 @@ function hardFacts() {
     ["party_secretary"],
     ["in_government"],
     // Personal relationships are player-relative and sometimes uncertain:
-    // missing facts, a one-sided crush or an ambiguous ex must NOT receive
+    // missing facts or an ambiguous ex must NOT receive
     // HARD_MISSING scores. Keep these likelihoods soft.
     ...PRIMARY_JOBS.map((job) => [job]),
     ["played_barcelona"],
@@ -311,8 +311,7 @@ export function recompute(state) {
   const positive = (qid) => answers.some((entry) => entry.qid === qid &&
     (entry.value === "yes" || entry.value === "probably"));
   const localActor = positive("from_bd") && positive("actor");
-  const playerPersonal = positive("knows_you") || positive("your_crush");
-  const confirmedCrush = positive("your_crush");
+  const playerPersonal = positive("knows_you");
   const confirmedRelationships = answers.filter((row) =>
     row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
@@ -338,7 +337,6 @@ export function recompute(state) {
           prior *= row.value === "yes" ? 2.5 : 1.6;
       }
     }
-    if (confirmedCrush && pool.ids[i] === "riddlex-role-crush") prior *= 4;
     let score = Math.log(prior + 1);
     for (let a = 0; a < answers.length; a++) {
       const answer = answers[a];
@@ -501,9 +499,6 @@ function gated(state, question, rows) {
     if (state.category !== "character") return false;
     if (id === "knows_you") return state.answers.some((row) => row.qid === "real" &&
       (row.value === "yes" || row.value === "probably"));
-    // Crushes need not be mutual or even known to the person in question.
-    if (id === "your_crush") return state.answers.some((row) =>
-      row.qid === "knows_you" && row.value !== "unknown");
     return state.answers.some((row) => row.qid === "knows_you" &&
       (row.value === "yes" || row.value === "probably"));
   }
@@ -977,17 +972,11 @@ export function chooseQuestion(state) {
         if (saidNo("your_partner")) {
           if (next("your_ex")) return "your_ex";
           if (saidNo("your_ex")) {
-            if (next("your_crush")) return "your_crush";
-            if (saidNo("your_crush")) {
-              if (next("your_best_friend")) return "your_best_friend";
-              if (saidNo("your_best_friend") && next("your_friend")) return "your_friend";
-            }
+            if (next("your_best_friend")) return "your_best_friend";
+            if (saidNo("your_best_friend") && next("your_friend")) return "your_friend";
           }
         }
       }
-    } else if (saidNo("knows_you") && next("your_crush")) {
-      // A one-sided crush must remain guessable.
-      return "your_crush";
     }
   }
   if (!state.category && saidNo("real") && saidNo("fictional") && !asked.has("animal")) return "animal";

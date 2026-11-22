@@ -209,13 +209,15 @@ async function exercise(browser, width, height){
   await page.locator('#ops-send').click();
   assert.deepEqual(submittedRoles,['manager'],'only Manager receives owner commands');
   await page.locator('#manager-chat-close').click();
-  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'drawer closes without changing office');
+  await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'true','drawer closes without changing office');
   await page.frameLocator('#preserved-staff-office').locator('.desk.it').click();
   assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'subordinate desk cannot open direct chat');
   await page.locator('#manager-chat-open').click();
   assert.equal(await page.locator('#manager-chat-panel').isVisible(),true,'office shortcut opens Manager');
   await page.keyboard.press('Escape');
-  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'Escape closes drawer');
+  await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'true','Escape closes drawer');
   await page.locator('#sidebar-toggle').click();
   await page.locator('[data-admin-tab="riddlex"]').click();
   assert.equal(await page.locator('#staff-workspace').isVisible(),false);

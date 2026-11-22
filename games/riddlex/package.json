@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test identity-proof.test.mjs personal.test.mjs photo-fit.test.mjs engine.test.mjs learn-form.test.mjs kb-plan.test.mjs expression.test.mjs gate.test.mjs learn-guard.test.mjs politics.test.mjs",
+    "test": "node --test production-flow.test.mjs identity-proof.test.mjs personal.test.mjs photo-fit.test.mjs engine.test.mjs learn-form.test.mjs kb-plan.test.mjs expression.test.mjs gate.test.mjs learn-guard.test.mjs politics.test.mjs",
     "harvest": "python3 knowledge/harvest.py",
     "pack": "python3 knowledge/pack.py",
     "simulate": "node simulate.mjs"

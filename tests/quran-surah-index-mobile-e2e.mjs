@@ -51,10 +51,35 @@ try {
     assert.ok(result.overflow<=2,"No horizontal page overflow at "+width+"px: "+result.overflow);
     assert.deepEqual(result.clipped,[],"All 114 names and metadata must fit at "+width+"px");
     assert.equal(await page.locator("#surah-list .surah-card").count(),114);
-    if(width===375){
+    // The oversized index banner and permanent full-width search are gone.
+    const intro=page.locator(".quran-index-heading");
+    assert.equal(await intro.locator("h1").textContent(),"আল-কুরআন");
+    assert.equal(await intro.locator("p").textContent(),"সূরা নির্বাচন করুন");
+    assert.ok(await intro.evaluate(el=>el.getBoundingClientRect().height)<145,
+      "Compact heading must not reserve a tall hero at "+width+"px");
+    assert.equal(await page.locator("#surah-search-panel").isVisible(),false,
+      "Search input stays collapsed until requested");
+    const searchButton=page.getByRole("button",{name:"সূরা খুঁজুন"});
+    assert.ok(await searchButton.evaluate(el=>el.getBoundingClientRect().width)<=48,
+      "Small magnifier replaces a wide search field at "+width+"px");
+    if(width===375||width===1280){
+      await searchButton.click();
+      assert.equal(await page.locator("#surah-search-panel").isVisible(),true);
+      assert.equal(await page.locator("#surah-search-toggle").getAttribute("aria-expanded"),"true");
+      assert.equal(await page.evaluate(()=>document.activeElement?.id),"surah-search");
       await page.locator("#surah-search").fill("বাকারা");
       assert.equal(await page.locator("#surah-list .surah-card").count(),1);
-      await page.locator("#surah-search").fill("");
+      assert.match(await page.locator("#list-status").textContent(),/১টি সূরা/);
+      await page.locator("#surah-search").press("Escape");
+      assert.equal(await page.locator("#surah-search-panel").isVisible(),false);
+      assert.equal(await page.locator("#surah-search-toggle").getAttribute("aria-expanded"),"false");
+      assert.equal(await page.locator("#surah-list .surah-card").count(),114);
+      assert.equal(await page.evaluate(()=>document.activeElement?.id),"surah-search-toggle");
+      // A second click opens and the close button returns to 114 cards.
+      await page.locator("#surah-search-toggle").click();
+      await page.locator("#surah-search").fill("সূরা নেই");
+      assert.equal(await page.locator("#surah-list .surah-card").count(),0);
+      await page.getByRole("button",{name:"সার্চ বন্ধ করুন"}).click();
       assert.equal(await page.locator("#surah-list .surah-card").count(),114);
     }
     assert.deepEqual(exceptions,[],"No index JS exceptions at "+width+"px");

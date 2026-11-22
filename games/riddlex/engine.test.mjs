@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute } from "./engine.js";
+import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 
@@ -411,6 +411,19 @@ test("parent nos block role questions, and a country yes implies its continent",
   assert.equal(questionBlocked(outside, "from_bd"), true);
   assert.equal(questionBlocked(outside, "from_in"), true);
   assert.equal(questionBlocked(outside, "from_us"), false);
+});
+
+test("public candidates need a confirmed occupation or other distinctive yes at scale", () => {
+  const pool = poolFromEntries(questions, Array.from({ length: 120 }, (_, k) =>
+    entry("candidate-" + k, 300 + k, ["real", "named", "male", "alive", "from_bd"],
+      { no: ["from_in", "cricketer", "actor", "writer", "adult_ent", "fictional"] })));
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [id, value] of [
+    ["real", "yes"], ["from_bd", "yes"], ["male", "yes"], ["cricketer", "no"],
+    ["actor", "no"], ["writer", "no"],
+  ]) answer(state, id, value);
+  assert.equal(shouldGuess(state), false, "country plus negatives do not identify a celebrity");
 });
 
 test("confirmed Bangladesh country never guesses an explicitly foreign celebrity", () => {

@@ -1,0 +1,65 @@
+name: One-time Walid AI social preview compatibility fix
+on:
+  push:
+    branches:
+      - fix/whatsapp-social-image-compat-20261122
+    paths:
+      - .github/workflows/one-time-social-preview-compat.yml
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    if: github.repository == 'walidibnwhakil/walid-ai-website'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/whatsapp-social-image-compat-20261122
+          persist-credentials: true
+      - name: Generate visually identical smaller share image and refresh OG tags
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet --disable-pip-version-check Pillow
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          source = Path('walid-ai-share-20261122.png')
+          target = Path('walid-ai-share-20261122-compatible.jpg')
+          with Image.open(source) as image:
+              assert image.size == (1200, 630), image.size
+              image.convert('RGB').save(target, 'JPEG', quality=95, optimize=True, progressive=True, subsampling=0)
+          assert target.stat().st_size < 600_000, target.stat().st_size
+          old = 'https://walid-ai.com/walid-ai-share-20261122.png?v=20261122-exact-floral'
+          new = 'https://walid-ai.com/' + target.name
+          updated = []
+          for page in Path('.').rglob('*.html'):
+              if '.git' in page.parts or 'node_modules' in page.parts:
+                  continue
+              html = page.read_text(encoding='utf-8')
+              if old not in html:
+                  continue
+              revised = html.replace(old, new)
+              revised = revised.replace('property="og:image:type" content="image/png"', 'property="og:image:type" content="image/jpeg"')
+              page.write_text(revised, encoding='utf-8')
+              updated.append(str(page))
+          assert len(updated) >= 40, f'Only {len(updated)} pages were found; expected 40'
+          assert '<meta property="og:image" content="' + new + '"' in Path('index.html').read_text(encoding='utf-8')
+          print('New image size:', target.stat().st_size, 'updated pages:', len(updated))
+          print('\n'.join(updated))
+          PY
+      - name: Remove temporary workflow and commit only the site fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/one-time-social-preview-compat.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git diff --cached --stat
+          git commit -m "fix(social): use under-600KB official floral preview on 40 pages"
+          git push origin HEAD:fix/whatsapp-social-image-compat-20261122

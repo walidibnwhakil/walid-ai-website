@@ -15,6 +15,28 @@
   // Private Help messages are displayed only for this session, never localStorage.
   const transientHelp=new Map();
   const CHAT_RETENTION_MS=5*24*60*60*1000;
+  let managerNotices=[],lastManagerTasks=[];
+  const NOTICE_SEEN_KEY='walid-manager-notice-ids';
+  function seenNotices(){
+    try{
+      const items=JSON.parse(sessionStorage.getItem(NOTICE_SEEN_KEY)||'[]');
+      return Array.isArray(items)?items.filter(x=>typeof x==='string').slice(-100):[];
+    }catch{return []}
+  }
+  function updateNoticeHead(){
+    const head=$('#manager-chat-head');if(!head||!ready)return;
+    const seen=new Set(seenNotices());
+    const unread=managerNotices.filter(n=>n?.id&&!seen.has(n.id)).length;
+    head.dataset.unread=unread?'true':'false';
+    head.setAttribute('aria-label',unread?'Open Manager chat, '+unread+' unread messages':'Open Manager chat');
+    head.title=unread?'Manager-এর '+unread+'টি নতুন বার্তা':'Chat with Manager';
+  }
+  function acknowledgeNotices(){
+    const saved=new Set(seenNotices());
+    managerNotices.forEach(n=>{if(n?.id)saved.add(n.id)});
+    try{sessionStorage.setItem(NOTICE_SEEN_KEY,JSON.stringify([...saved].slice(-100)))}catch{}
+    updateNoticeHead();
+  }
   function positionChatHead(){
     const head=$('#manager-chat-head'),anchor=$('#sidebar-toggle');
     if(!head||!anchor||!ready)return;
@@ -165,30 +187,49 @@
     }
     bubble.append(details);
   }
-  function renderHistory(tasks){
+  function renderHistory(tasks,notices=managerNotices){
     const host=$('#ops-history');host.replaceChildren();
     const cutoff=Date.now()-CHAT_RETENTION_MS;
     const filtered=(Array.isArray(tasks)?tasks:[])
       .filter(item=>item?.role==='manager'&&Date.parse(item.created_at||'')>=cutoff)
       .sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||'')).slice(-65);
-    if(!filtered.length){
-      // A non-persisted greeting is shown only when there are no previous commands.
+    const taskIds=new Set(filtered.map(item=>item.id));
+    const messageItems=filtered.map(task=>({type:'task',created_at:task.created_at,task}));
+    for(const notice of Array.isArray(notices)?notices:[]){
+      if(!notice?.id||Date.parse(notice.created_at||'')<cutoff)continue;
+      if(notice.task_id&&taskIds.has(notice.task_id))continue; // No duplicate alert next to its failed command.
+      messageItems.push({type:'notice',created_at:notice.created_at,notice});
+    }
+    messageItems.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
+    if(!messageItems.length){
       const greeting=appendMessage(host,'answer','Manager',
         'আসসালামু আলাইকুম, স্যার। Walid AI Office-এ স্বাগতম। আমি আপনার Manager। আপনার কী নির্দেশ আছে?');
       greeting.classList.add('manager-chat-greeting');
       return;
     }
-    for(const task of filtered){
+    for(const item of messageItems){
+      if(item.type==='notice'){
+        const notice=item.notice;
+        const bubble=appendMessage(host,'answer','Manager · '+fmt(notice.created_at),
+          notice.message||'একটি নতুন অফিস বার্তা এসেছে।');
+        bubble.classList.add('manager-chat-notice');
+        if(notice.kind==='alert')bubble.classList.add('manager-chat-alert');
+        if(typeof notice.source_url==='string'&&/^https:\/\/github\.com\/walidibnwhakil\/walid-ai-(?:website|backend)\/actions\/runs\/\d+$/.test(notice.source_url)){
+          const link=document.createElement('a');link.href=notice.source_url;link.target='_blank';link.rel='noopener noreferrer';
+          link.textContent='যাচাইয়ের রিপোর্ট';bubble.append(link);
+        }
+        continue;
+      }
+      const task=item.task;
       appendMessage(host,'question','আপনি · '+fmt(task.created_at),task.instruction||task.title||'');
       const result=task.result||{};
       const bubble=appendMessage(host,'answer','Manager · '+fmt(result.checked_at||task.updated_at),
         result.answer||(task.status==='running'?'আপনার নির্দেশ যাচাই করা হচ্ছে…':'এই অনুরোধের যাচাইকৃত উত্তর পাওয়া যায়নি।'),
         result.limitation||(['queued','running'].includes(task.status)?'প্রক্রিয়াধীন':task.status||'unknown'));
       appendDelegations(bubble,result);
-      const privateRows=transientHelp.get(task.id)||[];
-      for(const item of privateRows){
-        appendMessage(host,'answer','Admin Staff · '+fmt(item.received_at),item.message||'(Empty Help message)',
-          'শুধু এই সেশনে দৃশ্যমান; ইতিহাসে সংরক্ষিত নয়');
+      for(const privateRow of transientHelp.get(task.id)||[]){
+        appendMessage(host,'answer','Admin Staff · '+fmt(privateRow.received_at),
+          privateRow.message||'(Empty Help message)','শুধু এই সেশনে দৃশ্যমান; ইতিহাসে সংরক্ষিত নয়');
       }
     }
     host.scrollTop=host.scrollHeight;
@@ -221,9 +262,28 @@
   async function loadHistory(){
     if(!ready)return;
     try{
-      const data=await request('/api/admin/tasks');
-      renderHistory(data.tasks||[]);
+      const [data,brief]=await Promise.all([
+        request('/api/admin/tasks'),
+        request('/api/admin/manager/notices').catch(()=>({notices:managerNotices})),
+      ]);
+      lastManagerTasks=data.tasks||[];
+      managerNotices=Array.isArray(brief.notices)?brief.notices:[];
+      renderHistory(lastManagerTasks,managerNotices);
+      if($('#manager-chat-panel')?.classList.contains('is-open'))acknowledgeNotices();
+      else updateNoticeHead();
     }catch(error){status('চ্যাটের আগের বার্তা দেখানো যাচ্ছে না: '+error.message,true)}
+  }
+  async function refreshNotices(){
+    if(!ready)return;
+    try{
+      const brief=await request('/api/admin/manager/notices');
+      managerNotices=Array.isArray(brief.notices)?brief.notices:[];
+      updateNoticeHead();
+      if($('#manager-chat-panel')?.classList.contains('is-open')){
+        renderHistory(lastManagerTasks,managerNotices);
+        acknowledgeNotices();
+      }
+    }catch{/* A monitoring outage must not interrupt the owner's conversation. */}
   }
   async function submit(){
     if(!ready||busy)return;
@@ -276,6 +336,7 @@
   function logout(){
     closeManagerChat();
     transientHelp.clear();
+    managerNotices=[];lastManagerTasks=[];
     ready=false;setSidebarOpen(false);
     $('#manager-chat-head').disabled=true;$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=true);
@@ -287,6 +348,7 @@
     requestAnimationFrame(positionChatHead);
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=false);
     selectTab(currentTab,false);
+    void refreshNotices();
   });
   addEventListener('walid-admin-signed-out',logout);
   // No section hashes or alternate admin URLs.
@@ -354,6 +416,9 @@
   });
   addEventListener('resize',positionChatHead);
   addEventListener('scroll',positionChatHead,{passive:true});
+  addEventListener('focus',()=>{if(ready)void refreshNotices()});
+  document.addEventListener('visibilitychange',()=>{if(ready&&!document.hidden)void refreshNotices()});
+  setInterval(()=>{if(ready&&!document.hidden)void refreshNotices()},4*60*1000);
   $('#ops-checks')?.addEventListener('click',runChecks);
   $('#ops-reload')?.addEventListener('click',()=>{void loadStaff();void loadHistory()});
   createRoleCards();

@@ -392,6 +392,7 @@ try {
         let a = "unknown";
         if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
+        else if (policy === "chaplin" && q === "from_bd") a = "no";
         else if (policy === "chaplin" && q !== "from_bd")
           a = await page.evaluate((qid) =>
             window.__riddlex.replyFor("Q882", qid), q);

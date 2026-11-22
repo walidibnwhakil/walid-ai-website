@@ -195,6 +195,7 @@
 
 /* Anonymous aggregate page-view and active-time counters; never inspect reading content. */
 (() => {
+  if (typeof document.getElementById !== 'function' || typeof document.createElement !== 'function') return;
   if (document.querySelector('script[src^="/usage.js"]') || document.getElementById('walid-section-usage')) return;
   const script = document.createElement('script');
   script.id = 'walid-section-usage';

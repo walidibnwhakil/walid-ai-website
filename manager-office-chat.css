@@ -14,6 +14,16 @@
   box-shadow:0 8px 24px #000b,0 0 0 5px #4de4ff4a;
 }
 #workspace-shell > #manager-chat-head:disabled{opacity:.45;cursor:not-allowed}
+#workspace-shell > #manager-chat-head[data-unread="true"]::after{
+  content:"";position:absolute;right:0;top:0;width:12px;height:12px;
+  border-radius:50%;background:#ff987e;border:2px solid #102639;
+  box-shadow:0 0 0 2px #ff987e35;
+}
+.manager-chat-panel .manager-chat-alert{border-color:#6d5551!important}
+.manager-chat-panel .manager-chat-alert a{
+  font-size:.78rem;color:#a8e9ff;text-decoration:underline;text-underline-offset:3px;
+  overflow-wrap:anywhere;
+}
 #workspace-shell > #manager-chat-head svg{display:block;width:29px;height:29px}
 .manager-chat-backdrop{position:fixed;inset:0;z-index:119;background:#010811b3}
 .manager-chat-backdrop[hidden]{display:none!important}

@@ -131,6 +131,28 @@ async function exercise(browser, width, height){
   assert.deepEqual(await page.locator('#features > details.analytics-section > summary .section-title').allTextContents(),[
     'AI Chat','PDF Tools','Image Tools','Games','Education','Al-Quran & Islam','Sports','Others'
   ],'Dashboard section names and order must match the homepage');
+  const columnsFor=async(section)=>sections.nth(section).locator('.section-metrics-table thead th').allTextContents();
+  const expectedColumns={
+    chat:['Feature','Visitors ≈','Views','Answers','Errors','Active time'],
+    tools:['Feature','Visitors ≈','Views','Starts','Completed','Errors','Active time'],
+    learning:['Feature','Visitors ≈','Views','Starts','Completed','Active time'],
+    reading:['Feature','Visitors ≈','Views','Active time'],
+  };
+  assert.deepEqual(await columnsFor(0),expectedColumns.chat,'AI Chat shows answers and errors, not starts/completed');
+  assert.deepEqual(await columnsFor(1),expectedColumns.tools,'PDF shows tool starts/completions/errors, no answers');
+  assert.deepEqual(await columnsFor(2),expectedColumns.tools,'Image shows tool starts/completions/errors, no answers');
+  assert.deepEqual(await columnsFor(3),expectedColumns.learning,'Games show starts and completed only');
+  assert.deepEqual(await columnsFor(4),expectedColumns.learning,'Education shows starts and completed only');
+  assert.deepEqual(await columnsFor(5),expectedColumns.reading,'Quran is reading-only');
+  assert.deepEqual(await columnsFor(6),expectedColumns.reading,'Sports has only visits, views and active time');
+  const otherHeaders=sections.nth(7).locator('details.analytics-subsection .section-metrics-table thead th');
+  assert.equal(await otherHeaders.count(),3*expectedColumns.reading.length,'All three Others subcategories use reading-only columns');
+  for(const values of await otherHeaders.allTextContents())assert(expectedColumns.reading.includes(values),'Others books have no irrelevant columns: '+values);
+  for(const i of [0,1,2,3,4,5,6]){
+    const thCount=await sections.nth(i).locator('.section-metrics-table thead th').count();
+    const tdCount=await sections.nth(i).locator('.section-metrics-table tbody tr').first().locator('td').count();
+    assert.equal(tdCount,thCount,'Section '+i+' row values match context-specific header count');
+  }
   assert.equal(await page.locator('#features details[open]').count(),0,'All details start closed');
   await sections.nth(1).locator('summary').first().click();
   assert.equal(await sections.nth(1).getAttribute('open'),'','PDF opens with the arrow');

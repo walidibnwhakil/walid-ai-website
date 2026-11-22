@@ -371,15 +371,33 @@ export function recompute(state) {
   return state;
 }
 
+// A definite country is a requirement for a name, not merely a small
+// probability penalty. Otherwise a globally famous US actor with a missing
+// Bangladesh bit can beat a less-famous verified Bangladeshi actor.
+export function guessMatchesAnswers(state, index) {
+  if (index < 0 || index >= state.pool.count) return false;
+  for (const row of state.answers) {
+    if (row.value === "yes" && COUNTRIES.includes(row.qid) &&
+        factBit(state.pool, index, row.qi) !== 2) return false;
+    // Generic family/friend templates are impossible after a firm "no".
+    if (row.qid === "knows_you" && row.value === "no" &&
+        factBit(state.pool, index, row.qi) === 2) return false;
+  }
+  return true;
+}
+
 function topTwo(state) {
   let best = -1;
   let second = -1;
   let bestP = 0;
   let secondP = 0;
+  let eligibleTotal = 0;
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
+    if (!guessMatchesAnswers(state, i)) continue;
     const w = weights[i];
+    eligibleTotal += w;
     if (w > bestP) {
       second = best;
       secondP = bestP;
@@ -389,6 +407,12 @@ function topTwo(state) {
       second = i;
       secondP = w;
     }
+  }
+  // Confidence is relative to people who meet the confirmed identity facts.
+  // The question model itself still retains uncertain rows to gather evidence.
+  if (eligibleTotal > 0) {
+    bestP /= eligibleTotal;
+    secondP /= eligibleTotal;
   }
   return { best, second, bestP, secondP };
 }
@@ -705,7 +729,7 @@ function confirmedJob(state) {
   return PRIMARY_JOBS.find((job) => said(state, job, ["yes", "probably"])) || "";
 }
 
-function candidatesSplit(state, id, rows) {
+function candidatesSplit(state, id, rows, minimum = 0.15) {
   const qi = state.pool.qIndex.get(id);
   if (qi == null || !rows?.length) return false;
   let yes = 0;
@@ -719,7 +743,7 @@ function candidatesSplit(state, id, rows) {
     if (bit === 2) yes += weight;
     else if (bit === 1) no += weight;
   }
-  return total > 0 && yes / total >= 0.15 && no / total >= 0.15;
+  return total > 0 && yes / total >= minimum && no / total >= minimum;
 }
 
 function politicsBranch(state) {
@@ -756,7 +780,11 @@ function unrelatedJob(state, id) {
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   if (politics && politicsBranch(state, rows)) return false;
   const probe = politics ? "politician" : id;
-  return !candidatesSplit(state, probe, rows);
+  // Acting can overlap sports or politics, but cross-career detours should
+  // need substantial evidence rather than a weak 15% minority.
+  const minimum = job === "actor" && ["cricketer", "footballer", "politician"].includes(probe)
+    ? 0.30 : 0.15;
+  return !candidatesSplit(state, probe, rows, minimum);
 }
 
 function skippedAsDuplicate(state, id) {
@@ -846,6 +874,24 @@ function parentAbsent(state, parentId, rows, cache) {
 // strict: the parent must already be yes (or implied). Otherwise a no or
 // probably-not is enough to close the branch; an unasked parent stays open.
 export const QUESTION_REQUIRES = {
+  // Relationship questions form one branch, not general celebrity trivia.
+  your_parent: [{ id: "your_family", value: "yes", strict: true }],
+  your_sibling: [{ id: "your_family", value: "yes", strict: true },
+    { id: "your_parent", value: "no", strict: true }],
+  your_spouse: [{ id: "your_family", value: "yes", strict: true },
+    { id: "your_parent", value: "no", strict: true },
+    { id: "your_sibling", value: "no", strict: true }],
+  your_child: [{ id: "your_family", value: "yes", strict: true },
+    { id: "your_spouse", value: "no", strict: true }],
+  your_baby: [{ id: "your_child", value: "yes", strict: true }],
+  your_partner: [{ id: "your_family", value: "no", strict: true }],
+  your_ex: [{ id: "your_family", value: "no", strict: true },
+    { id: "your_partner", value: "no", strict: true }],
+  your_best_friend: [{ id: "your_family", value: "no", strict: true },
+    { id: "your_partner", value: "no", strict: true },
+    { id: "your_ex", value: "no", strict: true }],
+  your_friend: [{ id: "your_family", value: "no", strict: true },
+    { id: "your_best_friend", value: "no", strict: true }],
   party_bnp: [{ id: "from_bd", value: "yes" }],
   party_al: [{ id: "from_bd", value: "yes" }],
   party_jp: [{ id: "from_bd", value: "yes" }],
@@ -856,6 +902,7 @@ export const QUESTION_REQUIRES = {
 
 const STRICT_PARENT = {
   politics: "politician",
+  personal: "knows_you",
 };
 
 function answerValue(state, qid) {
@@ -877,9 +924,13 @@ export function prerequisitesFor(question) {
 
 function requirementFails(state, req, links) {
   const value = answerValue(state, req.id);
-  const affirmed = value === "yes" || value === "probably" || (value == null && impliedYes(state, req.id, links));
-  if (affirmed) return false;
-  if (value === "no" || value === "probably_not") return true;
+  const expectsNo = req.value === "no";
+  const matches = expectsNo
+    ? value === "no" || value === "probably_not"
+    : value === "yes" || value === "probably" ||
+      (value == null && impliedYes(state, req.id, links));
+  if (matches) return false;
+  if (value && value !== "unknown") return true;
   return !!req.strict;
 }
 
@@ -889,6 +940,12 @@ export function questionContradicts(state, qid) {
   const question = state.pool.questions[qi];
   const links = linksFor(state.pool);
   if (prerequisitesFor(question).some((req) => requirementFails(state, req, links))) return true;
+  // Don't ask "does he bat/bowl?" before confirming he plays cricket.
+  // The same rule applies to football positions, acting and music subtypes.
+  for (const parent of links.massParents.get(qid) || []) {
+    if (["cricketer", "footballer", "actor", "singer"].includes(parent) &&
+        requirementFails(state, { id: parent, value: "yes", strict: true }, links)) return true;
+  }
   return ancestorRejected(state, qid, links);
 }
 
@@ -931,7 +988,9 @@ function firstAllowedQuestion(state) {
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
+    if (!allowedInCategory(state, question) ||
+        blockedQuestion(state, question, rows, cache) ||
+        !gated(state, question, rows)) continue;
     return question.id;
   }
   return null;

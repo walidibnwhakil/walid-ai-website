@@ -36,6 +36,8 @@ jobs:
         run: python3 -m unittest discover -s tests -p 'test_pwa_manifest.py' -v
       - name: Validate PWA JavaScript syntax
         run: node --check pwa.js
+      - name: Verify scheduled CSE function smoke tests before daily automation
+        run: node --test games/riddlex/engine.test.mjs games/riddlex/politics.test.mjs games/ludo-rules.test.mjs games/chess/chess.test.mjs games/2048.test.mjs
       - name: Verify usage browser test syntax
         run: node --check tests/test_usage_browser.cjs
       - name: Verify current canonical routes, icons and retired Quran workflows

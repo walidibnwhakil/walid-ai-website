@@ -72,7 +72,17 @@ async function exercise(browser, width, height){
     notices:[{id:'morning-'+new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'}),
       kind:'morning',role:'Manager',
       created_at:new Date(new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'})+'T00:05:00+06:00').toISOString(),
-      message:'আসসালামু আলাইকুম, স্যার। শুভ সকাল।'}],
+      message:'আসসালামু আলাইকুম, স্যার। শুভ সকাল।'},
+      {id:'daily-'+new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'}),
+       kind:'daily_report',
+       created_at:new Date(new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'})+'T00:06:00+06:00').toISOString(),
+       message:'আজকের অফিস রিপোর্ট: IT / Cyber / Admin / CSE প্রত্যেকে যাচাই করেছেন।',
+       daily_delegations:[
+         {role:'monitor',instruction:'Daily website check',outcome:'Website and Backend HTTP 200',status:'ok'},
+         {role:'security',instruction:'Daily security signals',outcome:'No proven hacking; limited evidence',status:'limited'},
+         {role:'mail',instruction:'Daily Help inbox check',outcome:'Help inbox: no messages',status:'ok'},
+         {role:'code',instruction:'Daily function error scan',outcome:'Two anonymized PDF error events, cause unknown',status:'attention'}
+       ]}],
     scheduled_monitor_checked:true
   }}));
   // Approval UI is tested for section isolation only, not external Firebase sign-in.
@@ -132,7 +142,7 @@ async function exercise(browser, width, height){
   const initialTranscript=await page.locator('.manager-chat-transcript').boundingBox();
   assert(initialBubble.y+initialBubble.height>initialTranscript.y+initialTranscript.height-47,
     'When chat has one greeting, it must sit at bottom like Messenger, not at top');
-  const welcomeText=await page.locator('.manager-chat-notice').textContent();
+  const welcomeText=await page.locator('.manager-chat-notice').first().textContent();
   assert.match(welcomeText,/আসসালামু আলাইকুম/);
   assert(!welcomeText.includes('আপনার কোনো নির্দেশ থাকলে বলুন'),
     'Unrequested command prompts must not appear in the daily greeting');
@@ -384,14 +394,24 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#ops-role-name').textContent(),'IT Technician');
   assert.equal(await page.locator('#manager-staff-thread').isVisible(),true);
   assert.match(await page.locator('#manager-staff-thread .ops-message.question').first().textContent(),
-    /Check real website and backend HTTP status/);
+    /Daily website check/);
   assert.match(await page.locator('#manager-staff-thread .ops-message.answer').first().textContent(),
+    /Website and Backend HTTP 200/);
+  assert.match(await page.locator('#manager-staff-thread .ops-message.question').last().textContent(),
+    /Check real website and backend HTTP status/);
+  assert.match(await page.locator('#manager-staff-thread .ops-message.answer').last().textContent(),
     /Website HTTP 200/);
   const sent=await page.locator('#manager-staff-thread .ops-message.question').first().boundingBox();
   const reported=await page.locator('#manager-staff-thread .ops-message.answer').first().boundingBox();
   assert(sent.x>reported.x+25,'Manager commands are on the right, verified staff outcomes on the left');
   await page.locator('#manager-thread-back').click();
   assert.equal(await page.locator('#manager-staff-list').isVisible(),true);
+  await page.locator('.manager-staff-choice').filter({hasText:'Admin Staff'}).click();
+  assert.match(await page.locator('#manager-staff-thread').textContent(),/Daily Help inbox check/);
+  assert.match(await page.locator('#manager-staff-thread').textContent(),/Help inbox: no messages/);
+  assert.equal(await page.locator('.manager-chat-compose').isVisible(),false,
+    'Owner cannot directly instruct Admin Staff');
+  await page.locator('#manager-thread-back').click();
   await page.locator('#manager-thread-back').click();
   assert.equal(await page.locator('#ops-history').isVisible(),true);
   assert.equal(await page.locator('.manager-chat-compose').isVisible(),true);

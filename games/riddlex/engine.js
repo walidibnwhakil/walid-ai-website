@@ -1173,7 +1173,10 @@ export function decide(state) {
   // With sparse ordinary-person clues, continue questioning rather than
   // surrendering at eight. Preserve confident well-supported guesses and
   // keep the post-rejection gap used by the existing engine.
-  if (!qid && (waiting || !supportedIdentity(state)))
+  // Missing verified candidates in the currently loaded shard is not
+  // proof that an actor or other person is absent from the whole casebook.
+  // Ask remaining relevant questions rather than surrender immediately.
+  if (!qid && (waiting || !supportedIdentity(state) || best < 0))
     qid = firstAllowedQuestion(state);
   if (!qid) {
     if (best >= 0 && bestP > 0 && supportedIdentity(state))

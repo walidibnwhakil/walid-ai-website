@@ -89,6 +89,11 @@ function gameInProgress() {
 }
 
 const LOAD_MS = 15000;
+const debugLoad = new URLSearchParams(location.search).has("autotest");
+function loadEvent(event, detail = "") {
+  if (!debugLoad) return;
+  (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
+}
 const BUILD = "akinator-35";
 
 function withTimeout(promise, ms) {
@@ -220,26 +225,31 @@ async function openPlay() {
 }
 
 async function loadNamed(entries, token, begin) {
+  loadEvent("loadNamed.enter", JSON.stringify({ count: entries.length, category }));
   const names = entries.map((item) => item.file).filter((name) => !loadedNames.includes(name));
   if (!names.length || token !== loadToken) return;
   loadedNames.push(...names);
   let started = !begin;
   try {
   await loadShards("./kb", manifest, names, (partial) => {
+    loadEvent("loadShards.onPool", JSON.stringify({ count: partial.count, category }));
     if (token !== loadToken) return;
     // Extend the initial casebook only once per character game. These are
     // relationship templates, never actual people's names or account data.
     if (category === "character" && !partial.ids.includes("riddlex-role-mother")) {
       const roles = poolFromEntries(manifest.questions, [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER]);
       adoptPool(appendShard(partial, roles));
+      loadEvent("roles.appended", pool?.count);
     } else {
       adoptPool(partial);
     }
     if (started || !begin) return;
     started = true;
     state = createState(pool, { opening: "real", category });
+    loadEvent("state.created", state?.pool?.count);
     mode = "ask";
     step();
+    loadEvent("step.called", currentQ);
     const learnLater = () => loadLearned(manifest.questions).then((rows) => {
       if (!rows.length || token !== loadToken || !pool) return;
       adoptPool(mergePools([pool, poolFromEntries(manifest.questions, rows)]));
@@ -247,9 +257,11 @@ async function loadNamed(entries, token, begin) {
     if (typeof requestIdleCallback === "function") requestIdleCallback(() => learnLater());
     else setTimeout(learnLater, 400);
   }, pool);
+  loadEvent("loadShards.completed", pool?.count);
   } catch (error) {
     loadedNames = loadedNames.filter((name) => !names.includes(name));
     console.error("Riddlex knowledge loading failed", error);
+    loadEvent("loadNamed.error", error?.stack || error);
     throw error;
   }
 }
@@ -280,7 +292,9 @@ async function startGame(chosen) {
   job.catch(() => {});
   try {
     await withTimeout(job, LOAD_MS);
-  } catch {
+    loadEvent("startGame.loaded", category);
+  } catch (error) {
+    loadEvent("startGame.failed", error?.stack || error);
     if (token !== loadToken) return;
     loadToken += 1;
     showLoadRetry();

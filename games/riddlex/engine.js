@@ -8,6 +8,7 @@ const politicsUrl = new URL(
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
 import { SCREEN_STAR_1990S } from "./career-facts.js";
+import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -137,6 +138,7 @@ function applyPolitics(pool) {
 export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
+  if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
@@ -237,6 +239,9 @@ function hardFacts() {
     ["party_chief"],
     ["party_secretary"],
     ["in_government"],
+    // These are facts about the relationship, not about an individual's name.
+    ["knows_you"], ["your_family"], ["your_parent"], ["your_sibling"],
+    ["your_friend"], ["your_best_friend"],
     ...PRIMARY_JOBS.map((job) => [job]),
     ["played_barcelona"],
     ["ballon_dor"],
@@ -384,6 +389,9 @@ export function shouldGuess(state) {
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
   if (asked >= 72) return true;
+  const personal = state.answers.some((row) => row.qid === "knows_you" &&
+    (row.value === "yes" || row.value === "probably"));
+  if (personal && asked >= 4 && bestP >= 0.72 && ratio >= 4) return true;
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;
   // Shared facts such as country and job are not enough. Wait until one person stands clear.
@@ -464,6 +472,13 @@ function gated(state, question, rows) {
     // Still allowed once the matching topic is likely; the mass checks below do that.
   }
   if (id === "adult_ent") return adultAllowed(state);
+  if (group === "personal") {
+    if (id === "knows_you") return state.category === "character" &&
+      state.answers.some((row) => row.qid === "real" &&
+        (row.value === "yes" || row.value === "probably"));
+    return state.answers.some((row) => row.qid === "knows_you" &&
+      (row.value === "yes" || row.value === "probably"));
+  }
   if (id === "screen_star_1990s") {
     return state.answers.length >= 5 &&
       yesMass(state, "actor", rows) > 0.45 &&
@@ -503,7 +518,7 @@ function gated(state, question, rows) {
 }
 
 const CATEGORY_GROUPS = {
-  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics"]),
+  character: new Set(["kind", "person", "life", "birth", "country", "job", "adult", "fiction", "politics", "personal"]),
   animal: new Set(["animal", "look", "size"]),
   object: new Set(["object", "look", "size"]),
 };
@@ -907,6 +922,24 @@ export function chooseQuestion(state) {
     if (!asked.has("real")) return "real";
   }
   if ((state.category === "character" || !state.category) && saidNo("real") && !asked.has("fictional")) return "fictional";
+  // Introduce the optional personal-relationship path early. It is never
+  // used for animals/objects or famous people unless the user explicitly says
+  // this person knows them.
+  if (state.category === "character" && saidYes("real") && !asked.has("knows_you"))
+    return "knows_you";
+  if (state.category === "character" && saidYes("knows_you")) {
+    const next = (qid) => pool.qIndex.has(qid) && !asked.has(qid);
+    if (next("your_family")) return "your_family";
+    if (saidYes("your_family")) {
+      if (next("your_parent")) return "your_parent";
+      if (saidNo("your_parent") && next("your_sibling")) return "your_sibling";
+      const familyRole = saidYes("your_parent") || saidYes("your_sibling");
+      if (familyRole && next("female") && next("male")) return "female";
+    } else if (saidNo("your_family")) {
+      if (next("your_best_friend")) return "your_best_friend";
+      if (saidNo("your_best_friend") && next("your_friend")) return "your_friend";
+    }
+  }
   if (!state.category && saidNo("real") && saidNo("fictional") && !asked.has("animal")) return "animal";
   if (!state.category && saidNo("real") && saidNo("fictional") && saidNo("animal") && !asked.has("object")) return "object";
   if (!state.category && saidYes("fictional") && !asked.has("animal") && yesMass(state, "animal", state.alive.length > 7000 ? sampleAlive(state, 4000) : state.alive) > 0.18 && answers.length < 8) {

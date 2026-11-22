@@ -239,6 +239,93 @@ try {
     console.log("RIDDLEX_GAMEPLAY_PASS", width, height, orient);
     await page.close();
   }
+
+  // Drive the actual packed knowledge database through the same browser UI as
+  // a player, not a tiny mock casebook. Log every question, answer and guess.
+  async function replay(label, policy) {
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const trace = [];
+    try {
+      await page.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
+      await page.click("#play");
+      await page.waitForFunction(() => !document.getElementById("categories").hidden);
+      await page.click('[data-cat="character"]');
+      await page.waitForFunction(() => window.__riddlex?.state()?.mode === "ask", null, { timeout: 35000 });
+      const seen = new Set();
+      let confirmedCountry = false;
+      let knowsNo = false;
+      let cricketNo = false;
+      let parentYes = false;
+      let guesses = 0;
+      for (let turn = 0; turn < 32; turn++) {
+        await page.waitForFunction(() =>
+          ["ask", "guess", "learn"].includes(window.__riddlex?.state()?.mode),
+          null, { timeout: 35000 });
+        const state = await page.evaluate(() => window.__riddlex.state());
+        if (state.mode === "learn") {
+          trace.push("END: learn / defeat");
+          break;
+        }
+        if (state.mode === "guess") {
+          const name = await page.locator("#guess-line").textContent();
+          trace.push("GUESS: " + name + " [" + state.best + "]");
+          assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
+            "A no-personal-contact answer guessed a personal role");
+          if (policy === "family") {
+            assert.ok(state.best.startsWith("riddlex-role-"),
+              "A confirmed parent must not be replaced by a public celebrity");
+            break;
+          }
+          guesses++;
+          if (guesses >= 3) break;
+          await page.click("#wrong");
+          await page.waitForFunction(() => window.__riddlex?.state()?.mode === "wrong", null, { timeout: 20000 });
+          await page.click("#retry");
+          await page.waitForFunction(() => ["ask","learn","guess"].includes(window.__riddlex?.state()?.mode),
+            null, { timeout: 25000 });
+          continue;
+        }
+        const q = state.question;
+        if (seen.has(q)) throw new Error("Question repeated: " + q);
+        seen.add(q);
+        if (knowsNo) assert.ok(!q.startsWith("your_"), "Family question after knows-you NO: " + q);
+        if (parentYes) assert.ok(!["your_sibling","your_spouse","your_child","your_baby"].includes(q),
+          "Contradictory family question after parent YES: " + q);
+        if (!seen.has("cricketer") || cricketNo)
+          assert.ok(!["does_bat","does_bowl","batsman","bowler","all_rounder","cricket_opener"].includes(q),
+            "Cricket role asked without affirmative cricket answer: " + q);
+        let a = "unknown";
+        if (q === "real") a = "yes";
+        else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
+        else if (q === "from_bd") a = "yes";
+        else if (q === "cricketer" || q === "does_bat" || q === "does_bowl") a = "no";
+        else if (policy === "family" && q === "your_family") a = "yes";
+        else if (policy === "family" && q === "your_parent") a = "yes";
+        else if (policy === "family" && q === "female") a = "yes";
+        else if (policy === "family" && q === "male") a = "no";
+        else if (policy === "public" && ["politician","actor","singer","writer","footballer","scientist"].includes(q))
+          a = "no";
+        if (q === "from_bd" && a === "yes") confirmedCountry = true;
+        if (q === "knows_you" && a === "no") knowsNo = true;
+        if (q === "cricketer" && a === "no") cricketNo = true;
+        if (q === "your_parent" && a === "yes") parentYes = true;
+        trace.push("Q" + (turn+1) + " " + q + " = " + a);
+        await page.evaluate((value) => window.__riddlex.answer(value), a);
+      }
+      console.log("RIDDLEX_OWNER_REPLAY_" + policy.toUpperCase() + " " + JSON.stringify(trace));
+      assert.ok(seen.has("knows_you"), "Personal-contact question was not asked");
+      if (policy === "family") assert.ok(parentYes, "The family/parent route was not reached");
+      if (policy === "public") assert.ok(confirmedCountry, "Bangladesh question was not asked");
+      return trace;
+    } catch (error) {
+      console.error("RIDDLEX_OWNER_REPLAY_FAILED_" + policy.toUpperCase() + " " + JSON.stringify(trace));
+      throw error;
+    } finally {
+      await page.close();
+    }
+  }
+  await replay("Bangladeshi ordinary person", "public");
+  await replay("Bangladeshi family member", "family");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

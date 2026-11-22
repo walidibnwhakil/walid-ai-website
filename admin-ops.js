@@ -105,7 +105,7 @@
     previousManagerFocus=null;
   }
   function status(text, bad=false) {
-    for(const selector of ['#ops-status','#manager-chat-status']){
+    for(const selector of ['#manager-chat-status']){
       const el=$(selector);if(el){el.textContent=text;el.dataset.error=bad?'true':'false'}
     }
   }
@@ -123,34 +123,10 @@
     if(tab==='staff'){
       const frame=$('#preserved-staff-office');
       if(frame&&!frame.getAttribute('src'))frame.setAttribute('src',frame.dataset.src);
-      void loadStaff();void loadHistory();
+      void loadHistory();
     }
     if(tab==='riddlex')window.WalidAdminApprovals?.activate();
     requestAnimationFrame(positionChatHead);
-  }
-  function createRoleCards(){
-    const host=$('#ops-desks'); if(!host)return; host.replaceChildren();
-    roles.forEach(role=>{
-      const button=document.createElement('button');
-      button.type='button';button.className='ops-desk';
-      button.dataset.role=role.id;
-      const glyph=document.createElement('span');glyph.className='ops-desk-icon';glyph.textContent=role.icon;
-      const copy=document.createElement('span'),title=document.createElement('strong'),description=document.createElement('small');
-      title.textContent=role.name;description.textContent=role.desc;copy.append(title,description);
-      button.append(glyph,copy);
-      button.onclick=()=>openManagerChat();
-      host.append(button);
-    });
-    updateSelected();
-  }
-  function updateSelected(){
-    const item=roles.find(x=>x.id===selected);
-    $('#ops-role-name').textContent=item.name;
-    $('#ops-role-description').textContent=item.desc;
-    // Preserve the SVG send icon. TextContent would replace it with a wrapped label.
-    $('#ops-send').setAttribute('aria-label','Send message to Manager');
-    $('#ops-send').setAttribute('title','Send message');
-    document.querySelectorAll('.ops-desk').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.role===selected)));
   }
   function appendMessage(container,kind,heading,body,extra=''){
     const bubble=document.createElement('article');
@@ -244,21 +220,6 @@
       return body;
     }finally{clearTimeout(timer)}
   }
-  async function loadStaff(){
-    if(!ready)return;
-    try{
-      const data=await request('/api/admin/staff');
-      const state=data.status||{},cap=state.capabilities||{};
-      $('#ops-connect').textContent='Backend: authenticated · AI: '+(cap.ai_available?'configured':'unavailable')+
-        ' · History: '+(state.persistence?.durable?'Firestore':'temporary');
-      const coder=cap.coding||{};
-      $('#ops-capability').textContent=
-        'History: '+(state.persistence?.durable?'durable Firestore':'temporary Render filesystem')+
-        ' · CSE draft-PR runner: '+(coder.draft_pr_workflow_configured?'configured (subject to Actions access)':'not configured')+
-        ' · Approval-gated Merge: '+(coder.merge_executor_configured?'configured':'disabled')+
-        ' · Automatic Merge/Deploy: disabled.';
-    }catch(error){status(error.message,true)}
-  }
   async function loadHistory(){
     if(!ready)return;
     try{
@@ -315,23 +276,6 @@
       status('সংযোগ/প্রক্রিয়াকরণ সমস্যা: '+error.message,true);
       input.value=instruction;fitComposer();
     }finally{busy=false;$('#ops-send').disabled=false}
-  }
-  async function runChecks(){
-    if(!ready||busy)return;
-    const button=$('#ops-checks');busy=true;button.disabled=true;status('Running real HTTP and security-header checks…');
-    try{
-      const data=await request('/api/admin/staff/checks');
-      const host=$('#ops-check-results');host.replaceChildren();
-      for(const item of data.checks||[]){
-        const card=document.createElement('article');card.className='ops-check';
-        const h=document.createElement('strong');h.textContent=item.staff+' — '+(item.result?.ok?'PASS':'ATTENTION');
-        const pre=document.createElement('pre');pre.textContent=JSON.stringify(item.result?.details||item.result?.detail||item.result,null,2);
-        card.append(h,pre);host.append(card);
-      }
-      status('Completed actual read-only checks at '+fmt(data.checked_at)+'.');
-      void loadStaff();
-    }catch(error){status('Checks could not finish: '+error.message,true)}
-    finally{busy=false;button.disabled=false}
   }
   function logout(){
     closeManagerChat();
@@ -419,8 +363,5 @@
   addEventListener('focus',()=>{if(ready)void refreshNotices()});
   document.addEventListener('visibilitychange',()=>{if(ready&&!document.hidden)void refreshNotices()});
   setInterval(()=>{if(ready&&!document.hidden)void refreshNotices()},4*60*1000);
-  $('#ops-checks')?.addEventListener('click',runChecks);
-  $('#ops-reload')?.addEventListener('click',()=>{void loadStaff();void loadHistory()});
-  createRoleCards();
   window.WalidAdminOps={activate:selectTab};
 })();

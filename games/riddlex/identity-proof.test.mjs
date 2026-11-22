@@ -192,3 +192,51 @@ test("missing evidence cannot trigger a guess after only four answers", () => {
   const move = decide(state);
   assert.equal(move.type, "ask", JSON.stringify(move));
 });
+
+test("two negative character classifications lead to correction, not surrender", () => {
+  const state = createState(makePool(), { category: "character" });
+  recompute(state);
+  answer(state, "real", "no");
+  const next = decide(state);
+  assert.equal(next.type, "ask");
+  assert.equal(next.qid, "fictional", "the detective first checks a fictional person");
+  answer(state, "fictional", "no");
+  const move = decide(state);
+  assert.equal(move.type, "reconsider", JSON.stringify(move));
+  assert.equal(state.answers.length, 2);
+});
+
+test("four negative responses never open the surrender form", () => {
+  const state = createState(makePool(), { category: "character" });
+  recompute(state);
+  for (const qid of ["real", "fictional", "male", "female"])
+    answer(state, qid, "no");
+  const result = decide(state);
+  assert.equal(result.type, "reconsider");
+  assert.notEqual(result.type, "defeat");
+
+  // A real person may be neither a documented male nor female in the index.
+  // Do not treat missing or negative demographic data as a licence to quit.
+  const alternative = createState(makePool(), { category: "character" });
+  recompute(alternative);
+  for (const [qid, response] of [
+    ["real", "yes"], ["knows_you", "no"],
+    ["male", "no"], ["female", "no"],
+  ]) answer(alternative, qid, response);
+  const decision = decide(alternative);
+  assert.ok(["ask", "reconsider"].includes(decision.type), JSON.stringify(decision));
+  assert.notEqual(decision.type, "guess", "four answers cannot identify a public name");
+});
+
+test("category mismatch can be corrected by revisiting the previous answer", () => {
+  const state = createState(makePool(), { category: "character" });
+  recompute(state);
+  answer(state, "real", "no");
+  answer(state, "fictional", "no");
+  assert.equal(decide(state).type, "reconsider");
+  state.answers.pop();
+  recompute(state);
+  answer(state, "fictional", "yes");
+  assert.notEqual(decide(state).type, "reconsider",
+    "changing the contradictory answer should restore question flow");
+});

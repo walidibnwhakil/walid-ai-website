@@ -104,6 +104,20 @@ try {
     assert.equal(await page.locator("#game .lang-switch").isVisible(), true,
       "language option must be available after Play Now");
     await page.waitForFunction(() => !document.getElementById("categories").hidden);
+    const categoryLayout = await page.evaluate(() => {
+      const group = document.querySelector(".cat-row").getBoundingClientRect();
+      return {
+        groupWidth: group.width,
+        buttonWidths: [...document.querySelectorAll(".cat-row button")]
+          .map((button) => button.getBoundingClientRect().width),
+      };
+    });
+    if (orient === "landscape") {
+      assert.ok(categoryLayout.groupWidth <= 550,
+        "desktop category picker must not span most of the screen: " + categoryLayout.groupWidth);
+      assert.ok(categoryLayout.buttonWidths.every((w) => w >= 44 && w <= 190),
+        "Character, Object and Animal must be compact buttons: " + categoryLayout.buttonWidths);
+    }
     await page.click('[data-cat="animal"]');
     await page.waitForFunction(() =>
       !document.getElementById("answers").hidden
@@ -230,6 +244,77 @@ try {
       if (shotFolder) await page.screenshot({ path: join(shotFolder, "personal-question-portrait.png") });
       console.log("RIDDLEX_PERSONAL_QUESTIONS_PASS");
     }
+    // Use a fresh browser page to reproduce the two-No path independently
+    // of the animation and photo tests above. This mirrors a real new visit
+    // and also prevents a prior scene/worker lifecycle from masking the test.
+    const negativePage = await browser.newPage({
+      viewport: { width, height }, deviceScaleFactor: 1,
+    });
+    try {
+      negativePage.on("pageerror", (error) => errors.push(error.message));
+      await negativePage.route("**/*", (route) => {
+        if (new URL(route.request().url()).origin === origin) return route.continue();
+        return route.abort();
+      });
+      await negativePage.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
+      // The deferred module can finish after the load event. Don't try
+      // interacting before its Play/Answer event handlers are installed.
+      await negativePage.waitForFunction(() =>
+        typeof window.__riddlex?.ready === "function",
+        null, { timeout: 30000 });
+      await negativePage.evaluate(() => window.__riddlex.ready());
+      await negativePage.click("#play");
+      await negativePage.waitForFunction(() =>
+        !document.getElementById("categories").hidden, null, { timeout: 20000 });
+      await negativePage.click('[data-cat="character"]');
+      try {
+        await negativePage.waitForFunction(() =>
+          !document.getElementById("answers").hidden &&
+          document.getElementById("progress").textContent.includes("Question 1"),
+          null, { timeout: 30000 });
+      } catch (error) {
+        const details = await negativePage.evaluate(() => ({
+          status: document.getElementById("status")?.textContent,
+          categoryVisible: !document.getElementById("categories")?.hidden,
+          answerVisible: !document.getElementById("answers")?.hidden,
+          retryVisible: !document.getElementById("load-retry")?.hidden,
+          state: window.__riddlex?.state?.(),
+          trace: window.__riddlexLoadTrace || [],
+        }));
+        throw new Error("Negative-case setup failed: " + JSON.stringify(details) +
+          " :: " + error.message);
+      }
+      await negativePage.click("#answer-no"); // Not a real person
+      await negativePage.waitForFunction(() =>
+        !document.getElementById("answers").hidden &&
+        document.getElementById("progress").textContent.includes("Question 2"),
+        null, { timeout: 30000 });
+      await negativePage.click("#answer-no"); // Nor a fictional character
+      await negativePage.waitForFunction(() =>
+        !document.getElementById("categories").hidden &&
+        !document.getElementById("back").hidden &&
+        /clues|উত্তরগুলোর/.test(document.getElementById("status").textContent),
+        null, { timeout: 30000 });
+      assert.equal(await negativePage.locator("#learn").isVisible(), false,
+        "No answers must not open the give-up/name/photo form");
+      if (shotFolder) await negativePage.screenshot({
+        path: join(shotFolder, "recover-negative-" + orient + ".png"),
+      });
+      await negativePage.click("#back");
+      await negativePage.waitForFunction(() =>
+        !document.getElementById("answers").hidden &&
+        document.getElementById("progress").textContent.includes("Question 2"),
+        null, { timeout: 12000 });
+      await negativePage.click("#answer-yes"); // Correct fictional category
+      await negativePage.waitForFunction(() =>
+        !document.getElementById("answers").hidden &&
+        document.getElementById("progress").textContent.includes("Question 3"),
+        null, { timeout: 30000 });
+      console.log("RIDDLEX_NEGATIVE_RECOVERY_PASS", orient);
+    } finally {
+      await negativePage.close();
+    }
+
     assert.deepEqual(errors, [], "uncaught browser errors");
     console.log("RIDDLEX_GAMEPLAY_PASS", width, height, orient);
     await page.close();

@@ -1105,6 +1105,22 @@ function chooseConfirmationQuestion(state, leader) {
   return bestQid;
 }
 
+// Profession-specific facts must be checked before a public name is shown.
+// The 1990s film question is different from birth decade or acting debut.
+function pendingFilmEraQuestion(state) {
+  if (state.category !== "character" ||
+      !said(state, "actor", ["yes", "probably"]) ||
+      !said(state, "from_bd", ["yes", "probably"])) return null;
+  const answered = new Set(state.answers.map((row) => row.qid));
+  if (state.pool.qIndex.has("screen_star_pre1990") &&
+      !answered.has("screen_star_pre1990")) return "screen_star_pre1990";
+  if (state.pool.qIndex.has("screen_star_1990s") &&
+      !answered.has("screen_star_1990s") &&
+      !said(state, "screen_star_pre1990", ["yes", "probably"]))
+    return "screen_star_1990s";
+  return null;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -1247,6 +1263,10 @@ export function decide(state) {
   if (state.guesses >= 10 || state.answers.length >= 72) return { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
+  // When an actor from Bangladesh is confirmed, first establish WHEN they
+  // were known as a film star; generic occupation and fame are not enough.
+  const filmEra = pendingFilmEraQuestion(state);
+  if (filmEra) return { type: "ask", qid: filmEra };
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   // After any wrong guess, force a fresh evidence-gathering round.
   // In particular, do NOT bypass it through the no-question fallback.

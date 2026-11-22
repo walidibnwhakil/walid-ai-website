@@ -1098,7 +1098,7 @@ const PUBLIC_VERIFY_GROUPS = new Set([
 ]);
 
 function finalWorkQuestion(state, index) {
-  if (index < 0 || state.pool.count < 100 ||
+  if (index < 0 || !fullPublicGame(state) ||
       state.answers.length < 12 || state.category == null) return null;
   const pool = state.pool;
   const id = pool.ids[index];
@@ -1193,6 +1193,16 @@ export function decide(state) {
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
+  // A verified career fact can disprove a specific hypothesis. Immediately
+  // switch to checking the new leading person instead of persisting with the
+  // discredited name or asking unrelated generic questions.
+  const last = state.answers.at(-1);
+  const disproved = last?.value === "no" &&
+    (ACTOR_PROOF_IDS.has(last.qid) || WRITER_PROOF_IDS.has(last.qid));
+  if (disproved && fullPublicGame(state)) {
+    const nextVerification = finalWorkQuestion(state, best);
+    if (nextVerification) return { type: "ask", qid: nextVerification };
+  }
   if (!waiting && shouldGuess(state)) {
     const verification = finalWorkQuestion(state, best);
     return verification ? { type: "ask", qid: verification } :

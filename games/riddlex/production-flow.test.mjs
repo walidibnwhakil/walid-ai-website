@@ -187,3 +187,66 @@ test("published casebook never guesses before twelve answers", () => {
       "actual 19k-entry casebook should continue: " + JSON.stringify(move));
   }
 });
+
+test("any candidate can be verified through its distinguishable career facts", () => {
+  const crowd = poolFromEntries(questions, [
+    { id: "generic-football-star", en: "Generic Football Star", pop: 60000,
+      yes: ["real", "male", "alive", "footballer", "athlete", "from_ar",
+        "played_barcelona", "ballon_dor"],
+      no: ["politician", "knows_you", "cricketer", "actor"] },
+    { id: "generic-other-footballer", en: "Generic Other Footballer", pop: 15,
+      yes: ["real", "male", "alive", "footballer", "athlete", "from_ar"],
+      no: ["played_barcelona", "ballon_dor", "politician", "knows_you"] },
+  ]);
+  const state = createState(crowd, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"], ["male", "yes"],
+    ["alive", "yes"], ["from_ar", "yes"], ["footballer", "yes"],
+    ["athlete", "yes"], ["politician", "no"], ["actor", "no"],
+    ["cricketer", "no"], ["singer", "no"], ["scientist", "no"],
+  ]) answer(state, qid, value);
+  assert.equal(state.answers.length, 12);
+  assert.equal(shouldGuess(state), true);
+  const confirmed = [];
+  for (let i = 0; i < 5; i++) {
+    const move = decide(state);
+    if (move.type === "guess") {
+      assert.ok(confirmed.length >= 1, "candidate work must be checked before naming them");
+      assert.equal(crowd.ids[move.index], "generic-football-star");
+      return;
+    }
+    assert.equal(move.type, "ask", JSON.stringify(move));
+    assert.ok(["played_barcelona", "ballon_dor"].includes(move.qid),
+      "only relevant career evidence, not arbitrary trivia: " + move.qid);
+    confirmed.push(move.qid);
+    answer(state, move.qid, "yes");
+  }
+  assert.fail("game did not reach a justified guess after work verification");
+});
+
+test("a denied sourced film switches the detective to a different candidate", () => {
+  const crowd = poolFromEntries(questions, [
+    { id: "Q7322180", en: "Riaz", pop: 60000,
+      yes: ["real", "male", "alive", "from_bd", "actor"],
+      no: ["politician", "knows_you"] },
+    { id: "Q21066842", en: "Amin Khan", pop: 200,
+      yes: ["real", "male", "alive", "from_bd", "actor"],
+      no: ["politician", "knows_you"] },
+  ]);
+  const state = createState(crowd, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "no"], ["male", "yes"],
+    ["alive", "yes"], ["from_bd", "yes"], ["actor", "yes"],
+    ["politician", "no"], ["cricketer", "no"],
+    ["singer", "no"], ["scientist", "no"],
+    ["screen_star_1990s", "yes"], ["musician", "no"],
+  ]) answer(state, qid, value);
+  assert.equal(decide(state).qid, "actor_film_dui_duari");
+  answer(state, "actor_film_dui_duari", "no");
+  const next = decide(state);
+  assert.equal(next.type, "ask", JSON.stringify(next));
+  assert.equal(next.qid, "actor_walton_senior_exec",
+    "a disproved hypothesis must switch to the other person's evidence");
+});

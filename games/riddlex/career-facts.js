@@ -186,17 +186,17 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
     bn: "অঙ্গভঙ্গি ও শারীরিক কৌতুক কি তাঁর অভিনয়ের বিশেষ বৈশিষ্ট্য ছিল?",
   },
   {
-    id: "screen_short_moustache", group: "look",
+    id: "screen_short_moustache", group: "person",
     en: "Were they known for a small toothbrush-style moustache?",
     bn: "তাঁর পরিচিত চেহারায় কি ছোট, ব্রাশের মতো গোঁফ ছিল?",
   },
   {
-    id: "screen_bowler_cane", group: "look",
+    id: "screen_bowler_cane", group: "person",
     en: "Was a bowler hat and walking cane part of their iconic screen look?",
     bn: "গোল টুপি ও ছড়ি কি তাঁর বিখ্যাত পর্দার সাজের অংশ ছিল?",
   },
   {
-    id: "screen_hitler_resemblance", group: "look",
+    id: "screen_hitler_resemblance", group: "person",
     en: "Did their familiar moustached look resemble Adolf Hitler's?",
     bn: "তাঁর পরিচিত ছোট গোঁফের চেহারার সঙ্গে কি হিটলারের মিল ছিল?",
   },

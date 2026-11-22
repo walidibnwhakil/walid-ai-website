@@ -178,7 +178,7 @@ try {
       opposite.art);
     if (orient === "portrait") {
       await page.setViewportSize({ width, height });
-      await page.goto(origin + "/games/riddlex/", { waitUntil: "load" });
+      await page.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
       await page.click("#play");
       await page.waitForFunction(() => !document.getElementById("categories").hidden);
       await page.click('[data-cat="character"]');
@@ -194,6 +194,7 @@ try {
           loadRetry: !document.getElementById("load-retry")?.hidden,
           answersHidden: document.getElementById("answers")?.hidden,
           categoriesHidden: document.getElementById("categories")?.hidden,
+          loadTrace: window.__riddlexLoadTrace || [],
         }));
         throw new Error("Character gameplay did not open: " + JSON.stringify(snapshot) +
           "; pageErrors=" + errors.join(" | ") + "; " + error.message);

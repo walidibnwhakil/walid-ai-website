@@ -249,6 +249,7 @@ async function loadNamed(entries, token, begin) {
   }, pool);
   } catch (error) {
     loadedNames = loadedNames.filter((name) => !names.includes(name));
+    console.error("Riddlex knowledge loading failed", error);
     throw error;
   }
 }

@@ -314,5 +314,7 @@ details[open]>.section-summary .section-chevron{transform:rotate(225deg)}
   .admin-header .header-brand img{width:105px;max-height:48px}
   .admin-header .header-copy h1{font-size:1.45rem}
   .admin-header .header-copy p{font-size:.78rem;line-height:1.45}
-  .admin-header .top-actions{gap:5px}
+  .admin-header .top-actions{width:165px;max-width:100%;flex-wrap:wrap;gap:5px;justify-content:flex-end}
+  .admin-header .top-actions #date{width:100%;text-align:right}
+  .admin-header .top-actions button{margin-left:auto}
 }

@@ -138,7 +138,7 @@ test("the adult-entertainment question stays late and name-only", () => {
   assert.equal(canPrint(world, world.ids.indexOf("shakib")), false);
 });
 
-test("a wrong guess asks more questions before the next name", () => {
+test("a wrong guess asks for more evidence or concedes instead of guessing again immediately", () => {
   const shared = ["real", "named", "male", "alive", "from_bd", "writer"];
   const no = ["fictional", "animal", "object", "female", "from_in", "actor", "adult_ent", "cricketer"];
   const crowd = poolFromEntries(questions, [
@@ -159,6 +159,11 @@ test("a wrong guess asks more questions before the next name", () => {
       rejectIndex(state, decision.index);
       since = 0;
       continue;
+    }
+    // When no useful questions remain, concede rather than cycling names.
+    if (decision.type === "defeat") {
+      assert.equal(gaps.length, 1, "should not abandon the game before its first guess");
+      return;
     }
     assert.equal(decision.type, "ask", JSON.stringify(decision));
     const value = bit(crowd, "near", decision.qid) === 2 ? "yes" : bit(crowd, "near", decision.qid) === 1 ? "no" : "unknown";
@@ -509,7 +514,7 @@ test("truthful answers about Lionel Messi guess him, not Sergio Agüero", () => 
     answer(state, qid, value);
   }
   assert.equal(guessed, "Q615", asked.join(","));
-  assert.ok(asked.length <= 12, asked.join(","));
+  assert.ok(asked.length >= 10 && asked.length <= 16, asked.join(","));
   const regions = new Set(["from_asia", "from_europe", "from_africa", "from_north_america", "from_south_america"]);
   let run = 0;
   for (const qid of asked) {

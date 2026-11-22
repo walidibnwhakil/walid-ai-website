@@ -1,7 +1,8 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
 import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-39";
 import { UI, guessFont } from "./i18n.js?v=riddlex-menu-36";
-import { categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
+import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
 
@@ -226,7 +227,14 @@ async function loadNamed(entries, token, begin) {
   try {
   await loadShards("./kb", manifest, names, (partial) => {
     if (token !== loadToken) return;
-    adoptPool(partial);
+    // Extend the initial casebook only once per character game. These are
+    // relationship templates, never actual people's names or account data.
+    if (category === "character" && !partial.ids.includes("riddlex-role-mother")) {
+      const roles = poolFromEntries(manifest.questions, [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER]);
+      adoptPool(appendShard(partial, roles));
+    } else {
+      adoptPool(partial);
+    }
     if (started || !begin) return;
     started = true;
     state = createState(pool, { opening: "real", category });
@@ -380,6 +388,17 @@ async function onRetry() {
 async function beginDefeat() {
   mode = "learn";
   scene.playDefeat();
+  const personal = state?.answers.some((row) => row.qid === "knows_you" &&
+    (row.value === "yes" || row.value === "probably"));
+  if (personal) {
+    // A friend or family member's real name must never enter the shared
+    // learning submissions. Let the player start a fresh round instead.
+    showOnly("learn");
+    learnForm.hidden = true;
+    $("learn-again").hidden = false;
+    setStatus(text().privatePeople);
+    return;
+  }
   const adult = answersImplyAdult(state?.answers || []);
   setStatus(text().defeat);
   learnForm.hidden = false;

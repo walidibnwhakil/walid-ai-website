@@ -272,8 +272,15 @@ try {
           assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
             "A no-personal-contact answer guessed a personal role");
           if (policy === "family") {
-            assert.ok(state.best.startsWith("riddlex-role-"),
-              "A confirmed parent must not be replaced by a public celebrity");
+            assert.equal(state.best, "riddlex-role-mother",
+              "A confirmed mother must not be replaced by a public celebrity or wrong relative");
+            break;
+          }
+          if (policy === "public") {
+            assert.fail("Guessed an unsupported public celebrity from country and negative jobs: " + name);
+          }
+          if (policy === "shakib" && state.best === "Q266104") {
+            trace.push("CORRECT: real packed Shakib target");
             break;
           }
           guesses++;
@@ -305,6 +312,10 @@ try {
         else if (policy === "family" && q === "male") a = "no";
         else if (policy === "public" && ["politician","actor","singer","writer","footballer","scientist"].includes(q))
           a = "no";
+        else if (policy === "shakib" && q !== "knows_you")
+          a = await page.evaluate(() =>
+            window.__riddlex.find("Q266104") >= 0
+              ? window.__riddlex.replyFor("Q266104") : "unknown");
         if (q === "from_bd" && a === "yes") confirmedCountry = true;
         if (q === "knows_you" && a === "no") knowsNo = true;
         if (q === "cricketer" && a === "no") cricketNo = true;
@@ -316,6 +327,8 @@ try {
       assert.ok(seen.has("knows_you"), "Personal-contact question was not asked");
       if (policy === "family") assert.ok(parentYes, "The family/parent route was not reached");
       if (policy === "public") assert.ok(confirmedCountry, "Bangladesh question was not asked");
+      if (policy === "shakib") assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
+        "The real Shakib entry was not guessed after real answers");
       return trace;
     } catch (error) {
       console.error("RIDDLEX_OWNER_REPLAY_FAILED_" + policy.toUpperCase() + " " + JSON.stringify(trace));
@@ -326,6 +339,7 @@ try {
   }
   await replay("Bangladeshi ordinary person", "public");
   await replay("Bangladeshi family member", "family");
+  await replay("Shakib Al Hasan with the real database answers", "shakib");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

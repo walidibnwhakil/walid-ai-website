@@ -439,12 +439,12 @@
   document.head.append(script);
 })();
 
-/* Load Quran-only auto-scroll independently of the source-text renderer. */
+/* Quiet Quran touch reading, local bookmark and per-surah resume. */
 (() => {
   if (document.getElementById("walid-quran-autoscroll-script")) return;
   const script = document.createElement("script");
-  script.id = "walid-quran-autoscroll-script";
-  script.src = "/islam/quran/auto-scroll.js?v=20261122";
+  script.id = "walid-quran-reading-flow-script";
+  script.src = "/islam/quran/reading-flow.js?v=20261122b";
   script.async = true;
   document.head.append(script);
 })();

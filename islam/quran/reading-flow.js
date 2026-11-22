@@ -36,7 +36,7 @@
     ".ayah.walid-ayah-bookmarked{position:relative;border-color:#b89c59!important;background:#fffbef!important;box-shadow:inset 4px 0 #b59037,0 4px 15px #153c2708!important}",
     ".ayah.walid-ayah-bookmarked::after{content:'◆';position:absolute;top:9px;right:13px;font-size:.75rem;line-height:1;color:#ac8130;pointer-events:none}",
     ".ayah.walid-ayah-bookmarked .ayah-number::before{background:#f3e4b9!important;border-color:#ab893d!important;color:#674d1a!important}",
-    ".ayah-number[data-walid-bookmark]{cursor:pointer;touch-action:pan-y}",
+    ".ayah-number[data-walid-bookmark]{cursor:pointer;touch-action:pan-y;-webkit-user-select:none;user-select:none}",
     ".ayah-number[data-walid-bookmark]:focus-visible{outline:2px solid #8d6a25;outline-offset:4px;border-radius:5px}",
     ".walid-quran-toast{position:fixed;z-index:1001;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);max-width:min(90vw,380px);padding:9px 16px;border:1px solid #c9ddcd;border-radius:20px;background:#174b37;color:white;text-align:center;font:600 .92rem/1.5 system-ui,'Noto Sans Bengali',sans-serif;box-shadow:0 6px 24px #163e2f33;pointer-events:none;opacity:1;transition:opacity .35s ease}",
     ".walid-quran-toast[hidden]{display:none!important}",
@@ -246,6 +246,7 @@
     frame = requestAnimationFrame(animate);
   }
   function resumeAfterGesture() {
+    restoring = false; // A deliberate user scroll takes priority over the initial resume jump.
     stopAuto();
     gestureTimer = setTimeout(startAuto, 450);
   }
@@ -253,6 +254,7 @@
     return Boolean(readingRoot()?.contains(target) && onSurahTab());
   }
   document.addEventListener("touchstart", event => {
+    restoring = false;
     stopAuto();
     touching = true;
     const finger = event.touches[0];

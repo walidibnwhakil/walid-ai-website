@@ -5,17 +5,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class StaffWorkspaceUiTests(unittest.TestCase):
     def test_unified_owner_portal_has_three_sections(self):
-        page = (ROOT / "admin.html").read_text(encoding="utf-8")
+        page = (ROOT / "admin/index.html").read_text(encoding="utf-8")
         for value in ('id="dashboard"', 'id="staff-workspace"', 'id="riddlex-workspace"',
                       'data-admin-tab="dashboard"', 'data-admin-tab="staff"', 'data-admin-tab="riddlex"',
                       'id="ops-input"', 'id="riddlex-pending"', '/admin-ops.js', '/admin-approvals.js'):
             self.assertIn(value, page)
         self.assertIn('value="14"', page)
         self.assertIn('/walid-ai-approved-logo.png', page)
+        self.assertIn('https://walid-ai.com/admin/', page)
+        self.assertFalse((ROOT / 'admin.html').exists())
         self.assertIn('/walid-branding.css', page)
 
     def test_admin_is_login_only_until_authenticated(self):
-        page = (ROOT / "admin.html").read_text(encoding="utf-8")
+        page = (ROOT / "admin/index.html").read_text(encoding="utf-8")
         usage = (ROOT / "admin-usage.js").read_text(encoding="utf-8")
         ops = (ROOT / "admin-ops.js").read_text(encoding="utf-8")
         shell = (ROOT / "admin-shell.css").read_text(encoding="utf-8")
@@ -39,7 +41,7 @@ class StaffWorkspaceUiTests(unittest.TestCase):
 
     def test_original_office_is_restored_exactly_as_a_separate_visual_component(self):
         staff = (ROOT / "admin-staff.html").read_text(encoding="utf-8")
-        portal = (ROOT / "admin.html").read_text(encoding="utf-8")
+        portal = (ROOT / "admin/index.html").read_text(encoding="utf-8")
         ops = (ROOT / "admin-ops.js").read_text(encoding="utf-8")
         self.assertIn('Five desks. One protected network.', staff)
         self.assertIn('function robot(color)', staff)
@@ -52,11 +54,13 @@ class StaffWorkspaceUiTests(unittest.TestCase):
         self.assertIn('id="preserved-staff-office"', portal)
         self.assertIn('data-src="/admin-staff.html"', portal)
         self.assertIn("originalOffice.contentDocument", ops)
-        self.assertNotIn('location.replace("/admin.html#staff")', staff)
+        self.assertIn('<a href="/admin/">Analytics</a>', staff)
+        self.assertNotIn('/admin.html', staff)
 
     def test_riddlex_approval_redirect_remains_unchanged(self):
         riddlex = (ROOT / "games/riddlex/approve.html").read_text(encoding="utf-8")
-        self.assertIn('/admin.html#riddlex', riddlex)
+        self.assertIn('https://walid-ai.com/admin/', riddlex)
+        self.assertNotIn('/admin.html', riddlex)
         self.assertNotIn('firebase.firestore()', riddlex)
 
     def test_staff_actions_use_protected_server_records(self):
@@ -66,6 +70,7 @@ class StaffWorkspaceUiTests(unittest.TestCase):
             self.assertIn(route, ops)
         self.assertIn('Authorization:', ops)
         self.assertIn("walid-admin-authenticated", ops)
+        self.assertNotIn("location.hash.slice(1)", ops)
         self.assertIn("riddlex_entries", approvals)
         self.assertIn("signInWithPopup", approvals)
 

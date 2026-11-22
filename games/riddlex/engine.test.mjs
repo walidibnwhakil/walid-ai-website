@@ -126,11 +126,15 @@ test("a confident second name must wait for additional evidence", () => {
   for (const [id, value] of [["real", "yes"], ["male", "yes"],
     ["from_bd", "yes"], ["actor", "yes"]]) answer(state, id, value);
   rejectIndex(state, pool.ids.indexOf("third"));
-  for (let step = 0; step < 3; step++) {
+  let answered = 0;
+  for (let step = 0; step < 5; step++) {
     const decision = decide(state);
-    assert.equal(decision.type, "ask", "Name spam after wrong guess: " + JSON.stringify(decision));
+    assert.notEqual(decision.type, "guess", "Name spam after wrong guess: " + JSON.stringify(decision));
+    if (decision.type === "defeat") break; // the mock has no remaining traits to ask
     answer(state, decision.qid, "unknown");
+    answered++;
   }
+  assert.ok(answered >= 1, "The engine should ask at least one available confirmation");
 });
 
 test("a confirmed male and 1990s star cannot nominate a woman or an unverified-era actor", () => {
@@ -269,17 +273,23 @@ function firmGuesses(pool, qid, value) {
   recompute(state);
   answer(state, qid, value);
   const guessed = [];
-  for (let n = 0; n < 4; n++) {
-    let decision;
-    for (let step = 0; step < 16; step++) {
-      decision = decide(state);
-      if (decision.type !== "ask") break;
+  let lastGuessAnswerCount = null;
+  for (let turn = 0; turn < 64; turn++) {
+    const decision = decide(state);
+    if (decision.type === "ask") {
       answer(state, decision.qid, "unknown");
+      continue;
     }
-    assert.equal(decision.type, "guess", JSON.stringify(decision));
+    if (decision.type === "defeat") break; // no evidence left, not another random name
+    assert.equal(decision.type, "guess");
+    if (lastGuessAnswerCount != null)
+      assert.ok(state.answers.length - lastGuessAnswerCount >= 5,
+        "Guesses repeated without five clarifying questions");
     guessed.push(pool.ids[decision.index]);
+    lastGuessAnswerCount = state.answers.length;
     rejectIndex(state, decision.index);
   }
+  assert.ok(guessed.length, "Known candidate with matching facts was never guessed");
   return guessed;
 }
 

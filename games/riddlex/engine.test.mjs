@@ -216,10 +216,14 @@ function firmGuesses(pool, qid, value) {
       if (decision.type !== "ask") break;
       answer(state, decision.qid, "unknown");
     }
+    // A cautious detective can refuse to name further candidates when no
+    // evidence-producing question remains after an incorrect guess.
+    if (decision.type === "defeat") break;
     assert.equal(decision.type, "guess", JSON.stringify(decision));
     guessed.push(pool.ids[decision.index]);
     rejectIndex(state, decision.index);
   }
+  assert.ok(guessed.length >= 1, "at least one evidence-led hypothesis must be possible");
   return guessed;
 }
 

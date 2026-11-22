@@ -273,6 +273,12 @@ try {
           trace.push("GUESS: " + name + " [" + state.best + "]");
           assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
             "A no-personal-contact answer guessed a personal role");
+          if (policy === "actor") {
+            const recordedActing = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "actor"), state.best);
+            assert.equal(recordedActing, "yes",
+              "actor YES guessed someone with no acting evidence: " + state.best);
+          }
           if (policy === "family") {
             assert.equal(state.best, "riddlex-role-mother",
               "A confirmed mother must not be replaced by a public celebrity or wrong relative");

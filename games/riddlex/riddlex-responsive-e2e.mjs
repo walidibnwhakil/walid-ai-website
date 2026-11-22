@@ -296,6 +296,9 @@ try {
         }
         const q = state.question;
         if (seen.has(q)) throw new Error("Question repeated: " + q);
+        assert.ok(!(q === "dead" && seen.has("alive")), "Alive/dead question duplicated");
+        if (policy === "public" && seen.has("actor"))
+          assert.ok(!q.startsWith("screen_star_"), "Actor-only trivia after actor NO");
         seen.add(q);
         if (knowsNo) assert.ok(!q.startsWith("your_"), "Family question after knows-you NO: " + q);
         if (parentYes) assert.ok(!["your_sibling","your_spouse","your_child","your_baby"].includes(q),

@@ -1,16 +1,14 @@
 // Source-checked, historical career evidence for individual Bangladeshi actors.
 // "Unknown" is deliberate for everyone not listed: it is never proof of "no".
 // Keep questions about dated events, rather than brittle current employment.
-// Riaz: TBS News 2023 (Air Force, Dui Duari, Daruchini Dwip)
-// https://www.tbsnews.net/splash/acting-gave-me-fulfillment-riaz-617178
-// Daily Sun 2020 (Moner Majhe Tumi)
+// Riaz: Daily Sun (2020): Air Force and Dui Duari, Daruchini Dwip, Moner Majhe Tumi.
 // https://www.daily-sun.com/printversion/details/491983
-// Amin Khan: TBS News 2026 (Walton senior executive director)
+// Amin Khan: The Business Standard (January 2026): senior executive director at Walton.
 // https://www.tbsnews.net/economy/corporates/walton-signs-taskin-ahmed-brand-ambassador-1338306
-// The Daily Star 2026 (1993 debut Obujh Duti Mon)
-// https://www.thedailystar.net/culture/tv-film/news/amin-khan-looks-back-33-years-dhakai-cinema-4288576
-// bdnews24 2025 (Walton advertisement)
-// https://bangla.bdnews24.com/glitz/86f67c9f0c35
+// The Daily Star (2024): 1993 debut in Obujh Duti Mon.
+// https://www.thedailystar.net/entertainment/tv-film/news/amin-khan-reflects-30-years-achievements-the-industry-3723031
+// Daily Messenger (2024): featured in Walton television commercial.
+// https://www.dailymessenger.net/entertainment/news/20046
 
 export const ACTOR_PROOF_QUESTIONS = Object.freeze([
   {

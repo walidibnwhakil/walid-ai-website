@@ -15,7 +15,7 @@
   // Private Help messages are displayed only for this session, never localStorage.
   const transientHelp=new Map();
   const CHAT_RETENTION_MS=3*24*60*60*1000;
-  let managerNotices=[],lastManagerTasks=[];
+  let managerNotices=[],lastManagerTasks=[],chatView='manager',selectedStaffRole=null;
   const NOTICE_SEEN_KEY='walid-manager-notice-ids';
   function seenNotices(){
     try{
@@ -89,6 +89,7 @@
     document.body.classList.add('manager-chat-open');
     $('#manager-chat-head')?.setAttribute('aria-expanded','true');
     positionChatHead();
+    showChatView('manager');
     $('#ops-input')?.focus();
     fitComposer();
     void loadHistory();
@@ -137,31 +138,85 @@
     if(extra){const meta=document.createElement('small');meta.textContent=extra;bubble.append(meta)}
     container.append(bubble);return bubble;
   }
-  function appendDelegations(bubble,result){
-    const rows=Array.isArray(result?.delegations)?result.delegations.filter(item=>item&&typeof item==='object'):[];
-    if(!rows.length)return;
-    const details=document.createElement('details');details.className='manager-delegations';
-    const summary=document.createElement('summary');
-    summary.textContent='কাকে কী দায়িত্ব দেওয়া হয়েছে · '+rows.length+'টি রিপোর্ট';
-    details.append(summary);
-    for(const entry of rows){
-      const node=document.createElement('div');node.className='manager-workorder';
-      const role=roles.find(item=>item.id===entry.role);
-      const title=document.createElement('strong');
-      title.textContent=(role?.name||entry.role||'Staff')+' · '+(entry.status||'unknown');
-      node.append(title);
-      if(entry.instruction){
-        const work=document.createElement('p');work.textContent='Manager-এর নির্দেশ: '+entry.instruction;node.append(work);
+  function staffMessages(roleId){
+    const cutoff=Date.now()-CHAT_RETENTION_MS;
+    const messages=[];
+    for(const task of lastManagerTasks){
+      if(task?.role!=='manager'||Date.parse(task.created_at||'')<cutoff)continue;
+      for(const entry of task.result?.delegations||[]){
+        if(!entry||entry.role!==roleId)continue;
+        messages.push({
+          sent:task.created_at,
+          received:entry.checked_at||task.updated_at||task.created_at,
+          command:entry.instruction,
+          outcome:entry.outcome,
+          status:entry.status,
+        });
       }
-      if(entry.outcome){
-        const answer=document.createElement('p');answer.textContent='যাচাইয়ের ফল: '+entry.outcome;node.append(answer);
-      }
-      if(entry.checked_at){
-        const time=document.createElement('small');time.textContent='যাচাই: '+fmt(entry.checked_at);node.append(time);
-      }
-      details.append(node);
     }
-    bubble.append(details);
+    return messages.sort((a,b)=>String(a.sent).localeCompare(String(b.sent)));
+  }
+  function renderStaffList(){
+    const host=$('#manager-staff-list');if(!host)return;
+    host.replaceChildren();
+    for(const role of roles.filter(item=>item.id!=='manager')){
+      const entries=staffMessages(role.id);
+      const button=document.createElement('button');
+      button.type='button';button.className='manager-staff-choice';
+      const titleBox=document.createElement('span');
+      const name=document.createElement('strong');name.textContent=role.name;
+      const caption=document.createElement('small');
+      caption.textContent=entries.length
+        ?'সর্বশেষ কাজ: '+fmt(entries.at(-1).received)
+        :'এখনো কোনো সংরক্ষিত কাজের কথোপকথন নেই';
+      const arrow=document.createElement('span');arrow.className='chevron';arrow.textContent='›';
+      titleBox.append(name,caption);button.append(titleBox,arrow);
+      button.addEventListener('click',()=>showChatView('thread',role.id));
+      host.append(button);
+    }
+  }
+  function renderStaffThread(roleId){
+    const host=$('#manager-staff-thread');if(!host)return;
+    host.replaceChildren();
+    const role=roles.find(item=>item.id===roleId);
+    const entries=staffMessages(roleId);
+    if(!entries.length){
+      const empty=document.createElement('p');empty.className='manager-chat-no-history';
+      empty.textContent='এই কর্মীর সঙ্গে এখনো কোনো যাচাইকৃত কাজের বার্তা নেই।';
+      host.append(empty);return;
+    }
+    for(const entry of entries){
+      if(entry.command){
+        appendMessage(host,'question','Manager · '+fmt(entry.sent),entry.command);
+      }
+      appendMessage(host,'answer',(role?.name||'Staff')+' · '+fmt(entry.received),
+        entry.outcome||'এই কাজের যাচাইকৃত ফল এখনো পাওয়া যায়নি।',
+        entry.status&&entry.status!=='completed'?entry.status:'');
+    }
+    host.scrollTop=host.scrollHeight;
+    requestAnimationFrame(()=>{if(host.isConnected)host.scrollTop=host.scrollHeight});
+  }
+  function showChatView(view,roleId=null){
+    if(!['manager','list','thread'].includes(view))view='manager';
+    if(view==='thread'&&!roles.some(item=>item.id===roleId&&item.id!=='manager'))view='list';
+    chatView=view;selectedStaffRole=view==='thread'?roleId:null;
+    $('#ops-history').hidden=view!=='manager';
+    $('#manager-staff-list').hidden=view!=='list';
+    $('#manager-staff-thread').hidden=view!=='thread';
+    $('.manager-chat-compose').hidden=view!=='manager';
+    $('#manager-thread-back').hidden=view==='manager';
+    $('#manager-staff-chats').hidden=view!=='manager';
+    const role=roles.find(item=>item.id===roleId);
+    $('#ops-role-name').textContent=view==='manager'?'Manager':view==='list'?'Staff chats':role?.name||'Staff';
+    $('#ops-role-description').textContent=view==='manager'?'Walid AI · Private Office'
+      :view==='list'?'Manager-এর কর্মীদের সঙ্গে কথোপকথন':'Manager-এর সঙ্গে কাজের বার্তা';
+    if(view==='list')renderStaffList();
+    if(view==='thread')renderStaffThread(roleId);
+    if(view==='manager'){
+      const host=$('#ops-history');
+      host.scrollTop=host.scrollHeight;
+      $('#ops-input')?.focus();
+    }else{$('#manager-thread-back')?.focus()}
   }
   function renderHistory(tasks,notices=managerNotices){
     const host=$('#ops-history');host.replaceChildren();
@@ -202,11 +257,14 @@
       const result=task.result||{};
       const bubble=appendMessage(host,'answer','Manager · '+fmt(result.checked_at||task.updated_at),
         result.answer||(task.status==='running'?'আপনার নির্দেশ যাচাই করা হচ্ছে…':'এই অনুরোধের যাচাইকৃত উত্তর পাওয়া যায়নি।'),
-        result.limitation||(['queued','running'].includes(task.status)?'প্রক্রিয়াধীন':task.status||'unknown'));
-      appendDelegations(bubble,result);
-      for(const privateRow of transientHelp.get(task.id)||[]){
-        appendMessage(host,'answer','Admin Staff · '+fmt(privateRow.received_at),
-          privateRow.message||'(Empty Help message)','শুধু এই সেশনে দৃশ্যমান; ইতিহাসে সংরক্ষিত নয়');
+        ['queued','running'].includes(task.status)?'প্রক্রিয়াধীন':'');
+      // Private Help text stays in this owner's session and appears only when
+      // the owner actually requested Help; no technical storage disclaimer.
+      const recentHelp=transientHelp.get(task.id)||[];
+      if(recentHelp.length){
+        const detail=recentHelp.map(row=>'Help মেসেজ ('+fmt(row.received_at)+'): '+(row.message||'(খালি মেসেজ)')).join('\n');
+        const text=bubble.querySelector('p');
+        if(text)text.textContent+='\n'+detail;
       }
     }
     // Always open on the newest message; older messages remain scrollable above.
@@ -233,6 +291,8 @@
       lastManagerTasks=data.tasks||[];
       managerNotices=Array.isArray(brief.notices)?brief.notices:[];
       renderHistory(lastManagerTasks,managerNotices);
+      if(chatView==='list')renderStaffList();
+      if(chatView==='thread')renderStaffThread(selectedStaffRole);
       if($('#manager-chat-panel')?.classList.contains('is-open'))acknowledgeNotices();
       else updateNoticeHead();
     }catch(error){status('চ্যাটের আগের বার্তা দেখানো যাচ্ছে না: '+error.message,true)}
@@ -354,6 +414,11 @@
         // Other desks remain selectable for their read-only details inside the original office.
       });
     }catch{ /* The original office remains functional if the host cannot inspect it. */ }
+  });
+  $('#manager-staff-chats')?.addEventListener('click',()=>showChatView('list'));
+  $('#manager-thread-back')?.addEventListener('click',()=>{
+    if(chatView==='thread')showChatView('list');
+    else showChatView('manager');
   });
   $('#manager-chat-head')?.addEventListener('click',openManagerChat);
   $('#manager-chat-close')?.addEventListener('click',closeManagerChat);

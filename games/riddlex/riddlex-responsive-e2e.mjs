@@ -370,6 +370,11 @@ try {
         history.push([qid, response]);
         await realPage.click("#answer-" + (response === "unknown" ? "unknown" : response));
       }
+      await realPage.waitForFunction(() => {
+        const current = window.__riddlex?.state?.();
+        return current?.mode === "ask" &&
+          current.answers.length === 9 && !!current.question;
+      }, null, { timeout: 25000 });
       const gameState = await realPage.evaluate(() => window.__riddlex.state());
       assert.equal(gameState.answers.length, 9, JSON.stringify(history));
       assert.equal(gameState.mode, "ask",

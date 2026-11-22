@@ -47,7 +47,18 @@ async function exercise(browser, width, height){
     },
     tasks:[]
   }}));
-  await context.route('**/api/admin/tasks',route=>route.fulfill({status:200,json:{tasks:[],persistence:'temporary_filesystem'}}));
+  const submittedRoles=[];
+  await context.route('**/api/admin/tasks',route=>{
+    if(route.request().method()==='POST'){
+      const request=route.request().postDataJSON();
+      submittedRoles.push(request.role);
+      return route.fulfill({status:202,json:{
+        task:{id:'test-manager-1',role:request.role,status:'completed',
+          result:{answer:'জি স্যার, verified test response.',delegations:[{role:'monitor',status:'completed'}]}}
+      }});
+    }
+    return route.fulfill({status:200,json:{tasks:[],persistence:'temporary_filesystem'}});
+  });
   await context.route('**/api/admin/staff/checks',route=>route.fulfill({status:200,json:{checks:[]}}));
   // Approval UI is tested for section isolation only, not external Firebase sign-in.
   await context.route('**/www.gstatic.com/firebasejs/**',route=>route.abort());
@@ -63,6 +74,7 @@ async function exercise(browser, width, height){
   assert.equal(await page.locator('#dashboard').isVisible(),false,'analytics hidden before auth');
   assert.equal(await page.locator('#staff-workspace').isVisible(),false,'staff hidden before auth');
   assert.equal(await page.locator('#riddlex-workspace').isVisible(),false,'approvals hidden before auth');
+  assert.equal(await page.locator('#manager-chat-head').isVisible(),false,'manager chat head hidden until authenticated');
   const logo=await page.locator('.login-logo').boundingBox();
   const login=await page.locator('.auth-card').boundingBox();
   assert(logo.width>=195,'original logo is prominent on sign-in');
@@ -75,6 +87,23 @@ async function exercise(browser, width, height){
   await page.locator('#workspace-shell').waitFor({state:'visible'});
   assert.equal(await page.locator('#auth-screen').isVisible(),false,'sign-in card hidden after login');
   assert.equal(await page.locator('#dashboard').isVisible(),true);
+  const headButton=page.locator('#manager-chat-head');
+  assert.equal(await headButton.isVisible(),true,'robot chat head is visible in the collapsed sidebar');
+  assert.equal(await headButton.isEnabled(),true,'authenticated owner can open Manager');
+  assert.equal(await headButton.locator('svg').count(),1,'sidebar uses a small bot icon, not a text link');
+  assert.equal((await headButton.textContent()).trim(),'','bot head has no visible label');
+  assert.equal(await page.locator('#manager-chat-shortcut').count(),0,'no redundant text menu entry');
+  assert.equal(await page.locator('#manager-chat-open').count(),0,'no new button near the office');
+  assert.equal(await page.locator('.manager-office-actions').count(),0,'original office remains free of extra toolbars');
+  await headButton.click();
+  await page.locator('#manager-chat-panel').waitFor({state:'visible'});
+  assert.equal(await headButton.getAttribute('aria-expanded'),'true');
+  assert.equal(await page.locator('#dashboard').isVisible(),true,'sidebar chat head overlays Analytics without switching sections');
+  assert.equal(await page.locator('#staff-workspace').isVisible(),false,'staff office stays hidden behind sidebar chat opened from Analytics');
+  await page.keyboard.press('Escape');
+  await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
+  assert.equal(await headButton.getAttribute('aria-expanded'),'false');
+  assert.equal(await page.locator('#dashboard').isVisible(),true,'closing Manager returns to the original Analytics view');
   const header=await page.locator('.admin-header').boundingBox();
   const brand=page.locator('.admin-header .header-brand img');
   const brandBox=await brand.boundingBox();
@@ -189,8 +218,33 @@ async function exercise(browser, width, height){
   assert.equal(robotCount,5,'all original five workstations remain');
   const heading=await page.frameLocator('#preserved-staff-office').locator('.intro h1').textContent();
   assert.match(heading,/Five desks\. One protected network\./);
+  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'Manager drawer initially closed');
+  await page.frameLocator('#preserved-staff-office').locator('.desk.manager').click();
+  await page.locator('#manager-chat-panel').waitFor({state:'visible'});
+  assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'false');
+  assert.equal(await page.locator('#ops-role-name').textContent(),'Manager');
+  await page.locator('#ops-input').fill('আজকের visitor এবং সাইটের সমস্যা যাচাই করো');
+  await page.locator('#ops-send').click();
+  assert.deepEqual(submittedRoles,['manager'],'only Manager receives owner commands');
+  await page.locator('#manager-chat-close').click();
+  await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'true','drawer closes without changing office');
+  await page.frameLocator('#preserved-staff-office').locator('.desk.it').click();
+  assert.equal(await page.locator('#manager-chat-panel').isVisible(),false,'subordinate desk cannot open direct chat');
+  await headButton.click();
+  await page.locator('#manager-chat-panel').waitFor({state:'visible'});
+  assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'false','sidebar robot chat head opens Manager from Staff tab');
+  assert.equal(await page.locator('#staff-workspace').isVisible(),true,'office remains selected behind the chat head');
+  await page.keyboard.press('Escape');
+  await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#manager-chat-panel').getAttribute('aria-hidden'),'true','Escape closes drawer');
   await page.locator('#sidebar-toggle').click();
   await page.locator('[data-admin-tab="riddlex"]').click();
+  await headButton.click();
+  await page.locator('#manager-chat-panel').waitFor({state:'visible'});
+  assert.equal(await page.locator('#riddlex-workspace').isVisible(),true,'Manager overlay does not navigate away from Riddlex');
+  await page.locator('#manager-chat-close').click();
+  await page.locator('#manager-chat-panel').waitFor({state:'hidden'});
   assert.equal(await page.locator('#staff-workspace').isVisible(),false);
   assert.equal(await page.locator('#riddlex-workspace').isVisible(),true);
   assert.equal(await page.locator('#dashboard').isVisible(),false);

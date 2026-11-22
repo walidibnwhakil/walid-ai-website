@@ -8,6 +8,7 @@ import {
 import { poolFromEntries } from "./kb.js";
 import { ACTOR_PROOF_QUESTIONS } from "./actor-proof.js";
 import { WRITER_PROOF_QUESTIONS } from "./writer-proof.js";
+import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
 
 const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));

@@ -272,6 +272,13 @@ try {
           // misleading celebrity guess from sparse facts.
           if (policy === "actor") assert.ok(seen.size >= 12,
             "The engine gave up immediately on actor=yes: " + seen.size);
+          if (policy === "actor_1990s") {
+            const info = await page.evaluate(() => window.__riddlex.diagnose());
+            console.log("RIDDLEX_OWNER_ACTOR_1990S_DIAG " + JSON.stringify(info));
+            assert.ok(info.loadedCount > 1, "regional Bangladesh shards were never loaded");
+            assert.ok(info.bdActorCount > 0, "regional Bangladesh actor records were never added");
+            assert.ok(seen.size >= 20, "game surrendered before meaningful 1990s follow-up questions");
+          }
           break;
         }
         if (state.mode === "guess") {
@@ -279,7 +286,17 @@ try {
           trace.push("GUESS: " + name + " [" + state.best + "]");
           assert.ok(!knowsNo || !state.best.startsWith("riddlex-role-"),
             "A no-personal-contact answer guessed a personal role");
-          if (policy === "actor") {
+          if (policy === "actor_1990s") {
+            const contradictedEra = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "screen_star_pre1990"), state.best);
+            assert.notEqual(contradictedEra, "yes",
+              "Known pre-1990s star guessed despite firm NO: " + state.best);
+            const denied1990s = await page.evaluate((id) =>
+              window.__riddlex.replyFor(id, "screen_star_1990s"), state.best);
+            assert.notEqual(denied1990s, "no",
+              "Known NOT-1990s star guessed despite firm YES: " + state.best);
+          }
+          if (policy === "actor" || policy === "actor_1990s") {
             const recordedActing = await page.evaluate((id) =>
               window.__riddlex.replyFor(id, "actor"), state.best);
             assert.equal(recordedActing, "yes",
@@ -326,6 +343,11 @@ try {
         if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
         else if (q === "from_bd") a = "yes";
+        else if (policy === "actor_1990s" && ["named","alive","actor","screen_star_1990s"].includes(q)) a = "yes";
+        else if (policy === "actor_1990s" && [
+          "politician","writer","singer","musician","director","athlete",
+          "screen_star_pre1990","cricketer","footballer"
+        ].includes(q)) a = "no";
         else if (policy === "shakib" && q !== "knows_you")
           a = await page.evaluate(() =>
             window.__riddlex.find("Q266104") >= 0
@@ -373,6 +395,7 @@ try {
   await replay("Bangladeshi family member", "family");
   await replay("Shakib Al Hasan with the real database answers", "shakib");
   await replay("Bangladeshi actor who does not know the player", "actor");
+  await replay("1990s Bangladeshi actor, 12 real user answers", "actor_1990s");
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

@@ -1,7 +1,7 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-42";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-44";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-39";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-43";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
@@ -594,6 +594,41 @@ if (new URLSearchParams(location.search).has("autotest")) {
       best: guessIndex >= 0 ? pool.ids[guessIndex] : "",
     }),
     poolSize: () => pool?.count || 0,
+    diagnose: () => {
+      if (!pool || !state) return null;
+      const bit = (i, qid) => {
+        const qi = pool.qIndex.get(qid);
+        return qi == null ? 0 : factBit(pool, i, qi);
+      };
+      const matches = (i) => bit(i,"from_bd") === 2 && bit(i,"actor") === 2;
+      const eligible = state.alive.filter(matches);
+      const bdActors = [];
+      let bdActorCount = 0;
+      for (let i = 0; i < pool.count; i++) {
+        if (matches(i)) {
+          bdActorCount++;
+          if (bdActors.length < 8) bdActors.push({
+            id:pool.ids[i],en:pool.ens[i],alive:bit(i,"alive"),
+            era1990:bit(i,"screen_star_1990s"),
+            before1990:bit(i,"screen_star_pre1990"),
+            weight:state.weights[i]
+          });
+        }
+      }
+      return {
+        count:pool.count, alive:state.alive.length, bdActorCount,
+        bdActorAlive:eligible.length,
+        bdActor1990Alive:eligible.filter(i=>bit(i,"screen_star_1990s")===2).length,
+        loadedCount:loadedNames.length, loaded:loadedNames.slice(0,20),
+        nextPlan:catalog ? planShardLoads(catalog,state.answers,loadedNames).slice(0,12) : [],
+        loadTrace:(window.__riddlexLoadTrace || []).slice(-28),
+        bdActors, best:state.alive.slice().sort((a,b)=>state.weights[b]-state.weights[a]).slice(0,8).map(i=>({
+          id:pool.ids[i],name:pool.ens[i],
+          actor:bit(i,"actor"),bd:bit(i,"from_bd"),
+          era1990:bit(i,"screen_star_1990s"),weight:state.weights[i]
+        }))
+      };
+    },
     bytes: () => traffic.bytes,
     blinkCat: () => scene.blinkCat(),
     flickCat: () => scene.flickCat(),
@@ -606,8 +641,9 @@ if (new URLSearchParams(location.search).has("autotest")) {
     replyFor: (id, questionId = currentQ) => {
       const index = pool.ids.indexOf(id);
       const qi = pool.qIndex.get(questionId);
-      const base = index * pool.attrBytes + (qi >> 2);
-      const bit = (pool.attrs[base] >> ((qi & 3) << 1)) & 3;
+      // Sparse film-era and other overlay facts are not stored in the packed
+      // 28-byte rows. Test decisions through the same factBit as the engine.
+      const bit = index < 0 || qi == null ? 0 : factBit(pool, index, qi);
       return bit === 2 ? "yes" : bit === 1 ? "no" : "unknown";
     },
   };

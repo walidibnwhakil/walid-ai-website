@@ -657,6 +657,23 @@ test("animal and object rounds do not repeatedly scan all IDs for politics data"
   assert.equal(fullScans, 2, "a newly appended shard should allow one recheck");
 });
 
+test("reallocated overlays cannot leave phantom capacity that breaks regional shard append", () => {
+  const qs = [{ id: "real", group: "kind", en: "Real?", bn: "বাস্তব?" }];
+  const base = poolFromEntries(qs, [entry("one", 1, ["real"])]);
+  appendShard(base, poolFromEntries(qs, [entry("two", 1, ["real"])]));
+  assert.ok(base.capacity >= 2, "a first append reserved capacity");
+  // Mirrors applyPolitics: it replaced the arrays at exact count but left a
+  // previously larger capacity on the pool object.
+  base.capacity = 32;
+  base.attrs = base.attrs.slice(0, base.count * base.attrBytes);
+  base.pop = base.pop.slice(0, base.count);
+  base.flags = base.flags.slice(0, base.count);
+  appendShard(base, poolFromEntries(qs, [entry("bangladesh-actor", 1, ["real"])]));
+  assert.equal(base.count, 3);
+  assert.equal(base.ids[2], "bangladesh-actor");
+  assert.equal(factBit(base, 2, base.qIndex.get("real")), 2);
+});
+
 test("Shabnur exists in real BD female acting knowledge and is loaded by regional answers", () => {
   const manifest = JSON.parse(readFileSync(new URL("./kb/manifest.json", import.meta.url), "utf8"));
   const index = JSON.parse(readFileSync(new URL("./kb/index.json", import.meta.url), "utf8"));

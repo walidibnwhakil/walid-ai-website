@@ -108,7 +108,10 @@ test("wrong guesses preserve prior facts and do not immediately guess again", ()
       no: ["politician", "knows_you", "cricketer"] },
     { id: "Q21066842", en: "Amin Khan", pop: 220,
       yes: ["real", "male", "alive", "from_bd", "actor"],
-      no: ["politician", "knows_you", "cricketer"] },
+      no: ["politician", "knows_you", "cricketer", "writer"] },
+    { id: "fictional-test-actor", en: "Second multi-career actor", pop: 180,
+      yes: ["real", "male", "alive", "from_bd", "actor", "writer"],
+      no: ["politician", "knows_you", "cricketer", "singer", "scientist"] },
   ]);
   const state = createState(crowd, { category: "character" });
   recompute(state);

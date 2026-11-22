@@ -140,14 +140,9 @@ export function isPermissionDenied(error) {
 }
 
 export async function saveNewEntry(setDoc, payload) {
-  try {
-    await setDoc({ ...payload, status: "confirmed" });
-    return "confirmed";
-  } catch (error) {
-    if (!isPermissionDenied(error)) throw error;
-    await setDoc({ ...payload, status: "pending" });
-    return "pending";
-  }
+  // User submissions are never published without the owner's review.
+  await setDoc({ ...payload, status: "pending" });
+  return "pending";
 }
 
 export async function saveMergedEntry(updateDoc, merged, legacy) {
@@ -197,7 +192,7 @@ export async function submitLearning({ name, nameBn, file, answers, adult, alrea
     if (slot < 0) throw new Error("rate");
     const payload = {
       slug, nameEn: clean, nameBn: (nameBn || "").trim().slice(0, 80),
-      adult: !!adult, answers: packed, status: "confirmed", confirmations: 1,
+      adult: !!adult, answers: packed, status: "pending", confirmations: 1,
       confirmers: [uid], createdBy: uid, slot,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -223,7 +218,7 @@ export async function submitLearning({ name, nameBn, file, answers, adult, alrea
     return { status: data.status, confirmations: data.confirmations };
   }
   const confirmations = Math.min(12, (data.confirmations || 1) + 1);
-  const status = data.status === "pending" && confirmations >= 3 ? "confirmed" : data.status;
+  const status = data.status; // Confirmations cannot automatically publish a name.
   const stamp = firebase.firestore.FieldValue.serverTimestamp();
   const saved = await saveMergedEntry(
     (data) => ref.update(data),

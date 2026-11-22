@@ -196,7 +196,7 @@ try {
     }
     await page.click("#to-menu");
     assert.equal(await page.locator("#menu").isVisible(), true);
-    const opposite = orient === "portrait" ? { width: 1366, height: 768, art: "menu-desk" }
+    const opposite = orient === "portrait" ? { width: 1366, height: 768, art: "menu-user-approved" }
       : { width: 390, height: 844, art: "menu-portrait" };
     await page.setViewportSize({ width: opposite.width, height: opposite.height });
     await page.waitForFunction((art) =>

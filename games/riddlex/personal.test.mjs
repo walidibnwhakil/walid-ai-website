@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { answer, chooseQuestion, createState, decide, factBit, inCategory, recompute } from "./engine.js";
+import { answer, chooseQuestion, createState, decide, factBit, inCategory, questionBlocked, recompute } from "./engine.js";
 import { appendShard, poolFromEntries } from "./kb.js";
 import { PERSONAL_FACTS, PERSONAL_QUESTIONS, PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
 
 const baseQuestions = [
   { id: "real", group: "kind" }, { id: "fictional", group: "kind" },
   { id: "animal", group: "kind" }, { id: "object", group: "kind" },
-  { id: "named", group: "kind" }, { id: "male", group: "person" },
+  { id: "named", group: "kind" }, { id: "from_bd", group: "country" },
+  { id: "from_us", group: "country" }, { id: "male", group: "person" },
   { id: "female", group: "person" }, { id: "alive", group: "life" },
   { id: "from_game", group: "fiction" }, { id: "detective_role", group: "fiction" },
   ...PERSONAL_QUESTIONS,
@@ -74,6 +75,39 @@ test("non-personal celebrities are never incorrectly asserted to know the user",
   answer(state, "knows_you", "no");
   for (const person of PERSONAL_RELATIONS)
     assert.ok(state.weights[pool.ids.indexOf(person.id)] < state.weights[0]);
+});
+
+test("knows-you no closes family and relationship follow-ups", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "knows_you", "no");
+  for (const question of PERSONAL_QUESTIONS.filter((q) => q.id !== "knows_you"))
+    assert.equal(questionBlocked(state, question.id), true, question.id);
+});
+
+test("confirmed parent cannot be followed by sibling, spouse, or child questions", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  answer(state, "real", "yes");
+  answer(state, "knows_you", "yes");
+  answer(state, "your_family", "yes");
+  answer(state, "your_parent", "yes");
+  for (const id of ["your_sibling", "your_spouse", "your_child", "your_baby"])
+    assert.equal(questionBlocked(state, id), true, id);
+});
+
+test("Bangladeshi family role is not punished for missing country metadata", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real", "yes"], ["knows_you", "yes"], ["from_bd", "yes"],
+    ["your_family", "yes"], ["your_parent", "yes"], ["female", "yes"],
+  ]) answer(state, qid, value);
+  assert.ok(state.weights[roleIndex(pool, "mother")] > state.weights[0]);
 });
 
 test("Riddlex the detective is itself a guessable fictional character", () => {

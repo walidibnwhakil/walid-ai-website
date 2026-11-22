@@ -344,7 +344,11 @@ export function recompute(state) {
       const answer = answers[a];
       if (answer.value === "unknown") continue;
       const bit = factBit(pool, i, answer.qi);
-      const firm = hardLog(answer, bit, conflicted);
+      // A player's relative has no fixed nationality; a missing country
+      // fact must not overwhelm confirmed family information.
+      const unknownRoleCountry = relation && playerPersonal &&
+        COUNTRIES.includes(answer.qid) && bit === 0;
+      const firm = unknownRoleCountry ? null : hardLog(answer, bit, conflicted);
       score += firm == null ? LOG_MATCH[answer.value][bit] : firm;
     }
     logW[i] = score;
@@ -372,6 +376,15 @@ export function recompute(state) {
 }
 
 function topTwo(state) {
+  // Never guess a known foreign-country candidate after a firm country yes.
+  // An unknown country is not treated as a contradiction.
+  const chosenCountry = state.answers.find((row) =>
+    row.value === "yes" && COUNTRIES.includes(row.qid));
+  const otherCountryQIs = chosenCountry
+    ? COUNTRIES.filter((id) => id !== chosenCountry.qid)
+      .map((id) => state.pool.qIndex.get(id)).filter((qi) => qi != null)
+    : [];
+  const hasOtherIdentityEvidence = supportedIdentity(state);
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -379,6 +392,21 @@ function topTwo(state) {
   const { alive, weights } = state;
   for (let k = 0; k < alive.length; k++) {
     const i = alive[k];
+    if (chosenCountry) {
+      const countryFact = factBit(state.pool, i, chosenCountry.qi);
+      // Some verified local politicians have no packed country tag.
+      // Accept unknown nationality only with corroborating positive identity
+      // evidence; explicit foreign nationality is never accepted.
+      const isPersonalRole = state.pool.ids[i]?.startsWith("riddlex-role-") &&
+        state.answers.some((row) => row.qid === "knows_you" &&
+          ["yes", "probably"].includes(row.value));
+      if (!isPersonalRole && countryFact === 1) continue;
+      // A confirmed matching country wins over extra nationalities or
+      // historical birthplace tags (several notable figures have both).
+      if (!isPersonalRole && countryFact !== 2 &&
+          otherCountryQIs.some((qi) => factBit(state.pool, i, qi) === 2)) continue;
+      if (!isPersonalRole && countryFact === 0 && !hasOtherIdentityEvidence) continue;
+    }
     const w = weights[i];
     if (w > bestP) {
       second = best;
@@ -406,8 +434,25 @@ export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   return 4;
 }
 
+// The public database is huge; a country, gender, a couple of "no"s,
+ // or a high fame prior do not identify one particular person.
+function supportedIdentity(state) {
+  if (state.category !== "character" || state.pool.count < 100) return true;
+  if (!said(state, "real", ["yes", "probably"])) return true;
+  if (said(state, "knows_you", ["yes", "probably"])) return true;
+  return state.answers.some((row) => {
+    if (!["yes", "probably"].includes(row.value)) return false;
+    const group = state.pool.questions[row.qi]?.group;
+    return ["job", "politics", "fiction", "adult"].includes(group);
+  });
+}
+
 export function shouldGuess(state) {
   const asked = state.answers.length;
+  if (!supportedIdentity(state)) return false;
+  // Never guess a publicly indexed character after only a few generic facts.
+  if (state.category === "character" && state.pool.count >= 100 &&
+      !said(state, "knows_you", ["yes", "probably"]) && asked < 10) return false;
   if (!state.alive.length) return false;
   const { bestP, secondP } = topTwo(state);
   if (!(bestP > 0)) return false;
@@ -499,10 +544,26 @@ function gated(state, question, rows) {
   if (id === "adult_ent") return adultAllowed(state);
   if (group === "personal") {
     if (state.category !== "character") return false;
-    if (id === "knows_you") return state.answers.some((row) => row.qid === "real" &&
-      (row.value === "yes" || row.value === "probably"));
-    return state.answers.some((row) => row.qid === "knows_you" &&
-      (row.value === "yes" || row.value === "probably"));
+    const yes = (qid) => said(state, qid, ["yes", "probably"]);
+    const no = (qid) => said(state, qid, ["no", "probably_not"]);
+    if (id === "knows_you") return yes("real");
+    if (!yes("knows_you")) return false;
+    if (id === "your_family") return true;
+    if (yes("your_family")) {
+      if (id === "your_parent") return true;
+      if (id === "your_sibling") return no("your_parent");
+      if (id === "your_spouse") return no("your_parent") && no("your_sibling");
+      if (id === "your_child") return no("your_parent") && no("your_sibling") && no("your_spouse");
+      if (id === "your_baby") return yes("your_child");
+      return false;
+    }
+    if (no("your_family")) {
+      if (id === "your_partner") return true;
+      if (id === "your_ex") return no("your_partner");
+      if (id === "your_best_friend") return no("your_partner") && no("your_ex");
+      if (id === "your_friend") return no("your_partner") && no("your_ex") && no("your_best_friend");
+    }
+    return false;
   }
   if (id === "screen_star_1990s" || id === "screen_star_pre1990") {
     return state.answers.length >= 5 &&
@@ -762,7 +823,10 @@ function unrelatedJob(state, id) {
 function skippedAsDuplicate(state, id) {
   const yes = (qid) => said(state, qid, ["yes", "probably"]);
   const answered = (qid) => state.answers.some((answer) => answer.qid === qid && answer.value !== "unknown");
-  if ((id === "dead" && answered("alive")) || (id === "alive" && answered("dead"))) return true;
+  // Alive and dead are the same binary fact. An "unknown" answer should
+  // not trigger the opposite wording immediately afterwards.
+  if ((id === "dead" && state.answers.some((row) => row.qid === "alive")) ||
+      (id === "alive" && state.answers.some((row) => row.qid === "dead"))) return true;
   if ((id === "female" && yes("male")) || (id === "male" && yes("female"))) return true;
   if (id === "musician" && yes("singer")) return true;
   if (id === "screen_star_1990s" && said(state, "actor", ["no", "probably_not"])) return true;
@@ -895,6 +959,11 @@ export function questionContradicts(state, qid) {
 function blockedQuestion(state, question, rows, cache) {
   if (skippedAsDuplicate(state, question.id)) return true;
   const links = linksFor(state.pool);
+  // Sport-specific roles are not asked before confirming the sport.
+  for (const sport of ["cricketer", "footballer"]) {
+    if (links.parents.get(question.id)?.includes(sport) &&
+        !said(state, sport, ["yes", "probably"])) return true;
+  }
   if (impliedYes(state, question.id, links) || questionContradicts(state, question.id)) return true;
   for (const parent of links.massParents.get(question.id) || []) {
     if (parent === "politician" && politicsBranch(state)) continue;
@@ -907,7 +976,9 @@ export function questionBlocked(state, qid) {
   const qi = state.pool.qIndex.get(qid);
   if (qi == null) return false;
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
-  return blockedQuestion(state, state.pool.questions[qi], rows, new Map());
+  const question = state.pool.questions[qi];
+  if (question.group === "personal" && !gated(state, question, rows)) return true;
+  return blockedQuestion(state, question, rows, new Map());
 }
 
 function allowedInCategory(state, question) {
@@ -932,6 +1003,16 @@ function firstAllowedQuestion(state) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
     if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
+    if (question.id === "fictional" && said(state, "real", ["yes", "probably"])) continue;
+    if (question.id === "real" && said(state, "fictional", ["yes", "probably"])) continue;
+    if (question.group === "fiction" && said(state, "real", ["yes", "probably"])) continue;
+    if ((question.id === "screen_star_1990s" ||
+         question.id === "screen_star_pre1990") &&
+        !said(state, "actor", ["yes", "probably"])) continue;
+    if (question.id === "adult_ent" && !adultAllowed(state)) continue;
+    // Preserve broad fallbacks after a rejected guess, but never reopen
+    // personal or child sport branches contrary to earlier answers.
+    if (question.group === "personal" && !gated(state, question, rows)) continue;
     return question.id;
   }
   return null;
@@ -1059,9 +1140,14 @@ export function decide(state) {
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
   let qid = chooseQuestion(state);
-  if (!qid && waiting) qid = firstAllowedQuestion(state);
+  // With sparse ordinary-person clues, continue questioning rather than
+  // surrendering at eight. Preserve confident well-supported guesses and
+  // keep the post-rejection gap used by the existing engine.
+  if (!qid && (waiting || !supportedIdentity(state)))
+    qid = firstAllowedQuestion(state);
   if (!qid) {
-    if (best >= 0 && bestP > 0) return { type: "guess", index: best };
+    if (best >= 0 && bestP > 0 && supportedIdentity(state))
+      return { type: "guess", index: best };
     return { type: "defeat" };
   }
   return { type: "ask", qid };

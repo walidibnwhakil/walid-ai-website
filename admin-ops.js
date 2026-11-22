@@ -16,7 +16,7 @@
   const transientHelp=new Map();
   const CHAT_RETENTION_MS=3*24*60*60*1000;
   let managerNotices=[],lastManagerTasks=[],chatView='manager',selectedStaffRole=null;
-  let noticeRetryTimer=null;
+  let noticeRetryTimer=null,noticePollTimer=null,lastNoticeDigest='';
   const NOTICE_SEEN_KEY='walid-manager-notice-ids';
   function seenNotices(){
     try{
@@ -333,9 +333,15 @@
     if(!ready)return;
     try{
       const brief=await request('/api/admin/manager/notices');
-      managerNotices=Array.isArray(brief.notices)?brief.notices:[];
+      const incoming=Array.isArray(brief.notices)?brief.notices:[];
+      const digest=JSON.stringify(incoming.map(n=>[
+        n?.id,n?.created_at,n?.message,n?.daily_delegations?.length
+      ]));
+      const changed=digest!==lastNoticeDigest;
+      managerNotices=incoming;
+      lastNoticeDigest=digest;
       updateNoticeHead();
-      if($('#manager-chat-panel')?.classList.contains('is-open')){
+      if(changed&&$('#manager-chat-panel')?.classList.contains('is-open')){
         renderHistory(lastManagerTasks,managerNotices);
         if(chatView==='list')renderStaffList();
         if(chatView==='thread')renderStaffThread(selectedStaffRole);
@@ -383,10 +389,11 @@
     }finally{busy=false;$('#ops-send').disabled=false}
   }
   function logout(){
+    if(noticePollTimer){clearInterval(noticePollTimer);noticePollTimer=null}
     if(noticeRetryTimer){clearTimeout(noticeRetryTimer);noticeRetryTimer=null}
     closeManagerChat();
     transientHelp.clear();
-    managerNotices=[];lastManagerTasks=[];
+    managerNotices=[];lastManagerTasks=[];lastNoticeDigest='';
     ready=false;setSidebarOpen(false);
     $('#manager-chat-head').disabled=true;$('#staff-workspace').classList.add('hidden');$('#riddlex-workspace').classList.add('hidden');
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=true);
@@ -399,6 +406,15 @@
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.disabled=false);
     selectTab(currentTab,false);
     void refreshNotices();
+    if(noticePollTimer)clearInterval(noticePollTimer);
+    // Poll only while this authenticated page is in view. Missed cloud
+    // monitor runs remain available when the owner signs in again.
+    noticePollTimer=setInterval(()=>{
+      if(ready&&document.visibilityState!=='hidden')void refreshNotices();
+    },120000);
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(ready&&document.visibilityState==='visible')void refreshNotices();
   });
   addEventListener('walid-admin-signed-out',logout);
   // No section hashes or alternate admin URLs.

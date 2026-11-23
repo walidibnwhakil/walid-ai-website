@@ -1378,7 +1378,36 @@ const ACTOR_ONLY_IDENTITY_QUESTIONS = new Set(
     q.parent==="actor" && !MAINSTREAM_INDUSTRY_QUESTIONS.includes(q.id))
     .map(q=>q.id));
 
+// Keep movie-title trivia relevant. Asking about a movie that just happens
+// to exist somewhere in the casebook does not identify the current person.
+export const MAX_QUESTIONS_PER_ROUND = 24;
+const MAX_FILM_TITLES_PER_ROUND = 2;
+function isFilmTitleQuestion(id) {
+  return /^(?:film_(?!director_work|villain_dialogues)|broad_film_|profile_film_|screen_(?:debut_|acted_|first_film_|india_(?:dabangg|dangal|ddlj)))/.test(id);
+}
+function usefulFilmTitleQuestion(state, qid) {
+  if (!isFilmTitleQuestion(qid)) return true;
+  const old = state.answers.filter(row => isFilmTitleQuestion(row.qid));
+  if (old.length >= MAX_FILM_TITLES_PER_ROUND) return false;
+  // A yes, no, or don't-know answer should make the next question reconsider
+  // the candidate shortlist, not trigger another item in a film-title list.
+  if (state.answers.length && isFilmTitleQuestion(state.answers.at(-1).qid)) return false;
+  const industryKnown = said(state,"actor",["yes","probably"]) ||
+    said(state,"film_director_work",["yes","probably"]) ||
+    said(state,"from_film",["yes","probably"]);
+  if (!industryKnown) return false;
+  if (state.answers.length < 10) return true;
+  const qi = state.pool.qIndex.get(qid);
+  if (qi == null) return false;
+  // Only allow a title to be used when an appreciably likely candidate
+  // actually has this sourced fact and still fits the earlier firm answers.
+  return state.alive.some(i => state.weights[i] >= 0.003 &&
+    factBit(state.pool,i,qi) === 2 &&
+    eligibleForIdentityQuestion(state,i));
+}
+
 function blockedQuestion(state, question, rows, cache) {
+  if (!usefulFilmTitleQuestion(state, question.id)) return true;
   if (skippedAsDuplicate(state, question.id)) return true;
   // A confirmed adult-industry actor must not be questioned about unrelated
   // mainstream movies or screen roles before a mainstream industry is known.
@@ -2831,11 +2860,24 @@ export function decide(state) {
   const personalRole=confirmedPersonalRole(state);
   if (personalRole >= 0) return { type:"guess", index:personalRole };
   if (!state.alive.length) return { type: "defeat" };
-  // Neither 10 rejected names nor 72 answers establishes that the user lost.
-  // Continue asking every remaining relevant, non-duplicate question.
+  // Rejected names are evidence, not permission to make a blind guess.
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  // A supported identification comes before optional film or career trivia.
+  // Earlier discovery paths could keep bypassing shouldGuess indefinitely.
+  if (state.category === "character") {
+    const identified = verifiedIdentityCandidate(state);
+    if (identified >= 0) return { type:"guess", index:identified };
+    if (shouldGuess(state)) return { type:"guess", index:best };
+  }
+  // An honest failure with an option to teach the game is preferable to 41+
+  // repetitive questions or an evidence-free celebrity guess.
+  if (state.answers.length >= MAX_QUESTIONS_PER_ROUND) {
+    if (state.category !== "character" && shouldGuess(state))
+      return { type:"guess", index:best };
+    return { type:"defeat" };
+  }
   // Preserve existing, already-verified pen/phone/clock and function
   // inference before extending the conversation to newer object families.
   // This avoids losing good legacy gameplay to unnecessary extra questions.

@@ -1,0 +1,33 @@
+name: Riddlex 20 new-owner-target independent browser gameplay
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "games/riddlex/owner-20-ux-e2e.mjs"
+      - ".github/workflows/riddlex-owner-20-ux.yml"
+permissions:
+  contents: read
+jobs:
+  browser-ux-20:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check 20-target audit syntax
+        run: node --check games/riddlex/owner-20-ux-e2e.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Independently play 20 owner targets and log all bilingual questions
+        run: node games/riddlex/owner-20-ux-e2e.mjs
+      - name: Upload 20 full real-gameplay transcripts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-20-independent-question-answer-traces
+          path: ${{ runner.temp }}/riddlex-user-20.json
+          if-no-files-found: warn

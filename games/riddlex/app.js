@@ -4,6 +4,7 @@ import { UI, guessFont } from "./i18n.js?v=riddlex-40";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-56";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-56";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
+import { DOMAIN_PEOPLE } from "./domain-facts.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-57";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
@@ -243,7 +244,9 @@ async function loadNamed(entries, token, begin) {
       // at game start, even when the worldwide long-tail shards do not load.
       // This avoids guessing a famous unrelated candidate because the actual
       // public figure lives beyond the mobile transfer budget.
-      const extra = EXTRA_IDENTITY_PEOPLE.filter(person => !partial.ids.includes(person.id));
+      const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE].filter(person =>
+        !partial.ids.includes(person.id) &&
+        !EXTRA_IDENTITY_PEOPLE.some(other=>other !== person && other.id === person.id));
       const roles = poolFromEntries(manifest.questions,
         [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER, ...extra]);
       adoptPool(appendShard(partial, roles));

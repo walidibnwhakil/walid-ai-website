@@ -7,7 +7,7 @@ import { PERSONAL_QUESTIONS } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-61";
+import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-69";
 import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS } from "./everyday-facts.js";
 import { RECOGNITION_QUESTIONS } from "./recognition-facts.js";

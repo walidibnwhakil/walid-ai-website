@@ -15,12 +15,13 @@ import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS } from "./domain-facts.js";
 import { BROAD_QUESTIONS } from "./broad-facts.js";
 import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
+import { EVERYDAY_QUESTIONS } from "./everyday-facts.js";
 
 const root = new URL("../../", import.meta.url);
 const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.meta.url),"utf8"));
 const questionInfo = new Map([...manifest.questions, ...EXTRA_SCREEN_QUESTIONS,
   ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS,
-  ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS].map(q => [q.id,q]));
+  ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS].map(q => [q.id,q]));
 const mime={".html":"text/html",".css":"text/css",".js":"text/javascript",
   ".mjs":"text/javascript",".json":"application/json",".bin":"application/octet-stream",
   ".webp":"image/webp",".jpg":"image/jpeg",".png":"image/png",
@@ -198,11 +199,178 @@ const regions=new Set(["from_asia","from_europe","from_africa","from_north_ameri
 const fictionTags=new Set(["from_novel","from_bengali_lit","from_film","from_cartoon","from_anime","from_comics","from_game","by_humayun","by_zafar","by_ray"]);
 const objectNo=new Set(["vehicle","kitchen","clothing","food","furniture","cooking","uses_pressure","music_item","sport_item","obj_moves_air_blades","obj_cools_room","obj_keeps_food_cold","obj_mounted_ceiling","obj_flower_from_plant","obj_fragrant_flower","obj_five_spiral_waxy_petals","obj_frangipani_yellow_center"]);
 const careers=new Set(["actor","politician","cricketer","footballer","athlete","scientist","singer","business","writer","youtube","adult_ent"]);
+// Independent, human-readable observable functions for these real-world
+// test objects. This table belongs ONLY to browser QA; it never loads in the
+// game's reasoning engine and does not read the Riddlex candidate casebook.
+// Questions are broad physical/use traits, not 'is it NAME?' shortcuts.
+const everydayQuestionIds=new Set(EVERYDAY_QUESTIONS.map(q=>q.id));
+const independentEverydayFacts={
+  "Computer": [
+    "obj_family_electric",
+    "obj_computes_data"
+  ],
+  "TV": [
+    "obj_family_electric",
+    "obj_shows_television"
+  ],
+  "Glass #11": [
+    "obj_family_kitchen",
+    "obj_family_container",
+    "obj_drinking_glass"
+  ],
+  "Tissue": [
+    "obj_family_paper",
+    "obj_family_cleaning",
+    "obj_wiping_tissue"
+  ],
+  "Tablet (Medicine)": [
+    "obj_family_medicine",
+    "obj_oral_tablet"
+  ],
+  "Ladder": [
+    "obj_family_climbing",
+    "obj_climbing_ladder"
+  ],
+  "Perfume": [
+    "obj_family_personal_care",
+    "obj_skin_perfume"
+  ],
+  "Potty (Gu)": [
+    "obj_family_waste",
+    "obj_fecal_matter"
+  ],
+  "Ear Ring": [
+    "obj_family_worn",
+    "obj_ear_jewellery"
+  ],
+  "Nose Ring": [
+    "obj_family_worn",
+    "obj_nose_jewellery"
+  ],
+  "Kopaler Tip": [
+    "obj_family_worn",
+    "obj_forehead_dot"
+  ],
+  "Calender": [
+    "obj_family_paper",
+    "obj_dates_calendar"
+  ],
+  "Blender": [
+    "obj_family_electric",
+    "obj_family_kitchen",
+    "obj_blends_liquids"
+  ],
+  "Mixer": [
+    "obj_family_electric",
+    "obj_family_kitchen",
+    "obj_whisks_mixture"
+  ],
+  "Cream": [
+    "obj_family_personal_care",
+    "obj_skin_moisturizer",
+    "obj_skin_cream"
+  ],
+  "Lotion": [
+    "obj_family_personal_care",
+    "obj_skin_moisturizer",
+    "obj_skin_lotion"
+  ],
+  "Vaseline": [
+    "obj_family_personal_care",
+    "obj_skin_moisturizer",
+    "obj_skin_jelly"
+  ],
+  "Door": [
+    "obj_family_house",
+    "obj_room_door"
+  ],
+  "Window": [
+    "obj_family_house",
+    "obj_glazed_window"
+  ],
+  "Bag": [
+    "obj_family_container",
+    "obj_carries_items"
+  ],
+  "Key": [
+    "obj_family_lock",
+    "obj_metal_key"
+  ],
+  "Tala": [
+    "obj_family_lock",
+    "obj_padlock"
+  ],
+  "Bank": [
+    "obj_family_financial",
+    "obj_banking_service"
+  ],
+  "Bottle": [
+    "obj_family_container",
+    "obj_sealable_bottle"
+  ],
+  "Plate": [
+    "obj_family_kitchen",
+    "obj_food_plate"
+  ],
+  "Glass #35": [
+    "obj_family_kitchen",
+    "obj_family_container",
+    "obj_drinking_glass"
+  ],
+  "Dictionary": [
+    "obj_family_paper",
+    "obj_reference_dictionary"
+  ],
+  "Diary": [
+    "obj_family_paper",
+    "obj_personal_diary"
+  ],
+  "Sound Box": [
+    "obj_family_electric",
+    "obj_amplifies_sound"
+  ],
+  "Remote": [
+    "obj_family_electric",
+    "obj_remote_control"
+  ],
+  "Charger": [
+    "obj_family_electric",
+    "obj_recharges_battery"
+  ],
+  "Gas cylinder": [
+    "obj_family_container",
+    "obj_family_kitchen",
+    "obj_stores_cooking_gas"
+  ],
+  "Salt": [
+    "obj_family_kitchen",
+    "obj_family_consumable",
+    "obj_table_salt"
+  ],
+  "jharu": [
+    "obj_family_cleaning",
+    "obj_sweeping_broom"
+  ],
+  "Tupi": [
+    "obj_family_worn",
+    "obj_cap_head"
+  ],
+  "Jaynamaj": [
+    "obj_family_prayer",
+    "obj_prayer_mat"
+  ]
+};
+
 const common=new Set(["real","fictional","named","male","female","alive","dead","knows_you","your_family","your_partner","your_ex","your_friend","your_best_friend","handheld","pocket","electronic","daily_use"]);
 function answerFor(person,q) {
  const yes=new Set(person.yes||[]), no=new Set(person.no||[]);
  const level=common.has(q)?"সাধারণ":/^screen_|^film_|^career_|^politics_|^party_|_minister|_premier|^born_/.test(q)?"বিশেষ তথ্য":"মাঝারি";
  const give=(answer,reason)=>({answer,level,reason});
+ if(person.object && everydayQuestionIds.has(q)) {
+   const affirmed=independentEverydayFacts[person.name];
+   if(!affirmed) return give("unknown","object not characterized independently");
+   return give(affirmed.includes(q)?"yes":"no","observable object class or use");
+ }
  if(yes.has(q))return give("yes","independent persona fact");
  if(no.has(q))return give("no","independent persona fact");
  if((person.maybe||[]).includes(q))return give("probably","ambiguous origin/career");

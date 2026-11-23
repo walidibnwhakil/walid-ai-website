@@ -3,7 +3,7 @@
 
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-60";
 import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-60";
-import { PERSONAL_QUESTIONS } from "./personal-facts.js?v=riddlex-60";
+import { PERSONAL_QUESTIONS } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS } from "./domain-facts.js?v=riddlex-60";

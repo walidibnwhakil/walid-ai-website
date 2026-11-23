@@ -205,6 +205,9 @@ export function createState(pool, options = {}) {
     pool,
     answers: [],
     rejected: new Set(),
+    // Stable identity memory: numeric indices change when knowledge shards reload.
+    // Rejected people must remain excluded throughout this round.
+    rejectedIds: new Set(),
     guesses: 0,
     sinceGuess: 0,
     opening: options.opening || null,
@@ -311,6 +314,7 @@ export function recompute(state) {
   applyPolitics(state.pool);
   if (state.weights.length !== state.pool.count) state.weights = new Float64Array(state.pool.count);
   const { pool, answers, rejected } = state;
+  const rejectedIds = state.rejectedIds || new Set();
   const n = pool.count;
   const logW = new Float64Array(n);
   const conflicted = conflictedFamilies(answers);
@@ -322,7 +326,9 @@ export function recompute(state) {
     row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
-    if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
+    if (rejectedIds.has(pool.ids[i]) ||
+        (!rejectedIds.size && rejected.has(i)) ||
+        pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
@@ -1066,6 +1072,11 @@ export const QUESTION_REQUIRES = {
     id, [
       { id: "actor", value: "yes", strict: true },
       ...([
+        "screen_walton_executive", "screen_return_after_long_break",
+        "screen_debut_abujh_duti_mon", "screen_restaurant_business",
+        "screen_film_producer", "screen_famous_villain_dialogues",
+        "screen_800_plus_films", "screen_lead_to_villain",
+        "screen_theatre_tv_film", "screen_new_film_announced_2026",
         "screen_known_multiple_marriages", "screen_debut_anonto_bhalobasha",
         "screen_acted_bir_soinik", "screen_died_1996", "screen_died_2008",
         "screen_film_debut_pre1995", "screen_over_100_films",
@@ -1403,7 +1414,9 @@ export function rewind(state) {
 }
 
 export function rejectIndex(state, index) {
+  if (index < 0 || index >= state.pool.count) return state;
   state.rejected.add(index);
+  (state.rejectedIds ||= new Set()).add(state.pool.ids[index]);
   state.guesses += 1;
   state.sinceGuess = 0;
   return recompute(state);

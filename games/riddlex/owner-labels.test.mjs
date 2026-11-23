@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {ownerBengaliFallback} from "./owner-bengali-labels.js";
 import {poolFromEntries} from "./kb.js";
+import {inCategory} from "./engine.js";
+import {UNVERIFIED_OWNER_NAMES} from "./unverified-owner-names.js";
 
 test("original Bengali name from Grok or Wikidata always wins",()=>{
  assert.equal(ownerBengaliFallback("Kate Winslet","কেটের আসল বাংলা নাম"),"কেটের আসল বাংলা নাম");
@@ -22,6 +24,14 @@ test("unambiguous everyday and public profiles gain Bengali label without changi
  assert.equal(pool.bns[2],"মুরগি");
  assert.equal(pool.bns[3],"কানের দুল");
  assert.equal(pool.bns[4],"");
+});
+test("unverified name is recorded bilingually but cannot be a game guess",()=>{
+ const pool=poolFromEntries([{id:"real",group:"kind",en:"Real?",bn:"বাস্তব?"}],UNVERIFIED_OWNER_NAMES);
+ assert.equal(pool.count,1);
+ assert.equal(pool.ens[0],"Minami Ozawa (identity unverified)");
+ assert.equal(pool.bns[0],"মিনামি ওজাওয়া (পরিচয় যাচাই হয়নি)");
+ assert.ok(pool.flags[0]&4,"audit-only non-guessable flag");
+ assert.equal(inCategory(pool,0,"character"),false);
 });
 test("never assume short ambiguous names or assign wrong translation",()=>{
  for(const name of ["Ursula","Ram","Glass","Tablet"]) {

@@ -132,6 +132,7 @@ const yesFacts={
  "riddlex-topic-lisa-su":["topic_technology_business","topic_semiconductors"],
  "riddlex-topic-mr-bean":["topic_tv_comedy_fiction","topic_visual_comedy","topic_teddy_bear"],
  "riddlex-topic-amir-hawlader":["topic_modern_bengali_novel","topic_elma_behrouz","topic_novel_male_central"],
+ "c-poddoja":["topic_modern_bengali_novel","topic_elma_behrouz"],
  "riddlex-topic-mamunul-haque":["topic_islamic_speaker","topic_online_lectures"],
 };
 const noFacts={
@@ -144,6 +145,7 @@ const noFacts={
  Q317521:["topic_semiconductors","topic_ai_computing"],
  "riddlex-topic-lisa-su":["topic_electric_vehicles","topic_space_rockets"],
  "riddlex-topic-amir-hawlader":["topic_tv_comedy_fiction"],
+ "c-poddoja":["topic_novel_male_central"],
  "riddlex-topic-mr-bean":["topic_elma_behrouz","topic_modern_bengali_novel"],
 };
 const facts={};

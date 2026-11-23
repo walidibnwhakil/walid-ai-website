@@ -676,7 +676,17 @@ export function shouldGuess(state) {
   if (["object","animal"].includes(state.category) && state.pool.count >= 40) {
     if (asked < 5 || !hasCandidateEvidence(state, best) ||
         !hasFunctionEvidence(state, best)) return false;
-    return (bestP >= 0.82 && ratio >= 7) ||
+    // Popularity is not certainty. In a large sparse casebook, a perfectly
+    // verified fridge/butterfly can have a tiny absolute posterior because
+    // thousands of unrelated objects have UNKNOWN for this new question.
+    // A confirmed source-backed signature plus multiple matching category
+    // facts and decisive separation is sufficient; a generic electricity
+    // answer alone is explicitly NOT a signature.
+    const confirmedFunction = state.answers.some(row =>
+      row.value === "yes" && NONPERSON_SIGNATURES.includes(row.qid) &&
+      factBit(state.pool, best, row.qi) === 2);
+    return (confirmedFunction && ratio >= 8) ||
+      (bestP >= 0.82 && ratio >= 7) ||
       (bestP >= 0.4 && ratio >= 12);
   }
   // After a miss, one name far ahead of everyone else can be said at once.

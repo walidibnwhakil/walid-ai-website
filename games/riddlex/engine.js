@@ -9,6 +9,7 @@ const politicsUrl = new URL(
 const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await import(politicsUrl);
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
+import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
@@ -151,6 +152,7 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
+  if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
   const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
     DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
@@ -1240,6 +1242,8 @@ function parentAbsent(state, parentId, rows, cache) {
 // strict: the parent must already be yes (or implied). Otherwise a no or
 // probably-not is enough to close the branch; an unasked parent stays open.
 export const QUESTION_REQUIRES = {
+  ...Object.fromEntries(NARRATIVE_QUESTIONS.filter(q => q.parent).map(q =>
+    [q.id, [{ id:q.parent, value:"yes", strict:true }]])),
   party_bnp: [{ id: "from_bd", value: "yes" }],
   party_al: [{ id: "from_bd", value: "yes" }],
   party_jp: [{ id: "from_bd", value: "yes" }],
@@ -1425,7 +1429,7 @@ function allowedInCategory(state, question) {
 // his marriage clue is not evidence about the other actors by default.
 function hasUnrejectedFilmCandidate(state, qid) {
   const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
-    BROAD_FACTS[qid];
+    BROAD_FACTS[qid] || NARRATIVE_FACTS[qid];
   if (!facts) return true;
   return state.alive.some(i =>
     state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
@@ -2532,6 +2536,105 @@ function confirmedPersonalRole(state) {
   return index;
 }
 
+
+const NARRATIVE_GENERIC = new Set([
+  "story_indian_epic","story_mahabharata","story_ramayana",
+  "story_archery","story_secret_agent","history_religious_prophet",
+  "office_us_2009_2017","screen_money_heist",
+]);
+
+// First classify the story, then confirm an independently verifiable role.
+// Questions come from common taxonomy and the current answers; the player's
+// intended name is never supplied to this function.
+function narrativeDiscoveryQuestion(state) {
+  if(state.category!=="character" || state.answers.length<5) return null;
+  const yes=qid=>said(state,qid,["yes","probably"]);
+  const no=qid=>said(state,qid,["no","probably_not"]);
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const plan=[];
+  if(yes("fictional")){
+    plan.push("story_indian_epic");
+    if(yes("story_indian_epic")){
+      plan.push("story_mahabharata","story_ramayana","story_archery");
+      if(yes("story_mahabharata"))
+        plan.push("story_pandava","story_charioteer_guide",
+          "story_lifelong_vow","story_karna_armor");
+      if(yes("story_ramayana"))
+        plan.push("story_rama_brother","story_sita_husband","story_lanka_king");
+    }
+    if(no("story_indian_epic")){
+      plan.push("story_secret_agent");
+      if(yes("story_secret_agent"))plan.push("story_agent_007");
+    }
+  }
+  if(yes("real") && !yes("knows_you")){
+    if(yes("from_us") && yes("politician")){
+      plan.push("office_us_2009_2017");
+      if(yes("office_us_2009_2017")) plan.push("office_aca_2010");
+    }
+    if(yes("from_es") && yes("actor")){
+      plan.push("screen_money_heist");
+      if(yes("screen_money_heist")) plan.push("screen_tokyo_heist");
+    }
+    // A prophet need not have a contemporary nationality or job. Do not
+    // force modern career trivia after nationality and offices are unknown.
+    const noCountryKnown=!COUNTRIES.some(id=>yes(id));
+    const unknowns=state.answers.filter(row=>row.value==="unknown").length;
+    if(noCountryKnown && state.answers.length>=8 && unknowns>=3 &&
+       !yes("actor") && !yes("politician")){
+      plan.push("history_religious_prophet");
+      if(yes("history_religious_prophet"))
+        plan.push("history_first_human","history_jesus_isa");
+    }
+  }
+  const pool=state.pool;
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const qid of plan){
+    if(asked.has(qid))continue;
+    const qi=pool.qIndex.get(qid);
+    if(qi==null)continue;
+    const q=pool.questions[qi];
+    if(!allowedInCategory(state,q) || blockedQuestion(state,q,rows,cache) ||
+       !gated(state,q,rows) || !hasUnrejectedFilmCandidate(state,qid)) continue;
+    return qid;
+  }
+  return null;
+}
+
+// Guarded late guess: a category answer or general story name never suffices.
+// At least two independent affirmative source-supported characteristics must
+// agree, one of them distinctive, with no opposing definite player answer.
+// Ties stay questions, and all rejected identities remain excluded.
+function narrativeEvidenceCandidate(state){
+  if(state.category!=="character" || state.answers.length<8 ||
+     state.sinceGuess<questionsBeforeRetry(state))return -1;
+  const yes=state.answers.filter(row=>row.value==="yes" &&
+    NARRATIVE_FACTS[row.qid]);
+  if(yes.length<2)return -1;
+  const options=[];
+  for(const i of state.alive){
+    if(state.weights[i]<=0 || state.rejectedIds?.has(state.pool.ids[i]))continue;
+    const supported=yes.filter(row=>factBit(state.pool,i,row.qi)===2);
+    if(supported.length<2 ||
+       !supported.some(row=>!NARRATIVE_GENERIC.has(row.qid)))continue;
+    const wrong=state.answers.some(row=>{
+      if(row.value!=="yes" && row.value!=="no")return false;
+      const bit=factBit(state.pool,i,row.qi);
+      return row.value==="yes"?bit===1:bit===2;
+    });
+    if(wrong)continue;
+    // Use distinct facts and confirmations, not the candidate's fame prior.
+    const score=supported.length*2+
+      supported.filter(row=>!NARRATIVE_GENERIC.has(row.qid)).length*4;
+    options.push({i,score});
+  }
+  options.sort((a,b)=>b.score-a.score);
+  if(!options.length || (options[1]&&options[0].score-options[1].score<2))
+    return -1;
+  return options[0].i;
+}
+
 export function decide(state) {
   recompute(state);
   const personalRole=confirmedPersonalRole(state);
@@ -2544,6 +2647,10 @@ export function decide(state) {
   const focus = focusedCandidate(state, best, second, bestP, secondP);
   // Broad career/physical-purpose questions have higher player value than
   // obscure title trivia, popularity priors and unrelated generic followups.
+  const narrative=narrativeDiscoveryQuestion(state);
+  if(narrative) return {type:"ask",qid:narrative};
+  const narrativeCandidate=narrativeEvidenceCandidate(state);
+  if(narrativeCandidate>=0)return {type:"guess",index:narrativeCandidate};
   const broad=broadDiscoveryQuestion(state);
   if(broad) return {type:"ask",qid:broad};
   const domain = domainDiscoveryQuestion(state);

@@ -431,6 +431,8 @@ function topTwo(state) {
       "screen_bowler_cane", "screen_hitler_resemblance",
       "screen_great_dictator", "screen_comedy_award",
     ].includes(row.qid));
+  const checkedObjectAnimalFacts = state.answers.filter(row =>
+    ["yes","no"].includes(row.value) && HYPOTHESIS_FACTS[row.qid]);
   const checkedScreenFacts = state.answers.filter(row =>
     ["yes","no"].includes(row.value) && SCREEN_CAREER_DETAILS[row.qid] &&
     !["screen_role_lead","screen_role_villain","screen_role_comedy",
@@ -474,6 +476,11 @@ function topTwo(state) {
     // guessing a famous lead when the player described a comic performer.
     if (verifiedRoleClues.some((row) =>
       factBit(state.pool, i, row.qi) !== 2)) continue;
+    // A candidate with a known contradicting function/behaviour is excluded.
+    if (checkedObjectAnimalFacts.some(row => {
+      const bit = factBit(state.pool, i, row.qi);
+      return row.value === "yes" ? bit !== 2 : bit === 2;
+    })) continue;
     // A specific verified film, death-year or public-history clue must be
     // true for the person announced, not merely weighted as likely. A NO
     // excludes only positively known YES facts, never unknown records.
@@ -1196,6 +1203,9 @@ export function prerequisitesFor(question) {
 }
 
 function requirementFails(state, req, links) {
+  // The category selection already establishes Animal or Object.
+  if ((req.id === "object" || req.id === "animal") &&
+      state.category === req.id) return false;
   const value = answerValue(state, req.id);
   const affirmed = value === "yes" || value === "probably" || (value == null && impliedYes(state, req.id, links));
   if (affirmed) return false;
@@ -1372,7 +1382,7 @@ function pendingFilmEraQuestion(state) {
 function actorSignatureQuestion(state, leader) {
   if (leader < 0 ||
       !said(state, "actor", ["yes","probably"]) ||
-      !said(state, "from_bd", ["yes","probably"])) return null;
+      !["from_bd","from_in"].some(id => said(state,id,["yes","probably"]))) return null;
   const id = state.pool.ids[leader];
   const asked = new Set(state.answers.map(row => row.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state,6000) : state.alive;
@@ -1392,7 +1402,7 @@ function actorSignatureQuestion(state, leader) {
 
 function actorDiscoveryQuestion(state) {
   if (!said(state, "actor", ["yes","probably"]) ||
-      !said(state, "from_bd", ["yes","probably"])) return null;
+      !["from_bd","from_in"].some(id => said(state,id,["yes","probably"]))) return null;
   const asked = new Set(state.answers.map(row => row.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   const cache = new Map();
@@ -1417,6 +1427,41 @@ function actorDiscoveryQuestion(state) {
     if (score > bestScore) { bestScore = score; best = qid; }
   }
   return best;
+}
+
+// Hold the current hypothesis by stable ID while its evidence remains close
+// to the best alternative. Keep a compact trace of hypotheses in this round.
+function focusedCandidate(state, best, second, bestP, secondP) {
+  if (best < 0) return best;
+  let chosen = best;
+  if (second >= 0 && state.focusId === state.pool.ids[second] &&
+      secondP >= bestP * 0.7) chosen = second;
+  const id = state.pool.ids[chosen];
+  if (state.focusId !== id) {
+    state.focusId = id;
+    state.focusHistory ||= [];
+    if (!state.focusHistory.includes(id)) state.focusHistory.push(id);
+  }
+  return chosen;
+}
+
+function objectAnimalSignatureQuestion(state, candidate) {
+  if (candidate < 0 || !["object","animal"].includes(state.category)) return null;
+  const id = state.pool.ids[candidate];
+  const asked = new Set(state.answers.map(row => row.qid));
+  const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  const cache = new Map();
+  for (const qid of NONPERSON_SIGNATURES) {
+    if (HYPOTHESIS_FACTS[qid]?.[id] !== 2 || asked.has(qid)) continue;
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null) continue;
+    const question = state.pool.questions[qi];
+    if (allowedInCategory(state, question) &&
+        !blockedQuestion(state, question, rows, cache) &&
+        gated(state, question, rows) &&
+        hasUnrejectedFilmCandidate(state, qid)) return qid;
+  }
+  return null;
 }
 
 function firstAllowedQuestion(state) {
@@ -1565,8 +1610,9 @@ export function decide(state) {
   if (!state.alive.length) return { type: "defeat" };
   // Neither 10 rejected names nor 72 answers establishes that the user lost.
   // Continue asking every remaining relevant, non-duplicate question.
-  const { best, bestP, secondP } = topTwo(state);
+  const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
+  const focus = focusedCandidate(state, best, second, bestP, secondP);
   // First determine their usual role (lead, antagonist or comic performer).
   // Career era and signature props are follow-up branches, not universal
   // prerequisites to finding an actor or anyone else.
@@ -1578,15 +1624,21 @@ export function decide(state) {
   // film/business history before announcing their name. A vague "lead"
   // or "1990s" alone does not identify Riaz, Amin Khan, or Shakib Khan.
   if (state.answers.length >= 12 && bestP >= 0.04) {
-    const signature = actorSignatureQuestion(state, best);
-    if (signature && !hasScreenIdentityProof(state, best))
+    const signature = actorSignatureQuestion(state, focus);
+    if (signature && !hasScreenIdentityProof(state, focus))
+      return { type: "ask", qid: signature };
+  }
+  // Verify practical functions and behaviour for animals and objects, too.
+  if (state.answers.length >= 4 && ["object","animal"].includes(state.category)) {
+    const signature = objectAnimalSignatureQuestion(state, focus);
+    if (signature && !hasFunctionEvidence(state, focus))
       return { type: "ask", qid: signature };
   }
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   // After any wrong guess, force a fresh evidence-gathering round.
   // In particular, do NOT bypass it through the no-question fallback.
   if (waiting) {
-    const qid = chooseConfirmationQuestion(state, best) ||
+    const qid = chooseConfirmationQuestion(state, focus) ||
       chooseQuestion(state) || actorDiscoveryQuestion(state) ||
       firstAllowedQuestion(state);
     return qid ? { type: "ask", qid } : { type: "defeat" };
@@ -1597,7 +1649,7 @@ export function decide(state) {
     const personal = said(state, "knows_you", ["yes", "probably"]);
     if (state.guesses === 0 && !personal && state.category === "character" &&
         state.answers.length < 12) {
-      const verify = chooseConfirmationQuestion(state, best);
+      const verify = chooseConfirmationQuestion(state, focus);
       if (verify) return { type: "ask", qid: verify };
     }
     return { type: "guess", index: best };
@@ -1613,7 +1665,7 @@ export function decide(state) {
   // and NEVER takes this shortcut.
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
       supportedIdentity(state)) return { type: "guess", index: best };
-  qid ||= chooseConfirmationQuestion(state, best) ||
+  qid ||= chooseConfirmationQuestion(state, focus) ||
     actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
   return qid ? { type: "ask", qid } : { type: "defeat" };
 }

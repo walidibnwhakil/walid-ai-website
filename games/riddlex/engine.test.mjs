@@ -300,6 +300,55 @@ test("questioning does not terminate at 72 answers or ten rejected names", () =>
     "A follow-up must not repeat a previously asked question");
 });
 
+test("a living film actor cannot be replaced with known deceased film icons", () => {
+  const qs = [...questions, { id:"dead", group:"life", en:"Are they dead?", bn:"তিনি মারা গেছেন?" }, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q7462919", 50, ["real","named","male","actor","from_bd"]),
+    entry("Q7405420", 60000, ["real","named","male","actor","from_bd"]),
+    entry("Q4244083", 55000, ["real","named","male","actor","from_bd"]),
+  ]);
+  const life = (id,qid) => factBit(pool,pool.ids.indexOf(id),pool.qIndex.get(qid));
+  assert.equal(life("Q7462919","alive"),2);
+  assert.equal(life("Q7405420","dead"),2);
+  assert.equal(life("Q4244083","dead"),2);
+  for (const who of ["Q7405420","Q4244083"]) {
+    assert.equal(life(who,"alive"),1,who);
+  }
+  const state = createState(pool,{category:"character"});
+  recompute(state);
+  for(const [qid,value] of [["real","yes"],["male","yes"],["from_bd","yes"],
+    ["actor","yes"],["alive","yes"]]) answer(state,qid,value);
+  for(let turn=0;turn<32;turn++) {
+    const action=decide(state);
+    if(action.type==="guess") {
+      assert.equal(pool.ids[action.index],"Q7462919",
+        "A known deceased icon was suggested despite alive YES");
+      return;
+    }
+    if(action.type!=="ask") break;
+    answer(state,action.qid,"unknown");
+  }
+  // With insufficient identity evidence, asking or stopping beats a wrong dead-person guess.
+  assert.equal(questionBlocked(state,"screen_died_1996"),true,
+    "A death-year question must not follow a firm alive answer");
+});
+
+test("verified actor-specific clues distinguish the three cinema examples", () => {
+  const pool = poolFromEntries([...questions,...EXTRA_SCREEN_QUESTIONS], [
+    entry("Q7462919",100,["real","actor","from_bd","male"]),
+    entry("Q7405420",100,["real","actor","from_bd","male"]),
+    entry("Q4244083",100,["real","actor","from_bd","male"]),
+  ]);
+  const fact=(who,qid)=>factBit(pool,pool.ids.indexOf(who),pool.qIndex.get(qid));
+  assert.equal(fact("Q7462919","screen_known_multiple_marriages"),2);
+  assert.equal(fact("Q7462919","screen_debut_anonto_bhalobasha"),2);
+  assert.equal(fact("Q7405420","screen_died_1996"),2);
+  assert.equal(fact("Q4244083","screen_died_2008"),2);
+  assert.equal(fact("Q4244083","screen_acted_bir_soinik"),2);
+  assert.equal(fact("Q7405420","screen_died_2008"),1);
+  assert.equal(fact("Q4244083","screen_died_1996"),1);
+});
+
 test("Bangladesh is asked within the first five character questions", () => {
   const state = createState(world, { category: "character", opening: "real" });
   recompute(state);

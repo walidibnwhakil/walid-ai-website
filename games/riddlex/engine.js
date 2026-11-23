@@ -2223,6 +2223,34 @@ function lateSupportedPublicGuess(state,best,bestP,secondP) {
   return false;
 }
 
+// A leading, source-backed film candidate need not endure dozens of
+// unrelated title questions after two independent career facts identify
+// the same person. This is category-wide corroboration, not a rule for a
+// particular performer or a popularity-only shortcut.
+function corroboratedFilmHypothesis(state,index,bestP,secondP) {
+  if(state.category!=="character" || index<0 ||
+     state.answers.length<12 ||
+     state.sinceGuess<questionsBeforeRetry(state) ||
+     !said(state,"real",["yes","probably"]) ||
+     !said(state,"actor",["yes","probably"]) ||
+     !COUNTRIES.some(id=>said(state,id,["yes","probably"])) ||
+     bestP<.25 || oddsRatio(bestP,secondP)<3)return false;
+  const facts=state.answers.filter(row=>
+    row.value==="yes" &&
+    (["screen_star_pre1990","screen_star_1990s",
+      "screen_national_film_award"].includes(row.qid) ||
+      SCREEN_IDENTITY_QUESTIONS.includes(row.qid)) &&
+    factBit(state.pool,index,row.qi)===2);
+  if(facts.length<2)return false;
+  // The candidate must also respect every definite NO; UNKNOWN is neutral.
+  return !state.answers.some(row=>{
+    if(!["yes","no"].includes(row.value))return false;
+    const bit=factBit(state.pool,index,row.qi);
+    return (row.value==="yes" && bit===1) ||
+      (row.value==="no" && bit===2);
+  });
+}
+
 function confirmedPersonalRole(state) {
   if (state.category !== "character" ||
       !said(state, "real", ["yes", "probably"]) ||
@@ -2274,6 +2302,8 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  if(corroboratedFilmHypothesis(state,best,bestP,secondP))
+    return {type:"guess",index:best};
   const useful=usefulObjectQuestion(state);
   if(useful) return { type:"ask",qid:useful };
   const objectEvidence=evidenceBackedObjectCandidate(state);

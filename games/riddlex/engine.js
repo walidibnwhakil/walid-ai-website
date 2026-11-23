@@ -8,7 +8,9 @@ const politicsUrl = new URL(
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await import(politicsUrl);
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
-import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-60";
+import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
+import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
+import { EVERYDAY_QUESTIONS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
@@ -151,6 +153,8 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
+  if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
+  if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;
   const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
     DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
@@ -861,6 +865,8 @@ function gated(state, question, rows) {
       if (id === "your_spouse") return no("your_parent") && no("your_sibling");
       if (id === "your_child") return no("your_parent") && no("your_sibling") && no("your_spouse");
       if (id === "your_baby") return yes("your_child");
+      if (id === "your_grandparent") return no("your_parent") && no("your_sibling") &&
+        no("your_spouse") && no("your_child");
       return false;
     }
     if (no("your_family")) {
@@ -1238,6 +1244,10 @@ function parentAbsent(state, parentId, rows, cache) {
 // strict: the parent must already be yes (or implied). Otherwise a no or
 // probably-not is enough to close the branch; an unasked parent stays open.
 export const QUESTION_REQUIRES = {
+  ...Object.fromEntries(NARRATIVE_QUESTIONS.filter(q => q.parent).map(q =>
+    [q.id, [{ id:q.parent, value:"yes", strict:true }]])),
+  ...Object.fromEntries(EVERYDAY_QUESTIONS.filter(q=>q.parent).map(q=>
+    [q.id, [{id:q.parent,value:"yes",strict:true}]])),
   party_bnp: [{ id: "from_bd", value: "yes" }],
   party_al: [{ id: "from_bd", value: "yes" }],
   party_jp: [{ id: "from_bd", value: "yes" }],
@@ -1423,7 +1433,7 @@ function allowedInCategory(state, question) {
 // his marriage clue is not evidence about the other actors by default.
 function hasUnrejectedFilmCandidate(state, qid) {
   const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
-    BROAD_FACTS[qid];
+    BROAD_FACTS[qid] || NARRATIVE_FACTS[qid] || EVERYDAY_FACTS[qid];
   if (!facts) return true;
   return state.alive.some(i =>
     state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
@@ -2033,6 +2043,9 @@ export function chooseQuestion(state) {
           if (next("your_spouse")) return "your_spouse";
           if (saidNo("your_spouse") && next("your_child")) return "your_child";
           if (saidYes("your_child") && next("your_baby")) return "your_baby";
+          if (saidNo("your_spouse") && saidNo("your_child") && next("your_grandparent"))
+            return "your_grandparent";
+          if (saidYes("your_grandparent") && next("female") && next("male")) return "female";
         }
         const gendered = saidYes("your_parent") || saidYes("your_sibling") ||
           saidYes("your_spouse");
@@ -2501,6 +2514,8 @@ function confirmedPersonalRole(state) {
     else if (yes("your_spouse") && gender) role = gender==="female" ? "wife" : "husband";
     else if (yes("your_baby")) role="baby";
     else if (yes("your_child") && no("your_baby")) role="child";
+    else if (yes("your_grandparent") && gender)
+      role=gender==="female" ? "grandmother" : "grandfather";
   } else if (no("your_family")) {
     if (yes("your_partner") && gender)
       role = gender==="female" ? "girlfriend" : "boyfriend";
@@ -2525,6 +2540,179 @@ function confirmedPersonalRole(state) {
   return index;
 }
 
+
+
+const EVERYDAY_GENERIC = new Set([
+ ...EVERYDAY_FAMILY_IDS,"obj_skin_moisturizer"
+]);
+
+// No target-name switch. First ask ordinary uses, then distinguish several
+// similar objects by their different observable functions and physical form.
+function everydayDiscoveryQuestion(state) {
+ if(state.category!=="object" || state.answers.length<2) return null;
+ const yes=qid=>said(state,qid,["yes","probably"]);
+ const asked=new Set(state.answers.map(row=>row.qid));
+ const familyOrder=[
+   "obj_family_electric","obj_family_worn","obj_family_personal_care",
+   "obj_family_kitchen","obj_family_container","obj_family_paper",
+   "obj_family_house","obj_family_lock","obj_family_cleaning",
+   "obj_family_medicine","obj_family_climbing","obj_family_prayer",
+   "obj_family_consumable","obj_family_financial","obj_family_waste"
+ ];
+ const pool=state.pool;
+ const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+ const cache=new Map();
+ const attempt=(qid)=>{
+   if(asked.has(qid))return false;
+   const qi=pool.qIndex.get(qid);
+   if(qi==null)return false;
+   const q=pool.questions[qi];
+   return allowedInCategory(state,q) &&
+     !blockedQuestion(state,q,rows,cache) && gated(state,q,rows) &&
+     hasUnrejectedFilmCandidate(state,qid);
+ };
+ // Prefer a specific function immediately after its family is confirmed;
+ // if none matches, return to broad categories rather than trying the
+ // names of unrelated appliances.
+ for(const fam of familyOrder) {
+   if(!yes(fam))continue;
+   for(const q of EVERYDAY_QUESTIONS) {
+     if(q.parent===fam && attempt(q.id))return q.id;
+   }
+ }
+ if(yes("obj_skin_moisturizer"))
+   for(const id of ["obj_skin_cream","obj_skin_lotion","obj_skin_jelly"])
+     if(attempt(id))return id;
+ for(const family of familyOrder) if(attempt(family))return family;
+ return null;
+}
+
+// Evidence-based, reversible object hypotheses. A broad category alone never
+// identifies a specific item. Missing data is neutral; definite contradictions
+// veto a guess, and a competing object with equal support forces more questions.
+function everydayEvidenceCandidate(state) {
+ if(state.category!=="object" || state.answers.length<5 ||
+    state.sinceGuess<questionsBeforeRetry(state))return -1;
+ const yes=state.answers.filter(row=>row.value==="yes" &&
+    EVERYDAY_FACTS[row.qid]);
+ if(yes.length<2 || !yes.some(row=>!EVERYDAY_GENERIC.has(row.qid)))return -1;
+ const candidates=[];
+ for(const i of state.alive) {
+   if(state.weights[i]<=0 || state.rejectedIds?.has(state.pool.ids[i]))continue;
+   const facts=yes.filter(row=>factBit(state.pool,i,row.qi)===2);
+   const special=facts.filter(row=>!EVERYDAY_GENERIC.has(row.qid));
+   if(facts.length<2 || special.length===0)continue;
+   if(state.answers.some(row=>{
+     if(!["yes","no"].includes(row.value))return false;
+     const bit=factBit(state.pool,i,row.qi);
+     return row.value==="yes" ? bit===1 : bit===2;
+   }))continue;
+   candidates.push({i,score:facts.length+special.length*5});
+ }
+ candidates.sort((a,b)=>b.score-a.score);
+ if(!candidates.length || (candidates[1] &&
+    candidates[0].score-candidates[1].score<2))return -1;
+ return candidates[0].i;
+}
+
+const NARRATIVE_GENERIC = new Set([
+  "story_indian_epic","story_mahabharata","story_ramayana",
+  "story_archery","story_secret_agent","history_religious_prophet",
+  "office_us_2009_2017","screen_money_heist",
+]);
+
+// First classify the story, then confirm an independently verifiable role.
+// Questions come from common taxonomy and the current answers; the player's
+// intended name is never supplied to this function.
+function narrativeDiscoveryQuestion(state) {
+  if(state.category!=="character" || state.answers.length<5) return null;
+  const yes=qid=>said(state,qid,["yes","probably"]);
+  const no=qid=>said(state,qid,["no","probably_not"]);
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const plan=[];
+  if(yes("fictional")){
+    plan.push("story_indian_epic");
+    if(yes("story_indian_epic")){
+      plan.push("story_mahabharata","story_ramayana","story_archery");
+      if(yes("story_mahabharata"))
+        plan.push("story_pandava","story_charioteer_guide",
+          "story_lifelong_vow","story_karna_armor");
+      if(yes("story_ramayana"))
+        plan.push("story_rama_brother","story_sita_husband","story_lanka_king");
+    }
+    if(no("story_indian_epic")){
+      plan.push("story_secret_agent");
+      if(yes("story_secret_agent"))plan.push("story_agent_007");
+    }
+  }
+  if(yes("real") && !yes("knows_you")){
+    if(yes("from_us") && yes("politician")){
+      plan.push("office_us_2009_2017");
+      if(yes("office_us_2009_2017")) plan.push("office_aca_2010");
+    }
+    if(yes("from_es") && yes("actor")){
+      plan.push("screen_money_heist");
+      if(yes("screen_money_heist")) plan.push("screen_tokyo_heist");
+    }
+    // A prophet need not have a contemporary nationality or job. Do not
+    // force modern career trivia after nationality and offices are unknown.
+    const noCountryKnown=!COUNTRIES.some(id=>yes(id));
+    const unknowns=state.answers.filter(row=>row.value==="unknown").length;
+    if(noCountryKnown && state.answers.length>=8 && unknowns>=3 &&
+       !yes("actor") && !yes("politician")){
+      plan.push("history_religious_prophet");
+      if(yes("history_religious_prophet"))
+        plan.push("history_first_human","history_jesus_isa");
+    }
+  }
+  const pool=state.pool;
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const qid of plan){
+    if(asked.has(qid))continue;
+    const qi=pool.qIndex.get(qid);
+    if(qi==null)continue;
+    const q=pool.questions[qi];
+    if(!allowedInCategory(state,q) || blockedQuestion(state,q,rows,cache) ||
+       !gated(state,q,rows) || !hasUnrejectedFilmCandidate(state,qid)) continue;
+    return qid;
+  }
+  return null;
+}
+
+// Guarded late guess: a category answer or general story name never suffices.
+// At least two independent affirmative source-supported characteristics must
+// agree, one of them distinctive, with no opposing definite player answer.
+// Ties stay questions, and all rejected identities remain excluded.
+function narrativeEvidenceCandidate(state){
+  if(state.category!=="character" || state.answers.length<8 ||
+     state.sinceGuess<questionsBeforeRetry(state))return -1;
+  const yes=state.answers.filter(row=>row.value==="yes" &&
+    NARRATIVE_FACTS[row.qid]);
+  if(yes.length<2)return -1;
+  const options=[];
+  for(const i of state.alive){
+    if(state.weights[i]<=0 || state.rejectedIds?.has(state.pool.ids[i]))continue;
+    const supported=yes.filter(row=>factBit(state.pool,i,row.qi)===2);
+    if(supported.length<2 ||
+       !supported.some(row=>!NARRATIVE_GENERIC.has(row.qid)))continue;
+    const wrong=state.answers.some(row=>{
+      if(row.value!=="yes" && row.value!=="no")return false;
+      const bit=factBit(state.pool,i,row.qi);
+      return row.value==="yes"?bit===1:bit===2;
+    });
+    if(wrong)continue;
+    // Use distinct facts and confirmations, not the candidate's fame prior.
+    const score=supported.length*2+
+      supported.filter(row=>!NARRATIVE_GENERIC.has(row.qid)).length*4;
+    options.push({i,score});
+  }
+  options.sort((a,b)=>b.score-a.score);
+  if(!options.length || (options[1]&&options[0].score-options[1].score<2))
+    return -1;
+  return options[0].i;
+}
+
 export function decide(state) {
   recompute(state);
   const personalRole=confirmedPersonalRole(state);
@@ -2535,18 +2723,38 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  // Preserve existing, already-verified pen/phone/clock and function
+  // inference before extending the conversation to newer object families.
+  // This avoids losing good legacy gameplay to unnecessary extra questions.
+  if(state.category==="object") {
+    const legacyUseful=usefulObjectQuestion(state);
+    if(legacyUseful)return {type:"ask",qid:legacyUseful};
+    const legacyEvidence=evidenceBackedObjectCandidate(state);
+    if(legacyEvidence>=0)return {type:"guess",index:legacyEvidence};
+    const timekeeping=broadDiscoveryQuestion(state);
+    if(timekeeping)return {type:"ask",qid:timekeeping};
+    // Do not postpone an already proven wristwatch or similar established
+    // domain identity just to explore recently added object families.
+    const knownObject=verifiedIdentityCandidate(state);
+    if(knownObject>=0)return {type:"guess",index:knownObject};
+  }
   // Broad career/physical-purpose questions have higher player value than
   // obscure title trivia, popularity priors and unrelated generic followups.
+  const everydayCandidate=everydayEvidenceCandidate(state);
+  if(everydayCandidate>=0)return {type:"guess",index:everydayCandidate};
+  const everyday=everydayDiscoveryQuestion(state);
+  if(everyday)return {type:"ask",qid:everyday};
+  const narrativeCandidate=narrativeEvidenceCandidate(state);
+  if(narrativeCandidate>=0)return {type:"guess",index:narrativeCandidate};
+  const narrative=narrativeDiscoveryQuestion(state);
+  if(narrative) return {type:"ask",qid:narrative};
   const broad=broadDiscoveryQuestion(state);
   if(broad) return {type:"ask",qid:broad};
   const domain = domainDiscoveryQuestion(state);
   if(domain) return {type:"ask",qid:domain};
   if(corroboratedFilmHypothesis(state,best,bestP,secondP))
     return {type:"guess",index:best};
-  const useful=usefulObjectQuestion(state);
-  if(useful) return { type:"ask",qid:useful };
-  const objectEvidence=evidenceBackedObjectCandidate(state);
-  if(objectEvidence>=0) return {type:"guess",index:objectEvidence};
+
   const mixed = mixedCareerQuestion(state);
   if (mixed) return { type:"ask", qid:mixed };
   const adultFollowup = confirmedAdultOccupationQuestion(state);

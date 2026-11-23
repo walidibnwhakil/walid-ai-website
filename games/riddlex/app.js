@@ -1,11 +1,13 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-61";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-64";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-61";
-import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-60";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-64";
+import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_PEOPLE } from "./domain-facts.js?v=riddlex-60";
 import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-61";
+import { NARRATIVE_PEOPLE } from "./narrative-facts.js";
+import { EVERYDAY_OBJECTS } from "./everyday-facts.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
@@ -245,7 +247,7 @@ async function loadNamed(entries, token, begin) {
       // at game start, even when the worldwide long-tail shards do not load.
       // This avoids guessing a famous unrelated candidate because the actual
       // public figure lives beyond the mobile transfer budget.
-      const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE, ...BROAD_PEOPLE].filter(person =>
+      const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE, ...BROAD_PEOPLE, ...NARRATIVE_PEOPLE].filter(person =>
         !partial.ids.includes(person.id) &&
         !EXTRA_IDENTITY_PEOPLE.some(other=>other !== person && other.id === person.id));
       const roles = poolFromEntries(manifest.questions,
@@ -255,7 +257,7 @@ async function loadNamed(entries, token, begin) {
     } else if ((category === "animal" || category === "object") &&
         !partial._hypothesisExtraLoaded) {
       const originals = category === "object"
-        ? [...(EXTRA_HYPOTHESIS_ENTRIES.object || []), ...BROAD_OBJECTS]
+        ? [...(EXTRA_HYPOTHESIS_ENTRIES.object || []), ...BROAD_OBJECTS, ...EVERYDAY_OBJECTS]
         : (EXTRA_HYPOTHESIS_ENTRIES[category] || []);
       // Add only new identities; keep the existing packed casebook intact.
       const extra = originals.filter(item => !partial.ids.includes(item.id));

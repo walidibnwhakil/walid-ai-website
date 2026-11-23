@@ -3,6 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - "games/riddlex/**"
       - "games/riddlex/owner-20-ux-e2e.mjs"
       - ".github/workflows/riddlex-owner-20-ux.yml"
 permissions:

@@ -3,11 +3,13 @@
 
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-60";
 import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-60";
-import { PERSONAL_QUESTIONS } from "./personal-facts.js?v=riddlex-60";
+import { PERSONAL_QUESTIONS } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS } from "./domain-facts.js?v=riddlex-60";
 import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-61";
+import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
+import { EVERYDAY_QUESTIONS } from "./everyday-facts.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported
 // questions are represented as sparse, fact-checked runtime overlays.
@@ -284,7 +286,7 @@ export async function loadManifest(base = "./kb") {
   const response = await fetch(`${base}/manifest.json?v=riddlex-39`);
   if (!response.ok) throw new Error("Knowledge manifest failed");
   const manifest = await response.json();
-  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...PERSONAL_QUESTIONS]) {
+  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...PERSONAL_QUESTIONS]) {
     if (!manifest.questions.some((row) => row.id === question.id)) {
       manifest.questions.push({ ...question });
     }

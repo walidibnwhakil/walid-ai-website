@@ -42,13 +42,15 @@ test("one movie answer cannot automatically trigger another movie title", () => 
     "a title question must not chain immediately after Don't know");
 });
 
-test("two title questions close the movie-trivia lane, irrespective of Yes or No", () => {
+test("four movie titles are the absolute maximum, whatever the answers", () => {
   const state = startActor();
   answer(state, "film_mitin_mashi", "yes");
   answer(state, "named", "yes");
   answer(state, "film_crook", "no");
-  assert.equal(questionBlocked(state, "film_welcome"), true);
-  assert.equal(questionBlocked(state, "film_padmaavat_actor"), true);
+  answer(state, "male", "yes");
+  answer(state, "film_welcome", "unknown");
+  answer(state, "alive", "yes");
+  answer(state, "film_padmaavat_actor", "no");
   assert.equal(questionBlocked(state, "broad_film_baahubali"), true);
 });
 

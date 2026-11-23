@@ -12,6 +12,7 @@ import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=rid
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
+import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-61";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -82,7 +83,8 @@ function regionBit(pool, index, members) {
     // The same source-backed profile override used by factBit must apply
     // to continental regions. Otherwise an incorrect country bit in the
     // archived shard can contradict a verified birthplace or nationality.
-    const verified=DOMAIN_PROFILE_FACTS[member]?.[pool.ids[index]];
+    const verified=BROAD_PROFILE_FACTS[member]?.[pool.ids[index]] ??
+      DOMAIN_PROFILE_FACTS[member]?.[pool.ids[index]];
     const bit = verified !== undefined ? verified :
       attrAt(pool.attrs, pool.attrBytes, index, mqi);
     if (bit === 2) yes = true;
@@ -149,7 +151,8 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
-  const verifiedProfile=DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
+  const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
+    DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
   // Incomplete packed life tags cannot contradict authoritative dated records.
   if ((id === "alive" || id === "dead") && SCREEN_LIFE_DETAILS[pool.ids[index]])
@@ -162,6 +165,7 @@ export function factBit(pool, index, qi) {
   // answers for the other millions of people in the binary casebook.
   if (IDENTITY_FACTS[id]) return IDENTITY_FACTS[id][pool.ids[index]] || 0;
   if (DOMAIN_FACTS[id]) return DOMAIN_FACTS[id][pool.ids[index]] || 0;
+  if (BROAD_FACTS[id]) return BROAD_FACTS[id][pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -446,6 +450,9 @@ function topTwo(state) {
     ].includes(row.qid));
   const checkedObjectAnimalFacts = state.answers.filter(row =>
     ["yes","no"].includes(row.value) && HYPOTHESIS_FACTS[row.qid]);
+  const checkedStoryWorks = state.answers.filter(row => row.value === "yes" &&
+    BROAD_QUESTIONS.some(q=>q.id===row.qid && q.group==="fiction") &&
+    BROAD_FACTS[row.qid]);
   const checkedScreenFacts = state.answers.filter(row =>
     ["yes","no"].includes(row.value) && SCREEN_CAREER_DETAILS[row.qid] &&
     !["screen_role_lead","screen_role_villain","screen_role_comedy",
@@ -499,6 +506,10 @@ function topTwo(state) {
         return bit===1;
       return bit!==2;
     })) continue;
+    // An affirmative, source-verified story clue must belong to the
+    // character being guessed. This prevents a cartoon/film fame prior
+    // from falsely guessing Mr. Bean after the player confirms a magic lamp.
+    if (checkedStoryWorks.some(row=>factBit(state.pool,i,row.qi)!==2)) continue;
     // A candidate with a known contradicting function/behaviour is excluded.
     if (checkedObjectAnimalFacts.some(row => {
       const bit = factBit(state.pool, i, row.qi);
@@ -1411,7 +1422,8 @@ function allowedInCategory(state, question) {
 // least one surviving candidate. In particular, after Shakib Khan is rejected,
 // his marriage clue is not evidence about the other actors by default.
 function hasUnrejectedFilmCandidate(state, qid) {
-  const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid];
+  const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
+    BROAD_FACTS[qid];
   if (!facts) return true;
   return state.alive.some(i =>
     state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
@@ -1627,9 +1639,13 @@ const ANCHORED_ANIMAL_QUESTIONS = new Set(["is_dog", "is_mouse"]);
 const FICTION_PAIR = ["from_game", "detective_role"];
 const ANCHOR_SCREEN_QUESTIONS = new Set(SCREEN_IDENTITY_QUESTIONS);
 const ANCHOR_IDENTITY_QUESTIONS = new Set(IDENTITY_DISTINCTIVE_IDS);
-const ANCHOR_DOMAIN_QUESTIONS = new Set(DOMAIN_QUESTIONS.map(q=>q.id));
+const ANCHOR_DOMAIN_QUESTIONS = new Set([...DOMAIN_QUESTIONS,...BROAD_QUESTIONS]
+  .filter(q=>q.group!=="object").map(q=>q.id));
 const ANCHOR_POLITICS_QUESTIONS = new Set(POLITICS_IDENTITY_QUESTIONS);
-const ANCHOR_FUNCTION_QUESTIONS = new Set(NONPERSON_SIGNATURES);
+const ANCHOR_FUNCTION_QUESTIONS = new Set([
+  ...NONPERSON_SIGNATURES,
+  ...BROAD_QUESTIONS.filter(q=>q.group==="object" && q.id!=="obj_timekeeping").map(q=>q.id),
+]);
 
 function verifiedIdentityCandidate(state) {
   const { pool, answers } = state;
@@ -1707,7 +1723,15 @@ function verifiedIdentityCandidate(state) {
       answers.some(row=>["male","female"].includes(row.qid) &&
         ["yes","no"].includes(row.value) &&
         factBit(pool,i,row.qi)===(row.value==="yes"?2:1));
-    const professionProof = literaryProof || (domain.length>=3 &&
+    // Fantasy, comedy and folklore characters have no passport. Multiple
+    // independent, affirmative story-work facts plus the story medium
+    // are legitimate proof, without assuming one unique famous character.
+    const storyProof = known.has("fictional") && known.has("named") &&
+      ["from_film","from_cartoon","from_novel","fiction_tv_fantasy"]
+        .some(qid=>known.has(qid)) &&
+      domain.filter(row=>BROAD_QUESTIONS.some(q=>
+        q.group==="fiction" && q.id===row.qid)).length>=2;
+    const professionProof = literaryProof || storyProof || (domain.length>=3 &&
       (known.has("business") || known.has("scientist") ||
        known.has("politician") || known.has("writer") ||
        known.has("fictional") || known.has("youtube")));
@@ -2357,6 +2381,109 @@ function domainDiscoveryQuestion(state) {
   return null;
 }
 
+// Shared generalisation: ask what somebody DOES before trivia about named
+// works. Decisions depend only on confirmed player answers and cited feature
+// tables; never on a hard-coded intended identity.
+function broadDiscoveryQuestion(state) {
+  if (state.answers.length < 5) return null;
+  const yes=id=>said(state,id,["yes","probably"]);
+  const no=id=>said(state,id,["no","probably_not"]);
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const plan=[];
+  if (state.category==="object") {
+    if (yes("daily_use") || yes("handheld") || yes("pocket") ||
+        no("electronic")) {
+      plan.push("obj_timekeeping");
+      if(yes("obj_timekeeping"))
+        plan.push("obj_worn_wrist","obj_hangs_wall","obj_sets_alarm","obj_times_events");
+    }
+  }
+  if (state.category==="character") {
+    if (yes("real") && yes("from_in") && yes("actor")) {
+      if (!asked.has("screen_indian_bengali"))
+        plan.push("screen_indian_bengali");
+      if (yes("screen_indian_bengali")) {
+        plan.push("broad_film_nater_guru","film_bojhena","film_mitin_mashi");
+        plan.push("screen_web_series");
+        if (yes("screen_web_series")) plan.push("film_aashram");
+      }
+      if (no("screen_indian_bengali")) {
+        plan.push("screen_hindi_cinema");
+        if (yes("screen_hindi_cinema")) {
+          if (yes("male")) plan.push("film_welcome","film_padmaavat_actor","film_crook");
+          else plan.push("film_padmaavat_actor","film_crook","film_welcome");
+        }
+        if (no("screen_hindi_cinema")) {
+          plan.push("screen_telugu_cinema");
+          if (yes("screen_telugu_cinema")) plan.push("broad_film_baahubali");
+          if (no("screen_telugu_cinema")) {
+            plan.push("screen_kannada_cinema");
+            if (yes("screen_kannada_cinema")) plan.push("film_kgf");
+          }
+        }
+      }
+    } else if (yes("real") && yes("from_bd") && yes("actor")) {
+      plan.push("screen_bangladesh_bengali");
+      if (yes("screen_bangladesh_bengali")) {
+        if (yes("screen_role_villain")) plan.push("film_villain_dialogues");
+        else if (yes("female")) plan.push("film_humayun_dramas","film_mujib");
+        else plan.push("film_mujib","film_villain_dialogues","film_humayun_dramas");
+      }
+    } else if (yes("real") && yes("from_in") && no("actor") &&
+               no("cricketer") && no("footballer") &&
+               !yes("politician") && state.answers.length>=10) {
+      plan.push("film_director_work");
+      if (yes("film_director_work"))
+        plan.push("film_devdas_director","film_padmaavat_director");
+    }
+    if (yes("real") && yes("from_in") && yes("cricketer")) {
+      plan.push("cricket_indian_batsman");
+      if (yes("cricket_indian_batsman"))
+        plan.push("cricket_100_centuries","cricket_odis_2026");
+    }
+    if (yes("real") && yes("from_in") && yes("business")) {
+      plan.push("business_reliance");
+      if (yes("business_reliance")) plan.push("business_jio");
+    }
+    if (yes("real") && yes("from_bd") && yes("youtube")) {
+      plan.push("creator_food_vlogs");
+      if(yes("creator_food_vlogs")) plan.push("creator_online_entertainment");
+    }
+    if (yes("fictional") && !yes("from_novel")) {
+      if (yes("from_cartoon") || yes("from_film"))
+        plan.push("fiction_magic_lamp");
+      if (yes("fiction_magic_lamp")) plan.push("fiction_genie");
+      if (no("from_cartoon") || no("fiction_magic_lamp")) {
+        plan.push("fiction_tv_fantasy");
+        if(yes("fiction_tv_fantasy"))plan.push("fiction_seven_riddles");
+      }
+    }
+  }
+  if (!plan.length) return null;
+  // An ordinary player may not know every obscure film. After a couple of
+  // unknown answers in the same lane, move to a different type of question.
+  const filmUnknown=state.answers.filter(row=>row.value==="unknown" &&
+    BROAD_QUESTIONS.some(q=>q.id===row.qid && q.id.startsWith("film_"))).length;
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const id of plan) {
+    if(asked.has(id))continue;
+    if(filmUnknown>=2 && id.startsWith("film_") &&
+       id!=="film_director_work")continue;
+    const qi=state.pool.qIndex.get(id);
+    if(qi==null)continue;
+    const q=state.pool.questions[qi];
+    if(!allowedInCategory(state,q) ||
+       blockedQuestion(state,q,rows,cache) ||
+       !gated(state,q,rows))continue;
+    const facts=BROAD_FACTS[id]||{};
+    if(!state.alive.some(i=>state.weights[i]>0 &&
+       facts[state.pool.ids[i]]===2))continue;
+    return id;
+  }
+  return null;
+}
+
 function confirmedPersonalRole(state) {
   if (state.category !== "character" ||
       !said(state, "real", ["yes", "probably"]) ||
@@ -2408,6 +2535,10 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  // Broad career/physical-purpose questions have higher player value than
+  // obscure title trivia, popularity priors and unrelated generic followups.
+  const broad=broadDiscoveryQuestion(state);
+  if(broad) return {type:"ask",qid:broad};
   const domain = domainDiscoveryQuestion(state);
   if(domain) return {type:"ask",qid:domain};
   if(corroboratedFilmHypothesis(state,best,bestP,secondP))

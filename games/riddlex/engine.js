@@ -542,7 +542,7 @@ export function shouldGuess(state) {
   if (!supportedIdentity(state)) return false;
   // Never guess a publicly indexed character after only a few generic facts.
   if (state.category === "character" && state.pool.count >= 100 &&
-      !said(state, "knows_you", ["yes", "probably"]) && asked < 10) return false;
+      !said(state, "knows_you", ["yes", "probably"]) && asked < 8) return false;
   if (!state.alive.length) return false;
   const { best, bestP, secondP } = topTwo(state);
   if (!(bestP > 0) || best < 0) return false;

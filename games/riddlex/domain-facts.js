@@ -119,6 +119,29 @@ export const DOMAIN_PEOPLE=Object.freeze([
   yes:["real","named","male","alive","from_bd"],
   no:["fictional","dead","cricketer","footballer","actor"]},
 ]);
+// Verify the public biographical facts for all curated domain entries even
+// when a Wikidata ID already exists in a binary shard. The binary build may
+// contain an incorrect NO for a well-established fact: e.g. Newton's United
+// Kingdom nationality or authorship. A separately verified profile must not
+// be discarded merely because the existing ID was loaded first.
+const coreFacts={};
+for(const person of DOMAIN_PEOPLE) {
+  for(const qid of person.yes||[])
+    (coreFacts[qid] ||= {})[person.id]=2;
+  for(const qid of person.no||[])
+    (coreFacts[qid] ||= {})[person.id]=1;
+}
+// Ambiguous occupation labels are not automatically true or false.
+// Elon Musk's political involvement and Jensen Huang's technical training
+// do not establish that their main occupation is politician or scientist.
+for(const [personId,qids] of Object.entries({
+  Q317521:["politician"],
+  Q305177:["scientist"],
+})) for(const qid of qids) (coreFacts[qid] ||= {})[personId]=0;
+export const DOMAIN_PROFILE_FACTS=Object.freeze(Object.fromEntries(
+  Object.entries(coreFacts).map(([qid,people])=>
+    [qid,Object.freeze(people)])));
+
 const yesFacts={
  Q84597994:["topic_islamic_speaker","topic_online_lectures","topic_religious_author"],
  "riddlex-topic-mufti-amir-hamza":["topic_islamic_speaker","topic_online_lectures","topic_speaker_election_candidate"],

@@ -12,12 +12,13 @@ import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-55";
 import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
+import { DOMAIN_QUESTIONS } from "./domain-facts.js";
 
 const root = new URL("../../", import.meta.url);
 const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.meta.url),"utf8"));
 const questionInfo = new Map([...manifest.questions, ...EXTRA_SCREEN_QUESTIONS,
   ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS,
-  ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS].map(q => [q.id,q]));
+  ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS].map(q => [q.id,q]));
 const mime={".html":"text/html",".css":"text/css",".js":"text/javascript",
   ".mjs":"text/javascript",".json":"application/json",".bin":"application/octet-stream",
   ".webp":"image/webp",".jpg":"image/jpeg",".png":"image/png",

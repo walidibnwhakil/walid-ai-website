@@ -14,12 +14,13 @@ import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS } from "./domain-facts.js";
 import { BROAD_QUESTIONS } from "./broad-facts.js";
+import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
 
 const root = new URL("../../", import.meta.url);
 const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.meta.url),"utf8"));
 const questionInfo = new Map([...manifest.questions, ...EXTRA_SCREEN_QUESTIONS,
   ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS,
-  ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS].map(q => [q.id,q]));
+  ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS].map(q => [q.id,q]));
 const mime={".html":"text/html",".css":"text/css",".js":"text/javascript",
   ".mjs":"text/javascript",".json":"application/json",".bin":"application/octet-stream",
   ".webp":"image/webp",".jpg":"image/jpeg",".png":"image/png",
@@ -72,13 +73,27 @@ const bookNo=["from_anime","from_comics","from_game","from_bengali_lit",
 const nonKitchen=["kitchen","cooking","uses_pressure","food","vehicle","sport_item","music_item"];
 const goodsNo=["vehicle","sport_item","music_item","uses_pressure"];
 const people=[
- epic("Arjun","Arjuna of the Mahabharata",["Arjuna","Arjun","অর্জুন"]),
- epic("Krisno","Krishna in the Mahabharata narratives",["Krishna","Lord Krishna","শ্রীকৃষ্ণ","কৃষ্ণ"],[],["detective_role"]),
- epic("Karn","Karna of the Mahabharata",["Karna","Karn","কর্ণ"]),
- epic("Vism","Bhishma of the Mahabharata",["Bhishma","Bheeshma","Vishma","ভীষ্ম"],[],["superhero"]),
- epic("Ram","Rama of the Ramayana",["Rama","Ram","শ্রীরাম","রাম"]),
- epic("Lokkhon","Lakshmana of the Ramayana",["Lakshmana","Lakshman","Laxman","লক্ষ্মণ"]),
- epic("Rabon","Ravana of the Ramayana",["Ravana","Ravan","রাবণ"]),
+ epic("Arjun","Arjuna of the Mahabharata",["Arjuna","Arjun","অর্জুন"],
+   ["story_indian_epic","story_mahabharata","story_archery","story_pandava"],
+   ["story_ramayana","story_charioteer_guide","story_lifelong_vow","story_karna_armor"]),
+ epic("Krisno","Krishna in the Mahabharata narratives",["Krishna","Lord Krishna","শ্রীকৃষ্ণ","কৃষ্ণ"],
+   ["story_indian_epic","story_mahabharata","story_charioteer_guide"],
+   ["detective_role","story_ramayana","story_pandava","story_lifelong_vow","story_karna_armor"]),
+ epic("Karn","Karna of the Mahabharata",["Karna","Karn","কর্ণ"],
+   ["story_indian_epic","story_mahabharata","story_archery","story_karna_armor"],
+   ["story_ramayana","story_pandava","story_charioteer_guide","story_lifelong_vow"]),
+ epic("Vism","Bhishma of the Mahabharata",["Bhishma","Bheeshma","Vishma","ভীষ্ম"],
+   ["story_indian_epic","story_mahabharata","story_archery","story_lifelong_vow"],
+   ["superhero","story_ramayana","story_pandava","story_charioteer_guide","story_karna_armor"]),
+ epic("Ram","Rama of the Ramayana",["Rama","Ram","শ্রীরাম","রাম"],
+   ["story_indian_epic","story_ramayana","story_archery","story_sita_husband"],
+   ["story_mahabharata","story_rama_brother","story_lanka_king"]),
+ epic("Lokkhon","Lakshmana of the Ramayana",["Lakshmana","Lakshman","Laxman","লক্ষ্মণ"],
+   ["story_indian_epic","story_ramayana","story_archery","story_rama_brother"],
+   ["story_mahabharata","story_sita_husband","story_lanka_king"]),
+ epic("Rabon","Ravana of the Ramayana",["Ravana","Ravan","রাবণ"],
+   ["story_indian_epic","story_ramayana","story_lanka_king"],
+   ["story_mahabharata","story_sita_husband","story_rama_brother"]),
  {name:"Dada (Grand father)",canonical:"Player's grandfather (relationship, not public identity)",category:"character",
   matches:["Your grandfather","Grandfather","Grandpa","আপনার দাদা","আপনার নানা","Your grandpa"],
   personal:"grandfather",sex:"male",yes:["real","named","knows_you","your_family","your_grandparent"],
@@ -98,7 +113,7 @@ const people=[
  obj("Ladder","Ladder for climbing",["Ladder","Stepladder","মই"],
    ["tool"],["electronic","kitchen","clothing","container","cooking","food","pocket"],["metal"]),
  human("Barak Obama","Barack Obama (former US president)",["Barack Obama","Barak Obama","বারাক ওবামা"],"male","from_us","alive",
-   ["politician","led_gov","head_of_state","been_minister","born_1950_1969"],
+   ["politician","led_gov","head_of_state","been_minister","born_1950_1969","office_us_2009_2017","office_aca_2010"],
    ["actor","scientist","cricketer","footballer","been_premier"]),
  obj("Perfume","Perfume fragrance",["Perfume","Fragrance","Perfume spray","সুগন্ধি"],
    ["handheld","pocket","daily_use"],["electronic","kitchen","clothing","furniture","cooking","food","tool","metal"]),
@@ -161,15 +176,19 @@ const people=[
  obj("Jaynamaj","Prayer mat, ja-namaz",["Prayer mat","Salah mat","Jainamaz","Janamaz","জায়নামাজ","জায়নামাজ"],
    ["handheld","soft","daily_use"],["electronic","kitchen","cooking","food","furniture","container","metal","obj_timekeeping"]),
  human("Adam","Adam (the religious prophet)",["Adam","Prophet Adam","Adam (prophet)","আদম","হযরত আদম"],"male",null,"dead",
-   ["born_pre1900"],["actor","cricketer","footballer","scientist"]),
+   ["born_pre1900","history_religious_prophet","history_first_human"],
+   ["actor","cricketer","footballer","scientist","history_jesus_isa"]),
  human("Jissue","Jesus of Nazareth",["Jesus","Jesus Christ","যিশু","যীশু","ঈসা","Isa"],"male",null,null,
-   ["born_pre1900"],["actor","cricketer","footballer","scientist"]),
+   ["born_pre1900","history_religious_prophet","history_jesus_isa"],
+   ["actor","cricketer","footballer","scientist","history_first_human"]),
  human("Esha (As)","Isa (peace be upon him), Jesus",["Isa","Prophet Isa","Jesus","Jesus Christ","ঈসা","ঈসা (আ.)"],"male",null,null,
-   ["born_pre1900"],["actor","cricketer","footballer","scientist"]),
+   ["born_pre1900","history_religious_prophet","history_jesus_isa"],
+   ["actor","cricketer","footballer","scientist","history_first_human"]),
  epic("James Bond","James Bond (fictional secret agent)",["James Bond","007","জেমস বন্ড"],
-   ["from_film"],["from_bengali_lit","detective_role","superhero"]),
+   ["from_film","story_secret_agent","story_agent_007"],
+   ["from_bengali_lit","detective_role","superhero","story_indian_epic"]),
  human("Ursula Corbero","Úrsula Corberó, actress",["Úrsula Corberó","Ursula Corbero","Ursula Corberó","উরসুলা করবেরো"],"female","from_es","alive",
-   ["actor","born_1980_1989","screen_films_after_2000"],
+   ["actor","born_1980_1989","screen_films_after_2000","screen_money_heist","screen_tokyo_heist"],
    ["politician","scientist","cricketer","footballer"]),
 ];
 

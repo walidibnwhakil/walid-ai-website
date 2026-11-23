@@ -1,0 +1,67 @@
+name: Riddlex 50 fresh owner targets - independent real gameplay QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "games/riddlex/owner-50-independent-e2e.mjs"
+      - "games/riddlex/owner-50-aggregate.mjs"
+      - ".github/workflows/riddlex-owner-50-qa.yml"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  play:
+    name: Chromium gameplay targets (${{ matrix.shard }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check QA source syntax
+        run: node --check games/riddlex/owner-50-independent-e2e.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Play 10 owner targets in real Chromium (not a simulated guess engine)
+        env:
+          RIDDLEX_SHARD: ${{ matrix.shard }}
+        run: node games/riddlex/owner-50-independent-e2e.mjs
+      - name: Retain complete bilingual question and answer trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-50-play-batch-${{ matrix.shard }}
+          path: ${{ runner.temp }}/riddlex-user-50-part-${{ matrix.shard }}.json
+          if-no-files-found: error
+  aggregate:
+    name: Verify 50/50 outcomes and upload all complete transcripts
+    needs: [play]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Retrieve all five real-gameplay traces from this revision
+        uses: actions/download-artifact@v4
+        with:
+          pattern: riddlex-50-play-batch-*
+          path: qa-traces
+          merge-multiple: true
+      - name: Verify fifty distinct sessions and report failures honestly
+        run: node games/riddlex/owner-50-aggregate.mjs qa-traces
+      - name: Upload full 50-session question, answer and candidate diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-50-complete-real-browser-report
+          path: ${{ runner.temp }}/riddlex-50-combined.json
+          if-no-files-found: warn

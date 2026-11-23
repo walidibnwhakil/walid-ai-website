@@ -449,7 +449,7 @@ export const NARRATIVE_PEOPLE = Object.freeze([
   },
   {
     "id": "narrative-jesus-isa",
-    "en": "Jesus (Isa)",
+    "en": "Jesus",
     "bn": "যিশু (ঈসা)",
     "pop": 800,
     "yes": [

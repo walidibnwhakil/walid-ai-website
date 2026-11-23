@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, rejectIndex, recompute, shouldGuess } from "./engine.js";
+import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-48";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -115,6 +115,151 @@ test("four rejected guesses leave meaningful questions available", () => {
   assert.equal(decide(state).type, "ask");
 });
 
+test("a Bangladesh actor must answer film-era questions before the first guess", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q7322180", 900, ["real","male","actor","from_bd","named"]),
+    entry("Q7460127", 800, ["real","female","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [id,value] of [
+    ["real","yes"], ["male","yes"], ["from_bd","yes"], ["actor","yes"]
+  ]) answer(state,id,value);
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_role_lead"});
+  answer(state,"screen_role_lead","yes");
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_role_comedy"});
+  answer(state,"screen_role_comedy","no");
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_pre1990"});
+  answer(state,"screen_star_pre1990","no");
+  assert.deepEqual(decide(state), {type:"ask",qid:"screen_star_1990s"});
+});
+
+test("Chaplin is identified through comedy and distinctive screen appearance, not celebrity priors", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q882", 10, ["real","male","actor","named"]),
+    entry("Q18987612", 50000, ["real","male","actor","from_bd","named"]),
+    entry("Q5279795", 65000, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category:"character" });
+  recompute(state);
+  for (const [id,value] of [
+    ["real","yes"],["male","yes"],["from_bd","no"],["actor","yes"]
+  ]) answer(state,id,value);
+  const sequence = [
+    ["screen_role_lead","yes"],
+    ["screen_role_comedy","yes"],
+    ["screen_silent_comedy","yes"],
+    ["screen_physical_comedy","yes"],
+    ["screen_short_moustache","yes"],
+    ["screen_hitler_resemblance","yes"],
+    ["screen_bowler_cane","yes"],
+    ["screen_great_dictator","yes"],
+  ];
+  for (const [id,value] of sequence) {
+    assert.deepEqual(decide(state),{type:"ask",qid:id},"Missing Chaplin follow-up "+id);
+    answer(state,id,value);
+  }
+  for (const id of ["screen_role_comedy","screen_silent_comedy",
+    "screen_short_moustache","screen_hitler_resemblance"])
+    assert.equal(factBit(pool,0,pool.qIndex.get(id)),2,id);
+});
+
+test("Dildar can be investigated as a deceased supporting comedian, never presumed a lead hero", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q18987612", 10, ["real","male","actor","from_bd","named"]),
+    entry("Q5279795", 50000, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool,{category:"character"});
+  recompute(state);
+  for (const [id,value] of [
+    ["real","yes"],["male","yes"],["from_bd","yes"],["actor","yes"]
+  ]) answer(state,id,value);
+  for (const [qid,value] of [
+    ["screen_role_lead","no"],["screen_role_villain","no"],
+    ["screen_role_comedy","yes"],["screen_role_supporting","yes"],
+    ["screen_silent_comedy","no"],["screen_comedy_award","yes"],
+  ]) {
+    assert.deepEqual(decide(state),{type:"ask",qid},"Dildar branch skipped "+qid);
+    answer(state,qid,value);
+  }
+  assert.equal(factBit(pool,0,pool.qIndex.get("screen_role_comedy")),2);
+  assert.equal(factBit(pool,0,pool.qIndex.get("screen_role_lead")),1);
+});
+
+test("a rejected 1990s male movie star is followed by verified career questions", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const pool = poolFromEntries(qs, [
+    entry("Q7405420", 800, ["real","male","actor","from_bd","named"]),
+    entry("Q7322180", 700, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category:"character" });
+  recompute(state);
+  for (const [qid,value] of [["real","yes"],["male","yes"],["from_bd","yes"],
+    ["actor","yes"],["screen_star_pre1990","no"],["screen_star_1990s","yes"]])
+    answer(state,qid,value);
+  rejectIndex(state, 0); // Salman Shah was not the intended actor
+  const careerQuestions = [];
+  for (let i=0;i<5;i++) {
+    const decision=decide(state);
+    assert.equal(decision.type,"ask",
+      "No five-question verification after a rejected star: "+JSON.stringify(decision));
+    careerQuestions.push(decision.qid);
+    const qi=pool.qIndex.get(decision.qid);
+    const fact=factBit(pool,1,qi);
+    answer(state,decision.qid,fact===2?"yes":fact===1?"no":"unknown");
+  }
+  assert.ok(careerQuestions.filter(q=>q.startsWith("screen_")).length >= 4,
+    "Expected relevant film questions, not unrelated celebrity trivia: "+careerQuestions.join(", "));
+});
+
+test("a confident second name must wait for additional evidence", () => {
+  const pool = poolFromEntries(questions, [
+    entry("lead", 1000, ["real", "male", "named", "alive", "from_bd", "actor"]),
+    entry("runner-up", 8, ["real", "male", "named", "alive", "from_bd", "actor", "writer"]),
+    entry("third", 5, ["real", "named", "female", "from_in", "singer"]),
+  ]);
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [id, value] of [["real", "yes"], ["male", "yes"],
+    ["from_bd", "yes"], ["actor", "yes"]]) answer(state, id, value);
+  rejectIndex(state, pool.ids.indexOf("third"));
+  let answered = 0;
+  for (let step = 0; step < 5; step++) {
+    const decision = decide(state);
+    assert.notEqual(decision.type, "guess", "Name spam after wrong guess: " + JSON.stringify(decision));
+    if (decision.type === "defeat") break; // the mock has no remaining traits to ask
+    answer(state, decision.qid, "unknown");
+    answered++;
+  }
+  assert.ok(answered >= 1, "The engine should ask at least one available confirmation");
+});
+
+test("a confirmed male and 1990s star cannot nominate a woman or an unverified-era actor", () => {
+  const qs = [...questions, { id:"screen_star_1990s", group:"job", en:"1990s actor", bn:"৯০ এর অভিনেতা" }];
+  const pool = poolFromEntries(qs, [
+    entry("Q7322180", 100, ["real","male","actor","from_bd","named"]),
+    entry("Q13059781", 9000, ["real","female","actor","from_bd","named"], { no:["male"] }),
+    entry("unverified-man", 9500, ["real","male","actor","from_bd","named"]),
+  ]);
+  const state = createState(pool, { category:"character" });
+  recompute(state);
+  for (const [id,value] of [["real","yes"],["male","yes"],["from_bd","yes"],
+    ["actor","yes"],["screen_star_1990s","yes"]]) answer(state,id,value);
+  for (let attempt=0;attempt<4;attempt++) {
+    const decision=decide(state);
+    if (decision.type==="guess") {
+      assert.equal(pool.ids[decision.index],"Q7322180",
+        "gender or career decade was disregarded");
+      break;
+    }
+    if (decision.type==="defeat") break;
+    answer(state,decision.qid,"unknown");
+  }
+});
+
 test("Bangladesh is asked within the first five character questions", () => {
   const state = createState(world, { category: "character", opening: "real" });
   recompute(state);
@@ -183,16 +328,20 @@ test("a wrong guess asks more questions before the next name", () => {
       since = 0;
       continue;
     }
+    // If the tiny synthetic casebook runs out of distinguishing facts, a
+    // graceful stop is better than four consecutive unsupported names.
+    if (decision.type === "defeat") break;
     assert.equal(decision.type, "ask", JSON.stringify(decision));
     const value = bit(crowd, "near", decision.qid) === 2 ? "yes" : bit(crowd, "near", decision.qid) === 1 ? "no" : "unknown";
     answer(state, decision.qid, value);
     since += 1;
   }
-  assert.equal(gaps.length, 2, JSON.stringify(gaps));
-  assert.ok(gaps[1] >= 4, `only ${gaps[1]} questions between guesses`);
+  assert.ok(gaps.length >= 1, "the player should receive an initial plausible guess");
+  if (gaps.length > 1) assert.ok(gaps[1] >= 5,
+    `only ${gaps[1]} follow-up questions between guesses`);
 });
 
-test("one remaining name that is far ahead can be guessed without a long extra round", () => {
+test("a wrong guess cannot immediately become another guess, even with one name left", () => {
   const pair = poolFromEntries(questions, [
     entry("keeper", 400, ["real", "named", "male", "alive", "from_bd", "cricketer", "all_rounder"], { no: ["fictional", "animal", "object", "female", "from_in", "writer", "actor", "adult_ent"] }),
     entry("other", 40, ["real", "named", "female", "alive", "from_in", "actor"], { no: ["from_bd", "cricketer", "male", "fictional", "animal", "object", "adult_ent"] }),
@@ -209,7 +358,8 @@ test("one remaining name that is far ahead can be guessed without a long extra r
         guesses = 1;
         since = 0;
         const again = decide(state);
-        assert.equal(again.type, "guess", JSON.stringify(again));
+        assert.equal(again.type, "ask", JSON.stringify(again));
+        assert.ok(questionsBeforeRetry(state, 0.99, 99) >= 4);
         return;
       }
     }
@@ -227,17 +377,23 @@ function firmGuesses(pool, qid, value) {
   recompute(state);
   answer(state, qid, value);
   const guessed = [];
-  for (let n = 0; n < 4; n++) {
-    let decision;
-    for (let step = 0; step < 16; step++) {
-      decision = decide(state);
-      if (decision.type !== "ask") break;
+  let lastGuessAnswerCount = null;
+  for (let turn = 0; turn < 64; turn++) {
+    const decision = decide(state);
+    if (decision.type === "ask") {
       answer(state, decision.qid, "unknown");
+      continue;
     }
-    assert.equal(decision.type, "guess", JSON.stringify(decision));
+    if (decision.type === "defeat") break; // no evidence left, not another random name
+    assert.equal(decision.type, "guess");
+    if (lastGuessAnswerCount != null)
+      assert.ok(state.answers.length - lastGuessAnswerCount >= 5,
+        "Guesses repeated without five clarifying questions");
     guessed.push(pool.ids[decision.index]);
+    lastGuessAnswerCount = state.answers.length;
     rejectIndex(state, decision.index);
   }
+  assert.ok(guessed.length, "Known candidate with matching facts was never guessed");
   return guessed;
 }
 
@@ -797,8 +953,9 @@ test("Shabana and Alamgir are recognized as pre-1990 stars, not by birth year", 
   assert.equal(factBit(pool, 0, qi), 2);
   assert.equal(factBit(pool, 1, qi), 2);
   assert.equal(factBit(pool, 2, qi), 1);
-  assert.ok(qs.at(-2).en.includes("before 1990"));
-  assert.ok(!qs.at(-2).bn.includes("জন্ম"));
+  const pre1990Question = qs.find((q) => q.id === "screen_star_pre1990");
+  assert.ok(pre1990Question.en.includes("before 1990"));
+  assert.ok(!pre1990Question.bn.includes("জন্ম"));
 });
 
 test("politics augmentation survives spare array capacity after appending private roles", () => {

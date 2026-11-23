@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990 } from "./career-facts.js";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS } from "./career-facts.js?v=riddlex-48";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -143,6 +143,7 @@ export function factBit(pool, index, qi) {
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
+  if (SCREEN_CAREER_DETAILS[id]) return SCREEN_CAREER_DETAILS[id][pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -408,14 +409,24 @@ function topTwo(state) {
   const knownFilmEraAnswers = state.answers.filter((row) =>
     (row.qid === "screen_star_1990s" || row.qid === "screen_star_pre1990") &&
     (row.value === "yes" || row.value === "no"));
+  const verifiedRoleClues = state.answers.filter((row) =>
+    row.value === "yes" && [
+      "screen_role_lead", "screen_role_villain", "screen_role_comedy",
+      "screen_role_supporting", "screen_silent_comedy",
+      "screen_physical_comedy", "screen_short_moustache",
+      "screen_bowler_cane", "screen_hitler_resemblance",
+      "screen_great_dictator", "screen_comedy_award",
+    ].includes(row.qid));
   // Prioritize explicitly confirmed 1990-1999 film stars. When all such
   // names are rejected, widen to incomplete records instead of giving up.
   const confirmed1990s = knownFilmEraAnswers.find((row) =>
     row.qid === "screen_star_1990s" && row.value === "yes");
-  const hasVerified1990sCandidate = confirmed1990s && state.alive.some((i) =>
-    factBit(state.pool, i, confirmed1990s.qi) === 2 &&
-    (!confirmedActor || actorQi == null || factBit(state.pool, i, actorQi) === 2) &&
-    (!chosenCountry || factBit(state.pool, i, chosenCountry.qi) === 2));
+  const confirmedMale = state.answers.some((row) => row.qid === "male" && row.value === "yes");
+  const confirmedFemale = state.answers.some((row) => row.qid === "female" && row.value === "yes");
+  const deniedMale = state.answers.some((row) => row.qid === "male" && row.value === "no");
+  const deniedFemale = state.answers.some((row) => row.qid === "female" && row.value === "no");
+  const maleQi = state.pool.qIndex.get("male");
+  const femaleQi = state.pool.qIndex.get("female");
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -429,8 +440,19 @@ function topTwo(state) {
       const fact = factBit(state.pool, i, row.qi);
       return row.value === "yes" ? fact === 1 : fact === 2;
     })) continue;
-    if (hasVerified1990sCandidate &&
-        factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
+    // An explicit confirmed acting role must be positively supported for
+    // a name to be announced. Missing role classifications cannot justify
+    // guessing a famous lead when the player described a comic performer.
+    if (verifiedRoleClues.some((row) =>
+      factBit(state.pool, i, row.qi) !== 2)) continue;
+    // A definitive player-supplied decade must have an affirmative career
+    // record. A missing date is not evidence that a celebrity was famous
+    // in the 1990s; keep that person in the question pool, not the guesses.
+    if (confirmed1990s && factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
+    if (maleQi != null && confirmedMale && factBit(state.pool, i, maleQi) !== 2) continue;
+    if (femaleQi != null && confirmedFemale && factBit(state.pool, i, femaleQi) !== 2) continue;
+    if (maleQi != null && deniedMale && factBit(state.pool, i, maleQi) === 2) continue;
+    if (femaleQi != null && deniedFemale && factBit(state.pool, i, femaleQi) === 2) continue;
     // Real people need explicit acting evidence. Player-relative roles are
     // allowed to have unknown occupations when personally confirmed.
     if (confirmedActor && actorQi != null &&
@@ -478,12 +500,9 @@ function oddsRatio(bestP, secondP) {
 // far ahead, or after several new questions. Close scores wait longer.
 export function questionsBeforeRetry(state, bestP = 0, ratio = 1) {
   if (!state || state.guesses <= 0) return 0;
-  // If there truly is only one unrejected candidate, don't invent a
-  // pointless extra round. Otherwise popularity alone is not new evidence.
-  if (state.alive.length === 1 && bestP >= 0.8 && ratio >= 8) return 0;
-  if (bestP >= 0.8 && ratio >= 8) return 2;
-  if (ratio < 2.5) return 6;
-  return 4;
+  // A rejected name is new negative evidence. Popularity and a near-100%
+  // posterior do not permit immediately announcing another celebrity.
+  return ratio < 2.5 ? 6 : 5;
 }
 
 // The public database is huge; a country, gender, a couple of "no"s,
@@ -971,6 +990,30 @@ export const QUESTION_REQUIRES = {
   party_jamaat: [{ id: "from_bd", value: "yes" }],
   zia_family: [{ id: "from_bd", value: "yes" }],
   mujib_family: [{ id: "from_bd", value: "yes" }],
+  ...Object.fromEntries(Object.keys(SCREEN_CAREER_DETAILS).map((id) => [
+    id, [
+      { id: "actor", value: "yes", strict: true },
+      ...([
+        "screen_film_debut_pre1995", "screen_over_100_films",
+        "screen_films_after_2000", "screen_national_film_award",
+        "screen_air_force_before_films", "screen_first_film_keyamat",
+        "screen_first_film_banglar_nayok", "screen_comedy_award",
+      ].includes(id) ? [{ id: "from_bd", value: "yes", strict: true }] : []),
+      ...([
+        "screen_silent_comedy", "screen_physical_comedy",
+        "screen_comedy_award", "screen_short_moustache",
+        "screen_bowler_cane", "screen_hitler_resemblance",
+        "screen_great_dictator", "screen_world_famous",
+      ].includes(id) ? [{ id: "screen_role_comedy", value: "yes", strict: true }] : []),
+      ...([
+        "screen_short_moustache", "screen_bowler_cane",
+        "screen_hitler_resemblance", "screen_great_dictator",
+      ].includes(id) ? [{ id: "screen_silent_comedy", value: "yes", strict: true }] : []),
+      ...(id === "screen_hitler_resemblance" ? [
+        { id: "screen_short_moustache", value: "yes", strict: true },
+      ] : []),
+    ],
+  ])),
 };
 
 const STRICT_PARENT = {
@@ -1048,6 +1091,109 @@ function allowedInCategory(state, question) {
   if (state.category === "character" && (question.id === "animal" || question.id === "object")) return false;
   if (state.category !== "character" && question.group === "kind" && question.id !== "named") return false;
   return true;
+}
+
+// Before proposing another name, confirm distinguishing facts about the
+// current leader against surviving alternatives. Never spend this round on
+// already answered, contradictory, or unrelated category questions.
+function chooseConfirmationQuestion(state, leader) {
+  if (leader < 0 || !state.alive.length) return null;
+  const { pool, weights } = state;
+  const asked = new Set(state.answers.map((row) => row.qid));
+  const rows = state.alive.length > 1200 ? sampleAlive(state, 1200) : state.alive;
+  const absentCache = new Map();
+  const focusJob = confirmedJob(state);
+  let bestQid = null;
+  let bestScore = -Infinity;
+  for (let qi = 0; qi < pool.questions.length; qi++) {
+    const question = pool.questions[qi];
+    if (asked.has(question.id) || !allowedInCategory(state, question) ||
+        blockedQuestion(state, question, rows, absentCache) ||
+        !gated(state, question, rows)) continue;
+    // A confirmation must not reopen a mutually exclusive category.
+    // Re-asking "fictional?" after the player confirmed "real" isn't
+    // clarification, even if the candidate's packed fictional fact is "no".
+    if (question.id === "fictional" && said(state, "real", ["yes","probably"])) continue;
+    if (question.id === "real" && said(state, "fictional", ["yes","probably"])) continue;
+    if (question.group === "fiction" && said(state, "real", ["yes","probably"])) continue;
+    const leaderFact = factBit(pool, leader, qi);
+    if (leaderFact === 0) continue;
+    let distinctWeight = 0;
+    let comparableWeight = 0;
+    for (const i of rows) {
+      if (i === leader) continue;
+      const fact = factBit(pool, i, qi);
+      if (fact === 0) continue;
+      comparableWeight += weights[i];
+      if (fact !== leaderFact) distinctWeight += weights[i];
+    }
+    const relatedJob = focusJob && question.group === "job";
+    const relatedPolitics = focusJob === "politician" && question.group === "politics";
+    const related = relatedJob || relatedPolitics;
+    // Prefer questions that distinguish candidates; a verified trait of
+    // the leader is still a useful confirmation when the other records are
+    // incomplete. Job-specific questions get a relevance preference.
+    const score = distinctWeight * 8 + comparableWeight * 0.2 +
+      (related ? 0.4 : 0) + (leaderFact === 2 ? 0.1 : 0);
+    if (score > bestScore) {
+      bestScore = score;
+      bestQid = question.id;
+    }
+  }
+  return bestQid;
+}
+
+// Profession-specific facts must be checked before a public name is shown.
+// The 1990s film question is different from birth decade or acting debut.
+// General, evidence-led actor taxonomy. No assumption that the person is
+// famous, a lead hero, a star of the 1990s, or even Bangladeshi.
+function pendingActorRoleQuestion(state) {
+  if (state.category !== "character" ||
+      !said(state, "actor", ["yes", "probably"]) ||
+      said(state, "knows_you", ["yes", "probably"])) return null;
+  const known = new Set(state.answers.map((row) => row.qid));
+  const next = (id) => state.pool.qIndex.has(id) && !known.has(id);
+  const yes = (id) => said(state, id, ["yes", "probably"]);
+  const no = (id) => said(state, id, ["no", "probably_not"]);
+
+  if (next("screen_role_lead")) return "screen_role_lead";
+  if (no("screen_role_lead") && next("screen_role_villain"))
+    return "screen_role_villain";
+  if (next("screen_role_comedy")) return "screen_role_comedy";
+  if (yes("screen_role_comedy")) {
+    if (no("screen_role_lead") && next("screen_role_supporting"))
+      return "screen_role_supporting";
+    if (next("screen_silent_comedy")) return "screen_silent_comedy";
+    if (yes("screen_silent_comedy")) {
+      for (const id of [
+        "screen_physical_comedy", "screen_short_moustache",
+        "screen_hitler_resemblance", "screen_bowler_cane",
+        "screen_great_dictator", "screen_world_famous",
+      ]) {
+        if (id === "screen_hitler_resemblance" &&
+            !yes("screen_short_moustache")) continue;
+        if (next(id)) return id;
+      }
+    } else if (no("screen_silent_comedy") &&
+        yes("from_bd") && next("screen_comedy_award"))
+      return "screen_comedy_award";
+  }
+  return null;
+}
+
+function pendingFilmEraQuestion(state) {
+  if (state.category !== "character" ||
+      !said(state, "actor", ["yes", "probably"]) ||
+      !said(state, "from_bd", ["yes", "probably"]) ||
+      said(state, "screen_role_comedy", ["yes", "probably"])) return null;
+  const answered = new Set(state.answers.map((row) => row.qid));
+  if (state.pool.qIndex.has("screen_star_pre1990") &&
+      !answered.has("screen_star_pre1990")) return "screen_star_pre1990";
+  if (state.pool.qIndex.has("screen_star_1990s") &&
+      !answered.has("screen_star_1990s") &&
+      !said(state, "screen_star_pre1990", ["yes", "probably"]))
+    return "screen_star_1990s";
+  return null;
 }
 
 function firstAllowedQuestion(state) {
@@ -1192,8 +1338,32 @@ export function decide(state) {
   if (state.guesses >= 10 || state.answers.length >= 72) return { type: "defeat" };
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
+  // First determine their usual role (lead, antagonist or comic performer).
+  // Career era and signature props are follow-up branches, not universal
+  // prerequisites to finding an actor or anyone else.
+  const roleQuestion = pendingActorRoleQuestion(state);
+  if (roleQuestion) return { type: "ask", qid: roleQuestion };
+  const filmEra = pendingFilmEraQuestion(state);
+  if (filmEra) return { type: "ask", qid: filmEra };
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
-  if (!waiting && shouldGuess(state)) return { type: "guess", index: best };
+  // After any wrong guess, force a fresh evidence-gathering round.
+  // In particular, do NOT bypass it through the no-question fallback.
+  if (waiting) {
+    const qid = chooseConfirmationQuestion(state, best) ||
+      chooseQuestion(state) || firstAllowedQuestion(state);
+    return qid ? { type: "ask", qid } : { type: "defeat" };
+  }
+  if (shouldGuess(state)) {
+    // A famous person can dominate the prior long before we have enough
+    // independent information. Ask a target-specific confirmation first.
+    const personal = said(state, "knows_you", ["yes", "probably"]);
+    if (state.guesses === 0 && !personal && state.category === "character" &&
+        state.answers.length < 12) {
+      const verify = chooseConfirmationQuestion(state, best);
+      if (verify) return { type: "ask", qid: verify };
+    }
+    return { type: "guess", index: best };
+  }
   let qid = chooseQuestion(state);
   // With sparse ordinary-person clues, continue questioning rather than
   // surrendering at eight. Preserve confident well-supported guesses and
@@ -1201,7 +1371,7 @@ export function decide(state) {
   // Missing verified candidates in the currently loaded shard is not
   // proof that an actor or other person is absent from the whole casebook.
   // Ask remaining relevant questions rather than surrender immediately.
-  if (!qid && (waiting || !supportedIdentity(state) || best < 0))
+  if (!qid && (!supportedIdentity(state) || best < 0))
     qid = firstAllowedQuestion(state);
   if (!qid) {
     if (best >= 0 && bestP > 0 && supportedIdentity(state))

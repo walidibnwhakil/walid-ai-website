@@ -2903,7 +2903,8 @@ export function decide(state) {
   // A supported identification comes before optional film or career trivia.
   // Earlier discovery paths could keep bypassing shouldGuess indefinitely.
   if (state.category === "character" &&
-      !pendingActorRoleQuestion(state) && !pendingFilmEraQuestion(state)) {
+      !pendingActorRoleQuestion(state) && !pendingFilmEraQuestion(state) &&
+      !domainDiscoveryQuestion(state)) {
     const identified = verifiedIdentityCandidate(state);
     if (identified >= 0) return { type:"guess", index:identified };
     if (shouldGuess(state)) return { type:"guess", index:best };

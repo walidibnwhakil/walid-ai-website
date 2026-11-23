@@ -1,0 +1,25 @@
+name: Riddlex regression tests
+on:
+  push:
+    branches:
+      - fix/riddlex-answer-driven-20261124
+      - main
+    paths:
+      - "games/riddlex/**"
+      - ".github/workflows/riddlex-regression.yml"
+  pull_request:
+    paths:
+      - "games/riddlex/**"
+      - ".github/workflows/riddlex-regression.yml"
+jobs:
+  gameplay-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run Riddlex tests
+        working-directory: games/riddlex
+        run: npm test

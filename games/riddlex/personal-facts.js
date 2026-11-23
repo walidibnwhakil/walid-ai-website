@@ -12,6 +12,7 @@ export const PERSONAL_QUESTIONS = Object.freeze([
   { id: "your_ex", group: "personal", en: "Were they your romantic partner or spouse in the past?", bn: "তিনি কি আপনার প্রাক্তন প্রেমিক, প্রেমিকা বা জীবনসঙ্গী?" },
   { id: "your_friend", group: "personal", en: "Are they your friend?", bn: "তিনি কি আপনার বন্ধু?" },
   { id: "your_best_friend", group: "personal", en: "Are they your closest friend?", bn: "তিনি কি আপনার সবচেয়ে কাছের বন্ধু?" },
+  { id: "your_self", group: "personal", en: "Are you thinking of yourself?", bn: "আপনি কি নিজের কথাই ভাবছেন?" },
 ]);
 
 // Generic relations deliberately avoid assertions about a specific person's
@@ -30,6 +31,12 @@ function relation(id, en, bn, gender, facts, popularity = 620) {
 }
 
 export const PERSONAL_RELATIONS = Object.freeze([
+  // A player can be thinking of themselves without sharing any name, gender,
+  // location or personally identifying information. Self is a relationship
+  // type, not a profile stored in the public casebook.
+  relation("self", "Yourself", "আপনি নিজে", null,
+    { your_family:1, your_partner:1, your_ex:1,
+      your_friend:1, your_best_friend:1, your_self:2 }, 680),
   relation("mother", "Your mother", "আপনার মা", "female",
     { your_family: 2, your_parent: 2, your_sibling: 1 }, 850),
   relation("father", "Your father", "আপনার বাবা", "male",
@@ -53,9 +60,9 @@ export const PERSONAL_RELATIONS = Object.freeze([
   relation("ex", "Your ex", "আপনার প্রাক্তন সঙ্গী", null,
     { your_family: 1, your_partner: 1, your_ex: 2 }, 610),
   relation("best-friend", "Your best friend", "আপনার সবচেয়ে কাছের বন্ধু", null,
-    { your_family: 1, your_partner: 1, your_ex: 1, your_friend: 2, your_best_friend: 2 }, 650),
+    { your_family: 1, your_partner: 1, your_ex: 1, your_friend: 2, your_best_friend: 2, your_self:1 }, 650),
   relation("friend", "Your friend", "আপনার বন্ধু", null,
-    { your_family: 1, your_partner: 1, your_ex: 1, your_friend: 2, your_best_friend: 1 }, 620),
+    { your_family: 1, your_partner: 1, your_ex: 1, your_friend: 2, your_best_friend: 1, your_self:1 }, 620),
 ]);
 
 // Riddlex's own detective can be thought of as a fictional game character.

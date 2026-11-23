@@ -1393,16 +1393,16 @@ export function decide(state) {
   // The ordinary entropy picker can run out while useful candidate-specific
   // confirmations still exist. Try them before a broad, safe fallback.
   // A missing question is NEVER permission to guess an unverified name.
-  const qid = chooseQuestion(state) ||
-    chooseConfirmationQuestion(state, best) || firstAllowedQuestion(state);
-  if (qid) return { type: "ask", qid };
-  // Small self-contained demo/fixture casebooks have very few questions
-  // compared with the real 60k+ public knowledge base. Preserve their
-  // original final-candidate gameplay once every question is exhausted.
-  // Large public casebooks NEVER use this shortcut.
-  if (state.pool.count < 100 && best >= 0 && bestP > 0 &&
+  let qid = chooseQuestion(state);
+  // Preserve the original tiny-casebook behavior used by the self-contained
+  // demo and simulation fixtures. Guess when the informative question picker
+  // is exhausted so a later rejection still has unused clarifying questions.
+  // The actual public character casebook initially loads over 19k records
+  // and NEVER takes this shortcut.
+  if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
       supportedIdentity(state)) return { type: "guess", index: best };
-  return { type: "defeat" };
+  qid ||= chooseConfirmationQuestion(state, best) || firstAllowedQuestion(state);
+  return qid ? { type: "ask", qid } : { type: "defeat" };
 }
 
 export function canPrint(pool, index) {

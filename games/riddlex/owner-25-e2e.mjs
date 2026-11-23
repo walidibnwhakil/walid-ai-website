@@ -131,7 +131,7 @@ const commons = {
   "Jaya Ahsan":["career_bengali_films","career_worked_both_bengals","film_bisorjon"],
   "Deb":["career_bengali_films","career_indian_mp","film_chander_pahar"],
   "Jeet":["career_bengali_films","film_sathi_2002"],
-  "Mashrafee Bin Mortaza":["career_bd_mp","career_fast_bowler","career_bangladesh_captain"],
+  "Mashrafee Bin Mortaza":["career_bd_mp","career_fast_bowler","career_bangladesh_captain","career_narail_express"],
   "Pinaki Bhattacharya":["career_online_commentator"],
   "Koel Mallick":["career_bengali_films","film_nater_guru"],
   "Srabonti":["career_bengali_films","career_child_performer","film_mayar_badhon"],

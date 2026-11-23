@@ -11,7 +11,7 @@ const root=[
   {id:"named",group:"kind"},{id:"male",group:"person"},
   {id:"female",group:"person"},{id:"alive",group:"life"},
   {id:"dead",group:"life"},{id:"from_bd",group:"country"},
-  {id:"from_gb",group:"country"},{id:"from_us",group:"country"},
+  {id:"from_gb",group:"country"},{id:"from_europe",group:"country"},{id:"from_us",group:"country"},
   {id:"from_za",group:"country"},
   {id:"scientist",group:"job"},{id:"writer",group:"job"},
   {id:"business",group:"job"},{id:"politician",group:"job"},
@@ -85,4 +85,20 @@ test("sourced domain facts are true only for the actual person",()=>{
  assert.equal(bit("riddlex-topic-mr-bean","topic_tv_comedy_fiction"),2);
  assert.equal(bit("riddlex-topic-amir-hawlader","topic_elma_behrouz"),2);
  assert.equal(bit("riddlex-topic-shafiqul-masud","topic_jamaat_dhaka_south"),2);
+});
+
+test("verified profile overrides incorrect historic binary NOs, including region inference",()=>{
+ const bad=poolFromEntries(root,[
+  {id:"Q935",en:"Isaac Newton",pop:100,yes:["real","scientist"],
+   no:["writer","from_gb"]},
+  {id:"Q305177",en:"Jensen Huang",pop:100,yes:["real","scientist","business"]},
+  {id:"Q317521",en:"Elon Musk",pop:100,yes:["real","actor","politician"]},
+ ]);
+ const value=(id,qid)=>factBit(bad,bad.ids.indexOf(id),bad.qIndex.get(qid));
+ assert.equal(value("Q935","writer"),2,"Newton's authorship is not NO");
+ assert.equal(value("Q935","from_gb"),2,"Newton's Britain fact is not NO");
+ assert.equal(value("Q935","from_europe"),2,"verified country derives Europe");
+ assert.equal(value("Q305177","scientist"),0,"ambiguous profession must be neutral");
+ assert.equal(value("Q317521","actor"),1,"the entertainment actor tag is false");
+ assert.equal(value("Q317521","politician"),0,"political involvement is not a firm occupation");
 });

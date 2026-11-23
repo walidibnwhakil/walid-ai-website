@@ -518,6 +518,25 @@ function supportedIdentity(state) {
   });
 }
 
+// A high Bayesian score is not proof of identity: the player must have
+// affirmed independently verified distinguishing facts about the candidate.
+// Generic country, gender, life and fame priors do not count as evidence.
+function hasCandidateEvidence(state, index) {
+  if (index < 0) return false;
+  let positive = 0;
+  let distinctive = 0;
+  for (const row of state.answers) {
+    if (row.value !== "yes" || factBit(state.pool, index, row.qi) !== 2) continue;
+    const group = state.pool.questions[row.qi]?.group;
+    if (!["job", "politics", "fiction", "adult", "animal", "object", "look", "size"].includes(group)) continue;
+    positive++;
+    if (!PRIMARY_JOBS.includes(row.qid) && row.qid !== "athlete") distinctive++;
+  }
+  const actor = said(state, "actor", ["yes"]);
+  return actor ? positive >= 3 && distinctive >= 2
+    : positive >= 2 && distinctive >= 1;
+}
+
 export function shouldGuess(state) {
   const asked = state.answers.length;
   if (!supportedIdentity(state)) return false;
@@ -525,14 +544,20 @@ export function shouldGuess(state) {
   if (state.category === "character" && state.pool.count >= 100 &&
       !said(state, "knows_you", ["yes", "probably"]) && asked < 10) return false;
   if (!state.alive.length) return false;
-  const { bestP, secondP } = topTwo(state);
-  if (!(bestP > 0)) return false;
+  const { best, bestP, secondP } = topTwo(state);
+  if (!(bestP > 0) || best < 0) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
-  if (asked >= 72) return true;
   const personal = state.answers.some((row) => row.qid === "knows_you" &&
     (row.value === "yes" || row.value === "probably"));
   if (personal && asked >= 4 && bestP >= 0.72 && ratio >= 4) return true;
+  // Public characters must be supported by multiple specific yes answers,
+  // including verified career/role details for actors. Never reveal a name
+  // simply because the database has few remaining candidates or a turn cap.
+  if (state.category === "character" && state.pool.count >= 100 && !personal) {
+    return asked >= 10 && hasCandidateEvidence(state, best) &&
+      bestP >= 0.86 && ratio >= 9;
+  }
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;
   // Shared facts such as country and job are not enough. Wait until one person stands clear.
@@ -1335,7 +1360,8 @@ export function rejectIndex(state, index) {
 export function decide(state) {
   recompute(state);
   if (!state.alive.length) return { type: "defeat" };
-  if (state.guesses >= 10 || state.answers.length >= 72) return { type: "defeat" };
+  // Neither 10 rejected names nor 72 answers establishes that the user lost.
+  // Continue asking every remaining relevant, non-duplicate question.
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   // First determine their usual role (lead, antagonist or comic performer).
@@ -1364,21 +1390,12 @@ export function decide(state) {
     }
     return { type: "guess", index: best };
   }
-  let qid = chooseQuestion(state);
-  // With sparse ordinary-person clues, continue questioning rather than
-  // surrendering at eight. Preserve confident well-supported guesses and
-  // keep the post-rejection gap used by the existing engine.
-  // Missing verified candidates in the currently loaded shard is not
-  // proof that an actor or other person is absent from the whole casebook.
-  // Ask remaining relevant questions rather than surrender immediately.
-  if (!qid && (!supportedIdentity(state) || best < 0))
-    qid = firstAllowedQuestion(state);
-  if (!qid) {
-    if (best >= 0 && bestP > 0 && supportedIdentity(state))
-      return { type: "guess", index: best };
-    return { type: "defeat" };
-  }
-  return { type: "ask", qid };
+  // The ordinary entropy picker can run out while useful candidate-specific
+  // confirmations still exist. Try them before a broad, safe fallback.
+  // A missing question is NEVER permission to guess an unverified name.
+  const qid = chooseQuestion(state) ||
+    chooseConfirmationQuestion(state, best) || firstAllowedQuestion(state);
+  return qid ? { type: "ask", qid } : { type: "defeat" };
 }
 
 export function canPrint(pool, index) {

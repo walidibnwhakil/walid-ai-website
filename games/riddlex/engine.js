@@ -2733,6 +2733,10 @@ export function decide(state) {
     if(legacyEvidence>=0)return {type:"guess",index:legacyEvidence};
     const timekeeping=broadDiscoveryQuestion(state);
     if(timekeeping)return {type:"ask",qid:timekeeping};
+    // Do not postpone an already proven wristwatch or similar established
+    // domain identity just to explore recently added object families.
+    const knownObject=verifiedIdentityCandidate(state);
+    if(knownObject>=0)return {type:"guess",index:knownObject};
   }
   // Broad career/physical-purpose questions have higher player value than
   // obscure title trivia, popularity priors and unrelated generic followups.

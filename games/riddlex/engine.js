@@ -2256,6 +2256,65 @@ function corroboratedFilmHypothesis(state,index,bestP,secondP) {
   });
 }
 
+// Ask broad profession and medium-of-work questions before niche names.
+// The same taxonomy works for ANY player profile with the corresponding
+// evidence (religious lectures, physics, chips, TV comedy, modern literature).
+function domainDiscoveryQuestion(state) {
+  if (state.category!=="character" || state.answers.length<5) return null;
+  const yes=id=>said(state,id,["yes","probably"]);
+  const no=id=>said(state,id,["no","probably_not"]);
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const plan=[];
+  if (yes("fictional") && yes("from_novel") && yes("from_bengali_lit")) {
+    plan.push("topic_modern_bengali_novel");
+    if(yes("topic_modern_bengali_novel"))
+      plan.push("topic_elma_behrouz","topic_novel_male_central");
+  }
+  if (yes("fictional") && (yes("from_cartoon") || yes("from_film"))) {
+    plan.push("topic_tv_comedy_fiction");
+    if(yes("topic_tv_comedy_fiction"))
+      plan.push("topic_visual_comedy","topic_teddy_bear");
+  }
+  if(yes("real") && yes("scientist")) {
+    plan.push("topic_physics");
+    if(yes("topic_physics"))
+      plan.push("topic_classical_motion","topic_gravity");
+  }
+  if(yes("real") && yes("business") && !yes("youtube")) {
+    plan.push("topic_technology_business");
+    if(yes("topic_technology_business"))
+      plan.push("topic_semiconductors","topic_electric_vehicles",
+        "topic_ai_computing","topic_space_rockets");
+  }
+  if(yes("real") && yes("from_bd") && !yes("actor") &&
+     (yes("politician") || yes("writer") || yes("youtube") ||
+      (!yes("scientist") && !yes("cricketer") && !yes("footballer") &&
+       state.answers.length>=8 && !no("politician")))) {
+    plan.push("topic_islamic_speaker");
+    if(yes("topic_islamic_speaker"))
+      plan.push("topic_online_lectures","topic_religious_author");
+  }
+  if(yes("real") && yes("politician") && yes("party_jamaat")) {
+    plan.push("topic_jamaat_mp");
+    if(yes("topic_jamaat_mp"))plan.push("topic_jamaat_dhaka_south");
+  }
+  if(!plan.length)return null;
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const id of plan) {
+    if(asked.has(id))continue;
+    const qi=state.pool.qIndex.get(id);
+    if(qi==null)continue;
+    const q=state.pool.questions[qi];
+    if(!allowedInCategory(state,q) || blockedQuestion(state,q,rows,cache) ||
+       !gated(state,q,rows))continue;
+    if(!state.alive.some(i=>state.weights[i]>0 && factBit(state.pool,i,qi)===2))
+      continue;
+    return id;
+  }
+  return null;
+}
+
 function confirmedPersonalRole(state) {
   if (state.category !== "character" ||
       !said(state, "real", ["yes", "probably"]) ||
@@ -2307,6 +2366,8 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  const domain = domainDiscoveryQuestion(state);
+  if(domain) return {type:"ask",qid:domain};
   if(corroboratedFilmHypothesis(state,best,bestP,secondP))
     return {type:"guess",index:best};
   const useful=usefulObjectQuestion(state);

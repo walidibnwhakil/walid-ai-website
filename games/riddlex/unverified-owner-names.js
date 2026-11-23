@@ -13,7 +13,7 @@ export const UNVERIFIED_OWNER_NAMES=Object.freeze([
     pop:1,
     yes:["real","named"],
     no:["fictional","animal","object"],
-    adult:true,
+    adult:false,
     unverified:true,
     image:"",
     credit:"",

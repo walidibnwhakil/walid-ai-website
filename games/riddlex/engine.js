@@ -12,6 +12,7 @@ import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=rid
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
+import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-61";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -82,7 +83,8 @@ function regionBit(pool, index, members) {
     // The same source-backed profile override used by factBit must apply
     // to continental regions. Otherwise an incorrect country bit in the
     // archived shard can contradict a verified birthplace or nationality.
-    const verified=DOMAIN_PROFILE_FACTS[member]?.[pool.ids[index]];
+    const verified=BROAD_PROFILE_FACTS[member]?.[pool.ids[index]] ??
+      DOMAIN_PROFILE_FACTS[member]?.[pool.ids[index]];
     const bit = verified !== undefined ? verified :
       attrAt(pool.attrs, pool.attrBytes, index, mqi);
     if (bit === 2) yes = true;
@@ -149,7 +151,8 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
-  const verifiedProfile=DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
+  const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
+    DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
   // Incomplete packed life tags cannot contradict authoritative dated records.
   if ((id === "alive" || id === "dead") && SCREEN_LIFE_DETAILS[pool.ids[index]])
@@ -162,6 +165,7 @@ export function factBit(pool, index, qi) {
   // answers for the other millions of people in the binary casebook.
   if (IDENTITY_FACTS[id]) return IDENTITY_FACTS[id][pool.ids[index]] || 0;
   if (DOMAIN_FACTS[id]) return DOMAIN_FACTS[id][pool.ids[index]] || 0;
+  if (BROAD_FACTS[id]) return BROAD_FACTS[id][pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -1627,9 +1631,13 @@ const ANCHORED_ANIMAL_QUESTIONS = new Set(["is_dog", "is_mouse"]);
 const FICTION_PAIR = ["from_game", "detective_role"];
 const ANCHOR_SCREEN_QUESTIONS = new Set(SCREEN_IDENTITY_QUESTIONS);
 const ANCHOR_IDENTITY_QUESTIONS = new Set(IDENTITY_DISTINCTIVE_IDS);
-const ANCHOR_DOMAIN_QUESTIONS = new Set(DOMAIN_QUESTIONS.map(q=>q.id));
+const ANCHOR_DOMAIN_QUESTIONS = new Set([...DOMAIN_QUESTIONS,...BROAD_QUESTIONS]
+  .filter(q=>q.group!=="object").map(q=>q.id));
 const ANCHOR_POLITICS_QUESTIONS = new Set(POLITICS_IDENTITY_QUESTIONS);
-const ANCHOR_FUNCTION_QUESTIONS = new Set(NONPERSON_SIGNATURES);
+const ANCHOR_FUNCTION_QUESTIONS = new Set([
+  ...NONPERSON_SIGNATURES,
+  ...BROAD_QUESTIONS.filter(q=>q.group==="object" && q.id!=="obj_timekeeping").map(q=>q.id),
+]);
 
 function verifiedIdentityCandidate(state) {
   const { pool, answers } = state;

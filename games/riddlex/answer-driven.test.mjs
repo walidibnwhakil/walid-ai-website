@@ -3,10 +3,11 @@ import test from "node:test";
 import { readFile } from "node:fs/promises";
 import {
   MAX_QUESTIONS_PER_ROUND, answer, createState, decide,
-  questionBlocked, recompute
+  questionBlocked, recompute, factBit
 } from "./engine.js";
 import { poolFromEntries } from "./kb.js";
 import { BROAD_PEOPLE, BROAD_QUESTIONS } from "./broad-facts.js";
+import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS } from "./everyday-facts.js";
 
 const base = JSON.parse(await readFile(new URL("./kb/manifest.json", import.meta.url), "utf8")).questions;
 const questions = [...base, ...BROAD_QUESTIONS];
@@ -75,4 +76,26 @@ test("even an all-Yes actor run terminates within the round ceiling", () => {
   }
   assert.ok(finished);
   assert.ok(state.answers.length <= MAX_QUESTIONS_PER_ROUND);
+});
+
+test("source-backed creator clues separate challenge videos from education", () => {
+  const creators = poolFromEntries(questions, [
+    { id: "Q57618112", en: "MrBeast", pop: 50,
+      yes: ["real", "male", "alive", "from_us", "youtube", "business"] },
+    { id: "Q630446", en: "John Green", pop: 50,
+      yes: ["real", "male", "alive", "from_us", "youtube", "business"] },
+  ]);
+  const quiz = creators.qIndex.get("creator_large_scale_giveaways");
+  assert.ok(quiz != null);
+  assert.equal(factBit(creators, 0, quiz), 2);
+  assert.equal(factBit(creators, 1, quiz), 1);
+});
+
+test("three unknown object families do not force twelve more family guesses", () => {
+  const objects = poolFromEntries([...base, ...EVERYDAY_QUESTIONS], EVERYDAY_OBJECTS);
+  const state = createState(objects, {category:"object"});
+  for (const id of ["obj_family_electric","obj_family_worn","obj_family_personal_care"])
+    answer(state, id, "unknown");
+  assert.equal(questionBlocked(state, "obj_family_kitchen"), true);
+  assert.equal(questionBlocked(state, "obj_family_paper"), true);
 });

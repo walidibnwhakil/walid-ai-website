@@ -186,6 +186,23 @@ test("animal guesses ask a butterfly-specific behaviour, not just insect and fly
   assert.equal(pool.ids[decide(state).index],"c-butterfly");
 });
 
+test("international actors are not guessed from fame, lead roles and decade alone", () => {
+  const qs=[...questions,...EXTRA_SCREEN_QUESTIONS];
+  const pool=poolFromEntries(qs,[
+    entry("Q13059781",65000,["real","named","male","actor","from_bd"]),
+    ...Array.from({length:130},(_,i)=>
+      entry("other-actor-"+i,1,["real","named","male","actor","from_bd"])),
+  ]);
+  const state=createState(pool,{category:"character"});
+  recompute(state);
+  for(const [qid,value] of [
+    ["real","yes"],["actor","yes"],["male","yes"],["from_bd","yes"],
+    ["screen_role_lead","yes"],["screen_star_1990s","yes"],
+  ]) answer(state,qid,value);
+  assert.equal(shouldGuess(state),false,
+    "Famous, Bangladesh, actor, 1990s and leading role are not a unique identity");
+});
+
 test("four Indian Khan film facts attach to the correct distinct IDs", () => {
   const qs=[...questions,...EXTRA_SCREEN_QUESTIONS];
   const pool=poolFromEntries(qs,[

@@ -36,8 +36,11 @@ server.listen(0,"127.0.0.1");
 await once(server,"listening");
 const origin="http://127.0.0.1:"+server.address().port;
 
-// Ambiguous stage names are deliberately disambiguated. "Minami Ozawa" is
-// treated literally as the Japanese voice actress, not Minami Aizawa.
+// "Minami Ozawa" is a user-claimed retired JAV identity without an
+// independently verified match. Keep the claim visible as an inconclusive
+// stress test, not as a source-backed person's biography. In particular,
+// never transfer this claim to the documented Japanese voice actress by that
+// name or to Minami Aizawa.
 const people=[
  {name:"Ferdous",canonical:"Ferdous Ahmed",match:"^Ferdous Ahmed$",sex:"male",country:"from_bd",
   jobs:["actor","politician"],yes:["screen_role_lead","screen_star_1990s",

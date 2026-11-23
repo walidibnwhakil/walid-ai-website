@@ -372,6 +372,29 @@ test("rejected identity remains excluded when shards reorder their numeric indic
   assert.ok(surviving.includes("added-person"));
 });
 
+test("a generic 1990s leading-actor profile cannot announce Riaz without career proof", () => {
+  const qs=[...questions,...EXTRA_SCREEN_QUESTIONS];
+  const entries=[
+    entry("Q7322180", 65000, ["real","named","male","alive","actor","from_bd"]),
+    ...Array.from({length:125},(_,i)=>
+      entry("another-actor-"+i, 1, ["real","named","male","alive","actor","from_bd"])),
+  ];
+  const pool=poolFromEntries(qs,entries);
+  const state=createState(pool,{category:"character"});
+  recompute(state);
+  for(const [qid,value] of [
+    ["real","yes"],["knows_you","no"],["male","yes"],["alive","yes"],
+    ["from_bd","yes"],["actor","yes"],["named","yes"],
+    ["screen_role_lead","yes"],["screen_star_1990s","yes"],
+    ["screen_films_after_2000","yes"],["screen_over_100_films","yes"],
+  ]) if(pool.qIndex.has(qid)) answer(state,qid,value);
+  assert.equal(shouldGuess(state),false,
+    "Only profession, country, lead role and decade must not trigger a named guess");
+  answer(state,"screen_air_force_before_films","yes");
+  assert.equal(shouldGuess(state),true,
+    "A specific independently verified career trait permits a well-supported name");
+});
+
 test("after rejecting Shakib Khan, his unique marriage clue is not recycled", () => {
   const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
   const entries = [

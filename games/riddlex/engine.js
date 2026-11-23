@@ -448,6 +448,8 @@ function topTwo(state) {
   // names are rejected, widen to incomplete records instead of giving up.
   const confirmed1990s = knownFilmEraAnswers.find((row) =>
     row.qid === "screen_star_1990s" && row.value === "yes");
+  const confirmedPre1990 = knownFilmEraAnswers.find((row) =>
+    row.qid === "screen_star_pre1990" && row.value === "yes");
   const confirmedMale = state.answers.some((row) => row.qid === "male" && row.value === "yes");
   const confirmedFemale = state.answers.some((row) => row.qid === "female" && row.value === "yes");
   const deniedMale = state.answers.some((row) => row.qid === "male" && row.value === "no");
@@ -496,6 +498,10 @@ function topTwo(state) {
     // record. A missing date is not evidence that a celebrity was famous
     // in the 1990s; keep that person in the question pool, not the guesses.
     if (confirmed1990s && factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
+    // The same rule must apply to pre-1990 stars. Otherwise the top-guess
+    // shortlist may rank a later actor who has no confirmed early-era work,
+    // while the actual early-era performer remains buried in the posterior.
+    if (confirmedPre1990 && factBit(state.pool, i, confirmedPre1990.qi) !== 2) continue;
     // Explicit life/death answers are hard identity constraints; a player
     // confirming someone is alive must never see the known deceased Salman
     // Shah or Manna, regardless of their popularity.
@@ -1085,16 +1091,11 @@ function politicsSplit(state, qi, rows) {
 function unrelatedJob(state, id) {
   const job = confirmedJob(state);
   if (!job || job === id) return false;
-  // A member of parliament can also act or captain a cricket team; a writer
-  // can publish videos. Don't permanently suppress a second profession
-  // merely because it is uncommon in the global popularity distribution.
-  // Require real source-backed overlap, never an invented universal yes.
-  const multiCareer = (job==="politician" &&
-      ["actor","cricketer"].includes(id)) ||
-    (["actor","cricketer"].includes(job) && id==="politician") ||
-    (job==="writer" && id==="youtube");
-  if (state.category === "character" && state.pool.count >= 100 &&
-      multiCareer && PRIMARY_JOBS.includes(id)) {
+  // Any two professions can overlap. Do not hard-code a handful of
+  // celebrity examples as the only legal multi-career combinations.
+  // Keep the second job open ONLY when at least one live, source-backed
+  // candidate confirms BOTH occupations; otherwise avoid the distraction.
+  if (state.category === "character" && PRIMARY_JOBS.includes(id)) {
     const firstQi = state.pool.qIndex.get(job);
     const nextQi = state.pool.qIndex.get(id);
     if (firstQi != null && nextQi != null && state.alive.some(i =>

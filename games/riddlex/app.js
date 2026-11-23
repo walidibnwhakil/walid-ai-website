@@ -656,6 +656,16 @@ if (new URLSearchParams(location.search).has("autotest")) {
     reveal: (name, imageUrl) => scene.playReveal({ name, imageUrl }),
     loaded: () => loadedNames.slice(),
     find: (id) => pool?.ids.indexOf(id) ?? -1,
+    candidate: (id) => {
+      const indices=pool?.ids.map((item,i)=>item===id?i:-1).filter(i=>i>=0)||[];
+      return indices.map(i=>({
+        id,name:pool.ens[i],weight:state?.weights[i]??0,
+        alive:state?.alive.includes(i)??false,
+        facts:state?.answers.map(row=>({
+          qid:row.qid,response:row.value,bit:factBit(pool,i,row.qi),
+        }))||[],
+      }));
+    },
     replyFor: (id, questionId = currentQ) => {
       const index = pool.ids.indexOf(id);
       const qi = pool.qIndex.get(questionId);

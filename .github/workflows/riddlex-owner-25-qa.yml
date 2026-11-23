@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - "games/riddlex/owner-25-e2e.mjs"
+      - "games/riddlex/engine.js"
+      - "games/riddlex/identity-facts.js"
+      - "games/riddlex/app.js"
+      - "games/riddlex/kb.js"
       - ".github/workflows/riddlex-owner-25-qa.yml"
 
 permissions:

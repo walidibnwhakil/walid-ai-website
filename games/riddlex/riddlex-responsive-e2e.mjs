@@ -402,7 +402,7 @@ try {
           // derive the user's answers from an unloaded pool entry.
           const clues = {
             real:"yes", male:"yes", female:"no", alive:"no", dead:"yes",
-            actor:"yes", politician:"no",
+            from_bd:"yes", named:"yes", actor:"yes", politician:"no",
             screen_role_lead:"no", screen_role_villain:"no",
             screen_role_comedy:"yes", screen_role_supporting:"yes",
             screen_silent_comedy:"no", screen_comedy_award:"yes",

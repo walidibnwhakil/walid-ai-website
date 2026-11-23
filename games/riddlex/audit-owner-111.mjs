@@ -15,6 +15,7 @@ import {EVERYDAY_OBJECTS} from "./everyday-facts.js";
 import {RECOGNITION_PEOPLE,RECOGNITION_ANIMALS} from "./recognition-facts.js";
 import {EXTRA_HYPOTHESIS_ENTRIES} from "./hypothesis-facts.js";
 import {POLITICS_PEOPLE} from "./politics-extra.js";
+import {UNVERIFIED_OWNER_NAMES} from "./unverified-owner-names.js";
 const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.meta.url),"utf8"));
 const index=JSON.parse(await readFile(new URL("./kb/index.json",import.meta.url),"utf8"));
 const normal=x=>String(x||"").normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"");
@@ -29,7 +30,7 @@ for(let k=0;k<sessions.length;k++)for(const term of [sessions[k].name,...session
 const matched=Array.from({length:111},()=>[]);
 let scanned=0,pictureRecords=0;
 const already=new Set();
-function ingest({id,en,bn,aliases=[],image="",credit="",adult=false},source){
+function ingest({id,en,bn,aliases=[],image="",credit="",adult=false,unverified=false},source){
  if(!id)return;
  scanned++;
  if(image&&credit&&!adult)pictureRecords++;
@@ -40,7 +41,7 @@ function ingest({id,en,bn,aliases=[],image="",credit="",adult=false},source){
   const key=sessionIndex+":"+id;
   if(already.has(key))continue;
   already.add(key);
-  matched[sessionIndex].push({id,en,bn,image:!adult&&credit?image:"",credit:!adult&&image?credit:"",source,adult:!!adult});
+  matched[sessionIndex].push({id,en,bn,image:!adult&&credit?image:"",credit:!adult&&image?credit:"",source,adult:!!adult,unverified:!!unverified});
  }
 }
 const curated=[
@@ -48,6 +49,7 @@ const curated=[
  ...EXTRA_IDENTITY_PEOPLE,...DOMAIN_PEOPLE,...BROAD_PEOPLE,...BROAD_OBJECTS,
  ...NARRATIVE_PEOPLE,...EVERYDAY_OBJECTS,
  ...RECOGNITION_PEOPLE,...RECOGNITION_ANIMALS,
+ ...UNVERIFIED_OWNER_NAMES,
  ...POLITICS_PEOPLE,
  ...Object.values(EXTRA_HYPOTHESIS_ENTRIES).flat(),
 ];
@@ -72,7 +74,7 @@ const results=sessions.map((s,i)=>{
   bilingual:!!best?.bn,withLicensedPhoto:options.some(x=>!!x.image&&!!x.credit),
   best:best?{id:best.id,en:best.en,bn:best.bn,source:best.source,
     photo:!!best.image,credit:best.credit}:null,
-  matches:options.length};
+  matches:options.length,unverified:!!best?.unverified};
 });
 const absent=results.filter(x=>!x.found);
 const noBn=results.filter(x=>x.found&&!x.bilingual);
@@ -81,6 +83,8 @@ const summary={expected:111,scannedRecords:scanned,packedShards:files.length,
  matched:results.length-absent.length,missing:absent.length,
  bilingual:results.length-absent.length-noBn.length,
  sourceCreditPhotos:results.length-absent.length-noPhoto.length,
+ provisional:results.filter(x=>x.unverified).map(x=>x.name),
+ verifiedIdentities:results.filter(x=>x.found&&!x.unverified).length,
  absent:absent.map(x=>x.name),
  missingBengali:noBn.map(x=>x.name),
  photoMissing:noPhoto.map(x=>x.name)};

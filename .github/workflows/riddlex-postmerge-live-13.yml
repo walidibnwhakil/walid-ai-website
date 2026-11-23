@@ -1,0 +1,69 @@
+name: Riddlex POST MERGE 13 real LIVE website games
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "games/riddlex/postmerge-live-13-e2e.mjs"
+      - "games/riddlex/postmerge-live-13-aggregate.mjs"
+      - ".github/workflows/riddlex-postmerge-live-13.yml"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  play:
+    name: Real LIVE deployed Riddlex (${{ matrix.shard }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check production browser QA script
+        run: |
+          node --check games/riddlex/postmerge-live-13-e2e.mjs
+          node --check games/riddlex/postmerge-live-13-aggregate.mjs
+      - name: Install real Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Play deployed public site in English and Bangla (real browser clicks)
+        env:
+          RIDDLEX_SHARD: ${{ matrix.shard }}
+        run: node games/riddlex/postmerge-live-13-e2e.mjs
+      - name: Preserve real live-site question-answer transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postmerge-riddlex-live-13-${{ matrix.shard }}
+          path: ${{ runner.temp }}/riddlex-postmerge-live-13-part-${{ matrix.shard }}.json
+          if-no-files-found: error
+  aggregate:
+    name: Validate PUBLISHED 13 of 13 correct in EN and BN
+    needs: [play]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Retrieve independent production gameplay artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: postmerge-riddlex-live-13-*
+          path: live-results
+          merge-multiple: true
+      - name: Assert correct all 13, reject wrong guesses and browser failures
+        run: node games/riddlex/postmerge-live-13-aggregate.mjs live-results
+      - name: Keep combined report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-postmerge-live13-verified-report
+          path: ${{ runner.temp }}/riddlex-postmerge-live-13-combined.json
+          if-no-files-found: warn

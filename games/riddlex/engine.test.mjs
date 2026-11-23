@@ -123,6 +123,27 @@ test("object guesses need an affirmative function before announcing a famous fri
   assert.equal(pool.ids[decide(state).index],"c-fridge");
 });
 
+test("rare but verified item is found in a huge sparse casebook", () => {
+  const qs=[...questions,
+    {id:"daily_use",group:"object",en:"Daily?",bn:"দৈনিক?"},
+    {id:"handheld",group:"object",en:"Handheld?",bn:"হাতে?"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS];
+  const entries=[
+    entry("c-fridge",2,["object","kitchen","electronic","daily_use"]),
+    ...Array.from({length:400},(_,i)=>
+      entry("unknown-device-"+i,250,["object","electronic","daily_use"])),
+  ];
+  const pool=poolFromEntries(qs,entries);
+  const state=createState(pool,{category:"object"});
+  recompute(state);
+  for(const [qid,value] of [["electronic","yes"],["daily_use","yes"],
+    ["kitchen","yes"],["handheld","no"],["obj_keeps_food_cold","yes"]])
+    answer(state,qid,value);
+  assert.equal(shouldGuess(state),true,
+    "A uniquely verified food-cooling function must not lose to unverified popularity");
+  assert.equal(pool.ids[decide(state).index],"c-fridge");
+});
+
 test("animal guesses ask a butterfly-specific behaviour, not just insect and flying", () => {
   const qs=[...questions,
     {id:"insect",group:"animal",en:"Insect?",bn:"পোকা?"},

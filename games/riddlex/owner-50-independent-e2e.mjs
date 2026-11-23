@@ -81,7 +81,7 @@ const people=[
  epic("Rabon","Ravana of the Ramayana",["Ravana","Ravan","রাবণ"]),
  {name:"Dada (Grand father)",canonical:"Player's grandfather (relationship, not public identity)",category:"character",
   matches:["Your grandfather","Grandfather","Grandpa","আপনার দাদা","আপনার নানা","Your grandpa"],
-  personal:"grandfather",sex:"male",yes:["real","named","knows_you","your_family"],
+  personal:"grandfather",sex:"male",yes:["real","named","knows_you","your_family","your_grandparent"],
   no:["fictional","animal","object","your_parent","your_sibling","your_spouse",
     "your_child","your_baby","your_partner","your_ex","your_friend",
     "your_best_friend","your_self"]},

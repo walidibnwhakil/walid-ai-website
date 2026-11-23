@@ -154,11 +154,13 @@ try {
    }
    if(outcome==="incomplete")error="72-turn audit limit";
   } catch(e) {outcome="browser-error";error=String(e?.stack||e).slice(0,1000);}
+  const diagnostic=await page.evaluate(()=>window.__riddlex?.diagnose?.()||null).catch(()=>null);
   const row={name:person.name,category:person.category,canonical:person.canonical||person.name,
     status:outcome,questions:trace.length,
     unknowns:trace.filter(t=>t.answer==="unknown").length,
     difficult:trace.filter(t=>t.level==="বিশেষ তথ্য").length,
-    wrongGuesses:wrong,finalGuess,trace,error};
+    wrongGuesses:wrong,finalGuess,trace,error,
+    diagnostic:diagnostic&&{count:diagnostic.count,alive:diagnostic.alive,loadedCount:diagnostic.loadedCount,best:diagnostic.best}};
   results.push(row);
   console.log("RIDDLEX_16_CASE "+JSON.stringify(row));
   await page.close().catch(()=>{});

@@ -190,7 +190,7 @@ try {
  // Green means useful gameplay, not only a successful browser launch.
  // Publish all transcripts even on failure; this gate prevents accidental
  // merges of an apparently successful test suite with failing guesses.
- const minimumCorrect=12;
+ const minimumCorrect=16;
  if(counts.browserErrors || counts.correct<minimumCorrect) {
    console.error("RIDDLEX_16_QUALITY_GATE_FAILED "+JSON.stringify({
      correct:counts.correct,minimumCorrect,browserErrors:counts.browserErrors,

@@ -1,9 +1,10 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-54";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-55";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-54";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-55";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
-import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-54";
+import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
+import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-55";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
 
@@ -238,7 +239,13 @@ async function loadNamed(entries, token, begin) {
     // Extend the initial casebook only once per character game. These are
     // relationship templates, never actual people's names or account data.
     if (category === "character" && !partial.ids.includes("riddlex-role-mother")) {
-      const roles = poolFromEntries(manifest.questions, [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER]);
+      // Always make the small verified public-interest casebook available
+      // at game start, even when the worldwide long-tail shards do not load.
+      // This avoids guessing a famous unrelated candidate because the actual
+      // public figure lives beyond the mobile transfer budget.
+      const extra = EXTRA_IDENTITY_PEOPLE.filter(person => !partial.ids.includes(person.id));
+      const roles = poolFromEntries(manifest.questions,
+        [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER, ...extra]);
       adoptPool(appendShard(partial, roles));
       loadEvent("roles.appended", pool?.count);
     } else if ((category === "animal" || category === "object") &&

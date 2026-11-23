@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS } from "./career-facts.js?v=riddlex-50";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-50";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -141,6 +141,9 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
+  // Incomplete packed life tags cannot contradict authoritative dated records.
+  if ((id === "alive" || id === "dead") && SCREEN_LIFE_DETAILS[pool.ids[index]])
+    return SCREEN_LIFE_DETAILS[pool.ids[index]][id];
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   if (SCREEN_CAREER_DETAILS[id]) return SCREEN_CAREER_DETAILS[id][pool.ids[index]] || 0;

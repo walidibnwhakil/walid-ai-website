@@ -69,6 +69,22 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   // https://www.dhakatribune.com/amp/showtime/181524/dipjol-shakes-up-internet-with-road-safety-advert
   // Misha Sawdagor: https://www.thedailystar.net/video-stories/uncensored-with-rafi-hossain-dhaliwood-villain-misha-sawdagor-to-quit-acting-bangladesh-bd-1482064
   // Humayun Faridi: https://www.thedailystar.net/arts-entertainment/humayun-faridi-man-unmatched-impact-1231345
+  // India: date-checked, publicly reported traits. Unknown is not NO.
+  // Salman Khan said he remains unmarried (Indian Express, Oct 2026).
+  // https://indianexpress.com/article/entertainment/bollywood/salman-khan-koffee-with-karan-season-9-marriage-children-privacy-10921829/
+  // Aamir Khan married Gauri Spratt on 5 July 2026 (PTI).
+  // https://theprint.in/feature/aamir-khan-marries-longtime-partner-gauri-spratt-in-intimate-ceremony/2978049/
+  // Saif Ali Khan's Pataudi family background:
+  // https://www.britannica.com/biography/Saif-Ali-Khan
+  // Shah Rukh Khan's "King Khan" screen nickname:
+  // https://www.britannica.com/biography/Shah-Rukh-Khan
+  screen_india_unmarried: Object.freeze({ Q9543: 2, Q9557: 1 }),
+  screen_india_third_marriage: Object.freeze({ Q9557: 2, Q9543: 1 }),
+  screen_india_pataudi_family: Object.freeze({ Q252290: 2 }),
+  screen_india_king_khan: Object.freeze({ Q9535: 2 }),
+  screen_india_dabangg: Object.freeze({ Q9543: 2 }),
+  screen_india_dangal: Object.freeze({ Q9557: 2 }),
+  screen_india_ddlj: Object.freeze({ Q9535: 2 }),
   screen_walton_executive: Object.freeze({ Q21066842: 2 }),
   screen_return_after_long_break: Object.freeze({ Q21066842: 2 }),
   screen_debut_abujh_duti_mon: Object.freeze({ Q21066842: 2 }),
@@ -171,6 +187,27 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
 });
 
 export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
+  { id:"screen_india_unmarried", group:"person",
+    en:"Has this actor publicly said that they have never married?",
+    bn:"এই অভিনেতা কি প্রকাশ্যে জানিয়েছেন যে তিনি কখনো বিয়ে করেননি?" },
+  { id:"screen_india_third_marriage", group:"person",
+    en:"Did the actor marry for the third time in 2026?",
+    bn:"এই অভিনেতা কি ২০২৬ সালে তৃতীয়বার বিয়ে করেছেন?" },
+  { id:"screen_india_pataudi_family", group:"person",
+    en:"Does the actor belong to the historical Pataudi royal family?",
+    bn:"এই অভিনেতা কি ঐতিহাসিক পতৌদি নবাব পরিবারের সদস্য?" },
+  { id:"screen_india_king_khan", group:"job",
+    en:"Is the actor especially known by the nickname King Khan?",
+    bn:"এই অভিনেতা কি ‘কিং খান’ নামে বিশেষভাবে পরিচিত?" },
+  { id:"screen_india_dabangg", group:"job",
+    en:"Did the actor play the lead role in Dabangg?",
+    bn:"এই অভিনেতা কি ‘দাবাং’ চলচ্চিত্রে প্রধান চরিত্রে অভিনয় করেছেন?" },
+  { id:"screen_india_dangal", group:"job",
+    en:"Did the actor play the leading role in Dangal?",
+    bn:"এই অভিনেতা কি ‘দঙ্গল’ চলচ্চিত্রে প্রধান চরিত্রে অভিনয় করেছেন?" },
+  { id:"screen_india_ddlj", group:"job",
+    en:"Did the actor star in Dilwale Dulhania Le Jayenge?",
+    bn:"এই অভিনেতা কি ‘দিলওয়ালে দুলহানিয়া লে জায়েঙ্গে’ চলচ্চিত্রে অভিনয় করেছেন?" },
   { id:"screen_walton_executive", group:"job",
     en:"Have they held a senior executive role at Walton?",
     bn:"তিনি কি ওয়ালটনে উচ্চপদস্থ নির্বাহী হিসেবে কাজ করেছেন?" },

@@ -266,6 +266,13 @@ try {
         const state = await page.evaluate(() => window.__riddlex.state());
         if (state.mode === "learn") {
           trace.push("END: learn / defeat");
+          if (policy === "shakib") {
+            const info = await page.evaluate(() => ({
+              ...window.__riddlex.diagnose(),
+              shakibIndex: window.__riddlex.find("Q266104"),
+            }));
+            console.log("RIDDLEX_SHAKIB_UNCERTAINTY_DIAG " + JSON.stringify(info));
+          }
           if (policy === "actor_female_1990s") {
             assert.ok(seen.size >= 10, "Stopped before actor/decade investigation");
             // Exhausting sparse verified facts is preferable to guessing four

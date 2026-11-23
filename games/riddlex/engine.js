@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS } from "./career-facts.js?v=riddlex-48";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-50";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -141,6 +141,9 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
+  // Incomplete packed life tags cannot contradict authoritative dated records.
+  if ((id === "alive" || id === "dead") && SCREEN_LIFE_DETAILS[pool.ids[index]])
+    return SCREEN_LIFE_DETAILS[pool.ids[index]][id];
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   if (SCREEN_CAREER_DETAILS[id]) return SCREEN_CAREER_DETAILS[id][pool.ids[index]] || 0;
@@ -417,6 +420,13 @@ function topTwo(state) {
       "screen_bowler_cane", "screen_hitler_resemblance",
       "screen_great_dictator", "screen_comedy_award",
     ].includes(row.qid));
+  const checkedScreenFacts = state.answers.filter(row =>
+    ["yes","no"].includes(row.value) && SCREEN_CAREER_DETAILS[row.qid] &&
+    !["screen_role_lead","screen_role_villain","screen_role_comedy",
+      "screen_role_supporting","screen_silent_comedy",
+      "screen_physical_comedy","screen_short_moustache",
+      "screen_bowler_cane","screen_hitler_resemblance",
+      "screen_great_dictator","screen_comedy_award"].includes(row.qid));
   // Prioritize explicitly confirmed 1990-1999 film stars. When all such
   // names are rejected, widen to incomplete records instead of giving up.
   const confirmed1990s = knownFilmEraAnswers.find((row) =>
@@ -427,6 +437,14 @@ function topTwo(state) {
   const deniedFemale = state.answers.some((row) => row.qid === "female" && row.value === "no");
   const maleQi = state.pool.qIndex.get("male");
   const femaleQi = state.pool.qIndex.get("female");
+  const aliveQi = state.pool.qIndex.get("alive");
+  const deadQi = state.pool.qIndex.get("dead");
+  const confirmedAlive = state.answers.some(row =>
+    (row.qid === "alive" && row.value === "yes") ||
+    (row.qid === "dead" && row.value === "no"));
+  const confirmedDead = state.answers.some(row =>
+    (row.qid === "dead" && row.value === "yes") ||
+    (row.qid === "alive" && row.value === "no"));
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -445,10 +463,24 @@ function topTwo(state) {
     // guessing a famous lead when the player described a comic performer.
     if (verifiedRoleClues.some((row) =>
       factBit(state.pool, i, row.qi) !== 2)) continue;
+    // A specific verified film, death-year or public-history clue must be
+    // true for the person announced, not merely weighted as likely. A NO
+    // excludes only positively known YES facts, never unknown records.
+    if (checkedScreenFacts.some(row => {
+      const bit = factBit(state.pool, i, row.qi);
+      return row.value === "yes" ? bit !== 2 : bit === 2;
+    })) continue;
     // A definitive player-supplied decade must have an affirmative career
     // record. A missing date is not evidence that a celebrity was famous
     // in the 1990s; keep that person in the question pool, not the guesses.
     if (confirmed1990s && factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
+    // Explicit life/death answers are hard identity constraints; a player
+    // confirming someone is alive must never see the known deceased Salman
+    // Shah or Manna, regardless of their popularity.
+    if (confirmedAlive && ((deadQi != null && factBit(state.pool, i, deadQi) === 2) ||
+        (aliveQi != null && factBit(state.pool, i, aliveQi) === 1))) continue;
+    if (confirmedDead && ((aliveQi != null && factBit(state.pool, i, aliveQi) === 2) ||
+        (deadQi != null && factBit(state.pool, i, deadQi) === 1))) continue;
     if (maleQi != null && confirmedMale && factBit(state.pool, i, maleQi) !== 2) continue;
     if (femaleQi != null && confirmedFemale && factBit(state.pool, i, femaleQi) !== 2) continue;
     if (maleQi != null && deniedMale && factBit(state.pool, i, maleQi) === 2) continue;
@@ -518,21 +550,61 @@ function supportedIdentity(state) {
   });
 }
 
+// A high Bayesian score is not proof of identity: the player must have
+// affirmed independently verified distinguishing facts about the candidate.
+// Generic country, gender, life and fame priors do not count as evidence.
+function hasCandidateEvidence(state, index) {
+  if (index < 0) return false;
+  let positive = 0;
+  let distinctive = 0;
+  for (const row of state.answers) {
+    if (row.value !== "yes" || factBit(state.pool, index, row.qi) !== 2) continue;
+    const group = state.pool.questions[row.qi]?.group;
+    if (!["job", "politics", "fiction", "adult", "animal", "object", "look", "size"].includes(group) &&
+        !(group === "person" && row.qid.startsWith("screen_"))) continue;
+    positive++;
+    if (!PRIMARY_JOBS.includes(row.qid) && row.qid !== "athlete") distinctive++;
+  }
+  const actor = said(state, "actor", ["yes"]);
+  return actor ? positive >= 3 && distinctive >= 2
+    : positive >= 2 && distinctive >= 1;
+}
+
 export function shouldGuess(state) {
   const asked = state.answers.length;
   if (!supportedIdentity(state)) return false;
   // Never guess a publicly indexed character after only a few generic facts.
   if (state.category === "character" && state.pool.count >= 100 &&
-      !said(state, "knows_you", ["yes", "probably"]) && asked < 10) return false;
+      !said(state, "knows_you", ["yes", "probably"]) && asked < 8) return false;
   if (!state.alive.length) return false;
-  const { bestP, secondP } = topTwo(state);
-  if (!(bestP > 0)) return false;
+  const { best, bestP, secondP } = topTwo(state);
+  if (!(bestP > 0) || best < 0) return false;
   const ratio = oddsRatio(bestP, secondP);
   if (state.sinceGuess < questionsBeforeRetry(state, bestP, ratio)) return false;
-  if (asked >= 72) return true;
   const personal = state.answers.some((row) => row.qid === "knows_you" &&
     (row.value === "yes" || row.value === "probably"));
   if (personal && asked >= 4 && bestP >= 0.72 && ratio >= 4) return true;
+  // Public characters must be supported by multiple specific yes answers,
+  // including verified career/role details for actors. Never reveal a name
+  // simply because the database has few remaining candidates or a turn cap.
+  if (state.category === "character" && state.pool.count >= 100 && !personal) {
+    if (asked < 8 || !hasCandidateEvidence(state, best)) return false;
+    // Sparse records from thousands of unrelated people dilute the absolute
+    // posterior even when a candidate's independently verified identity
+    // clues match and its nearest plausible alternative is far behind.
+    // Require both adequate corroboration AND decisive relative separation.
+    // A publicly checked role or signature fact can be much stronger
+    // evidence than a raw percentage when most records are incomplete.
+    // Three independent, candidate-matching verified cinema facts and
+    // decisive separation justify identifying distinctive comedians such
+    // as Dildar, without opening the door to fame-only guesses.
+    const verifiedSpecific = state.answers.filter(row =>
+      row.value === "yes" && SCREEN_CAREER_DETAILS[row.qid] &&
+      factBit(state.pool, best, row.qi) === 2).length;
+    return (bestP >= 0.86 && ratio >= 9) ||
+      (bestP >= 0.25 && ratio >= 12) ||
+      (verifiedSpecific >= 3 && ratio >= 8);
+  }
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;
   // Shared facts such as country and job are not enough. Wait until one person stands clear.
@@ -994,6 +1066,8 @@ export const QUESTION_REQUIRES = {
     id, [
       { id: "actor", value: "yes", strict: true },
       ...([
+        "screen_known_multiple_marriages", "screen_debut_anonto_bhalobasha",
+        "screen_acted_bir_soinik", "screen_died_1996", "screen_died_2008",
         "screen_film_debut_pre1995", "screen_over_100_films",
         "screen_films_after_2000", "screen_national_film_award",
         "screen_air_force_before_films", "screen_first_film_keyamat",
@@ -1009,6 +1083,9 @@ export const QUESTION_REQUIRES = {
         "screen_short_moustache", "screen_bowler_cane",
         "screen_hitler_resemblance", "screen_great_dictator",
       ].includes(id) ? [{ id: "screen_silent_comedy", value: "yes", strict: true }] : []),
+      ...(["screen_died_1996","screen_died_2008"].includes(id) ? [
+        { id: "dead", value: "yes", strict: true },
+      ] : []),
       ...(id === "screen_hitler_resemblance" ? [
         { id: "screen_short_moustache", value: "yes", strict: true },
       ] : []),
@@ -1335,7 +1412,8 @@ export function rejectIndex(state, index) {
 export function decide(state) {
   recompute(state);
   if (!state.alive.length) return { type: "defeat" };
-  if (state.guesses >= 10 || state.answers.length >= 72) return { type: "defeat" };
+  // Neither 10 rejected names nor 72 answers establishes that the user lost.
+  // Continue asking every remaining relevant, non-duplicate question.
   const { best, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   // First determine their usual role (lead, antagonist or comic performer).
@@ -1364,21 +1442,19 @@ export function decide(state) {
     }
     return { type: "guess", index: best };
   }
+  // The ordinary entropy picker can run out while useful candidate-specific
+  // confirmations still exist. Try them before a broad, safe fallback.
+  // A missing question is NEVER permission to guess an unverified name.
   let qid = chooseQuestion(state);
-  // With sparse ordinary-person clues, continue questioning rather than
-  // surrendering at eight. Preserve confident well-supported guesses and
-  // keep the post-rejection gap used by the existing engine.
-  // Missing verified candidates in the currently loaded shard is not
-  // proof that an actor or other person is absent from the whole casebook.
-  // Ask remaining relevant questions rather than surrender immediately.
-  if (!qid && (!supportedIdentity(state) || best < 0))
-    qid = firstAllowedQuestion(state);
-  if (!qid) {
-    if (best >= 0 && bestP > 0 && supportedIdentity(state))
-      return { type: "guess", index: best };
-    return { type: "defeat" };
-  }
-  return { type: "ask", qid };
+  // Preserve the original tiny-casebook behavior used by the self-contained
+  // demo and simulation fixtures. Guess when the informative question picker
+  // is exhausted so a later rejection still has unused clarifying questions.
+  // The actual public character casebook initially loads over 19k records
+  // and NEVER takes this shortcut.
+  if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
+      supportedIdentity(state)) return { type: "guess", index: best };
+  qid ||= chooseConfirmationQuestion(state, best) || firstAllowedQuestion(state);
+  return qid ? { type: "ask", qid } : { type: "defeat" };
 }
 
 export function canPrint(pool, index) {

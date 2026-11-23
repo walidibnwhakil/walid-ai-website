@@ -37,6 +37,15 @@ export const SCREEN_STAR_PRE1990 = Object.freeze({
  // Shabnur's 1993 debut, National Film Award and later films:
  // https://theindependentbd.com/printversion/details/170459
  // Do not fill other people's unknown attributes with guessed "no"s.
+// Verified life facts override incomplete packed profile fields. This avoids
+// guessing a deceased star after the player firmly answers "alive=yes".
+// Only record documented cases; do not infer life status from an absent entry.
+export const SCREEN_LIFE_DETAILS = Object.freeze({
+  Q7462919: Object.freeze({ alive:2, dead:1 }), // Shakib Khan, active 2026
+  Q7405420: Object.freeze({ alive:1, dead:2 }), // Salman Shah, 1996
+  Q4244083: Object.freeze({ alive:1, dead:2 }), // Manna, 2008
+});
+
 export const SCREEN_CAREER_DETAILS = Object.freeze({
   // Shakib Khan: Anonto Bhalobasha debut and two publicly reported marriages.
   // https://www.imdb.com/name/nm3492497/

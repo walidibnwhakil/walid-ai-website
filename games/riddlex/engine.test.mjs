@@ -260,6 +260,46 @@ test("a confirmed male and 1990s star cannot nominate a woman or an unverified-e
   }
 });
 
+test("a large public casebook never guesses from generic facts or a fame prior", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const crowd = [
+    entry("Q7322180", 65000, ["real", "named", "male", "actor", "from_bd"]),
+    ...Array.from({ length: 120 }, (_, i) =>
+      entry("unverified-" + i, 2, ["real", "named", "male", "actor", "from_bd"])),
+  ];
+  const state = createState(poolFromEntries(qs, crowd), { category:"character" });
+  recompute(state);
+  for (const [qid, value] of [
+    ["real","yes"],["male","yes"],["from_bd","yes"],["actor","yes"],
+    ["screen_role_lead","unknown"],["screen_role_comedy","unknown"],
+    ["screen_star_pre1990","no"],["screen_star_1990s","yes"],
+  ]) answer(state, qid, value);
+  assert.equal(shouldGuess(state), false,
+    "Occupation, gender, country, era and a famous prior do not prove one identity");
+  assert.notEqual(decide(state).type, "guess",
+    "Riddlex must ask about the possible person before announcing their name");
+});
+
+test("questioning does not terminate at 72 answers or ten rejected names", () => {
+  const extra = Array.from({ length: 80 }, (_, i) => ({
+    id: "extra_object_fact_" + i, group:"object",
+    en: "Extra object fact " + i, bn: "বস্তুর আরও তথ্য " + i,
+  }));
+  const pool = poolFromEntries([...questions, ...extra], [
+    entry("cooker", 400, ["object","kitchen","cooking","metal","uses_pressure"]),
+    entry("pot", 200, ["object","kitchen","cooking","metal"]),
+  ]);
+  const state = createState(pool, {category:"object"});
+  recompute(state);
+  for (let i=0;i<73;i++) answer(state, "extra_object_fact_" + i, "unknown");
+  state.guesses = 10;
+  state.sinceGuess = 0;
+  const next = decide(state);
+  assert.equal(next.type, "ask", JSON.stringify(next));
+  assert.ok(!state.answers.some(row => row.qid === next.qid),
+    "A follow-up must not repeat a previously asked question");
+});
+
 test("Bangladesh is asked within the first five character questions", () => {
   const state = createState(world, { category: "character", opening: "real" });
   recompute(state);

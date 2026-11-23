@@ -156,12 +156,20 @@ try {
    if(outcome==="incomplete")error="72-turn audit limit";
   } catch(e) {outcome="browser-error";error=String(e?.stack||e).slice(0,1000);}
   const diagnostic=await page.evaluate(()=>window.__riddlex?.diagnose?.()||null).catch(()=>null);
+  const ids={ "Aijek Newton":["Q935"],"Jensen Huang":["Q305177"],
+    "Elon Musk":["Q317521"],"Mr Bean":["riddlex-topic-mr-bean"],
+    "Mizanur Rahman Azhari":["Q84597994"],
+    "Delowar Hossain Saidi":["Q5254959"] }[person.name]||[];
+  const candidateEvidence=await page.evaluate(
+    keys=>keys.flatMap(k=>window.__riddlex?.candidate?.(k)||[]),
+    ids).catch(()=>[]);
   const row={name:person.name,category:person.category,canonical:person.canonical||person.name,
     status:outcome,questions:trace.length,
     unknowns:trace.filter(t=>t.answer==="unknown").length,
     difficult:trace.filter(t=>t.level==="বিশেষ তথ্য").length,
     wrongGuesses:wrong,finalGuess,trace,error,
-    diagnostic:diagnostic&&{count:diagnostic.count,alive:diagnostic.alive,loadedCount:diagnostic.loadedCount,best:diagnostic.best}};
+    diagnostic:diagnostic&&{count:diagnostic.count,alive:diagnostic.alive,loadedCount:diagnostic.loadedCount,best:diagnostic.best},
+    candidateEvidence};
   results.push(row);
   console.log("RIDDLEX_16_CASE "+JSON.stringify(row));
   await page.close().catch(()=>{});

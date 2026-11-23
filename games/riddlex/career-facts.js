@@ -140,8 +140,13 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
     Q7405420: 1, Q7322180: 2, Q7460127: 2, Q4244083: 2, Q7462919: 2,
     Q21066842: 2, Q15848298: 2, Q15868587: 2, Q5279795: 2, Q5939749: 2,
   }),
+  // Source-verified film awards. An absent attribute for a prominent
+  // actress must not be treated as proof that she never received an award.
+  // Banglapedia (Women): https://en.banglapedia.org/index.php?title=Women
+  // bdnews24 (2017): https://bdnews24.com/bangladesh/sheikh-hasina-assures-film-industry-of-support-for-development
   screen_national_film_award: Object.freeze({
     Q7322180: 2, Q7460127: 2, Q4244083: 2, Q7462919: 2,
+    Q7460022: 2, // Shabana, multiple Bangladesh National Film Awards
   }),
   screen_air_force_before_films: Object.freeze({
     Q7322180: 2,

@@ -191,10 +191,10 @@ test("Riddlex the detective is itself a guessable fictional character", () => {
 });
 
 test("generic roles contain no private person's name or identifying details", () => {
-  assert.equal(PERSONAL_RELATIONS.length, 13);
+  assert.equal(PERSONAL_RELATIONS.length, 14);
   for (const role of PERSONAL_RELATIONS) {
     assert.ok(role.id.startsWith("riddlex-role-"));
-    assert.ok(role.en.startsWith("Your "));
+    assert.ok(role.en.startsWith("Your ") || role.en==="Yourself");
     assert.ok(!role.image && !role.credit);
     assert.ok(PERSONAL_FACTS[role.id]);
   }
@@ -259,6 +259,6 @@ test("crush is not among supported relationship questions or guesses", () => {
   const pool = casebook();
   assert.equal(pool.qIndex.has("your_crush"), false);
   assert.equal(pool.ids.some((id) => id.includes("crush")), false);
-  assert.equal(PERSONAL_QUESTIONS.length, 11);
-  assert.equal(PERSONAL_RELATIONS.length, 13);
+  assert.equal(PERSONAL_QUESTIONS.length, 12);
+  assert.equal(PERSONAL_RELATIONS.length, 14);
 });

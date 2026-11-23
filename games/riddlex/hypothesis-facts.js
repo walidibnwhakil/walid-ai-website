@@ -17,6 +17,26 @@ export const EXTRA_HYPOTHESIS_QUESTIONS = Object.freeze([
   { id: "obj_uses_electricity", group: "object",
     en: "Does it normally run on electricity?",
     bn: "এটি কি সাধারণত বিদ্যুতে চলে?" },
+  // General, observable functions. These discriminate ordinary tools and
+  // devices, rather than memorising any named answer.
+  { id:"obj_writes_paper", group:"object",
+    en:"Is it used to write or draw on paper?",
+    bn:"এটি কি কাগজে লেখা বা আঁকার কাজে ব্যবহার হয়?" },
+  { id:"obj_uses_ink", group:"object",
+    en:"Does it use ink to write?",
+    bn:"এটি কি কালি দিয়ে লেখে?" },
+  { id:"obj_uses_graphite", group:"object",
+    en:"Does it write using a graphite core?",
+    bn:"এটি কি গ্রাফাইটের শিস দিয়ে লেখে?" },
+  { id:"obj_broad_marker_tip", group:"object",
+    en:"Does it usually have a broad felt tip for marking or highlighting?",
+    bn:"এটির কি সাধারণত দাগ বা হাইলাইট করার জন্য মোটা ফেল্ট টিপ থাকে?" },
+  { id:"obj_makes_calls", group:"object",
+    en:"Can it make a telephone call?",
+    bn:"এটি দিয়ে কি ফোনকল করা যায়?" },
+  { id:"obj_touchscreen", group:"object",
+    en:"Does it normally have a touch-sensitive screen?",
+    bn:"এটির কি সাধারণত স্পর্শ-সংবেদনশীল স্ক্রিন আছে?" },
   { id: "animal_visits_flowers", group: "animal",
     en: "Does it often visit flowers to feed on nectar?",
     bn: "মধুরস খেতে কি এটি প্রায়ই ফুলে ফুলে ঘোরে?" },
@@ -52,6 +72,24 @@ export const HYPOTHESIS_FACTS = Object.freeze({
     "c-fan": 2, "c-ceiling-fan": 2, "c-air-conditioner": 2,
     "c-fridge": 2, "c-phone": 2, "c-tv": 2, "c-rice-cooker": 2,
   }),
+  obj_writes_paper: Object.freeze({
+    "c-pen":2, "c-pencil":2, "c-marker":2, "c-phone":1,
+  }),
+  obj_uses_ink: Object.freeze({
+    "c-pen":2, "c-marker":2, "c-pencil":1,
+  }),
+  obj_uses_graphite: Object.freeze({
+    "c-pencil":2, "c-pen":1, "c-marker":1,
+  }),
+  obj_broad_marker_tip: Object.freeze({
+    "c-marker":2, "c-pen":1, "c-pencil":1,
+  }),
+  obj_makes_calls: Object.freeze({
+    "c-phone":2, "c-pen":1, "c-pencil":1, "c-marker":1,
+  }),
+  obj_touchscreen: Object.freeze({
+    "c-phone":2, "c-pen":1, "c-pencil":1, "c-marker":1,
+  }),
   // Nectar is SHARED by butterflies and honeybees, not an identity proof.
   // https://pollinators.wisc.edu/bee-identification/non-bee-pollinators/
   // https://www.amnh.org/exhibitions/butterflies/butterfly-behavior
@@ -82,6 +120,20 @@ export const HYPOTHESIS_FACTS = Object.freeze({
 // Their common attributes are also recorded for ordinary question selection.
 export const EXTRA_HYPOTHESIS_ENTRIES = Object.freeze({
   object: Object.freeze([
+    // Ordinary writing tools belong in the general object vocabulary, with
+    // nearby alternatives so a single broad "tool" YES never proves pen.
+    { id:"c-pen",en:"Pen",bn:"কলম",pop:175,
+      yes:["object","tool","handheld","pocket","daily_use"],
+      no:["real","fictional","animal","named","electronic","vehicle","clothing",
+        "food","furniture","kitchen","cooking","uses_pressure","music_item","sport_item"] },
+    { id:"c-pencil",en:"Pencil",bn:"পেনসিল",pop:155,
+      yes:["object","tool","handheld","pocket","daily_use"],
+      no:["real","fictional","animal","named","electronic","vehicle","clothing",
+        "food","furniture","kitchen","cooking","uses_pressure","music_item","sport_item"] },
+    { id:"c-marker",en:"Marker pen",bn:"মার্কার",pop:125,
+      yes:["object","tool","handheld","pocket","daily_use"],
+      no:["real","fictional","animal","named","electronic","vehicle","clothing",
+        "food","furniture","kitchen","cooking","uses_pressure","music_item","sport_item"] },
     // Plants/flowers are accessible through the existing "Object" choice
     // without changing the user-approved menu artwork or category layout.
     { id:"c-kathgolap", en:"Kathgolap (Frangipani)", bn:"কাঠগোলাপ",

@@ -13,7 +13,7 @@
 // https://en.wikipedia.org/wiki/Mr._Bean_(character)
 // Missing public attributes stay UNKNOWN. Never invent "no" by omission.
 export const DOMAIN_QUESTIONS = Object.freeze([
- {id:"topic_islamic_speaker",parent:"real",group:"job",
+ {id:"topic_islamic_speaker",parent:"from_bd",group:"job",
   en:"Is this person known for delivering Islamic religious lectures?",
   bn:"এই ব্যক্তি কি ইসলাম বিষয়ে বক্তৃতা বা ওয়াজ করার জন্য পরিচিত?"},
  {id:"topic_online_lectures",parent:"topic_islamic_speaker",group:"job",
@@ -55,7 +55,7 @@ export const DOMAIN_QUESTIONS = Object.freeze([
  {id:"topic_space_rockets",parent:"topic_technology_business",group:"job",
   en:"Are they also associated with a company building launch rockets?",
   bn:"তিনি কি মহাকাশে উৎক্ষেপণের রকেট নির্মাতা প্রতিষ্ঠানের সঙ্গেও যুক্ত?"},
- {id:"topic_tv_comedy_fiction",parent:"fictional",group:"fiction",
+ {id:"topic_tv_comedy_fiction",parent:"from_cartoon",group:"fiction",
   en:"Is this a fictional character primarily known from television comedy?",
   bn:"এই কাল্পনিক চরিত্র কি মূলত টেলিভিশনের হাস্যরসাত্মক অনুষ্ঠানের জন্য পরিচিত?"},
  {id:"topic_visual_comedy",parent:"topic_tv_comedy_fiction",group:"fiction",

@@ -84,7 +84,7 @@ const people=[
  human("Monica Belucci","Monica Bellucci, Italian actress",["Monica Bellucci","Monica Belucci","মনিকা বেলুচ্চি"],"female","from_it","alive",
   ["actor","screen_role_lead","screen_star_1990s","screen_films_after_2000","born_1960_1969"],
   ["politician","cricketer","footballer","scientist","screen_indian_bengali","screen_telugu_cinema"]),
- {name:"Murgi",canonical:"Domestic hen / chicken",category:"animal",matches:["Chicken","Hen","Domestic chicken","মুরগি","মুরগী"],animal:true,sex:"female",
+ {name:"Murgi",canonical:"Domestic hen / chicken",category:"animal",matches:["Chicken","Chicken (hen)","Hen","Domestic hen","Domestic chicken","মুরগি","মুরগী"],animal:true,sex:"female",
   yes:["animal","bird","farm"],no:["real","fictional","object","named","mammal","fish","reptile","insect","wild","water_life","is_dog","is_cat","is_mouse","animal_makes_honey","animal_pollen_baskets","animal_visits_flowers"],
   maybeNo:["can_fly"],maybe:["pet"]},
  human("Newazuddin Siddique","Nawazuddin Siddiqui, Indian actor",["Nawazuddin Siddiqui","Nawazuddin Siddique","নওয়াজউদ্দিন সিদ্দিকী"],"male","from_in","alive",

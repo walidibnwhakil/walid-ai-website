@@ -1087,8 +1087,12 @@ function unrelatedJob(state, id) {
   // can publish videos. Don't permanently suppress a second profession
   // merely because it is uncommon in the global popularity distribution.
   // Require real source-backed overlap, never an invented universal yes.
+  const multiCareer = (job==="politician" &&
+      ["actor","cricketer"].includes(id)) ||
+    (["actor","cricketer"].includes(job) && id==="politician") ||
+    (job==="writer" && id==="youtube");
   if (state.category === "character" && state.pool.count >= 100 &&
-      PRIMARY_JOBS.includes(id)) {
+      multiCareer && PRIMARY_JOBS.includes(id)) {
     const firstQi = state.pool.qIndex.get(job);
     const nextQi = state.pool.qIndex.get(id);
     if (firstQi != null && nextQi != null && state.alive.some(i =>

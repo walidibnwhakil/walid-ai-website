@@ -1415,7 +1415,8 @@ function allowedInCategory(state, question) {
 // least one surviving candidate. In particular, after Shakib Khan is rejected,
 // his marriage clue is not evidence about the other actors by default.
 function hasUnrejectedFilmCandidate(state, qid) {
-  const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid];
+  const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
+    BROAD_FACTS[qid];
   if (!facts) return true;
   return state.alive.some(i =>
     state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
@@ -2365,6 +2366,96 @@ function domainDiscoveryQuestion(state) {
   return null;
 }
 
+// Shared generalisation: ask what somebody DOES before trivia about named
+// works. Decisions depend only on confirmed player answers and cited feature
+// tables; never on a hard-coded intended identity.
+function broadDiscoveryQuestion(state) {
+  if (state.answers.length < 5) return null;
+  const yes=id=>said(state,id,["yes","probably"]);
+  const no=id=>said(state,id,["no","probably_not"]);
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const plan=[];
+  if (state.category==="object") {
+    if (yes("daily_use") || yes("handheld") || yes("pocket") ||
+        no("electronic")) {
+      plan.push("obj_timekeeping");
+      if(yes("obj_timekeeping"))
+        plan.push("obj_worn_wrist","obj_hangs_wall","obj_sets_alarm","obj_times_events");
+    }
+  }
+  if (state.category==="character") {
+    if (yes("real") && yes("from_in") && yes("actor")) {
+      plan.push("screen_indian_bengali","screen_hindi_cinema",
+        "screen_telugu_cinema","screen_kannada_cinema","screen_web_series");
+      if (yes("screen_indian_bengali"))
+        plan.push("film_nater_guru","film_bojhena","film_mitin_mashi");
+      if (yes("screen_hindi_cinema"))
+        plan.push("film_padmaavat_actor","film_crook","film_welcome");
+      if (yes("screen_telugu_cinema"))
+        plan.push("film_baahubali");
+      if (yes("screen_kannada_cinema"))
+        plan.push("film_kgf");
+      if (yes("screen_web_series"))
+        plan.push("film_aashram");
+    } else if (yes("real") && yes("from_bd") && yes("actor")) {
+      plan.push("screen_bangladesh_bengali");
+      if (yes("screen_bangladesh_bengali"))
+        plan.push("film_humayun_dramas","film_mujib","film_villain_dialogues");
+    } else if (yes("real") && yes("from_in") && no("actor") &&
+               !yes("cricketer") && !yes("footballer") &&
+               !yes("politician") && state.answers.length>=10) {
+      plan.push("film_director_work");
+      if (yes("film_director_work"))
+        plan.push("film_devdas_director","film_padmaavat_director");
+    }
+    if (yes("real") && yes("from_in") && yes("cricketer")) {
+      plan.push("cricket_indian_batsman");
+      if (yes("cricket_indian_batsman"))
+        plan.push("cricket_100_centuries","cricket_odis_2026");
+    }
+    if (yes("real") && yes("from_in") && yes("business")) {
+      plan.push("business_reliance");
+      if (yes("business_reliance")) plan.push("business_jio");
+    }
+    if (yes("real") && yes("from_bd") && yes("youtube")) {
+      plan.push("creator_food_vlogs");
+      if(yes("creator_food_vlogs")) plan.push("creator_online_entertainment");
+    }
+    if (yes("fictional") && !yes("from_novel")) {
+      if (yes("from_cartoon") || yes("from_film"))
+        plan.push("fiction_magic_lamp");
+      if (yes("fiction_magic_lamp")) plan.push("fiction_genie");
+      if (no("from_cartoon") || no("fiction_magic_lamp")) {
+        plan.push("fiction_tv_fantasy");
+        if(yes("fiction_tv_fantasy"))plan.push("fiction_seven_riddles");
+      }
+    }
+  }
+  if (!plan.length) return null;
+  // An ordinary player may not know every obscure film. After a couple of
+  // unknown answers in the same lane, move to a different type of question.
+  const filmUnknown=state.answers.filter(row=>row.value==="unknown" &&
+    BROAD_QUESTIONS.some(q=>q.id===row.qid && q.id.startsWith("film_"))).length;
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const id of plan) {
+    if(asked.has(id))continue;
+    if(filmUnknown>=2 && id.startsWith("film_") &&
+       id!=="film_director_work")continue;
+    const qi=state.pool.qIndex.get(id);
+    if(qi==null)continue;
+    const q=state.pool.questions[qi];
+    if(!allowedInCategory(state,q) ||
+       blockedQuestion(state,q,rows,cache) ||
+       !gated(state,q,rows))continue;
+    const facts=BROAD_FACTS[id]||{};
+    if(!state.alive.some(i=>state.weights[i]>0 &&
+       facts[state.pool.ids[i]]===2))continue;
+    return id;
+  }
+  return null;
+}
+
 function confirmedPersonalRole(state) {
   if (state.category !== "character" ||
       !said(state, "real", ["yes", "probably"]) ||
@@ -2416,6 +2507,10 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  // Broad career/physical-purpose questions have higher player value than
+  // obscure title trivia, popularity priors and unrelated generic followups.
+  const broad=broadDiscoveryQuestion(state);
+  if(broad) return {type:"ask",qid:broad};
   const domain = domainDiscoveryQuestion(state);
   if(domain) return {type:"ask",qid:domain};
   if(corroboratedFilmHypothesis(state,best,bestP,secondP))

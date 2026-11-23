@@ -2136,6 +2136,61 @@ function evidenceBackedObjectCandidate(state) {
   return options[0].i;
 }
 
+// When all meaningful questions are exhausted, a well-supported public
+// hypothesis may be tried instead of an automatic loss. This is not a
+// guess-by-popularity rule: the *proposed candidate* must have affirmed
+// source-backed traits, no contradiction, and separation from alternatives.
+// A wrong hypothesis is explicitly rejectable and the engine keeps learning.
+function lateSupportedPublicGuess(state,best,bestP,secondP) {
+  if(state.category!=="character" || best<0 ||
+     state.answers.length<16 ||
+     state.guesses>=3 ||
+     state.sinceGuess<questionsBeforeRetry(state) ||
+     !said(state,"real",["yes","probably"]) ||
+     said(state,"knows_you",["yes","probably"])) return false;
+  const pool=state.pool;
+  const affirm=state.answers.filter(x=>x.value==="yes");
+  if(affirm.some(row=> {
+    const q=pool.questions[row.qi];
+    if(q?.group==="politics" && row.qid.startsWith("party_"))
+      return factBit(pool,best,row.qi)!==2;
+    return false;
+  }))return false;
+  if(state.answers.some(row=>{
+    if(!["yes","no"].includes(row.value))return false;
+    const bit=factBit(pool,best,row.qi);
+    return (row.value==="yes" && bit===1) ||
+      (row.value==="no" && bit===2);
+  })) return false;
+  const careers=affirm.filter(row=>{
+    const group=pool.questions[row.qi]?.group;
+    return ["job","adult"].includes(group) &&
+      factBit(pool,best,row.qi)===2 &&
+      PRIMARY_JOBS.includes(row.qid);
+  });
+  const cinema=affirm.filter(row=>
+    (row.qid==="screen_star_pre1990" ||
+     row.qid==="screen_star_1990s" ||
+     row.qid==="screen_national_film_award" ||
+     (SCREEN_CAREER_DETAILS[row.qid] && row.qid!=="screen_role_lead")) &&
+    factBit(pool,best,row.qi)===2);
+  // Multiple date/career facts can identify an older film performer even
+  // when a globally famous later actor still carries a large sparse prior.
+  const actor=affirm.some(x=>x.qid==="actor");
+  if(actor && cinema.length>=2 && careers.length>=1 &&
+     bestP>=.17 && oddsRatio(bestP,secondP)>=2)
+    return true;
+  // After 18+ honest answers, two confirmed separate occupations plus
+  // a confirmed country justify a *reversible* hypothesis when the leading
+  // candidate holds a substantial probability. This handles crossover
+  // careers without forcing a single job to describe someone's identity.
+  if(state.answers.length>=18 && careers.length>=2 && bestP>=.50 &&
+     oddsRatio(bestP,secondP)>=1.05 &&
+     COUNTRIES.some(id=>affirm.some(row=>row.qid===id &&
+       factBit(pool,best,row.qi)===2)))return true;
+  return false;
+}
+
 function confirmedPersonalRole(state) {
   if (state.category !== "character" ||
       !said(state, "real", ["yes", "probably"]) ||
@@ -2262,7 +2317,8 @@ export function decide(state) {
     chooseConfirmationQuestion(state, focus) ||
     actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
   if (qid) return { type: "ask", qid };
-  if (lateVerifiedFictionGuess(state,best,bestP,secondP))
+  if (lateVerifiedFictionGuess(state,best,bestP,secondP) ||
+      lateSupportedPublicGuess(state,best,bestP,secondP))
     return { type:"guess", index:best };
   return { type:"defeat" };
 }

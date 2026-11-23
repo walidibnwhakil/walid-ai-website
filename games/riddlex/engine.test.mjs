@@ -447,7 +447,7 @@ test("a large public casebook never guesses from generic facts or a fame prior",
     "Riddlex must ask about the possible person before announcing their name");
 });
 
-test("questioning does not terminate at 72 answers or ten rejected names", () => {
+test("a stalled round stops instead of asking dozens of irrelevant questions", () => {
   const extra = Array.from({ length: 80 }, (_, i) => ({
     id: "extra_object_fact_" + i, group:"object",
     en: "Extra object fact " + i, bn: "বস্তুর আরও তথ্য " + i,
@@ -462,9 +462,7 @@ test("questioning does not terminate at 72 answers or ten rejected names", () =>
   state.guesses = 10;
   state.sinceGuess = 0;
   const next = decide(state);
-  assert.equal(next.type, "ask", JSON.stringify(next));
-  assert.ok(!state.answers.some(row => row.qid === next.qid),
-    "A follow-up must not repeat a previously asked question");
+  assert.equal(next.type, "defeat", JSON.stringify(next));
 });
 
 test("a living film actor cannot be replaced with known deceased film icons", () => {

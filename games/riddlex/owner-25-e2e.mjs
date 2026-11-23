@@ -11,12 +11,13 @@ import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-55";
 import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-55";
 import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
+import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 
 const root = new URL("../../", import.meta.url);
 const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.meta.url),"utf8"));
 const questionInfo = new Map([...manifest.questions, ...EXTRA_SCREEN_QUESTIONS,
   ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS,
-  ...PERSONAL_QUESTIONS].map(q => [q.id,q]));
+  ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS].map(q => [q.id,q]));
 const mime={".html":"text/html",".css":"text/css",".js":"text/javascript",
   ".mjs":"text/javascript",".json":"application/json",".bin":"application/octet-stream",
   ".webp":"image/webp",".jpg":"image/jpeg",".png":"image/png",
@@ -292,6 +293,20 @@ try {
    game:"actual PR-head Riddlex browser game",answerMode:"independent cautious public facts; unverified questions=unknown",
    counts,results},null,2));
  console.log("RIDDLEX_25_ARTIFACT "+out);
+ // Green workflow checks must mean the actual gameplay passed. This target
+ // has no independently validated public identity; report its loss honestly,
+ // but don't silently count it among source-verified gameplay successes.
+ const unverifiedNames=new Set(["Minami Ozawa"]);
+ const failures=results.filter(row=>
+   !unverifiedNames.has(row.name) && row.status!=="correct");
+ if(failures.length) {
+   console.error("RIDDLEX_25_VERIFIED_FAILURES "+JSON.stringify(
+     failures.map(({name,status,questions,error})=>({name,status,questions,error}))));
+   process.exitCode=1;
+ } else {
+   console.log("RIDDLEX_25_VERIFIED_SUCCESS "+(people.length-unverifiedNames.size)+
+     " source-verified identities; unverified target recorded, not disguised");
+ }
 } finally {
  await browser?.close();
  await new Promise(resolve=>server.close(resolve));

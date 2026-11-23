@@ -2430,7 +2430,7 @@ function broadDiscoveryQuestion(state) {
         else plan.push("film_mujib","film_villain_dialogues","film_humayun_dramas");
       }
     } else if (yes("real") && yes("from_in") && no("actor") &&
-               !yes("cricketer") && !yes("footballer") &&
+               no("cricketer") && no("footballer") &&
                !yes("politician") && state.answers.length>=10) {
       plan.push("film_director_work");
       if (yes("film_director_work"))

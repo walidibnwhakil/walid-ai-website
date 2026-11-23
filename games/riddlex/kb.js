@@ -1,10 +1,10 @@
 // Compact little-endian knowledge shards. Names stay in one blob so the
 // first question can render before every shard has finished parsing.
 
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-54";
-import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-54";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-55";
+import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-55";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
-import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-54";
+import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported

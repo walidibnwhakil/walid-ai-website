@@ -1,8 +1,9 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-51";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-52";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-51";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-52";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js";
+import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-52";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
 
@@ -240,6 +241,15 @@ async function loadNamed(entries, token, begin) {
       const roles = poolFromEntries(manifest.questions, [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER]);
       adoptPool(appendShard(partial, roles));
       loadEvent("roles.appended", pool?.count);
+    } else if ((category === "animal" || category === "object") &&
+        !partial._hypothesisExtraLoaded) {
+      const originals = EXTRA_HYPOTHESIS_ENTRIES[category] || [];
+      // Add only new identities; keep the existing packed casebook intact.
+      const extra = originals.filter(item => !partial.ids.includes(item.id));
+      if (extra.length) {
+        adoptPool(appendShard(partial, poolFromEntries(manifest.questions, extra)));
+      } else adoptPool(partial);
+      partial._hypothesisExtraLoaded = true;
     } else {
       adoptPool(partial);
     }

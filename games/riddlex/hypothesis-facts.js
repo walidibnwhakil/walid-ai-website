@@ -28,6 +28,9 @@ export const EXTRA_HYPOTHESIS_QUESTIONS = Object.freeze([
   { id:"obj_uses_graphite", group:"object",
     en:"Does it write using a graphite core?",
     bn:"এটি কি গ্রাফাইটের শিস দিয়ে লেখে?" },
+  { id:"obj_broad_marker_tip", group:"object",
+    en:"Does it usually have a broad felt tip for marking or highlighting?",
+    bn:"এটির কি সাধারণত দাগ বা হাইলাইট করার জন্য মোটা ফেল্ট টিপ থাকে?" },
   { id:"obj_makes_calls", group:"object",
     en:"Can it make a telephone call?",
     bn:"এটি দিয়ে কি ফোনকল করা যায়?" },
@@ -77,6 +80,9 @@ export const HYPOTHESIS_FACTS = Object.freeze({
   }),
   obj_uses_graphite: Object.freeze({
     "c-pencil":2, "c-pen":1, "c-marker":1,
+  }),
+  obj_broad_marker_tip: Object.freeze({
+    "c-marker":2, "c-pen":1, "c-pencil":1,
   }),
   obj_makes_calls: Object.freeze({
     "c-phone":2, "c-pen":1, "c-pencil":1, "c-marker":1,

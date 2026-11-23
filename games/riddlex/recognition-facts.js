@@ -5,175 +5,175 @@
 export const RECOGNITION_QUESTIONS=Object.freeze([
   {
     "id": "profile_film_titanic",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this performer have a major role in the 1997 film Titanic?",
     "bn": "এই শিল্পী কি ১৯৯৭ সালের টাইটানিক চলচ্চিত্রে গুরুত্বপূর্ণ চরিত্রে ছিলেন?"
   },
   {
     "id": "profile_film_oscar_lead",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Has this performer won an Academy Award for acting in a leading role?",
     "bn": "এই শিল্পী কি প্রধান চরিত্রে অভিনয়ের জন্য অস্কার পেয়েছেন?"
   },
   {
     "id": "profile_film_malena",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this actress star in the Italian film Malèna?",
     "bn": "এই অভিনেত্রী কি ইতালীয় চলচ্চিত্র মালেনায় অভিনয় করেছেন?"
   },
   {
     "id": "profile_film_spectre",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this performer appear in the James Bond film Spectre?",
     "bn": "এই শিল্পী কি জেমস বন্ডের স্পেক্ট্র চলচ্চিত্রে অভিনয় করেছেন?"
   },
   {
     "id": "profile_film_sacred_games",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this performer appear in the streaming series Sacred Games?",
     "bn": "এই শিল্পী কি সেক্রেড গেমস ওয়েব সিরিজে অভিনয় করেছেন?"
   },
   {
     "id": "profile_film_gangs_wasseypur",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this performer feature prominently in Gangs of Wasseypur?",
     "bn": "এই শিল্পী কি গ্যাংস অব ওয়াসেপুর চলচ্চিত্রে গুরুত্বপূর্ণ চরিত্রে ছিলেন?"
   },
   {
     "id": "profile_film_south_india",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Is the person known for Tamil, Telugu or Malayalam films?",
     "bn": "তিনি কি তামিল, তেলুগু বা মালয়ালম চলচ্চিত্রে পরিচিত?"
   },
   {
     "id": "profile_film_mahanati",
-    "group": "screen",
+    "group": "job",
     "parent": "profile_film_south_india",
     "en": "Did this actress portray the title character in Mahanati?",
     "bn": "এই অভিনেত্রী কি মহানটি চলচ্চিত্রে মূল চরিত্রে অভিনয় করেছেন?"
   },
   {
     "id": "profile_film_national_award",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Has this performer won India's National Film Award for acting?",
     "bn": "এই শিল্পী কি অভিনয়ের জন্য ভারতের জাতীয় চলচ্চিত্র পুরস্কার পেয়েছেন?"
   },
   {
     "id": "profile_film_aashram",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this performer act in the Hindi web series Aashram?",
     "bn": "এই শিল্পী কি আশ্রম ওয়েব সিরিজে অভিনয় করেছেন?"
   },
   {
     "id": "profile_film_animal_2023",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this male actor play an antagonist in the 2023 film Animal?",
     "bn": "এই পুরুষ অভিনেতা কি ২০২৩ সালের অ্যানিম্যাল চলচ্চিত্রে প্রতিপক্ষ চরিত্রে ছিলেন?"
   },
   {
     "id": "profile_film_quantico",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this actress star in the American television series Quantico?",
     "bn": "এই অভিনেত্রী কি মার্কিন টিভি সিরিজ কোয়ান্টিকোতে প্রধান চরিত্রে ছিলেন?"
   },
   {
     "id": "profile_film_miss_world",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this actress win the Miss World title in 2000?",
     "bn": "এই অভিনেত্রী কি ২০০০ সালে মিস ওয়ার্ল্ড হয়েছিলেন?"
   },
   {
     "id": "profile_film_indian_tv",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Is the performer especially known for leading Indian television serials?",
     "bn": "এই শিল্পী কি ভারতীয় টিভি ধারাবাহিকে প্রধান চরিত্রের জন্য পরিচিত?"
   },
   {
     "id": "profile_film_hatim_role",
-    "group": "screen",
+    "group": "job",
     "parent": "profile_film_indian_tv",
     "en": "Did this actor play Hatim in the 2003 Indian fantasy television series?",
     "bn": "এই অভিনেতা কি ২০০৩ সালের ভারতীয় ফ্যান্টাসি ধারাবাহিকে হাতিম চরিত্রে অভিনয় করেছেন?"
   },
   {
     "id": "profile_sports_wrestling",
-    "group": "sports",
+    "group": "job",
     "parent": "real",
     "en": "Is this person a professional wrestler, rather than a footballer or cricketer?",
     "bn": "তিনি কি ফুটবলার বা ক্রিকেটার নন, পেশাদার কুস্তিগির?"
   },
   {
     "id": "profile_sports_wwe",
-    "group": "sports",
+    "group": "job",
     "parent": "profile_sports_wrestling",
     "en": "Is this wrestler strongly associated with WWE?",
     "bn": "এই কুস্তিগির কি WWE-এর সঙ্গে বিশেষভাবে পরিচিত?"
   },
   {
     "id": "profile_sports_record_champion",
-    "group": "sports",
+    "group": "job",
     "parent": "profile_sports_wwe",
     "en": "Has this wrestler won WWE world championship titles more than ten times?",
     "bn": "এই কুস্তিগির কি WWE-তে দশবারের বেশি বিশ্ব চ্যাম্পিয়ন হয়েছেন?"
   },
   {
     "id": "profile_sports_peacemaker",
-    "group": "screen",
+    "group": "job",
     "parent": "actor",
     "en": "Did this performer play Peacemaker in DC's films or television series?",
     "bn": "এই শিল্পী কি ডিসির চলচ্চিত্র বা সিরিজে পিসমেকার চরিত্রে অভিনয় করেছেন?"
   },
   {
     "id": "profile_bd_physician",
-    "group": "profession",
+    "group": "job",
     "parent": "real",
     "en": "Is this person professionally trained and known as a medical doctor?",
     "bn": "এই ব্যক্তি কি পেশায় চিকিৎসক?"
   },
   {
     "id": "profile_bd_barrister",
-    "group": "profession",
+    "group": "job",
     "parent": "real",
     "en": "Is this person qualified as a barrister or lawyer?",
     "bn": "এই ব্যক্তি কি ব্যারিস্টার বা আইনজীবী?"
   },
   {
     "id": "profile_bd_public_family",
-    "group": "public",
+    "group": "person",
     "parent": "real",
     "en": "Is this Bangladeshi person publicly known through a national political family?",
     "bn": "বাংলাদেশে তিনি কি জাতীয় পর্যায়ের কোনো রাজনৈতিক পরিবারের সঙ্গে পরিচিত?"
   },
   {
     "id": "profile_bd_leader_spouse",
-    "group": "public",
+    "group": "person",
     "parent": "profile_bd_public_family",
     "en": "Is this person the spouse of a national political leader?",
     "bn": "এই ব্যক্তি কি জাতীয় পর্যায়ের একজন রাজনৈতিক নেতার জীবনসঙ্গী?"
   },
   {
     "id": "profile_bd_leader_daughter",
-    "group": "public",
+    "group": "person",
     "parent": "profile_bd_public_family",
     "en": "Is this person the daughter of a nationally known political leader?",
     "bn": "এই ব্যক্তি কি জাতীয় পর্যায়ের একজন পরিচিত রাজনৈতিক নেতার মেয়ে?"
   },
   {
     "id": "profile_bd_uk_bar",
-    "group": "profession",
+    "group": "job",
     "parent": "profile_bd_barrister",
     "en": "Did this person complete barrister training in the United Kingdom?",
     "bn": "এই ব্যক্তি কি যুক্তরাজ্যে ব্যারিস্টারি প্রশিক্ষণ সম্পন্ন করেছেন?"

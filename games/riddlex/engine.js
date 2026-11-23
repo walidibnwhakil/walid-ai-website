@@ -1620,6 +1620,7 @@ const ANCHORED_ANIMAL_QUESTIONS = new Set(["is_dog", "is_mouse"]);
 const FICTION_PAIR = ["from_game", "detective_role"];
 const ANCHOR_SCREEN_QUESTIONS = new Set(SCREEN_IDENTITY_QUESTIONS);
 const ANCHOR_IDENTITY_QUESTIONS = new Set(IDENTITY_DISTINCTIVE_IDS);
+const ANCHOR_DOMAIN_QUESTIONS = new Set(DOMAIN_QUESTIONS.map(q=>q.id));
 const ANCHOR_POLITICS_QUESTIONS = new Set(POLITICS_IDENTITY_QUESTIONS);
 const ANCHOR_FUNCTION_QUESTIONS = new Set(NONPERSON_SIGNATURES);
 
@@ -1640,6 +1641,7 @@ function verifiedIdentityCandidate(state) {
   if (!gameDetective && !affirmed.some(row =>
       ANCHOR_SCREEN_QUESTIONS.has(row.qid) ||
       ANCHOR_IDENTITY_QUESTIONS.has(row.qid) ||
+      ANCHOR_DOMAIN_QUESTIONS.has(row.qid) ||
       ANCHOR_POLITICS_QUESTIONS.has(row.qid) ||
       ANCHOR_FUNCTION_QUESTIONS.has(row.qid) ||
       (state.category === "animal" && ANCHORED_ANIMAL_QUESTIONS.has(row.qid))))
@@ -1658,8 +1660,13 @@ function verifiedIdentityCandidate(state) {
       ANCHOR_POLITICS_QUESTIONS.has(row.qid));
     // Public non-sensitive distinctive works and roles can identify authors,
     // athletes, film actors, officeholders and adult-industry performers.
+    const domain = verified.filter(row=>ANCHOR_DOMAIN_QUESTIONS.has(row.qid));
+    // One generic profession/medium clue cannot identify a person.
+    // Two independent affirmative sourced domains are required at minimum.
+    const domainProof = domain.length>=2;
     const identity = verified.filter(row =>
-      ANCHOR_IDENTITY_QUESTIONS.has(row.qid));
+      ANCHOR_IDENTITY_QUESTIONS.has(row.qid) ||
+      (domainProof && ANCHOR_DOMAIN_QUESTIONS.has(row.qid)));
     const functionProof = ["object","animal"].includes(state.category) &&
       verified.filter(row => ANCHOR_FUNCTION_QUESTIONS.has(row.qid));
     const species = state.category === "animal" &&
@@ -1684,8 +1691,16 @@ function verifiedIdentityCandidate(state) {
       const qi=pool.qIndex.get(qid);
       return known.has(qid) && qi!=null && factBit(pool,i,qi)===2;
     });
+    // Two domain facts plus nationality, or three domain facts plus an
+    // affirmed profession/fictional category, are meaningful corroboration.
+    // Don't make ambiguous or dual-nationality users guess a single passport.
+    const professionProof = domain.length>=3 &&
+      (known.has("business") || known.has("scientist") ||
+       known.has("politician") || known.has("writer") ||
+       known.has("fictional") || known.has("youtube"));
     if ((career?.length || office?.length || identity.length) &&
-        !countryProof && !(identity.length && regionProof)) continue;
+        !countryProof && !(identity.length && regionProof) &&
+        !professionProof) continue;
     if (functionProof?.length && relevant.length < 2) continue;
     if (species?.length && relevant.length < 3) continue;
     if (fictionProof && (!known.has("named") || relevant.length < 2)) continue;
@@ -2298,6 +2313,8 @@ function domainDiscoveryQuestion(state) {
     plan.push("topic_jamaat_mp");
     if(yes("topic_jamaat_mp"))plan.push("topic_jamaat_dhaka_south");
   }
+  if(yes("topic_islamic_speaker") && !no("politician"))
+    plan.push("topic_speaker_election_candidate");
   if(!plan.length)return null;
   const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
   const cache=new Map();

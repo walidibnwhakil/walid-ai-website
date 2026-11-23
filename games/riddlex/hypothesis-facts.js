@@ -46,7 +46,7 @@ export const EXTRA_HYPOTHESIS_ENTRIES = Object.freeze({
       yes:["object","electronic","daily_use","metal"],
       no:["animal","real","fictional","named","kitchen","cooking","vehicle","pocket","clothing"] },
     { id:"c-air-conditioner", en:"Air conditioner", bn:"এয়ার কন্ডিশনার", pop:110,
-      yes:["object","electronic","daily_use","bigger_than_person"],
+      yes:["object","electronic","daily_use"],
       no:["animal","real","fictional","named","kitchen","cooking","vehicle","pocket","clothing"] },
   ]),
   animal: Object.freeze([

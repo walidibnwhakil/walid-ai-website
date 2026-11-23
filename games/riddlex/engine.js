@@ -1181,6 +1181,16 @@ function allowedInCategory(state, question) {
   return true;
 }
 
+// Questions with a named, source-backed career detail must still describe at
+// least one surviving candidate. In particular, after Shakib Khan is rejected,
+// his marriage clue is not evidence about the other actors by default.
+function hasUnrejectedFilmCandidate(state, qid) {
+  const facts = SCREEN_CAREER_DETAILS[qid];
+  if (!facts) return true;
+  return state.alive.some(i =>
+    state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
+}
+
 // Before proposing another name, confirm distinguishing facts about the
 // current leader against surviving alternatives. Never spend this round on
 // already answered, contradictory, or unrelated category questions.
@@ -1197,7 +1207,8 @@ function chooseConfirmationQuestion(state, leader) {
     const question = pool.questions[qi];
     if (asked.has(question.id) || !allowedInCategory(state, question) ||
         blockedQuestion(state, question, rows, absentCache) ||
-        !gated(state, question, rows)) continue;
+        !gated(state, question, rows) ||
+        !hasUnrejectedFilmCandidate(state, question.id)) continue;
     // A confirmation must not reopen a mutually exclusive category.
     // Re-asking "fictional?" after the player confirmed "real" isn't
     // clarification, even if the candidate's packed fictional fact is "no".
@@ -1284,6 +1295,39 @@ function pendingFilmEraQuestion(state) {
   return null;
 }
 
+// Once broad entropy-gain questions are exhausted, explore unused
+// source-backed actor distinctions (career, company, producer, genre).
+// This can discover an overlooked actor such as Amin Khan even if a more
+// famous candidate initially dominates the popularity-weighted shortlist.
+function actorDiscoveryQuestion(state) {
+  if (!said(state, "actor", ["yes","probably"]) ||
+      !said(state, "from_bd", ["yes","probably"])) return null;
+  const asked = new Set(state.answers.map(row => row.qid));
+  const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  const cache = new Map();
+  let best = null;
+  let bestScore = -1;
+  for (const [qid, facts] of Object.entries(SCREEN_CAREER_DETAILS)) {
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null || asked.has(qid) ||
+        !hasUnrejectedFilmCandidate(state, qid)) continue;
+    const question = state.pool.questions[qi];
+    if (!allowedInCategory(state, question) ||
+        blockedQuestion(state, question, rows, cache) ||
+        !gated(state, question, rows)) continue;
+    let known = 0;
+    let largest = 0;
+    for (const i of state.alive) {
+      if (facts[state.pool.ids[i]] !== 2) continue;
+      known += state.weights[i];
+      largest = Math.max(largest, state.weights[i]);
+    }
+    const score = largest * 4 + known;
+    if (score > bestScore) { bestScore = score; best = qid; }
+  }
+  return best;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -1291,7 +1335,9 @@ function firstAllowedQuestion(state) {
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
+    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache) ||
+        !gated(state, question, rows) ||
+        !hasUnrejectedFilmCandidate(state, question.id)) continue;
     if (question.id === "fictional" && said(state, "real", ["yes", "probably"])) continue;
     if (question.id === "real" && said(state, "fictional", ["yes", "probably"])) continue;
     if (question.group === "fiction" && said(state, "real", ["yes", "probably"])) continue;
@@ -1368,7 +1414,8 @@ export function chooseQuestion(state) {
     const question = pool.questions[qi];
     if (asked.has(question.id)) continue;
     if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, absentCache)) continue;
-    if (!gated(state, question, rows)) continue;
+    if (!gated(state, question, rows) ||
+        !hasUnrejectedFilmCandidate(state, question.id)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
     if ((question.id === "played_barcelona" || question.id === "ballon_dor") && saidYes("footballer")) gain *= 4;
@@ -1441,7 +1488,8 @@ export function decide(state) {
   // In particular, do NOT bypass it through the no-question fallback.
   if (waiting) {
     const qid = chooseConfirmationQuestion(state, best) ||
-      chooseQuestion(state) || firstAllowedQuestion(state);
+      chooseQuestion(state) || actorDiscoveryQuestion(state) ||
+      firstAllowedQuestion(state);
     return qid ? { type: "ask", qid } : { type: "defeat" };
   }
   if (shouldGuess(state)) {
@@ -1466,7 +1514,8 @@ export function decide(state) {
   // and NEVER takes this shortcut.
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
       supportedIdentity(state)) return { type: "guess", index: best };
-  qid ||= chooseConfirmationQuestion(state, best) || firstAllowedQuestion(state);
+  qid ||= chooseConfirmationQuestion(state, best) ||
+    actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
   return qid ? { type: "ask", qid } : { type: "defeat" };
 }
 

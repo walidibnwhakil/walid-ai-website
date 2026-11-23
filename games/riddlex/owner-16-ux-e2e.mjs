@@ -178,9 +178,18 @@ try {
    game:"actual PR-head Riddlex browser game",answerMode:"independent cautious public facts; unverified questions=unknown",
    counts,results},null,2));
  console.log("RIDDLEX_16_ARTIFACT "+out);
- // This is a diagnostic study. Non-correct guesses are meaningful results;
- // only browser execution errors fail the workflow.
- if(counts.browserErrors) process.exitCode=1;
+ // Green means useful gameplay, not only a successful browser launch.
+ // Publish all transcripts even on failure; this gate prevents accidental
+ // merges of an apparently successful test suite with failing guesses.
+ const minimumCorrect=12;
+ if(counts.browserErrors || counts.correct<minimumCorrect) {
+   console.error("RIDDLEX_16_QUALITY_GATE_FAILED "+JSON.stringify({
+     correct:counts.correct,minimumCorrect,browserErrors:counts.browserErrors,
+     missed:results.filter(row=>row.status!=="correct")
+       .map(row=>({name:row.name,status:row.status,questions:row.questions}))
+   }));
+   process.exitCode=1;
+ }
 } finally {
  await browser?.close();
  await new Promise(resolve=>server.close(resolve));

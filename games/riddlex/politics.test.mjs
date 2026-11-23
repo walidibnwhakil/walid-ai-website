@@ -151,14 +151,6 @@ function play(person, { retry = false } = {}) {
     answer(state, decision.qid, reply(person, decision.qid));
     absorb(state.answers);
   }
-  if (person.id === "Q43969" && !retry) {
-    const top = state.alive.slice().sort((a,b)=>state.weights[b]-state.weights[a]).slice(0,12)
-      .map(i=>({id:pool.ids[i],name:pool.ens[i],weight:state.weights[i]}));
-    console.log("YUNUS_DIAG",JSON.stringify({questions:asked,guesses,
-      alive:state.alive.length,target:pool.ids.indexOf(person.id),
-      targetWeight:state.weights[pool.ids.indexOf(person.id)],
-      top, next:decide(state),loaded:loaded.slice(-8)}));
-  }
   return { questions: asked.length, asked, guesses, politics: false, missed: true };
 }
 

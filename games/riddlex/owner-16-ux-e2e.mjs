@@ -12,7 +12,6 @@ import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-55";
 import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
-import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 
 const root = new URL("../../", import.meta.url);
 const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.meta.url),"utf8"));

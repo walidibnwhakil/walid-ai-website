@@ -1,7 +1,7 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
 import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-65";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-65";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-66";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_PEOPLE } from "./domain-facts.js?v=riddlex-60";
@@ -251,8 +251,11 @@ async function loadNamed(entries, token, begin) {
       const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE, ...BROAD_PEOPLE, ...NARRATIVE_PEOPLE, ...RECOGNITION_PEOPLE].filter(person =>
         !partial.ids.includes(person.id) &&
         !EXTRA_IDENTITY_PEOPLE.some(other=>other !== person && other.id === person.id));
+      // Use the same already-licensed Grok-era picture and credit only
+      // when an exact matching record is unambiguous; never show an icon.
+      const licensed=inheritCreditedPortraits(partial, extra);
       const roles = poolFromEntries(manifest.questions,
-        [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER, ...extra]);
+        [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER, ...licensed]);
       adoptPool(appendShard(partial, roles));
       loadEvent("roles.appended", pool?.count);
     } else if ((category === "animal" || category === "object") &&

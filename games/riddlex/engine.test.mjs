@@ -144,6 +144,26 @@ test("rare but verified item is found in a huge sparse casebook", () => {
   assert.equal(pool.ids[decide(state).index],"c-fridge");
 });
 
+test("generic electrical appliance clues cannot force a popular TV guess", () => {
+  const qs=[...questions,
+    {id:"daily_use",group:"object",en:"Daily?",bn:"দৈনিক?"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS];
+  const pool=poolFromEntries(qs,[
+    entry("c-tv",65000,["object","electronic","daily_use"]),
+    ...Array.from({length:120},(_,i)=>
+      entry("electronic-item-"+i,1,["object","electronic","daily_use"])),
+  ]);
+  const state=createState(pool,{category:"object"});
+  recompute(state);
+  answer(state,"electronic","yes");
+  answer(state,"daily_use","yes");
+  answer(state,"metal","unknown");
+  answer(state,"kitchen","unknown");
+  answer(state,"cooking","unknown");
+  assert.equal(shouldGuess(state),false,
+    "TV, fan and air conditioner all fit generic electrical questions");
+});
+
 test("animal guesses ask a butterfly-specific behaviour, not just insect and flying", () => {
   const qs=[...questions,
     {id:"insect",group:"animal",en:"Insect?",bn:"পোকা?"},

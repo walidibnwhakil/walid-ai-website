@@ -53,7 +53,7 @@ const descriptions = [
  ["career_adult_director","adult_ent",
   "Have they also directed adult films?","তিনি কি প্রাপ্তবয়স্ক চলচ্চিত্র পরিচালনাও করেছেন?",false],
  ["career_adult_to_india","adult_ent",
-  "Did they later become known for Indian mainstream films?","তিনি কি পরে ভারতের মূলধারার চলচ্চিত্রেও পরিচিত হন?",false],
+  "Did they later become known for Indian mainstream films?","তিনি কি পরে ভারতের মূলধারার চলচ্চিত্রেও পরিচিত হন?",true],
  // Individually distinctive but familiar works/roles. A 'no' is informative,
  // but a film title is never assumed familiar; players may say Unknown.
  ["film_hothat_brishti","actor",

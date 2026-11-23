@@ -450,6 +450,7 @@ try {
  for(const person of people.filter((_,i)=>i%3===Number(process.env.RIDDLEX_SHARD||0))) {
   const page=await browser.newPage({viewport:{width:390,height:844}});
   const trace=[],wrong=[];
+  const chosenLang=people.indexOf(person)%2===0?"bn":"en";
   let outcome="incomplete",error="",finalGuess="",tries=0;
   const seen=new Set();
   try {
@@ -466,12 +467,28 @@ try {
    await page.click(`[data-cat="${person.category}"]`);
    await page.waitForFunction(()=>window.__riddlex?.state()?.mode==="ask",
      null,{timeout:50000});
+   // Use the same live answer codes in alternating Bangla/English sessions.
+   // Language switching may translate the text, NEVER change question ID.
+   if(chosenLang==="bn"){
+     const original=await page.evaluate(()=>window.__riddlex.state().question);
+     await page.locator('[data-set-lang="bn"]').click();
+     const [language,question,wording]=await Promise.all([
+       page.evaluate(()=>document.documentElement.lang),
+       page.evaluate(()=>window.__riddlex.state().question),
+       page.locator("#status").textContent(),
+     ]);
+     if(language!=="bn" || question!==original ||
+        wording!==questionInfo.get(original)?.bn)
+       throw Error("Bangla UI failed to translate without changing question identity");
+   }
    for(let turn=0;turn<72;turn++) {
     await page.waitForFunction(()=>["ask","guess","learn"].includes(
       window.__riddlex?.state()?.mode),null,{timeout:50000});
     const state=await page.evaluate(()=>window.__riddlex.state());
     if(state.mode==="learn"){outcome="defeat";break;}
     if(state.mode==="guess"){
+      // Read the exact English reveal string after playing in either language.
+      if(chosenLang==="bn")await page.locator('[data-set-lang="en"]').click();
       const label=(await page.locator("#guess-line").textContent())?.trim()||"";
       const exact=label.replace(/^Are you thinking of\s*/i,"").replace(/\?$/,"").trim();
       finalGuess=exact;
@@ -503,7 +520,7 @@ try {
   const candidateEvidence=await page.evaluate(
     keys=>keys.flatMap(k=>window.__riddlex?.candidate?.(k)||[]),
     ids).catch(()=>[]);
-  const row={sequence:people.indexOf(person)+1,name:person.name,category:person.category,canonical:person.canonical||person.name,
+  const row={sequence:people.indexOf(person)+1,name:person.name,category:person.category,language:chosenLang,canonical:person.canonical||person.name,
     status:outcome,questions:trace.length,
     unknowns:trace.filter(t=>t.answer==="unknown").length,
     difficult:trace.filter(t=>t.level==="বিশেষ তথ্য").length,

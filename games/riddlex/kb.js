@@ -2,7 +2,7 @@
 // first question can render before every shard has finished parsing.
 
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-52";
-import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-52";
+import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-53";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported

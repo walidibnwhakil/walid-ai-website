@@ -522,7 +522,7 @@ try {
         assert.ok(trace.some(item=>item.startsWith("CORRECT:")),
           "The candidate-hypothesis replay did not identify " + policy);
         const signature = {
-          fridge:"obj_keeps_food_cold", ceiling_fan:"obj_moves_air_blades",
+          fridge:"obj_keeps_food_cold", ceiling_fan:"obj_mounted_ceiling",
           air_conditioner:"obj_cools_room", butterfly:"animal_patterned_wings",
           honeybee:"animal_makes_honey",
         };

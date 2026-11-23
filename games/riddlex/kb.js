@@ -34,6 +34,7 @@ export function poolFromEntries(questions, entries) {
     bns[index] = ownerBengaliFallback(entry.en, entry.bn);
     pop[index] = Math.min(65535, entry.pop || 1);
     if (entry.adult) flags[index] |= 1;
+    if (entry.unverified) flags[index] |= 4; // audit-only candidate, never guess
     images[index] = entry.adult ? "" : (entry.image || "");
     credits[index] = images[index] ? (entry.credit || "") : "";
     if (entry.aliases?.length) aliasMap.set(entry.id, entry.aliases);

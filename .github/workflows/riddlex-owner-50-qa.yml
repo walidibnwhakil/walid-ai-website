@@ -3,8 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "games/riddlex/owner-50-independent-e2e.mjs"
-      - "games/riddlex/owner-50-aggregate.mjs"
+      - "games/riddlex/**"
       - ".github/workflows/riddlex-owner-50-qa.yml"
 permissions:
   contents: read

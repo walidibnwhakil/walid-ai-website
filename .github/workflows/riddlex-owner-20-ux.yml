@@ -31,3 +31,27 @@ jobs:
           name: riddlex-20-independent-question-answer-traces
           path: ${{ runner.temp }}/riddlex-user-20.json
           if-no-files-found: warn
+
+  browser-ux-16-legacy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check known-good 16-target syntax
+        run: node --check games/riddlex/owner-16-ux-e2e.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Preserve all 16 previously correct real gameplay sessions
+        run: node games/riddlex/owner-16-ux-e2e.mjs
+      - name: Upload 16 legacy gameplay traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-16-legacy-preservation
+          path: ${{ runner.temp }}/riddlex-user-16.json
+          if-no-files-found: warn

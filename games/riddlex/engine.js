@@ -685,9 +685,20 @@ export function shouldGuess(state) {
     const confirmedFunction = state.answers.some(row =>
       row.value === "yes" && NONPERSON_SIGNATURES.includes(row.qid) &&
       factBit(state.pool, best, row.qi) === 2);
+    // For a record lacking bespoke function facts, demand several positive
+    // category traits including at least one concrete non-generic attribute.
+    // "Electronic" + "daily use" does not identify a TV, AC or fan.
+    const confirmedTraits = state.answers.filter(row => row.value === "yes" &&
+      factBit(state.pool, best, row.qi) === 2 &&
+      ["object","animal","look","size"].includes(state.pool.questions[row.qi]?.group));
+    const generic = new Set([
+      "electronic","daily_use","wild","can_fly","metal","soft",
+      "bigger_than_person",
+    ]);
+    const specificTrait = confirmedTraits.some(row => !generic.has(row.qid));
     return (confirmedFunction && ratio >= 8) ||
-      (bestP >= 0.82 && ratio >= 7) ||
-      (bestP >= 0.4 && ratio >= 12);
+      (confirmedTraits.length >= 3 && specificTrait &&
+       bestP >= 0.88 && ratio >= 12);
   }
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;

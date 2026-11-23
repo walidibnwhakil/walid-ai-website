@@ -72,3 +72,22 @@ test("validated core attributes remain available when new records are packed spa
  assert.equal(factBit(s.pool,i,s.pool.qIndex.get("from_in")),2);
  assert.equal(BROAD_PROFILE_FACTS.actor["riddlex-broad-deepika"],2);
 });
+
+test("two independent magic-lamp clues identify Aladdin, not a famous cartoon guess",()=>{
+ const s=game("character",BROAD_PEOPLE.filter(x=>
+   ["Aladdin","Hatim","Genie of the Lamp"].includes(x.en)));
+ const d=play(s,[["real","no"],["fictional","yes"],["male","yes"],["from_novel","no"],
+   ["from_cartoon","yes"],["from_film","yes"],["named","yes"],
+   ["fiction_magic_lamp","yes"],["fiction_genie","yes"]]);
+ assert.equal(d.type,"guess");
+ assert.equal(s.pool.ids[d.index],"riddlex-broad-aladdin");
+});
+test("seven riddles and a fantasy TV series identify Hatim, not a random comic character",()=>{
+ const s=game("character",BROAD_PEOPLE.filter(x=>
+   ["Aladdin","Hatim","Genie of the Lamp"].includes(x.en)));
+ const d=play(s,[["real","no"],["fictional","yes"],["male","yes"],["from_novel","no"],
+   ["from_cartoon","no"],["named","yes"],
+   ["fiction_tv_fantasy","yes"],["fiction_seven_riddles","yes"]]);
+ assert.equal(d.type,"guess");
+ assert.equal(s.pool.ids[d.index],"riddlex-broad-hatim");
+});

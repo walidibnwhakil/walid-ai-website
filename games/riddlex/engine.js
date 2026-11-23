@@ -1380,30 +1380,39 @@ const ACTOR_ONLY_IDENTITY_QUESTIONS = new Set(
 
 // Keep movie-title trivia relevant. Asking about a movie that just happens
 // to exist somewhere in the casebook does not identify the current person.
-export const MAX_QUESTIONS_PER_ROUND = 24;
-const MAX_FILM_TITLES_PER_ROUND = 2;
+export const MAX_QUESTIONS_PER_ROUND = 28;
+// Allow a few source-backed title checks, not an unlimited filmography.
+const MAX_FILM_TITLES_PER_ROUND = 4;
 function isFilmTitleQuestion(id) {
-  return /^(?:film_(?!director_work|villain_dialogues)|broad_film_|profile_film_|screen_(?:debut_|acted_|first_film_|india_(?:dabangg|dangal|ddlj)))/.test(id);
+  // Awards, acting markets and television-career taxonomy are NOT movie titles.
+  return /^(?:film_(?!director_work|villain_dialogues)|broad_film_|profile_film_(?!south_india|indian_tv|miss_world|national_award|oscar_lead|hatim_role)|screen_(?:debut_|acted_|first_film_|india_(?:dabangg|dangal|ddlj)))/.test(id);
 }
 function usefulFilmTitleQuestion(state, qid) {
   if (!isFilmTitleQuestion(qid)) return true;
-  const old = state.answers.filter(row => isFilmTitleQuestion(row.qid));
-  if (old.length >= MAX_FILM_TITLES_PER_ROUND) return false;
-  // A yes, no, or don't-know answer should make the next question reconsider
-  // the candidate shortlist, not trigger another item in a film-title list.
-  if (state.answers.length && isFilmTitleQuestion(state.answers.at(-1).qid)) return false;
+  const asked = state.answers.filter(row => isFilmTitleQuestion(row.qid));
+  if (asked.length >= MAX_FILM_TITLES_PER_ROUND) return false;
   const industryKnown = said(state,"actor",["yes","probably"]) ||
     said(state,"film_director_work",["yes","probably"]) ||
     said(state,"from_film",["yes","probably"]);
   if (!industryKnown) return false;
-  if (state.answers.length < 10) return true;
   const qi = state.pool.qIndex.get(qid);
   if (qi == null) return false;
-  // Only allow a title to be used when an appreciably likely candidate
-  // actually has this sourced fact and still fits the earlier firm answers.
-  return state.alive.some(i => state.weights[i] >= 0.003 &&
+  const compatible = i => state.weights[i] > 0 &&
     factBit(state.pool,i,qi) === 2 &&
-    eligibleForIdentityQuestion(state,i));
+    eligibleForIdentityQuestion(state,i);
+  const last = state.answers.at(-1);
+  if (last && isFilmTitleQuestion(last.qid)) {
+    // A title answered No or Don't know never starts a new title list.
+    // A Yes allows ONE genuinely corroborating film: both titles must
+    // belong to the same still-possible person.
+    if (last.value !== "yes" || !state.alive.some(i =>
+      compatible(i) && factBit(state.pool,i,last.qi) === 2)) return false;
+  }
+  if (state.answers.length < 10) return true;
+  // Use previously confirmed candidate facts, not popularity alone. Obscure
+  // performers must remain discoverable, even when the 19k casebook dilutes
+  // their posterior below 0.3%.
+  return state.alive.some(compatible);
 }
 
 function blockedQuestion(state, question, rows, cache) {
@@ -2866,7 +2875,8 @@ export function decide(state) {
   const focus = focusedCandidate(state, best, second, bestP, secondP);
   // A supported identification comes before optional film or career trivia.
   // Earlier discovery paths could keep bypassing shouldGuess indefinitely.
-  if (state.category === "character") {
+  if (state.category === "character" &&
+      !pendingActorRoleQuestion(state) && !pendingFilmEraQuestion(state)) {
     const identified = verifiedIdentityCandidate(state);
     if (identified >= 0) return { type:"guess", index:identified };
     if (shouldGuess(state)) return { type:"guess", index:best };

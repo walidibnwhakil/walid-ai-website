@@ -22,6 +22,9 @@ export const DOMAIN_QUESTIONS = Object.freeze([
  {id:"topic_religious_author",parent:"topic_islamic_speaker",group:"job",
   en:"Have they published books about religion?",
   bn:"তিনি কি ধর্মীয় বিষয়ে বই লিখেছেন বা প্রকাশ করেছেন?"},
+ {id:"topic_speaker_election_candidate",parent:"topic_islamic_speaker",group:"politics",
+  en:"Has this religious speaker also stood as a parliamentary election candidate?",
+  bn:"এই ধর্মীয় বক্তা কি জাতীয় সংসদ নির্বাচনের প্রার্থীও হয়েছেন?"},
  {id:"topic_jamaat_mp",parent:"party_jamaat",group:"politics",
   en:"Has this person been elected a member of Bangladesh's Parliament?",
   bn:"তিনি কি বাংলাদেশের জাতীয় সংসদের সদস্য নির্বাচিত হয়েছেন?"},
@@ -118,7 +121,7 @@ export const DOMAIN_PEOPLE=Object.freeze([
 ]);
 const yesFacts={
  Q84597994:["topic_islamic_speaker","topic_online_lectures","topic_religious_author"],
- "riddlex-topic-mufti-amir-hamza":["topic_islamic_speaker","topic_online_lectures"],
+ "riddlex-topic-mufti-amir-hamza":["topic_islamic_speaker","topic_online_lectures","topic_speaker_election_candidate"],
  Q5254959:["topic_islamic_speaker","topic_online_lectures","topic_religious_author","topic_jamaat_mp"],
  "riddlex-topic-shafiqul-masud":["topic_jamaat_mp","topic_jamaat_dhaka_south"],
  Q935:["topic_physics","topic_classical_motion","topic_gravity"],

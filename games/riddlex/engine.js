@@ -834,6 +834,8 @@ function gated(state, question, rows) {
       if (id === "your_ex") return no("your_partner");
       if (id === "your_best_friend") return no("your_partner") && no("your_ex");
       if (id === "your_friend") return no("your_partner") && no("your_ex") && no("your_best_friend");
+      if (id === "your_self") return no("your_partner") && no("your_ex") &&
+        no("your_best_friend") && no("your_friend");
     }
     return false;
   }
@@ -1208,8 +1210,15 @@ export const QUESTION_REQUIRES = {
   zia_family: [{ id: "from_bd", value: "yes" }],
   mujib_family: [{ id: "from_bd", value: "yes" }],
   ...Object.fromEntries(Object.keys(HYPOTHESIS_FACTS).map((id) => [
-    id, [{ id: id.startsWith("animal_") ? "animal" : "object",
-           value: "yes", strict: true }],
+    id, [
+      { id: id.startsWith("animal_") ? "animal" : "object",
+        value: "yes", strict: true },
+      ...(["obj_fragrant_flower","obj_five_spiral_waxy_petals",
+        "obj_frangipani_yellow_center"].includes(id)
+        ? [{id:"obj_flower_from_plant",value:"yes",strict:true}] : []),
+      ...(id==="obj_mounted_ceiling"
+        ? [{id:"obj_moves_air_blades",value:"yes",strict:true}] : []),
+    ],
   ])),
   // Film, sport and public-office questions require that the player has
   // confirmed the corresponding occupation, never merely fame or nationality.
@@ -1936,6 +1945,8 @@ export function chooseQuestion(state) {
           if (saidNo("your_ex")) {
             if (next("your_best_friend")) return "your_best_friend";
             if (saidNo("your_best_friend") && next("your_friend")) return "your_friend";
+            if (saidNo("your_best_friend") && saidNo("your_friend") &&
+                next("your_self")) return "your_self";
           }
         }
       }
@@ -2013,8 +2024,51 @@ export function rejectIndex(state, index) {
   return recompute(state);
 }
 
+function confirmedPersonalRole(state) {
+  if (state.category !== "character" ||
+      !said(state, "real", ["yes", "probably"]) ||
+      !said(state, "knows_you", ["yes", "probably"])) return -1;
+  const yes = qid => said(state, qid, ["yes", "probably"]);
+  const no = qid => said(state, qid, ["no", "probably_not"]);
+  const gender = yes("female") ? "female"
+    : yes("male") ? "male"
+    : no("female") ? "male"
+    : no("male") ? "female" : null;
+  let role = null;
+  if (yes("your_family")) {
+    if (yes("your_parent") && gender) role = gender==="female" ? "mother" : "father";
+    else if (yes("your_sibling") && gender) role = gender==="female" ? "sister" : "brother";
+    else if (yes("your_spouse") && gender) role = gender==="female" ? "wife" : "husband";
+    else if (yes("your_baby")) role="baby";
+    else if (yes("your_child") && no("your_baby")) role="child";
+  } else if (no("your_family")) {
+    if (yes("your_partner") && gender)
+      role = gender==="female" ? "girlfriend" : "boyfriend";
+    else if (yes("your_ex")) role="ex";
+    else if (yes("your_best_friend")) role="best-friend";
+    else if (no("your_best_friend") && yes("your_friend")) role="friend";
+    else if (yes("your_self")) role="self";
+  }
+  if (!role) return -1;
+  const id="riddlex-role-"+role;
+  const index=state.pool.ids.indexOf(id);
+  if (index < 0 || state.rejectedIds?.has(id)) return -1;
+  // No private name needs to be inferred. The player confirmed this
+  // relationship directly; it must not be beaten by a fame-weighted public
+  // casebook record. Do not bypass explicit contradictory answers.
+  if (state.answers.some(row => {
+    if (!["yes", "no"].includes(row.value)) return false;
+    const fact=PERSONAL_FACTS[id]?.[row.qid] || 0;
+    return (row.value==="yes" && fact===1) ||
+      (row.value==="no" && fact===2);
+  })) return -1;
+  return index;
+}
+
 export function decide(state) {
   recompute(state);
+  const personalRole=confirmedPersonalRole(state);
+  if (personalRole >= 0) return { type:"guess", index:personalRole };
   if (!state.alive.length) return { type: "defeat" };
   // Neither 10 rejected names nor 72 answers establishes that the user lost.
   // Continue asking every remaining relevant, non-duplicate question.

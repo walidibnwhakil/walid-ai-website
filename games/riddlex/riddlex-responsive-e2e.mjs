@@ -259,7 +259,7 @@ try {
       let guesses = 0;
       let lastGuessQuestionCount = -1;
       let filmFollowUpsAfterGuess = 0;
-      for (let turn = 0; turn < (["actor_male_1990s","chaplin","dildar"].includes(policy) ? 55 : 32); turn++) {
+      for (let turn = 0; turn < (["actor_male_1990s","chaplin","dildar","amin"].includes(policy) ? 55 : 32); turn++) {
         await page.waitForFunction(() =>
           ["ask", "guess", "learn"].includes(window.__riddlex?.state()?.mode),
           null, { timeout: 35000 });
@@ -357,6 +357,10 @@ try {
             trace.push("CORRECT: Dildar by supporting comedy role");
             break;
           }
+          if (policy === "amin" && state.best === "Q21066842") {
+            trace.push("CORRECT: Amin Khan by film career and Walton role");
+            break;
+          }
           if (policy === "family") {
             assert.equal(state.best, "riddlex-role-mother",
               "A confirmed mother must not be replaced by a public celebrity or wrong relative");
@@ -417,6 +421,26 @@ try {
           a = clues[q] || await page.evaluate((qid) =>
             window.__riddlex.replyFor("Q18987612", qid), q);
         }
+        else if (policy === "amin") {
+          // User's affirmative facts are independent of whether regional
+          // film shards have downloaded the actor yet.
+          const clues = {
+            real:"yes", knows_you:"no", male:"yes", female:"no",
+            alive:"yes", dead:"no", from_bd:"yes", named:"yes",
+            actor:"yes", screen_role_lead:"yes",
+            screen_star_pre1990:"no", screen_star_1990s:"yes",
+            screen_walton_executive:"yes",
+            screen_return_after_long_break:"yes",
+            screen_debut_abujh_duti_mon:"yes",
+            screen_film_debut_pre1995:"yes",
+            screen_over_100_films:"yes",
+            screen_films_after_2000:"yes",
+            screen_new_film_announced_2026:"yes",
+            cricketer:"no", footballer:"no", politician:"no",
+          };
+          a = clues[q] || await page.evaluate(qid =>
+            window.__riddlex.replyFor("Q21066842", qid), q);
+        }
         else if (q === "from_bd") a = "yes";
         else if (policy === "actor_male_1990s" && q === "male") a = "yes";
         else if (policy === "actor_male_1990s" && ["real","alive","named","actor","screen_star_1990s"].includes(q)) a = "yes";
@@ -475,6 +499,13 @@ try {
       }
       if (policy === "shakib") assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
         "The real Shakib entry was not guessed after real answers");
+      if (policy === "amin") {
+        assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
+          "Amin Khan was not recognized after corroborated career and Walton answers");
+        assert.ok(seen.has("screen_walton_executive") ||
+          seen.has("screen_debut_abujh_duti_mon"),
+          "No identifying career question was asked about Amin Khan");
+      }
       return trace;
     } catch (error) {
       console.error("RIDDLEX_OWNER_REPLAY_FAILED_" + policy.toUpperCase() + " " + JSON.stringify(trace));
@@ -490,6 +521,7 @@ try {
   await replay("1990s Bangladeshi actor, 12 real user answers", "actor_1990s");
   await replay("Female Bangladesh actress with male=no", "actor_female_1990s");
   await replay("Male Bangladesh actor 1990–1999 with multiple rejected guesses", "actor_male_1990s");
+  await replay("Amin Khan with verified film and Walton career clues", "amin");
   await replay("Charlie Chaplin: global silent comic with moustache", "chaplin");
   await replay("Dildar: late Bangladeshi supporting comedian", "dildar");
 } finally {

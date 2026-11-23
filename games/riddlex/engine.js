@@ -2385,22 +2385,33 @@ function broadDiscoveryQuestion(state) {
   }
   if (state.category==="character") {
     if (yes("real") && yes("from_in") && yes("actor")) {
-      plan.push("screen_indian_bengali","screen_hindi_cinema",
-        "screen_telugu_cinema","screen_kannada_cinema","screen_web_series");
-      if (yes("screen_indian_bengali"))
+      if (!asked.has("screen_indian_bengali"))
+        plan.push("screen_indian_bengali");
+      if (yes("screen_indian_bengali")) {
         plan.push("film_nater_guru","film_bojhena","film_mitin_mashi");
-      if (yes("screen_hindi_cinema"))
-        plan.push("film_padmaavat_actor","film_crook","film_welcome");
-      if (yes("screen_telugu_cinema"))
-        plan.push("film_baahubali");
-      if (yes("screen_kannada_cinema"))
-        plan.push("film_kgf");
-      if (yes("screen_web_series"))
-        plan.push("film_aashram");
+        plan.push("screen_web_series");
+        if (yes("screen_web_series")) plan.push("film_aashram");
+      }
+      if (no("screen_indian_bengali")) {
+        plan.push("screen_hindi_cinema");
+        if (yes("screen_hindi_cinema"))
+          plan.push("film_padmaavat_actor","film_crook","film_welcome");
+        if (no("screen_hindi_cinema")) {
+          plan.push("screen_telugu_cinema");
+          if (yes("screen_telugu_cinema")) plan.push("film_baahubali");
+          if (no("screen_telugu_cinema")) {
+            plan.push("screen_kannada_cinema");
+            if (yes("screen_kannada_cinema")) plan.push("film_kgf");
+          }
+        }
+      }
     } else if (yes("real") && yes("from_bd") && yes("actor")) {
       plan.push("screen_bangladesh_bengali");
-      if (yes("screen_bangladesh_bengali"))
-        plan.push("film_humayun_dramas","film_mujib","film_villain_dialogues");
+      if (yes("screen_bangladesh_bengali")) {
+        if (yes("screen_role_villain")) plan.push("film_villain_dialogues");
+        else if (yes("female")) plan.push("film_humayun_dramas","film_mujib");
+        else plan.push("film_mujib","film_villain_dialogues","film_humayun_dramas");
+      }
     } else if (yes("real") && yes("from_in") && no("actor") &&
                !yes("cricketer") && !yes("footballer") &&
                !yes("politician") && state.answers.length>=10) {

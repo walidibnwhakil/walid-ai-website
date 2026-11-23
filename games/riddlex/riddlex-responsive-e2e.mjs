@@ -721,6 +721,9 @@ try {
       name,category,outcome,loadedAtEnd,questions,unknowns,
       wrongGuessCount:wrongGuesses.length,note
     }))));
+  assert.deepEqual(qaResults.filter(row=>row.outcome!=="correct").map(
+    row=>row.name+": "+row.outcome),[],
+    "All ten independently played owner cases must be identified correctly");
 
 } finally {
   await browser?.close();

@@ -593,8 +593,17 @@ export function shouldGuess(state) {
     // posterior even when a candidate's independently verified identity
     // clues match and its nearest plausible alternative is far behind.
     // Require both adequate corroboration AND decisive relative separation.
+    // A publicly checked role or signature fact can be much stronger
+    // evidence than a raw percentage when most records are incomplete.
+    // Three independent, candidate-matching verified cinema facts and
+    // decisive separation justify identifying distinctive comedians such
+    // as Dildar, without opening the door to fame-only guesses.
+    const verifiedSpecific = state.answers.filter(row =>
+      row.value === "yes" && SCREEN_CAREER_DETAILS[row.qid] &&
+      factBit(state.pool, best, row.qi) === 2).length;
     return (bestP >= 0.86 && ratio >= 9) ||
-      (bestP >= 0.25 && ratio >= 12);
+      (bestP >= 0.25 && ratio >= 12) ||
+      (verifiedSpecific >= 3 && ratio >= 8);
   }
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;

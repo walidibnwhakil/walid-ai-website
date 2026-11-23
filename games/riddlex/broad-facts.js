@@ -118,6 +118,10 @@ export const BROAD_OBJECTS=Object.freeze([
  object("riddlex-broad-stopwatch","Stopwatch","স্টপওয়াচ",["obj_times_events","handheld"],["obj_worn_wrist","obj_hangs_wall"]),
 ]);
 const values={};for(const q of BROAD_QUESTIONS)values[q.id]={};
+ // Existing established Bengali-cinema actors are comparators for the
+ // industry question, not duplicate celebrity records or instant guesses.
+ values.screen_indian_bengali["riddlex-profile-deb"]=2;
+ values.screen_indian_bengali["riddlex-profile-jeet"]=2;
 const sources=[...BROAD_PEOPLE,...BROAD_OBJECTS];
 for(const item of sources){
  for(const qid of item.yes||[])if(values[qid])values[qid][item.id]=2;

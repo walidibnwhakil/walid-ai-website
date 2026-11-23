@@ -29,6 +29,18 @@ export const EXTRA_HYPOTHESIS_QUESTIONS = Object.freeze([
   { id: "animal_pollen_baskets", group: "animal",
     en: "Does it carry pollen in special baskets on its hind legs?",
     bn: "এটি কি পেছনের পায়ের বিশেষ থলিতে ফুলের পরাগ বহন করে?" },
+  { id:"obj_flower_from_plant", group:"object",
+    en:"Is it a flower that grows on a plant?",
+    bn:"এটি কি গাছে ফোটা কোনো ফুল?" },
+  { id:"obj_fragrant_flower", group:"object",
+    en:"Is this flower usually fragrant?",
+    bn:"ফুলটির কি সাধারণত সুগন্ধ আছে?" },
+  { id:"obj_five_spiral_waxy_petals", group:"object",
+    en:"Does it typically have five thick, overlapping petals arranged in a spiral?",
+    bn:"এর কি সাধারণত ঘূর্ণির মতো সাজানো পাঁচটি মোটা, পরস্পর-ছোঁয়া পাপড়ি আছে?" },
+  { id:"obj_frangipani_yellow_center", group:"object",
+    en:"Can its flowers be white or pink with a yellow centre?",
+    bn:"ফুলটির রং কি সাদা বা গোলাপি এবং মাঝখানটা হলুদ হতে পারে?" },
 ]);
 
 export const HYPOTHESIS_FACTS = Object.freeze({
@@ -48,12 +60,40 @@ export const HYPOTHESIS_FACTS = Object.freeze({
   animal_patterned_wings: Object.freeze({ "c-butterfly": 2, "c-honeybee": 1 }),
   animal_makes_honey: Object.freeze({ "c-honeybee": 2, "c-butterfly": 1 }),
   animal_pollen_baskets: Object.freeze({ "c-honeybee": 2, "c-butterfly": 1 }),
+  // Plumeria (Kathgolap) facts: FAO, RHS, Singapore NParks, USDA.
+  // https://www.fao.org/4/ai387e/AI387E05.htm
+  // https://www.rhs.org.uk/plants/94126/plumeria-rubra/details
+  // https://www.nparks.gov.sg/florafaunaweb/flora/8/6/8620
+  obj_flower_from_plant: Object.freeze({
+    "c-kathgolap":2, "c-jasmine-flower":2, "c-hibiscus-flower":2,
+  }),
+  obj_fragrant_flower: Object.freeze({
+    "c-kathgolap":2, "c-jasmine-flower":2,
+  }),
+  obj_five_spiral_waxy_petals: Object.freeze({
+    "c-kathgolap":2,
+  }),
+  obj_frangipani_yellow_center: Object.freeze({
+    "c-kathgolap":2,
+  }),
 });
 
 // Minimal new curated examples unavailable in the old packed curated shard.
 // Their common attributes are also recorded for ordinary question selection.
 export const EXTRA_HYPOTHESIS_ENTRIES = Object.freeze({
   object: Object.freeze([
+    // Plants/flowers are accessible through the existing "Object" choice
+    // without changing the user-approved menu artwork or category layout.
+    { id:"c-kathgolap", en:"Kathgolap (Frangipani)", bn:"কাঠগোলাপ",
+      pop:180, yes:["object"], no:["animal","real","fictional","electronic",
+        "vehicle","clothing","kitchen","cooking","metal","sport_item","music_item",
+        "uses_pressure"] },
+    { id:"c-jasmine-flower", en:"Jasmine flower", bn:"জুঁই ফুল",
+      pop:155, yes:["object"], no:["animal","real","fictional","electronic",
+        "vehicle","clothing","kitchen","cooking","metal","sport_item","music_item"] },
+    { id:"c-hibiscus-flower", en:"Hibiscus flower", bn:"জবা ফুল",
+      pop:150, yes:["object"], no:["animal","real","fictional","electronic",
+        "vehicle","clothing","kitchen","cooking","metal","sport_item","music_item"] },
     { id:"c-ceiling-fan", en:"Ceiling fan", bn:"সিলিং ফ্যান", pop:80,
       yes:["object","electronic","daily_use","metal"],
       no:["animal","real","fictional","named","kitchen","cooking","vehicle","pocket","clothing"] },

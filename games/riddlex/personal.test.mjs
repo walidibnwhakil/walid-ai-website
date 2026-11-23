@@ -259,6 +259,6 @@ test("crush is not among supported relationship questions or guesses", () => {
   const pool = casebook();
   assert.equal(pool.qIndex.has("your_crush"), false);
   assert.equal(pool.ids.some((id) => id.includes("crush")), false);
-  assert.equal(PERSONAL_QUESTIONS.length, 11);
-  assert.equal(PERSONAL_RELATIONS.length, 13);
+  assert.equal(PERSONAL_QUESTIONS.length, 12);
+  assert.equal(PERSONAL_RELATIONS.length, 14);
 });

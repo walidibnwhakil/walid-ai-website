@@ -11,6 +11,7 @@ import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_L
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
+import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } from "./recognition-facts.js";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
@@ -155,6 +156,7 @@ export function factBit(pool, index, qi) {
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
   if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;
+  if (RECOGNITION_FACTS[id]) return RECOGNITION_FACTS[id][pool.ids[index]] || 0;
   const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
     DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
@@ -208,6 +210,8 @@ function binaryEntropy(p) {
 }
 
 export function inCategory(pool, index, category) {
+  // Unverified user-supplied aliases remain searchable but never become guesses.
+  if (pool.flags?.[index] & 4) return false;
   const bit = (id) => {
     const qi = pool.qIndex.get(id);
     return qi == null ? 0 : factBit(pool, index, qi);
@@ -1247,6 +1251,8 @@ export const QUESTION_REQUIRES = {
   ...Object.fromEntries(NARRATIVE_QUESTIONS.filter(q => q.parent).map(q =>
     [q.id, [{ id:q.parent, value:"yes", strict:true }]])),
   ...Object.fromEntries(EVERYDAY_QUESTIONS.filter(q=>q.parent).map(q=>
+    [q.id, [{id:q.parent,value:"yes",strict:true}]])),
+  ...Object.fromEntries(RECOGNITION_QUESTIONS.filter(q=>q.parent).map(q=>
     [q.id, [{id:q.parent,value:"yes",strict:true}]])),
   party_bnp: [{ id: "from_bd", value: "yes" }],
   party_al: [{ id: "from_bd", value: "yes" }],
@@ -2713,6 +2719,113 @@ function narrativeEvidenceCandidate(state){
   return options[0].i;
 }
 
+
+// Reusable classification questions for people with incomplete worldwide
+// records. Route by confirmed country/role and player answers, not the target
+// name, celebrity rank, or language. Specific film/relationship facts are
+// withheld until the relevant broad occupation/branch is established.
+function recognitionDiscoveryQuestion(state) {
+  if (state.answers.length<6) return null;
+  const yes=id=>said(state,id,["yes","probably"]);
+  const no=id=>said(state,id,["no","probably_not"]);
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const plan=[];
+  if(state.category==="animal" && yes("bird")) {
+    plan.push("profile_animal_poultry");
+    if(yes("profile_animal_poultry"))
+      plan.push("profile_animal_eggs","profile_animal_comb");
+  }
+  if(state.category==="character" && yes("real") && !yes("knows_you")) {
+    if(yes("from_bd") && !yes("actor") && no("actor")) {
+      plan.push("profile_bd_physician","profile_bd_barrister");
+      if(yes("profile_bd_physician") || yes("profile_bd_barrister")) {
+        plan.push("profile_bd_public_family");
+        if(yes("profile_bd_public_family")) {
+          if(yes("profile_bd_physician"))plan.push("profile_bd_leader_spouse");
+          if(yes("profile_bd_barrister"))
+            plan.push("profile_bd_leader_daughter","profile_bd_uk_bar");
+        }
+      }
+    }
+    if(yes("from_us") && yes("male")) {
+      plan.push("profile_sports_wrestling");
+      if(yes("profile_sports_wrestling")) {
+        plan.push("profile_sports_wwe");
+        if(yes("profile_sports_wwe"))
+          plan.push("profile_sports_record_champion");
+        if(yes("actor"))plan.push("profile_sports_peacemaker");
+      }
+    }
+    if(yes("actor")) {
+      if(yes("from_gb"))plan.push("profile_film_titanic","profile_film_oscar_lead");
+      if(yes("from_it"))plan.push("profile_film_malena","profile_film_spectre");
+      if(yes("from_in")) {
+        if(yes("female")) {
+          plan.push("profile_film_south_india");
+          if(yes("profile_film_south_india"))
+            plan.push("profile_film_mahanati","profile_film_national_award");
+          if(no("profile_film_south_india")) {
+            plan.push("profile_film_miss_world","profile_film_quantico");
+          }
+        } else if(yes("male")) {
+          plan.push("profile_film_indian_tv");
+          if(yes("profile_film_indian_tv"))plan.push("profile_film_hatim_role");
+          else if(no("profile_film_indian_tv"))
+            plan.push("profile_film_sacred_games","profile_film_gangs_wasseypur",
+              "profile_film_aashram","profile_film_animal_2023");
+        }
+      }
+    }
+  }
+  if(!plan.length)return null;
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const qid of plan){
+    if(asked.has(qid))continue;
+    const qi=state.pool.qIndex.get(qid);
+    if(qi==null)continue;
+    const question=state.pool.questions[qi];
+    if(!allowedInCategory(state,question) ||
+       blockedQuestion(state,question,rows,cache) ||
+       !gated(state,question,rows) ||
+       !hasUnrejectedFilmCandidate(state,qid))continue;
+    return qid;
+  }
+  return null;
+}
+
+// Source-backed distinctive identity evidence is stronger than a global fame
+// prior: two affirmations are required, including one specific performance or
+// profession-family characteristic. Definitive contradiction vetoes a guess.
+// The table and decision are target-agnostic and identical in EN and BN.
+function recognitionEvidenceCandidate(state) {
+  if(!["character","animal"].includes(state.category) ||
+     state.answers.length<7 ||
+     state.sinceGuess<questionsBeforeRetry(state))return -1;
+  const evidence=state.answers.filter(row=>
+     row.value==="yes" && RECOGNITION_FACTS[row.qid]);
+  if(evidence.length<2)return -1;
+  const specificity=new Set(RECOGNITION_SPECIFIC_IDS);
+  const candidates=[];
+  for(const index of state.alive){
+    if(state.weights[index]<=0 ||
+       state.rejectedIds?.has(state.pool.ids[index]))continue;
+    const affirmations=evidence.filter(row=>factBit(state.pool,index,row.qi)===2);
+    const distinct=affirmations.filter(row=>specificity.has(row.qid));
+    if(affirmations.length<2 || !distinct.length)continue;
+    if(state.answers.some(row=>{
+      if(row.value!=="yes" && row.value!=="no")return false;
+      const bit=factBit(state.pool,index,row.qi);
+      return row.value==="yes"?bit===1:bit===2;
+    }))continue;
+    candidates.push({index,score:affirmations.length*3+distinct.length*7});
+  }
+  candidates.sort((a,b)=>b.score-a.score);
+  if(!candidates.length ||
+      (candidates[1] && candidates[0].score-candidates[1].score<2))return -1;
+  return candidates[0].index;
+}
+
 export function decide(state) {
   recompute(state);
   const personalRole=confirmedPersonalRole(state);
@@ -2748,6 +2861,10 @@ export function decide(state) {
   if(narrativeCandidate>=0)return {type:"guess",index:narrativeCandidate};
   const narrative=narrativeDiscoveryQuestion(state);
   if(narrative) return {type:"ask",qid:narrative};
+  const recognized=recognitionEvidenceCandidate(state);
+  if(recognized>=0)return {type:"guess",index:recognized};
+  const recognition=recognitionDiscoveryQuestion(state);
+  if(recognition)return {type:"ask",qid:recognition};
   const broad=broadDiscoveryQuestion(state);
   if(broad) return {type:"ask",qid:broad};
   const domain = domainDiscoveryQuestion(state);

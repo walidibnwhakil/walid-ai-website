@@ -10,6 +10,8 @@ import { DOMAIN_QUESTIONS } from "./domain-facts.js?v=riddlex-60";
 import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-61";
 import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS } from "./everyday-facts.js";
+import { RECOGNITION_QUESTIONS } from "./recognition-facts.js";
+import { ownerBengaliFallback } from "./owner-bengali-labels.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported
 // questions are represented as sparse, fact-checked runtime overlays.
@@ -29,9 +31,10 @@ export function poolFromEntries(questions, entries) {
   entries.forEach((entry, index) => {
     ids[index] = entry.id;
     ens[index] = entry.en || "";
-    bns[index] = entry.bn || "";
+    bns[index] = ownerBengaliFallback(entry.en, entry.bn);
     pop[index] = Math.min(65535, entry.pop || 1);
     if (entry.adult) flags[index] |= 1;
+    if (entry.unverified) flags[index] |= 4; // audit-only candidate, never guess
     images[index] = entry.adult ? "" : (entry.image || "");
     credits[index] = images[index] ? (entry.credit || "") : "";
     if (entry.aliases?.length) aliasMap.set(entry.id, entry.aliases);
@@ -97,6 +100,7 @@ export function decodeShard(buffer, questions) {
     [ens[index], offset] = readString(view, offset, enLen);
     const bnLen = view.getUint16(offset, true); offset += 2;
     [bns[index], offset] = readString(view, offset, bnLen);
+    bns[index] = ownerBengaliFallback(ens[index], bns[index]);
     attrs.set(new Uint8Array(buffer, offset, attrBytes), index * attrBytes);
     offset += attrBytes;
     if (flags[index] & 2) {
@@ -144,6 +148,47 @@ export function mergePools(pools) {
   }
   const qIndex = new Map(questions.map((question, index) => [question.id, index]));
   return { questions, qIndex, attrBytes, count, attrs, pop, flags, ids, ens, bns, images, credits, aliasMap };
+}
+
+// Reuse ONLY photos already present in the packaged, attributed casebook.
+// For a newly supported identity, an exact (not substring) verified name or
+// alias can inherit an existing photo and its real license/photographer credit.
+// Ambiguous names and missing credits get NO IMAGE. This preserves Grok's
+// original source-backed photo presentation with zero extra downloads.
+export function inheritCreditedPortraits(loadedPool, entries) {
+  if (!loadedPool?.count || !Array.isArray(entries) || !entries.length)
+    return entries;
+  const normalize = value => String(value||"").normalize("NFKC").trim()
+    .toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"");
+  const names = new Map();
+  for (let i=0;i<loadedPool.count;i++) {
+    if (loadedPool.flags?.[i] & 1) continue; // previously restricted adult photo
+    const image=loadedPool.images?.[i];
+    const credit=loadedPool.credits?.[i];
+    if (!image || !credit) continue; // attribution required, never invent it
+    const record={id:loadedPool.ids[i],image,credit};
+    const aliases=loadedPool.aliasMap?.get(record.id)||[];
+    for (const name of [loadedPool.ens?.[i],loadedPool.bns?.[i],...aliases]) {
+      const key=normalize(name);
+      if (!key) continue;
+      if (!names.has(key))names.set(key,new Map());
+      names.get(key).set(record.id,record);
+    }
+  }
+  return entries.map(entry=>{
+    if (!entry || entry.image || entry.adult) return entry;
+    const candidates=new Map();
+    for (const name of [entry.en,...(entry.aliases||[])]) {
+      const records=names.get(normalize(name));
+      if (!records)continue;
+      for (const [id,record] of records)candidates.set(id,record);
+    }
+    // One exact matching identity: fine. Several different identities with
+    // overlapping names: leave blank rather than showing a wrong portrait.
+    if(candidates.size!==1)return entry;
+    const photo=candidates.values().next().value;
+    return {...entry,image:photo.image,credit:photo.credit};
+  });
 }
 
 export function imageSrc(image) {
@@ -286,7 +331,7 @@ export async function loadManifest(base = "./kb") {
   const response = await fetch(`${base}/manifest.json?v=riddlex-39`);
   if (!response.ok) throw new Error("Knowledge manifest failed");
   const manifest = await response.json();
-  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...PERSONAL_QUESTIONS]) {
+  for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...RECOGNITION_QUESTIONS, ...PERSONAL_QUESTIONS]) {
     if (!manifest.questions.some((row) => row.id === question.id)) {
       manifest.questions.push({ ...question });
     }

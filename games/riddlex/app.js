@@ -1,13 +1,15 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-64";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-66";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, traffic } from "./kb.js?v=riddlex-64";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-67";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_PEOPLE } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-61";
+import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-62";
 import { NARRATIVE_PEOPLE } from "./narrative-facts.js";
 import { EVERYDAY_OBJECTS } from "./everyday-facts.js";
+import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js";
+import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
@@ -100,7 +102,7 @@ function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "akinator-35";
+const BUILD = "riddlex-66";
 
 function withTimeout(promise, ms) {
   let timer;
@@ -247,18 +249,21 @@ async function loadNamed(entries, token, begin) {
       // at game start, even when the worldwide long-tail shards do not load.
       // This avoids guessing a famous unrelated candidate because the actual
       // public figure lives beyond the mobile transfer budget.
-      const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE, ...BROAD_PEOPLE, ...NARRATIVE_PEOPLE].filter(person =>
+      const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE, ...BROAD_PEOPLE, ...NARRATIVE_PEOPLE, ...RECOGNITION_PEOPLE, ...UNVERIFIED_OWNER_NAMES].filter(person =>
         !partial.ids.includes(person.id) &&
         !EXTRA_IDENTITY_PEOPLE.some(other=>other !== person && other.id === person.id));
+      // Use the same already-licensed Grok-era picture and credit only
+      // when an exact matching record is unambiguous; never show an icon.
+      const licensed=inheritCreditedPortraits(partial, extra);
       const roles = poolFromEntries(manifest.questions,
-        [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER, ...extra]);
+        [...PERSONAL_RELATIONS, RIDDLEX_CHARACTER, ...licensed]);
       adoptPool(appendShard(partial, roles));
       loadEvent("roles.appended", pool?.count);
     } else if ((category === "animal" || category === "object") &&
         !partial._hypothesisExtraLoaded) {
       const originals = category === "object"
         ? [...(EXTRA_HYPOTHESIS_ENTRIES.object || []), ...BROAD_OBJECTS, ...EVERYDAY_OBJECTS]
-        : (EXTRA_HYPOTHESIS_ENTRIES[category] || []);
+        : [...(EXTRA_HYPOTHESIS_ENTRIES[category] || []), ...RECOGNITION_ANIMALS];
       // Add only new identities; keep the existing packed casebook intact.
       const extra = originals.filter(item => !partial.ids.includes(item.id));
       if (extra.length) {

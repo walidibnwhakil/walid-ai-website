@@ -1536,6 +1536,15 @@ function verifiedIdentityCandidate(state) {
   const political = saidYes("politician") && saidYes("real");
   const gameDetective = state.category === "character" && saidYes("fictional") &&
     FICTION_PAIR.every(saidYes);
+  // No affirmative identity signature yet: ordinary category/country/job
+  // answers cannot establish an identity. Avoid scanning thousands of sparse
+  // records on every early turn.
+  if (!gameDetective && !affirmed.some(row =>
+      ANCHOR_SCREEN_QUESTIONS.has(row.qid) ||
+      ANCHOR_POLITICS_QUESTIONS.has(row.qid) ||
+      ANCHOR_FUNCTION_QUESTIONS.has(row.qid) ||
+      (state.category === "animal" && ANCHORED_ANIMAL_QUESTIONS.has(row.qid))))
+    return -1;
   const candidates = [];
   // Only consider surviving records with the actual facts. Never invent
   // private-profile facts or use a missing record as verified information.
@@ -1625,10 +1634,17 @@ function verifiedIdentityDiscoveryQuestion(state) {
         blockedQuestion(state,state.pool.questions[qi],rows,blocked) ||
         !gated(state,state.pool.questions[qi],rows) ||
         !hasUnrejectedFilmCandidate(state,qid)) continue;
+    // These overlays are intentionally sparse: score their known YES IDs
+    // rather than doing a factBit lookup for every person in the huge casebook.
+    const sourceFacts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid];
+    const yesIds = sourceFacts
+      ? new Set(Object.entries(sourceFacts)
+          .filter(([,fact])=>fact===2).map(([id])=>id))
+      : new Set(Object.entries(POLITICS_FACTS)
+          .filter(([,spec])=>spec.yes?.includes(qid)).map(([id])=>id));
     let score = 0;
     for (const i of state.alive) {
-      if (factBit(state.pool,i,qi) !== 2) continue;
-      score += state.weights[i];
+      if (yesIds.has(state.pool.ids[i])) score += state.weights[i];
     }
     // Shared flower classification comes first, before identifying a
     // particular plant from an otherwise unrelated "object" category.

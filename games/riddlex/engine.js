@@ -11,6 +11,7 @@ import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_L
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-56";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-57";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
+import { DOMAIN_QUESTIONS, DOMAIN_FACTS } from "./domain-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -153,6 +154,7 @@ export function factBit(pool, index, qi) {
   // Named public-career facts are sparse independent overlays, not made-up
   // answers for the other millions of people in the binary casebook.
   if (IDENTITY_FACTS[id]) return IDENTITY_FACTS[id][pool.ids[index]] || 0;
+  if (DOMAIN_FACTS[id]) return DOMAIN_FACTS[id][pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -1241,6 +1243,9 @@ export const QUESTION_REQUIRES = {
   ])),
   // Film, sport and public-office questions require that the player has
   // confirmed the corresponding occupation, never merely fame or nationality.
+  ...Object.fromEntries(DOMAIN_QUESTIONS.filter(question=>question.parent).map(question=>[
+    question.id,[{id:question.parent,value:"yes",strict:true}],
+  ])),
   ...Object.fromEntries(EXTRA_IDENTITY_QUESTIONS.map(question => [
     question.id, [{ id:question.parent, value:"yes", strict:true }],
   ])),

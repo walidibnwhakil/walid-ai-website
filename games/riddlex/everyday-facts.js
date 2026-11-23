@@ -529,7 +529,6 @@ export const EVERYDAY_OBJECTS = Object.freeze([
     "pop": 180,
     "yes": [
       "object",
-      "daily_use",
       "soft",
       "obj_family_waste",
       "obj_fecal_matter"

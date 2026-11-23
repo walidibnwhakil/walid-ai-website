@@ -2723,6 +2723,17 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  // Preserve existing, already-verified pen/phone/clock and function
+  // inference before extending the conversation to newer object families.
+  // This avoids losing good legacy gameplay to unnecessary extra questions.
+  if(state.category==="object") {
+    const legacyUseful=usefulObjectQuestion(state);
+    if(legacyUseful)return {type:"ask",qid:legacyUseful};
+    const legacyEvidence=evidenceBackedObjectCandidate(state);
+    if(legacyEvidence>=0)return {type:"guess",index:legacyEvidence};
+    const timekeeping=broadDiscoveryQuestion(state);
+    if(timekeeping)return {type:"ask",qid:timekeeping};
+  }
   // Broad career/physical-purpose questions have higher player value than
   // obscure title trivia, popularity priors and unrelated generic followups.
   const everydayCandidate=everydayEvidenceCandidate(state);
@@ -2739,10 +2750,7 @@ export function decide(state) {
   if(domain) return {type:"ask",qid:domain};
   if(corroboratedFilmHypothesis(state,best,bestP,secondP))
     return {type:"guess",index:best};
-  const useful=usefulObjectQuestion(state);
-  if(useful) return { type:"ask",qid:useful };
-  const objectEvidence=evidenceBackedObjectCandidate(state);
-  if(objectEvidence>=0) return {type:"guess",index:objectEvidence};
+
   const mixed = mixedCareerQuestion(state);
   if (mixed) return { type:"ask", qid:mixed };
   const adultFollowup = confirmedAdultOccupationQuestion(state);

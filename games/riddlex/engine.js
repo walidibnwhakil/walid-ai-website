@@ -480,8 +480,16 @@ function topTwo(state) {
     // An explicit confirmed acting role must be positively supported for
     // a name to be announced. Missing role classifications cannot justify
     // guessing a famous lead when the player described a comic performer.
-    if (verifiedRoleClues.some((row) =>
-      factBit(state.pool, i, row.qi) !== 2)) continue;
+    if (verifiedRoleClues.some((row) => {
+      const bit=factBit(state.pool,i,row.qi);
+      // "Lead" and "supporting" are broad descriptions missing from many
+      // otherwise verified filmographies. Unknown is not a denial.
+      // Distinctive comedy, villain and silent-screen traits still require
+      // affirmative evidence before a name may be announced.
+      if (["screen_role_lead","screen_role_supporting"].includes(row.qid))
+        return bit===1;
+      return bit!==2;
+    })) continue;
     // A candidate with a known contradicting function/behaviour is excluded.
     if (checkedObjectAnimalFacts.some(row => {
       const bit = factBit(state.pool, i, row.qi);

@@ -10,6 +10,7 @@ const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await i
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
+import { EVERYDAY_QUESTIONS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
@@ -153,6 +154,7 @@ export function factBit(pool, index, qi) {
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
+  if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;
   const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
     DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
@@ -1244,6 +1246,8 @@ function parentAbsent(state, parentId, rows, cache) {
 export const QUESTION_REQUIRES = {
   ...Object.fromEntries(NARRATIVE_QUESTIONS.filter(q => q.parent).map(q =>
     [q.id, [{ id:q.parent, value:"yes", strict:true }]])),
+  ...Object.fromEntries(EVERYDAY_QUESTIONS.filter(q=>q.parent).map(q=>
+    [q.id, [{id:q.parent,value:"yes",strict:true}]])),
   party_bnp: [{ id: "from_bd", value: "yes" }],
   party_al: [{ id: "from_bd", value: "yes" }],
   party_jp: [{ id: "from_bd", value: "yes" }],
@@ -1429,7 +1433,7 @@ function allowedInCategory(state, question) {
 // his marriage clue is not evidence about the other actors by default.
 function hasUnrejectedFilmCandidate(state, qid) {
   const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
-    BROAD_FACTS[qid] || NARRATIVE_FACTS[qid];
+    BROAD_FACTS[qid] || NARRATIVE_FACTS[qid] || EVERYDAY_FACTS[qid];
   if (!facts) return true;
   return state.alive.some(i =>
     state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
@@ -2537,6 +2541,80 @@ function confirmedPersonalRole(state) {
 }
 
 
+
+const EVERYDAY_GENERIC = new Set([
+ ...EVERYDAY_FAMILY_IDS,"obj_skin_moisturizer"
+]);
+
+// No target-name switch. First ask ordinary uses, then distinguish several
+// similar objects by their different observable functions and physical form.
+function everydayDiscoveryQuestion(state) {
+ if(state.category!=="object" || state.answers.length<2) return null;
+ const yes=qid=>said(state,qid,["yes","probably"]);
+ const asked=new Set(state.answers.map(row=>row.qid));
+ const familyOrder=[
+   "obj_family_electric","obj_family_worn","obj_family_personal_care",
+   "obj_family_kitchen","obj_family_container","obj_family_paper",
+   "obj_family_house","obj_family_lock","obj_family_cleaning",
+   "obj_family_medicine","obj_family_climbing","obj_family_prayer",
+   "obj_family_consumable","obj_family_financial","obj_family_waste"
+ ];
+ const pool=state.pool;
+ const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+ const cache=new Map();
+ const attempt=(qid)=>{
+   if(asked.has(qid))return false;
+   const qi=pool.qIndex.get(qid);
+   if(qi==null)return false;
+   const q=pool.questions[qi];
+   return allowedInCategory(state,q) &&
+     !blockedQuestion(state,q,rows,cache) && gated(state,q,rows) &&
+     hasUnrejectedFilmCandidate(state,qid);
+ };
+ // Prefer a specific function immediately after its family is confirmed;
+ // if none matches, return to broad categories rather than trying the
+ // names of unrelated appliances.
+ for(const fam of familyOrder) {
+   if(!yes(fam))continue;
+   for(const q of EVERYDAY_QUESTIONS) {
+     if(q.parent===fam && attempt(q.id))return q.id;
+   }
+ }
+ if(yes("obj_skin_moisturizer"))
+   for(const id of ["obj_skin_cream","obj_skin_lotion","obj_skin_jelly"])
+     if(attempt(id))return id;
+ for(const family of familyOrder) if(attempt(family))return family;
+ return null;
+}
+
+// Evidence-based, reversible object hypotheses. A broad category alone never
+// identifies a specific item. Missing data is neutral; definite contradictions
+// veto a guess, and a competing object with equal support forces more questions.
+function everydayEvidenceCandidate(state) {
+ if(state.category!=="object" || state.answers.length<5 ||
+    state.sinceGuess<questionsBeforeRetry(state))return -1;
+ const yes=state.answers.filter(row=>row.value==="yes" &&
+    EVERYDAY_FACTS[row.qid]);
+ if(yes.length<2 || !yes.some(row=>!EVERYDAY_GENERIC.has(row.qid)))return -1;
+ const candidates=[];
+ for(const i of state.alive) {
+   if(state.weights[i]<=0 || state.rejectedIds?.has(state.pool.ids[i]))continue;
+   const facts=yes.filter(row=>factBit(state.pool,i,row.qi)===2);
+   const special=facts.filter(row=>!EVERYDAY_GENERIC.has(row.qid));
+   if(facts.length<2 || special.length===0)continue;
+   if(state.answers.some(row=>{
+     if(!["yes","no"].includes(row.value))return false;
+     const bit=factBit(state.pool,i,row.qi);
+     return row.value==="yes" ? bit===1 : bit===2;
+   }))continue;
+   candidates.push({i,score:facts.length+special.length*5});
+ }
+ candidates.sort((a,b)=>b.score-a.score);
+ if(!candidates.length || (candidates[1] &&
+    candidates[0].score-candidates[1].score<2))return -1;
+ return candidates[0].i;
+}
+
 const NARRATIVE_GENERIC = new Set([
   "story_indian_epic","story_mahabharata","story_ramayana",
   "story_archery","story_secret_agent","history_religious_prophet",
@@ -2647,6 +2725,10 @@ export function decide(state) {
   const focus = focusedCandidate(state, best, second, bestP, secondP);
   // Broad career/physical-purpose questions have higher player value than
   // obscure title trivia, popularity priors and unrelated generic followups.
+  const everyday=everydayDiscoveryQuestion(state);
+  if(everyday)return {type:"ask",qid:everyday};
+  const everydayCandidate=everydayEvidenceCandidate(state);
+  if(everydayCandidate>=0)return {type:"guess",index:everydayCandidate};
   const narrative=narrativeDiscoveryQuestion(state);
   if(narrative) return {type:"ask",qid:narrative};
   const narrativeCandidate=narrativeEvidenceCandidate(state);

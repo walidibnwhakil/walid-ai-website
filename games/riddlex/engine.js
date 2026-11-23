@@ -626,10 +626,27 @@ function hasCandidateEvidence(state, index) {
     if (!["job", "politics", "fiction", "adult", "animal", "object", "look", "size"].includes(group) &&
         !(group === "person" && row.qid.startsWith("screen_"))) continue;
     positive++;
-    if (!PRIMARY_JOBS.includes(row.qid) && row.qid !== "athlete") distinctive++;
+    // Broad role, decade and high film counts describe thousands of actors.
+    // These are useful filters, but cannot by themselves verify identity.
+    const broadlyShared = new Set([
+      "screen_role_lead","screen_role_villain","screen_role_comedy",
+      "screen_role_supporting","screen_star_1990s","screen_star_pre1990",
+      "screen_film_debut_pre1995","screen_films_after_2000",
+      "screen_over_100_films","screen_national_film_award",
+      "screen_new_film_announced_2026",
+    ]);
+    if (!PRIMARY_JOBS.includes(row.qid) && row.qid !== "athlete" &&
+        !broadlyShared.has(row.qid)) distinctive++;
   }
   const actor = said(state, "actor", ["yes"]);
-  return actor ? positive >= 3 && distinctive >= 2
+  // One independently verified personal signature (a specific film, role,
+  // career association or historical fact) is enough alongside multiple
+  // matching broad answers; otherwise demand two genuinely specific clues.
+  const provedScreenSignature = actor && state.answers.some(row =>
+    row.value === "yes" && SCREEN_IDENTITY_QUESTIONS.includes(row.qid) &&
+    factBit(state.pool, index, row.qi) === 2);
+  return actor
+    ? positive >= 3 && distinctive >= (provedScreenSignature ? 1 : 2)
     : positive >= 2 && distinctive >= 1;
 }
 

@@ -8,7 +8,7 @@ const politicsUrl = new URL(
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await import(politicsUrl);
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
-import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-60";
+import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
@@ -861,6 +861,8 @@ function gated(state, question, rows) {
       if (id === "your_spouse") return no("your_parent") && no("your_sibling");
       if (id === "your_child") return no("your_parent") && no("your_sibling") && no("your_spouse");
       if (id === "your_baby") return yes("your_child");
+      if (id === "your_grandparent") return no("your_parent") && no("your_sibling") &&
+        no("your_spouse") && no("your_child");
       return false;
     }
     if (no("your_family")) {
@@ -2033,6 +2035,9 @@ export function chooseQuestion(state) {
           if (next("your_spouse")) return "your_spouse";
           if (saidNo("your_spouse") && next("your_child")) return "your_child";
           if (saidYes("your_child") && next("your_baby")) return "your_baby";
+          if (saidNo("your_spouse") && saidNo("your_child") && next("your_grandparent"))
+            return "your_grandparent";
+          if (saidYes("your_grandparent") && next("female") && next("male")) return "female";
         }
         const gendered = saidYes("your_parent") || saidYes("your_sibling") ||
           saidYes("your_spouse");
@@ -2501,6 +2506,8 @@ function confirmedPersonalRole(state) {
     else if (yes("your_spouse") && gender) role = gender==="female" ? "wife" : "husband";
     else if (yes("your_baby")) role="baby";
     else if (yes("your_child") && no("your_baby")) role="child";
+    else if (yes("your_grandparent") && gender)
+      role=gender==="female" ? "grandmother" : "grandfather";
   } else if (no("your_family")) {
     if (yes("your_partner") && gender)
       role = gender==="female" ? "girlfriend" : "boyfriend";

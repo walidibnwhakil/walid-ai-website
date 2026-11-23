@@ -1225,6 +1225,10 @@ export const QUESTION_REQUIRES = {
         ? [{id:"obj_flower_from_plant",value:"yes",strict:true}] : []),
       ...(id==="obj_mounted_ceiling"
         ? [{id:"obj_moves_air_blades",value:"yes",strict:true}] : []),
+      ...(["obj_uses_ink","obj_uses_graphite","obj_broad_marker_tip"].includes(id)
+        ? [{id:"obj_writes_paper",value:"yes",strict:true}] : []),
+      ...(["obj_makes_calls","obj_touchscreen"].includes(id)
+        ? [{id:"electronic",value:"yes",strict:true}] : []),
     ],
   ])),
   // Film, sport and public-office questions require that the player has
@@ -2059,6 +2063,79 @@ function lateVerifiedFictionGuess(state, best, bestP, secondP) {
   return !contradictions;
 }
 
+// Ask broad *uses* of an object before model-specific trivia. The branches
+// are shared by all writing tools and communication devices, not hard-coded
+// to the player's intended name.
+function usefulObjectQuestion(state) {
+  if(state.category!=="object") return null;
+  const yes = id => said(state,id,["yes","probably"]);
+  const no = id => said(state,id,["no","probably_not"]);
+  const asked = new Set(state.answers.map(x=>x.qid));
+  let options=[];
+  if(yes("tool") && yes("handheld")) {
+    if(!asked.has("obj_writes_paper")) options.push("obj_writes_paper");
+    if(yes("obj_writes_paper")) {
+      if(!asked.has("obj_uses_ink")) options.push("obj_uses_ink");
+      if(yes("obj_uses_ink") && !asked.has("obj_broad_marker_tip"))
+        options.push("obj_broad_marker_tip");
+      if(no("obj_uses_ink") && !asked.has("obj_uses_graphite"))
+        options.push("obj_uses_graphite");
+    }
+  }
+  if(yes("electronic") && yes("handheld")) {
+    if(!asked.has("obj_makes_calls")) options.push("obj_makes_calls");
+    if(yes("obj_makes_calls") && !asked.has("obj_touchscreen"))
+      options.push("obj_touchscreen");
+  }
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  return options.find(id=>{
+    const qi=state.pool.qIndex.get(id);
+    return qi!=null && !blockedQuestion(state,state.pool.questions[qi],rows,cache) &&
+      allowedInCategory(state,state.pool.questions[qi]) &&
+      gated(state,state.pool.questions[qi],rows);
+  })||null;
+}
+
+// Fame-weighted Bayesian probabilities can favor records that *lack* all
+// object attributes. For objects only, prefer a candidate with multiple
+// explicitly verified physical traits and a source-backed function rather
+// than a high prior plus UNKNOWN attributes. Two similarly supported
+// candidates remain ambiguous and must be separated with another question.
+function evidenceBackedObjectCandidate(state) {
+  if(state.category!=="object" || state.answers.length<7 ||
+      state.sinceGuess<questionsBeforeRetry(state)) return -1;
+  const known=state.answers.filter(row=>row.value==="yes" &&
+    state.pool.questions[row.qi]?.group==="object");
+  const knownSignatures=known.filter(row=>HYPOTHESIS_FACTS[row.qid]);
+  if(known.length<3 || !knownSignatures.length) return -1;
+  const no=state.answers.filter(row=>row.value==="no");
+  const options=[];
+  for(const i of state.alive) {
+    if(state.weights[i]<=0 || state.rejectedIds?.has(state.pool.ids[i]))continue;
+    // At least one verified affirmative object function, not just a claim
+    // that a candidate is a thing.
+    let signature=0, support=0, contradiction=false;
+    for(const row of known) {
+      const bit=factBit(state.pool,i,row.qi);
+      if(bit===1) {contradiction=true;break;}
+      if(bit!==2)continue;
+      support++;
+      if(HYPOTHESIS_FACTS[row.qid])signature++;
+    }
+    if(contradiction || !signature || support<4)continue;
+    if(no.some(row=>factBit(state.pool,i,row.qi)===2))continue;
+    // Include negative evidence as a modest tie-breaker. A missing fact
+    // stays neutral: it is never counted as a positive.
+    const negatives=no.filter(row=>factBit(state.pool,i,row.qi)===1).length;
+    options.push({i,score:support+signature*2+Math.min(negatives,5)*.12});
+  }
+  if(!options.length)return -1;
+  options.sort((a,b)=>b.score-a.score);
+  if(options[1] && options[0].score-options[1].score<1.5)return -1;
+  return options[0].i;
+}
+
 function confirmedPersonalRole(state) {
   if (state.category !== "character" ||
       !said(state, "real", ["yes", "probably"]) ||
@@ -2110,6 +2187,10 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  const useful=usefulObjectQuestion(state);
+  if(useful) return { type:"ask",qid:useful };
+  const objectEvidence=evidenceBackedObjectCandidate(state);
+  if(objectEvidence>=0) return {type:"guess",index:objectEvidence};
   const mixed = mixedCareerQuestion(state);
   if (mixed) return { type:"ask", qid:mixed };
   const adultFollowup = confirmedAdultOccupationQuestion(state);

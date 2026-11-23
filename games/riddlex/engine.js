@@ -1417,6 +1417,23 @@ function usefulFilmTitleQuestion(state, qid) {
 
 function blockedQuestion(state, question, rows, cache) {
   if (!usefulFilmTitleQuestion(state, question.id)) return true;
+  // The user may not know a specialised taxonomy. Three unanswered or
+  // negative family questions cannot monopolise an entire object round.
+  if (EVERYDAY_FAMILY_IDS.includes(question.id) &&
+      !state.answers.some(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
+        ["yes","probably"].includes(row.value)) &&
+      state.answers.filter(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
+        ["no","probably_not","unknown"].includes(row.value)).length >= 3)
+    return true;
+  // Recognition overlays are only relevant in their actual domain.
+  if (question.id.startsWith("profile_bd_") &&
+      !said(state,"from_bd",["yes","probably"])) return true;
+  if (question.id.startsWith("profile_sports_") &&
+      !said(state,"athlete",["yes","probably"]) &&
+      !said(state,"profile_sports_wrestling",["yes","probably"])) return true;
+  if (question.id.startsWith("profile_film_") &&
+      !said(state,"actor",["yes","probably"]) &&
+      !said(state,"from_film",["yes","probably"])) return true;
   if (skippedAsDuplicate(state, question.id)) return true;
   // A confirmed adult-industry actor must not be questioned about unrelated
   // mainstream movies or screen roles before a mainstream industry is known.

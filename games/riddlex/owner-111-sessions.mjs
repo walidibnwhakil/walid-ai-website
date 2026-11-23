@@ -47,7 +47,11 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "batch": "early-16",
     "number": 6,
     "name": "Shafikul Islam (Jamat Leader)",
-    "aliases": []
+    "aliases": [
+      "Shafiqul Islam Masud",
+      "Shafikul Islam Masud",
+      "শফিকুল ইসলাম মাসুদ"
+    ]
   },
   {
     "batch": "early-16",
@@ -81,7 +85,9 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "number": 10,
     "name": "best Friend",
     "aliases": [
-      "Best friend"
+      "Best friend",
+      "Your best friend",
+      "আপনার সবচেয়ে কাছের বন্ধু"
     ]
   },
   {
@@ -134,7 +140,10 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "name": "Ghori",
     "aliases": [
       "Clock",
-      "Watch"
+      "Watch",
+      "Wristwatch",
+      "হাতঘড়ি",
+      "ঘড়ি"
     ]
   },
   {
@@ -155,7 +164,10 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "batch": "extra-20",
     "number": 4,
     "name": "Tridha Chowdhury",
-    "aliases": []
+    "aliases": [
+      "Tridha Choudhury",
+      "ত্রিধা চৌধুরী"
+    ]
   },
   {
     "batch": "extra-20",
@@ -222,7 +234,11 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "batch": "extra-20",
     "number": 14,
     "name": "meher afroz shawon",
-    "aliases": []
+    "aliases": [
+      "Meher Afroz Shaon",
+      "Meher Afroz Shawon",
+      "মেহের আফরোজ শাওন"
+    ]
   },
   {
     "batch": "extra-20",
@@ -271,7 +287,10 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "batch": "celebrities-25",
     "number": 1,
     "name": "Ferdous",
-    "aliases": []
+    "aliases": [
+      "Ferdous Ahmed",
+      "ফেরদৌস আহমেদ"
+    ]
   },
   {
     "batch": "celebrities-25",
@@ -328,7 +347,10 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "batch": "celebrities-25",
     "number": 9,
     "name": "Koel Mallik",
-    "aliases": []
+    "aliases": [
+      "Koel Mallick",
+      "কোয়েল মল্লিক"
+    ]
   },
   {
     "batch": "celebrities-25",
@@ -505,7 +527,9 @@ export const OWNER_111_SESSIONS=Object.freeze([
     "aliases": [
       "Grandfather",
       "Grandpa",
-      "Grand father"
+      "Grand father",
+      "Your grandfather",
+      "আপনার দাদা বা নানা"
     ]
   },
   {

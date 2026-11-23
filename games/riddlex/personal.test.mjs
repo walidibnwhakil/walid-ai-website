@@ -191,10 +191,10 @@ test("Riddlex the detective is itself a guessable fictional character", () => {
 });
 
 test("generic roles contain no private person's name or identifying details", () => {
-  assert.equal(PERSONAL_RELATIONS.length, 13);
+  assert.equal(PERSONAL_RELATIONS.length, 14);
   for (const role of PERSONAL_RELATIONS) {
     assert.ok(role.id.startsWith("riddlex-role-"));
-    assert.ok(role.en.startsWith("Your "));
+    assert.ok(role.en.startsWith("Your ") || role.en==="Yourself");
     assert.ok(!role.image && !role.credit);
     assert.ok(PERSONAL_FACTS[role.id]);
   }

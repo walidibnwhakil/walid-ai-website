@@ -2165,8 +2165,15 @@ function evidenceBackedObjectCandidate(state) {
       state.sinceGuess<questionsBeforeRetry(state)) return -1;
   const known=state.answers.filter(row=>row.value==="yes" &&
     state.pool.questions[row.qi]?.group==="object");
-  const knownSignatures=known.filter(row=>HYPOTHESIS_FACTS[row.qid]);
-  if(known.length<3 || !knownSignatures.length) return -1;
+  // Electricity alone describes thousands of devices. A proposed object
+  // must be supported by a distinctive use/shape function, or by at least
+  // two independent observable functions that eliminate similar objects.
+  const knownSignatures=known.filter(row=>
+    HYPOTHESIS_FACTS[row.qid] && row.qid!=="obj_uses_electricity");
+  const confirmedUnique=knownSignatures.some(row=>
+    NONPERSON_SIGNATURES.includes(row.qid));
+  if(known.length<3 ||
+     (!confirmedUnique && knownSignatures.length<2)) return -1;
   const no=state.answers.filter(row=>row.value==="no");
   const options=[];
   for(const i of state.alive) {
@@ -2179,9 +2186,14 @@ function evidenceBackedObjectCandidate(state) {
       if(bit===1) {contradiction=true;break;}
       if(bit!==2)continue;
       support++;
-      if(HYPOTHESIS_FACTS[row.qid])signature++;
+      if(HYPOTHESIS_FACTS[row.qid] && row.qid!=="obj_uses_electricity")
+        signature++;
     }
     if(contradiction || !signature || support<4)continue;
+    const confirmedFunction=knownSignatures.filter(row=>
+      factBit(state.pool,i,row.qi)===2);
+    if(!confirmedFunction.some(row=>NONPERSON_SIGNATURES.includes(row.qid)) &&
+       confirmedFunction.length<2)continue;
     if(no.some(row=>factBit(state.pool,i,row.qi)===2))continue;
     // Include negative evidence as a modest tie-breaker. A missing fact
     // stays neutral: it is never counted as a positive.

@@ -10,6 +10,7 @@ const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await i
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-54";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-54";
+import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -149,6 +150,9 @@ export function factBit(pool, index, qi) {
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   if (SCREEN_CAREER_DETAILS[id]) return SCREEN_CAREER_DETAILS[id][pool.ids[index]] || 0;
   if (HYPOTHESIS_FACTS[id]) return HYPOTHESIS_FACTS[id][pool.ids[index]] || 0;
+  // Named public-career facts are sparse independent overlays, not made-up
+  // answers for the other millions of people in the binary casebook.
+  if (IDENTITY_FACTS[id]) return IDENTITY_FACTS[id][pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -675,6 +679,12 @@ export function shouldGuess(state) {
   // including verified career/role details for actors. Never reveal a name
   // simply because the database has few remaining candidates or a turn cap.
   if (state.category === "character" && state.pool.count >= 100 && !personal) {
+    // A widely shared occupation or industry is not a person's identity.
+    // Public profile records need their own distinctive corroboration.
+    if (state.pool.ids[best]?.startsWith("riddlex-profile-") &&
+        !state.answers.some(row => row.value === "yes" &&
+          ANCHOR_IDENTITY_QUESTIONS.has(row.qid) &&
+          factBit(state.pool,best,row.qi)===2)) return false;
     if (asked < 8 || !hasCandidateEvidence(state, best)) return false;
     if (said(state, "actor", ["yes","probably"]) &&
         !hasScreenIdentityProof(state, best)) return false;
@@ -1073,6 +1083,18 @@ function politicsSplit(state, qi, rows) {
 function unrelatedJob(state, id) {
   const job = confirmedJob(state);
   if (!job || job === id) return false;
+  // A member of parliament can also act or captain a cricket team; a writer
+  // can publish videos. Don't permanently suppress a second profession
+  // merely because it is uncommon in the global popularity distribution.
+  // Require real source-backed overlap, never an invented universal yes.
+  if (state.category === "character" && state.pool.count >= 100 &&
+      PRIMARY_JOBS.includes(id)) {
+    const firstQi = state.pool.qIndex.get(job);
+    const nextQi = state.pool.qIndex.get(id);
+    if (firstQi != null && nextQi != null && state.alive.some(i =>
+      state.weights[i] > 0 && factBit(state.pool,i,firstQi) === 2 &&
+      factBit(state.pool,i,nextQi) === 2)) return false;
+  }
   const primary = PRIMARY_JOBS.includes(id);
   const politics = id === "politician" || state.pool.questions[state.pool.qIndex.get(id)]?.group === "politics";
   if (!primary && !(politics && job !== "politician")) return false;
@@ -1184,6 +1206,11 @@ export const QUESTION_REQUIRES = {
   ...Object.fromEntries(Object.keys(HYPOTHESIS_FACTS).map((id) => [
     id, [{ id: id.startsWith("animal_") ? "animal" : "object",
            value: "yes", strict: true }],
+  ])),
+  // Film, sport and public-office questions require that the player has
+  // confirmed the corresponding occupation, never merely fame or nationality.
+  ...Object.fromEntries(EXTRA_IDENTITY_QUESTIONS.map(question => [
+    question.id, [{ id:question.parent, value:"yes", strict:true }],
   ])),
   ...Object.fromEntries(Object.keys(SCREEN_CAREER_DETAILS).map((id) => [
     id, [
@@ -1522,6 +1549,7 @@ function objectAnimalSignatureQuestion(state, candidate) {
 const ANCHORED_ANIMAL_QUESTIONS = new Set(["is_dog", "is_mouse"]);
 const FICTION_PAIR = ["from_game", "detective_role"];
 const ANCHOR_SCREEN_QUESTIONS = new Set(SCREEN_IDENTITY_QUESTIONS);
+const ANCHOR_IDENTITY_QUESTIONS = new Set(IDENTITY_DISTINCTIVE_IDS);
 const ANCHOR_POLITICS_QUESTIONS = new Set(POLITICS_IDENTITY_QUESTIONS);
 const ANCHOR_FUNCTION_QUESTIONS = new Set(NONPERSON_SIGNATURES);
 
@@ -1541,6 +1569,7 @@ function verifiedIdentityCandidate(state) {
   // records on every early turn.
   if (!gameDetective && !affirmed.some(row =>
       ANCHOR_SCREEN_QUESTIONS.has(row.qid) ||
+      ANCHOR_IDENTITY_QUESTIONS.has(row.qid) ||
       ANCHOR_POLITICS_QUESTIONS.has(row.qid) ||
       ANCHOR_FUNCTION_QUESTIONS.has(row.qid) ||
       (state.category === "animal" && ANCHORED_ANIMAL_QUESTIONS.has(row.qid))))
@@ -1557,13 +1586,17 @@ function verifiedIdentityCandidate(state) {
       ANCHOR_SCREEN_QUESTIONS.has(row.qid));
     const office = political && verified.filter(row =>
       ANCHOR_POLITICS_QUESTIONS.has(row.qid));
+    // Public non-sensitive distinctive works and roles can identify authors,
+    // athletes, film actors, officeholders and adult-industry performers.
+    const identity = verified.filter(row =>
+      ANCHOR_IDENTITY_QUESTIONS.has(row.qid));
     const functionProof = ["object","animal"].includes(state.category) &&
       verified.filter(row => ANCHOR_FUNCTION_QUESTIONS.has(row.qid));
     const species = state.category === "animal" &&
       verified.filter(row => ANCHORED_ANIMAL_QUESTIONS.has(row.qid));
     const fictionProof = gameDetective && FICTION_PAIR.every(qid => known.has(qid));
     const strong = (career?.length || 0) + (office?.length || 0) +
-      (functionProof?.length || 0) + (species?.length || 0);
+      identity.length + (functionProof?.length || 0) + (species?.length || 0);
     if (!strong && !fictionProof) continue;
     // Supporting facts must come from the SAME candidate and current round.
     // For the dog this means e.g. dog=yes, mammal=yes, pet=yes.
@@ -1572,9 +1605,8 @@ function verifiedIdentityCandidate(state) {
       ["job","politics","fiction","animal","object","look","size"].includes(
         pool.questions[row.qi]?.group));
     if (relevant.length < 2) continue;
-    if ((career?.length || office?.length) && !known.has("from_bd") &&
-        !known.has("from_in") && !known.has("from_gb") &&
-        !known.has("from_us")) continue;
+    if ((career?.length || office?.length || identity.length) &&
+        !COUNTRIES.some(country => known.has(country))) continue;
     if (functionProof?.length && relevant.length < 2) continue;
     if (species?.length && relevant.length < 3) continue;
     if (fictionProof && (!known.has("named") || relevant.length < 2)) continue;
@@ -1611,13 +1643,27 @@ function verifiedIdentityDiscoveryQuestion(state) {
   const saidYes = qid => said(state,qid,["yes","probably"]);
   const actor = saidYes("actor") &&
     (saidYes("from_bd") || saidYes("from_in"));
-  const politics = saidYes("politician") && saidYes("from_bd");
+  const politics = saidYes("politician") &&
+    COUNTRIES.some(id=>saidYes(id));
+  const cricket = saidYes("cricketer") && saidYes("from_bd");
+  const writing = (saidYes("writer") || saidYes("youtube")) &&
+    saidYes("from_bd");
+  const adult = saidYes("adult_ent") &&
+    COUNTRIES.some(id=>saidYes(id));
   const flower = state.category === "object";
-  if (!actor && !politics && !flower) return null;
+  if (!actor && !politics && !cricket && !writing && !adult && !flower) return null;
   const asked = new Set(state.answers.map(row=>row.qid));
   const questions = [
     ...(actor ? SCREEN_IDENTITY_QUESTIONS : []),
     ...(politics ? POLITICS_IDENTITY_QUESTIONS : []),
+    ...EXTRA_IDENTITY_QUESTIONS
+      .filter(question => (
+        (actor && question.parent==="actor") ||
+        (politics && question.parent==="politician") ||
+        (cricket && question.parent==="cricketer") ||
+        (writing && question.id==="career_online_commentator") ||
+        (adult && question.parent==="adult_ent")
+      )).map(question=>question.id),
     ...(flower ? ["obj_flower_from_plant",
        "obj_fragrant_flower", "obj_five_spiral_waxy_petals",
        "obj_frangipani_yellow_center"] : []),
@@ -1636,7 +1682,8 @@ function verifiedIdentityDiscoveryQuestion(state) {
         !hasUnrejectedFilmCandidate(state,qid)) continue;
     // These overlays are intentionally sparse: score their known YES IDs
     // rather than doing a factBit lookup for every person in the huge casebook.
-    const sourceFacts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid];
+    const sourceFacts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
+      IDENTITY_FACTS[qid];
     const yesIds = sourceFacts
       ? new Set(Object.entries(sourceFacts)
           .filter(([,fact])=>fact===2).map(([id])=>id))
@@ -1671,6 +1718,30 @@ function crossProfessionQuestion(state, candidate) {
     const qi = state.pool.qIndex.get(qid);
     if (qi == null || asked.has(qid)) continue;
     if (factBit(state.pool,candidate,qi) === 2) return qid;
+  }
+  return null;
+}
+
+// Ask about an established politician's SECOND well-known occupation before
+// probing dozens of party/ministerial questions. Only ask when the surviving
+// records include an actual politician with that other verified career.
+function mixedCareerQuestion(state) {
+  if (state.category !== "character" ||
+      !said(state,"politician",["yes","probably"]) ||
+      !COUNTRIES.some(qid=>said(state,qid,["yes","probably"])) ||
+      state.answers.length < 6) return null;
+  if (["actor","cricketer"].some(qid =>
+      said(state,qid,["yes","probably"]))) return null;
+  const { pool } = state;
+  const politicianQi=pool.qIndex.get("politician");
+  if (politicianQi == null) return null;
+  for (const qid of ["actor","cricketer"]) {
+    if (state.answers.some(row=>row.qid===qid)) continue;
+    const qi=pool.qIndex.get(qid);
+    if(qi==null) continue;
+    if(state.alive.some(i=>state.weights[i]>0 &&
+        factBit(pool,i,politicianQi)===2 && factBit(pool,i,qi)===2))
+      return qid;
   }
   return null;
 }
@@ -1824,6 +1895,8 @@ export function decide(state) {
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  const mixed = mixedCareerQuestion(state);
+  if (mixed) return { type:"ask", qid:mixed };
   // First determine their usual role (lead, antagonist or comic performer).
   // Career era and signature props are follow-up branches, not universal
   // prerequisites to finding an actor or anyone else.
@@ -1851,9 +1924,9 @@ export function decide(state) {
   const evidenceIndex = verifiedIdentityCandidate(state);
   if (evidenceIndex >= 0)
     return { type:"guess", index:evidenceIndex };
-  const verification = state.answers.length >= 10 &&
-    (state.answers.length % 3 === 1)
-      ? verifiedIdentityDiscoveryQuestion(state) : null;
+  // Distinctive, independently verified career questions should not be
+  // postponed until a global information-gain threshold is exhausted.
+  const verification = verifiedIdentityDiscoveryQuestion(state);
   if (verification) return { type:"ask", qid:verification };
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   // After any wrong guess, force a fresh evidence-gathering round.

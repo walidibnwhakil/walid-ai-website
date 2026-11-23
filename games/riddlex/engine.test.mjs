@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-52";
-import { EXTRA_HYPOTHESIS_QUESTIONS, EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-52";
+import { EXTRA_HYPOTHESIS_QUESTIONS, EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-53";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -164,7 +164,7 @@ test("generic electrical appliance clues cannot force a popular TV guess", () =>
     "TV, fan and air conditioner all fit generic electrical questions");
 });
 
-test("animal guesses ask a butterfly-specific behaviour, not just insect and flying", () => {
+test("flower nectar is shared, so butterfly requires a separate distinguishing fact", () => {
   const qs=[...questions,
     {id:"insect",group:"animal",en:"Insect?",bn:"পোকা?"},
     {id:"can_fly",group:"animal",en:"Fly?",bn:"উড়ে?"},
@@ -174,16 +174,55 @@ test("animal guesses ask a butterfly-specific behaviour, not just insect and fly
     ...Array.from({length:120},(_,i)=>
       entry("flying-insect-"+i,1,["animal","insect","can_fly","wild"]))];
   const pool=poolFromEntries(qs,animals);
-  pool.pop[0]=65000;
+  const butterfly=pool.ids.indexOf("c-butterfly");
+  const honeybee=pool.ids.indexOf("c-honeybee");
+  assert.ok(butterfly>=0 && honeybee>=0);
+  assert.equal(factBit(pool,butterfly,pool.qIndex.get("animal_visits_flowers")),2);
+  assert.equal(factBit(pool,honeybee,pool.qIndex.get("animal_visits_flowers")),2,
+    "Both butterfly and honeybee visit flowers for nectar");
+  pool.pop[butterfly]=65000;
+  pool.pop[honeybee]=10000;
   const state=createState(pool,{category:"animal"});
   recompute(state);
   for(const [qid,value] of [["insect","yes"],["can_fly","yes"],
-    ["wild","yes"],["pet","no"]]) answer(state,qid,value);
-  assert.equal(shouldGuess(state),false);
-  assert.equal(decide(state).qid,"animal_visits_flowers");
-  answer(state,"animal_visits_flowers","yes");
+    ["wild","yes"],["pet","no"],["animal_visits_flowers","yes"]])
+    answer(state,qid,value);
+  assert.equal(shouldGuess(state),false,
+    "Shared nectar feeding cannot, on its own, identify a butterfly");
+  const confirmation=decide(state);
+  assert.equal(confirmation.type,"ask");
+  assert.equal(confirmation.qid,"animal_patterned_wings",
+    "Distinguish butterfly wings from honeybee wings");
+  answer(state,"animal_patterned_wings","yes");
   assert.equal(shouldGuess(state),true);
   assert.equal(pool.ids[decide(state).index],"c-butterfly");
+});
+
+test("honeybee is also a viable hypothesis after nectar YES", () => {
+  const qs=[...questions,
+    {id:"insect",group:"animal",en:"Insect?",bn:"পোকা?"},
+    {id:"can_fly",group:"animal",en:"Fly?",bn:"উড়ে?"},
+    {id:"wild",group:"animal",en:"Wild?",bn:"বন্য?"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS];
+  const animals=[...EXTRA_HYPOTHESIS_ENTRIES.animal,
+    ...Array.from({length:120},(_,i)=>
+      entry("flying-insect-"+i,1,["animal","insect","can_fly","wild"]))];
+  const pool=poolFromEntries(qs,animals);
+  pool.pop[pool.ids.indexOf("c-honeybee")]=65000;
+  const state=createState(pool,{category:"animal"});
+  recompute(state);
+  for(const [qid,value] of [["insect","yes"],["can_fly","yes"],
+    ["wild","yes"],["pet","no"],["animal_visits_flowers","yes"]])
+    answer(state,qid,value);
+  assert.equal(shouldGuess(state),false,
+    "Nectar doesn't establish the identity of a honeybee either");
+  const question=decide(state);
+  assert.equal(question.type,"ask");
+  assert.equal(question.qid,"animal_makes_honey",
+    "Check whether the insect makes and stores honey");
+  answer(state,question.qid,"yes");
+  assert.equal(shouldGuess(state),true);
+  assert.equal(pool.ids[decide(state).index],"c-honeybee");
 });
 
 test("international actors are not guessed from fame, lead roles and decade alone", () => {

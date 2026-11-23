@@ -246,8 +246,9 @@ try {
     const targets = {
       fridge: "c-fridge", ceiling_fan: "c-ceiling-fan",
       air_conditioner: "c-air-conditioner", butterfly: "c-butterfly",
+      honeybee: "c-honeybee",
     };
-    const category = policy === "butterfly" ? "animal"
+    const category = ["butterfly","honeybee"].includes(policy) ? "animal"
       : targets[policy] ? "object" : "character";
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
     const trace = [];
@@ -521,8 +522,9 @@ try {
         assert.ok(trace.some(item=>item.startsWith("CORRECT:")),
           "The candidate-hypothesis replay did not identify " + policy);
         const signature = {
-          fridge:"obj_keeps_food_cold", ceiling_fan:"obj_moves_air_blades",
-          air_conditioner:"obj_cools_room", butterfly:"animal_visits_flowers",
+          fridge:"obj_keeps_food_cold", ceiling_fan:"obj_mounted_ceiling",
+          air_conditioner:"obj_cools_room", butterfly:"animal_patterned_wings",
+          honeybee:"animal_makes_honey",
         };
         assert.ok(seen.has(signature[policy]),
           "Game guessed without checking the unique " + policy + " function");
@@ -553,7 +555,8 @@ try {
   await replay("Refrigerator: keeps food fresh and cold", "fridge");
   await replay("Ceiling fan: moving air overhead", "ceiling_fan");
   await replay("Air conditioner: cools a room", "air_conditioner");
-  await replay("Butterfly: visits flowers", "butterfly");
+  await replay("Butterfly: colourful wings, not just shared flower visits", "butterfly");
+  await replay("Honeybee: collects nectar but makes honey", "honeybee");
   await replay("Charlie Chaplin: global silent comic with moustache", "chaplin");
   await replay("Dildar: late Bangladeshi supporting comedian", "dildar");
 } finally {

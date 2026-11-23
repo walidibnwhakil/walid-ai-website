@@ -1730,6 +1730,12 @@ function verifiedIdentityDiscoveryQuestion(state) {
             })) return false;
         if (saidYes("male") && !person.yes.includes("male")) return false;
         if (saidYes("female") && !person.yes.includes("female")) return false;
+        // Once the player knows the film industry, do not ask about
+        // performers who have no known work in that industry.
+        for (const industry of ["career_bengali_films","career_hindi_films",
+            "career_telugu_films","career_hollywood_films"]) {
+          if (saidYes(industry) && !person.yes.includes(industry)) return false;
+        }
         return true;
       })) continue;
       // Identify industry before obscure individual film trivia.
@@ -1804,11 +1810,19 @@ function confirmedAdultOccupationQuestion(state) {
       !COUNTRIES.some(qid=>said(state,qid,["yes","probably"]))) return null;
   const qi=state.pool.qIndex.get("adult_ent");
   if (qi == null) return null;
-  const people=state.alive.filter(i=>state.weights[i]>.025 &&
-    factBit(state.pool,i,qi)===2 && state.pool.ids[i]?.startsWith("riddlex-profile-"));
+  const matchedCountry=COUNTRIES.find(country=>
+    said(state,country,["yes","probably"]));
+  const countryQi=state.pool.qIndex.get(matchedCountry);
+  const people=state.alive.filter(i=>state.weights[i]>.005 &&
+    factBit(state.pool,i,qi)===2 &&
+    state.pool.ids[i]?.startsWith("riddlex-profile-") &&
+    countryQi!=null && factBit(state.pool,i,countryQi)===2);
   if (!people.length) return null;
   const total=people.reduce((sum,i)=>sum+state.weights[i],0);
-  return total>.14 ? "adult_ent" : null;
+  // A corroborated source-backed candidate with a known home country is
+  // enough to justify *asking* the profession, not enough to guess a name.
+  // Keep the threshold well above a speculative global prior.
+  return total>=.015 ? "adult_ent" : null;
 }
 
 function firstAllowedQuestion(state) {

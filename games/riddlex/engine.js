@@ -1694,10 +1694,16 @@ function verifiedIdentityCandidate(state) {
     // Two domain facts plus nationality, or three domain facts plus an
     // affirmed profession/fictional category, are meaningful corroboration.
     // Don't make ambiguous or dual-nationality users guess a single passport.
-    const professionProof = domain.length>=3 &&
+    const literaryProof = domain.length>=2 &&
+      known.has("fictional") && known.has("from_novel") &&
+      known.has("from_bengali_lit") &&
+      answers.some(row=>["male","female"].includes(row.qid) &&
+        ["yes","no"].includes(row.value) &&
+        factBit(pool,i,row.qi)===(row.value==="yes"?2:1));
+    const professionProof = literaryProof || (domain.length>=3 &&
       (known.has("business") || known.has("scientist") ||
        known.has("politician") || known.has("writer") ||
-       known.has("fictional") || known.has("youtube"));
+       known.has("fictional") || known.has("youtube")));
     if ((career?.length || office?.length || identity.length) &&
         !countryProof && !(identity.length && regionProof) &&
         !professionProof) continue;

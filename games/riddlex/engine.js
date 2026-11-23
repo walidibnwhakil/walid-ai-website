@@ -1058,7 +1058,8 @@ export const QUESTION_REQUIRES = {
       { id: "actor", value: "yes", strict: true },
       ...([
         "screen_known_multiple_marriages", "screen_debut_anonto_bhalobasha",
-        "screen_acted_bir_soinik", "screen_film_debut_pre1995", "screen_over_100_films",
+        "screen_acted_bir_soinik", "screen_died_1996", "screen_died_2008",
+        "screen_film_debut_pre1995", "screen_over_100_films",
         "screen_films_after_2000", "screen_national_film_award",
         "screen_air_force_before_films", "screen_first_film_keyamat",
         "screen_first_film_banglar_nayok", "screen_comedy_award",

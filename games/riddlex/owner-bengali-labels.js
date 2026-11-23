@@ -3,6 +3,7 @@
 // Conservative exact-name matches only; never infer someone's identity from a
 // partial name or conflate a fictional character with a real person.
 const labels=Object.freeze({
+  "adam": "আদম",
   "mrbeast": "মিস্টার বিস্ট",
   "jimmydonaldson": "জিমি ডোনাল্ডসন",
   "poddoja": "পদ্মজা",

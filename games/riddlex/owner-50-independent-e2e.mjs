@@ -174,7 +174,7 @@ const people=[
 ];
 
 const countries=new Set(["from_bd","from_in","from_pk","from_us","from_gb","from_jp","from_kr","from_cn","from_fr","from_de","from_ru","from_br","from_ca","from_au","from_es","from_it","from_mx","from_ng","from_eg","from_tr","from_id","from_sa","from_ar","from_za"]);
-const regionMap={from_bd:"from_asia",from_in:"from_asia",from_pk:"from_asia",from_jp:"from_asia",from_gb:"from_europe",from_fr:"from_europe",from_de:"from_europe",from_it:"from_europe",from_us:"from_north_america",from_ca:"from_north_america",from_za:"from_africa"};
+const regionMap={from_bd:"from_asia",from_in:"from_asia",from_pk:"from_asia",from_jp:"from_asia",from_gb:"from_europe",from_fr:"from_europe",from_de:"from_europe",from_it:"from_europe",from_es:"from_europe",from_us:"from_north_america",from_ca:"from_north_america",from_za:"from_africa"};
 const regions=new Set(["from_asia","from_europe","from_africa","from_north_america","from_south_america"]);
 const fictionTags=new Set(["from_novel","from_bengali_lit","from_film","from_cartoon","from_anime","from_comics","from_game","by_humayun","by_zafar","by_ray"]);
 const objectNo=new Set(["vehicle","kitchen","clothing","food","furniture","cooking","uses_pressure","music_item","sport_item","obj_moves_air_blades","obj_cools_room","obj_keeps_food_cold","obj_mounted_ceiling","obj_flower_from_plant","obj_fragrant_flower","obj_five_spiral_waxy_petals","obj_frangipani_yellow_center"]);
@@ -271,7 +271,7 @@ try {
   const candidateEvidence=await page.evaluate(
     keys=>keys.flatMap(k=>window.__riddlex?.candidate?.(k)||[]),
     ids).catch(()=>[]);
-  const row={name:person.name,category:person.category,canonical:person.canonical||person.name,
+  const row={sequence:people.indexOf(person)+1,name:person.name,category:person.category,canonical:person.canonical||person.name,
     status:outcome,questions:trace.length,
     unknowns:trace.filter(t=>t.answer==="unknown").length,
     difficult:trace.filter(t=>t.level==="বিশেষ তথ্য").length,
@@ -282,6 +282,7 @@ try {
   console.log("RIDDLEX_50_CASE "+JSON.stringify(row));
   await page.close().catch(()=>{});
  }
+ if(results.length!==10) throw Error("Expected 10 games in this shard, got "+results.length);
  const counts={correct:results.filter(r=>r.status==="correct").length,
    defeat:results.filter(r=>r.status==="defeat").length,
    wrong:results.filter(r=>r.wrongGuesses.length).length,
@@ -290,7 +291,7 @@ try {
    cases:results.map(({name,canonical,status,questions,unknowns,difficult,
      wrongGuesses,finalGuess,error})=>({name,canonical,status,questions,
        unknowns,difficult,wrongGuesses,finalGuess,error}))}));
- const out=join(process.env.RUNNER_TEMP||process.cwd(),"riddlex-user-50-part.json");
+ const out=join(process.env.RUNNER_TEMP||process.cwd(),"riddlex-user-50-part-"+(process.env.RIDDLEX_SHARD||"0")+".json");
  await writeFile(out,JSON.stringify({testedAt:new Date().toISOString(),
    game:"actual PR-head Riddlex browser game",answerMode:"independent cautious public facts; unverified questions=unknown",
    counts,results},null,2));

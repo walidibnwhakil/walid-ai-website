@@ -1302,8 +1302,34 @@ export function questionContradicts(state, qid) {
   return ancestorRejected(state, qid, links);
 }
 
+const MAINSTREAM_INDUSTRY_QUESTIONS = Object.freeze([
+  "career_bengali_films", "career_hindi_films",
+  "career_telugu_films", "career_hollywood_films",
+]);
+const ACTOR_ONLY_IDENTITY_QUESTIONS = new Set(
+  EXTRA_IDENTITY_QUESTIONS.filter(q =>
+    q.parent==="actor" && !MAINSTREAM_INDUSTRY_QUESTIONS.includes(q.id))
+    .map(q=>q.id));
+
 function blockedQuestion(state, question, rows, cache) {
   if (skippedAsDuplicate(state, question.id)) return true;
+  // A confirmed adult-industry actor must not be questioned about unrelated
+  // mainstream movies or screen roles before a mainstream industry is known.
+  if (state.category==="character" &&
+      said(state,"adult_ent",["yes","probably"]) &&
+      !MAINSTREAM_INDUSTRY_QUESTIONS.some(id=>said(state,id,["yes","probably"])) &&
+      (question.id.startsWith("screen_") ||
+       ACTOR_ONLY_IDENTITY_QUESTIONS.has(question.id)))
+    return true;
+  // A curated question about one country's films or career is not evidence
+  // about every actor worldwide. Avoid exhausting unrelated national markets
+  // once the player's country is known, including during the fallback path.
+  if (IDENTITY_FACTS[question.id]) {
+    const country=COUNTRIES.find(id=>said(state,id,["yes","probably"]));
+    if (country && !EXTRA_IDENTITY_PEOPLE.some(person=>
+      IDENTITY_FACTS[question.id][person.id]===2 &&
+      person.yes.includes(country))) return true;
+  }
   const links = linksFor(state.pool);
   // Sport-specific roles are not asked before confirming the sport.
   for (const sport of ["cricketer", "footballer"]) {

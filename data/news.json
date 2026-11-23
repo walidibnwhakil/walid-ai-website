@@ -1,8 +1,36 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-22T21:31:52.598985+00:00",
+  "updatedAt": "2026-11-23T02:13:16.222718+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Democrats win largest House majority since 1992 after flipping North Carolina seat",
+      "url": "https://www.bbc.co.uk/news/articles/c6vg29g7dlyno?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-23T01:23:43+00:00",
+      "category": "World"
+    },
+    {
+      "title": "COP31 fails to reach major climate deal as talks expose deep divisions",
+      "url": "https://www.bbc.co.uk/news/articles/cqwy06zrd26lo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-23T00:50:35+00:00",
+      "category": "Technology"
+    },
+    {
+      "title": "Italian jeweller and businessman Paolo Bulgari dies aged 89",
+      "url": "https://www.bbc.co.uk/news/articles/c8e39qk5vrpdo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-23T00:33:36+00:00",
+      "category": "World"
+    },
+    {
+      "title": "'Danger seems greater all the time': Ukrainians search for missing after Russian strikes",
+      "url": "https://www.bbc.co.uk/news/videos/cre3dvd1k9y1o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-22T22:37:43+00:00",
+      "category": "Technology"
+    },
     {
       "title": "Miley Cyrus marries Maxx Morando in California ceremony",
       "url": "https://www.bbc.co.uk/news/articles/cq8e0p87l89lo?at_medium=RSS&at_campaign=rss",
@@ -18,13 +46,6 @@
       "category": "World"
     },
     {
-      "title": "Democrats win largest House majority since 1992 after flipping North Carolina seat",
-      "url": "https://www.bbc.co.uk/news/articles/c6vg29g7dlyno?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-22T20:26:24+00:00",
-      "category": "World"
-    },
-    {
       "title": "What's next after no deal at COP31 climate talks?",
       "url": "https://www.bbc.co.uk/news/videos/cr1ewge81q4qo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
@@ -37,20 +58,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-22T18:29:46+00:00",
       "category": "World"
-    },
-    {
-      "title": "COP31 fails to reach major climate deal as talks expose deep divisions",
-      "url": "https://www.bbc.co.uk/news/articles/cqwy06zrd26lo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-22T18:17:59+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "'Danger seems greater all the time': Ukrainians search for missing after Russian strikes",
-      "url": "https://www.bbc.co.uk/news/videos/cre3dvd1k9y1o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-22T17:57:43+00:00",
-      "category": "Technology"
     },
     {
       "title": "Russia-bound ship towed away after it was attacked in Gulf of Finland",
@@ -71,13 +78,6 @@
       "url": "https://www.bbc.co.uk/news/articles/cw3dgk29d37no?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-22T09:20:45+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Italian jeweller and businessman Paolo Bulgari dies aged 89",
-      "url": "https://www.bbc.co.uk/news/articles/c8e39qk5vrpdo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-22T07:12:41+00:00",
       "category": "World"
     },
     {

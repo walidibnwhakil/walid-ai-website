@@ -1,8 +1,50 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-22T21:31:53.000206+00:00",
+  "updatedAt": "2026-11-23T02:13:16.490428+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "A 'wow' player - why Ngumoha is already a Liverpool game-changer",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmn80y5w84qqo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T23:20:16+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "European football: Barcelona roar back from two goals down to sink Villarreal",
+      "url": "https://www.theguardian.com/football/2026/nov/22/european-football-barcelona-villarreal-juventus-milan-inter",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T22:20:43+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Thitikul wins third title in a row at LPGA finale",
+      "url": "https://www.bbc.co.uk/sport/golf/articles/ckjwjvwexd12o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T21:54:08+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Fifa to confirm UK as host for 2035 Women's World Cup",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cx30g83716lzo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T21:44:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'World's best could've lost 4-0' - but should Man Utd have done more at Anfield?",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm782j80yypwo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-22T21:36:00+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "‘It’s painful for me’: Pochettino criticises Yoro red card in Anfield humiliation",
+      "url": "https://www.theguardian.com/football/2026/nov/22/mauricio-pochettino-manchester-united-reign-begins-with-anfield-humiliation-liverpool",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T21:31:03+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Chaotic week, nightmare start and huge reality check for Pochettino",
       "url": "https://www.bbc.co.uk/sport/football/articles/cwd012903kvgo?at_medium=RSS&at_campaign=rss",
@@ -11,7 +53,7 @@
       "category": "Sports"
     },
     {
-      "title": "Price wins Grand Slam to end major title wait",
+      "title": "Price wins Grand Slam to end wait for major title",
       "url": "https://www.bbc.co.uk/sport/darts/articles/cklye10j4z1yo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-22T21:06:47+00:00",
@@ -22,6 +64,13 @@
       "url": "https://www.bbc.co.uk/sport/football/articles/ck053nyl6399o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-22T21:04:15+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Pochettino’s new-manager bounce falls flat with De Ligt move a disastrous step | Jamie Jackson",
+      "url": "https://www.theguardian.com/football/2026/nov/22/mauricio-pochettino-matthijs-de-ligt-harry-maguire-manchester-united-liverpool-premier-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-22T20:58:35+00:00",
       "category": "Sports"
     },
     {
@@ -46,13 +95,6 @@
       "category": "Sports"
     },
     {
-      "title": "European football: Barcelona roar back from two goals down to sink Villarreal",
-      "url": "https://www.theguardian.com/football/2026/nov/22/european-football-barcelona-villarreal-juventus-milan-inter",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-22T19:39:27+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "From conceding seven to Hull heroics - how Tzolakis recovered to defy Brighton",
       "url": "https://www.bbc.co.uk/sport/football/articles/cm4gn7npqe8yo?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
@@ -64,13 +106,6 @@
       "url": "https://www.theguardian.com/football/2026/nov/22/liverpool-manchester-united-premier-league-match-report",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-22T18:35:14+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Yoro sees red as Ngumoha shines - Liverpool v Man Utd player ratings",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c933gzxk66yyo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T18:28:51+00:00",
       "category": "Sports"
     },
     {
@@ -95,31 +130,10 @@
       "category": "Sports"
     },
     {
-      "title": "Did beaten Wales still show they have come a long way?",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cjr4gn7yd9d5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T15:07:06+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Manchester City’s WSL title bid hit by Spurs after Vinberg and Naz’s late double",
       "url": "https://www.theguardian.com/football/2026/nov/22/manchester-city-tottenham-wsl-match-report",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-22T14:59:23+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "England will not get carried away by beating All Blacks",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/ckr5gdpm1q5no?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T12:45:57+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Verstappen a constant amid chaos as he says Russell is 'so far below my level'",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/c3n0l5p5x5x5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-22T11:07:32+00:00",
       "category": "Sports"
     },
     {
@@ -137,24 +151,10 @@
       "category": "Sports"
     },
     {
-      "title": "Lionel Messi at center of red-card controversy as Inter Miami face early MLS playoff exit",
-      "url": "https://www.theguardian.com/football/2026/nov/21/lionel-messi-red-card-controversy-inter-miami-columbus-crew-mls-playoffs",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-22T03:01:55+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "‘Obviously it’s not good’: Arteta sweating over David Raya’s fitness after injury",
       "url": "https://www.theguardian.com/football/2026/nov/21/david-raya-shoulder-injury-arsenal-newcastle-mikel-arteta",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-21T21:48:21+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Evanilson and Kluivert sink Forest to earn Bournemouth ninth win in a row",
-      "url": "https://www.theguardian.com/football/2026/nov/21/bournemouth-nottingham-forest-premier-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-21T17:10:24+00:00",
       "category": "Sports"
     },
     {
@@ -4521,7 +4521,7 @@
           "matchType": "t20",
           "startTime": "2026-11-23T02:00:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "live",
           "source": "CricketData"
         },
         {

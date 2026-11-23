@@ -1410,6 +1410,13 @@ function pendingActorRoleQuestion(state) {
   if (state.category !== "character" ||
       !said(state, "actor", ["yes", "probably"]) ||
       said(state, "knows_you", ["yes", "probably"])) return null;
+  // Do not force mainstream leading-role/comedy trivia on an independently
+  // confirmed adult-film performer whose mainstream acting is unestablished.
+  // This is a branch preference, never a judgment about their identity.
+  if (said(state, "adult_ent", ["yes", "probably"]) &&
+      !["career_bengali_films","career_hindi_films","career_telugu_films",
+         "career_hollywood_films"].some(id=>said(state,id,["yes","probably"])))
+    return null;
   const known = new Set(state.answers.map((row) => row.qid));
   const next = (id) => state.pool.qIndex.has(id) && !known.has(id);
   const yes = (id) => said(state, id, ["yes", "probably"]);
@@ -1670,13 +1677,19 @@ function verifiedIdentityDiscoveryQuestion(state) {
     COUNTRIES.some(id=>saidYes(id));
   const flower = state.category === "object";
   if (!actor && !politics && !cricket && !writing && !adult && !flower) return null;
+  // When the player has confirmed an adult-industry profession, ask those
+  // verifiable career details first, not dozens of unrelated movie titles.
+  // Preserve mainstream cinema questions if that industry was also confirmed.
+  const screenActor = actor && (!adult ||
+    ["career_bengali_films","career_hindi_films","career_telugu_films",
+     "career_hollywood_films"].some(saidYes));
   const asked = new Set(state.answers.map(row=>row.qid));
   const questions = [
-    ...(actor ? SCREEN_IDENTITY_QUESTIONS : []),
+    ...(screenActor ? SCREEN_IDENTITY_QUESTIONS : []),
     ...(politics ? POLITICS_IDENTITY_QUESTIONS : []),
     ...EXTRA_IDENTITY_QUESTIONS
       .filter(question => (
-        (actor && question.parent==="actor") ||
+        (screenActor && question.parent==="actor") ||
         (politics && question.parent==="politician") ||
         (cricket && question.parent==="cricketer") ||
         (writing && question.id==="career_online_commentator") ||
@@ -1813,16 +1826,24 @@ function confirmedAdultOccupationQuestion(state) {
   const matchedCountry=COUNTRIES.find(country=>
     said(state,country,["yes","probably"]));
   const countryQi=state.pool.qIndex.get(matchedCountry);
-  const people=state.alive.filter(i=>state.weights[i]>.005 &&
-    factBit(state.pool,i,qi)===2 &&
+  // One relevant question is justified when a surviving, sourced adult
+  // performer shares this exact country and actor profession. A celebrity's
+  // popularity weight alone is NOT a reliable veto: it starved Italian and
+  // Japanese long-tail careers of even the first profession question.
+  // Do not distract from a confirmed mainstream leading actor.
+  if (said(state,"screen_role_lead",["yes","probably"])) return null;
+  const genderQi=state.pool.qIndex.get("female");
+  const saidFemale=said(state,"female",["yes","probably"]);
+  const saidMale=said(state,"female",["no","probably_not"]);
+  const possible=state.alive.some(i=>
+    state.weights[i]>0 &&
     state.pool.ids[i]?.startsWith("riddlex-profile-") &&
-    countryQi!=null && factBit(state.pool,i,countryQi)===2);
-  if (!people.length) return null;
-  const total=people.reduce((sum,i)=>sum+state.weights[i],0);
-  // A corroborated source-backed candidate with a known home country is
-  // enough to justify *asking* the profession, not enough to guess a name.
-  // Keep the threshold well above a speculative global prior.
-  return total>=.015 ? "adult_ent" : null;
+    factBit(state.pool,i,qi)===2 &&
+    countryQi!=null && factBit(state.pool,i,countryQi)===2 &&
+    (genderQi==null || (!saidFemale && !saidMale) ||
+      (saidFemale && factBit(state.pool,i,genderQi)===2) ||
+      (saidMale && factBit(state.pool,i,genderQi)===1)));
+  return possible ? "adult_ent" : null;
 }
 
 function firstAllowedQuestion(state) {

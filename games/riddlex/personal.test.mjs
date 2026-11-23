@@ -191,7 +191,7 @@ test("Riddlex the detective is itself a guessable fictional character", () => {
 });
 
 test("generic roles contain no private person's name or identifying details", () => {
-  assert.equal(PERSONAL_RELATIONS.length, 14);
+  assert.equal(PERSONAL_RELATIONS.length, 16);
   for (const role of PERSONAL_RELATIONS) {
     assert.ok(role.id.startsWith("riddlex-role-"));
     assert.ok(role.en.startsWith("Your ") || role.en==="Yourself");
@@ -260,5 +260,45 @@ test("crush is not among supported relationship questions or guesses", () => {
   assert.equal(pool.qIndex.has("your_crush"), false);
   assert.equal(pool.ids.some((id) => id.includes("crush")), false);
   assert.equal(PERSONAL_QUESTIONS.length, 12);
-  assert.equal(PERSONAL_RELATIONS.length, 14);
+  assert.equal(PERSONAL_RELATIONS.length, 16);
+});
+
+test("a private grandfather is reached by evidence without confusing father or spouse", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  const replies = [
+    ["real", "yes"],
+    ["knows_you", "yes"],
+    ["your_family", "yes"],
+    ["your_parent", "no"],
+    ["your_sibling", "no"],
+    ["your_spouse", "no"],
+    ["your_child", "no"],
+  ];
+  for (const [qid, value] of replies) answer(state, qid, value);
+  assert.equal(chooseQuestion(state), "your_grandparent");
+  answer(state, "your_grandparent", "yes");
+  assert.equal(chooseQuestion(state), "female");
+  answer(state, "female", "no");
+  const decision = decide(state);
+  assert.equal(decision.type, "guess");
+  assert.equal(pool.ids[decision.index], "riddlex-role-grandfather");
+  const grandfather = roleIndex(pool, "grandfather");
+  assert.equal(factBit(pool, grandfather, pool.qIndex.get("your_grandparent")), 2);
+  assert.equal(factBit(pool, roleIndex(pool, "grandmother"), pool.qIndex.get("female")), 2);
+});
+
+test("grandparent question is forbidden before excluding nearer relatives", () => {
+  const pool = casebook();
+  const state = createState(pool, { category: "character" });
+  recompute(state);
+  for (const [qid, value] of [["real","yes"],["knows_you","yes"],["your_family","yes"]])
+    answer(state, qid, value);
+  assert.equal(questionBlocked(state, "your_grandparent"), true);
+  answer(state, "your_parent", "no");
+  answer(state, "your_sibling", "no");
+  answer(state, "your_spouse", "no");
+  answer(state, "your_child", "no");
+  assert.equal(questionBlocked(state, "your_grandparent"), false);
 });

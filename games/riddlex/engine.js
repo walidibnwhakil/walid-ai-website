@@ -1606,11 +1606,20 @@ function verifiedIdentityCandidate(state) {
     // For the dog this means e.g. dog=yes, mammal=yes, pet=yes.
     // For the game detective, "from a game" + "detective" + "fictional".
     const relevant = verified.filter(row =>
-      ["job","politics","fiction","animal","object","look","size"].includes(
+      ["job","politics","adult","fiction","animal","object","look","size"].includes(
         pool.questions[row.qi]?.group));
     if (relevant.length < 2) continue;
+    // A distinctive title plus a confirmed continent is also meaningful:
+    // e.g. a French-British actress can be known as European even when
+    // the player is unsure which of two passports she has.
+    const countryProof = COUNTRIES.some(country=>known.has(country));
+    const regionProof = ["from_asia","from_europe","from_north_america",
+      "from_south_america","from_africa"].some(qid=>{
+      const qi=pool.qIndex.get(qid);
+      return known.has(qid) && qi!=null && factBit(pool,i,qi)===2;
+    });
     if ((career?.length || office?.length || identity.length) &&
-        !COUNTRIES.some(country => known.has(country))) continue;
+        !countryProof && !(identity.length && regionProof)) continue;
     if (functionProof?.length && relevant.length < 2) continue;
     if (species?.length && relevant.length < 3) continue;
     if (fictionProof && (!known.has("named") || relevant.length < 2)) continue;
@@ -1649,7 +1658,9 @@ function verifiedIdentityDiscoveryQuestion(state) {
   // markets: US/UK/French, Telugu, Japanese and others use the same
   // source-backed questions after profession and country confirmation.
   const actor = saidYes("actor") &&
-    COUNTRIES.some(country=>saidYes(country));
+    (COUNTRIES.some(country=>saidYes(country)) ||
+     ["from_asia","from_europe","from_north_america",
+      "from_south_america","from_africa"].some(qid=>saidYes(qid)));
   const politics = saidYes("politician") &&
     COUNTRIES.some(id=>saidYes(id));
   const cricket = saidYes("cricketer") && saidYes("from_bd");
@@ -1700,6 +1711,36 @@ function verifiedIdentityDiscoveryQuestion(state) {
     for (const i of state.alive) {
       if (yesIds.has(state.pool.ids[i])) score += state.weights[i];
     }
+    // Explicit confirmed country/gender prevents wasting dozens of questions
+    // about industries and movies from a different country. Never invent
+    // negative facts for unknown long-tail people.
+    if (sourceFacts && IDENTITY_FACTS[qid]) {
+      const knownCountries=COUNTRIES.filter(qid=>saidYes(qid));
+      const knownRegions=["from_asia","from_europe","from_north_america",
+        "from_south_america","from_africa"].filter(qid=>saidYes(qid));
+      const candidates=EXTRA_IDENTITY_PEOPLE.filter(person=>
+        sourceFacts[person.id]===2);
+      if (!candidates.some(person=>{
+        if (knownCountries.length && !knownCountries.some(q=>person.yes.includes(q)))
+          return false;
+        if (!knownCountries.length && knownRegions.length &&
+            !knownRegions.some(q=>{
+              const region=REGIONS[q]||[];
+              return region.some(country=>person.yes.includes(country));
+            })) return false;
+        if (saidYes("male") && !person.yes.includes("male")) return false;
+        if (saidYes("female") && !person.yes.includes("female")) return false;
+        return true;
+      })) continue;
+      // Identify industry before obscure individual film trivia.
+      if (!state.answers.some(row=>row.qid==="career_bengali_films" ||
+          row.qid==="career_hindi_films" || row.qid==="career_telugu_films" ||
+          row.qid==="career_hollywood_films") &&
+          ["career_bengali_films","career_hindi_films",
+            "career_telugu_films","career_hollywood_films"].includes(qid))
+        score += 0.04;
+    }
+    if (score <= 0.00005 && !flower) continue;
     // Shared flower classification comes first, before identifying a
     // particular plant from an otherwise unrelated "object" category.
     if (flower && qid === "obj_flower_from_plant") score += 0.1;
@@ -1751,6 +1792,23 @@ function mixedCareerQuestion(state) {
       return qid;
   }
   return null;
+}
+
+// A narrow, late occupational clarification when a real public adult
+// performer is plausible. Avoid asking ordinary actors this question merely
+// because they are famous, and retain the original ten-turn minimum.
+function confirmedAdultOccupationQuestion(state) {
+  if (state.category !== "character" || state.answers.length < 12 ||
+      !said(state,"actor",["yes","probably"]) ||
+      state.answers.some(row=>row.qid==="adult_ent") ||
+      !COUNTRIES.some(qid=>said(state,qid,["yes","probably"]))) return null;
+  const qi=state.pool.qIndex.get("adult_ent");
+  if (qi == null) return null;
+  const people=state.alive.filter(i=>state.weights[i]>.025 &&
+    factBit(state.pool,i,qi)===2 && state.pool.ids[i]?.startsWith("riddlex-profile-"));
+  if (!people.length) return null;
+  const total=people.reduce((sum,i)=>sum+state.weights[i],0);
+  return total>.14 ? "adult_ent" : null;
 }
 
 function firstAllowedQuestion(state) {
@@ -1904,6 +1962,8 @@ export function decide(state) {
   const focus = focusedCandidate(state, best, second, bestP, secondP);
   const mixed = mixedCareerQuestion(state);
   if (mixed) return { type:"ask", qid:mixed };
+  const adultFollowup = confirmedAdultOccupationQuestion(state);
+  if (adultFollowup) return { type:"ask", qid:adultFollowup };
   // First determine their usual role (lead, antagonist or comic performer).
   // Career era and signature props are follow-up branches, not universal
   // prerequisites to finding an actor or anyone else.

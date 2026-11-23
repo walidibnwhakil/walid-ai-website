@@ -1704,6 +1704,28 @@ function verifiedIdentityCandidate(state) {
 // source-backed identity question because the rest of the records are UNKNOWN.
 // Ask these candidate-verification questions periodically *before* exhausting
 // every generic occupation, colour or celebrity question.
+// Strong facts that the player has personally affirmed must guide the
+// *questions*, not just the final guess. This prevents showing film trivia
+// from a different era or politician after already having conflicting facts.
+function eligibleForIdentityQuestion(state,i) {
+  const pool=state.pool;
+  return state.answers.every(row=>{
+    if(!["yes","no"].includes(row.value))return true;
+    const bit=factBit(pool,i,row.qi);
+    if(row.value==="yes" && bit===1)return false;
+    if(row.value==="no" && bit===2)return false;
+    // A verified era, occupation or source-checked film award is not
+    // supported by a missing fact for the purposes of *driving questions*.
+    // The candidate remains in the Bayesian pool; we just don't let that
+    // unsupported profile steer unrelated trivia.
+    if(row.value==="yes" &&
+      (["screen_star_pre1990","screen_star_1990s",
+        "screen_national_film_award"].includes(row.qid) ||
+        row.qid==="actor") && bit!==2)return false;
+    return true;
+  });
+}
+
 function verifiedIdentityDiscoveryQuestion(state) {
   if (state.answers.length < 9) return null;
   const saidYes = qid => said(state,qid,["yes","probably"]);
@@ -1747,6 +1769,8 @@ function verifiedIdentityDiscoveryQuestion(state) {
   ];
   const rows = state.alive.length > 7000
     ? sampleAlive(state,6000) : state.alive;
+  const evidenceEligible=state.alive.filter(i=>
+    state.weights[i]>0 && eligibleForIdentityQuestion(state,i));
   const blocked = new Map();
   let best = null;
   let bestScore = -1;
@@ -1767,7 +1791,7 @@ function verifiedIdentityDiscoveryQuestion(state) {
       : new Set(Object.entries(POLITICS_FACTS)
           .filter(([,spec])=>spec.yes?.includes(qid)).map(([id])=>id));
     let score = 0;
-    for (const i of state.alive) {
+    for (const i of evidenceEligible) {
       if (yesIds.has(state.pool.ids[i])) score += state.weights[i];
     }
     // Explicit confirmed country/gender prevents wasting dozens of questions

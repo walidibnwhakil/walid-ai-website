@@ -3,7 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-50";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-51";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -347,6 +347,104 @@ test("verified actor-specific clues distinguish the three cinema examples", () =
   assert.equal(fact("Q4244083","screen_acted_bir_soinik"),2);
   assert.equal(fact("Q7405420","screen_died_2008"),1);
   assert.equal(fact("Q4244083","screen_died_1996"),1);
+});
+
+test("rejected identity remains excluded when shards reorder their numeric indices", () => {
+  const initial = poolFromEntries(questions, [
+    entry("bad-guess", 5000, ["real","male","actor","from_bd"]),
+    entry("new-choice", 500, ["real","male","actor","from_bd"]),
+  ]);
+  const state = createState(initial, {category:"character"});
+  recompute(state);
+  rejectIndex(state, 0);
+  assert.ok(state.rejectedIds.has("bad-guess"));
+  const reordered = poolFromEntries(questions, [
+    entry("new-choice", 500, ["real","male","actor","from_bd"]),
+    entry("bad-guess", 5000, ["real","male","actor","from_bd"]),
+    entry("added-person", 800, ["real","male","actor","from_bd"]),
+  ]);
+  state.pool = reordered;
+  recompute(state);
+  const surviving = state.alive.map(i => reordered.ids[i]);
+  assert.ok(!surviving.includes("bad-guess"), "a rejected name must stay rejected");
+  assert.ok(surviving.includes("new-choice"),
+    "the original rejected numeric index must not exclude a different person");
+  assert.ok(surviving.includes("added-person"));
+});
+
+test("a generic 1990s leading-actor profile cannot announce Riaz without career proof", () => {
+  const qs=[...questions,...EXTRA_SCREEN_QUESTIONS];
+  const entries=[
+    entry("Q7322180", 65000, ["real","named","male","alive","actor","from_bd"]),
+    ...Array.from({length:125},(_,i)=>
+      entry("another-actor-"+i, 1, ["real","named","male","alive","actor","from_bd"])),
+  ];
+  const pool=poolFromEntries(qs,entries);
+  const state=createState(pool,{category:"character"});
+  recompute(state);
+  for(const [qid,value] of [
+    ["real","yes"],["knows_you","no"],["male","yes"],["alive","yes"],
+    ["from_bd","yes"],["actor","yes"],["named","yes"],
+    ["screen_role_lead","yes"],["screen_star_1990s","yes"],
+    ["screen_films_after_2000","yes"],["screen_over_100_films","yes"],
+  ]) if(pool.qIndex.has(qid)) answer(state,qid,value);
+  assert.equal(shouldGuess(state),false,
+    "Only profession, country, lead role and decade must not trigger a named guess");
+  answer(state,"screen_air_force_before_films","yes");
+  assert.equal(shouldGuess(state),true,
+    "A specific independently verified career trait permits a well-supported name");
+});
+
+test("after rejecting Shakib Khan, his unique marriage clue is not recycled", () => {
+  const qs = [...questions, ...EXTRA_SCREEN_QUESTIONS];
+  const entries = [
+    entry("Q7462919", 9000, ["real","named","male","actor","from_bd","alive"]),
+    entry("Q21066842", 900, ["real","named","male","actor","from_bd","alive"]),
+    entry("Q7322180", 800, ["real","named","male","actor","from_bd","alive"]),
+    ...Array.from({length: 120}, (_,i) =>
+      entry("bd-actor-" + i, 2, ["real","named","male","actor","from_bd","alive"])),
+  ];
+  const pool=poolFromEntries(qs,entries);
+  const state=createState(pool,{category:"character"});
+  recompute(state);
+  for(const [qid,value] of [["real","yes"],["male","yes"],["from_bd","yes"],
+    ["actor","yes"],["alive","yes"]]) answer(state,qid,value);
+  rejectIndex(state,0);
+  const seen = [];
+  for(let n=0;n<60;n++) {
+    const d=decide(state);
+    if(d.type==="ask") {
+      seen.push(d.qid);
+      assert.notEqual(d.qid,"screen_known_multiple_marriages",
+        "Marriage clue belongs only to an already rejected candidate");
+      answer(state,d.qid,"unknown");
+    } else if(d.type==="guess") {
+      assert.notEqual(pool.ids[d.index],"Q7462919",
+        "The previously rejected candidate must not reappear");
+      rejectIndex(state,d.index);
+    } else break;
+  }
+  assert.ok(seen.some(q=>q.startsWith("screen_")),seen.join(","));
+});
+
+test("extra public film clues attach to the correct actors, not all actors", () => {
+  const qs=[...questions,...EXTRA_SCREEN_QUESTIONS];
+  const pool=poolFromEntries(qs, [
+    entry("Q21066842",200,["real","male","actor","from_bd"]),
+    entry("Q15848298",200,["real","male","actor","from_bd"]),
+    entry("Q15868587",200,["real","male","actor","from_bd"]),
+    entry("Q5279795",200,["real","male","actor","from_bd"]),
+    entry("Q5939749",200,["real","male","actor","from_bd"]),
+    entry("Q7462919",200,["real","male","actor","from_bd"]),
+  ]);
+  const f=(id,qid)=>factBit(pool,pool.ids.indexOf(id),pool.qIndex.get(qid));
+  assert.equal(f("Q21066842","screen_walton_executive"),2);
+  assert.equal(f("Q21066842","screen_return_after_long_break"),2);
+  assert.equal(f("Q15848298","screen_restaurant_business"),2);
+  assert.equal(f("Q15868587","screen_800_plus_films"),2);
+  assert.equal(f("Q5279795","screen_film_producer"),2);
+  assert.equal(f("Q5939749","screen_theatre_tv_film"),2);
+  assert.equal(f("Q7462919","screen_walton_executive"),0);
 });
 
 test("Bangladesh is asked within the first five character questions", () => {

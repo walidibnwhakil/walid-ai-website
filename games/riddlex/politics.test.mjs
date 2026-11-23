@@ -116,15 +116,20 @@ function play(person, { retry = false } = {}) {
           let other = -1;
           let best = 0;
           for (const index of state.alive) {
-            if (index === decision.index) continue;
+            // Multiple knowledge shards may contain the same public identity.
+            // A forced wrong guess must be a different person, not another
+            // index pointing to the correct person's identical Q-ID.
+            if (index === decision.index || pool.ids[index] === person.id) continue;
             if (state.weights[index] > best) {
               best = state.weights[index];
               other = index;
             }
           }
           if (other < 0) {
-            other = decision.index === 0 ? 1 : 0;
+            other = pool.ids.findIndex((id) => id !== person.id);
           }
+          assert.ok(other >= 0 && pool.ids[other] !== person.id,
+            "Retry must reject a different person, not a duplicate identity");
           guesses.push(pool.ens[other]);
           rejectIndex(state, other);
         } else {

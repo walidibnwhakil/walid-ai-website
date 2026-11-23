@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-50";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-51";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -205,6 +205,9 @@ export function createState(pool, options = {}) {
     pool,
     answers: [],
     rejected: new Set(),
+    // Stable identity memory: numeric indices change when knowledge shards reload.
+    // Rejected people must remain excluded throughout this round.
+    rejectedIds: new Set(),
     guesses: 0,
     sinceGuess: 0,
     opening: options.opening || null,
@@ -311,6 +314,7 @@ export function recompute(state) {
   applyPolitics(state.pool);
   if (state.weights.length !== state.pool.count) state.weights = new Float64Array(state.pool.count);
   const { pool, answers, rejected } = state;
+  const rejectedIds = state.rejectedIds || new Set();
   const n = pool.count;
   const logW = new Float64Array(n);
   const conflicted = conflictedFamilies(answers);
@@ -322,7 +326,9 @@ export function recompute(state) {
     row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
-    if (rejected.has(i) || pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
+    if (rejectedIds.has(pool.ids[i]) ||
+        (!rejectedIds.size && rejected.has(i)) ||
+        pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
       logW[i] = -Infinity;
       continue;
     }
@@ -550,6 +556,33 @@ function supportedIdentity(state) {
   });
 }
 
+// Sources for these traits describe a particular person's real career,
+ // not broad acting categories like "lead", "1990s" or "100+ films".
+const SCREEN_IDENTITY_QUESTIONS = [
+  "screen_walton_executive", "screen_debut_abujh_duti_mon",
+  "screen_return_after_long_break",
+  "screen_air_force_before_films", "screen_first_film_banglar_nayok",
+  "screen_debut_anonto_bhalobasha", "screen_known_multiple_marriages",
+  "screen_restaurant_business", "screen_lead_to_villain",
+  "screen_800_plus_films", "screen_famous_villain_dialogues",
+  "screen_film_producer", "screen_theatre_tv_film",
+  "screen_acted_bir_soinik", "screen_first_film_keyamat",
+  "screen_comedy_award", "screen_bowler_cane", "screen_great_dictator",
+];
+
+function hasScreenIdentityProof(state, index) {
+  const id = state.pool.ids[index];
+  // Only require an identity signature when a source-backed signature
+  // exists for this particular candidate. Unknown identities remain
+  // available for broader questioning instead of being marked false.
+  const possible = SCREEN_IDENTITY_QUESTIONS.filter(qid =>
+    SCREEN_CAREER_DETAILS[qid]?.[id] === 2);
+  if (!possible.length) return true;
+  return state.answers.some(row =>
+    row.value === "yes" && possible.includes(row.qid) &&
+    factBit(state.pool, index, row.qi) === 2);
+}
+
 // A high Bayesian score is not proof of identity: the player must have
 // affirmed independently verified distinguishing facts about the candidate.
 // Generic country, gender, life and fame priors do not count as evidence.
@@ -589,6 +622,9 @@ export function shouldGuess(state) {
   // simply because the database has few remaining candidates or a turn cap.
   if (state.category === "character" && state.pool.count >= 100 && !personal) {
     if (asked < 8 || !hasCandidateEvidence(state, best)) return false;
+    if (said(state, "actor", ["yes","probably"]) &&
+        said(state, "from_bd", ["yes","probably"]) &&
+        !hasScreenIdentityProof(state, best)) return false;
     // Sparse records from thousands of unrelated people dilute the absolute
     // posterior even when a candidate's independently verified identity
     // clues match and its nearest plausible alternative is far behind.
@@ -1066,6 +1102,11 @@ export const QUESTION_REQUIRES = {
     id, [
       { id: "actor", value: "yes", strict: true },
       ...([
+        "screen_walton_executive", "screen_return_after_long_break",
+        "screen_debut_abujh_duti_mon", "screen_restaurant_business",
+        "screen_film_producer", "screen_famous_villain_dialogues",
+        "screen_800_plus_films", "screen_lead_to_villain",
+        "screen_theatre_tv_film", "screen_new_film_announced_2026",
         "screen_known_multiple_marriages", "screen_debut_anonto_bhalobasha",
         "screen_acted_bir_soinik", "screen_died_1996", "screen_died_2008",
         "screen_film_debut_pre1995", "screen_over_100_films",
@@ -1170,6 +1211,16 @@ function allowedInCategory(state, question) {
   return true;
 }
 
+// Questions with a named, source-backed career detail must still describe at
+// least one surviving candidate. In particular, after Shakib Khan is rejected,
+// his marriage clue is not evidence about the other actors by default.
+function hasUnrejectedFilmCandidate(state, qid) {
+  const facts = SCREEN_CAREER_DETAILS[qid];
+  if (!facts) return true;
+  return state.alive.some(i =>
+    state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
+}
+
 // Before proposing another name, confirm distinguishing facts about the
 // current leader against surviving alternatives. Never spend this round on
 // already answered, contradictory, or unrelated category questions.
@@ -1186,7 +1237,8 @@ function chooseConfirmationQuestion(state, leader) {
     const question = pool.questions[qi];
     if (asked.has(question.id) || !allowedInCategory(state, question) ||
         blockedQuestion(state, question, rows, absentCache) ||
-        !gated(state, question, rows)) continue;
+        !gated(state, question, rows) ||
+        !hasUnrejectedFilmCandidate(state, question.id)) continue;
     // A confirmation must not reopen a mutually exclusive category.
     // Re-asking "fictional?" after the player confirmed "real" isn't
     // clarification, even if the candidate's packed fictional fact is "no".
@@ -1273,6 +1325,60 @@ function pendingFilmEraQuestion(state) {
   return null;
 }
 
+// Once broad entropy-gain questions are exhausted, explore unused
+// source-backed actor distinctions (career, company, producer, genre).
+// This can discover an overlooked actor such as Amin Khan even if a more
+// famous candidate initially dominates the popularity-weighted shortlist.
+function actorSignatureQuestion(state, leader) {
+  if (leader < 0 ||
+      !said(state, "actor", ["yes","probably"]) ||
+      !said(state, "from_bd", ["yes","probably"])) return null;
+  const id = state.pool.ids[leader];
+  const asked = new Set(state.answers.map(row => row.qid));
+  const rows = state.alive.length > 7000 ? sampleAlive(state,6000) : state.alive;
+  const cache = new Map();
+  for (const qid of SCREEN_IDENTITY_QUESTIONS) {
+    if (SCREEN_CAREER_DETAILS[qid]?.[id] !== 2 || asked.has(qid)) continue;
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null) continue;
+    const question = state.pool.questions[qi];
+    if (allowedInCategory(state, question) &&
+        !blockedQuestion(state, question, rows, cache) &&
+        gated(state, question, rows) &&
+        hasUnrejectedFilmCandidate(state, qid)) return qid;
+  }
+  return null;
+}
+
+function actorDiscoveryQuestion(state) {
+  if (!said(state, "actor", ["yes","probably"]) ||
+      !said(state, "from_bd", ["yes","probably"])) return null;
+  const asked = new Set(state.answers.map(row => row.qid));
+  const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
+  const cache = new Map();
+  let best = null;
+  let bestScore = -1;
+  for (const [qid, facts] of Object.entries(SCREEN_CAREER_DETAILS)) {
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null || asked.has(qid) ||
+        !hasUnrejectedFilmCandidate(state, qid)) continue;
+    const question = state.pool.questions[qi];
+    if (!allowedInCategory(state, question) ||
+        blockedQuestion(state, question, rows, cache) ||
+        !gated(state, question, rows)) continue;
+    let known = 0;
+    let largest = 0;
+    for (const i of state.alive) {
+      if (facts[state.pool.ids[i]] !== 2) continue;
+      known += state.weights[i];
+      largest = Math.max(largest, state.weights[i]);
+    }
+    const score = largest * 4 + known;
+    if (score > bestScore) { bestScore = score; best = qid; }
+  }
+  return best;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -1280,7 +1386,9 @@ function firstAllowedQuestion(state) {
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
-    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache)) continue;
+    if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, cache) ||
+        !gated(state, question, rows) ||
+        !hasUnrejectedFilmCandidate(state, question.id)) continue;
     if (question.id === "fictional" && said(state, "real", ["yes", "probably"])) continue;
     if (question.id === "real" && said(state, "fictional", ["yes", "probably"])) continue;
     if (question.group === "fiction" && said(state, "real", ["yes", "probably"])) continue;
@@ -1357,7 +1465,8 @@ export function chooseQuestion(state) {
     const question = pool.questions[qi];
     if (asked.has(question.id)) continue;
     if (!allowedInCategory(state, question) || blockedQuestion(state, question, rows, absentCache)) continue;
-    if (!gated(state, question, rows)) continue;
+    if (!gated(state, question, rows) ||
+        !hasUnrejectedFilmCandidate(state, question.id)) continue;
     let gain = gainOn(state, qi, rows);
     if (question.id === "adult_ent") gain *= answers.length >= 12 ? 1 : 0.2;
     if ((question.id === "played_barcelona" || question.id === "ballon_dor") && saidYes("footballer")) gain *= 4;
@@ -1403,7 +1512,9 @@ export function rewind(state) {
 }
 
 export function rejectIndex(state, index) {
+  if (index < 0 || index >= state.pool.count) return state;
   state.rejected.add(index);
+  (state.rejectedIds ||= new Set()).add(state.pool.ids[index]);
   state.guesses += 1;
   state.sinceGuess = 0;
   return recompute(state);
@@ -1423,12 +1534,21 @@ export function decide(state) {
   if (roleQuestion) return { type: "ask", qid: roleQuestion };
   const filmEra = pendingFilmEraQuestion(state);
   if (filmEra) return { type: "ask", qid: filmEra };
+  // Once the actor branch is known, verify a candidate's distinctive
+  // film/business history before announcing their name. A vague "lead"
+  // or "1990s" alone does not identify Riaz, Amin Khan, or Shakib Khan.
+  if (state.answers.length >= 12 && bestP >= 0.04) {
+    const signature = actorSignatureQuestion(state, best);
+    if (signature && !hasScreenIdentityProof(state, best))
+      return { type: "ask", qid: signature };
+  }
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   // After any wrong guess, force a fresh evidence-gathering round.
   // In particular, do NOT bypass it through the no-question fallback.
   if (waiting) {
     const qid = chooseConfirmationQuestion(state, best) ||
-      chooseQuestion(state) || firstAllowedQuestion(state);
+      chooseQuestion(state) || actorDiscoveryQuestion(state) ||
+      firstAllowedQuestion(state);
     return qid ? { type: "ask", qid } : { type: "defeat" };
   }
   if (shouldGuess(state)) {
@@ -1453,7 +1573,8 @@ export function decide(state) {
   // and NEVER takes this shortcut.
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
       supportedIdentity(state)) return { type: "guess", index: best };
-  qid ||= chooseConfirmationQuestion(state, best) || firstAllowedQuestion(state);
+  qid ||= chooseConfirmationQuestion(state, best) ||
+    actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
   return qid ? { type: "ask", qid } : { type: "defeat" };
 }
 

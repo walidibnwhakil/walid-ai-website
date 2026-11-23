@@ -9,6 +9,7 @@ import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-61";
 import { NARRATIVE_PEOPLE } from "./narrative-facts.js";
 import { EVERYDAY_OBJECTS } from "./everyday-facts.js";
 import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js";
+import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
@@ -248,7 +249,7 @@ async function loadNamed(entries, token, begin) {
       // at game start, even when the worldwide long-tail shards do not load.
       // This avoids guessing a famous unrelated candidate because the actual
       // public figure lives beyond the mobile transfer budget.
-      const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE, ...BROAD_PEOPLE, ...NARRATIVE_PEOPLE, ...RECOGNITION_PEOPLE].filter(person =>
+      const extra = [...EXTRA_IDENTITY_PEOPLE, ...DOMAIN_PEOPLE, ...BROAD_PEOPLE, ...NARRATIVE_PEOPLE, ...RECOGNITION_PEOPLE, ...UNVERIFIED_OWNER_NAMES].filter(person =>
         !partial.ids.includes(person.id) &&
         !EXTRA_IDENTITY_PEOPLE.some(other=>other !== person && other.id === person.id));
       // Use the same already-licensed Grok-era picture and credit only

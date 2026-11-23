@@ -3,13 +3,13 @@
 // Someone ruled out that way only returns if the player contradicts that fact.
 
 const politicsUrl = new URL(
-  import.meta.url.includes("?") ? "./politics-extra.js?v=akinator-35" : "./politics-extra.js",
+  import.meta.url.includes("?") ? "./politics-extra.js?v=riddlex-54" : "./politics-extra.js",
   import.meta.url,
 );
-const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-52";
+const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await import(politicsUrl);
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-54";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
-import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-53";
+import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-54";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -583,6 +583,10 @@ const SCREEN_IDENTITY_QUESTIONS = [
   "screen_india_unmarried", "screen_india_third_marriage",
   "screen_india_pataudi_family", "screen_india_king_khan",
   "screen_india_dabangg", "screen_india_dangal", "screen_india_ddlj",
+  "screen_hero_alom_music_video",
+  "screen_ananta_khoj_debut", "screen_ananta_business_producer",
+  "screen_apu_koti_takar_kabin", "screen_apu_kal_shokale",
+  "screen_bubly_bossgiri_debut", "screen_bubly_news_presenter",
 ];
 
 function hasScreenIdentityProof(state, index) {
@@ -1196,6 +1200,10 @@ export const QUESTION_REQUIRES = {
         "screen_films_after_2000", "screen_national_film_award",
         "screen_air_force_before_films", "screen_first_film_keyamat",
         "screen_first_film_banglar_nayok", "screen_comedy_award",
+        "screen_hero_alom_music_video", "screen_ananta_khoj_debut",
+        "screen_ananta_business_producer", "screen_apu_koti_takar_kabin",
+        "screen_apu_kal_shokale", "screen_bubly_bossgiri_debut",
+        "screen_bubly_news_presenter",
       ].includes(id) ? [{ id: "from_bd", value: "yes", strict: true }] : []),
       ...([
         "screen_india_unmarried", "screen_india_third_marriage",
@@ -1505,6 +1513,168 @@ function objectAnimalSignatureQuestion(state, candidate) {
   return null;
 }
 
+
+// A unique, verified affirmative clue should not be drowned out by thousands
+// of popularity-weighted UNKNOWN records. This is a last-mile evidence rule,
+// not an assumption that a famous candidate must be correct. An independent
+// confirming category fact is still mandatory; shared traits alone never
+// identify a person, animal or object.
+const ANCHORED_ANIMAL_QUESTIONS = new Set(["is_dog", "is_mouse"]);
+const FICTION_PAIR = ["from_game", "detective_role"];
+const ANCHOR_SCREEN_QUESTIONS = new Set(SCREEN_IDENTITY_QUESTIONS);
+const ANCHOR_POLITICS_QUESTIONS = new Set(POLITICS_IDENTITY_QUESTIONS);
+const ANCHOR_FUNCTION_QUESTIONS = new Set(NONPERSON_SIGNATURES);
+
+function verifiedIdentityCandidate(state) {
+  const { pool, answers } = state;
+  if (answers.length < 5 || (state.category === "character" && answers.length < 8) ||
+      state.sinceGuess < questionsBeforeRetry(state)) return -1;
+  const affirmed = answers.filter(row => row.value === "yes");
+  if (!affirmed.length) return -1;
+  const saidYes = qid => affirmed.some(row => row.qid === qid);
+  const actor = saidYes("actor") && saidYes("real");
+  const political = saidYes("politician") && saidYes("real");
+  const gameDetective = state.category === "character" && saidYes("fictional") &&
+    FICTION_PAIR.every(saidYes);
+  // No affirmative identity signature yet: ordinary category/country/job
+  // answers cannot establish an identity. Avoid scanning thousands of sparse
+  // records on every early turn.
+  if (!gameDetective && !affirmed.some(row =>
+      ANCHOR_SCREEN_QUESTIONS.has(row.qid) ||
+      ANCHOR_POLITICS_QUESTIONS.has(row.qid) ||
+      ANCHOR_FUNCTION_QUESTIONS.has(row.qid) ||
+      (state.category === "animal" && ANCHORED_ANIMAL_QUESTIONS.has(row.qid))))
+    return -1;
+  const candidates = [];
+  // Only consider surviving records with the actual facts. Never invent
+  // private-profile facts or use a missing record as verified information.
+  for (const i of state.alive) {
+    const id = pool.ids[i];
+    if (state.rejectedIds?.has(id) || state.weights[i] <= 0) continue;
+    const verified = affirmed.filter(row => factBit(pool, i, row.qi) === 2);
+    const known = new Set(verified.map(row => row.qid));
+    const career = actor && verified.filter(row =>
+      ANCHOR_SCREEN_QUESTIONS.has(row.qid));
+    const office = political && verified.filter(row =>
+      ANCHOR_POLITICS_QUESTIONS.has(row.qid));
+    const functionProof = ["object","animal"].includes(state.category) &&
+      verified.filter(row => ANCHOR_FUNCTION_QUESTIONS.has(row.qid));
+    const species = state.category === "animal" &&
+      verified.filter(row => ANCHORED_ANIMAL_QUESTIONS.has(row.qid));
+    const fictionProof = gameDetective && FICTION_PAIR.every(qid => known.has(qid));
+    const strong = (career?.length || 0) + (office?.length || 0) +
+      (functionProof?.length || 0) + (species?.length || 0);
+    if (!strong && !fictionProof) continue;
+    // Supporting facts must come from the SAME candidate and current round.
+    // For the dog this means e.g. dog=yes, mammal=yes, pet=yes.
+    // For the game detective, "from a game" + "detective" + "fictional".
+    const relevant = verified.filter(row =>
+      ["job","politics","fiction","animal","object","look","size"].includes(
+        pool.questions[row.qi]?.group));
+    if (relevant.length < 2) continue;
+    if ((career?.length || office?.length) && !known.has("from_bd") &&
+        !known.has("from_in") && !known.has("from_gb") &&
+        !known.has("from_us")) continue;
+    if (functionProof?.length && relevant.length < 2) continue;
+    if (species?.length && relevant.length < 3) continue;
+    if (fictionProof && (!known.has("named") || relevant.length < 2)) continue;
+    // All category-specific YES answers on the proposed identity must be
+    // source-backed, not contradicted; UNKNOWN answers are neutral.
+    const contradiction = answers.some(row => {
+      if (!["yes","no"].includes(row.value)) return false;
+      const bit = factBit(pool, i, row.qi);
+      return (row.value === "yes" && bit === 1) ||
+        (row.value === "no" && bit === 2);
+    });
+    if (contradiction) continue;
+    const score = strong * 5 + relevant.length * 1.3 +
+      verified.length * 0.12 + (fictionProof ? 10 : 0);
+    candidates.push({ index:i, score });
+  }
+  if (!candidates.length) return -1;
+  candidates.sort((a,b) => b.score - a.score);
+  // Two equally verified identities must be distinguished with another
+  // question; don't break a tie by fame or arbitrary casebook order.
+  if (candidates[1] && candidates[0].score - candidates[1].score < 2) return -1;
+  const index = candidates[0].index;
+  // Shared traits: a "flower visits nectar" YES could be both butterfly and
+  // honeybee. Our function anchors exclude shared facts and reject a tie.
+  return index;
+}
+
+// In a huge sparse casebook the entropy picker can ignore a strong,
+// source-backed identity question because the rest of the records are UNKNOWN.
+// Ask these candidate-verification questions periodically *before* exhausting
+// every generic occupation, colour or celebrity question.
+function verifiedIdentityDiscoveryQuestion(state) {
+  if (state.answers.length < 9) return null;
+  const saidYes = qid => said(state,qid,["yes","probably"]);
+  const actor = saidYes("actor") &&
+    (saidYes("from_bd") || saidYes("from_in"));
+  const politics = saidYes("politician") && saidYes("from_bd");
+  const flower = state.category === "object";
+  if (!actor && !politics && !flower) return null;
+  const asked = new Set(state.answers.map(row=>row.qid));
+  const questions = [
+    ...(actor ? SCREEN_IDENTITY_QUESTIONS : []),
+    ...(politics ? POLITICS_IDENTITY_QUESTIONS : []),
+    ...(flower ? ["obj_flower_from_plant",
+       "obj_fragrant_flower", "obj_five_spiral_waxy_petals",
+       "obj_frangipani_yellow_center"] : []),
+  ];
+  const rows = state.alive.length > 7000
+    ? sampleAlive(state,6000) : state.alive;
+  const blocked = new Map();
+  let best = null;
+  let bestScore = -1;
+  for (const qid of questions) {
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null || asked.has(qid) ||
+        !allowedInCategory(state,state.pool.questions[qi]) ||
+        blockedQuestion(state,state.pool.questions[qi],rows,blocked) ||
+        !gated(state,state.pool.questions[qi],rows) ||
+        !hasUnrejectedFilmCandidate(state,qid)) continue;
+    // These overlays are intentionally sparse: score their known YES IDs
+    // rather than doing a factBit lookup for every person in the huge casebook.
+    const sourceFacts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid];
+    const yesIds = sourceFacts
+      ? new Set(Object.entries(sourceFacts)
+          .filter(([,fact])=>fact===2).map(([id])=>id))
+      : new Set(Object.entries(POLITICS_FACTS)
+          .filter(([,spec])=>spec.yes?.includes(qid)).map(([id])=>id));
+    let score = 0;
+    for (const i of state.alive) {
+      if (yesIds.has(state.pool.ids[i])) score += state.weights[i];
+    }
+    // Shared flower classification comes first, before identifying a
+    // particular plant from an otherwise unrelated "object" category.
+    if (flower && qid === "obj_flower_from_plant") score += 0.1;
+    if (flower && qid !== "obj_flower_from_plant" &&
+        !saidYes("obj_flower_from_plant")) continue;
+    if (score > bestScore) { bestScore=score; best=qid; }
+  }
+  return best;
+}
+
+// A person may be known for science, writing or business AND have held
+// public office. When generic questions are exhausted, check a documented
+// cross-profession fact rather than surrendering despite a very strong
+// candidate. This also keeps the older Yunus chief-adviser path working.
+function crossProfessionQuestion(state, candidate) {
+  if (state.category !== "character" || candidate < 0 ||
+      state.answers.length < 6 || said(state,"politician",["yes","probably"]))
+    return null;
+  if (!["scientist","writer","business"].some(qid =>
+      said(state,qid,["yes","probably"]))) return null;
+  const asked = new Set(state.answers.map(row=>row.qid));
+  for (const qid of ["been_minister","led_gov","head_of_state"]) {
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null || asked.has(qid)) continue;
+    if (factBit(state.pool,candidate,qi) === 2) return qid;
+  }
+  return null;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -1675,13 +1845,23 @@ export function decide(state) {
     if (signature && !hasFunctionEvidence(state, focus))
       return { type: "ask", qid: signature };
   }
+  // A confirmed animal subtype, specific film/political career fact, or
+  // original game-character combination is evidence even when a global fame
+  // prior dominates the posterior. Rejected identities remain excluded.
+  const evidenceIndex = verifiedIdentityCandidate(state);
+  if (evidenceIndex >= 0)
+    return { type:"guess", index:evidenceIndex };
+  const verification = state.answers.length >= 10 &&
+    (state.answers.length % 3 === 1)
+      ? verifiedIdentityDiscoveryQuestion(state) : null;
+  if (verification) return { type:"ask", qid:verification };
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   // After any wrong guess, force a fresh evidence-gathering round.
   // In particular, do NOT bypass it through the no-question fallback.
   if (waiting) {
     const qid = chooseConfirmationQuestion(state, focus) ||
-      chooseQuestion(state) || actorDiscoveryQuestion(state) ||
-      firstAllowedQuestion(state);
+      chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
+      actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
     return qid ? { type: "ask", qid } : { type: "defeat" };
   }
   if (shouldGuess(state)) {
@@ -1706,7 +1886,9 @@ export function decide(state) {
   // and NEVER takes this shortcut.
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
       supportedIdentity(state)) return { type: "guess", index: best };
-  qid ||= chooseConfirmationQuestion(state, focus) ||
+  qid ||= verifiedIdentityDiscoveryQuestion(state) ||
+    crossProfessionQuestion(state, focus) ||
+    chooseConfirmationQuestion(state, focus) ||
     actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
   return qid ? { type: "ask", qid } : { type: "defeat" };
 }

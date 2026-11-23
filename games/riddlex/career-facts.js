@@ -78,6 +78,21 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   // https://www.britannica.com/biography/Saif-Ali-Khan
   // Shah Rukh Khan's "King Khan" screen nickname:
   // https://www.britannica.com/biography/Shah-Rukh-Khan
+  // New Bangladesh career signatures, verified from The Daily Star.
+  // https://www.thedailystar.net/ananta-jalil-back-with-most-welcome-2-37118
+  // https://www.thedailystar.net/entertainment/tv-film/news/ananta-jalil-barsha-spend-time-daily-star-3563681
+  // https://www.thedailystar.net/news-detail-249763
+  // https://www.thedailystar.net/arts-entertainment/bubly-turns-heads-1334353
+  // https://www.thedailystar.net/arts-entertainment/news/bubly-her-upcoming-ventures-2105153
+  // Viral social-media music videos and screen appearances (Arab News / AFP):
+  // https://www.arabnews.com/offbeat/tuneless-bangladeshi-social-media-star-grilled-by-police-2135851
+  screen_hero_alom_music_video: Object.freeze({ Q26923194:2 }),
+  screen_ananta_khoj_debut: Object.freeze({ Q5299478:2 }),
+  screen_ananta_business_producer: Object.freeze({ Q5299478:2 }),
+  screen_apu_koti_takar_kabin: Object.freeze({ Q14301448:2 }),
+  screen_apu_kal_shokale: Object.freeze({ Q14301448:2 }),
+  screen_bubly_bossgiri_debut: Object.freeze({ Q31176164:2 }),
+  screen_bubly_news_presenter: Object.freeze({ Q31176164:2 }),
   screen_india_unmarried: Object.freeze({ Q9543: 2, Q9557: 1 }),
   screen_india_third_marriage: Object.freeze({ Q9557: 2, Q9543: 1 }),
   screen_india_pataudi_family: Object.freeze({ Q252290: 2 }),
@@ -148,7 +163,8 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   screen_role_lead: Object.freeze({
     Q882: 2, Q18987612: 1, Q7405420: 2, Q7322180: 2,
     Q7460127: 2, Q13059781: 2, Q7462919: 2, Q4244083: 2,
-    Q21066842: 2, Q15848298: 2,
+    Q21066842: 2, Q15848298: 2, Q5299478:2,
+    Q14301448:2, Q31176164:2,
   }),
   screen_role_villain: Object.freeze({
     Q5279795: 2, Q18987612: 1, Q882: 1,
@@ -187,6 +203,27 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
 });
 
 export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
+  { id:"screen_hero_alom_music_video", group:"job",
+    en:"Did this entertainer become well known through online music videos?",
+    bn:"এই বিনোদনশিল্পী কি অনলাইনের মিউজিক ভিডিওর মাধ্যমে বিশেষ পরিচিতি পান?" },
+  { id:"screen_ananta_khoj_debut", group:"job",
+    en:"Was this actor's debut film Khoj: The Search?",
+    bn:"এই অভিনয়শিল্পীর প্রথম চলচ্চিত্র কি ‘খোঁজ: দ্য সার্চ’?" },
+  { id:"screen_ananta_business_producer", group:"job",
+    en:"Did this actor run a business and produce their own feature films?",
+    bn:"এই অভিনয়শিল্পী কি ব্যবসার পাশাপাশি নিজেই চলচ্চিত্র প্রযোজনা করেছেন?" },
+  { id:"screen_apu_koti_takar_kabin", group:"job",
+    en:"Did this actress play the female lead in Koti Takar Kabin?",
+    bn:"এই অভিনেত্রী কি ‘কোটি টাকার কাবিন’ চলচ্চিত্রে প্রধান নারী চরিত্রে অভিনয় করেছিলেন?" },
+  { id:"screen_apu_kal_shokale", group:"job",
+    en:"Did this actress begin her film career in Kal Shokale?",
+    bn:"এই অভিনেত্রী কি ‘কাল সকালে’ চলচ্চিত্র দিয়ে চলচ্চিত্রজীবন শুরু করেছিলেন?" },
+  { id:"screen_bubly_bossgiri_debut", group:"job",
+    en:"Did this actress make her film debut in Bossgiri?",
+    bn:"এই অভিনেত্রী কি ‘বসগিরি’ চলচ্চিত্র দিয়ে বড় পর্দায় অভিষেক করেন?" },
+  { id:"screen_bubly_news_presenter", group:"job",
+    en:"Did this actress work as a TV news presenter before entering films?",
+    bn:"এই অভিনেত্রী কি চলচ্চিত্রে আসার আগে টেলিভিশনে সংবাদ উপস্থাপনা করতেন?" },
   { id:"screen_india_unmarried", group:"person",
     en:"Has this actor publicly said that they have never married?",
     bn:"এই অভিনেতা কি প্রকাশ্যে জানিয়েছেন যে তিনি কখনো বিয়ে করেননি?" },

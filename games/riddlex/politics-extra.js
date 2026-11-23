@@ -7,6 +7,26 @@ const BIRTHS = ["born_pre1900", "born_1900_1949", "born_1950_1969", "born_1970_1
 const COUNTRIES = ["from_bd", "from_in", "from_pk", "from_us", "from_gb", "from_jp", "from_kr", "from_cn", "from_fr", "from_de", "from_ru", "from_br", "from_ca", "from_au", "from_es", "from_it", "from_mx", "from_ng", "from_eg", "from_tr", "from_id", "from_sa", "from_ar", "from_za"];
 const JOBS = ["actor", "singer", "writer", "cricketer", "footballer", "athlete", "scientist", "musician", "director", "business", "youtube", "adult_ent"];
 
+// Dated, independently reported identities. Missing data remains UNKNOWN.
+// https://www.thedailystar.net/news/governance/news/rashed-khan-appointed-political-assistant-pm-4228211
+// https://www.tbsnews.net/bangladesh/politics/rashed-khan-resigns-gono-odhikar-parishad-gs-joins-bnp-contest-polls-jhenaidah-4
+// https://www.thedailystar.net/news/bangladesh/politics/news/want-form-my-own-party-hero-alom-3245046
+// https://www.thedailystar.net/news/bangladesh/politics/news/wont-join-any-polls-under-al-govt-hero-alom-3374316
+export const EXTRA_POLITICS_QUESTIONS = Object.freeze([
+  { id:"politics_gono_odhikar_gs", group:"politics",
+    en:"Did this person previously serve as the general secretary of Gono Odhikar Parishad?",
+    bn:"এই ব্যক্তি কি আগে গণঅধিকার পরিষদের সাধারণ সম্পাদক ছিলেন?" },
+  { id:"politics_pm_political_aide_2026", group:"politics",
+    en:"Was this person appointed as Bangladesh's prime minister's political assistant in 2026?",
+    bn:"এই ব্যক্তি কি ২০২৬ সালে বাংলাদেশের প্রধানমন্ত্রীর রাজনৈতিক সহকারী হিসেবে নিয়োগ পান?" },
+  { id:"politics_bogura_independent", group:"politics",
+    en:"Did this person contest parliamentary by-elections in Bogura as an independent candidate?",
+    bn:"এই ব্যক্তি কি বগুড়ায় সংসদীয় উপনির্বাচনে স্বতন্ত্র প্রার্থী হয়েছিলেন?" },
+]);
+
+export const POLITICS_IDENTITY_QUESTIONS = Object.freeze(
+  EXTRA_POLITICS_QUESTIONS.map(question=>question.id));
+
 function bits(yes, no = []) {
   return { yes, no };
 }
@@ -80,7 +100,22 @@ function sheet({ id, en, bn, pop, male, alive, birth, scientist, yes, no }) {
 }
 
 // People the packed shards never included. Same shape as a shard row.
+// Hero Alom stood as an independent in Bogura by-elections in 2023.
+POLITICS_FACTS.Q26923194 = bits(["politician", "actor", "singer", "politics_bogura_independent"], []);
+
 export const POLITICS_PEOPLE = [
+  sheet({
+    id:"riddlex-rashed-khan",
+    en:"Md Rashed Khan",
+    bn:"মো. রাশেদ খান",
+    pop:185,
+    male:true, alive:true, birth:"born_1990_1999",
+    yes:["party_bnp", "politics_gono_odhikar_gs",
+         "politics_pm_political_aide_2026"],
+    no:["party_al","party_jp","party_jamaat","led_gov",
+        "zia_family","mujib_family","head_of_state","been_premier",
+        "party_chief","party_secretary"],
+  }),
   sheet({
     id: "Q5515139",
     en: "GM Quader",
@@ -107,7 +142,7 @@ export const POLITICS_PEOPLE = [
 
 for (const person of POLITICS_PEOPLE) {
   POLITICS_FACTS[person.id] = bits(
-    person.yes.filter((qid) => qid.startsWith("party_") || ["led_gov", "zia_family", "mujib_family", "lives_abroad", "been_minister", "been_premier", "head_of_state", "in_government"].includes(qid)),
-    person.no.filter((qid) => qid.startsWith("party_") || ["led_gov", "zia_family", "mujib_family", "lives_abroad", "been_minister", "been_premier", "head_of_state", "in_government"].includes(qid)),
+    person.yes.filter((qid) => qid.startsWith("party_") || qid.startsWith("politics_") || ["led_gov", "zia_family", "mujib_family", "lives_abroad", "been_minister", "been_premier", "head_of_state", "in_government"].includes(qid)),
+    person.no.filter((qid) => qid.startsWith("party_") || qid.startsWith("politics_") || ["led_gov", "zia_family", "mujib_family", "lives_abroad", "been_minister", "been_premier", "head_of_state", "in_government"].includes(qid)),
   );
 }

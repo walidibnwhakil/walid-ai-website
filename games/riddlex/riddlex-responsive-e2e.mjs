@@ -559,6 +559,172 @@ try {
   await replay("Honeybee: collects nectar but makes honey", "honeybee");
   await replay("Charlie Chaplin: global silent comic with moustache", "chaplin");
   await replay("Dildar: late Bangladeshi supporting comedian", "dildar");
+  // User-requested reality check: play TEN independent sessions in Chromium
+  // against the exact PR-head site served from local files. Never seed extra identities or alter
+  // the game's knowledge: this is QA-only and logs failures honestly.
+  const ownerTrials = [
+    { name:"Mirza Fakhrul Islam Alamgir", category:"character", id:"Q6874839", sex:"male",
+      facts:{politician:"yes",party_bnp:"yes",party_al:"no",head_of_state:"yes",
+        been_minister:"yes",led_gov:"no",been_premier:"no",party_secretary:"no"} },
+    { name:"Rashed Khan (former Gono Odhikar secretary)", category:"character", id:"riddlex-rashed-khan",
+      sex:"male", facts:{politician:"yes",party_bnp:"yes",party_al:"no",
+        party_secretary:"no",head_of_state:"no",been_premier:"no",
+        been_minister:"no",led_gov:"no",party_chief:"no",
+        zia_family:"no",mujib_family:"no",lives_abroad:"no",athlete:"no"} },
+    { name:"Obaidul Quader", category:"character", id:"Q14325293", sex:"male",
+      facts:{politician:"yes",party_al:"yes",party_bnp:"no",head_of_state:"no",
+        been_minister:"yes",party_secretary:"yes",led_gov:"no",been_premier:"no"} },
+    { name:"Hero Alom", category:"character", id:"Q26923194", sex:"male",
+      facts:{actor:"yes",singer:"yes",youtube:"yes",politician:"yes",
+        business:"yes",cricketer:"no",footballer:"no",led_gov:"no",
+        head_of_state:"no",been_premier:"no",been_minister:"no",
+        party_al:"no",party_bnp:"no",party_jp:"no",party_jamaat:"no",
+        party_secretary:"no",zia_family:"no",mujib_family:"no",
+        lives_abroad:"no",athlete:"no"} },
+    { name:"Ananta Jalil", category:"character", id:"Q5299478", sex:"male",
+      facts:{actor:"yes",director:"yes",business:"yes",politician:"no",
+        cricketer:"no",footballer:"no",screen_role_lead:"yes",
+        screen_star_pre1990:"no",screen_star_1990s:"no",
+        screen_film_debut_pre1995:"no",screen_films_after_2000:"yes",
+        screen_over_100_films:"no",screen_debut_anonto_bhalobasha:"no",
+        screen_air_force_before_films:"no",
+        screen_first_film_banglar_nayok:"no",screen_800_plus_films:"no"} },
+    { name:"Apu Biswas", category:"character", id:"Q14301448", sex:"female",
+      facts:{actor:"yes",politician:"no",cricketer:"no",footballer:"no",
+        screen_role_lead:"yes",screen_star_pre1990:"no",screen_star_1990s:"no",
+        screen_film_debut_pre1995:"no",screen_films_after_2000:"yes"} },
+    { name:"Shobnom Bubly", category:"character", id:"Q31176164", sex:"female",
+      facts:{actor:"yes",politician:"no",cricketer:"no",footballer:"no",
+        screen_role_lead:"yes",screen_star_pre1990:"no",screen_star_1990s:"no",
+        screen_film_debut_pre1995:"no",screen_films_after_2000:"yes"} },
+    { name:"Dog", category:"animal", id:"Q144",
+      facts:{mammal:"yes",pet:"yes",is_dog:"yes",is_cat:"no",is_mouse:"no",
+        bird:"no",fish:"no",reptile:"no",insect:"no",can_fly:"no",
+        bigger_than_person:"no",water_life:"no",wild:"no",
+        animal_visits_flowers:"no",animal_patterned_wings:"no",
+        animal_makes_honey:"no",animal_pollen_baskets:"no"} },
+    { name:"Riddlex", category:"character", id:"riddlex-detective",
+      fiction:true, facts:{fictional:"yes",real:"no",from_game:"yes",
+        detective_role:"yes",named:"yes",animal:"no",object:"no",
+        from_novel:"no",from_film:"no",from_comics:"no",from_anime:"no",
+        from_cartoon:"no",superhero:"no",from_bengali_lit:"no",
+        talks:"yes"} },
+    { name:"Kathgolap (frangipani flower)", category:"object", id:"c-kathgolap",
+      flower:true, facts:{electronic:"no",vehicle:"no",clothing:"no",
+        kitchen:"no",cooking:"no",food:"no",metal:"no",music_item:"no",
+        sport_item:"no",uses_pressure:"no",obj_uses_electricity:"no",
+        obj_moves_air_blades:"no",obj_keeps_food_cold:"no",obj_cools_room:"no",
+        pocket:"no",bigger_than_person:"no"} },
+  ];
+  const qaResults = [];
+  for (const trial of ownerTrials) {
+    const page = await browser.newPage({
+      viewport:{width:390,height:844}, deviceScaleFactor:1,
+    });
+    const trace = [];
+    const seen = new Set();
+    const wrongGuesses = [];
+    let outcome = "incomplete";
+    let loadedAtEnd = false;
+    let note = "";
+    try {
+      // The deployed app, rather than an engine mock or an invented casebook.
+      const response = await page.goto(
+        origin + "/games/riddlex/?autotest=1",
+        {waitUntil:"load",timeout:45000});
+      if (response?.status() !== 200)
+        throw new Error("LIVE_HTTP_" + response?.status());
+      await page.click("#play");
+      await page.waitForFunction(() =>
+        !document.getElementById("categories").hidden,
+        null,{timeout:25000});
+      await page.click('[data-cat="' + trial.category + '"]');
+      await page.waitForFunction(() =>
+        window.__riddlex?.state()?.mode === "ask",
+        null,{timeout:45000});
+      for (let turn=0;turn<65;turn++) {
+        await page.waitForFunction(()=>
+          ["ask","guess","learn"].includes(window.__riddlex?.state()?.mode),
+          null,{timeout:35000});
+        const state = await page.evaluate(()=>window.__riddlex.state());
+        if (state.mode==="learn") {outcome="defeat";break;}
+        if (state.mode==="guess") {
+          const label=(await page.locator("#guess-line").textContent())?.trim() || "";
+          const guessRecord={questionCount:trace.length,id:state.best,label};
+          const correctById=trial.id && state.best===trial.id;
+          const correctByName=trial.name.startsWith("Rashed Khan") &&
+            /^Are you thinking of (Md\.? |Muhammad )?Rashed Khan\??$/i.test(label);
+          const correctFlower=trial.flower &&
+            /kathgolap|frangipani|plumeria|কাঠগোলাপ/i.test(label);
+          if (correctById || correctByName || correctFlower) {
+            outcome="correct";break;
+          }
+          wrongGuesses.push(guessRecord);
+          if (wrongGuesses.length>=5) {outcome="wrong-guesses";break;}
+          await page.evaluate(()=>window.__riddlex.wrong());
+          await page.waitForFunction(()=>
+            window.__riddlex?.state()?.mode==="wrong",
+            null,{timeout:25000});
+          await page.evaluate(()=>window.__riddlex.retry());
+          await page.waitForFunction(()=>
+            ["ask","guess","learn"].includes(window.__riddlex?.state()?.mode),
+            null,{timeout:35000});
+          continue;
+        }
+        const q=state.question;
+        if(seen.has(q)) {
+          note="Question repeated: "+q;
+          outcome="repeated-question";break;
+        }
+        seen.add(q);
+        const known=trial.facts[q];
+        let a=known||"unknown";
+        if(!known) {
+          if(q==="named" && trial.category==="character")a="yes";
+          else if(trial.category==="character" && !trial.fiction) {
+            if(q==="real")a="yes";
+            else if(q==="fictional")a="no";
+            else if(q==="knows_you")a="no";
+            else if(q==="male" && trial.sex)a=trial.sex==="male"?"yes":"no";
+            else if(q==="female" && trial.sex)a=trial.sex==="female"?"yes":"no";
+            else if(q==="alive")a="yes";
+            else if(q==="dead")a="no";
+            else if(q==="from_bd")a="yes";
+            else if(q.startsWith("from_") && q!=="from_asia")a="no";
+          }
+          if(a==="unknown" && trial.id) {
+            a=await page.evaluate(({id,q})=>window.__riddlex.replyFor(id,q),
+              {id:trial.id,q});
+          }
+        }
+        trace.push({q,a});
+        await page.evaluate(value=>window.__riddlex.answer(value),a);
+      }
+      if (trial.id) loadedAtEnd=await page.evaluate(
+        id=>window.__riddlex.find(id)>=0,trial.id);
+      if(outcome==="incomplete")note="Reached 65 turns without a terminal result";
+    } catch(error) {
+      outcome="browser-error";
+      note=String(error?.stack || error).slice(0,700);
+    } finally {
+      const item={name:trial.name,category:trial.category,targetId:trial.id,
+        outcome,loadedAtEnd,questions:trace.length,
+        unknowns:trace.filter(row=>row.a==="unknown").length,
+        wrongGuesses,trace,note};
+      qaResults.push(item);
+      console.log("OWNER_TEN_RESULT "+JSON.stringify(item));
+      await page.close().catch(()=>{});
+    }
+  }
+  console.log("OWNER_TEN_SUMMARY "+JSON.stringify(qaResults.map(
+    ({name,category,outcome,loadedAtEnd,questions,unknowns,wrongGuesses,note})=>({
+      name,category,outcome,loadedAtEnd,questions,unknowns,
+      wrongGuessCount:wrongGuesses.length,note
+    }))));
+  assert.deepEqual(qaResults.filter(row=>row.outcome!=="correct").map(
+    row=>row.name+": "+row.outcome),[],
+    "All ten independently played owner cases must be identified correctly");
+
 } finally {
   await browser?.close();
   await new Promise((resolve) => server.close(resolve));

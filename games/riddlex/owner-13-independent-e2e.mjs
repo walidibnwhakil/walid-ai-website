@@ -4,8 +4,6 @@
 // that knows the hidden casebook's exact answer to every question.
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
-import { createServer } from "node:http";
-import { once } from "node:events";
 import { extname, join } from "node:path";
 import { once } from "node:events";
 import { chromium } from "playwright";
@@ -25,7 +23,7 @@ const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.met
 const questionInfo = new Map([...manifest.questions, ...EXTRA_SCREEN_QUESTIONS,
   ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS,
   ...PERSONAL_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...RECOGNITION_QUESTIONS].map(q => [q.id,q]));
-// This QA harness must open the DEPLOYED site, never the local repository.
+// Isolated regression harness serves PR-head files, never production.
 const mime={".html":"text/html",".css":"text/css",".js":"text/javascript",
   ".mjs":"text/javascript",".json":"application/json",".bin":"application/octet-stream",
   ".webp":"image/webp",".jpg":"image/jpeg",".png":"image/png",

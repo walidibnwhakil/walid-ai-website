@@ -3,7 +3,7 @@ import test from "node:test";
 import { answer, createState, decide, questionBlocked, recompute } from "./engine.js";
 import { poolFromEntries } from "./kb.js";
 import { PERSONAL_QUESTIONS, PERSONAL_RELATIONS } from "./personal-facts.js";
-import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js";
+import { EXTRA_HYPOTHESIS_QUESTIONS, EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js";
 
 const q=[
   {id:"real",group:"kind"}, {id:"fictional",group:"kind"},
@@ -56,4 +56,48 @@ test("irrelevant flower and ceiling details are gated by earlier category answer
   assert.equal(questionBlocked(s,"obj_frangipani_yellow_center"),true);
   answer(s,"obj_moves_air_blades","no");
   assert.equal(questionBlocked(s,"obj_mounted_ceiling"),true);
+});
+
+test("phone is recognized from verified functions despite an unrelated high-prior object",()=>{
+  const qs=[
+    {id:"object",group:"kind"},{id:"real",group:"kind"},{id:"fictional",group:"kind"},
+    {id:"animal",group:"kind"},{id:"electronic",group:"object"},
+    {id:"tool",group:"object"},{id:"handheld",group:"object"},
+    {id:"pocket",group:"object"},{id:"daily_use",group:"object"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS,
+  ].map(x=>({en:x.id,bn:x.id,...x}));
+  const entries=[
+    {id:"unrelated",en:"Famous thing",pop:65000,yes:["object"],no:["real","fictional","animal"]},
+    {id:"c-phone",en:"Mobile phone",pop:100,yes:["object","electronic","handheld","pocket","daily_use"],no:["real","fictional","animal","tool"]},
+    ...EXTRA_HYPOTHESIS_ENTRIES.object,
+  ];
+  const p=poolFromEntries(qs,entries),state=createState(p,{category:"object"});
+  recompute(state);
+  const d=run(state,[["electronic","yes"],["handheld","yes"],["pocket","yes"],
+    ["daily_use","yes"],["tool","no"],["obj_makes_calls","yes"],
+    ["obj_touchscreen","yes"]]);
+  assert.equal(d.type,"guess");
+  assert.equal(p.ids[d.index],"c-phone");
+});
+test("pen needs writing/ink evidence and is not guessed from generic handheld tool",()=>{
+  const qs=[
+    {id:"object",group:"kind"},{id:"real",group:"kind"},{id:"fictional",group:"kind"},
+    {id:"animal",group:"kind"},{id:"electronic",group:"object"},
+    {id:"tool",group:"object"},{id:"handheld",group:"object"},
+    {id:"pocket",group:"object"},{id:"daily_use",group:"object"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS,
+  ].map(x=>({en:x.id,bn:x.id,...x}));
+  const p=poolFromEntries(qs,EXTRA_HYPOTHESIS_ENTRIES.object);
+  const state=createState(p,{category:"object"});recompute(state);
+  for(const [qid,val] of [["tool","yes"],["handheld","yes"],["pocket","yes"],
+    ["daily_use","yes"],["electronic","no"],["obj_writes_paper","yes"]])
+    answer(state,qid,val);
+  // Ink and marker-tip are general distinguishing questions: no early guess
+  // just because pen, marker and pencil are all pocket-sized writing tools.
+  assert.equal(decide(state).type,"ask");
+  answer(state,"obj_uses_ink","yes");
+  answer(state,"obj_broad_marker_tip","no");
+  const d=decide(state);
+  assert.equal(d.type,"guess");
+  assert.equal(p.ids[d.index],"c-pen");
 });

@@ -2725,14 +2725,14 @@ export function decide(state) {
   const focus = focusedCandidate(state, best, second, bestP, secondP);
   // Broad career/physical-purpose questions have higher player value than
   // obscure title trivia, popularity priors and unrelated generic followups.
-  const everyday=everydayDiscoveryQuestion(state);
-  if(everyday)return {type:"ask",qid:everyday};
   const everydayCandidate=everydayEvidenceCandidate(state);
   if(everydayCandidate>=0)return {type:"guess",index:everydayCandidate};
-  const narrative=narrativeDiscoveryQuestion(state);
-  if(narrative) return {type:"ask",qid:narrative};
+  const everyday=everydayDiscoveryQuestion(state);
+  if(everyday)return {type:"ask",qid:everyday};
   const narrativeCandidate=narrativeEvidenceCandidate(state);
   if(narrativeCandidate>=0)return {type:"guess",index:narrativeCandidate};
+  const narrative=narrativeDiscoveryQuestion(state);
+  if(narrative) return {type:"ask",qid:narrative};
   const broad=broadDiscoveryQuestion(state);
   if(broad) return {type:"ask",qid:broad};
   const domain = domainDiscoveryQuestion(state);

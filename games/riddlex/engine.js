@@ -450,6 +450,9 @@ function topTwo(state) {
     ].includes(row.qid));
   const checkedObjectAnimalFacts = state.answers.filter(row =>
     ["yes","no"].includes(row.value) && HYPOTHESIS_FACTS[row.qid]);
+  const checkedStoryWorks = state.answers.filter(row => row.value === "yes" &&
+    BROAD_QUESTIONS.some(q=>q.id===row.qid && q.group==="fiction") &&
+    BROAD_FACTS[row.qid]);
   const checkedScreenFacts = state.answers.filter(row =>
     ["yes","no"].includes(row.value) && SCREEN_CAREER_DETAILS[row.qid] &&
     !["screen_role_lead","screen_role_villain","screen_role_comedy",
@@ -503,6 +506,10 @@ function topTwo(state) {
         return bit===1;
       return bit!==2;
     })) continue;
+    // An affirmative, source-verified story clue must belong to the
+    // character being guessed. This prevents a cartoon/film fame prior
+    // from falsely guessing Mr. Bean after the player confirms a magic lamp.
+    if (checkedStoryWorks.some(row=>factBit(state.pool,i,row.qi)!==2)) continue;
     // A candidate with a known contradicting function/behaviour is excluded.
     if (checkedObjectAnimalFacts.some(row => {
       const bit = factBit(state.pool, i, row.qi);
@@ -1716,7 +1723,15 @@ function verifiedIdentityCandidate(state) {
       answers.some(row=>["male","female"].includes(row.qid) &&
         ["yes","no"].includes(row.value) &&
         factBit(pool,i,row.qi)===(row.value==="yes"?2:1));
-    const professionProof = literaryProof || (domain.length>=3 &&
+    // Fantasy, comedy and folklore characters have no passport. Multiple
+    // independent, affirmative story-work facts plus the story medium
+    // are legitimate proof, without assuming one unique famous character.
+    const storyProof = known.has("fictional") && known.has("named") &&
+      ["from_film","from_cartoon","from_novel","fiction_tv_fantasy"]
+        .some(qid=>known.has(qid)) &&
+      domain.filter(row=>BROAD_QUESTIONS.some(q=>
+        q.group==="fiction" && q.id===row.qid)).length>=2;
+    const professionProof = literaryProof || storyProof || (domain.length>=3 &&
       (known.has("business") || known.has("scientist") ||
        known.has("politician") || known.has("writer") ||
        known.has("fictional") || known.has("youtube")));

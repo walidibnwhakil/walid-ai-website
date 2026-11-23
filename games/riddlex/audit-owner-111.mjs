@@ -17,7 +17,7 @@ import {EXTRA_HYPOTHESIS_ENTRIES} from "./hypothesis-facts.js";
 import {POLITICS_PEOPLE} from "./politics-extra.js";
 const manifest=JSON.parse(await readFile(new URL("./kb/manifest.json",import.meta.url),"utf8"));
 const index=JSON.parse(await readFile(new URL("./kb/index.json",import.meta.url),"utf8"));
-const normal=x=>String(x||"").normalize("NFKC").toLowerCase().replace(/[^\\p{L}\\p{N}]+/gu,"");
+const normal=x=>String(x||"").normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"");
 const sessions=OWNER_111_SESSIONS;
 if(sessions.length!==111)throw Error("Must audit all exactly 111 owner sessions");
 const wanted=new Map();

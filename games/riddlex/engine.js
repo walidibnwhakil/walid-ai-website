@@ -15,7 +15,7 @@ import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } fr
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-61";
+import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-69";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -1495,9 +1495,12 @@ function allowedInCategory(state, question) {
 function hasUnrejectedFilmCandidate(state, qid) {
   const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
     BROAD_FACTS[qid] || NARRATIVE_FACTS[qid] || EVERYDAY_FACTS[qid];
-  if (!facts) return true;
+  const verifiedExisting = BROAD_PROFILE_FACTS[qid];
+  if (!facts && !verifiedExisting) return true;
   return state.alive.some(i =>
-    state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
+    state.weights[i] > 0 &&
+    (facts?.[state.pool.ids[i]] === 2 ||
+     verifiedExisting?.[state.pool.ids[i]] === 2));
 }
 
 // Before proposing another name, confirm distinguishing facts about the
@@ -2523,6 +2526,11 @@ function broadDiscoveryQuestion(state) {
       plan.push("creator_food_vlogs");
       if(yes("creator_food_vlogs")) plan.push("creator_online_entertainment");
     }
+    if (yes("real") && yes("from_us") && yes("youtube") && yes("business")) {
+      plan.push("creator_online_entertainment");
+      if (yes("creator_online_entertainment"))
+        plan.push("creator_large_scale_giveaways");
+    }
     if (yes("fictional") && !yes("from_novel")) {
       if (yes("from_cartoon") || yes("from_film"))
         plan.push("fiction_magic_lamp");
@@ -2551,8 +2559,10 @@ function broadDiscoveryQuestion(state) {
        blockedQuestion(state,q,rows,cache) ||
        !gated(state,q,rows))continue;
     const facts=BROAD_FACTS[id]||{};
+    const existing=BROAD_PROFILE_FACTS[id]||{};
     if(!state.alive.some(i=>state.weights[i]>0 &&
-       facts[state.pool.ids[i]]===2))continue;
+       (facts[state.pool.ids[i]]===2 ||
+        existing[state.pool.ids[i]]===2)))continue;
     return id;
   }
   return null;

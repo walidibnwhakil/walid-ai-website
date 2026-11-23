@@ -555,7 +555,7 @@ export function shouldGuess(state) {
   // including verified career/role details for actors. Never reveal a name
   // simply because the database has few remaining candidates or a turn cap.
   if (state.category === "character" && state.pool.count >= 100 && !personal) {
-    return asked >= 10 && hasCandidateEvidence(state, best) &&
+    return asked >= 8 && hasCandidateEvidence(state, best) &&
       bestP >= 0.86 && ratio >= 9;
   }
   // After a miss, one name far ahead of everyone else can be said at once.

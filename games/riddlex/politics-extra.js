@@ -101,7 +101,7 @@ function sheet({ id, en, bn, pop, male, alive, birth, scientist, yes, no }) {
 
 // People the packed shards never included. Same shape as a shard row.
 // Hero Alom stood as an independent in Bogura by-elections in 2023.
-POLITICS_FACTS.Q26923194 = bits(["politics_bogura_independent"], []);
+POLITICS_FACTS.Q26923194 = bits(["politician", "actor", "singer", "politics_bogura_independent"], []);
 
 export const POLITICS_PEOPLE = [
   sheet({

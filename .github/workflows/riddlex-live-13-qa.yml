@@ -1,0 +1,69 @@
+name: Riddlex LIVE 13 owner target gameplay audit
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "games/riddlex/live-13-independent-e2e.mjs"
+      - "games/riddlex/live-13-aggregate.mjs"
+      - ".github/workflows/riddlex-live-13-qa.yml"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  play-live:
+    name: LIVE new-target gameplay batch (${{ matrix.shard }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check QA syntax
+        run: |
+          node --check games/riddlex/live-13-independent-e2e.mjs
+          node --check games/riddlex/live-13-aggregate.mjs
+      - name: Install Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Play real public walid-ai.com Riddlex against independent personas
+        env:
+          RIDDLEX_SHARD: ${{ matrix.shard }}
+        run: node games/riddlex/live-13-independent-e2e.mjs
+      - name: Upload entire bilingual transcript for each game
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-live-13-batch-${{ matrix.shard }}
+          path: ${{ runner.temp }}/riddlex-user-13-part-${{ matrix.shard }}.json
+          if-no-files-found: error
+  aggregate:
+    name: Report and strictly verify all 13 live game outcomes
+    needs: [play-live]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Retrieve independent real browser traces
+        uses: actions/download-artifact@v4
+        with:
+          pattern: riddlex-live-13-batch-*
+          path: live-13-traces
+          merge-multiple: true
+      - name: Reject missing games and incorrect guesses
+        run: node games/riddlex/live-13-aggregate.mjs live-13-traces
+      - name: Upload complete per-question audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-live-13-complete-report
+          path: ${{ runner.temp }}/riddlex-13-live-combined.json
+          if-no-files-found: warn

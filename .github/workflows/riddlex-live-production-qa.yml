@@ -1,0 +1,89 @@
+name: Riddlex LIVE deployed-site 50 game QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "games/riddlex/owner-50-live-e2e.mjs"
+      - "games/riddlex/live-ui-smoke-e2e.mjs"
+      - ".github/workflows/riddlex-live-production-qa.yml"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  live-ui:
+    name: LIVE mobile desktop menu and answer buttons
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install real Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Test published site, real menu and answer button clicks
+        run: node games/riddlex/live-ui-smoke-e2e.mjs
+      - name: Upload published site screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-LIVE-mobile-and-desktop-screenshots
+          path: ${{ runner.temp }}/riddlex-live-evidence/*.png
+          if-no-files-found: warn
+  play-live:
+    name: LIVE Chromium 10 target games (${{ matrix.shard }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check deployed-site QA syntax
+        run: node --check games/riddlex/owner-50-live-e2e.mjs
+      - name: Install real Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Play production https://walid-ai.com 10 independent sessions
+        env:
+          RIDDLEX_SHARD: ${{ matrix.shard }}
+        run: node games/riddlex/owner-50-live-e2e.mjs
+      - name: Preserve exact production gameplay and answer transcripts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-LIVE-batch-${{ matrix.shard }}
+          path: ${{ runner.temp }}/riddlex-user-50-part-${{ matrix.shard }}.json
+          if-no-files-found: error
+  verify-live:
+    name: Assert LIVE production 50 of 50 guessed correctly
+    needs: [play-live]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Retrieve exactly 50 live browser traces
+        uses: actions/download-artifact@v4
+        with:
+          pattern: riddlex-LIVE-batch-*
+          path: live-qa-traces
+          merge-multiple: true
+      - name: Validate real production results, no simulation
+        run: node games/riddlex/owner-50-aggregate.mjs live-qa-traces
+      - name: Preserve combined production test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-LIVE-50-full-production-report
+          path: ${{ runner.temp }}/riddlex-50-combined.json
+          if-no-files-found: warn

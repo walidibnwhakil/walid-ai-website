@@ -11,7 +11,7 @@ import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_L
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-56";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-57";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
-import { DOMAIN_QUESTIONS, DOMAIN_FACTS } from "./domain-facts.js";
+import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -79,7 +79,12 @@ function regionBit(pool, index, members) {
     const mqi = pool.qIndex.get(member);
     if (mqi == null) continue;
     present += 1;
-    const bit = attrAt(pool.attrs, pool.attrBytes, index, mqi);
+    // The same source-backed profile override used by factBit must apply
+    // to continental regions. Otherwise an incorrect country bit in the
+    // archived shard can contradict a verified birthplace or nationality.
+    const verified=DOMAIN_PROFILE_FACTS[member]?.[pool.ids[index]];
+    const bit = verified !== undefined ? verified :
+      attrAt(pool.attrs, pool.attrBytes, index, mqi);
     if (bit === 2) yes = true;
     else if (bit === 1) nos += 1;
   }
@@ -144,6 +149,8 @@ export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
+  const verifiedProfile=DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
+  if (verifiedProfile !== undefined) return verifiedProfile;
   // Incomplete packed life tags cannot contradict authoritative dated records.
   if ((id === "alive" || id === "dead") && SCREEN_LIFE_DETAILS[pool.ids[index]])
     return SCREEN_LIFE_DETAILS[pool.ids[index]][id];

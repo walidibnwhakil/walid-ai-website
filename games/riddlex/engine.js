@@ -2388,7 +2388,7 @@ function broadDiscoveryQuestion(state) {
       if (!asked.has("screen_indian_bengali"))
         plan.push("screen_indian_bengali");
       if (yes("screen_indian_bengali")) {
-        plan.push("film_nater_guru","film_bojhena","film_mitin_mashi");
+        plan.push("broad_film_nater_guru","film_bojhena","film_mitin_mashi");
         plan.push("screen_web_series");
         if (yes("screen_web_series")) plan.push("film_aashram");
       }
@@ -2400,7 +2400,7 @@ function broadDiscoveryQuestion(state) {
         }
         if (no("screen_hindi_cinema")) {
           plan.push("screen_telugu_cinema");
-          if (yes("screen_telugu_cinema")) plan.push("film_baahubali");
+          if (yes("screen_telugu_cinema")) plan.push("broad_film_baahubali");
           if (no("screen_telugu_cinema")) {
             plan.push("screen_kannada_cinema");
             if (yes("screen_kannada_cinema")) plan.push("film_kgf");

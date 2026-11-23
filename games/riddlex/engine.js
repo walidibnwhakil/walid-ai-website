@@ -9,7 +9,7 @@ const politicsUrl = new URL(
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-52";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
-import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-52";
+import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-53";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -598,10 +598,13 @@ function hasScreenIdentityProof(state, index) {
     factBit(state.pool, index, row.qi) === 2);
 }
 
-// Specific real-world functions and behaviour identify animals and objects.
- // The broad "uses electricity" question is useful context but never unique.
+// A trait shared by multiple named candidates is useful to narrow the
+// category, but it is NOT an identity confirmation. Derive this from the
+// knowledge table so adding another animal with the same behaviour cannot
+// silently turn a generic trait into a unique proof again.
 const NONPERSON_SIGNATURES = Object.keys(HYPOTHESIS_FACTS)
-  .filter(qid => qid !== "obj_uses_electricity");
+  .filter(qid => Object.values(HYPOTHESIS_FACTS[qid])
+    .filter(value => value === 2).length === 1);
 
 function hasFunctionEvidence(state, index) {
   const id = state.pool.ids[index];

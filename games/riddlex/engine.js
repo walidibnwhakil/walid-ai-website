@@ -556,6 +556,33 @@ function supportedIdentity(state) {
   });
 }
 
+// Sources for these traits describe a particular person's real career,
+ // not broad acting categories like "lead", "1990s" or "100+ films".
+const SCREEN_IDENTITY_QUESTIONS = [
+  "screen_walton_executive", "screen_debut_abujh_duti_mon",
+  "screen_return_after_long_break",
+  "screen_air_force_before_films", "screen_first_film_banglar_nayok",
+  "screen_debut_anonto_bhalobasha", "screen_known_multiple_marriages",
+  "screen_restaurant_business", "screen_lead_to_villain",
+  "screen_800_plus_films", "screen_famous_villain_dialogues",
+  "screen_film_producer", "screen_theatre_tv_film",
+  "screen_acted_bir_soinik", "screen_first_film_keyamat",
+  "screen_comedy_award", "screen_bowler_cane", "screen_great_dictator",
+];
+
+function hasScreenIdentityProof(state, index) {
+  const id = state.pool.ids[index];
+  // Only require an identity signature when a source-backed signature
+  // exists for this particular candidate. Unknown identities remain
+  // available for broader questioning instead of being marked false.
+  const possible = SCREEN_IDENTITY_QUESTIONS.filter(qid =>
+    SCREEN_CAREER_DETAILS[qid]?.[id] === 2);
+  if (!possible.length) return true;
+  return state.answers.some(row =>
+    row.value === "yes" && possible.includes(row.qid) &&
+    factBit(state.pool, index, row.qi) === 2);
+}
+
 // A high Bayesian score is not proof of identity: the player must have
 // affirmed independently verified distinguishing facts about the candidate.
 // Generic country, gender, life and fame priors do not count as evidence.
@@ -595,6 +622,9 @@ export function shouldGuess(state) {
   // simply because the database has few remaining candidates or a turn cap.
   if (state.category === "character" && state.pool.count >= 100 && !personal) {
     if (asked < 8 || !hasCandidateEvidence(state, best)) return false;
+    if (said(state, "actor", ["yes","probably"]) &&
+        said(state, "from_bd", ["yes","probably"]) &&
+        !hasScreenIdentityProof(state, best)) return false;
     // Sparse records from thousands of unrelated people dilute the absolute
     // posterior even when a candidate's independently verified identity
     // clues match and its nearest plausible alternative is far behind.
@@ -1299,6 +1329,27 @@ function pendingFilmEraQuestion(state) {
 // source-backed actor distinctions (career, company, producer, genre).
 // This can discover an overlooked actor such as Amin Khan even if a more
 // famous candidate initially dominates the popularity-weighted shortlist.
+function actorSignatureQuestion(state, leader) {
+  if (leader < 0 ||
+      !said(state, "actor", ["yes","probably"]) ||
+      !said(state, "from_bd", ["yes","probably"])) return null;
+  const id = state.pool.ids[leader];
+  const asked = new Set(state.answers.map(row => row.qid));
+  const rows = state.alive.length > 7000 ? sampleAlive(state,6000) : state.alive;
+  const cache = new Map();
+  for (const qid of SCREEN_IDENTITY_QUESTIONS) {
+    if (SCREEN_CAREER_DETAILS[qid]?.[id] !== 2 || asked.has(qid)) continue;
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null) continue;
+    const question = state.pool.questions[qi];
+    if (allowedInCategory(state, question) &&
+        !blockedQuestion(state, question, rows, cache) &&
+        gated(state, question, rows) &&
+        hasUnrejectedFilmCandidate(state, qid)) return qid;
+  }
+  return null;
+}
+
 function actorDiscoveryQuestion(state) {
   if (!said(state, "actor", ["yes","probably"]) ||
       !said(state, "from_bd", ["yes","probably"])) return null;
@@ -1483,6 +1534,14 @@ export function decide(state) {
   if (roleQuestion) return { type: "ask", qid: roleQuestion };
   const filmEra = pendingFilmEraQuestion(state);
   if (filmEra) return { type: "ask", qid: filmEra };
+  // Once the actor branch is known, verify a candidate's distinctive
+  // film/business history before announcing their name. A vague "lead"
+  // or "1990s" alone does not identify Riaz, Amin Khan, or Shakib Khan.
+  if (state.answers.length >= 12 && bestP >= 0.04) {
+    const signature = actorSignatureQuestion(state, best);
+    if (signature && !hasScreenIdentityProof(state, best))
+      return { type: "ask", qid: signature };
+  }
   const waiting = state.sinceGuess < questionsBeforeRetry(state, bestP, ratio);
   // After any wrong guess, force a fresh evidence-gathering round.
   // In particular, do NOT bypass it through the no-question fallback.

@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS } from "./career-facts.js?v=riddlex-48";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS } from "./career-facts.js?v=riddlex-50";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
@@ -417,6 +417,13 @@ function topTwo(state) {
       "screen_bowler_cane", "screen_hitler_resemblance",
       "screen_great_dictator", "screen_comedy_award",
     ].includes(row.qid));
+  const checkedScreenFacts = state.answers.filter(row =>
+    ["yes","no"].includes(row.value) && SCREEN_CAREER_DETAILS[row.qid] &&
+    !["screen_role_lead","screen_role_villain","screen_role_comedy",
+      "screen_role_supporting","screen_silent_comedy",
+      "screen_physical_comedy","screen_short_moustache",
+      "screen_bowler_cane","screen_hitler_resemblance",
+      "screen_great_dictator","screen_comedy_award"].includes(row.qid));
   // Prioritize explicitly confirmed 1990-1999 film stars. When all such
   // names are rejected, widen to incomplete records instead of giving up.
   const confirmed1990s = knownFilmEraAnswers.find((row) =>
@@ -427,6 +434,14 @@ function topTwo(state) {
   const deniedFemale = state.answers.some((row) => row.qid === "female" && row.value === "no");
   const maleQi = state.pool.qIndex.get("male");
   const femaleQi = state.pool.qIndex.get("female");
+  const aliveQi = state.pool.qIndex.get("alive");
+  const deadQi = state.pool.qIndex.get("dead");
+  const confirmedAlive = state.answers.some(row =>
+    (row.qid === "alive" && row.value === "yes") ||
+    (row.qid === "dead" && row.value === "no"));
+  const confirmedDead = state.answers.some(row =>
+    (row.qid === "dead" && row.value === "yes") ||
+    (row.qid === "alive" && row.value === "no"));
   let best = -1;
   let second = -1;
   let bestP = 0;
@@ -445,10 +460,24 @@ function topTwo(state) {
     // guessing a famous lead when the player described a comic performer.
     if (verifiedRoleClues.some((row) =>
       factBit(state.pool, i, row.qi) !== 2)) continue;
+    // A specific verified film, death-year or public-history clue must be
+    // true for the person announced, not merely weighted as likely. A NO
+    // excludes only positively known YES facts, never unknown records.
+    if (checkedScreenFacts.some(row => {
+      const bit = factBit(state.pool, i, row.qi);
+      return row.value === "yes" ? bit !== 2 : bit === 2;
+    })) continue;
     // A definitive player-supplied decade must have an affirmative career
     // record. A missing date is not evidence that a celebrity was famous
     // in the 1990s; keep that person in the question pool, not the guesses.
     if (confirmed1990s && factBit(state.pool, i, confirmed1990s.qi) !== 2) continue;
+    // Explicit life/death answers are hard identity constraints; a player
+    // confirming someone is alive must never see the known deceased Salman
+    // Shah or Manna, regardless of their popularity.
+    if (confirmedAlive && ((deadQi != null && factBit(state.pool, i, deadQi) === 2) ||
+        (aliveQi != null && factBit(state.pool, i, aliveQi) === 1))) continue;
+    if (confirmedDead && ((aliveQi != null && factBit(state.pool, i, aliveQi) === 2) ||
+        (deadQi != null && factBit(state.pool, i, deadQi) === 1))) continue;
     if (maleQi != null && confirmedMale && factBit(state.pool, i, maleQi) !== 2) continue;
     if (femaleQi != null && confirmedFemale && factBit(state.pool, i, femaleQi) !== 2) continue;
     if (maleQi != null && deniedMale && factBit(state.pool, i, maleQi) === 2) continue;
@@ -528,7 +557,8 @@ function hasCandidateEvidence(state, index) {
   for (const row of state.answers) {
     if (row.value !== "yes" || factBit(state.pool, index, row.qi) !== 2) continue;
     const group = state.pool.questions[row.qi]?.group;
-    if (!["job", "politics", "fiction", "adult", "animal", "object", "look", "size"].includes(group)) continue;
+    if (!["job", "politics", "fiction", "adult", "animal", "object", "look", "size"].includes(group) &&
+        !(group === "person" && row.qid.startsWith("screen_"))) continue;
     positive++;
     if (!PRIMARY_JOBS.includes(row.qid) && row.qid !== "athlete") distinctive++;
   }
@@ -1024,7 +1054,8 @@ export const QUESTION_REQUIRES = {
     id, [
       { id: "actor", value: "yes", strict: true },
       ...([
-        "screen_film_debut_pre1995", "screen_over_100_films",
+        "screen_known_multiple_marriages", "screen_debut_anonto_bhalobasha",
+        "screen_acted_bir_soinik", "screen_film_debut_pre1995", "screen_over_100_films",
         "screen_films_after_2000", "screen_national_film_award",
         "screen_air_force_before_films", "screen_first_film_keyamat",
         "screen_first_film_banglar_nayok", "screen_comedy_award",
@@ -1039,6 +1070,9 @@ export const QUESTION_REQUIRES = {
         "screen_short_moustache", "screen_bowler_cane",
         "screen_hitler_resemblance", "screen_great_dictator",
       ].includes(id) ? [{ id: "screen_silent_comedy", value: "yes", strict: true }] : []),
+      ...(["screen_died_1996","screen_died_2008"].includes(id) ? [
+        { id: "dead", value: "yes", strict: true },
+      ] : []),
       ...(id === "screen_hitler_resemblance" ? [
         { id: "screen_short_moustache", value: "yes", strict: true },
       ] : []),

@@ -555,8 +555,13 @@ export function shouldGuess(state) {
   // including verified career/role details for actors. Never reveal a name
   // simply because the database has few remaining candidates or a turn cap.
   if (state.category === "character" && state.pool.count >= 100 && !personal) {
-    return asked >= 8 && hasCandidateEvidence(state, best) &&
-      bestP >= 0.86 && ratio >= 9;
+    if (asked < 8 || !hasCandidateEvidence(state, best)) return false;
+    // Sparse records from thousands of unrelated people dilute the absolute
+    // posterior even when a candidate's independently verified identity
+    // clues match and its nearest plausible alternative is far behind.
+    // Require both adequate corroboration AND decisive relative separation.
+    return (bestP >= 0.86 && ratio >= 9) ||
+      (bestP >= 0.25 && ratio >= 12);
   }
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;

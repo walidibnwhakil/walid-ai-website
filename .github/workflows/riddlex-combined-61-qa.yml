@@ -1,0 +1,75 @@
+name: Riddlex combined 61-game regression (one revision)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "games/riddlex/owner-61-aggregate.mjs"
+      - ".github/workflows/riddlex-combined-61-qa.yml"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  browser-gameplay:
+    name: Real Playwright gameplay (${{ matrix.batch }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - batch: owner-20
+            script: games/riddlex/owner-20-ux-e2e.mjs
+            json: riddlex-user-20.json
+          - batch: prior-16
+            script: games/riddlex/owner-16-ux-e2e.mjs
+            json: riddlex-user-16.json
+          - batch: original-25
+            script: games/riddlex/owner-25-e2e.mjs
+            json: riddlex-owner-25.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check gameplay script syntax
+        run: node --check "${{ matrix.script }}"
+      - name: Install Chromium once per parallel game batch
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install chromium
+      - name: Actually play all target identities in the browser
+        id: gameplay
+        continue-on-error: true
+        run: node "${{ matrix.script }}"
+      - name: Keep every English/Bengali question and answer
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-61-batch-${{ matrix.batch }}
+          path: ${{ runner.temp }}/${{ matrix.json }}
+          if-no-files-found: error
+  combined-summary:
+    name: Verify all 61 sessions and block regressions
+    runs-on: ubuntu-24.04
+    needs: [browser-gameplay]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Retrieve every real browser session from this workflow
+        uses: actions/download-artifact@v4
+        with:
+          pattern: riddlex-61-batch-*
+          path: qa-traces
+          merge-multiple: true
+      - name: Aggregate 20 + 16 + 25 and enforce zero new failures
+        run: node games/riddlex/owner-61-aggregate.mjs qa-traces
+      - name: Publish combined complete 61-game question and answer report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-61-combined-complete-real-gameplay
+          path: ${{ runner.temp }}/riddlex-61-combined.json
+          if-no-files-found: error

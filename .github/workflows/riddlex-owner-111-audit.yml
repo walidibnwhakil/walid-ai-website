@@ -1,0 +1,32 @@
+name: Riddlex audit 111 owner names bilingual labels and credited images
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "games/riddlex/audit-owner-111.mjs"
+      - "games/riddlex/owner-111-sessions.mjs"
+      - ".github/workflows/riddlex-owner-111-audit.yml"
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Ensure audit syntax valid
+        run: |
+          node --check games/riddlex/audit-owner-111.mjs
+          node --check games/riddlex/owner-111-sessions.mjs
+      - name: Count actual matches in every published packed shard and curated casebook
+        run: node games/riddlex/audit-owner-111.mjs
+      - name: Save complete original 111 sessions and matched bilingual/image sources
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riddlex-owner-111-inventory
+          path: ${{ runner.temp }}/riddlex-owner-111-database-audit.json
+          if-no-files-found: warn

@@ -2394,8 +2394,10 @@ function broadDiscoveryQuestion(state) {
       }
       if (no("screen_indian_bengali")) {
         plan.push("screen_hindi_cinema");
-        if (yes("screen_hindi_cinema"))
-          plan.push("film_padmaavat_actor","film_crook","film_welcome");
+        if (yes("screen_hindi_cinema")) {
+          if (yes("male")) plan.push("film_welcome","film_padmaavat_actor","film_crook");
+          else plan.push("film_padmaavat_actor","film_crook","film_welcome");
+        }
         if (no("screen_hindi_cinema")) {
           plan.push("screen_telugu_cinema");
           if (yes("screen_telugu_cinema")) plan.push("film_baahubali");

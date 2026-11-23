@@ -210,6 +210,8 @@ function binaryEntropy(p) {
 }
 
 export function inCategory(pool, index, category) {
+  // Unverified user-supplied aliases remain searchable but never become guesses.
+  if (pool.flags?.[index] & 4) return false;
   const bit = (id) => {
     const qi = pool.qIndex.get(id);
     return qi == null ? 0 : factBit(pool, index, qi);

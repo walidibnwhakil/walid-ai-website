@@ -147,6 +147,47 @@ export function mergePools(pools) {
   return { questions, qIndex, attrBytes, count, attrs, pop, flags, ids, ens, bns, images, credits, aliasMap };
 }
 
+// Reuse ONLY photos already present in the packaged, attributed casebook.
+// For a newly supported identity, an exact (not substring) verified name or
+// alias can inherit an existing photo and its real license/photographer credit.
+// Ambiguous names and missing credits get NO IMAGE. This preserves Grok's
+// original source-backed photo presentation with zero extra downloads.
+export function inheritCreditedPortraits(loadedPool, entries) {
+  if (!loadedPool?.count || !Array.isArray(entries) || !entries.length)
+    return entries;
+  const normalize = value => String(value||"").normalize("NFKC").trim()
+    .toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"");
+  const names = new Map();
+  for (let i=0;i<loadedPool.count;i++) {
+    if (loadedPool.flags?.[i] & 1) continue; // previously restricted adult photo
+    const image=loadedPool.images?.[i];
+    const credit=loadedPool.credits?.[i];
+    if (!image || !credit) continue; // attribution required, never invent it
+    const record={id:loadedPool.ids[i],image,credit};
+    const aliases=loadedPool.aliasMap?.get(record.id)||[];
+    for (const name of [loadedPool.ens?.[i],loadedPool.bns?.[i],...aliases]) {
+      const key=normalize(name);
+      if (!key) continue;
+      if (!names.has(key))names.set(key,new Map());
+      names.get(key).set(record.id,record);
+    }
+  }
+  return entries.map(entry=>{
+    if (!entry || entry.image || entry.adult) return entry;
+    const candidates=new Map();
+    for (const name of [entry.en,...(entry.aliases||[])]) {
+      const records=names.get(normalize(name));
+      if (!records)continue;
+      for (const [id,record] of records)candidates.set(id,record);
+    }
+    // One exact matching identity: fine. Several different identities with
+    // overlapping names: leave blank rather than showing a wrong portrait.
+    if(candidates.size!==1)return entry;
+    const photo=candidates.values().next().value;
+    return {...entry,image:photo.image,credit:photo.credit};
+  });
+}
+
 export function imageSrc(image) {
   if (!image) return "";
   if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) return image;

@@ -243,13 +243,19 @@ try {
   // Drive the actual packed knowledge database through the same browser UI as
   // a player, not a tiny mock casebook. Log every question, answer and guess.
   async function replay(label, policy) {
+    const targets = {
+      fridge: "c-fridge", ceiling_fan: "c-ceiling-fan",
+      air_conditioner: "c-air-conditioner", butterfly: "c-butterfly",
+    };
+    const category = policy === "butterfly" ? "animal"
+      : targets[policy] ? "object" : "character";
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
     const trace = [];
     try {
       await page.goto(origin + "/games/riddlex/?autotest=1", { waitUntil: "load" });
       await page.click("#play");
       await page.waitForFunction(() => !document.getElementById("categories").hidden);
-      await page.click('[data-cat="character"]');
+      await page.click('[data-cat="' + category + '"]');
       await page.waitForFunction(() => window.__riddlex?.state()?.mode === "ask", null, { timeout: 35000 });
       const seen = new Set();
       let confirmedCountry = false;
@@ -259,13 +265,15 @@ try {
       let guesses = 0;
       let lastGuessQuestionCount = -1;
       let filmFollowUpsAfterGuess = 0;
-      for (let turn = 0; turn < (["actor_male_1990s","chaplin","dildar","amin"].includes(policy) ? 55 : 32); turn++) {
+      for (let turn = 0; turn < (["actor_male_1990s","chaplin","dildar","amin"].includes(policy) || targets[policy] ? 55 : 32); turn++) {
         await page.waitForFunction(() =>
           ["ask", "guess", "learn"].includes(window.__riddlex?.state()?.mode),
           null, { timeout: 35000 });
         const state = await page.evaluate(() => window.__riddlex.state());
         if (state.mode === "learn") {
           trace.push("END: learn / defeat");
+          if (targets[policy]) assert.fail(
+            "Could not identify the " + policy + " after verification questions");
           if (policy === "shakib") {
             const info = await page.evaluate(() => ({
               ...window.__riddlex.diagnose(),
@@ -361,6 +369,10 @@ try {
             trace.push("CORRECT: Amin Khan by film career and Walton role");
             break;
           }
+          if (targets[policy] && state.best === targets[policy]) {
+            trace.push("CORRECT: " + policy + " after candidate-specific function clues");
+            break;
+          }
           if (policy === "family") {
             assert.equal(state.best, "riddlex-role-mother",
               "A confirmed mother must not be replaced by a public celebrity or wrong relative");
@@ -401,7 +413,12 @@ try {
           assert.ok(!["does_bat","does_bowl","batsman","bowler","all_rounder","cricket_opener"].includes(q),
             "Cricket role asked without affirmative cricket answer: " + q);
         let a = "unknown";
-        if (q === "real") a = "yes";
+        if (targets[policy]) {
+          // Use the full real packed casebook, not a synthetic fixture.
+          a = await page.evaluate(({id,qid}) => window.__riddlex.replyFor(id,qid),
+            {id:targets[policy],qid:q});
+        }
+        else if (q === "real") a = "yes";
         else if (q === "knows_you") a = policy === "family" ? "yes" : "no";
         else if (policy === "chaplin" && q === "from_bd") a = "no";
         else if (policy === "chaplin" && q !== "from_bd")
@@ -479,7 +496,8 @@ try {
         await page.evaluate((value) => window.__riddlex.answer(value), a);
       }
       console.log("RIDDLEX_OWNER_REPLAY_" + policy.toUpperCase() + " " + JSON.stringify(trace));
-      assert.ok(seen.has("knows_you"), "Personal-contact question was not asked");
+      if (category === "character")
+        assert.ok(seen.has("knows_you"), "Personal-contact question was not asked");
       if (policy === "family") assert.ok(parentYes, "The family/parent route was not reached");
       if (policy === "public" || policy === "actor")
         assert.ok(confirmedCountry, "Bangladesh question was not asked");
@@ -499,6 +517,16 @@ try {
       }
       if (policy === "shakib") assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
         "The real Shakib entry was not guessed after real answers");
+      if (targets[policy]) {
+        assert.ok(trace.some(item=>item.startsWith("CORRECT:")),
+          "The candidate-hypothesis replay did not identify " + policy);
+        const signature = {
+          fridge:"obj_keeps_food_cold", ceiling_fan:"obj_moves_air_blades",
+          air_conditioner:"obj_cools_room", butterfly:"animal_visits_flowers",
+        };
+        assert.ok(seen.has(signature[policy]),
+          "Game guessed without checking the unique " + policy + " function");
+      }
       if (policy === "amin") {
         assert.ok(trace.some((item) => item.startsWith("CORRECT:")),
           "Amin Khan was not recognized after corroborated career and Walton answers");
@@ -522,6 +550,10 @@ try {
   await replay("Female Bangladesh actress with male=no", "actor_female_1990s");
   await replay("Male Bangladesh actor 1990–1999 with multiple rejected guesses", "actor_male_1990s");
   await replay("Amin Khan with verified film and Walton career clues", "amin");
+  await replay("Refrigerator: keeps food fresh and cold", "fridge");
+  await replay("Ceiling fan: moving air overhead", "ceiling_fan");
+  await replay("Air conditioner: cools a room", "air_conditioner");
+  await replay("Butterfly: visits flowers", "butterfly");
   await replay("Charlie Chaplin: global silent comic with moustache", "chaplin");
   await replay("Dildar: late Bangladeshi supporting comedian", "dildar");
 } finally {

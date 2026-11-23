@@ -3,7 +3,8 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-51";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-52";
+import { EXTRA_HYPOTHESIS_QUESTIONS, EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-52";
 
 const questions = [
   { id: "real", group: "kind" },
@@ -91,6 +92,133 @@ function play(pool, id, { flip = -1 } = {}) {
   }
   return { ok: false, step: 28 };
 }
+
+test("object guesses need an affirmative function before announcing a famous fridge", () => {
+  const qs=[...questions,
+    {id:"daily_use",group:"object",en:"Daily use?",bn:"নিয়মিত?" },
+    {id:"handheld",group:"object",en:"Handheld?",bn:"হাতে?"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS];
+  const objects=[
+    entry("c-fridge",65000,["object","kitchen","electronic","daily_use"]),
+    entry("c-fan",140,["object","electronic","daily_use"]),
+    ...EXTRA_HYPOTHESIS_ENTRIES.object,
+    ...Array.from({length:120},(_,i)=>
+      entry("ordinary-appliance-"+i,1,["object","electronic","daily_use"])),
+  ];
+  const pool=poolFromEntries(qs,objects);
+  const state=createState(pool,{category:"object"});
+  recompute(state);
+  for(const [qid,value] of [["electronic","yes"],["daily_use","yes"],
+    ["kitchen","yes"],["handheld","no"],["metal","unknown"]])
+    answer(state,qid,value);
+  assert.equal(shouldGuess(state),false,
+    "Popularity, electricity and kitchen alone do not verify fridge");
+  const q=decide(state);
+  assert.equal(q.type,"ask");
+  assert.equal(q.qid,"obj_keeps_food_cold",
+    "The engine should test the function of its fridge hypothesis");
+  answer(state,q.qid,"yes");
+  assert.equal(shouldGuess(state),true,
+    "Confirmed food-cooling function plus independent clues support fridge");
+  assert.equal(pool.ids[decide(state).index],"c-fridge");
+});
+
+test("rare but verified item is found in a huge sparse casebook", () => {
+  const qs=[...questions,
+    {id:"daily_use",group:"object",en:"Daily?",bn:"দৈনিক?"},
+    {id:"handheld",group:"object",en:"Handheld?",bn:"হাতে?"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS];
+  const entries=[
+    entry("c-fridge",2,["object","kitchen","electronic","daily_use"]),
+    ...Array.from({length:400},(_,i)=>
+      entry("unknown-device-"+i,250,["object","electronic","daily_use"])),
+  ];
+  const pool=poolFromEntries(qs,entries);
+  const state=createState(pool,{category:"object"});
+  recompute(state);
+  for(const [qid,value] of [["electronic","yes"],["daily_use","yes"],
+    ["kitchen","yes"],["handheld","no"],["obj_keeps_food_cold","yes"]])
+    answer(state,qid,value);
+  assert.equal(shouldGuess(state),true,
+    "A uniquely verified food-cooling function must not lose to unverified popularity");
+  assert.equal(pool.ids[decide(state).index],"c-fridge");
+});
+
+test("generic electrical appliance clues cannot force a popular TV guess", () => {
+  const qs=[...questions,
+    {id:"daily_use",group:"object",en:"Daily?",bn:"দৈনিক?"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS];
+  const pool=poolFromEntries(qs,[
+    entry("c-tv",65000,["object","electronic","daily_use"]),
+    ...Array.from({length:120},(_,i)=>
+      entry("electronic-item-"+i,1,["object","electronic","daily_use"])),
+  ]);
+  const state=createState(pool,{category:"object"});
+  recompute(state);
+  answer(state,"electronic","yes");
+  answer(state,"daily_use","yes");
+  answer(state,"metal","unknown");
+  answer(state,"kitchen","unknown");
+  answer(state,"cooking","unknown");
+  assert.equal(shouldGuess(state),false,
+    "TV, fan and air conditioner all fit generic electrical questions");
+});
+
+test("animal guesses ask a butterfly-specific behaviour, not just insect and flying", () => {
+  const qs=[...questions,
+    {id:"insect",group:"animal",en:"Insect?",bn:"পোকা?"},
+    {id:"can_fly",group:"animal",en:"Fly?",bn:"উড়ে?"},
+    {id:"wild",group:"animal",en:"Wild?",bn:"বন্য?"},
+    ...EXTRA_HYPOTHESIS_QUESTIONS];
+  const animals=[...EXTRA_HYPOTHESIS_ENTRIES.animal,
+    ...Array.from({length:120},(_,i)=>
+      entry("flying-insect-"+i,1,["animal","insect","can_fly","wild"]))];
+  const pool=poolFromEntries(qs,animals);
+  pool.pop[0]=65000;
+  const state=createState(pool,{category:"animal"});
+  recompute(state);
+  for(const [qid,value] of [["insect","yes"],["can_fly","yes"],
+    ["wild","yes"],["pet","no"]]) answer(state,qid,value);
+  assert.equal(shouldGuess(state),false);
+  assert.equal(decide(state).qid,"animal_visits_flowers");
+  answer(state,"animal_visits_flowers","yes");
+  assert.equal(shouldGuess(state),true);
+  assert.equal(pool.ids[decide(state).index],"c-butterfly");
+});
+
+test("international actors are not guessed from fame, lead roles and decade alone", () => {
+  const qs=[...questions,...EXTRA_SCREEN_QUESTIONS];
+  const pool=poolFromEntries(qs,[
+    entry("Q13059781",65000,["real","named","male","actor","from_bd"]),
+    ...Array.from({length:130},(_,i)=>
+      entry("other-actor-"+i,1,["real","named","male","actor","from_bd"])),
+  ]);
+  const state=createState(pool,{category:"character"});
+  recompute(state);
+  for(const [qid,value] of [
+    ["real","yes"],["actor","yes"],["male","yes"],["from_bd","yes"],
+    ["screen_role_lead","yes"],["screen_star_1990s","yes"],
+  ]) answer(state,qid,value);
+  assert.equal(shouldGuess(state),false,
+    "Famous, Bangladesh, actor, 1990s and leading role are not a unique identity");
+});
+
+test("four Indian Khan film facts attach to the correct distinct IDs", () => {
+  const qs=[...questions,...EXTRA_SCREEN_QUESTIONS];
+  const pool=poolFromEntries(qs,[
+    entry("Q9543",1400,["real","named","male","actor","from_in"]),
+    entry("Q9557",1300,["real","named","male","actor","from_in"]),
+    entry("Q252290",1200,["real","named","male","actor","from_in"]),
+    entry("Q9535",1500,["real","named","male","actor","from_in"]),
+  ]);
+  const has=(id,q)=>factBit(pool,pool.ids.indexOf(id),pool.qIndex.get(q));
+  assert.equal(has("Q9543","screen_india_unmarried"),2);
+  assert.equal(has("Q9557","screen_india_third_marriage"),2);
+  assert.equal(has("Q252290","screen_india_pataudi_family"),2);
+  assert.equal(has("Q9535","screen_india_king_khan"),2);
+  assert.equal(has("Q9543","screen_india_third_marriage"),1);
+  assert.equal(has("Q9535","screen_india_pataudi_family"),0);
+});
 
 test("male no does not lead to redundant female question", () => {
   const state = createState(world, { category: "character" });

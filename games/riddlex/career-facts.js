@@ -84,6 +84,9 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   // https://www.thedailystar.net/news-detail-249763
   // https://www.thedailystar.net/arts-entertainment/bubly-turns-heads-1334353
   // https://www.thedailystar.net/arts-entertainment/news/bubly-her-upcoming-ventures-2105153
+  // Viral social-media music videos and screen appearances (Arab News / AFP):
+  // https://www.arabnews.com/offbeat/tuneless-bangladeshi-social-media-star-grilled-by-police-2135851
+  screen_hero_alom_music_video: Object.freeze({ Q26923194:2 }),
   screen_ananta_khoj_debut: Object.freeze({ Q5299478:2 }),
   screen_ananta_business_producer: Object.freeze({ Q5299478:2 }),
   screen_apu_koti_takar_kabin: Object.freeze({ Q14301448:2 }),
@@ -200,6 +203,9 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
 });
 
 export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
+  { id:"screen_hero_alom_music_video", group:"job",
+    en:"Did this entertainer become well known through online music videos?",
+    bn:"এই বিনোদনশিল্পী কি অনলাইনের মিউজিক ভিডিওর মাধ্যমে বিশেষ পরিচিতি পান?" },
   { id:"screen_ananta_khoj_debut", group:"job",
     en:"Was this actor's debut film Khoj: The Search?",
     bn:"এই অভিনয়শিল্পীর প্রথম চলচ্চিত্র কি ‘খোঁজ: দ্য সার্চ’?" },

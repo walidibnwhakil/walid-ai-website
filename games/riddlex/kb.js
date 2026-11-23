@@ -11,6 +11,7 @@ import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-61";
 import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS } from "./everyday-facts.js";
 import { RECOGNITION_QUESTIONS } from "./recognition-facts.js";
+import { ownerBengaliFallback } from "./owner-bengali-labels.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported
 // questions are represented as sparse, fact-checked runtime overlays.
@@ -30,7 +31,7 @@ export function poolFromEntries(questions, entries) {
   entries.forEach((entry, index) => {
     ids[index] = entry.id;
     ens[index] = entry.en || "";
-    bns[index] = entry.bn || "";
+    bns[index] = ownerBengaliFallback(entry.en, entry.bn);
     pop[index] = Math.min(65535, entry.pop || 1);
     if (entry.adult) flags[index] |= 1;
     images[index] = entry.adult ? "" : (entry.image || "");
@@ -98,6 +99,7 @@ export function decodeShard(buffer, questions) {
     [ens[index], offset] = readString(view, offset, enLen);
     const bnLen = view.getUint16(offset, true); offset += 2;
     [bns[index], offset] = readString(view, offset, bnLen);
+    bns[index] = ownerBengaliFallback(ens[index], bns[index]);
     attrs.set(new Uint8Array(buffer, offset, attrBytes), index * attrBytes);
     offset += attrBytes;
     if (flags[index] & 2) {

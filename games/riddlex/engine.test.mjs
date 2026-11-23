@@ -3,7 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-48";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-50";
 
 const questions = [
   { id: "real", group: "kind" },

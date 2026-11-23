@@ -1641,8 +1641,11 @@ function verifiedIdentityCandidate(state) {
 function verifiedIdentityDiscoveryQuestion(state) {
   if (state.answers.length < 9) return null;
   const saidYes = qid => said(state,qid,["yes","probably"]);
+  // Bangladesh and India should not be hard-coded as the only acting
+  // markets: US/UK/French, Telugu, Japanese and others use the same
+  // source-backed questions after profession and country confirmation.
   const actor = saidYes("actor") &&
-    (saidYes("from_bd") || saidYes("from_in"));
+    COUNTRIES.some(country=>saidYes(country));
   const politics = saidYes("politician") &&
     COUNTRIES.some(id=>saidYes(id));
   const cricket = saidYes("cricketer") && saidYes("from_bd");

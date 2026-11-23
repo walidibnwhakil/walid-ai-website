@@ -1640,6 +1640,25 @@ function verifiedIdentityDiscoveryQuestion(state) {
   return best;
 }
 
+// A person may be known for science, writing or business AND have held
+// public office. When generic questions are exhausted, check a documented
+// cross-profession fact rather than surrendering despite a very strong
+// candidate. This also keeps the older Yunus chief-adviser path working.
+function crossProfessionQuestion(state, candidate) {
+  if (state.category !== "character" || candidate < 0 ||
+      state.answers.length < 6 || said(state,"politician",["yes","probably"]))
+    return null;
+  if (!["scientist","writer","business"].some(qid =>
+      said(state,qid,["yes","probably"]))) return null;
+  const asked = new Set(state.answers.map(row=>row.qid));
+  for (const qid of ["been_minister","led_gov","head_of_state"]) {
+    const qi = state.pool.qIndex.get(qid);
+    if (qi == null || asked.has(qid)) continue;
+    if (factBit(state.pool,candidate,qi) === 2) return qid;
+  }
+  return null;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -1852,6 +1871,7 @@ export function decide(state) {
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
       supportedIdentity(state)) return { type: "guess", index: best };
   qid ||= verifiedIdentityDiscoveryQuestion(state) ||
+    crossProfessionQuestion(state, focus) ||
     chooseConfirmationQuestion(state, focus) ||
     actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
   return qid ? { type: "ask", qid } : { type: "defeat" };

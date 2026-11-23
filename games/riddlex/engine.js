@@ -1091,11 +1091,17 @@ function politicsSplit(state, qi, rows) {
 function unrelatedJob(state, id) {
   const job = confirmedJob(state);
   if (!job || job === id) return false;
-  // Any two professions can overlap. Do not hard-code a handful of
-  // celebrity examples as the only legal multi-career combinations.
-  // Keep the second job open ONLY when at least one live, source-backed
-  // candidate confirms BOTH occupations; otherwise avoid the distraction.
-  if (state.category === "character" && PRIMARY_JOBS.includes(id)) {
+  // Source-backed multi-career branches, but only when the second career
+  // is meaningfully related to the confirmed first one. A generic athlete
+  // with a business investment must not divert the game from sport.
+  const multiCareer = (job==="politician" &&
+      ["actor","cricketer"].includes(id)) ||
+    (["actor","cricketer"].includes(job) && id==="politician") ||
+    (job==="writer" && id==="youtube") ||
+    (job==="youtube" && ["writer","business"].includes(id)) ||
+    (job==="business" && id==="youtube");
+  if (state.category === "character" && state.pool.count >= 100 &&
+      multiCareer && PRIMARY_JOBS.includes(id)) {
     const firstQi = state.pool.qIndex.get(job);
     const nextQi = state.pool.qIndex.get(id);
     if (firstQi != null && nextQi != null && state.alive.some(i =>

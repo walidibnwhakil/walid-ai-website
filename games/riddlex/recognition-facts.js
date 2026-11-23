@@ -203,6 +203,8 @@ export const RECOGNITION_QUESTIONS=Object.freeze([
 export const RECOGNITION_PEOPLE=Object.freeze([
   {
     "id": "identity-kate-winslet",
+    "image": "Kate Winslet March 18, 2014 (headshot).jpg",
+    "credit": "Mingle Media TV — CC BY-SA 2.0 · Wikimedia Commons",
     "en": "Kate Winslet",
     "bn": "কেট উইন্সলেট",
     "pop": 760,
@@ -233,6 +235,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
   },
   {
     "id": "identity-monica-bellucci",
+    "image": "Monica Bellucci 2002.jpg",
+    "credit": "Georges Biard — CC BY-SA 3.0 · Wikimedia Commons",
     "en": "Monica Bellucci",
     "bn": "মনিকা বেলুচ্চি",
     "pop": 670,
@@ -263,6 +267,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
   },
   {
     "id": "identity-nawazuddin",
+    "image": "Nawazuddin Siddiqui.jpg",
+    "credit": "Bollywood Hungama — CC BY 3.0 · Wikimedia Commons",
     "en": "Nawazuddin Siddiqui",
     "bn": "নওয়াজউদ্দিন সিদ্দিকী",
     "pop": 650,
@@ -293,6 +299,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
   },
   {
     "id": "identity-keerthy-suresh",
+    "image": "Keerthy Suresh 2.jpg",
+    "credit": "Verghese TK — CC BY-SA 4.0 · Wikimedia Commons",
     "en": "Keerthy Suresh",
     "bn": "কীর্তি সুরেশ",
     "pop": 690,
@@ -323,6 +331,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
   },
   {
     "id": "identity-bobby-deol",
+    "image": "Bobby Deol.jpg",
+    "credit": "Bollywood Hungama — CC BY 3.0 · Wikimedia Commons",
     "en": "Bobby Deol",
     "bn": "ববি দেওল",
     "pop": 710,
@@ -353,6 +363,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
   },
   {
     "id": "identity-rahil-azam",
+    "image": "Rahil-Azam.jpg",
+    "credit": "Bollywood Hungama — CC BY 3.0 · Wikimedia Commons",
     "en": "Rahil Azam",
     "bn": "রাহিল আজম",
     "pop": 430,
@@ -382,6 +394,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
   },
   {
     "id": "identity-priyanka-chopra",
+    "image": "Priyankachopra.jpg",
+    "credit": "Bollywood Hungama — CC BY 3.0 · Wikimedia Commons",
     "en": "Priyanka Chopra Jonas",
     "bn": "প্রিয়াঙ্কা চোপড়া",
     "pop": 970,
@@ -412,6 +426,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
   },
   {
     "id": "identity-john-cena",
+    "image": "John Cena 01.jpg",
+    "credit": "Gage Skidmore — CC BY-SA 4.0 · Wikimedia Commons",
     "en": "John Cena",
     "bn": "জন সিনা",
     "pop": 850,
@@ -507,6 +523,8 @@ export const RECOGNITION_PEOPLE=Object.freeze([
 export const RECOGNITION_ANIMALS=Object.freeze([
   {
     "id": "identity-domestic-hen",
+    "image": "Hen chicken.jpg",
+    "credit": "Thegreenj — CC BY-SA 3.0 · Wikimedia Commons",
     "en": "Chicken (hen)",
     "bn": "মুরগি",
     "pop": 450,

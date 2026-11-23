@@ -2025,6 +2025,34 @@ export function rejectIndex(state, index) {
   return recompute(state);
 }
 
+// Late fallback for *fictional* identities already in the sourced casebook.
+// A sparse global casebook can leave a real matching character at a low
+// absolute posterior because thousands of unrelated identities have missing
+// attributes. Try a relative, evidence-grounded hypothesis only AFTER all
+// relevant questions are exhausted; never guess on fame alone or a single
+// broad fiction/category answer.
+function lateVerifiedFictionGuess(state, best, bestP, secondP) {
+  if (state.category!=="character" || best < 0 ||
+      state.answers.length < 12 ||
+      !said(state,"fictional",["yes","probably"]) ||
+      said(state,"real",["yes","probably"]) ||
+      state.sinceGuess < questionsBeforeRetry(state) ||
+      bestP < 0.03 || oddsRatio(bestP, secondP) < 4.5 ||
+      !hasCandidateEvidence(state,best)) return false;
+  const verified=state.answers.filter(row =>
+    row.value==="yes" &&
+    state.pool.questions[row.qi]?.group==="fiction" &&
+    factBit(state.pool,best,row.qi)===2);
+  if (verified.length < 2) return false;
+  const contradictions=state.answers.some(row => {
+    if (!["yes","no"].includes(row.value)) return false;
+    const bit=factBit(state.pool,best,row.qi);
+    return (row.value==="yes" && bit===1) ||
+      (row.value==="no" && bit===2);
+  });
+  return !contradictions;
+}
+
 function confirmedPersonalRole(state) {
   if (state.category !== "character" ||
       !said(state, "real", ["yes", "probably"]) ||
@@ -2146,7 +2174,10 @@ export function decide(state) {
     crossProfessionQuestion(state, focus) ||
     chooseConfirmationQuestion(state, focus) ||
     actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
-  return qid ? { type: "ask", qid } : { type: "defeat" };
+  if (qid) return { type: "ask", qid };
+  if (lateVerifiedFictionGuess(state,best,bestP,secondP))
+    return { type:"guess", index:best };
+  return { type:"defeat" };
 }
 
 export function canPrint(pool, index) {

@@ -15,6 +15,8 @@ export const SCREEN_STAR_1990S = Object.freeze({
   Q6926134: 2,   // Moushumi, 1993
   Q7322180: 2,   // Riaz, recognition in late 1990s
   Q52149647: 1,  // Puja Cherry, became a lead film star in 2018
+  Q21066842: 2,  // Amin Khan, 1990s leading actor
+  Q15848298: 2,  // Omar Sani, 1993 breakthrough
 });
 
 // Historical film-career records; these are not live "still acting" claims.
@@ -44,6 +46,7 @@ export const SCREEN_LIFE_DETAILS = Object.freeze({
   Q7462919: Object.freeze({ alive:2, dead:1 }), // Shakib Khan, active 2026
   Q7405420: Object.freeze({ alive:1, dead:2 }), // Salman Shah, 1996
   Q4244083: Object.freeze({ alive:1, dead:2 }), // Manna, 2008
+  Q5939749: Object.freeze({ alive:1, dead:2 }), // Humayun Faridi, 2012
 });
 
 export const SCREEN_CAREER_DETAILS = Object.freeze({
@@ -56,6 +59,28 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   // Salman Shah died 6 September 1996. The cause remains disputed;
   // do not turn an allegation about suicide into a definite yes/no.
   // https://www.tbsnews.net/bangladesh/court/salman-shah-murder-case-probe-report-submission-deferred-8-december-1593486
+  // Source-backed facts. Absence of an entry means unknown, never "no".
+  // Amin Khan: https://www.jugantor.com/dhaliwood/1130491
+  // https://www.thedailystar.net/culture/entertainment/news/i-wasnt-away-because-any-resentment-amin-khan-his-return-the-silver-screen-4240031
+  // https://bmdb.com.bd/person/68/
+  // Omar Sani: https://en.prothomalo.com/entertainment/4p4s2itvuo
+  // https://www.ajkerpatrika.com/entertainment/cinema/ajpiprq6peptb
+  // Dipjol: https://www.tbsnews.net/splash/nowadays-whoever-invests-money-ends-director-dipjol-650298
+  // https://www.dhakatribune.com/amp/showtime/181524/dipjol-shakes-up-internet-with-road-safety-advert
+  // Misha Sawdagor: https://www.thedailystar.net/video-stories/uncensored-with-rafi-hossain-dhaliwood-villain-misha-sawdagor-to-quit-acting-bangladesh-bd-1482064
+  // Humayun Faridi: https://www.thedailystar.net/arts-entertainment/humayun-faridi-man-unmatched-impact-1231345
+  screen_walton_executive: Object.freeze({ Q21066842: 2 }),
+  screen_return_after_long_break: Object.freeze({ Q21066842: 2 }),
+  screen_debut_abujh_duti_mon: Object.freeze({ Q21066842: 2 }),
+  screen_restaurant_business: Object.freeze({ Q15848298: 2 }),
+  screen_film_producer: Object.freeze({ Q5279795: 2 }),
+  screen_famous_villain_dialogues: Object.freeze({ Q5279795: 2 }),
+  screen_800_plus_films: Object.freeze({ Q15868587: 2 }),
+  screen_lead_to_villain: Object.freeze({ Q15848298: 2 }),
+  screen_theatre_tv_film: Object.freeze({ Q5939749: 2 }),
+  screen_new_film_announced_2026: Object.freeze({
+    Q21066842: 2, Q15848298: 2, Q15868587: 2,
+  }),
   screen_known_multiple_marriages: Object.freeze({
     Q7462919: 2,
   }),
@@ -74,12 +99,15 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   screen_film_debut_pre1995: Object.freeze({
     Q7405420: 2, Q7460127: 2, Q13059781: 2, Q6926134: 2,
     Q7322180: 1, Q7462919: 1, Q4244083: 2,
+    Q21066842: 2, Q15848298: 2,
   }),
   screen_over_100_films: Object.freeze({
     Q7405420: 1, Q7322180: 2, Q7460127: 2, Q4244083: 2,
+    Q21066842: 2, Q15868587: 2,
   }),
   screen_films_after_2000: Object.freeze({
     Q7405420: 1, Q7322180: 2, Q7460127: 2, Q4244083: 2, Q7462919: 2,
+    Q21066842: 2, Q15848298: 2, Q15868587: 2, Q5279795: 2, Q5939749: 2,
   }),
   screen_national_film_award: Object.freeze({
     Q7322180: 2, Q7460127: 2, Q4244083: 2, Q7462919: 2,
@@ -104,9 +132,11 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   screen_role_lead: Object.freeze({
     Q882: 2, Q18987612: 1, Q7405420: 2, Q7322180: 2,
     Q7460127: 2, Q13059781: 2, Q7462919: 2, Q4244083: 2,
+    Q21066842: 2, Q15848298: 2,
   }),
   screen_role_villain: Object.freeze({
     Q5279795: 2, Q18987612: 1, Q882: 1,
+    Q15868587: 2, Q5939749: 2, Q15848298: 2,
   }),
   screen_role_comedy: Object.freeze({
     Q882: 2, Q18987612: 2,
@@ -141,6 +171,36 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
 });
 
 export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
+  { id:"screen_walton_executive", group:"job",
+    en:"Have they held a senior executive role at Walton?",
+    bn:"তিনি কি ওয়ালটনে উচ্চপদস্থ নির্বাহী হিসেবে কাজ করেছেন?" },
+  { id:"screen_return_after_long_break", group:"job",
+    en:"Did they plan a film comeback after a long break?",
+    bn:"দীর্ঘ বিরতির পর কি তিনি আবার চলচ্চিত্রে ফেরার পরিকল্পনা করেছেন?" },
+  { id:"screen_debut_abujh_duti_mon", group:"job",
+    en:"Was their first film Abujh Duti Mon?",
+    bn:"তাঁর প্রথম চলচ্চিত্র কি ‘অবুঝ দুটি মন’?" },
+  { id:"screen_restaurant_business", group:"job",
+    en:"Have they run a restaurant business alongside acting?",
+    bn:"অভিনয়ের পাশাপাশি কি তিনি রেস্তোরাঁর ব্যবসা করেছেন?" },
+  { id:"screen_film_producer", group:"job",
+    en:"Have they produced feature films?",
+    bn:"তিনি কি চলচ্চিত্র প্রযোজনাও করেছেন?" },
+  { id:"screen_famous_villain_dialogues", group:"job",
+    en:"Are they especially known for distinctive villain dialogues?",
+    bn:"খলচরিত্রের স্বতন্ত্র সংলাপের জন্য কি তিনি বিশেষভাবে পরিচিত?" },
+  { id:"screen_800_plus_films", group:"job",
+    en:"Have they appeared in more than 800 films?",
+    bn:"তিনি কি ৮০০টির বেশি চলচ্চিত্রে অভিনয় করেছেন?" },
+  { id:"screen_lead_to_villain", group:"job",
+    en:"Did they become known for villain roles after starting as a screen hero?",
+    bn:"নায়ক হিসেবে শুরু করে পরে কি খলচরিত্রেও পরিচিত হয়েছেন?" },
+  { id:"screen_theatre_tv_film", group:"job",
+    en:"Were they widely known for acting in theatre, television and film?",
+    bn:"মঞ্চ, টেলিভিশন ও চলচ্চিত্র—তিন মাধ্যমেই কি তিনি বিশেষভাবে পরিচিত ছিলেন?" },
+  { id:"screen_new_film_announced_2026", group:"job",
+    en:"Were they announced in a new film project in 2026?",
+    bn:"২০২৬ সালে কি তাঁর নতুন চলচ্চিত্রে অভিনয়ের ঘোষণা এসেছে?" },
   {
     id:"screen_known_multiple_marriages", group:"person",
     en:"Have they been publicly reported to have married more than once?",

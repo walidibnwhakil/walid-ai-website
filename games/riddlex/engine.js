@@ -7,8 +7,9 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-51";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-52";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js";
+import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-52";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -147,6 +148,7 @@ export function factBit(pool, index, qi) {
   if (id === "screen_star_1990s") return SCREEN_STAR_1990S[pool.ids[index]] || 0;
   if (id === "screen_star_pre1990") return SCREEN_STAR_PRE1990[pool.ids[index]] || 0;
   if (SCREEN_CAREER_DETAILS[id]) return SCREEN_CAREER_DETAILS[id][pool.ids[index]] || 0;
+  if (HYPOTHESIS_FACTS[id]) return HYPOTHESIS_FACTS[id][pool.ids[index]] || 0;
   const members = id && REGIONS[id];
   if (members && members.length > 1) return regionBit(pool, index, members);
   applyPolitics(pool);
@@ -208,6 +210,9 @@ export function createState(pool, options = {}) {
     // Stable identity memory: numeric indices change when knowledge shards reload.
     // Rejected people must remain excluded throughout this round.
     rejectedIds: new Set(),
+    // An active hypothesis is a stable entity ID, not a mutable shard index.
+    focusId: null,
+    focusHistory: [],
     guesses: 0,
     sinceGuess: 0,
     opening: options.opening || null,
@@ -568,6 +573,9 @@ const SCREEN_IDENTITY_QUESTIONS = [
   "screen_film_producer", "screen_theatre_tv_film",
   "screen_acted_bir_soinik", "screen_first_film_keyamat",
   "screen_comedy_award", "screen_bowler_cane", "screen_great_dictator",
+  "screen_india_unmarried", "screen_india_third_marriage",
+  "screen_india_pataudi_family", "screen_india_king_khan",
+  "screen_india_dabangg", "screen_india_dangal", "screen_india_ddlj",
 ];
 
 function hasScreenIdentityProof(state, index) {
@@ -580,6 +588,21 @@ function hasScreenIdentityProof(state, index) {
   if (!possible.length) return true;
   return state.answers.some(row =>
     row.value === "yes" && possible.includes(row.qid) &&
+    factBit(state.pool, index, row.qi) === 2);
+}
+
+// Specific real-world functions and behaviour identify animals and objects.
+ // The broad "uses electricity" question is useful context but never unique.
+const NONPERSON_SIGNATURES = Object.keys(HYPOTHESIS_FACTS)
+  .filter(qid => qid !== "obj_uses_electricity");
+
+function hasFunctionEvidence(state, index) {
+  const id = state.pool.ids[index];
+  const signatureIds = NONPERSON_SIGNATURES.filter(qid =>
+    HYPOTHESIS_FACTS[qid]?.[id] === 2);
+  if (!signatureIds.length) return true;
+  return state.answers.some(row =>
+    row.value === "yes" && signatureIds.includes(row.qid) &&
     factBit(state.pool, index, row.qi) === 2);
 }
 
@@ -623,7 +646,6 @@ export function shouldGuess(state) {
   if (state.category === "character" && state.pool.count >= 100 && !personal) {
     if (asked < 8 || !hasCandidateEvidence(state, best)) return false;
     if (said(state, "actor", ["yes","probably"]) &&
-        said(state, "from_bd", ["yes","probably"]) &&
         !hasScreenIdentityProof(state, best)) return false;
     // Sparse records from thousands of unrelated people dilute the absolute
     // posterior even when a candidate's independently verified identity
@@ -640,6 +662,15 @@ export function shouldGuess(state) {
     return (bestP >= 0.86 && ratio >= 9) ||
       (bestP >= 0.25 && ratio >= 12) ||
       (verifiedSpecific >= 3 && ratio >= 8);
+  }
+  // Objects and animals have the same evidence standard as public people:
+  // do not guess a likely fan, fridge, air conditioner or butterfly solely
+  // from category popularity or several generic negative responses.
+  if (["object","animal"].includes(state.category) && state.pool.count >= 40) {
+    if (asked < 5 || !hasCandidateEvidence(state, best) ||
+        !hasFunctionEvidence(state, best)) return false;
+    return (bestP >= 0.82 && ratio >= 7) ||
+      (bestP >= 0.4 && ratio >= 12);
   }
   // After a miss, one name far ahead of everyone else can be said at once.
   if (state.guesses > 0 && bestP >= 0.8 && ratio >= 8) return true;
@@ -1098,6 +1129,10 @@ export const QUESTION_REQUIRES = {
   party_jamaat: [{ id: "from_bd", value: "yes" }],
   zia_family: [{ id: "from_bd", value: "yes" }],
   mujib_family: [{ id: "from_bd", value: "yes" }],
+  ...Object.fromEntries(Object.keys(HYPOTHESIS_FACTS).map((id) => [
+    id, [{ id: id.startsWith("animal_") ? "animal" : "object",
+           value: "yes", strict: true }],
+  ])),
   ...Object.fromEntries(Object.keys(SCREEN_CAREER_DETAILS).map((id) => [
     id, [
       { id: "actor", value: "yes", strict: true },
@@ -1114,6 +1149,11 @@ export const QUESTION_REQUIRES = {
         "screen_air_force_before_films", "screen_first_film_keyamat",
         "screen_first_film_banglar_nayok", "screen_comedy_award",
       ].includes(id) ? [{ id: "from_bd", value: "yes", strict: true }] : []),
+      ...([
+        "screen_india_unmarried", "screen_india_third_marriage",
+        "screen_india_pataudi_family", "screen_india_king_khan",
+        "screen_india_dabangg", "screen_india_dangal", "screen_india_ddlj",
+      ].includes(id) ? [{ id: "from_in", value: "yes", strict: true }] : []),
       ...([
         "screen_silent_comedy", "screen_physical_comedy",
         "screen_comedy_award", "screen_short_moustache",
@@ -1215,7 +1255,7 @@ function allowedInCategory(state, question) {
 // least one surviving candidate. In particular, after Shakib Khan is rejected,
 // his marriage clue is not evidence about the other actors by default.
 function hasUnrejectedFilmCandidate(state, qid) {
-  const facts = SCREEN_CAREER_DETAILS[qid];
+  const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid];
   if (!facts) return true;
   return state.alive.some(i =>
     state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);

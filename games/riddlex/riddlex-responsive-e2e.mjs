@@ -568,7 +568,7 @@ try {
         been_minister:"yes",led_gov:"no",been_premier:"no",party_secretary:"no"} },
     { name:"Rashed Khan (former Gono Odhikar secretary)", category:"character", id:"riddlex-rashed-khan",
       sex:"male", facts:{politician:"yes",party_bnp:"yes",party_al:"no",
-        party_secretary:"yes",head_of_state:"no",been_premier:"no",
+        party_secretary:"no",head_of_state:"no",been_premier:"no",
         been_minister:"no",led_gov:"no",party_chief:"no",
         zia_family:"no",mujib_family:"no",lives_abroad:"no",athlete:"no"} },
     { name:"Obaidul Quader", category:"character", id:"Q14325293", sex:"male",

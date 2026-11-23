@@ -570,18 +570,26 @@ try {
     { name:"Rashed Khan (former Gono Odhikar secretary)", category:"character", id:"",
       sex:"male", facts:{politician:"yes",party_bnp:"yes",party_al:"no",
         party_secretary:"yes",head_of_state:"no",been_premier:"no",
-        been_minister:"no",led_gov:"no"} },
+        been_minister:"no",led_gov:"no",party_chief:"no",
+        zia_family:"no",mujib_family:"no",lives_abroad:"no",athlete:"no"} },
     { name:"Obaidul Quader", category:"character", id:"Q14325293", sex:"male",
       facts:{politician:"yes",party_al:"yes",party_bnp:"no",head_of_state:"no",
         been_minister:"yes",party_secretary:"yes",led_gov:"no",been_premier:"no"} },
     { name:"Hero Alom", category:"character", id:"Q26923194", sex:"male",
       facts:{actor:"yes",singer:"yes",youtube:"yes",politician:"yes",
-        business:"yes",cricketer:"no",footballer:"no"} },
+        business:"yes",cricketer:"no",footballer:"no",led_gov:"no",
+        head_of_state:"no",been_premier:"no",been_minister:"no",
+        party_al:"no",party_bnp:"no",party_jp:"no",party_jamaat:"no",
+        party_secretary:"no",zia_family:"no",mujib_family:"no",
+        lives_abroad:"no",athlete:"no"} },
     { name:"Ananta Jalil", category:"character", id:"Q5299478", sex:"male",
       facts:{actor:"yes",director:"yes",business:"yes",politician:"no",
         cricketer:"no",footballer:"no",screen_role_lead:"yes",
         screen_star_pre1990:"no",screen_star_1990s:"no",
-        screen_film_debut_pre1995:"no",screen_films_after_2000:"yes"} },
+        screen_film_debut_pre1995:"no",screen_films_after_2000:"yes",
+        screen_over_100_films:"no",screen_debut_anonto_bhalobasha:"no",
+        screen_air_force_before_films:"no",
+        screen_first_film_banglar_nayok:"no",screen_800_plus_films:"no"} },
     { name:"Apu Biswas", category:"character", id:"Q14301448", sex:"female",
       facts:{actor:"yes",politician:"no",cricketer:"no",footballer:"no",
         screen_role_lead:"yes",screen_star_pre1990:"no",screen_star_1990s:"no",
@@ -593,11 +601,15 @@ try {
     { name:"Dog", category:"animal", id:"Q144",
       facts:{mammal:"yes",pet:"yes",is_dog:"yes",is_cat:"no",is_mouse:"no",
         bird:"no",fish:"no",reptile:"no",insect:"no",can_fly:"no",
-        bigger_than_person:"no",water_life:"no",wild:"no"} },
+        bigger_than_person:"no",water_life:"no",wild:"no",
+        animal_visits_flowers:"no",animal_patterned_wings:"no",
+        animal_makes_honey:"no",animal_pollen_baskets:"no"} },
     { name:"Riddlex", category:"character", id:"riddlex-detective",
       fiction:true, facts:{fictional:"yes",real:"no",from_game:"yes",
         detective_role:"yes",named:"yes",animal:"no",object:"no",
-        from_novel:"no",from_film:"no",from_comics:"no",from_anime:"no"} },
+        from_novel:"no",from_film:"no",from_comics:"no",from_anime:"no",
+        from_cartoon:"no",superhero:"no",from_bengali_lit:"no",
+        talks:"yes"} },
     { name:"Kathgolap (frangipani flower)", category:"object", id:"",
       flower:true, facts:{electronic:"no",vehicle:"no",clothing:"no",
         kitchen:"no",cooking:"no",food:"no",metal:"no",music_item:"no",
@@ -639,7 +651,7 @@ try {
         if (state.mode==="learn") {outcome="defeat";break;}
         if (state.mode==="guess") {
           const label=(await page.locator("#guess-line").textContent())?.trim() || "";
-          wrongGuesses.push({questionCount:trace.length,id:state.best,label});
+          const guessRecord={questionCount:trace.length,id:state.best,label};
           const correctById=trial.id && state.best===trial.id;
           const correctByName=trial.name.startsWith("Rashed Khan") &&
             /^Are you thinking of (Md\.? |Muhammad )?Rashed Khan\??$/i.test(label);
@@ -648,6 +660,7 @@ try {
           if (correctById || correctByName || correctFlower) {
             outcome="correct";break;
           }
+          wrongGuesses.push(guessRecord);
           if (wrongGuesses.length>=5) {outcome="wrong-guesses";break;}
           await page.evaluate(()=>window.__riddlex.wrong());
           await page.waitForFunction(()=>
@@ -668,7 +681,8 @@ try {
         const known=trial.facts[q];
         let a=known||"unknown";
         if(!known) {
-          if(trial.category==="character" && !trial.fiction) {
+          if(q==="named" && trial.category==="character")a="yes";
+          else if(trial.category==="character" && !trial.fiction) {
             if(q==="real")a="yes";
             else if(q==="fictional")a="no";
             else if(q==="knows_you")a="no";

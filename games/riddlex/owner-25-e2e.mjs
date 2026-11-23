@@ -197,7 +197,7 @@ try {
   const seen=new Set();
   try {
    await page.route("**/*",route=>
-     new URL(route.request().url).origin===origin?route.continue():route.abort());
+     new URL(route.request().url()).origin===origin?route.continue():route.abort());
    const response=await page.goto(origin+"/games/riddlex/?autotest=1",
      {waitUntil:"load",timeout:45000});
    if(!response||response.status()!==200)throw Error("Game not served");

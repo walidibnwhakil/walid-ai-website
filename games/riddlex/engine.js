@@ -2906,6 +2906,47 @@ function recognitionEvidenceCandidate(state) {
   return candidates[0].index;
 }
 
+// Source-backed cross-career clues are much more informative than another
+// unrelated celebrity's film title. This is a generic intersection of
+// country + confirmed professions + known career market, never name matching.
+function crossCareerIdentityQuestion(state) {
+  if(state.category!=="character" || state.answers.length<11 ||
+     !said(state,"real",["yes","probably"]) ||
+     !said(state,"actor",["yes","probably"]))return null;
+  const yes=id=>said(state,id,["yes","probably"]);
+  const confirmed=PRIMARY_JOBS.filter(job=>yes(job));
+  if(confirmed.length<2)return null;
+  const countries=COUNTRIES.filter(yes);
+  if(!countries.length)return null;
+  const confirmedMarkets=MAINSTREAM_INDUSTRY_QUESTIONS.filter(yes);
+  const genre=EXTRA_IDENTITY_PEOPLE.filter(p=>
+    countries.some(c=>p.yes.includes(c)) &&
+    confirmed.every(job=>p.yes.includes(job)) &&
+    confirmedMarkets.every(m=>p.yes.includes(m)) &&
+    !state.answers.some(row=>
+      (row.value==="yes" && p.no.includes(row.qid)) ||
+      (row.value==="no" && p.yes.includes(row.qid))));
+  if(!genre.length || genre.length>3)return null;
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const person of genre) {
+    for(const q of EXTRA_IDENTITY_QUESTIONS) {
+      if(!q.distinctive || !person.yes.includes(q.id) ||
+         !q.id.startsWith("film_") || asked.has(q.id))continue;
+      const qi=state.pool.qIndex.get(q.id);
+      if(qi==null || !state.alive.some(i=>
+          state.weights[i]>0 && state.pool.ids[i]===person.id))continue;
+      if(!allowedInCategory(state,state.pool.questions[qi]) ||
+         blockedQuestion(state,state.pool.questions[qi],rows,cache) ||
+         !gated(state,state.pool.questions[qi],rows) ||
+         !hasUnrejectedFilmCandidate(state,q.id))continue;
+      return q.id;
+    }
+  }
+  return null;
+}
+
 export function decide(state) {
   recompute(state);
   const personalRole=confirmedPersonalRole(state);
@@ -2960,6 +3001,46 @@ export function decide(state) {
       state.pool.qIndex.has("youtube") &&
       !questionBlocked(state,"youtube"))
     return {type:"ask",qid:"youtube"};
+  // Known country and active profession should precede more one-off film
+  // titles, especially for European film performers with dual nationality.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"actor",["yes","probably"]) &&
+      said(state,"from_europe",["yes","probably"]) &&
+      state.answers.length >= 9 &&
+      !COUNTRIES.some(id=>said(state,id,["yes"])) ) {
+    for (const country of ["from_gb","from_fr","from_it"]) {
+      if(state.pool.qIndex.has(country) &&
+         !state.answers.some(row=>row.qid===country) &&
+         !questionBlocked(state,country))
+        return {type:"ask",qid:country};
+    }
+  }
+  // Country-confirmed public profiles should establish a basic occupation
+  // rather than exhausting every generic job before opening adult-film or
+  // other niche subbranches. A NO remains a genuine elimination.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      ["from_it","from_jp"].some(id=>said(state,id,["yes","probably"])) &&
+      state.answers.length >= 11 &&
+      !PRIMARY_JOBS.some(job=>said(state,job,["yes","probably"])) &&
+      !state.answers.some(row=>row.qid==="actor") &&
+      state.pool.qIndex.has("actor") && !questionBlocked(state,"actor"))
+    return {type:"ask",qid:"actor"};
+  // A confirmed Indian Hindi-film actor's second profession can separate
+  // the small actor+singer intersection before obscure competing film titles.
+  if (state.category === "character" &&
+      said(state,"actor",["yes","probably"]) &&
+      said(state,"from_in",["yes","probably"]) &&
+      said(state,"career_hindi_films",["yes","probably"]) &&
+      state.answers.length >= 12 &&
+      !state.answers.some(row=>row.qid==="singer") &&
+      EXTRA_IDENTITY_PEOPLE.some(p=>["actor","singer","from_in",
+        "career_hindi_films"].every(id=>p.yes.includes(id))) &&
+      state.pool.qIndex.has("singer") && !questionBlocked(state,"singer"))
+    return {type:"ask",qid:"singer"};
+  const roleAwareSignature=crossCareerIdentityQuestion(state);
+  if(roleAwareSignature)return {type:"ask",qid:roleAwareSignature};
   // An undecided career needs a basic athlete/sports branch eventually;
   // generic UNKNOWN answers should not bury it behind 18 niche questions.
   if (state.category === "character" &&

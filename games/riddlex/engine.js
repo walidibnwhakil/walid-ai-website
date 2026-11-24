@@ -3091,15 +3091,24 @@ export function decide(state) {
   // Previously the cap returned DEFEAT even when the last two answers had
   // just proved a pen, key, glass or other item.
   if (state.answers.length >= MAX_QUESTIONS_PER_ROUND) {
+    // The final answer can establish an identity in ANY category. Apply
+    // the same evidence checks as the ordinary interview before giving up.
+    // Never use the ceiling itself as evidence or guess a blind name.
     if (state.category === "object") {
-      for (const found of [evidenceBackedObjectCandidate(state),
-        everydayEvidenceCandidate(state), verifiedIdentityCandidate(state)]) {
-        if (found >= 0) return { type:"guess", index:found };
-      }
+      const found = evidenceBackedObjectCandidate(state);
+      if (found >= 0) return {type:"guess", index:found};
     }
-    if (state.category !== "character" && shouldGuess(state))
-      return { type:"guess", index:best };
-    return { type:"defeat" };
+    for (const found of [everydayEvidenceCandidate(state),
+      narrativeEvidenceCandidate(state), recognitionEvidenceCandidate(state),
+      verifiedIdentityCandidate(state)]) {
+      if (found >= 0) return {type:"guess", index:found};
+    }
+    if (shouldGuess(state) ||
+        corroboratedFilmHypothesis(state,best,bestP,secondP) ||
+        lateVerifiedFictionGuess(state,best,bestP,secondP) ||
+        lateSupportedPublicGuess(state,best,bestP,secondP))
+      return {type:"guess", index:best};
+    return {type:"defeat"};
   }
   // Once North America is affirmed, establish the US/Canada distinction
   // before launching niche occupations or film-name trivia.

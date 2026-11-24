@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
-import { appendShard, planShardLoads, poolFromEntries } from "./kb.js";
+import { appendShard, planShardLoads, poolFromEntries, loadShards } from "./kb.js";
 
 const sample = {
   top: "ix/top.bin",
@@ -126,4 +126,24 @@ test("later questions cannot exceed the cumulative knowledge transfer budget", (
   const spent = 1000 + 3000 + plan.reduce((sum, item) => sum + item.bytes, 0);
   assert.ok(spent <= sample.budget);
   assert.ok(!plan.some((item) => already.includes(item.file)));
+});
+
+test("a nonresponding knowledge worker falls back to the real shard decoder", async () => {
+  const oldWorker = globalThis.Worker;
+  const oldFetch = globalThis.fetch;
+  const manifest = JSON.parse(await readFile(new URL("./kb/manifest.json", import.meta.url), "utf8"));
+  const bytes = await readFile(new URL("./kb/ix/top.bin", import.meta.url));
+  globalThis.Worker = class { postMessage() {} };
+  globalThis.fetch = async () => ({
+    ok: true, arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+  });
+  try {
+    const pool = await loadShards("./test-worker-timeout", manifest, ["ix/top.bin"]);
+    assert.ok(pool.count > 1000);
+    assert.equal(pool.ids.length, pool.count);
+  } finally {
+    if (oldWorker === undefined) delete globalThis.Worker;
+    else globalThis.Worker = oldWorker;
+    globalThis.fetch = oldFetch;
+  }
 });

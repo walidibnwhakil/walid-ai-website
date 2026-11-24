@@ -103,3 +103,29 @@ test("unrelated No/Unknown object families leave the correct family reachable", 
   assert.equal(questionBlocked(state, "obj_family_house"), false);
   assert.equal(questionBlocked(state, "obj_family_lock"), false);
 });
+
+test("a tentative country answer never hides another plausible country", () => {
+  const countryPool = poolFromEntries(base, [
+    {id:"french",en:"French performer",pop:90,
+      yes:["real","alive","female","actor","from_fr"]},
+    {id:"british",en:"British performer",pop:90,
+      yes:["real","alive","female","actor","from_gb"]},
+    {id:"canadian",en:"Canadian performer",pop:90,
+      yes:["real","alive","female","actor","from_ca"]},
+    {id:"american",en:"American performer",pop:90,
+      yes:["real","alive","female","actor","from_us"]},
+  ]);
+  const european = createState(countryPool, {category:"character"});
+  answer(european,"real","yes");
+  answer(european,"from_europe","yes");
+  answer(european,"from_gb","probably");
+  assert.equal(questionBlocked(european,"from_fr"),false,
+    "Probably UK is not a definitive No to France");
+
+  const northAmerican = createState(countryPool, {category:"character"});
+  answer(northAmerican,"real","yes");
+  answer(northAmerican,"from_north_america","yes");
+  answer(northAmerican,"from_us","probably");
+  assert.equal(questionBlocked(northAmerican,"from_ca"),false,
+    "Probably USA must not prohibit Canada");
+});

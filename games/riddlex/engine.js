@@ -411,6 +411,11 @@ export function recompute(state) {
   const weights = state.weights;
   const alive = [];
   let sum = 0;
+  if (!Number.isFinite(max)) {
+    weights.fill(0);
+    state.alive = [];
+    return state;
+  }
   const floor = max - 14;
   for (let i = 0; i < n; i++) {
     if (logW[i] < floor) {
@@ -1398,7 +1403,8 @@ const ACTOR_ONLY_IDENTITY_QUESTIONS = new Set(
 
 // Keep movie-title trivia relevant. Asking about a movie that just happens
 // to exist somewhere in the casebook does not identify the current person.
-export const MAX_QUESTIONS_PER_ROUND = 28;
+// Compatibility export for older callers. Questions end when evidence is exhausted, not by turn count.
+export const MAX_QUESTIONS_PER_ROUND = Infinity;
 // Allow a few source-backed title checks, not an unlimited filmography.
 const MAX_FILM_TITLES_PER_ROUND = 4;
 function isFilmTitleQuestion(id) {
@@ -2111,6 +2117,7 @@ function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   const cache = new Map();
+  let best = null, bestGain = 0;
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
@@ -2127,9 +2134,10 @@ function firstAllowedQuestion(state) {
     // Preserve broad fallbacks after a rejected guess, but never reopen
     // personal or child sport branches contrary to earlier answers.
     if (question.group === "personal" && !gated(state, question, rows)) continue;
-    return question.id;
+    const gain = gainOn(state, qi, rows);
+    if (gain > bestGain) { best = question.id; bestGain = gain; }
   }
-  return null;
+  return best;
 }
 
 export function chooseQuestion(state) {
@@ -2232,7 +2240,7 @@ export function chooseQuestion(state) {
 
 export function answer(state, qid, value) {
   const qi = state.pool.qIndex.get(qid);
-  if (qi == null || !ANSWERS.includes(value)) return state;
+  if (qi == null || !ANSWERS.includes(value) || state.answers.some(row => row.qid === qid)) return state;
   state.answers.push({ qid, qi, value });
   state.sinceGuess += 1;
   return recompute(state);
@@ -3086,29 +3094,6 @@ export function decide(state) {
     const identified = verifiedIdentityCandidate(state);
     if (identified >= 0) return { type:"guess", index:identified };
     if (shouldGuess(state)) return { type:"guess", index:best };
-  }
-  // A genuine verified answer takes precedence over the question ceiling.
-  // Previously the cap returned DEFEAT even when the last two answers had
-  // just proved a pen, key, glass or other item.
-  if (state.answers.length >= MAX_QUESTIONS_PER_ROUND) {
-    // The final answer can establish an identity in ANY category. Apply
-    // the same evidence checks as the ordinary interview before giving up.
-    // Never use the ceiling itself as evidence or guess a blind name.
-    if (state.category === "object") {
-      const found = evidenceBackedObjectCandidate(state);
-      if (found >= 0) return {type:"guess", index:found};
-    }
-    for (const found of [everydayEvidenceCandidate(state),
-      narrativeEvidenceCandidate(state), recognitionEvidenceCandidate(state),
-      verifiedIdentityCandidate(state)]) {
-      if (found >= 0) return {type:"guess", index:found};
-    }
-    if (shouldGuess(state) ||
-        corroboratedFilmHypothesis(state,best,bestP,secondP) ||
-        lateVerifiedFictionGuess(state,best,bestP,secondP) ||
-        lateSupportedPublicGuess(state,best,bestP,secondP))
-      return {type:"guess", index:best};
-    return {type:"defeat"};
   }
   // Once North America is affirmed, establish the US/Canada distinction
   // before launching niche occupations or film-name trivia.

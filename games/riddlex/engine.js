@@ -3020,13 +3020,24 @@ export function decide(state) {
         return {type:"ask",qid:country};
     }
   }
-  // Country-confirmed public profiles should establish a basic occupation
-  // rather than exhausting every generic job before opening adult-film or
-  // other niche subbranches. A NO remains a genuine elimination.
+  // A probable US connection does not imply a confirmed US nationality.
+  // For a North American public figure with a hesitant "probably" for US,
+  // check Canada before US-only career trivia excludes Canadian profiles.
   if (state.category === "character" &&
       said(state,"real",["yes","probably"]) &&
-      ["from_it","from_jp"].some(id=>said(state,id,["yes","probably"])) &&
-      state.answers.length >= 11 &&
+      said(state,"from_north_america",["yes","probably"]) &&
+      said(state,"from_us",["probably"]) &&
+      !state.answers.some(row=>row.qid==="from_ca") &&
+      state.pool.qIndex.has("from_ca") && !questionBlocked(state,"from_ca"))
+    return {type:"ask",qid:"from_ca"};
+  // Once a country is established, the broad "Do they act?" career
+  // question should precede more specialist celebrity/profession trivia.
+  // This applies to American TV actors, European filmmakers, and Japanese
+  // performers alike; it is not a celebrity-specific shortcut.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      COUNTRIES.some(id=>said(state,id,["yes","probably"])) &&
+      state.answers.length >= 10 &&
       !PRIMARY_JOBS.some(job=>said(state,job,["yes","probably"])) &&
       !state.answers.some(row=>row.qid==="actor") &&
       state.pool.qIndex.has("actor") && !questionBlocked(state,"actor"))

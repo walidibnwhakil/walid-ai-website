@@ -9,8 +9,8 @@ import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS } from "./domain-facts.js?v=riddlex-60";
 import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-69";
 import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
-import { EVERYDAY_QUESTIONS } from "./everyday-facts.js";
-import { RECOGNITION_QUESTIONS } from "./recognition-facts.js";
+import { EVERYDAY_QUESTIONS } from "./everyday-facts.js?v=riddlex-71";
+import { RECOGNITION_QUESTIONS } from "./recognition-facts.js?v=riddlex-71";
 import { ownerBengaliFallback } from "./owner-bengali-labels.js";
 
 // The legacy binary shards store 28 attribute bytes while newer supported
@@ -328,7 +328,7 @@ export function categoryShards(manifest, category) {
 }
 
 export async function loadManifest(base = "./kb") {
-  const response = await fetch(`${base}/manifest.json?v=riddlex-70`, { cache: "no-cache" });
+  const response = await fetch(`${base}/manifest.json?v=riddlex-71`, { cache: "no-cache" });
   if (!response.ok) throw new Error("Knowledge manifest failed");
   const manifest = await response.json();
   for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...RECOGNITION_QUESTIONS, ...PERSONAL_QUESTIONS]) {

@@ -10,7 +10,7 @@ const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await i
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
-import { EVERYDAY_QUESTIONS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
+import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
 import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } from "./recognition-facts.js";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
@@ -2668,42 +2668,69 @@ const EVERYDAY_GENERIC = new Set([
 // No target-name switch. First ask ordinary uses, then distinguish several
 // similar objects by their different observable functions and physical form.
 function everydayDiscoveryQuestion(state) {
- if(state.category!=="object" || state.answers.length<2) return null;
- const yes=qid=>said(state,qid,["yes","probably"]);
- const asked=new Set(state.answers.map(row=>row.qid));
- const familyOrder=[
-   "obj_family_electric","obj_family_worn","obj_family_personal_care",
-   "obj_family_kitchen","obj_family_container","obj_family_paper",
-   "obj_family_house","obj_family_lock","obj_family_cleaning",
-   "obj_family_medicine","obj_family_climbing","obj_family_prayer",
-   "obj_family_consumable","obj_family_financial","obj_family_waste"
- ];
- const pool=state.pool;
- const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
- const cache=new Map();
- const attempt=(qid)=>{
-   if(asked.has(qid))return false;
-   const qi=pool.qIndex.get(qid);
-   if(qi==null)return false;
-   const q=pool.questions[qi];
-   return allowedInCategory(state,q) &&
-     !blockedQuestion(state,q,rows,cache) && gated(state,q,rows) &&
-     hasUnrejectedFilmCandidate(state,qid);
- };
- // Prefer a specific function immediately after its family is confirmed;
- // if none matches, return to broad categories rather than trying the
- // names of unrelated appliances.
- for(const fam of familyOrder) {
-   if(!yes(fam))continue;
-   for(const q of EVERYDAY_QUESTIONS) {
-     if(q.parent===fam && attempt(q.id))return q.id;
-   }
- }
- if(yes("obj_skin_moisturizer"))
-   for(const id of ["obj_skin_cream","obj_skin_lotion","obj_skin_jelly"])
-     if(attempt(id))return id;
- for(const family of familyOrder) if(attempt(family))return family;
- return null;
+  if (state.category !== "object" || state.answers.length < 2) return null;
+  const asked = new Set(state.answers.map(row => row.qid));
+  const yes = id => said(state,id,["yes","probably"]);
+  const unknownFamilies = state.answers.filter(row =>
+    EVERYDAY_FAMILY_IDS.includes(row.qid) && row.value === "unknown").length;
+  const pool = state.pool;
+
+  // These source-backed family questions already have an explicit OBJECT
+  // parent, supplied by the user's category selection. Do not let global
+  // celebrity/encyclopedia priors hide them through low yesMass or
+  // parentAbsent; that previously skipped paper, door and lock families
+  // and spent the remaining round asking about arbitrary colours instead.
+  const available = qid => {
+    if (asked.has(qid) || !pool.qIndex.has(qid)) return false;
+    const q = pool.questions[pool.qIndex.get(qid)];
+    if (!q || !allowedInCategory(state,q)) return false;
+    if (EVERYDAY_FAMILY_IDS.includes(qid))
+      return unknownFamilies < 3 && !questionContradicts(state,qid);
+    if (q.parent && yes(q.parent) &&
+        EVERYDAY_QUESTIONS.some(item => item.id === qid))
+      return !questionContradicts(state,qid);
+    const rows = state.alive.length > 7000 ? sampleAlive(state,6000) : state.alive;
+    return !blockedQuestion(state,q,rows,new Map()) && gated(state,q,rows);
+  };
+
+  // An affirmed family immediately leads to concrete observable functions.
+  // A NO to one child does not close its siblings; a YES can already
+  // identify a candidate with an independently verified object function.
+  for (const family of EVERYDAY_FAMILY_IDS) {
+    if (!yes(family)) continue;
+    for (const q of EVERYDAY_QUESTIONS)
+      if (q.parent === family && available(q.id)) return q.id;
+  }
+  if (yes("obj_skin_moisturizer"))
+    for (const id of ["obj_skin_cream","obj_skin_lotion","obj_skin_jelly"])
+      if (available(id)) return id;
+
+  // Choose the next FAMILY by comparing the real supported objects' facts,
+  // not by a hard-coded family order or by the fame of the Bible/Qur'an.
+  // This shared classification works equally for glass, tissue, key,
+  // dictionary, door, medicine and all other sourced everyday objects.
+  const observations = state.answers.filter(row =>
+    ["yes","no","probably","probably_not"].includes(row.value));
+  const compatible = EVERYDAY_OBJECTS.filter(item => !observations.some(row =>
+    (["no","probably_not"].includes(row.value) && item.yes.includes(row.qid)) ||
+    (["yes","probably"].includes(row.value) && item.no.includes(row.qid))));
+  const base = compatible.length ? compatible : EVERYDAY_OBJECTS;
+  let best = null, bestScore = -Infinity;
+  for (const family of EVERYDAY_FAMILY_IDS) {
+    if (!available(family)) continue;
+    const positives = base.filter(item => item.yes.includes(family));
+    if (!positives.length) continue;
+    const balance = positives.length / base.length;
+    // Maximize useful binary splits, lightly favor candidates matching
+    // more previously confirmed observable features.
+    const support = Math.max(0,...positives.map(item =>
+      observations.filter(row =>
+        ["yes","probably"].includes(row.value) &&
+        item.yes.includes(row.qid)).length));
+    const score = Math.min(balance,1-balance)*4 + support*.08;
+    if (score > bestScore) { bestScore = score; best = family; }
+  }
+  return best;
 }
 
 // Evidence-based, reversible object hypotheses. A broad category alone never

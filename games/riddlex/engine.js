@@ -2688,8 +2688,12 @@ function everydayDiscoveryQuestion(state) {
     if (asked.has(qid) || !pool.qIndex.has(qid)) return false;
     const q = pool.questions[pool.qIndex.get(qid)];
     if (!q || !allowedInCategory(state,q)) return false;
-    if (EVERYDAY_FAMILY_IDS.includes(qid))
-      return unknownFamilies < 3 && !questionContradicts(state,qid);
+    if (EVERYDAY_FAMILY_IDS.includes(qid)) {
+      // These are independent sibling families. A NO to electric, clothing
+      // or skin-care must never disqualify paper, door, glass or medicine.
+      // The object category was explicitly chosen by the player already.
+      return unknownFamilies < 3;
+    }
     if (q.parent && yes(q.parent) &&
         EVERYDAY_QUESTIONS.some(item => item.id === qid))
       return !questionContradicts(state,qid);

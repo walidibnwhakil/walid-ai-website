@@ -1417,18 +1417,15 @@ function usefulFilmTitleQuestion(state, qid) {
 
 function blockedQuestion(state, question, rows, cache) {
   if (!usefulFilmTitleQuestion(state, question.id)) return true;
-  // The user may not know a specialised taxonomy. Three unanswered or
-  // negative family questions cannot monopolise an entire object round.
-  if (EVERYDAY_FAMILY_IDS.includes(question.id) &&
-      !state.answers.some(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
-        ["yes","probably"].includes(row.value)) &&
-      state.answers.filter(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
-        ["no","probably_not","unknown"].includes(row.value)).length >= 3)
-    return true;
+  // A NO to one object family must never suppress unrelated families.
+  // Example: "not electric/worn/skincare" must still allow paper, doors,
+  // locks, containers and cleaning. The previous three-NO ceiling made
+  // verified object facts unreachable and forced dozens of colour questions.
   // Recognition overlays are only relevant in their actual domain.
   if (question.id.startsWith("profile_bd_") &&
       !said(state,"from_bd",["yes","probably"])) return true;
   if (question.id.startsWith("profile_sports_") &&
+      question.id !== "profile_sports_wrestling" &&
       !said(state,"athlete",["yes","probably"]) &&
       !said(state,"profile_sports_wrestling",["yes","probably"])) return true;
   if (question.id.startsWith("profile_film_") &&
@@ -2487,7 +2484,7 @@ function broadDiscoveryQuestion(state) {
       if (no("screen_indian_bengali")) {
         plan.push("screen_hindi_cinema");
         if (yes("screen_hindi_cinema")) {
-          if (yes("male")) plan.push("film_welcome","film_padmaavat_actor","film_crook");
+          if (yes("male") || no("female")) plan.push("film_welcome","film_padmaavat_actor","film_crook");
           else plan.push("film_padmaavat_actor","film_crook","film_welcome");
         }
         if (no("screen_hindi_cinema")) {
@@ -2812,7 +2809,10 @@ function recognitionDiscoveryQuestion(state) {
         }
       }
     }
-    if(yes("from_us") && yes("male")) {
+    // The opening often asks "Are they a woman?" instead of "Are they a man?".
+    // A NO to that question must not silently disable male-career questions.
+    // Use the answer for question routing only, never as proof for a guess.
+    if(yes("from_us") && (yes("male") || no("female"))) {
       plan.push("profile_sports_wrestling");
       if(yes("profile_sports_wrestling")) {
         plan.push("profile_sports_wwe");
@@ -2825,14 +2825,14 @@ function recognitionDiscoveryQuestion(state) {
       if(yes("from_gb"))plan.push("profile_film_titanic","profile_film_oscar_lead");
       if(yes("from_it"))plan.push("profile_film_malena","profile_film_spectre");
       if(yes("from_in")) {
-        if(yes("female")) {
+        if(yes("female") || no("male")) {
           plan.push("profile_film_south_india");
           if(yes("profile_film_south_india"))
             plan.push("profile_film_mahanati","profile_film_national_award");
           if(no("profile_film_south_india")) {
             plan.push("profile_film_miss_world","profile_film_quantico");
           }
-        } else if(yes("male")) {
+        } else if(yes("male") || no("female")) {
           plan.push("profile_film_indian_tv");
           if(yes("profile_film_indian_tv"))plan.push("profile_film_hatim_role");
           else if(no("profile_film_indian_tv"))
@@ -2902,7 +2902,8 @@ export function decide(state) {
   const focus = focusedCandidate(state, best, second, bestP, secondP);
   // A supported identification comes before optional film or career trivia.
   // Earlier discovery paths could keep bypassing shouldGuess indefinitely.
-  if (state.category === "character" &&
+  if (state.category === "character" && state.pool.count >= 100 &&
+      state.answers.length >= 8 &&
       !pendingActorRoleQuestion(state) && !pendingFilmEraQuestion(state) &&
       !domainDiscoveryQuestion(state)) {
     const identified = verifiedIdentityCandidate(state);

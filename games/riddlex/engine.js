@@ -3040,6 +3040,21 @@ export function decide(state) {
         return {type:"ask",qid:id};
     }
   }
+  // A real public person's nationality must be established before asking
+  // dozens of speculative continents, occupations or movie titles. In the
+  // large worldwide casebook a dead Bangladesh screen comedian can have low
+  // prior weight, so the entropy picker previously skipped from_bd entirely
+  // and exhausted the round on unrelated foreign countries.
+  // The question is neutral for non-Bangladeshi players: a NO simply routes
+  // the next interview into the worldwide region/career branch.
+  if (state.category === "character" &&
+      state.answers.length >= 4 &&
+      said(state, "real", ["yes", "probably"]) &&
+      said(state, "knows_you", ["no", "probably_not"]) &&
+      !state.answers.some(row => row.qid === "from_bd") &&
+      state.pool.qIndex.has("from_bd") &&
+      !questionBlocked(state, "from_bd"))
+    return { type: "ask", qid: "from_bd" };
   // A generic social-media career does not prove one particular video
   // creator. Ask the relevant source-backed content niche before trying a
   // celebrity name. In the Bangladeshi creator casebook this is a useful

@@ -2071,6 +2071,33 @@ function confirmedAdultOccupationQuestion(state) {
   return possible ? "adult_ent" : null;
 }
 
+// A compact casebook can have sparse profile facts. If one answer is
+// mistaken or a name has just been rejected, the entropy picker may see
+// no useful question despite having honest, verifiable attributes left.
+// Ask a documented general-purpose fact rather than declaring defeat.
+// The production 19k+ casebook never takes this shortcut.
+function smallCasebookEvidenceQuestion(state) {
+  if(state.category!=="character" || state.pool.count>=100)return null;
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const ids=["cricketer","actor","politician","scientist","footballer",
+    "writer","singer","athlete","all_rounder","alive","named",
+    "male","female","from_in","from_bd"];
+  for(const id of ids) {
+    const qi=state.pool.qIndex.get(id);
+    if(qi==null || asked.has(id))continue;
+    if(id==="all_rounder" && !said(state,"cricketer",["yes","probably"]))
+      continue;
+    if(["cricketer","footballer"].includes(id) &&
+        said(state,"athlete",["no","probably_not"]))continue;
+    if(PRIMARY_JOBS.includes(id) && unrelatedJob(state,id))continue;
+    if(!allowedInCategory(state,state.pool.questions[qi]))continue;
+    if(!state.alive.some(i=>state.weights[i]>0 &&
+        factBit(state.pool,i,qi)!==0))continue;
+    return id;
+  }
+  return null;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -3085,6 +3112,8 @@ export function decide(state) {
       state.answers.some(row=>row.qid==="from_bd") &&
       state.answers.some(row=>row.value==="yes" &&
         PRIMARY_JOBS.includes(row.qid)) &&
+      !pendingActorRoleQuestion(state) && !pendingFilmEraQuestion(state) &&
+      !domainDiscoveryQuestion(state) &&
       best >= 0 && bestP >= 0.75 && ratio >= 4)
     return {type:"guess",index:best};
   // Preserve existing, already-verified pen/phone/clock and function
@@ -3164,7 +3193,8 @@ export function decide(state) {
   if (waiting) {
     const qid = chooseConfirmationQuestion(state, focus) ||
       chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
-      actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
+      actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
+      smallCasebookEvidenceQuestion(state);
     return qid ? { type: "ask", qid } : { type: "defeat" };
   }
   if (shouldGuess(state)) {
@@ -3181,7 +3211,8 @@ export function decide(state) {
   // The ordinary entropy picker can run out while useful candidate-specific
   // confirmations still exist. Try them before a broad, safe fallback.
   // A missing question is NEVER permission to guess an unverified name.
-  let qid = chooseQuestion(state);
+  let qid = chooseQuestion(state) ||
+    smallCasebookEvidenceQuestion(state);
   // Preserve the original tiny-casebook behavior used by the self-contained
   // demo and simulation fixtures. Guess when the informative question picker
   // is exhausted so a later rejection still has unused clarifying questions.
@@ -3193,7 +3224,8 @@ export function decide(state) {
   qid ||= verifiedIdentityDiscoveryQuestion(state) ||
     crossProfessionQuestion(state, focus) ||
     chooseConfirmationQuestion(state, focus) ||
-    actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
+    actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
+    smallCasebookEvidenceQuestion(state);
   if (qid) return { type: "ask", qid };
   if (lateVerifiedFictionGuess(state,best,bestP,secondP) ||
       lateSupportedPublicGuess(state,best,bestP,secondP))

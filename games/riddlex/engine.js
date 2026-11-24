@@ -10,8 +10,8 @@ const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await i
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
-import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
-import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } from "./recognition-facts.js";
+import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js?v=riddlex-71";
+import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS, RECOGNITION_PROFILE_FACTS } from "./recognition-facts.js?v=riddlex-71";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
@@ -156,7 +156,9 @@ export function factBit(pool, index, qi) {
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
   if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;
-  if (RECOGNITION_FACTS[id]) return RECOGNITION_FACTS[id][pool.ids[index]] || 0;
+  const recognitionFact = RECOGNITION_FACTS[id]?.[pool.ids[index]] ?? RECOGNITION_PROFILE_FACTS[pool.ids[index]]?.[id];
+  if (recognitionFact !== undefined) return recognitionFact;
+  if (RECOGNITION_FACTS[id]) return 0;
   const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
     DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
@@ -411,6 +413,11 @@ export function recompute(state) {
   const weights = state.weights;
   const alive = [];
   let sum = 0;
+  if (!Number.isFinite(max)) {
+    weights.fill(0);
+    state.alive = [];
+    return state;
+  }
   const floor = max - 14;
   for (let i = 0; i < n; i++) {
     if (logW[i] < floor) {
@@ -1398,7 +1405,8 @@ const ACTOR_ONLY_IDENTITY_QUESTIONS = new Set(
 
 // Keep movie-title trivia relevant. Asking about a movie that just happens
 // to exist somewhere in the casebook does not identify the current person.
-export const MAX_QUESTIONS_PER_ROUND = 28;
+// Compatibility export for older callers. Questions end when evidence is exhausted, not by turn count.
+export const MAX_QUESTIONS_PER_ROUND = Infinity;
 // Allow a few source-backed title checks, not an unlimited filmography.
 const MAX_FILM_TITLES_PER_ROUND = 4;
 function isFilmTitleQuestion(id) {
@@ -1407,17 +1415,38 @@ function isFilmTitleQuestion(id) {
 }
 function usefulFilmTitleQuestion(state, qid) {
   if (!isFilmTitleQuestion(qid)) return true;
-  const asked = state.answers.filter(row => isFilmTitleQuestion(row.qid));
-  if (asked.length >= MAX_FILM_TITLES_PER_ROUND) return false;
+  const contextIds = new Set([...COUNTRIES, "from_asia","from_europe",
+    "from_north_america","from_south_america","from_africa",
+    "career_bengali_films","career_hindi_films","career_telugu_films",
+    "career_hollywood_films","screen_bangladesh_bengali","screen_indian_bengali",
+    "screen_hindi_cinema","screen_telugu_cinema","screen_kannada_cinema"]);
+  const context = state.answers.filter(row=>contextIds.has(row.qid) && row.value==="yes");
+  // Before establishing origin or film market, a movie list is not a useful
+  // way to distinguish real performers. A confirmed new market starts a
+  // new evidence branch rather than exhausting it on old unrelated titles.
+  if (said(state,"real",["yes","probably"]) && !context.length) return false;
+  const lastContext = state.answers.findLastIndex(row=>contextIds.has(row.qid) && row.value==="yes");
+  const asked = state.answers.slice(lastContext+1).filter(row => isFilmTitleQuestion(row.qid));
   const industryKnown = said(state,"actor",["yes","probably"]) ||
     said(state,"film_director_work",["yes","probably"]) ||
     said(state,"from_film",["yes","probably"]);
   if (!industryKnown) return false;
   const qi = state.pool.qIndex.get(qid);
   if (qi == null) return false;
+  const knownOrigins = context.filter(row=>COUNTRIES.includes(row.qid) ||
+    ["from_asia","from_europe","from_north_america","from_south_america","from_africa"].includes(row.qid));
   const compatible = i => state.weights[i] > 0 &&
     factBit(state.pool,i,qi) === 2 &&
-    eligibleForIdentityQuestion(state,i);
+    eligibleForIdentityQuestion(state,i) &&
+    (!knownOrigins.length || knownOrigins.some(row=>factBit(state.pool,i,row.qi)===2));
+  // After several rejected or unknown titles, only a corroboration of an
+  // actually affirmed title belonging to the same candidate may extend
+  // this branch. The number itself never proves or disproves an identity.
+  if (asked.length >= MAX_FILM_TITLES_PER_ROUND) {
+    const affirmed=asked.filter(row=>row.value==="yes");
+    if(affirmed.length!==1 || !state.alive.some(i=>compatible(i) &&
+      factBit(state.pool,i,affirmed[0].qi)===2))return false;
+  }
   const last = state.answers.at(-1);
   if (last && isFilmTitleQuestion(last.qid)) {
     // A title answered No or Don't know never starts a new title list.
@@ -1521,11 +1550,11 @@ function hasUnrejectedFilmCandidate(state, qid) {
   const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
     BROAD_FACTS[qid] || NARRATIVE_FACTS[qid] || EVERYDAY_FACTS[qid];
   const verifiedExisting = BROAD_PROFILE_FACTS[qid];
-  if (!facts && !verifiedExisting) return true;
-  return state.alive.some(i =>
-    state.weights[i] > 0 &&
-    (facts?.[state.pool.ids[i]] === 2 ||
-     verifiedExisting?.[state.pool.ids[i]] === 2));
+  if (!facts && !verifiedExisting && !RECOGNITION_FACTS[qid]) return true;
+  const qi=state.pool.qIndex.get(qid);
+  if(qi==null)return false;
+  return state.alive.some(i => state.weights[i] > 0 &&
+    factBit(state.pool,i,qi)===2 && eligibleForIdentityQuestion(state,i));
 }
 
 // Before proposing another name, confirm distinguishing facts about the
@@ -2111,6 +2140,7 @@ function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
   const cache = new Map();
+  let best = null, bestGain = 0;
   for (let qi = 0; qi < state.pool.questions.length; qi++) {
     const question = state.pool.questions[qi];
     if (asked.has(question.id)) continue;
@@ -2127,9 +2157,26 @@ function firstAllowedQuestion(state) {
     // Preserve broad fallbacks after a rejected guess, but never reopen
     // personal or child sport branches contrary to earlier answers.
     if (question.group === "personal" && !gated(state, question, rows)) continue;
-    return question.id;
+    let gain = gainOn(state, qi, rows);
+    // Sparse knowledge can contain a positive trait for some plausible
+    // identities and no recorded value for others. A confirmation still
+    // carries information even without a known-negative sample.
+    if (gain === 0) {
+      let yes = 0, no = 0, total = 0;
+      for (const i of rows) {
+        const w = state.weights[i];
+        if (!(w > 0) || !eligibleForIdentityQuestion(state,i)) continue;
+        total += w;
+        const bit = factBit(state.pool,i,qi);
+        if (bit === 2) yes += w;
+        else if (bit === 1) no += w;
+      }
+      if (total > 0 && yes > 0 && yes < total * 0.999999)
+        gain = 0.1 * binaryEntropy(yes / total);
+    }
+    if (gain > bestGain) { best = question.id; bestGain = gain; }
   }
-  return null;
+  return best;
 }
 
 export function chooseQuestion(state) {
@@ -2232,7 +2279,7 @@ export function chooseQuestion(state) {
 
 export function answer(state, qid, value) {
   const qi = state.pool.qIndex.get(qid);
-  if (qi == null || !ANSWERS.includes(value)) return state;
+  if (qi == null || !ANSWERS.includes(value) || state.answers.some(row => row.qid === qid)) return state;
   state.answers.push({ qid, qi, value });
   state.sinceGuess += 1;
   return recompute(state);
@@ -2878,6 +2925,13 @@ function recognitionDiscoveryQuestion(state) {
   const no=id=>said(state,id,["no","probably_not"]);
   const asked=new Set(state.answers.map(row=>row.qid));
   const plan=[];
+  if(state.category==="character" && yes("fictional")) {
+    if(!asked.has("from_cartoon"))plan.push("from_cartoon");
+    if(yes("from_cartoon")) {
+      plan.push("profile_cartoon_unicef");
+      if(yes("profile_cartoon_unicef"))plan.push("profile_cartoon_parrot");
+    }
+  }
   if(state.category==="animal" && yes("bird")) {
     plan.push("profile_animal_poultry");
     if(yes("profile_animal_poultry"))
@@ -2903,11 +2957,23 @@ function recognitionDiscoveryQuestion(state) {
       if(yes("profile_sports_wrestling")) {
         plan.push("profile_sports_wwe");
         if(yes("profile_sports_wwe"))
-          plan.push("profile_sports_record_champion");
+          plan.push("profile_sports_record_champion","profile_sports_dx","profile_sports_wwe_executive");
         if(yes("actor"))plan.push("profile_sports_peacemaker");
       }
     }
+    if(yes("singer") && yes("from_us")) {
+      plan.push("profile_music_brothers");
+      if(yes("profile_music_brothers"))plan.push("profile_music_jealous");
+    }
     if(yes("actor")) {
+      if(yes("career_hollywood_films") && (yes("from_us") || yes("from_north_america"))) {
+        if((yes("male") || no("female")) && yes("from_us"))
+          plan.push("profile_film_mission_impossible","profile_film_top_gun");
+        if((yes("female") || no("male")) && yes("from_us"))
+          plan.push("profile_film_maleficent","profile_film_tomb_raider");
+        if((yes("female") || no("male")) && !yes("from_us") && yes("from_north_america"))
+          plan.push("profile_film_knives_out","profile_film_no_time_to_die");
+      }
       // A tentative UK answer is not proof of a British film career.
       // Wait for a definite UK answer; otherwise first resolve France etc.
       if(said(state,"from_gb",["yes"]))plan.push("profile_film_titanic","profile_film_oscar_lead");
@@ -2942,6 +3008,8 @@ function recognitionDiscoveryQuestion(state) {
        blockedQuestion(state,question,rows,cache) ||
        !gated(state,question,rows) ||
        !hasUnrejectedFilmCandidate(state,qid))continue;
+    if(RECOGNITION_FACTS[qid] && !state.alive.some(i=>state.weights[i]>0 &&
+      factBit(state.pool,i,qi)===2 && eligibleForIdentityQuestion(state,i)))continue;
     return qid;
   }
   return null;
@@ -3087,20 +3155,6 @@ export function decide(state) {
     if (identified >= 0) return { type:"guess", index:identified };
     if (shouldGuess(state)) return { type:"guess", index:best };
   }
-  // A genuine verified answer takes precedence over the question ceiling.
-  // Previously the cap returned DEFEAT even when the last two answers had
-  // just proved a pen, key, glass or other item.
-  if (state.answers.length >= MAX_QUESTIONS_PER_ROUND) {
-    if (state.category === "object") {
-      for (const found of [evidenceBackedObjectCandidate(state),
-        everydayEvidenceCandidate(state), verifiedIdentityCandidate(state)]) {
-        if (found >= 0) return { type:"guess", index:found };
-      }
-    }
-    if (state.category !== "character" && shouldGuess(state))
-      return { type:"guess", index:best };
-    return { type:"defeat" };
-  }
   // Once North America is affirmed, establish the US/Canada distinction
   // before launching niche occupations or film-name trivia.
   if (state.category === "character" &&
@@ -3185,6 +3239,24 @@ export function decide(state) {
         "career_hindi_films"].every(id=>p.yes.includes(id))) &&
       state.pool.qIndex.has("singer") && !questionBlocked(state,"singer"))
     return {type:"ask",qid:"singer"};
+  // After ruling out acting, ask a basic online-creator or business
+  // occupation before obscure specialty trivia or an early defeat.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"actor",["no","probably_not"]) &&
+      state.answers.length >= 10 &&
+      !PRIMARY_JOBS.some(id=>id!=="business" && id!=="youtube" &&
+        said(state,id,["yes","probably"]))) {
+    for (const id of ["youtube","business"]) {
+      if (id==="business" && !said(state,"youtube",["yes","probably"])) continue;
+      if (state.answers.some(row=>row.qid===id)) continue;
+      const qi=state.pool.qIndex.get(id);
+      if (qi!=null && !questionBlocked(state,id) &&
+          state.alive.some(i=>state.weights[i]>0 &&
+            factBit(state.pool,i,qi)===2 && eligibleForIdentityQuestion(state,i)))
+        return {type:"ask",qid:id};
+    }
+  }
   const roleAwareSignature=crossCareerIdentityQuestion(state);
   if(roleAwareSignature)return {type:"ask",qid:roleAwareSignature};
   // An undecided career needs a basic athlete/sports branch eventually;
@@ -3301,7 +3373,7 @@ export function decide(state) {
       chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
       actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
       smallCasebookEvidenceQuestion(state) ||
-      (state.pool.count < 100 ? ["alive","named","female","writer","singer"]
+      (state.category === "character" && state.pool.count < 100 ? ["alive","named","female","writer","singer"]
         .find(id=>state.pool.qIndex.has(id) &&
           !state.answers.some(row=>row.qid===id) &&
           !questionContradicts(state,id)) : null);

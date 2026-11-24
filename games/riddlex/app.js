@@ -1,14 +1,14 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-69";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-71";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-69";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-71";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_PEOPLE } from "./domain-facts.js?v=riddlex-60";
 import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-69";
 import { NARRATIVE_PEOPLE } from "./narrative-facts.js";
-import { EVERYDAY_OBJECTS } from "./everyday-facts.js";
-import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js";
+import { EVERYDAY_OBJECTS } from "./everyday-facts.js?v=riddlex-71";
+import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js?v=riddlex-71";
 import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
@@ -96,13 +96,13 @@ function gameInProgress() {
   return mode === "ask" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
 }
 
-const LOAD_MS = 15000;
+const LOAD_MS = 30000;
 const debugLoad = new URLSearchParams(location.search).has("autotest");
 function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "riddlex-69";
+const BUILD = "riddlex-71";
 
 function withTimeout(promise, ms) {
   let timer;
@@ -129,21 +129,30 @@ function showLoadRetry() {
 async function boot() {
   applyLanguage();
   if (!menuCatController) menuCatController = startMenuCat($("menu-cat"));
-  loading = Promise.all([
-    loadManifest("./kb"),
-    fetch(`./kb/index.json?v=${BUILD}`).then((response) => {
-      if (!response.ok) throw new Error("Knowledge index failed");
-      return response.json();
-    }),
-  ]).then(([loaded, index]) => {
-    manifest = loaded;
-    catalog = index;
+  const bootToken = ++bootGeneration;
+  manifest = null;
+  catalog = null;
+  // The index is an optional long-tail enhancement; an unavailable index
+  // must not block the manifest or the character/animal/object starter pools.
+  loading = loadManifest("./kb").then(loaded => {
+    if (bootToken === bootGeneration) manifest = loaded;
     return loaded;
   });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  fetch(`./kb/index.json?v=${BUILD}`, { signal: controller.signal })
+    .then(response => {
+      if (!response.ok) throw new Error("Knowledge index failed");
+      return response.json();
+    })
+    .then(index => { if (bootToken === bootGeneration) catalog = index; })
+    .catch(error => { loadEvent("index.optionalFailed", error?.message); })
+    .finally(() => clearTimeout(timer));
   loading.catch(() => {});
 }
 
 let loadToken = 0;
+let bootGeneration = 0;
 function adoptPool(next) {
   pool = next;
   if (!state || state.category !== category || !pool) return;
@@ -228,8 +237,9 @@ async function openPlay() {
   scene.setMood("curious");
   try { await scene.start(); } catch { /* the picture can arrive late; the choices stay up */ }
   scheduleUnderBubble();
+  const token = loadToken;
   try { await withTimeout(loading, LOAD_MS); }
-  catch { showLoadRetry(); }
+  catch { if (token === loadToken && mode === "pick") showLoadRetry(); }
 }
 
 async function loadNamed(entries, token, begin) {
@@ -307,6 +317,8 @@ async function startGame(chosen) {
   const token = ++loadToken;
   loadedNames = [];
   pool = null;
+  state = null;
+  currentQ = null;
   loadChain = Promise.resolve();
   hideLoadRetry();
   setStatus(text().loading);
@@ -316,9 +328,11 @@ async function startGame(chosen) {
     return;
   }
   if (token !== loadToken) return;
-  const job = chosen === "character" && catalog
-    ? loadNamed(planShardLoads(catalog, [], []), token, true)
-    : loadNamed(categoryShards(manifest, chosen).map((file) => ({ file })), token, true);
+  const planned = chosen === "character" && catalog
+    ? planShardLoads(catalog, [], []) : [];
+  const initial = planned.length ? planned
+    : categoryShards(manifest, chosen).map(file => ({ file }));
+  const job = loadNamed(initial, token, true);
   job.catch(() => {});
   try {
     await withTimeout(job, LOAD_MS);
@@ -326,6 +340,8 @@ async function startGame(chosen) {
   } catch (error) {
     loadEvent("startGame.failed", error?.stack || error);
     if (token !== loadToken) return;
+    // Never replace a playable round with a loading error from a later shard.
+    if (state && state.category === chosen && pool && mode !== "pick") return;
     loadToken += 1;
     showLoadRetry();
   }
@@ -335,8 +351,14 @@ async function step() {
   if (!state) return;
   const session = loadToken;
   const playingState = state;
-  const pending = category === "character" && catalog
-    ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
+  const wantsFiction = state.answers.some(row =>
+    (row.qid === "real" && ["no","probably_not"].includes(row.value)) ||
+    (row.qid === "fictional" && ["yes","probably"].includes(row.value)));
+  // Fiction remains reachable if the optional worldwide index is unavailable.
+  const fallback = wantsFiction && manifest?.shards?.includes("ix/fiction.bin") &&
+    !loadedNames.includes("ix/fiction.bin") ? [{file:"ix/fiction.bin"}] : [];
+  const pending = category === "character"
+    ? queueShards(catalog ? planShardLoads(catalog, state.answers, loadedNames) : fallback, loadToken)
     : null;
   let decision = decide(state);
   // A new clue can activate country/occupation shards that are not yet in

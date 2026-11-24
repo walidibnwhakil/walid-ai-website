@@ -1,3 +1,4 @@
+// Sources for new records: https://www.unicef.org/bangladesh/en/meena-and-unicef ; https://www.rottentomatoes.com/celebrity/tom_cruise ; public film credits and WWE biographies.
 // Generic evidence taxonomy with explicit bilingual questions.
 // Facts are public, independently verifiable career and physical attributes.
 // NO identity-specific "is this NAME?" question. Missing entries stay UNKNOWN.
@@ -199,6 +200,19 @@ export const RECOGNITION_QUESTIONS=Object.freeze([
     "en": "Does this bird typically have a fleshy comb on top of its head?",
     "bn": "এই পাখির মাথায় কি সাধারণত মাংসল ঝুঁটি থাকে?"
   }
+,
+  {"id":"profile_film_mission_impossible","group":"job","parent":"actor","en":"Did they play Ethan Hunt in Mission: Impossible?","bn":"তিনি কি মিশন ইম্পসিবল চলচ্চিত্রে ইথান হান্ট চরিত্রে অভিনয় করেছেন?"},
+  {"id":"profile_film_top_gun","group":"job","parent":"actor","en":"Did they play Maverick in Top Gun?","bn":"তিনি কি টপ গান চলচ্চিত্রে ম্যাভেরিক চরিত্রে অভিনয় করেছেন?"},
+  {"id":"profile_film_maleficent","group":"job","parent":"actor","en":"Did they play the title character in Maleficent?","bn":"তিনি কি ম্যালেফিসেন্ট চলচ্চিত্রে নাম ভূমিকায় অভিনয় করেছেন?"},
+  {"id":"profile_film_tomb_raider","group":"job","parent":"actor","en":"Did they play Lara Croft in the early Tomb Raider films?","bn":"তিনি কি প্রথম দিকের টুম্ব রেইডার চলচ্চিত্রে লারা ক্রফট চরিত্রে অভিনয় করেছেন?"},
+  {"id":"profile_film_knives_out","group":"job","parent":"actor","en":"Did they portray Marta in Knives Out?","bn":"তিনি কি নাইভস আউট চলচ্চিত্রে মার্টা চরিত্রে অভিনয় করেছেন?"},
+  {"id":"profile_film_no_time_to_die","group":"job","parent":"actor","en":"Did they play Paloma in No Time to Die?","bn":"তিনি কি নো টাইম টু ডাই চলচ্চিত্রে পালোমা চরিত্রে অভিনয় করেছেন?"},
+  {"id":"profile_music_brothers","group":"job","parent":"singer","en":"Are they a member of the Jonas Brothers band?","bn":"তিনি কি জোনাস ব্রাদার্স ব্যান্ডের সদস্য?"},
+  {"id":"profile_music_jealous","group":"job","parent":"singer","en":"Did they release the solo song Jealous in 2014?","bn":"তিনি কি ২০১৪ সালে একক গান জেলাস প্রকাশ করেছিলেন?"},
+  {"id":"profile_sports_dx","group":"job","parent":"profile_sports_wwe","en":"Was this wrestler a founding member of D-Generation X?","bn":"এই কুস্তিগির কি ডি-জেনারেশন এক্স দলের প্রতিষ্ঠাতা সদস্য ছিলেন?"},
+  {"id":"profile_sports_wwe_executive","group":"job","parent":"profile_sports_wwe","en":"Did this wrestler become a WWE chief content officer?","bn":"এই কুস্তিগির কি পরে WWE-এর প্রধান কনটেন্ট কর্মকর্তা হয়েছেন?"},
+  {"id":"profile_cartoon_unicef","group":"fiction","parent":"from_cartoon","en":"Is this character from a UNICEF educational cartoon series?","bn":"চরিত্রটি কি ইউনিসেফের শিক্ষামূলক কার্টুন সিরিজের?"},
+  {"id":"profile_cartoon_parrot","group":"fiction","parent":"profile_cartoon_unicef","en":"Is this character a girl whose pet parrot is called Mithu?","bn":"চরিত্রটি কি এমন একটি মেয়ে যার পোষা টিয়াপাখির নাম মিঠু?"}
 ]);
 export const RECOGNITION_PEOPLE=Object.freeze([
   {
@@ -519,6 +533,13 @@ export const RECOGNITION_PEOPLE=Object.freeze([
       "Barrister Zaima Rahman"
     ]
   }
+,
+  {"id":"identity-tom-cruise","en":"Tom Cruise","bn":"টম ক্রুজ","pop":400,"yes":["real","named","alive","male","from_us","actor","screen_role_lead","career_hollywood_films","profile_film_mission_impossible","profile_film_top_gun"],"no":["fictional","animal","object","female","profile_sports_wrestling","profile_film_maleficent","profile_film_tomb_raider","profile_film_knives_out","profile_film_no_time_to_die"],"aliases":[]},
+  {"id":"identity-angelina-jolie","en":"Angelina Jolie","bn":"অ্যাঞ্জেলিনা জোলি","pop":400,"yes":["real","named","alive","female","from_us","actor","director","screen_role_lead","career_hollywood_films","profile_film_maleficent","profile_film_tomb_raider"],"no":["fictional","animal","object","male","profile_film_mission_impossible","profile_film_top_gun","profile_film_knives_out","profile_film_no_time_to_die","tv_euphoria"],"aliases":[]},
+  {"id":"identity-ana-de-armas","en":"Ana de Armas","bn":"আনা দে আরমাস","pop":400,"yes":["real","named","alive","female","actor","screen_role_lead","career_hollywood_films","from_north_america","profile_film_knives_out","profile_film_no_time_to_die"],"no":["fictional","animal","object","male","from_us","from_bd","from_in","profile_film_maleficent","profile_film_tomb_raider","tv_euphoria"],"aliases":[]},
+  {"id":"identity-nick-jonas","en":"Nick Jonas","bn":"নিক জোনাস","pop":400,"yes":["real","named","alive","male","from_us","actor","singer","musician","profile_music_brothers","profile_music_jealous"],"no":["fictional","animal","object","female","profile_sports_wrestling","profile_film_mission_impossible","profile_film_top_gun"],"aliases":[]},
+  {"id":"identity-triple-h","en":"Triple H","bn":"ট্রিপল এইচ","pop":400,"yes":["real","named","alive","male","from_us","athlete","profile_sports_wrestling","profile_sports_wwe","profile_sports_record_champion","profile_sports_dx","profile_sports_wwe_executive"],"no":["fictional","animal","object","female","profile_sports_peacemaker"],"aliases":["Paul Levesque","Paul Michael Levesque"]},
+  {"id":"identity-cartoon-meena","en":"Meena","bn":"মীনা","pop":400,"yes":["fictional","named","female","from_cartoon","talks","profile_cartoon_unicef","profile_cartoon_parrot"],"no":["real","male","animal","object","from_anime","from_game","superhero","detective_role"],"aliases":["UNICEF Meena"]}
 ]);
 export const RECOGNITION_ANIMALS=Object.freeze([
   {
@@ -559,7 +580,28 @@ export const RECOGNITION_ANIMALS=Object.freeze([
     ]
   }
 ]);
+// Explicit general facts on these curated records must remain visible even
+// where an older sparse overlay also defines the same question.
+export const RECOGNITION_PROFILE_FACTS=Object.freeze(Object.fromEntries(
+  [...RECOGNITION_PEOPLE,...RECOGNITION_ANIMALS].map(entry=>[
+    entry.id,Object.freeze(Object.fromEntries([
+      ...entry.yes.map(id=>[id,2]),...entry.no.map(id=>[id,1])
+    ]))
+  ])
+));
 export const RECOGNITION_FACTS=Object.freeze({
+  "profile_cartoon_parrot": {"identity-cartoon-meena":2},
+  "profile_cartoon_unicef": {"identity-cartoon-meena":2},
+  "profile_sports_wwe_executive": {"identity-triple-h":2,"identity-john-cena":1},
+  "profile_sports_dx": {"identity-triple-h":2,"identity-john-cena":1},
+  "profile_music_jealous": {"identity-nick-jonas":2},
+  "profile_music_brothers": {"identity-nick-jonas":2},
+  "profile_film_no_time_to_die": {"identity-tom-cruise":1,"identity-angelina-jolie":1,"identity-ana-de-armas":2},
+  "profile_film_knives_out": {"identity-tom-cruise":1,"identity-angelina-jolie":1,"identity-ana-de-armas":2},
+  "profile_film_tomb_raider": {"identity-tom-cruise":1,"identity-angelina-jolie":2,"identity-ana-de-armas":1},
+  "profile_film_maleficent": {"identity-tom-cruise":1,"identity-angelina-jolie":2,"identity-ana-de-armas":1},
+  "profile_film_top_gun": {"identity-tom-cruise":2,"identity-angelina-jolie":1,"identity-nick-jonas":1},
+  "profile_film_mission_impossible": {"identity-tom-cruise":2,"identity-angelina-jolie":1,"identity-nick-jonas":1},
   "profile_film_titanic": {
     "identity-kate-winslet": 2,
     "identity-monica-bellucci": 1,
@@ -630,15 +672,21 @@ export const RECOGNITION_FACTS=Object.freeze({
     "identity-bobby-deol": 1
   },
   "profile_sports_wrestling": {
+    "identity-tom-cruise": 1,
+    "identity-nick-jonas": 1,
+    "identity-triple-h": 2,
     "identity-john-cena": 2
   },
   "profile_sports_wwe": {
+    "identity-triple-h": 2,
     "identity-john-cena": 2
   },
   "profile_sports_record_champion": {
+    "identity-triple-h": 2,
     "identity-john-cena": 2
   },
   "profile_sports_peacemaker": {
+    "identity-triple-h": 1,
     "identity-john-cena": 2
   },
   "profile_bd_physician": {
@@ -674,4 +722,4 @@ export const RECOGNITION_FACTS=Object.freeze({
     "identity-domestic-hen": 2
   }
 });
-export const RECOGNITION_SPECIFIC_IDS=Object.freeze(["profile_film_titanic","profile_film_oscar_lead","profile_film_malena","profile_film_spectre","profile_film_sacred_games","profile_film_gangs_wasseypur","profile_film_mahanati","profile_film_national_award","profile_film_aashram","profile_film_animal_2023","profile_film_quantico","profile_film_miss_world","profile_film_hatim_role","profile_sports_record_champion","profile_sports_peacemaker","profile_bd_leader_spouse","profile_bd_leader_daughter","profile_bd_uk_bar","profile_animal_comb"]);
+export const RECOGNITION_SPECIFIC_IDS=Object.freeze(["profile_film_mission_impossible","profile_film_top_gun","profile_film_maleficent","profile_film_tomb_raider","profile_film_knives_out","profile_film_no_time_to_die","profile_music_jealous","profile_sports_wwe_executive","profile_cartoon_parrot","profile_film_titanic","profile_film_oscar_lead","profile_film_malena","profile_film_spectre","profile_film_sacred_games","profile_film_gangs_wasseypur","profile_film_mahanati","profile_film_national_award","profile_film_aashram","profile_film_animal_2023","profile_film_quantico","profile_film_miss_world","profile_film_hatim_role","profile_sports_record_champion","profile_sports_peacemaker","profile_bd_leader_spouse","profile_bd_leader_daughter","profile_bd_uk_bar","profile_animal_comb"]);

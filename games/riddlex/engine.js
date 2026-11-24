@@ -1129,6 +1129,10 @@ function politicsSplit(state, qi, rows) {
 function unrelatedJob(state, id) {
   const job = confirmedJob(state);
   if (!job || job === id) return false;
+  // Tiny self-contained casebooks have no global celebrity coverage. Ask
+  // about a second documented career instead of suppressing their only
+  // distinction by a probability threshold meant for 20,000 people.
+  if (state.pool.count < 100) return false;
   // Source-backed multi-career branches, but only when the second career
   // is meaningfully related to the confirmed first one. A generic athlete
   // with a business investment must not divert the game from sport.
@@ -1417,10 +1421,16 @@ function usefulFilmTitleQuestion(state, qid) {
 
 function blockedQuestion(state, question, rows, cache) {
   if (!usefulFilmTitleQuestion(state, question.id)) return true;
-  // A NO to one object family must never suppress unrelated families.
-  // Example: "not electric/worn/skincare" must still allow paper, doors,
-  // locks, containers and cleaning. The previous three-NO ceiling made
-  // verified object facts unreachable and forced dozens of colour questions.
+  // Negative family answers remain useful: three NO answers must NOT
+  // block unrelated categories such as doors, locks or paper.
+  // But after three DON'T KNOW responses to specialised family labels,
+  // switch to basic physical-function questions instead of asking all 15
+  // categories that a player has said they cannot classify.
+  if (EVERYDAY_FAMILY_IDS.includes(question.id) &&
+      !state.answers.some(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
+        ["yes","probably"].includes(row.value)) &&
+      state.answers.filter(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
+        row.value === "unknown").length >= 3) return true;
   // Recognition overlays are only relevant in their actual domain.
   if (question.id.startsWith("profile_bd_") &&
       !said(state,"from_bd",["yes","probably"])) return true;
@@ -2910,13 +2920,50 @@ export function decide(state) {
     if (identified >= 0) return { type:"guess", index:identified };
     if (shouldGuess(state)) return { type:"guess", index:best };
   }
-  // An honest failure with an option to teach the game is preferable to 41+
-  // repetitive questions or an evidence-free celebrity guess.
+  // A genuine verified answer takes precedence over the question ceiling.
+  // Previously the cap returned DEFEAT even when the last two answers had
+  // just proved a pen, key, glass or other item.
   if (state.answers.length >= MAX_QUESTIONS_PER_ROUND) {
+    if (state.category === "object") {
+      for (const found of [evidenceBackedObjectCandidate(state),
+        everydayEvidenceCandidate(state), verifiedIdentityCandidate(state)]) {
+        if (found >= 0) return { type:"guess", index:found };
+      }
+    }
     if (state.category !== "character" && shouldGuess(state))
       return { type:"guess", index:best };
     return { type:"defeat" };
   }
+  // Once North America is affirmed, establish the US/Canada distinction
+  // before launching niche occupations or film-name trivia.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"from_north_america",["yes","probably"]) &&
+      !state.answers.some(row=>row.qid==="from_us") &&
+      state.pool.qIndex.has("from_us") &&
+      !questionBlocked(state,"from_us"))
+    return {type:"ask",qid:"from_us"};
+  // A US creator with a confirmed business role needs the everyday
+  // "makes YouTube videos?" question before prize/challenge trivia.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"from_us",["yes","probably"]) &&
+      said(state,"business",["yes","probably"]) &&
+      !said(state,"actor",["yes","probably"]) &&
+      !state.answers.some(row=>row.qid==="youtube") &&
+      state.pool.qIndex.has("youtube") &&
+      !questionBlocked(state,"youtube"))
+    return {type:"ask",qid:"youtube"};
+  // An undecided career needs a basic athlete/sports branch eventually;
+  // generic UNKNOWN answers should not bury it behind 18 niche questions.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      state.answers.length >= 10 &&
+      !state.answers.some(row=>row.qid==="athlete") &&
+      !PRIMARY_JOBS.some(job=>said(state,job,["yes","probably"])) &&
+      state.pool.qIndex.has("athlete") &&
+      !questionBlocked(state,"athlete"))
+    return {type:"ask",qid:"athlete"};
   // Preserve existing, already-verified pen/phone/clock and function
   // inference before extending the conversation to newer object families.
   // This avoids losing good legacy gameplay to unnecessary extra questions.
@@ -3018,6 +3065,7 @@ export function decide(state) {
   // The actual public character casebook initially loads over 19k records
   // and NEVER takes this shortcut.
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
+      state.answers.length >= 6 &&
       supportedIdentity(state)) return { type: "guess", index: best };
   qid ||= verifiedIdentityDiscoveryQuestion(state) ||
     crossProfessionQuestion(state, focus) ||

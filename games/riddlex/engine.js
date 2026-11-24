@@ -3135,11 +3135,25 @@ export function decide(state) {
   if (state.category === "character" &&
       said(state,"real",["yes","probably"]) &&
       COUNTRIES.some(id=>said(state,id,["yes","probably"])) &&
-      state.answers.length >= 10 &&
-      !PRIMARY_JOBS.some(job=>said(state,job,["yes","probably"])) &&
+      state.answers.length >= 9 &&
       !state.answers.some(row=>row.qid==="actor") &&
-      state.pool.qIndex.has("actor") && !questionBlocked(state,"actor"))
-    return {type:"ask",qid:"actor"};
+      state.pool.qIndex.has("actor") &&
+      !questionContradicts(state,"actor")) {
+    const yes = id => said(state,id,["yes","probably"]);
+    const creative = ["writer","musician","singer"].filter(yes).length;
+    const distinctNonActingCareer =
+      ["politician","scientist","athlete","cricketer","footballer",
+       "business","youtube","adult_ent"].some(yes);
+    // Writing and music can coexist with an acting career. A British
+    // screen comedian was previously treated as "career already known" once
+    // writer and musician were confirmed, so the game never asked ACTOR
+    // and surrendered after unrelated athlete trivia. Ask the broad
+    // on-screen question before any niche screen trivia; secondary creative
+    // work must not close the actor branch.
+    if (!PRIMARY_JOBS.some(yes) ||
+        (creative >= 2 && !distinctNonActingCareer))
+      return {type:"ask",qid:"actor"};
+  }
   // A confirmed Indian Hindi-film actor's second profession can separate
   // the small actor+singer intersection before obscure competing film titles.
   if (state.category === "character" &&

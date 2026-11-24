@@ -158,3 +158,24 @@ test("tentative US nationality cannot suppress a confirmed Canadian adult-career
   assert.equal(questionBlocked(state,"career_adult_to_india"),false,
     "Probably US must not hide a sourced Canadian performer");
 });
+
+test("multiple creative careers never suppress the broad acting interview", () => {
+  const careerPool = poolFromEntries(base, [
+    {id:"silent-performer",en:"Screen performer",pop:200,
+      yes:["real","named","male","writer","musician","singer",
+        "from_europe","from_gb","actor"]},
+    ...Array.from({length:180},(_,i)=>({
+      id:"writer-musician-"+i,en:"Creative professional "+i,pop:200,
+      yes:["real","named","male","writer","musician","from_europe","from_gb"]
+    }))
+  ]);
+  const s = createState(careerPool,{category:"character"});
+  for (const [qid,value] of [
+    ["real","yes"],["knows_you","no"],["female","no"],
+    ["alive","no"],["writer","yes"],["from_europe","yes"],
+    ["from_fr","no"],["from_gb","yes"],["musician","yes"]
+  ]) answer(s,qid,value);
+  const next=decide(s);
+  assert.deepEqual(next,{type:"ask",qid:"actor"},
+    "writer+musician must not skip acting and end in unrelated sport trivia");
+});

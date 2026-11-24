@@ -1,0 +1,34 @@
+name: Riddlex exact owner 20 visible UI audit
+on:
+  pull_request:
+    paths:
+      - "games/riddlex/owner-exact20-ui.mjs"
+      - ".github/workflows/riddlex-exact20-ui.yml"
+jobs:
+  visible-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    env:
+      RIDDLEX_SHARDS: 4
+      RIDDLEX_SHARD: ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser runner
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Play the exact targets in both languages without debug mode
+        run: node games/riddlex/owner-exact20-ui.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: riddlex-exact20-visible-ui-${{ matrix.shard }}
+          path: ${{ runner.temp }}/riddlex-exact20-*.json
+          if-no-files-found: error

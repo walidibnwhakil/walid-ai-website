@@ -2134,7 +2134,23 @@ function firstAllowedQuestion(state) {
     // Preserve broad fallbacks after a rejected guess, but never reopen
     // personal or child sport branches contrary to earlier answers.
     if (question.group === "personal" && !gated(state, question, rows)) continue;
-    const gain = gainOn(state, qi, rows);
+    let gain = gainOn(state, qi, rows);
+    // Sparse knowledge can contain a positive trait for some plausible
+    // identities and no recorded value for others. A confirmation still
+    // carries information even without a known-negative sample.
+    if (gain === 0) {
+      let yes = 0, no = 0, total = 0;
+      for (const i of rows) {
+        const w = state.weights[i];
+        if (!(w > 0) || !eligibleForIdentityQuestion(state,i)) continue;
+        total += w;
+        const bit = factBit(state.pool,i,qi);
+        if (bit === 2) yes += w;
+        else if (bit === 1) no += w;
+      }
+      if (total > 0 && yes > 0 && yes < total * 0.999999)
+        gain = 0.1 * binaryEntropy(yes / total);
+    }
     if (gain > bestGain) { best = question.id; bestGain = gain; }
   }
   return best;
@@ -3179,6 +3195,24 @@ export function decide(state) {
         "career_hindi_films"].every(id=>p.yes.includes(id))) &&
       state.pool.qIndex.has("singer") && !questionBlocked(state,"singer"))
     return {type:"ask",qid:"singer"};
+  // After ruling out acting, ask a basic online-creator or business
+  // occupation before obscure specialty trivia or an early defeat.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"actor",["no","probably_not"]) &&
+      state.answers.length >= 10 &&
+      !PRIMARY_JOBS.some(id=>id!=="business" && id!=="youtube" &&
+        said(state,id,["yes","probably"]))) {
+    for (const id of ["youtube","business"]) {
+      if (id==="business" && !said(state,"youtube",["yes","probably"])) continue;
+      if (state.answers.some(row=>row.qid===id)) continue;
+      const qi=state.pool.qIndex.get(id);
+      if (qi!=null && !questionBlocked(state,id) &&
+          state.alive.some(i=>state.weights[i]>0 &&
+            factBit(state.pool,i,qi)===2 && eligibleForIdentityQuestion(state,i)))
+        return {type:"ask",qid:id};
+    }
+  }
   const roleAwareSignature=crossCareerIdentityQuestion(state);
   if(roleAwareSignature)return {type:"ask",qid:roleAwareSignature};
   // An undecided career needs a basic athlete/sports branch eventually;

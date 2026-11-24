@@ -57,27 +57,35 @@ test("four movie titles are the absolute maximum, whatever the answers", () => {
   assert.equal(questionBlocked(state, "broad_film_baahubali"), true);
 });
 
-test("a round has a finite ceiling instead of 41+ repetitive questions", () => {
+test("the engine does not impose a 28-question cutoff", () => {
+  assert.equal(MAX_QUESTIONS_PER_ROUND, Infinity);
   const state = createState(pool, { category: "character" });
-  recompute(state);
-  const ids = questions.slice(0, MAX_QUESTIONS_PER_ROUND).map(q => q.id);
-  for (const id of ids) answer(state, id, "unknown");
-  assert.equal(decide(state).type, "defeat",
-    "without corroborating evidence the game must admit it cannot identify");
+  const unrelated = questions.filter(q => !["real","fictional","knows_you"].includes(q.id)).slice(0, 28);
+  for (const q of unrelated) answer(state, q.id, "unknown");
+  assert.equal(state.answers.length, 28);
+  assert.deepEqual(decide(state), {type:"ask", qid:"real"});
 });
 
-test("even an all-Yes actor run terminates within the round ceiling", () => {
+test("repeated input cannot count the same answer twice", () => {
   const state = createState(pool, { category: "character" });
-  recompute(state);
-  let finished = false;
-  for (let step = 0; step <= MAX_QUESTIONS_PER_ROUND; step++) {
+  answer(state, "real", "yes");
+  answer(state, "real", "no");
+  assert.equal(state.answers.length, 1);
+  assert.equal(state.answers[0].value, "yes");
+});
+
+test("a round finishes or continues only with a new question", () => {
+  const state = createState(pool, { category: "character" });
+  const seen = new Set();
+  for (let step = 0; step <= pool.questions.length; step++) {
     const next = decide(state);
-    if (next.type !== "ask") { finished = true; break; }
+    if (next.type !== "ask") return;
+    assert.ok(!seen.has(next.qid), "repeated question: " + next.qid);
+    seen.add(next.qid);
     answer(state, next.qid,
       ["knows_you", "from_bd", "female"].includes(next.qid) ? "no" : "yes");
   }
-  assert.ok(finished);
-  assert.ok(state.answers.length <= MAX_QUESTIONS_PER_ROUND);
+  assert.fail("ran out of unique questions without a terminal decision");
 });
 
 test("source-backed creator clues separate challenge videos from education", () => {

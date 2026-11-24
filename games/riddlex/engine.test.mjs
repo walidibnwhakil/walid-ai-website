@@ -75,22 +75,25 @@ function play(pool, id, { flip = -1 } = {}) {
   const state = createState(pool, { opening: "real", category });
   recompute(state);
   let flipped = false;
+  const trace = [];
   for (let step = 0; step < 28; step++) {
     const decision = decide(state);
     if (decision.type === "guess") {
+      trace.push({ guess:pool.ids[decision.index] });
       if (decision.index === target) return { ok: true, step, guesses: state.guesses + 1 };
       rejectIndex(state, decision.index);
       continue;
     }
-    if (decision.type !== "ask") return { ok: false, step, reason: decision.type };
+    if (decision.type !== "ask") return { ok: false, step, reason: decision.type, trace };
     let value = bit(pool, id, decision.qid) === 2 ? "yes" : bit(pool, id, decision.qid) === 1 ? "no" : "unknown";
     if (!flipped && flip >= 0 && value !== "unknown" && state.answers.length === flip) {
       value = value === "yes" ? "no" : "yes";
       flipped = true;
     }
+    trace.push({ qid:decision.qid, value });
     answer(state, decision.qid, value);
   }
-  return { ok: false, step: 28 };
+  return { ok: false, step: 28, trace };
 }
 
 test("object guesses need an affirmative function before announcing a famous fridge", () => {

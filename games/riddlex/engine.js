@@ -3023,9 +3023,13 @@ export function decide(state) {
   if (state.category === "character" && state.pool.count < 100 &&
       state.answers.length < 5 &&
       said(state,"real",["yes","probably"]) &&
-      !said(state,"knows_you",["yes","probably"])) {
+      !said(state,"knows_you",["yes","probably"]) &&
+      !said(state,"actor",["yes","probably"])) {
     const seen = new Set(state.answers.map(row => row.qid));
-    for (const id of ["male","alive","from_bd","actor","cricketer","named"]) {
+    // "Named" is a soft, reversible clue. Asking it early also prevents a
+    // single accidental answer from becoming a fatal hard life/country error.
+    // Never interrupt an already confirmed actor's role/era interview.
+    for (const id of ["male","named","alive","from_bd","actor","cricketer"]) {
       if (state.pool.qIndex.has(id) && !seen.has(id) &&
           !questionContradicts(state,id) &&
           !skippedAsDuplicate(state,id))

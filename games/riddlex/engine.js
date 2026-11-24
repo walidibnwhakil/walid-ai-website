@@ -1186,7 +1186,12 @@ function skippedAsDuplicate(state, id) {
   if ((id === "played_barcelona" || id === "ballon_dor") && !yes("footballer")) return true;
   if (unrelatedJob(state, id)) return true;
   if ((id === "wild" && yes("pet")) || (id === "pet" && yes("wild"))) return true;
-  if (COUNTRIES.includes(id) && COUNTRIES.some((country) => country !== id && yes(country))) return true;
+  // "Probably from the US/UK" is uncertain evidence, NOT a confirmed
+  // mutually exclusive nationality. Otherwise a tentative US answer
+  // prevented ever asking Canada, and a tentative UK answer hid France.
+  // Only a definite YES makes another country a redundant follow-up.
+  if (COUNTRIES.includes(id) && COUNTRIES.some((country) =>
+      country !== id && said(state,country,["yes"]))) return true;
   if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;
   const parties = ["party_bnp", "party_al", "party_jp", "party_jamaat"];
   if (parties.includes(id) && parties.some((party) => party !== id && yes(party))) return true;
@@ -2868,7 +2873,9 @@ function recognitionDiscoveryQuestion(state) {
       }
     }
     if(yes("actor")) {
-      if(yes("from_gb"))plan.push("profile_film_titanic","profile_film_oscar_lead");
+      // A tentative UK answer is not proof of a British film career.
+      // Wait for a definite UK answer; otherwise first resolve France etc.
+      if(said(state,"from_gb",["yes"]))plan.push("profile_film_titanic","profile_film_oscar_lead");
       if(yes("from_it"))plan.push("profile_film_malena","profile_film_spectre");
       if(yes("from_in")) {
         if(yes("female") || no("male")) {

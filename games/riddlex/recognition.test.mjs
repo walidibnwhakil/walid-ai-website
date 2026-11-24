@@ -9,7 +9,7 @@ const basic=["real","fictional","animal","object","named","male","female","alive
  "doctor","lawyer"].map(id=>({id,group:"kind",en:id,bn:id}));
 const pool=poolFromEntries([...basic,...RECOGNITION_QUESTIONS],[...RECOGNITION_PEOPLE,...RECOGNITION_ANIMALS]);
 test("new career evidence questions always have natural English and Bangla wording",()=>{
- assert.equal(RECOGNITION_QUESTIONS.length,28);
+ assert.equal(RECOGNITION_QUESTIONS.length,40);
  for(const q of RECOGNITION_QUESTIONS){
   assert.ok(q.en?.length>20,q.id+" English");
   assert.ok(q.bn?.length>12,q.id+" Bangla");
@@ -17,7 +17,7 @@ test("new career evidence questions always have natural English and Bangla wordi
  }
 });
 test("each person and chicken has two facts including independently distinguishing evidence",()=>{
- assert.equal(RECOGNITION_PEOPLE.length,10);
+ assert.equal(RECOGNITION_PEOPLE.length,16);
  assert.equal(RECOGNITION_ANIMALS.length,1);
  const ids=new Set;
  for(const person of [...RECOGNITION_PEOPLE,...RECOGNITION_ANIMALS]){
@@ -46,4 +46,11 @@ test("English names and Bengali labels denote same record, regardless of languag
  assert.ok(names.has("Priyanka Chopra Jonas"));
  assert.ok(names.has("Rahil Azam"));
  for(const p of RECOGNITION_PEOPLE) assert.ok(p.bn && p.en && p.bn!==p.en);
+});
+
+test("explicit region and film-market facts are preserved across sparse overlays",()=>{
+ const more=poolFromEntries([...basic,{id:"from_north_america",group:"country"},
+  {id:"career_hollywood_films",group:"job"},{id:"from_cartoon",group:"fiction"},...RECOGNITION_QUESTIONS],RECOGNITION_PEOPLE);
+ for(const [id,qid] of [["identity-ana-de-armas","from_north_america"],["identity-tom-cruise","career_hollywood_films"],["identity-cartoon-meena","from_cartoon"]])
+  assert.equal(factBit(more,more.ids.indexOf(id),more.qIndex.get(qid)),2,id+" "+qid);
 });

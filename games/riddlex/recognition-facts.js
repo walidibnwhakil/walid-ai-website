@@ -580,6 +580,15 @@ export const RECOGNITION_ANIMALS=Object.freeze([
     ]
   }
 ]);
+// Explicit general facts on these curated records must remain visible even
+// where an older sparse overlay also defines the same question.
+export const RECOGNITION_PROFILE_FACTS=Object.freeze(Object.fromEntries(
+  [...RECOGNITION_PEOPLE,...RECOGNITION_ANIMALS].map(entry=>[
+    entry.id,Object.freeze(Object.fromEntries([
+      ...entry.yes.map(id=>[id,2]),...entry.no.map(id=>[id,1])
+    ]))
+  ])
+));
 export const RECOGNITION_FACTS=Object.freeze({
   "profile_cartoon_parrot": {"identity-cartoon-meena":2},
   "profile_cartoon_unicef": {"identity-cartoon-meena":2},

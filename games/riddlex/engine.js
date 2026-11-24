@@ -1144,6 +1144,10 @@ function unrelatedJob(state, id) {
   const multiCareer = (job==="politician" &&
       ["actor","cricketer"].includes(id)) ||
     (["actor","cricketer"].includes(job) && id==="politician") ||
+    // Actors may also be professional singers. This is a verified
+    // second occupation, not an invitation to ask every unrelated job.
+    (job==="actor" && id==="singer") ||
+    (job==="singer" && id==="actor") ||
     (job==="writer" && id==="youtube") ||
     (job==="youtube" && ["writer","business"].includes(id)) ||
     (job==="business" && id==="youtube");

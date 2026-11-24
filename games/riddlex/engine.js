@@ -10,8 +10,8 @@ const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await i
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
-import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
-import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } from "./recognition-facts.js";
+import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js?v=riddlex-71";
+import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } from "./recognition-facts.js?v=riddlex-71";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";

@@ -8,6 +8,7 @@ import {
 import { poolFromEntries } from "./kb.js";
 import { BROAD_PEOPLE, BROAD_QUESTIONS } from "./broad-facts.js";
 import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS } from "./everyday-facts.js";
+import { EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 
 const base = JSON.parse(await readFile(new URL("./kb/manifest.json", import.meta.url), "utf8")).questions;
 const questions = [...base, ...BROAD_QUESTIONS];
@@ -128,4 +129,32 @@ test("a tentative country answer never hides another plausible country", () => {
   answer(northAmerican,"from_us","probably");
   assert.equal(questionBlocked(northAmerican,"from_ca"),false,
     "Probably USA must not prohibit Canada");
+});
+
+test("tentative British origin cannot suppress an affirmed French actor's film question", () => {
+  const people = poolFromEntries([...base, ...EXTRA_IDENTITY_QUESTIONS],
+    EXTRA_IDENTITY_PEOPLE);
+  const state = createState(people, {category:"character"});
+  for (const [qid,value] of [
+    ["real","yes"],["knows_you","no"],["female","yes"],["alive","yes"],
+    ["actor","yes"],["from_europe","yes"],
+    ["from_gb","probably"],["from_fr","yes"],
+    ["screen_role_lead","yes"],["career_hollywood_films","yes"]
+  ]) answer(state,qid,value);
+  assert.equal(questionBlocked(state,"film_nymphomaniac"),false,
+    "Probably British must not hide a sourced French performer");
+});
+
+test("tentative US nationality cannot suppress a confirmed Canadian adult-career question", () => {
+  const people = poolFromEntries([...base, ...EXTRA_IDENTITY_QUESTIONS],
+    EXTRA_IDENTITY_PEOPLE);
+  const state = createState(people, {category:"character"});
+  for (const [qid,value] of [
+    ["real","yes"],["female","yes"],["alive","yes"],
+    ["from_north_america","yes"],["from_us","probably"],
+    ["from_ca","yes"],["actor","yes"],["adult_ent","yes"],
+    ["career_former_adult","yes"]
+  ]) answer(state,qid,value);
+  assert.equal(questionBlocked(state,"career_adult_to_india"),false,
+    "Probably US must not hide a sourced Canadian performer");
 });

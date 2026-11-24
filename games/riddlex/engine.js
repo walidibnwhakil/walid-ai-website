@@ -11,7 +11,7 @@ import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_L
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js?v=riddlex-71";
-import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } from "./recognition-facts.js?v=riddlex-71";
+import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS, RECOGNITION_PROFILE_FACTS } from "./recognition-facts.js?v=riddlex-71";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
@@ -156,7 +156,9 @@ export function factBit(pool, index, qi) {
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
   if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;
-  if (RECOGNITION_FACTS[id]) return RECOGNITION_FACTS[id][pool.ids[index]] || 0;
+  const recognitionFact = RECOGNITION_FACTS[id]?.[pool.ids[index]] ?? RECOGNITION_PROFILE_FACTS[pool.ids[index]]?.[id];
+  if (recognitionFact !== undefined) return recognitionFact;
+  if (RECOGNITION_FACTS[id]) return 0;
   const verifiedProfile=BROAD_PROFILE_FACTS[id]?.[pool.ids[index]] ??
     DOMAIN_PROFILE_FACTS[id]?.[pool.ids[index]];
   if (verifiedProfile !== undefined) return verifiedProfile;
@@ -1413,17 +1415,38 @@ function isFilmTitleQuestion(id) {
 }
 function usefulFilmTitleQuestion(state, qid) {
   if (!isFilmTitleQuestion(qid)) return true;
-  const asked = state.answers.filter(row => isFilmTitleQuestion(row.qid));
-  if (asked.length >= MAX_FILM_TITLES_PER_ROUND) return false;
+  const contextIds = new Set([...COUNTRIES, "from_asia","from_europe",
+    "from_north_america","from_south_america","from_africa",
+    "career_bengali_films","career_hindi_films","career_telugu_films",
+    "career_hollywood_films","screen_bangladesh_bengali","screen_indian_bengali",
+    "screen_hindi_cinema","screen_telugu_cinema","screen_kannada_cinema"]);
+  const context = state.answers.filter(row=>contextIds.has(row.qid) && row.value==="yes");
+  // Before establishing origin or film market, a movie list is not a useful
+  // way to distinguish real performers. A confirmed new market starts a
+  // new evidence branch rather than exhausting it on old unrelated titles.
+  if (said(state,"real",["yes","probably"]) && !context.length) return false;
+  const lastContext = state.answers.findLastIndex(row=>contextIds.has(row.qid) && row.value==="yes");
+  const asked = state.answers.slice(lastContext+1).filter(row => isFilmTitleQuestion(row.qid));
   const industryKnown = said(state,"actor",["yes","probably"]) ||
     said(state,"film_director_work",["yes","probably"]) ||
     said(state,"from_film",["yes","probably"]);
   if (!industryKnown) return false;
   const qi = state.pool.qIndex.get(qid);
   if (qi == null) return false;
+  const knownOrigins = context.filter(row=>COUNTRIES.includes(row.qid) ||
+    ["from_asia","from_europe","from_north_america","from_south_america","from_africa"].includes(row.qid));
   const compatible = i => state.weights[i] > 0 &&
     factBit(state.pool,i,qi) === 2 &&
-    eligibleForIdentityQuestion(state,i);
+    eligibleForIdentityQuestion(state,i) &&
+    (!knownOrigins.length || knownOrigins.some(row=>factBit(state.pool,i,row.qi)===2));
+  // After several rejected or unknown titles, only a corroboration of an
+  // actually affirmed title belonging to the same candidate may extend
+  // this branch. The number itself never proves or disproves an identity.
+  if (asked.length >= MAX_FILM_TITLES_PER_ROUND) {
+    const affirmed=asked.filter(row=>row.value==="yes");
+    if(affirmed.length!==1 || !state.alive.some(i=>compatible(i) &&
+      factBit(state.pool,i,affirmed[0].qi)===2))return false;
+  }
   const last = state.answers.at(-1);
   if (last && isFilmTitleQuestion(last.qid)) {
     // A title answered No or Don't know never starts a new title list.
@@ -1527,11 +1550,11 @@ function hasUnrejectedFilmCandidate(state, qid) {
   const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
     BROAD_FACTS[qid] || NARRATIVE_FACTS[qid] || EVERYDAY_FACTS[qid];
   const verifiedExisting = BROAD_PROFILE_FACTS[qid];
-  if (!facts && !verifiedExisting) return true;
-  return state.alive.some(i =>
-    state.weights[i] > 0 &&
-    (facts?.[state.pool.ids[i]] === 2 ||
-     verifiedExisting?.[state.pool.ids[i]] === 2));
+  if (!facts && !verifiedExisting && !RECOGNITION_FACTS[qid]) return true;
+  const qi=state.pool.qIndex.get(qid);
+  if(qi==null)return false;
+  return state.alive.some(i => state.weights[i] > 0 &&
+    factBit(state.pool,i,qi)===2 && eligibleForIdentityQuestion(state,i));
 }
 
 // Before proposing another name, confirm distinguishing facts about the

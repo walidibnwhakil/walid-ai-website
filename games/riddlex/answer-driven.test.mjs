@@ -91,11 +91,15 @@ test("source-backed creator clues separate challenge videos from education", () 
   assert.equal(factBit(creators, 1, quiz), 1);
 });
 
-test("three unknown object families do not force twelve more family guesses", () => {
+test("unrelated No/Unknown object families leave the correct family reachable", () => {
   const objects = poolFromEntries([...base, ...EVERYDAY_QUESTIONS], EVERYDAY_OBJECTS);
   const state = createState(objects, {category:"object"});
   for (const id of ["obj_family_electric","obj_family_worn","obj_family_personal_care"])
-    answer(state, id, "unknown");
-  assert.equal(questionBlocked(state, "obj_family_kitchen"), true);
-  assert.equal(questionBlocked(state, "obj_family_paper"), true);
+    answer(state, id, "no");
+  // Those three No answers are real evidence against three families,
+  // not a reason to disable paper, doors, locks, containers or medicine.
+  assert.equal(questionBlocked(state, "obj_family_kitchen"), false);
+  assert.equal(questionBlocked(state, "obj_family_paper"), false);
+  assert.equal(questionBlocked(state, "obj_family_house"), false);
+  assert.equal(questionBlocked(state, "obj_family_lock"), false);
 });

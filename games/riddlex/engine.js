@@ -3329,7 +3329,7 @@ export function decide(state) {
       chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
       actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
       smallCasebookEvidenceQuestion(state) ||
-      (state.pool.count < 100 ? ["alive","named","female","writer","singer"]
+      (state.category === "character" && state.pool.count < 100 ? ["alive","named","female","writer","singer"]
         .find(id=>state.pool.qIndex.has(id) &&
           !state.answers.some(row=>row.qid===id) &&
           !questionContradicts(state,id)) : null);

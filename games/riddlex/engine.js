@@ -1468,10 +1468,14 @@ function blockedQuestion(state, question, rows, cache) {
   // about every actor worldwide. Avoid exhausting unrelated national markets
   // once the player's country is known, including during the fallback path.
   if (IDENTITY_FACTS[question.id]) {
-    const country=COUNTRIES.find(id=>said(state,id,["yes","probably"]));
-    if (country && !EXTRA_IDENTITY_PEOPLE.some(person=>
+    // An earlier "probably" nationality must NEVER override a later
+    // confirmed one: French Stacy Martin may be "probably UK" to a player,
+    // and Canadian Sunny Leone may be "probably US". Using the first
+    // tentative country used to permanently hide their verified roles.
+    const confirmedCountry=COUNTRIES.find(id=>said(state,id,["yes"]));
+    if (confirmedCountry && !EXTRA_IDENTITY_PEOPLE.some(person=>
       IDENTITY_FACTS[question.id][person.id]===2 &&
-      person.yes.includes(country))) return true;
+      person.yes.includes(confirmedCountry))) return true;
   }
   const links = linksFor(state.pool);
   // Sport-specific roles are not asked before confirming the sport.

@@ -56,3 +56,32 @@ jobs:
           }
           await browser.close();
           JS
+
+  live-gameplay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    env:
+      RIDDLEX_LIVE_URL: https://walid-ai.com
+      RIDDLEX_SHARDS: 4
+      RIDDLEX_SHARD: ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser runner
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Play the 20 exact targets in both languages on actual production
+        run: node games/riddlex/owner-exact20-ui.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: riddlex-production-live-${{ matrix.shard }}
+          path: ${{ runner.temp }}/riddlex-exact20-*.json
+          if-no-files-found: error

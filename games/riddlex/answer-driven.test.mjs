@@ -160,6 +160,24 @@ test("tentative US nationality cannot suppress a confirmed Canadian adult-career
     "Probably US must not hide a sourced Canadian performer");
 });
 
+test("dead Bangladeshi public actors get country asked before speculative foreign trivia", () => {
+  const questionsWithPersonal = [...base, ...PERSONAL_QUESTIONS];
+  const largeCasebook = poolFromEntries(questionsWithPersonal, [
+    {id:"bd-deceased-comedian", en:"Bangladeshi screen comedian",pop:8,
+      yes:["real","male","dead","from_bd","actor"]},
+    ...Array.from({length:180},(_,i)=>({
+      id:"world-profile-"+i,en:"Generic global figure "+i,pop:100,
+      yes:["real","male","dead"]
+    }))
+  ]);
+  const state = createState(largeCasebook,{category:"character"});
+  for(const [qid,value] of [
+    ["real","yes"],["knows_you","no"],["female","no"],["alive","no"]
+  ]) answer(state,qid,value);
+  assert.deepEqual(decide(state), {type:"ask",qid:"from_bd"},
+    "Do not exhaust the round on unknown continents before asking about Bangladesh");
+});
+
 test("multiple creative careers never suppress the broad acting interview", () => {
   // The real game loads PERSONAL_QUESTIONS into the manifest before play.
   // Without knows_you, the test silently drops that answer and ends one turn early.

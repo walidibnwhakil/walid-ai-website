@@ -351,8 +351,14 @@ async function step() {
   if (!state) return;
   const session = loadToken;
   const playingState = state;
-  const pending = category === "character" && catalog
-    ? queueShards(planShardLoads(catalog, state.answers, loadedNames), loadToken)
+  const wantsFiction = state.answers.some(row =>
+    (row.qid === "real" && ["no","probably_not"].includes(row.value)) ||
+    (row.qid === "fictional" && ["yes","probably"].includes(row.value)));
+  // Fiction remains reachable if the optional worldwide index is unavailable.
+  const fallback = wantsFiction && manifest?.shards?.includes("ix/fiction.bin") &&
+    !loadedNames.includes("ix/fiction.bin") ? [{file:"ix/fiction.bin"}] : [];
+  const pending = category === "character"
+    ? queueShards(catalog ? planShardLoads(catalog, state.answers, loadedNames) : fallback, loadToken)
     : null;
   let decision = decide(state);
   // A new clue can activate country/occupation shards that are not yet in

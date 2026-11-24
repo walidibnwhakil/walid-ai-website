@@ -12,7 +12,7 @@ const questions=[
 ];
 const pool=poolFromEntries(questions,EVERYDAY_OBJECTS);
 test("every familiar object has a family and independently discernible function",()=>{
- assert.equal(EVERYDAY_OBJECTS.length,35);
+ assert.equal(EVERYDAY_OBJECTS.length,36);
  const ids=new Set();
  for(const entry of EVERYDAY_OBJECTS){
    assert.ok(!ids.has(entry.id),"duplicate "+entry.id);
@@ -45,4 +45,12 @@ test("family must be confirmed before a specific object question",()=>{
 test("independent cream, lotion, petroleum jelly are never equal synonyms",()=>{
  const keys=["obj_skin_cream","obj_skin_lotion","obj_skin_jelly"];
  for(const qid of keys)assert.equal(Object.values(EVERYDAY_FACTS[qid]).filter(v=>v===2).length,1,qid);
+});
+
+test("a bound reading book is not a diary, calendar, dictionary, or tissue",()=>{
+ const book=pool.ids.indexOf("everyday-reading-book");
+ assert.ok(book>=0);
+ assert.equal(factBit(pool,book,pool.qIndex.get("obj_reading_book")),2);
+ for(const id of ["everyday-diary","everyday-calendar","everyday-dictionary","everyday-tissue"])
+  assert.equal(factBit(pool,pool.ids.indexOf(id),pool.qIndex.get("obj_reading_book")),1);
 });

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
-import { appendShard, planShardLoads, poolFromEntries, loadShards } from "./kb.js";
+import { loadManifest,  appendShard, planShardLoads, poolFromEntries, loadShards } from "./kb.js";
 
 const sample = {
   top: "ix/top.bin",
@@ -146,4 +146,46 @@ test("a nonresponding knowledge worker falls back to the real shard decoder", as
     else globalThis.Worker = oldWorker;
     globalThis.fetch = oldFetch;
   }
+});
+
+test("a transient AbortError on the first binary body download retries and loads the real casebook", async () => {
+  const oldFetch = globalThis.fetch;
+  const manifest = JSON.parse(await readFile(new URL("./kb/manifest.json", import.meta.url), "utf8"));
+  const bytes = await readFile(new URL("./kb/objects.bin", import.meta.url));
+  const signals = [];
+  globalThis.fetch = async (url, options) => {
+    signals.push(options.signal);
+    return {ok:true, arrayBuffer:async()=>{
+      if(signals.length === 1) throw new DOMException("signal is aborted without reason","AbortError");
+      return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    }};
+  };
+  try {
+    const pool = await loadShards("./test-aborted-download", manifest, ["objects.bin"]);
+    assert.equal(pool.count,18);
+    assert.equal(signals.length,2);
+    assert.notEqual(signals[0],signals[1]);
+  } finally {globalThis.fetch = oldFetch;}
+});
+test("a failed manifest request recovers without restarting the game", async () => {
+  const oldFetch = globalThis.fetch;
+  const data = JSON.parse(await readFile(new URL("./kb/manifest.json", import.meta.url), "utf8"));
+  let calls = 0;
+  globalThis.fetch = async () => {
+    if(++calls===1) throw new DOMException("Interrupted","AbortError");
+    return {ok:true,json:async()=>structuredClone(data)};
+  };
+  try {
+    const result = await loadManifest("./test-manifest-recovery");
+    assert.equal(calls,2);
+    assert.ok(result.questions.length >= data.questions.length);
+  } finally {globalThis.fetch = oldFetch;}
+});
+test("a permanent missing binary returns a clear failure without retrying",async()=>{
+  const oldFetch=globalThis.fetch;let calls=0;
+  globalThis.fetch=async()=>{calls++;return {ok:false,status:404};};
+  try{
+    await assert.rejects(loadShards("./test-missing-file",{questions:[]},["missing.bin"]),/HTTP 404/);
+    assert.equal(calls,1);
+  }finally{globalThis.fetch=oldFetch;}
 });

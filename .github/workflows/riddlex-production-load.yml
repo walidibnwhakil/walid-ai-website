@@ -1,0 +1,58 @@
+name: Riddlex production load diagnosis
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/riddlex-production-load.yml'
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect actual production HTTP responses
+        run: |
+          node --input-type=module <<'JS'
+          import {createHash} from 'node:crypto';
+          import {readFile} from 'node:fs/promises';
+          const base='https://walid-ai.com/games/riddlex/';
+          const paths=['','app.js?v=riddlex-71','engine.js?v=riddlex-71','kb.js?v=riddlex-71','kb-worker.js','kb/manifest.json?v=riddlex-71','kb/index.json?v=riddlex-71','kb/ix/top.bin','kb/ix/fiction.bin','kb/animals.bin','kb/objects.bin','kb/curated-extra.bin'];
+          await Promise.all(paths.map(async path=>{
+            try{
+              const start=Date.now(),res=await fetch(base+path,{cache:'no-store',signal:AbortSignal.timeout(45000)});
+              const bytes=Buffer.from(await res.arrayBuffer());
+              const local=await readFile('games/riddlex/'+(path.split('?')[0]||'index.html')).catch(()=>null);
+              const hash=b=>createHash('sha256').update(b).digest('hex');
+              console.log('LIVE_ASSET '+JSON.stringify({path,status:res.status,url:res.url,contentType:res.headers.get('content-type'),size:bytes.length,ms:Date.now()-start,prefix:bytes.subarray(0,100).toString('utf8'),matchRepo:local?hash(bytes)===hash(local):null,build:path===''?bytes.toString().match(/app\.js\?v=[^"']+/)?.[0]:undefined}));
+            }catch(error){console.log('LIVE_ASSET_ERROR '+JSON.stringify({path,error:String(error),cause:String(error.cause||'')}))}
+          }));
+          JS
+      - name: Install Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Diagnose live browser initialization without writing learning data
+        run: |
+          node --input-type=module <<'JS'
+          import {chromium} from 'playwright';
+          const browser=await chromium.launch({headless:true});
+          for(const category of ['character','animal','object']){
+            const page=await browser.newPage();
+            page.on('console',m=>{if(['error','warning'].includes(m.type()))console.log('LIVE_CONSOLE '+JSON.stringify({category,type:m.type(),text:m.text()}))});
+            page.on('pageerror',e=>console.log('LIVE_PAGEERROR '+JSON.stringify({category,error:e.stack})));
+            page.on('requestfailed',r=>console.log('LIVE_REQUEST_FAILED '+JSON.stringify({category,url:r.url(),reason:r.failure()?.errorText})));
+            page.on('response',r=>{if(r.status()>=400||/\/kb\/|\/app\.js/.test(r.url()))console.log('LIVE_RESPONSE '+JSON.stringify({category,url:r.url(),status:r.status()}))});
+            try{
+              await page.goto('https://walid-ai.com/games/riddlex/?autotest=1',{waitUntil:'domcontentloaded',timeout:45000});
+              console.log('LIVE_BUILD '+JSON.stringify(await page.locator('script[type=module]').evaluateAll(n=>n.map(x=>x.src))));
+              await page.locator('#play').click({timeout:15000});
+              await page.locator('[data-cat="'+category+'"]').click({timeout:15000});
+              await page.waitForFunction(()=>{const shown=id=>{let x=document.getElementById(id);return x&&x.getClientRects().length>0&&!x.hidden};return shown('load-retry')||shown('q-badge')||shown('learn')},null,{timeout:65000});
+              console.log('LIVE_RESULT '+JSON.stringify({category,status:await page.locator('#status').textContent(),trace:await page.evaluate(()=>window.__riddlexLoadTrace||[])}));
+            }catch(error){console.log('LIVE_RESULT_ERROR '+JSON.stringify({category,error:String(error),trace:await page.evaluate(()=>window.__riddlexLoadTrace||[]).catch(()=>[])}))}
+            await page.close();
+          }
+          await browser.close();
+          JS

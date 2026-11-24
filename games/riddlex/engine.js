@@ -3017,6 +3017,21 @@ export function decide(state) {
   const personalRole=confirmedPersonalRole(state);
   if (personalRole >= 0) return { type:"guess", index:personalRole };
   if (!state.alive.length) return { type: "defeat" };
+  // The tiny self-contained game must establish basic identity before
+  // proposing a fame-weighted name. A previous fallback could guess Shakib
+  // after only "real", before Bangladesh or profession was even asked.
+  if (state.category === "character" && state.pool.count < 100 &&
+      state.answers.length < 5 &&
+      said(state,"real",["yes","probably"]) &&
+      !said(state,"knows_you",["yes","probably"])) {
+    const seen = new Set(state.answers.map(row => row.qid));
+    for (const id of ["male","alive","from_bd","actor","cricketer","named"]) {
+      if (state.pool.qIndex.has(id) && !seen.has(id) &&
+          !questionContradicts(state,id) &&
+          !skippedAsDuplicate(state,id))
+        return {type:"ask",qid:id};
+    }
+  }
   // Rejected names are evidence, not permission to make a blind guess.
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
@@ -3121,11 +3136,13 @@ export function decide(state) {
   // generic UNKNOWN answers should not bury it behind 18 niche questions.
   if (state.category === "character" &&
       said(state,"real",["yes","probably"]) &&
-      state.answers.length >= 10 &&
+      state.answers.length >= 8 &&
       !state.answers.some(row=>row.qid==="athlete") &&
-      !PRIMARY_JOBS.some(job=>said(state,job,["yes","probably"])) &&
+      (!PRIMARY_JOBS.some(job=>said(state,job,["yes","probably"])) ||
+       (said(state,"from_us",["yes"]) &&
+        said(state,"actor",["yes","probably"]))) &&
       state.pool.qIndex.has("athlete") &&
-      !questionBlocked(state,"athlete"))
+      !questionContradicts(state,"athlete"))
     return {type:"ask",qid:"athlete"};
   // For the tiny demo/test casebooks, establish country before allowing a
   // fame-weighted guess or giving up. Production pools use the normal
@@ -3228,7 +3245,11 @@ export function decide(state) {
     const qid = chooseConfirmationQuestion(state, focus) ||
       chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
       actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
-      smallCasebookEvidenceQuestion(state);
+      smallCasebookEvidenceQuestion(state) ||
+      (state.pool.count < 100 ? ["alive","named","female","writer","singer"]
+        .find(id=>state.pool.qIndex.has(id) &&
+          !state.answers.some(row=>row.qid===id) &&
+          !questionContradicts(state,id)) : null);
     return qid ? { type: "ask", qid } : { type: "defeat" };
   }
   if (shouldGuess(state)) {

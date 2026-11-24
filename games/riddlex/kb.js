@@ -328,7 +328,7 @@ export function categoryShards(manifest, category) {
 }
 
 export async function loadManifest(base = "./kb") {
-  const response = await fetch(`${base}/manifest.json?v=riddlex-39`);
+  const response = await fetch(`${base}/manifest.json?v=riddlex-70`, { cache: "no-cache" });
   if (!response.ok) throw new Error("Knowledge manifest failed");
   const manifest = await response.json();
   for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...RECOGNITION_QUESTIONS, ...PERSONAL_QUESTIONS]) {
@@ -446,8 +446,24 @@ function decodeOffThread(buffer, questions) {
       }
       const id = ++workerSeq;
       const copy = buffer.slice(0);
-      workerJobs.set(id, { resolve, reject, questions });
-      worker.postMessage({ id, buffer: copy, questions }, [copy]);
+      // A worker can fail silently (blocked module, suspended tab, or lost
+      // message). Reject in bounded time so fetchShard can decode locally.
+      const timer = setTimeout(() => {
+        workerJobs.delete(id);
+        reject(new Error("Knowledge worker timed out"));
+      }, 4000);
+      workerJobs.set(id, {
+        resolve: value => { clearTimeout(timer); resolve(value); },
+        reject: error => { clearTimeout(timer); reject(error); },
+        questions
+      });
+      try {
+        worker.postMessage({ id, buffer: copy, questions }, [copy]);
+      } catch (error) {
+        clearTimeout(timer);
+        workerJobs.delete(id);
+        reject(error);
+      }
     } catch (error) {
       resolve(decodeShard(buffer, questions));
     }
@@ -458,9 +474,16 @@ async function fetchShard(base, name, questions) {
   const key = `${base}/${name}`;
   if (shardCache.has(key)) return shardCache.get(key);
   const pending = (async () => {
-    const response = await fetch(key);
-    if (!response.ok) throw new Error("Knowledge shard failed");
-    const buffer = await response.arrayBuffer();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 18000);
+    let buffer;
+    try {
+      const response = await fetch(key, { signal: controller.signal });
+      if (!response.ok) throw new Error(`Knowledge shard failed: ${name} (HTTP ${response.status})`);
+      buffer = await response.arrayBuffer();
+    } finally {
+      clearTimeout(timer);
+    }
     traffic.bytes += buffer.byteLength;
     try {
       return await decodeOffThread(buffer, questions);

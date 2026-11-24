@@ -3064,6 +3064,18 @@ export function decide(state) {
       !state.answers.some(row=>row.qid==="from_bd") &&
       state.pool.qIndex.has("from_bd"))
     return {type:"ask",qid:"from_bd"};
+  // In a small controlled casebook, a *supported* leading person should
+  // be proposed while meaningful follow-up questions remain. Previously a
+  // guess happened only after exhausting those questions, so rejecting one
+  // name caused immediate DEFEAT and a single mistaken answer was terminal.
+  // This policy never applies to the large public casebook.
+  if (state.category === "character" && state.pool.count < 100 &&
+      state.guesses === 0 && state.answers.length >= 5 &&
+      state.answers.some(row=>row.qid==="from_bd") &&
+      state.answers.some(row=>row.value==="yes" &&
+        PRIMARY_JOBS.includes(row.qid)) &&
+      best >= 0 && bestP >= 0.75 && ratio >= 4)
+    return {type:"guess",index:best};
   // Preserve existing, already-verified pen/phone/clock and function
   // inference before extending the conversation to newer object families.
   // This avoids losing good legacy gameplay to unnecessary extra questions.

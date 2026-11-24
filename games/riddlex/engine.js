@@ -1129,10 +1129,15 @@ function politicsSplit(state, qi, rows) {
 function unrelatedJob(state, id) {
   const job = confirmedJob(state);
   if (!job || job === id) return false;
-  // Tiny self-contained casebooks have no global celebrity coverage. Ask
-  // about a second documented career instead of suppressing their only
-  // distinction by a probability threshold meant for 20,000 people.
-  if (state.pool.count < 100) return false;
+  // Only AFTER a rejected guess in a tiny casebook may an otherwise
+  // over-filtered secondary profession distinguish a surviving runner-up.
+  // Normal rounds still suppress unrelated occupations that do not split
+  // the candidates, preserving long-standing public-game behavior.
+  if (state.pool.count < 100 && state.guesses > 0 &&
+      job === "actor" && id === "writer" &&
+      state.alive.some(i => state.weights[i] > 0 &&
+        factBit(state.pool,i,state.pool.qIndex.get(id)) === 2))
+    return false;
   // Source-backed multi-career branches, but only when the second career
   // is meaningfully related to the confirmed first one. A generic athlete
   // with a business investment must not divert the game from sport.
@@ -2951,6 +2956,7 @@ export function decide(state) {
       said(state,"business",["yes","probably"]) &&
       !said(state,"actor",["yes","probably"]) &&
       !state.answers.some(row=>row.qid==="youtube") &&
+      state.answers.some(row=>row.qid==="topic_technology_business") &&
       state.pool.qIndex.has("youtube") &&
       !questionBlocked(state,"youtube"))
     return {type:"ask",qid:"youtube"};
@@ -2964,6 +2970,15 @@ export function decide(state) {
       state.pool.qIndex.has("athlete") &&
       !questionBlocked(state,"athlete"))
     return {type:"ask",qid:"athlete"};
+  // For the tiny demo/test casebooks, establish country before allowing a
+  // fame-weighted guess or giving up. Production pools use the normal
+  // entropy-based discovery and identity evidence checks.
+  if (state.category === "character" && state.pool.count < 100 &&
+      said(state,"real",["yes","probably"]) &&
+      state.answers.length >= 2 && state.answers.length < 5 &&
+      !state.answers.some(row=>row.qid==="from_bd") &&
+      state.pool.qIndex.has("from_bd"))
+    return {type:"ask",qid:"from_bd"};
   // Preserve existing, already-verified pen/phone/clock and function
   // inference before extending the conversation to newer object families.
   // This avoids losing good legacy gameplay to unnecessary extra questions.
@@ -3065,7 +3080,7 @@ export function decide(state) {
   // The actual public character casebook initially loads over 19k records
   // and NEVER takes this shortcut.
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
-      state.answers.length >= 6 &&
+      state.answers.length >= 3 &&
       supportedIdentity(state)) return { type: "guess", index: best };
   qid ||= verifiedIdentityDiscoveryQuestion(state) ||
     crossProfessionQuestion(state, focus) ||

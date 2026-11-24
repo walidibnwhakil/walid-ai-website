@@ -618,6 +618,10 @@ if (new URLSearchParams(location.search).has("autotest")) {
       question: currentQ,
       status: status.textContent,
       answers: state.answers.map((item) => item.qid),
+      // Browser QA can check exact Yes/No click values (autotest mode only).
+      lastAnswer: state.answers.length ? {
+        qid: state.answers.at(-1).qid, value: state.answers.at(-1).value
+      } : null,
       guesses: state.guesses,
       best: guessIndex >= 0 ? pool.ids[guessIndex] : "",
     }),

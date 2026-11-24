@@ -154,7 +154,17 @@ try {
     const response=answerFor(person,q);
     trace.push({index:trace.length+1,id:q,
       en:qinfo.en||q,bn:qinfo.bn||q,...response});
-    await page.evaluate(value=>window.__riddlex.answer(value),response.answer);
+    // Press the REAL visible button and confirm the engine recorded that
+    // exact value, including Yes versus No, before moving to the next turn.
+    await page.locator(`#answers button[data-answer="${response.answer}"]`)
+      .click({timeout:15000});
+    await page.waitForFunction(({qid,value}) => {
+      const next=window.__riddlex?.state();
+      return next?.lastAnswer?.qid===qid &&
+        next?.lastAnswer?.value===value &&
+        (next.mode==="guess" || next.mode==="learn" ||
+          (next.mode==="ask" && next.question && next.question!==qid));
+    },{qid:q,value:response.answer},{timeout:50000});
    }
    if(outcome==="incomplete")error="72-turn audit limit";
   } catch(e) {outcome="browser-error";error=String(e?.stack||e).slice(0,1000);}

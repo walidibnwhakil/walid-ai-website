@@ -3036,6 +3036,20 @@ export function decide(state) {
         return {type:"ask",qid:id};
     }
   }
+  // A generic social-media career does not prove one particular video
+  // creator. Ask the relevant source-backed content niche before trying a
+  // celebrity name. In the Bangladeshi creator casebook this is a useful
+  // discriminator between food reviewers and unrelated screen performers.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"youtube",["yes","probably"]) &&
+      said(state,"from_bd",["yes","probably"]) &&
+      !state.answers.some(row=>row.qid==="creator_food_vlogs") &&
+      state.pool.qIndex.has("creator_food_vlogs") &&
+      !questionContradicts(state,"creator_food_vlogs") &&
+      Object.keys(BROAD_FACTS.creator_food_vlogs || {}).some(id=>
+        state.pool.ids.includes(id)))
+    return {type:"ask",qid:"creator_food_vlogs"};
   // Rejected names are evidence, not permission to make a blind guess.
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);

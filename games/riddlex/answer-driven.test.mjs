@@ -9,6 +9,7 @@ import { poolFromEntries } from "./kb.js";
 import { BROAD_PEOPLE, BROAD_QUESTIONS } from "./broad-facts.js";
 import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS } from "./everyday-facts.js";
 import { EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
+import { PERSONAL_QUESTIONS } from "./personal-facts.js";
 
 const base = JSON.parse(await readFile(new URL("./kb/manifest.json", import.meta.url), "utf8")).questions;
 const questions = [...base, ...BROAD_QUESTIONS];
@@ -160,7 +161,9 @@ test("tentative US nationality cannot suppress a confirmed Canadian adult-career
 });
 
 test("multiple creative careers never suppress the broad acting interview", () => {
-  const careerPool = poolFromEntries(base, [
+  // The real game loads PERSONAL_QUESTIONS into the manifest before play.
+  // Without knows_you, the test silently drops that answer and ends one turn early.
+  const careerPool = poolFromEntries([...base, ...PERSONAL_QUESTIONS], [
     {id:"silent-performer",en:"Screen performer",pop:200,
       yes:["real","named","male","writer","musician","singer",
         "from_europe","from_gb","actor"]},

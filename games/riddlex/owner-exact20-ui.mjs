@@ -108,8 +108,8 @@ try{
    const url=new URL("/games/riddlex/",origin).href;
    const response=await page.goto(url,{waitUntil:"domcontentloaded",timeout:45000});
    if(!response?.ok())throw Error("Page HTTP "+response?.status());
-   await page.locator('[data-set-lang="'+lang+'"]').click({timeout:15000});
    await page.locator("#play").click({timeout:15000});
+   await page.locator('[data-set-lang="'+lang+'"]').click({timeout:15000});
    await page.locator('[data-cat="'+t.category+'"]').click({timeout:15000});
    let previous="";
    for(let turn=0;turn<80;turn++){

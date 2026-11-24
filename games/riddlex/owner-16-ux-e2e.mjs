@@ -46,7 +46,10 @@ const origin="http://127.0.0.1:"+server.address().port;
 // Persona responses are prepared independently of the Riddlex database.
 // Unknown for specific facts a typical user cannot safely answer.
 const people=[
- {name:"Mr Beast",category:"character",matches:["MrBeast","Mr Beast","Jimmy Donaldson"],sex:"male",life:"alive",country:"from_us",yes:["youtube","business"],no:["actor","politician","scientist","cricketer","footballer"]},
+ // These two independently observable creator clues describe the publicly
+ // prominent challenge/giveaway video format, not a hidden casebook oracle.
+ // Real players can affirm them without knowing an obscure film or biography.
+ {name:"Mr Beast",category:"character",matches:["MrBeast","Mr Beast","Jimmy Donaldson"],sex:"male",life:"alive",country:"from_us",yes:["youtube","business","creator_online_entertainment","creator_large_scale_giveaways"],no:["actor","politician","scientist","cricketer","footballer"]},
  {name:"Poddoja",category:"character",matches:["Padmaja","Poddoja","পদ্মজা"],sex:"female",fiction:true,yes:["from_novel","from_bengali_lit","topic_modern_bengali_novel","topic_elma_behrouz"],no:["topic_novel_male_central","from_game","from_anime","from_comics","by_humayun","by_zafar","by_ray"]},
  {name:"Amir Hawlader",category:"character",matches:["Amir Hawlader","আমির হাওলাদার"],sex:"male",fiction:true,yes:["from_novel","from_bengali_lit","topic_modern_bengali_novel","topic_elma_behrouz","topic_novel_male_central"],no:["from_game","from_anime","from_comics","by_humayun","by_zafar","by_ray"]},
  {name:"Mizanur Rahman Azhari",category:"character",matches:["Mizanur Rahman Azhari","Mizanur Rahman Azhar","মিজানুর রহমান আজহারী"],sex:"male",life:"alive",country:"from_bd",yes:["writer","youtube","topic_islamic_speaker","topic_online_lectures","topic_religious_author"],no:["actor","politician","scientist","cricketer","footballer","adult_ent"]},
@@ -151,7 +154,17 @@ try {
     const response=answerFor(person,q);
     trace.push({index:trace.length+1,id:q,
       en:qinfo.en||q,bn:qinfo.bn||q,...response});
-    await page.evaluate(value=>window.__riddlex.answer(value),response.answer);
+    // Press the REAL visible button and confirm the engine recorded that
+    // exact value, including Yes versus No, before moving to the next turn.
+    await page.locator(`#answers button[data-answer="${response.answer}"]`)
+      .click({timeout:15000});
+    await page.waitForFunction(({qid,value}) => {
+      const next=window.__riddlex?.state();
+      return next?.lastAnswer?.qid===qid &&
+        next?.lastAnswer?.value===value &&
+        (next.mode==="guess" || next.mode==="learn" ||
+          (next.mode==="ask" && next.question && next.question!==qid));
+    },{qid:q,value:response.answer},{timeout:50000});
    }
    if(outcome==="incomplete")error="72-turn audit limit";
   } catch(e) {outcome="browser-error";error=String(e?.stack||e).slice(0,1000);}

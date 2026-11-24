@@ -1,0 +1,37 @@
+name: Riddlex regression tests
+on:
+  push:
+    branches:
+      - fix/riddlex-answer-driven-20261124
+      - main
+    paths:
+      - "games/riddlex/**"
+      - ".github/workflows/riddlex-regression.yml"
+  pull_request:
+    paths:
+      - "games/riddlex/**"
+      - ".github/workflows/riddlex-regression.yml"
+jobs:
+  quick-core-behavior:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify guessing, retry and identity branches quickly
+        working-directory: games/riddlex
+        run: |
+          node --test --test-name-pattern="one wrong answer|wrong guess cannot|wrong guess asks|Bangladesh is asked|five briefed targets|Bangladesh actor|Chaplin|Dildar|online-video creator|religious speakers|technology business" engine.test.mjs domain-reasoning.test.mjs
+  gameplay-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run Riddlex tests
+        working-directory: games/riddlex
+        run: npm test

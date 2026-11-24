@@ -52,6 +52,7 @@ export const BROAD_QUESTIONS=Object.freeze([
  q("business_jio","job","business_reliance","Are they associated with the Jio telecommunications business?","তিনি কি জিও টেলিযোগাযোগ ব্যবসার সঙ্গে যুক্ত?"),
  q("creator_food_vlogs","job","youtube","Are they especially known for food-review or food-vlogging videos?","তিনি কি খাবারের রিভিউ বা ফুড ভ্লগ ভিডিওর জন্য বিশেষভাবে পরিচিত?"),
  q("creator_online_entertainment","job","youtube","Are entertainment and challenge videos a notable part of their online content?","বিনোদন বা চ্যালেঞ্জ ভিডিও কি তাঁর অনলাইন কনটেন্টের উল্লেখযোগ্য অংশ?"),
+ q("creator_large_scale_giveaways","job","creator_online_entertainment","Is this creator known for very large giveaway or prize-based challenge videos?","এই নির্মাতা কি বড় পুরস্কার বা উপহারভিত্তিক চ্যালেঞ্জ ভিডিওর জন্য পরিচিত?"),
  q("fiction_magic_lamp","fiction","fictional","Is a magical lamp a central part of this character's story?","এই চরিত্রের গল্পে কি একটি জাদুর প্রদীপ গুরুত্বপূর্ণ?"),
  q("fiction_genie","fiction","fiction_magic_lamp","Does a genie from the lamp help the central character?","প্রদীপের জিন কি গল্পের মূল চরিত্রকে সাহায্য করে?"),
  q("fiction_seven_riddles","fiction","fictional","Must this character solve seven riddles during an adventure?","অভিযানের সময় কি এই চরিত্রকে সাতটি ধাঁধার সমাধান করতে হয়?"),
@@ -135,6 +136,14 @@ export const BROAD_PROFILE_FACTS=Object.freeze((()=>{
  const m={};for(const item of BROAD_PEOPLE) {
    for(const qid of item.yes||[])(m[qid] ||= {})[item.id]=2;
    for(const qid of item.no||[])(m[qid] ||= {})[item.id]=1;
+ }
+ // Sourced distinctions on existing packed public profiles. These IDs
+ // belong to the original casebook; do not create duplicate people.
+ // MrBeast: large prize/challenge video formats. John Green: educational
+ // video essays/vlogs, not prize-based challenge programming.
+ for(const qid of ["creator_online_entertainment","creator_large_scale_giveaways"]) {
+   (m[qid] ||= {})["Q57618112"]=2;
+   m[qid]["Q630446"]=1;
  }
  return Object.fromEntries(Object.entries(m).map(([k,v])=>[k,Object.freeze(v)]));
 })());

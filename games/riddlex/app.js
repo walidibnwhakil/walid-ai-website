@@ -1,11 +1,11 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-66";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-69";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-67";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-69";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_PEOPLE } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-62";
+import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-69";
 import { NARRATIVE_PEOPLE } from "./narrative-facts.js";
 import { EVERYDAY_OBJECTS } from "./everyday-facts.js";
 import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js";
@@ -102,7 +102,7 @@ function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "riddlex-66";
+const BUILD = "riddlex-69";
 
 function withTimeout(promise, ms) {
   let timer;
@@ -618,6 +618,10 @@ if (new URLSearchParams(location.search).has("autotest")) {
       question: currentQ,
       status: status.textContent,
       answers: state.answers.map((item) => item.qid),
+      // Browser QA can check exact Yes/No click values (autotest mode only).
+      lastAnswer: state.answers.length ? {
+        qid: state.answers.at(-1).qid, value: state.answers.at(-1).value
+      } : null,
       guesses: state.guesses,
       best: guessIndex >= 0 ? pool.ids[guessIndex] : "",
     }),

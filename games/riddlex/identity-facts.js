@@ -119,7 +119,10 @@ function profile(id,en,bn,country,gender,professions,facts,pop=120){
 export const EXTRA_IDENTITY_PEOPLE=Object.freeze([
  profile("riddlex-profile-ferdous","Ferdous Ahmed","ফেরদৌস আহমেদ","from_bd","male",
   ["actor","politician"],["career_bengali_films","career_bd_mp","film_hothat_brishti",
-  "screen_role_lead","screen_films_after_2000","screen_national_film_award"],190),
+  // The 1998 breakthrough "Hothat Brishti" made him a household name.
+  // Daily Star (2023): /entertainment/tv-film/news/ferdous-reminiscences-about-hothat-brishti-nachiketa-3307796
+  "screen_star_1990s","screen_role_lead","screen_films_after_2000",
+  "screen_national_film_award"],190),
  profile("riddlex-profile-dighi","Prarthana Fardin Dighi","প্রার্থনা ফারদিন দীঘি","from_bd","female",
   ["actor"],["career_bengali_films","career_child_performer","film_kabuliwala_child",
   "screen_films_after_2000","screen_national_film_award"],150),

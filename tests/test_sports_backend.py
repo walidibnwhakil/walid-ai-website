@@ -181,7 +181,13 @@ class SportsBackendTests(unittest.TestCase):
             "matchDateTimeUTC": "2026-11-21T12:00:00Z", "matchIsFinished": True,
             "matchResults": [{"resultTypeID": 1, "pointsTeam1": 1, "pointsTeam2": 0}]
         }
-        with patch.object(fetch, "urlopen", return_value=Response([row])):
+        # Hold the clock at the match day: read_openliga deliberately discards
+        # completed matches older than 72 hours. The halftime-vs-final
+        # assertion must not expire as wall time advances.
+        with patch.object(fetch, "urlopen", return_value=Response([row])), \
+             patch.object(fetch, "datetime") as clock:
+            clock.now.return_value = __import__("datetime").datetime(2026, 11, 21, 14, tzinfo=fetch.timezone.utc)
+            clock.fromisoformat = __import__("datetime").datetime.fromisoformat
             matches = fetch.read_openliga()
         self.assertEqual(matches[0]["homeScore"], None)
         self.assertEqual(matches[0]["awayScore"], None)

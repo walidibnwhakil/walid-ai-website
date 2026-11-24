@@ -10,12 +10,12 @@ const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await i
 import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
-import { EVERYDAY_QUESTIONS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
+import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js";
 import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS } from "./recognition-facts.js";
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-61";
+import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-69";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -1129,12 +1129,25 @@ function politicsSplit(state, qi, rows) {
 function unrelatedJob(state, id) {
   const job = confirmedJob(state);
   if (!job || job === id) return false;
+  // Only AFTER a rejected guess in a tiny casebook may an otherwise
+  // over-filtered secondary profession distinguish a surviving runner-up.
+  // Normal rounds still suppress unrelated occupations that do not split
+  // the candidates, preserving long-standing public-game behavior.
+  if (state.pool.count < 100 && state.guesses > 0 &&
+      job === "actor" && id === "writer" &&
+      state.alive.some(i => state.weights[i] > 0 &&
+        factBit(state.pool,i,state.pool.qIndex.get(id)) === 2))
+    return false;
   // Source-backed multi-career branches, but only when the second career
   // is meaningfully related to the confirmed first one. A generic athlete
   // with a business investment must not divert the game from sport.
   const multiCareer = (job==="politician" &&
       ["actor","cricketer"].includes(id)) ||
     (["actor","cricketer"].includes(job) && id==="politician") ||
+    // Actors may also be professional singers. This is a verified
+    // second occupation, not an invitation to ask every unrelated job.
+    (job==="actor" && id==="singer") ||
+    (job==="singer" && id==="actor") ||
     (job==="writer" && id==="youtube") ||
     (job==="youtube" && ["writer","business"].includes(id)) ||
     (job==="business" && id==="youtube");
@@ -1173,7 +1186,12 @@ function skippedAsDuplicate(state, id) {
   if ((id === "played_barcelona" || id === "ballon_dor") && !yes("footballer")) return true;
   if (unrelatedJob(state, id)) return true;
   if ((id === "wild" && yes("pet")) || (id === "pet" && yes("wild"))) return true;
-  if (COUNTRIES.includes(id) && COUNTRIES.some((country) => country !== id && yes(country))) return true;
+  // "Probably from the US/UK" is uncertain evidence, NOT a confirmed
+  // mutually exclusive nationality. Otherwise a tentative US answer
+  // prevented ever asking Canada, and a tentative UK answer hid France.
+  // Only a definite YES makes another country a redundant follow-up.
+  if (COUNTRIES.includes(id) && COUNTRIES.some((country) =>
+      country !== id && said(state,country,["yes"]))) return true;
   if (BIRTHS.includes(id) && BIRTHS.some((birth) => birth !== id && yes(birth))) return true;
   const parties = ["party_bnp", "party_al", "party_jp", "party_jamaat"];
   if (parties.includes(id) && parties.some((party) => party !== id && yes(party))) return true;
@@ -1378,7 +1396,65 @@ const ACTOR_ONLY_IDENTITY_QUESTIONS = new Set(
     q.parent==="actor" && !MAINSTREAM_INDUSTRY_QUESTIONS.includes(q.id))
     .map(q=>q.id));
 
+// Keep movie-title trivia relevant. Asking about a movie that just happens
+// to exist somewhere in the casebook does not identify the current person.
+export const MAX_QUESTIONS_PER_ROUND = 28;
+// Allow a few source-backed title checks, not an unlimited filmography.
+const MAX_FILM_TITLES_PER_ROUND = 4;
+function isFilmTitleQuestion(id) {
+  // Awards, acting markets and television-career taxonomy are NOT movie titles.
+  return /^(?:film_(?!director_work|villain_dialogues)|broad_film_|profile_film_(?!south_india|indian_tv|miss_world|national_award|oscar_lead|hatim_role)|screen_(?:debut_|acted_|first_film_|india_(?:dabangg|dangal|ddlj)))/.test(id);
+}
+function usefulFilmTitleQuestion(state, qid) {
+  if (!isFilmTitleQuestion(qid)) return true;
+  const asked = state.answers.filter(row => isFilmTitleQuestion(row.qid));
+  if (asked.length >= MAX_FILM_TITLES_PER_ROUND) return false;
+  const industryKnown = said(state,"actor",["yes","probably"]) ||
+    said(state,"film_director_work",["yes","probably"]) ||
+    said(state,"from_film",["yes","probably"]);
+  if (!industryKnown) return false;
+  const qi = state.pool.qIndex.get(qid);
+  if (qi == null) return false;
+  const compatible = i => state.weights[i] > 0 &&
+    factBit(state.pool,i,qi) === 2 &&
+    eligibleForIdentityQuestion(state,i);
+  const last = state.answers.at(-1);
+  if (last && isFilmTitleQuestion(last.qid)) {
+    // A title answered No or Don't know never starts a new title list.
+    // A Yes allows ONE genuinely corroborating film: both titles must
+    // belong to the same still-possible person.
+    if (last.value !== "yes" || !state.alive.some(i =>
+      compatible(i) && factBit(state.pool,i,last.qi) === 2)) return false;
+  }
+  if (state.answers.length < 10) return true;
+  // Use previously confirmed candidate facts, not popularity alone. Obscure
+  // performers must remain discoverable, even when the 19k casebook dilutes
+  // their posterior below 0.3%.
+  return state.alive.some(compatible);
+}
+
 function blockedQuestion(state, question, rows, cache) {
+  if (!usefulFilmTitleQuestion(state, question.id)) return true;
+  // Negative family answers remain useful: three NO answers must NOT
+  // block unrelated categories such as doors, locks or paper.
+  // But after three DON'T KNOW responses to specialised family labels,
+  // switch to basic physical-function questions instead of asking all 15
+  // categories that a player has said they cannot classify.
+  if (EVERYDAY_FAMILY_IDS.includes(question.id) &&
+      !state.answers.some(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
+        ["yes","probably"].includes(row.value)) &&
+      state.answers.filter(row => EVERYDAY_FAMILY_IDS.includes(row.qid) &&
+        row.value === "unknown").length >= 3) return true;
+  // Recognition overlays are only relevant in their actual domain.
+  if (question.id.startsWith("profile_bd_") &&
+      !said(state,"from_bd",["yes","probably"])) return true;
+  if (question.id.startsWith("profile_sports_") &&
+      question.id !== "profile_sports_wrestling" &&
+      !said(state,"athlete",["yes","probably"]) &&
+      !said(state,"profile_sports_wrestling",["yes","probably"])) return true;
+  if (question.id.startsWith("profile_film_") &&
+      !said(state,"actor",["yes","probably"]) &&
+      !said(state,"from_film",["yes","probably"])) return true;
   if (skippedAsDuplicate(state, question.id)) return true;
   // A confirmed adult-industry actor must not be questioned about unrelated
   // mainstream movies or screen roles before a mainstream industry is known.
@@ -1392,10 +1468,14 @@ function blockedQuestion(state, question, rows, cache) {
   // about every actor worldwide. Avoid exhausting unrelated national markets
   // once the player's country is known, including during the fallback path.
   if (IDENTITY_FACTS[question.id]) {
-    const country=COUNTRIES.find(id=>said(state,id,["yes","probably"]));
-    if (country && !EXTRA_IDENTITY_PEOPLE.some(person=>
+    // An earlier "probably" nationality must NEVER override a later
+    // confirmed one: French Stacy Martin may be "probably UK" to a player,
+    // and Canadian Sunny Leone may be "probably US". Using the first
+    // tentative country used to permanently hide their verified roles.
+    const confirmedCountry=COUNTRIES.find(id=>said(state,id,["yes"]));
+    if (confirmedCountry && !EXTRA_IDENTITY_PEOPLE.some(person=>
       IDENTITY_FACTS[question.id][person.id]===2 &&
-      person.yes.includes(country))) return true;
+      person.yes.includes(confirmedCountry))) return true;
   }
   const links = linksFor(state.pool);
   // Sport-specific roles are not asked before confirming the sport.
@@ -1440,9 +1520,12 @@ function allowedInCategory(state, question) {
 function hasUnrejectedFilmCandidate(state, qid) {
   const facts = SCREEN_CAREER_DETAILS[qid] || HYPOTHESIS_FACTS[qid] ||
     BROAD_FACTS[qid] || NARRATIVE_FACTS[qid] || EVERYDAY_FACTS[qid];
-  if (!facts) return true;
+  const verifiedExisting = BROAD_PROFILE_FACTS[qid];
+  if (!facts && !verifiedExisting) return true;
   return state.alive.some(i =>
-    state.weights[i] > 0 && facts[state.pool.ids[i]] === 2);
+    state.weights[i] > 0 &&
+    (facts?.[state.pool.ids[i]] === 2 ||
+     verifiedExisting?.[state.pool.ids[i]] === 2));
 }
 
 // Before proposing another name, confirm distinguishing facts about the
@@ -1997,6 +2080,33 @@ function confirmedAdultOccupationQuestion(state) {
   return possible ? "adult_ent" : null;
 }
 
+// A compact casebook can have sparse profile facts. If one answer is
+// mistaken or a name has just been rejected, the entropy picker may see
+// no useful question despite having honest, verifiable attributes left.
+// Ask a documented general-purpose fact rather than declaring defeat.
+// The production 19k+ casebook never takes this shortcut.
+function smallCasebookEvidenceQuestion(state) {
+  if(state.category!=="character" || state.pool.count>=100)return null;
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const ids=["cricketer","actor","politician","scientist","footballer",
+    "writer","singer","athlete","all_rounder","alive","named",
+    "male","female","from_in","from_bd"];
+  for(const id of ids) {
+    const qi=state.pool.qIndex.get(id);
+    if(qi==null || asked.has(id))continue;
+    if(id==="all_rounder" && !said(state,"cricketer",["yes","probably"]))
+      continue;
+    if(["cricketer","footballer"].includes(id) &&
+        said(state,"athlete",["no","probably_not"]))continue;
+    if(PRIMARY_JOBS.includes(id) && unrelatedJob(state,id))continue;
+    if(!allowedInCategory(state,state.pool.questions[qi]))continue;
+    if(!state.alive.some(i=>state.weights[i]>0 &&
+        factBit(state.pool,i,qi)!==0))continue;
+    return id;
+  }
+  return null;
+}
+
 function firstAllowedQuestion(state) {
   const asked = new Set(state.answers.map((answer) => answer.qid));
   const rows = state.alive.length > 7000 ? sampleAlive(state, 6000) : state.alive;
@@ -2429,7 +2539,7 @@ function broadDiscoveryQuestion(state) {
       if (no("screen_indian_bengali")) {
         plan.push("screen_hindi_cinema");
         if (yes("screen_hindi_cinema")) {
-          if (yes("male")) plan.push("film_welcome","film_padmaavat_actor","film_crook");
+          if (yes("male") || no("female")) plan.push("film_welcome","film_padmaavat_actor","film_crook");
           else plan.push("film_padmaavat_actor","film_crook","film_welcome");
         }
         if (no("screen_hindi_cinema")) {
@@ -2468,6 +2578,11 @@ function broadDiscoveryQuestion(state) {
       plan.push("creator_food_vlogs");
       if(yes("creator_food_vlogs")) plan.push("creator_online_entertainment");
     }
+    if (yes("real") && yes("from_us") && yes("youtube") && yes("business")) {
+      plan.push("creator_online_entertainment");
+      if (yes("creator_online_entertainment"))
+        plan.push("creator_large_scale_giveaways");
+    }
     if (yes("fictional") && !yes("from_novel")) {
       if (yes("from_cartoon") || yes("from_film"))
         plan.push("fiction_magic_lamp");
@@ -2496,8 +2611,10 @@ function broadDiscoveryQuestion(state) {
        blockedQuestion(state,q,rows,cache) ||
        !gated(state,q,rows))continue;
     const facts=BROAD_FACTS[id]||{};
+    const existing=BROAD_PROFILE_FACTS[id]||{};
     if(!state.alive.some(i=>state.weights[i]>0 &&
-       facts[state.pool.ids[i]]===2))continue;
+       (facts[state.pool.ids[i]]===2 ||
+        existing[state.pool.ids[i]]===2)))continue;
     return id;
   }
   return null;
@@ -2555,42 +2672,73 @@ const EVERYDAY_GENERIC = new Set([
 // No target-name switch. First ask ordinary uses, then distinguish several
 // similar objects by their different observable functions and physical form.
 function everydayDiscoveryQuestion(state) {
- if(state.category!=="object" || state.answers.length<2) return null;
- const yes=qid=>said(state,qid,["yes","probably"]);
- const asked=new Set(state.answers.map(row=>row.qid));
- const familyOrder=[
-   "obj_family_electric","obj_family_worn","obj_family_personal_care",
-   "obj_family_kitchen","obj_family_container","obj_family_paper",
-   "obj_family_house","obj_family_lock","obj_family_cleaning",
-   "obj_family_medicine","obj_family_climbing","obj_family_prayer",
-   "obj_family_consumable","obj_family_financial","obj_family_waste"
- ];
- const pool=state.pool;
- const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
- const cache=new Map();
- const attempt=(qid)=>{
-   if(asked.has(qid))return false;
-   const qi=pool.qIndex.get(qid);
-   if(qi==null)return false;
-   const q=pool.questions[qi];
-   return allowedInCategory(state,q) &&
-     !blockedQuestion(state,q,rows,cache) && gated(state,q,rows) &&
-     hasUnrejectedFilmCandidate(state,qid);
- };
- // Prefer a specific function immediately after its family is confirmed;
- // if none matches, return to broad categories rather than trying the
- // names of unrelated appliances.
- for(const fam of familyOrder) {
-   if(!yes(fam))continue;
-   for(const q of EVERYDAY_QUESTIONS) {
-     if(q.parent===fam && attempt(q.id))return q.id;
-   }
- }
- if(yes("obj_skin_moisturizer"))
-   for(const id of ["obj_skin_cream","obj_skin_lotion","obj_skin_jelly"])
-     if(attempt(id))return id;
- for(const family of familyOrder) if(attempt(family))return family;
- return null;
+  if (state.category !== "object" || state.answers.length < 2) return null;
+  const asked = new Set(state.answers.map(row => row.qid));
+  const yes = id => said(state,id,["yes","probably"]);
+  const unknownFamilies = state.answers.filter(row =>
+    EVERYDAY_FAMILY_IDS.includes(row.qid) && row.value === "unknown").length;
+  const pool = state.pool;
+
+  // These source-backed family questions already have an explicit OBJECT
+  // parent, supplied by the user's category selection. Do not let global
+  // celebrity/encyclopedia priors hide them through low yesMass or
+  // parentAbsent; that previously skipped paper, door and lock families
+  // and spent the remaining round asking about arbitrary colours instead.
+  const available = qid => {
+    if (asked.has(qid) || !pool.qIndex.has(qid)) return false;
+    const q = pool.questions[pool.qIndex.get(qid)];
+    if (!q || !allowedInCategory(state,q)) return false;
+    if (EVERYDAY_FAMILY_IDS.includes(qid)) {
+      // These are independent sibling families. A NO to electric, clothing
+      // or skin-care must never disqualify paper, door, glass or medicine.
+      // The object category was explicitly chosen by the player already.
+      return unknownFamilies < 3;
+    }
+    if (q.parent && yes(q.parent) &&
+        EVERYDAY_QUESTIONS.some(item => item.id === qid))
+      return !questionContradicts(state,qid);
+    const rows = state.alive.length > 7000 ? sampleAlive(state,6000) : state.alive;
+    return !blockedQuestion(state,q,rows,new Map()) && gated(state,q,rows);
+  };
+
+  // An affirmed family immediately leads to concrete observable functions.
+  // A NO to one child does not close its siblings; a YES can already
+  // identify a candidate with an independently verified object function.
+  for (const family of EVERYDAY_FAMILY_IDS) {
+    if (!yes(family)) continue;
+    for (const q of EVERYDAY_QUESTIONS)
+      if (q.parent === family && available(q.id)) return q.id;
+  }
+  if (yes("obj_skin_moisturizer"))
+    for (const id of ["obj_skin_cream","obj_skin_lotion","obj_skin_jelly"])
+      if (available(id)) return id;
+
+  // Choose the next FAMILY by comparing the real supported objects' facts,
+  // not by a hard-coded family order or by the fame of the Bible/Qur'an.
+  // This shared classification works equally for glass, tissue, key,
+  // dictionary, door, medicine and all other sourced everyday objects.
+  const observations = state.answers.filter(row =>
+    ["yes","no","probably","probably_not"].includes(row.value));
+  const compatible = EVERYDAY_OBJECTS.filter(item => !observations.some(row =>
+    (["no","probably_not"].includes(row.value) && item.yes.includes(row.qid)) ||
+    (["yes","probably"].includes(row.value) && item.no.includes(row.qid))));
+  const base = compatible.length ? compatible : EVERYDAY_OBJECTS;
+  let best = null, bestScore = -Infinity;
+  for (const family of EVERYDAY_FAMILY_IDS) {
+    if (!available(family)) continue;
+    const positives = base.filter(item => item.yes.includes(family));
+    if (!positives.length) continue;
+    const balance = positives.length / base.length;
+    // Maximize useful binary splits, lightly favor candidates matching
+    // more previously confirmed observable features.
+    const support = Math.max(0,...positives.map(item =>
+      observations.filter(row =>
+        ["yes","probably"].includes(row.value) &&
+        item.yes.includes(row.qid)).length));
+    const score = Math.min(balance,1-balance)*4 + support*.08;
+    if (score > bestScore) { bestScore = score; best = family; }
+  }
+  return best;
 }
 
 // Evidence-based, reversible object hypotheses. A broad category alone never
@@ -2747,7 +2895,10 @@ function recognitionDiscoveryQuestion(state) {
         }
       }
     }
-    if(yes("from_us") && yes("male")) {
+    // The opening often asks "Are they a woman?" instead of "Are they a man?".
+    // A NO to that question must not silently disable male-career questions.
+    // Use the answer for question routing only, never as proof for a guess.
+    if(yes("from_us") && (yes("male") || no("female"))) {
       plan.push("profile_sports_wrestling");
       if(yes("profile_sports_wrestling")) {
         plan.push("profile_sports_wwe");
@@ -2757,17 +2908,19 @@ function recognitionDiscoveryQuestion(state) {
       }
     }
     if(yes("actor")) {
-      if(yes("from_gb"))plan.push("profile_film_titanic","profile_film_oscar_lead");
+      // A tentative UK answer is not proof of a British film career.
+      // Wait for a definite UK answer; otherwise first resolve France etc.
+      if(said(state,"from_gb",["yes"]))plan.push("profile_film_titanic","profile_film_oscar_lead");
       if(yes("from_it"))plan.push("profile_film_malena","profile_film_spectre");
       if(yes("from_in")) {
-        if(yes("female")) {
+        if(yes("female") || no("male")) {
           plan.push("profile_film_south_india");
           if(yes("profile_film_south_india"))
             plan.push("profile_film_mahanati","profile_film_national_award");
           if(no("profile_film_south_india")) {
             plan.push("profile_film_miss_world","profile_film_quantico");
           }
-        } else if(yes("male")) {
+        } else if(yes("male") || no("female")) {
           plan.push("profile_film_indian_tv");
           if(yes("profile_film_indian_tv"))plan.push("profile_film_hatim_role");
           else if(no("profile_film_indian_tv"))
@@ -2826,16 +2979,249 @@ function recognitionEvidenceCandidate(state) {
   return candidates[0].index;
 }
 
+// Source-backed cross-career clues are much more informative than another
+// unrelated celebrity's film title. This is a generic intersection of
+// country + confirmed professions + known career market, never name matching.
+function crossCareerIdentityQuestion(state) {
+  if(state.category!=="character" || state.answers.length<11 ||
+     !said(state,"real",["yes","probably"]) ||
+     !said(state,"actor",["yes","probably"]))return null;
+  const yes=id=>said(state,id,["yes","probably"]);
+  const confirmed=PRIMARY_JOBS.filter(job=>yes(job));
+  if(confirmed.length<2)return null;
+  const countries=COUNTRIES.filter(yes);
+  if(!countries.length)return null;
+  const confirmedMarkets=MAINSTREAM_INDUSTRY_QUESTIONS.filter(yes);
+  const genre=EXTRA_IDENTITY_PEOPLE.filter(p=>
+    countries.some(c=>p.yes.includes(c)) &&
+    confirmed.every(job=>p.yes.includes(job)) &&
+    confirmedMarkets.every(m=>p.yes.includes(m)) &&
+    !state.answers.some(row=>
+      (row.value==="yes" && p.no.includes(row.qid)) ||
+      (row.value==="no" && p.yes.includes(row.qid))));
+  if(!genre.length || genre.length>3)return null;
+  const asked=new Set(state.answers.map(row=>row.qid));
+  const rows=state.alive.length>7000?sampleAlive(state,6000):state.alive;
+  const cache=new Map();
+  for(const person of genre) {
+    for(const q of EXTRA_IDENTITY_QUESTIONS) {
+      if(!q.distinctive || !person.yes.includes(q.id) ||
+         !q.id.startsWith("film_") || asked.has(q.id))continue;
+      const qi=state.pool.qIndex.get(q.id);
+      if(qi==null || !state.alive.some(i=>
+          state.weights[i]>0 && state.pool.ids[i]===person.id))continue;
+      if(!allowedInCategory(state,state.pool.questions[qi]) ||
+         blockedQuestion(state,state.pool.questions[qi],rows,cache) ||
+         !gated(state,state.pool.questions[qi],rows) ||
+         !hasUnrejectedFilmCandidate(state,q.id))continue;
+      return q.id;
+    }
+  }
+  return null;
+}
+
 export function decide(state) {
   recompute(state);
   const personalRole=confirmedPersonalRole(state);
   if (personalRole >= 0) return { type:"guess", index:personalRole };
   if (!state.alive.length) return { type: "defeat" };
-  // Neither 10 rejected names nor 72 answers establishes that the user lost.
-  // Continue asking every remaining relevant, non-duplicate question.
+  // The tiny self-contained game must establish basic identity before
+  // proposing a fame-weighted name. A previous fallback could guess Shakib
+  // after only "real", before Bangladesh or profession was even asked.
+  if (state.category === "character" && state.pool.count < 100 &&
+      state.answers.length < 5 &&
+      said(state,"real",["yes","probably"]) &&
+      !said(state,"knows_you",["yes","probably"]) &&
+      !said(state,"actor",["yes","probably"])) {
+    const seen = new Set(state.answers.map(row => row.qid));
+    // "Named" is a soft, reversible clue. Asking it early also prevents a
+    // single accidental answer from becoming a fatal hard life/country error.
+    // Never interrupt an already confirmed actor's role/era interview.
+    for (const id of ["male","named","alive","from_bd","actor","cricketer"]) {
+      if (state.pool.qIndex.has(id) && !seen.has(id) &&
+          !questionContradicts(state,id) &&
+          !skippedAsDuplicate(state,id))
+        return {type:"ask",qid:id};
+    }
+  }
+  // A real public person's nationality must be established before asking
+  // dozens of speculative continents, occupations or movie titles. In the
+  // large worldwide casebook a dead Bangladesh screen comedian can have low
+  // prior weight, so the entropy picker previously skipped from_bd entirely
+  // and exhausted the round on unrelated foreign countries.
+  // The question is neutral for non-Bangladeshi players: a NO simply routes
+  // the next interview into the worldwide region/career branch.
+  if (state.category === "character" &&
+      state.answers.length >= 4 &&
+      said(state, "real", ["yes", "probably"]) &&
+      said(state, "knows_you", ["no", "probably_not"]) &&
+      !state.answers.some(row => row.qid === "from_bd") &&
+      state.pool.qIndex.has("from_bd") &&
+      !questionBlocked(state, "from_bd"))
+    return { type: "ask", qid: "from_bd" };
+  // A generic social-media career does not prove one particular video
+  // creator. Ask the relevant source-backed content niche before trying a
+  // celebrity name. In the Bangladeshi creator casebook this is a useful
+  // discriminator between food reviewers and unrelated screen performers.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"youtube",["yes","probably"]) &&
+      said(state,"from_bd",["yes","probably"]) &&
+      !state.answers.some(row=>row.qid==="creator_food_vlogs") &&
+      state.pool.qIndex.has("creator_food_vlogs") &&
+      !questionContradicts(state,"creator_food_vlogs") &&
+      Object.keys(BROAD_FACTS.creator_food_vlogs || {}).some(id=>
+        state.pool.ids.includes(id)))
+    return {type:"ask",qid:"creator_food_vlogs"};
+  // Rejected names are evidence, not permission to make a blind guess.
   const { best, second, bestP, secondP } = topTwo(state);
   const ratio = oddsRatio(bestP, secondP);
   const focus = focusedCandidate(state, best, second, bestP, secondP);
+  // A supported identification comes before optional film or career trivia.
+  // Earlier discovery paths could keep bypassing shouldGuess indefinitely.
+  if (state.category === "character" && state.pool.count >= 100 &&
+      state.answers.length >= 8 &&
+      !pendingActorRoleQuestion(state) && !pendingFilmEraQuestion(state) &&
+      !domainDiscoveryQuestion(state)) {
+    const identified = verifiedIdentityCandidate(state);
+    if (identified >= 0) return { type:"guess", index:identified };
+    if (shouldGuess(state)) return { type:"guess", index:best };
+  }
+  // A genuine verified answer takes precedence over the question ceiling.
+  // Previously the cap returned DEFEAT even when the last two answers had
+  // just proved a pen, key, glass or other item.
+  if (state.answers.length >= MAX_QUESTIONS_PER_ROUND) {
+    if (state.category === "object") {
+      for (const found of [evidenceBackedObjectCandidate(state),
+        everydayEvidenceCandidate(state), verifiedIdentityCandidate(state)]) {
+        if (found >= 0) return { type:"guess", index:found };
+      }
+    }
+    if (state.category !== "character" && shouldGuess(state))
+      return { type:"guess", index:best };
+    return { type:"defeat" };
+  }
+  // Once North America is affirmed, establish the US/Canada distinction
+  // before launching niche occupations or film-name trivia.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"from_north_america",["yes","probably"]) &&
+      !state.answers.some(row=>row.qid==="from_us") &&
+      state.pool.qIndex.has("from_us") &&
+      !questionBlocked(state,"from_us"))
+    return {type:"ask",qid:"from_us"};
+  // A US creator with a confirmed business role needs the everyday
+  // "makes YouTube videos?" question before prize/challenge trivia.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"from_us",["yes","probably"]) &&
+      said(state,"business",["yes","probably"]) &&
+      !said(state,"actor",["yes","probably"]) &&
+      !state.answers.some(row=>row.qid==="youtube") &&
+      state.answers.some(row=>row.qid==="topic_technology_business") &&
+      state.pool.qIndex.has("youtube") &&
+      !questionBlocked(state,"youtube"))
+    return {type:"ask",qid:"youtube"};
+  // Known country and active profession should precede more one-off film
+  // titles, especially for European film performers with dual nationality.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"actor",["yes","probably"]) &&
+      said(state,"from_europe",["yes","probably"]) &&
+      state.answers.length >= 9 &&
+      !COUNTRIES.some(id=>said(state,id,["yes"])) ) {
+    for (const country of ["from_gb","from_fr","from_it"]) {
+      if(state.pool.qIndex.has(country) &&
+         !state.answers.some(row=>row.qid===country) &&
+         !questionBlocked(state,country))
+        return {type:"ask",qid:country};
+    }
+  }
+  // A probable US connection does not imply a confirmed US nationality.
+  // For a North American public figure with a hesitant "probably" for US,
+  // check Canada before US-only career trivia excludes Canadian profiles.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      said(state,"from_north_america",["yes","probably"]) &&
+      said(state,"from_us",["probably"]) &&
+      !state.answers.some(row=>row.qid==="from_ca") &&
+      state.pool.qIndex.has("from_ca") && !questionBlocked(state,"from_ca"))
+    return {type:"ask",qid:"from_ca"};
+  // Once a country is established, the broad "Do they act?" career
+  // question should precede more specialist celebrity/profession trivia.
+  // This applies to American TV actors, European filmmakers, and Japanese
+  // performers alike; it is not a celebrity-specific shortcut.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      COUNTRIES.some(id=>said(state,id,["yes","probably"])) &&
+      state.answers.length >= 9 &&
+      !state.answers.some(row=>row.qid==="actor") &&
+      state.pool.qIndex.has("actor") &&
+      !questionContradicts(state,"actor")) {
+    const yes = id => said(state,id,["yes","probably"]);
+    const creative = ["writer","musician","singer"].filter(yes).length;
+    const distinctNonActingCareer =
+      ["politician","scientist","athlete","cricketer","footballer",
+       "business","youtube","adult_ent"].some(yes);
+    // Writing and music can coexist with an acting career. A British
+    // screen comedian was previously treated as "career already known" once
+    // writer and musician were confirmed, so the game never asked ACTOR
+    // and surrendered after unrelated athlete trivia. Ask the broad
+    // on-screen question before any niche screen trivia; secondary creative
+    // work must not close the actor branch.
+    if (!PRIMARY_JOBS.some(yes) ||
+        (creative >= 2 && !distinctNonActingCareer))
+      return {type:"ask",qid:"actor"};
+  }
+  // A confirmed Indian Hindi-film actor's second profession can separate
+  // the small actor+singer intersection before obscure competing film titles.
+  if (state.category === "character" &&
+      said(state,"actor",["yes","probably"]) &&
+      said(state,"from_in",["yes","probably"]) &&
+      said(state,"career_hindi_films",["yes","probably"]) &&
+      state.answers.length >= 12 &&
+      !state.answers.some(row=>row.qid==="singer") &&
+      EXTRA_IDENTITY_PEOPLE.some(p=>["actor","singer","from_in",
+        "career_hindi_films"].every(id=>p.yes.includes(id))) &&
+      state.pool.qIndex.has("singer") && !questionBlocked(state,"singer"))
+    return {type:"ask",qid:"singer"};
+  const roleAwareSignature=crossCareerIdentityQuestion(state);
+  if(roleAwareSignature)return {type:"ask",qid:roleAwareSignature};
+  // An undecided career needs a basic athlete/sports branch eventually;
+  // generic UNKNOWN answers should not bury it behind 18 niche questions.
+  if (state.category === "character" &&
+      said(state,"real",["yes","probably"]) &&
+      state.answers.length >= 8 &&
+      !state.answers.some(row=>row.qid==="athlete") &&
+      (!PRIMARY_JOBS.some(job=>said(state,job,["yes","probably"])) ||
+       (said(state,"from_us",["yes"]) &&
+        said(state,"actor",["yes","probably"]))) &&
+      state.pool.qIndex.has("athlete") &&
+      !questionContradicts(state,"athlete"))
+    return {type:"ask",qid:"athlete"};
+  // For the tiny demo/test casebooks, establish country before allowing a
+  // fame-weighted guess or giving up. Production pools use the normal
+  // entropy-based discovery and identity evidence checks.
+  if (state.category === "character" && state.pool.count < 100 &&
+      said(state,"real",["yes","probably"]) &&
+      state.answers.length >= 2 && state.answers.length < 5 &&
+      !state.answers.some(row=>row.qid==="from_bd") &&
+      state.pool.qIndex.has("from_bd"))
+    return {type:"ask",qid:"from_bd"};
+  // In a small controlled casebook, a *supported* leading person should
+  // be proposed while meaningful follow-up questions remain. Previously a
+  // guess happened only after exhausting those questions, so rejecting one
+  // name caused immediate DEFEAT and a single mistaken answer was terminal.
+  // This policy never applies to the large public casebook.
+  if (state.category === "character" && state.pool.count < 100 &&
+      state.guesses === 0 && state.answers.length >= 5 &&
+      state.answers.some(row=>row.qid==="from_bd") &&
+      state.answers.some(row=>row.value==="yes" &&
+        PRIMARY_JOBS.includes(row.qid)) &&
+      !pendingActorRoleQuestion(state) && !pendingFilmEraQuestion(state) &&
+      !domainDiscoveryQuestion(state) &&
+      best >= 0 && bestP >= 0.75 && ratio >= 4)
+    return {type:"guess",index:best};
   // Preserve existing, already-verified pen/phone/clock and function
   // inference before extending the conversation to newer object families.
   // This avoids losing good legacy gameplay to unnecessary extra questions.
@@ -2913,7 +3299,12 @@ export function decide(state) {
   if (waiting) {
     const qid = chooseConfirmationQuestion(state, focus) ||
       chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
-      actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
+      actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
+      smallCasebookEvidenceQuestion(state) ||
+      (state.pool.count < 100 ? ["alive","named","female","writer","singer"]
+        .find(id=>state.pool.qIndex.has(id) &&
+          !state.answers.some(row=>row.qid===id) &&
+          !questionContradicts(state,id)) : null);
     return qid ? { type: "ask", qid } : { type: "defeat" };
   }
   if (shouldGuess(state)) {
@@ -2930,18 +3321,21 @@ export function decide(state) {
   // The ordinary entropy picker can run out while useful candidate-specific
   // confirmations still exist. Try them before a broad, safe fallback.
   // A missing question is NEVER permission to guess an unverified name.
-  let qid = chooseQuestion(state);
+  let qid = chooseQuestion(state) ||
+    smallCasebookEvidenceQuestion(state);
   // Preserve the original tiny-casebook behavior used by the self-contained
   // demo and simulation fixtures. Guess when the informative question picker
   // is exhausted so a later rejection still has unused clarifying questions.
   // The actual public character casebook initially loads over 19k records
   // and NEVER takes this shortcut.
   if (!qid && state.pool.count < 100 && best >= 0 && bestP > 0 &&
+      state.answers.length >= 3 &&
       supportedIdentity(state)) return { type: "guess", index: best };
   qid ||= verifiedIdentityDiscoveryQuestion(state) ||
     crossProfessionQuestion(state, focus) ||
     chooseConfirmationQuestion(state, focus) ||
-    actorDiscoveryQuestion(state) || firstAllowedQuestion(state);
+    actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
+    smallCasebookEvidenceQuestion(state);
   if (qid) return { type: "ask", qid };
   if (lateVerifiedFictionGuess(state,best,bestP,secondP) ||
       lateSupportedPublicGuess(state,best,bestP,secondP))

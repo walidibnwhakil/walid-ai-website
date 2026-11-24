@@ -2902,6 +2902,13 @@ function recognitionDiscoveryQuestion(state) {
   const no=id=>said(state,id,["no","probably_not"]);
   const asked=new Set(state.answers.map(row=>row.qid));
   const plan=[];
+  if(state.category==="character" && yes("fictional")) {
+    if(!asked.has("from_cartoon"))plan.push("from_cartoon");
+    if(yes("from_cartoon")) {
+      plan.push("profile_cartoon_unicef");
+      if(yes("profile_cartoon_unicef"))plan.push("profile_cartoon_parrot");
+    }
+  }
   if(state.category==="animal" && yes("bird")) {
     plan.push("profile_animal_poultry");
     if(yes("profile_animal_poultry"))
@@ -2927,11 +2934,23 @@ function recognitionDiscoveryQuestion(state) {
       if(yes("profile_sports_wrestling")) {
         plan.push("profile_sports_wwe");
         if(yes("profile_sports_wwe"))
-          plan.push("profile_sports_record_champion");
+          plan.push("profile_sports_record_champion","profile_sports_dx","profile_sports_wwe_executive");
         if(yes("actor"))plan.push("profile_sports_peacemaker");
       }
     }
+    if(yes("singer") && yes("from_us")) {
+      plan.push("profile_music_brothers");
+      if(yes("profile_music_brothers"))plan.push("profile_music_jealous");
+    }
     if(yes("actor")) {
+      if(yes("career_hollywood_films") && (yes("from_us") || yes("from_north_america"))) {
+        if((yes("male") || no("female")) && yes("from_us"))
+          plan.push("profile_film_mission_impossible","profile_film_top_gun");
+        if((yes("female") || no("male")) && yes("from_us"))
+          plan.push("profile_film_maleficent","profile_film_tomb_raider");
+        if((yes("female") || no("male")) && !yes("from_us") && yes("from_north_america"))
+          plan.push("profile_film_knives_out","profile_film_no_time_to_die");
+      }
       // A tentative UK answer is not proof of a British film career.
       // Wait for a definite UK answer; otherwise first resolve France etc.
       if(said(state,"from_gb",["yes"]))plan.push("profile_film_titanic","profile_film_oscar_lead");
@@ -2966,6 +2985,8 @@ function recognitionDiscoveryQuestion(state) {
        blockedQuestion(state,question,rows,cache) ||
        !gated(state,question,rows) ||
        !hasUnrejectedFilmCandidate(state,qid))continue;
+    if(RECOGNITION_FACTS[qid] && !state.alive.some(i=>state.weights[i]>0 &&
+      factBit(state.pool,i,qi)===2 && eligibleForIdentityQuestion(state,i)))continue;
     return qid;
   }
   return null;

@@ -461,7 +461,10 @@ test("a stalled round stops instead of asking dozens of irrelevant questions", (
   ]);
   const state = createState(pool, {category:"object"});
   recompute(state);
-  for (let i=0;i<73;i++) answer(state, "extra_object_fact_" + i, "unknown");
+  // Exhaust the actual available object questions, not an arbitrary turn
+  // count. No further evidence is available for these two candidates.
+  for (const question of pool.questions.filter(q => q.group === "object"))
+    answer(state, question.id, "unknown");
   state.guesses = 10;
   state.sinceGuess = 0;
   const next = decide(state);
@@ -651,7 +654,9 @@ test("the adult-entertainment question stays late and name-only", () => {
   ]);
   const state = createState(actors);
   recompute(state);
-  for (let count = 0; count < 9; count++) answer(state, "real", "yes");
+  answer(state, "real", "yes");
+  for (const id of ["fictional","animal","object","named","female","alive","from_bd","from_in"])
+    answer(state, id, "unknown");
   assert.equal(adultAllowed(state), false);
   assert.notEqual(chooseQuestion(state), "adult_ent");
   answer(state, "male", "yes");

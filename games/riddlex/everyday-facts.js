@@ -359,6 +359,14 @@ export const EVERYDAY_QUESTIONS = Object.freeze([
     "en": "Is it faeces or stool produced by digestion?",
     "bn": "এটি কি পরিপাকের ফলে তৈরি মল?"
   }
+,
+  {
+    "id": "obj_reading_book",
+    "group": "object",
+    "parent": "obj_family_paper",
+    "en": "Is it mainly a bound collection of pages intended for reading, rather than a dictionary, diary or calendar?",
+    "bn": "এটি কি অভিধান, ডায়েরি বা ক্যালেন্ডার নয়, মূলত পড়ার জন্য বাঁধাই করা পাতার সমষ্টি?"
+  }
 ]);
 export const EVERYDAY_OBJECTS = Object.freeze([
   {
@@ -1157,6 +1165,38 @@ export const EVERYDAY_OBJECTS = Object.freeze([
       "Janamaz"
     ]
   }
+,
+  {
+    "id": "everyday-reading-book",
+    "en": "Book",
+    "bn": "বই",
+    "pop": 450,
+    "yes": [
+      "object",
+      "handheld",
+      "obj_family_paper",
+      "obj_reading_book"
+    ],
+    "no": [
+      "real",
+      "fictional",
+      "animal",
+      "electronic",
+      "vehicle",
+      "food",
+      "clothing",
+      "furniture",
+      "obj_family_electric",
+      "obj_reference_dictionary",
+      "obj_personal_diary",
+      "obj_dates_calendar",
+      "obj_wiping_tissue"
+    ],
+    "aliases": [
+      "Reading book",
+      "বই"
+    ]
+  }
 ]);
 export const EVERYDAY_FACTS = Object.freeze({
   "obj_family_electric": {
@@ -1195,6 +1235,7 @@ export const EVERYDAY_FACTS = Object.freeze({
     "everyday-cap": 2
   },
   "obj_family_paper": {
+    "everyday-reading-book": 2,
     "everyday-tissue": 2,
     "everyday-calendar": 2,
     "everyday-dictionary": 2,
@@ -1295,6 +1336,7 @@ export const EVERYDAY_FACTS = Object.freeze({
   "obj_cap_head": {
     "everyday-cap": 2
   },
+  "obj_reading_book": {"everyday-reading-book": 2,"everyday-dictionary": 1,"everyday-diary": 1,"everyday-calendar": 1,"everyday-tissue": 1},
   "obj_reference_dictionary": {
     "everyday-dictionary": 2
   },

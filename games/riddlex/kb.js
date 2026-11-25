@@ -1,13 +1,13 @@
 // Compact little-endian knowledge shards. Names stay in one blob so the
 // first question can render before every shard has finished parsing.
 
-import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-60";
+import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-73";
 import { EXTRA_HYPOTHESIS_QUESTIONS } from "./hypothesis-facts.js?v=riddlex-60";
 import { PERSONAL_QUESTIONS } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_POLITICS_QUESTIONS } from "./politics-extra.js?v=riddlex-55";
 import { EXTRA_IDENTITY_QUESTIONS } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-69";
+import { BROAD_QUESTIONS } from "./broad-facts.js?v=riddlex-73";
 import { NARRATIVE_QUESTIONS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS } from "./everyday-facts.js?v=riddlex-71";
 import { RECOGNITION_QUESTIONS } from "./recognition-facts.js?v=riddlex-71";
@@ -356,11 +356,16 @@ async function fetchKnowledge(url, read, firstMs = 18000, secondMs = 30000) {
 }
 
 export async function loadManifest(base = "./kb") {
-  const manifest = await fetchKnowledge(`${base}/manifest.json?v=riddlex-72`, response => response.json(), 10000, 20000);
+  const manifest = await fetchKnowledge(`${base}/manifest.json?v=riddlex-73`, response => response.json(), 10000, 20000);
   for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...RECOGNITION_QUESTIONS, ...PERSONAL_QUESTIONS]) {
     if (!manifest.questions.some((row) => row.id === question.id)) {
       manifest.questions.push({ ...question });
     }
+  }
+  const named = manifest.questions.find(question => question.id === "named");
+  if (named) {
+    named.en = "Does this fictional character have a specific name in the story?";
+    named.bn = "গল্পে এই কাল্পনিক চরিত্রটির কি নির্দিষ্ট কোনো নাম আছে?";
   }
   return manifest;
 }
@@ -456,7 +461,7 @@ function decodeOffThread(buffer, questions) {
   return new Promise((resolve, reject) => {
     try {
       if (!worker) {
-        worker = new Worker(new URL("./kb-worker.js?v=riddlex-72", import.meta.url), { type: "module" });
+        worker = new Worker(new URL("./kb-worker.js?v=riddlex-73", import.meta.url), { type: "module" });
         worker.onmessage = (event) => {
           const job = workerJobs.get(event.data.id);
           if (!job) return;

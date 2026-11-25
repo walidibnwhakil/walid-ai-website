@@ -1036,6 +1036,9 @@ export function buildTraitLinks(questions) {
 
   for (const question of list) {
     const id = question.id;
+    // An owner clue is scoped by its explicit category. Do not infer a
+    // profession from its free-form English/Bengali wording.
+    if(question.ownerQuestion){add(question.category,id,{entail:false,mass:false});continue;}
     let parent = ROLE_PARENT[id] || null;
     if (!parent && id.includes("_")) {
       const stemmed = STEM_PARENT[id.split("_")[0]];

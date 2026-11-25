@@ -208,3 +208,25 @@ test("multiple creative careers never suppress the broad acting interview", () =
   assert.deepEqual(next,{type:"ask",qid:"actor"},
     "writer+musician must not skip acting and end in unrelated sport trivia");
 });
+
+test("real public people never receive the ambiguous own-name question", () => {
+  const state = startActor();
+  assert.equal(questionBlocked(state, "named"), true);
+});
+test("fictional characters do not receive the redundant own-name question either", () => {
+  const fictionPool=poolFromEntries(base, [
+    {id:"named-hero",en:"Named hero",yes:["fictional","named"],no:["real"]},
+    {id:"unnamed-hero",en:"Unnamed hero",yes:["fictional"],no:["real","named"]},
+  ]);
+  const state=createState(fictionPool,{category:"character"});
+  answer(state,"real","no");
+  answer(state,"fictional","yes");
+  assert.equal(questionBlocked(state,"named"),true);
+});
+test("the same Aashram question is not repeated with another question ID", () => {
+  const questions2=[...questions,{id:"profile_film_aashram",group:"job",parent:"actor"}];
+  const state=createState(poolFromEntries(questions2,BROAD_PEOPLE),{category:"character"});
+  answer(state,"real","yes");answer(state,"from_in","yes");answer(state,"actor","yes");
+  answer(state,"film_aashram","no");
+  assert.equal(questionBlocked(state,"profile_film_aashram"),true);
+});

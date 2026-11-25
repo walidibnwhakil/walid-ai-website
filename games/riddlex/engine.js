@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-73";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js?v=riddlex-71";
@@ -15,7 +15,7 @@ import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS, REC
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-69";
+import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-73";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -1082,7 +1082,13 @@ function linksFor(pool) {
 }
 
 function said(state, qid, values) {
-  return state.answers.some((answer) => answer.qid === qid && values.includes(answer.value));
+  const group=EQUIVALENT_QUESTION_INDEX.get(qid);
+  if (!group) return state.answers.some(answer=>answer.qid===qid && values.includes(answer.value));
+  const direct=state.answers.find(answer=>answer.qid===qid);
+  if (direct && direct.value!=="unknown") return values.includes(direct.value);
+  return state.answers.some(answer=>
+    (answer.qid===qid || (group.includes(answer.qid) && answer.value!=="unknown")) &&
+    values.includes(answer.value));
 }
 
 const PRIMARY_JOBS = ["footballer", "cricketer", "actor", "singer", "politician", "writer", "scientist", "musician", "director", "business", "youtube"];
@@ -1175,7 +1181,21 @@ function unrelatedJob(state, id) {
   return !candidatesSplit(state, probe, rows);
 }
 
+// Equivalent questions can originate from different fact tables. A new
+// question ID must not make an already answered proposition new evidence.
+const EQUIVALENT_QUESTION_GROUPS = [
+  ["screen_hindi_cinema","career_hindi_films"],
+  ["screen_telugu_cinema","career_telugu_films"],
+  ["film_aashram","profile_film_aashram"],
+];
+const EQUIVALENT_QUESTION_INDEX=new Map(EQUIVALENT_QUESTION_GROUPS.flatMap(group=>group.map(id=>[id,group])));
 function skippedAsDuplicate(state, id) {
+  // Real/fictional and story-medium clues already classify the character.
+  // Keep the historical named bit for compatibility, never ask it aloud.
+  if (id === "named") return true;
+  const equivalents = EQUIVALENT_QUESTION_INDEX.get(id);
+  if (equivalents && state.answers.some(row=>row.qid!==id &&
+      equivalents.includes(row.qid) && row.value!=="unknown")) return true;
   const yes = (qid) => said(state, qid, ["yes", "probably"]);
   const answered = (qid) => state.answers.some((answer) => answer.qid === qid && answer.value !== "unknown");
   // Alive and dead are the same binary fact. An "unknown" answer should
@@ -1532,7 +1552,7 @@ export function questionBlocked(state, qid) {
 function allowedInCategory(state, question) {
   // Most players cannot know someone else's birth decade. The birth facts
   // remain available internally for indexing, but must not be asked aloud.
-  if (question.group === "birth") return false;
+  if (question.id === "named" || question.group === "birth") return false;
   // A current-government answer requires regularly refreshed official data,
   // which this static knowledge snapshot does not provide.
   if (question.id === "in_government") return false;
@@ -1854,7 +1874,7 @@ function verifiedIdentityCandidate(state) {
     // Fantasy, comedy and folklore characters have no passport. Multiple
     // independent, affirmative story-work facts plus the story medium
     // are legitimate proof, without assuming one unique famous character.
-    const storyProof = known.has("fictional") && known.has("named") &&
+    const storyProof = known.has("fictional") &&
       ["from_film","from_cartoon","from_novel","fiction_tv_fantasy"]
         .some(qid=>known.has(qid)) &&
       domain.filter(row=>BROAD_QUESTIONS.some(q=>
@@ -1868,7 +1888,7 @@ function verifiedIdentityCandidate(state) {
         !professionProof) continue;
     if (functionProof?.length && relevant.length < 2) continue;
     if (species?.length && relevant.length < 3) continue;
-    if (fictionProof && (!known.has("named") || relevant.length < 2)) continue;
+    if (fictionProof && relevant.length < 2) continue;
     // All category-specific YES answers on the proposed identity must be
     // source-backed, not contradicted; UNKNOWN answers are neutral.
     const contradiction = answers.some(row => {
@@ -2118,7 +2138,7 @@ function smallCasebookEvidenceQuestion(state) {
   if(state.category!=="character" || state.pool.count>=100)return null;
   const asked=new Set(state.answers.map(row=>row.qid));
   const ids=["cricketer","actor","politician","scientist","footballer",
-    "writer","singer","athlete","all_rounder","alive","named",
+    "writer","singer","athlete","all_rounder","alive",
     "male","female","from_in","from_bd"];
   for(const id of ids) {
     const qi=state.pool.qIndex.get(id);
@@ -2455,6 +2475,7 @@ function lateSupportedPublicGuess(state,best,bestP,secondP) {
   // when a globally famous later actor still carries a large sparse prior.
   const actor=affirm.some(x=>x.qid==="actor");
   if(actor && cinema.length>=2 && careers.length>=1 &&
+     cinema.some(row=>SCREEN_IDENTITY_QUESTIONS.includes(row.qid)) &&
      bestP>=.17 && oddsRatio(bestP,secondP)>=2)
     return true;
   // After 18+ honest answers, two confirmed separate occupations plus
@@ -2486,7 +2507,7 @@ function corroboratedFilmHypothesis(state,index,bestP,secondP) {
       "screen_national_film_award"].includes(row.qid) ||
       SCREEN_IDENTITY_QUESTIONS.includes(row.qid)) &&
     factBit(state.pool,index,row.qi)===2);
-  if(facts.length<2)return false;
+  if(facts.length<2 || !hasScreenIdentityProof(state,index))return false;
   // The candidate must also respect every definite NO; UNKNOWN is neutral.
   return !state.answers.some(row=>{
     if(!["yes","no"].includes(row.value))return false;
@@ -3102,10 +3123,8 @@ export function decide(state) {
       !said(state,"knows_you",["yes","probably"]) &&
       !said(state,"actor",["yes","probably"])) {
     const seen = new Set(state.answers.map(row => row.qid));
-    // "Named" is a soft, reversible clue. Asking it early also prevents a
-    // single accidental answer from becoming a fatal hard life/country error.
     // Never interrupt an already confirmed actor's role/era interview.
-    for (const id of ["male","named","alive","from_bd","actor","cricketer"]) {
+    for (const id of ["male","alive","from_bd","actor","cricketer"]) {
       if (state.pool.qIndex.has(id) && !seen.has(id) &&
           !questionContradicts(state,id) &&
           !skippedAsDuplicate(state,id))
@@ -3257,6 +3276,21 @@ export function decide(state) {
         return {type:"ask",qid:id};
     }
   }
+  // Authors may be scientists as well. Resolve the broad crossover before
+  // searching every specialty question in the worldwide casebook.
+  if (state.category==="character" && state.answers.length>=10 &&
+      said(state,"real",["yes"]) && said(state,"writer",["yes"]) &&
+      said(state,"actor",["no","probably_not"]) &&
+      !state.answers.some(row=>row.qid==="scientist") &&
+      !said(state,"politician",["yes","probably"])) {
+    const country=COUNTRIES.find(id=>said(state,id,["yes"]));
+    const ci=state.pool.qIndex.get(country), si=state.pool.qIndex.get("scientist");
+    const wi=state.pool.qIndex.get("writer");
+    if(ci!=null && si!=null && wi!=null && state.alive.some(i=>
+      state.weights[i]>0 && factBit(state.pool,i,ci)===2 &&
+      factBit(state.pool,i,wi)===2 && factBit(state.pool,i,si)===2))
+      return {type:"ask",qid:"scientist"};
+  }
   const roleAwareSignature=crossCareerIdentityQuestion(state);
   if(roleAwareSignature)return {type:"ask",qid:roleAwareSignature};
   // An undecided career needs a basic athlete/sports branch eventually;
@@ -3373,7 +3407,7 @@ export function decide(state) {
       chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
       actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
       smallCasebookEvidenceQuestion(state) ||
-      (state.category === "character" && state.pool.count < 100 ? ["alive","named","female","writer","singer"]
+      (state.category === "character" && state.pool.count < 100 ? ["alive","female","writer","singer"]
         .find(id=>state.pool.qIndex.has(id) &&
           !state.answers.some(row=>row.qid===id) &&
           !questionContradicts(state,id)) : null);

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, shouldGuess } from "./engine.js";
+import { answer, adultAllowed, buildTraitLinks, canPrint, chooseQuestion, createState, decide, factBit, questionBlocked, questionsBeforeRetry, rejectIndex, recompute, rewind, shouldGuess } from "./engine.js";
 import { appendShard, decodeShard, planShardLoads, poolFromEntries } from "./kb.js";
 import { EXTRA_SCREEN_QUESTIONS } from "./career-facts.js?v=riddlex-52";
 import { EXTRA_HYPOTHESIS_QUESTIONS, EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-53";
@@ -642,9 +642,29 @@ test("guesses the five briefed targets from truthful answers", () => {
   }
 });
 
-test("one wrong answer still leaves Shakib reachable", () => {
-  const result = play(world, "shakib", { flip: 2 });
-  assert.equal(result.ok, true, JSON.stringify(result));
+test("an accidental life-status answer is correctable without guessing against a definite answer", () => {
+  // Removing 'named' changed the third question from a redundant clue to
+  // life status. The game must not guess a living person after alive=no.
+  const state=createState(world,{opening:"real",category:"character"});
+  for(const [qid,value] of [["real","yes"],["male","yes"],["alive","no"]])
+    answer(state,qid,value);
+  const target=world.ids.indexOf("shakib");
+  const before=decide(state);
+  assert.ok(before.type!=="guess" || before.index!==target);
+  rewind(state);
+  answer(state,"alive","yes");
+  for(let step=0;step<28;step++){
+    const d=decide(state);
+    if(d.type==="guess"){
+      if(d.index===target)return;
+      rejectIndex(state,d.index);
+    }else{
+      assert.equal(d.type,"ask");
+      const v=bit(world,"shakib",d.qid);
+      answer(state,d.qid,v===2?"yes":v===1?"no":"unknown");
+    }
+  }
+  assert.fail("corrected life-status answer did not recover the target");
 });
 
 test("the adult-entertainment question stays late and name-only", () => {

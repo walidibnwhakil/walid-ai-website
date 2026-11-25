@@ -1,11 +1,11 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-71";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-73";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-72";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-73";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_PEOPLE } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-69";
+import { BROAD_PEOPLE, BROAD_OBJECTS } from "./broad-facts.js?v=riddlex-73";
 import { NARRATIVE_PEOPLE } from "./narrative-facts.js";
 import { EVERYDAY_OBJECTS } from "./everyday-facts.js?v=riddlex-71";
 import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js?v=riddlex-71";
@@ -102,7 +102,7 @@ function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "riddlex-72";
+const BUILD = "riddlex-73";
 document.documentElement.dataset.riddlexBuild = BUILD;
 
 function withTimeout(promise, ms) {
@@ -424,10 +424,19 @@ async function beginGuess(index) {
 
 async function onAnswer(value) {
   if (mode !== "ask" || !currentQ) return;
+  const question = currentQ;
+  const round = state;
+  const session = loadToken;
+  currentQ = null;
+  mode = "thinking";
   scene.react(value);
   scene.setMood("thinking");
-  applyAnswer(state, currentQ, value);
-  currentQ = null;
+  // Return control to the browser after the click before doing the
+  // potentially expensive casebook scoring. Lock this question first so
+  // a second click or keyboard press cannot count a different answer.
+  await new Promise(resolve => setTimeout(resolve, 0));
+  if (session !== loadToken || round !== state || mode !== "thinking") return;
+  applyAnswer(round, question, value);
   await step();
 }
 
@@ -480,7 +489,8 @@ async function beginDefeat() {
   $("learn-note").textContent = adult ? text().noPhoto : "";
   $("learn-photo").value = "";
   $("learn-name").value = "";
-  $("back").hidden = true;
+  // Players can correct an accidental answer even after an unsuccessful round.
+  $("back").hidden = !state?.answers.length;
 }
 
 function showLearnMessage(message) {
@@ -538,8 +548,8 @@ function onPlayAgain() {
 }
 
 function onUndo() {
-  if (!state?.answers.length) return;
-  if (mode === "guess" || mode === "reveal" || mode === "wrong") {
+  if (mode === "thinking" || !state?.answers.length) return;
+  if (["guess","reveal","wrong","learn"].includes(mode)) {
     scene.clearReveal();
     guessIndex = -1;
     $("credit").textContent = "";

@@ -16,6 +16,7 @@ export const SCREEN_STAR_1990S = Object.freeze({
   Q7322180: 2,   // Riaz, recognition in late 1990s
   Q52149647: 1,  // Puja Cherry, became a lead film star in 2018
   Q21066842: 2,  // Amin Khan, 1990s leading actor
+  Q5279795: 2, // Dipjol, late-1990s breakthrough in Teji (BMDb https://bmdb.com.bd/person/607/)
   Q15848298: 2,  // Omar Sani, 1993 breakthrough
 });
 
@@ -104,7 +105,7 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   screen_return_after_long_break: Object.freeze({ Q21066842: 2 }),
   screen_debut_abujh_duti_mon: Object.freeze({ Q21066842: 2 }),
   screen_restaurant_business: Object.freeze({ Q15848298: 2 }),
-  screen_film_producer: Object.freeze({ Q5279795: 2 }),
+  screen_film_producer: Object.freeze({ Q5279795: 2, "riddlex-broad-dipjol": 2 }),
   screen_famous_villain_dialogues: Object.freeze({ Q5279795: 2 }),
   screen_800_plus_films: Object.freeze({ Q15868587: 2 }),
   screen_lead_to_villain: Object.freeze({ Q15848298: 2 }),
@@ -273,7 +274,7 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
     bn:"তিনি কি ৮০০টির বেশি চলচ্চিত্রে অভিনয় করেছেন?" },
   { id:"screen_lead_to_villain", group:"job",
     en:"Did they become known for villain roles after starting as a screen hero?",
-    bn:"নায়ক হিসেবে শুরু করে পরে কি খলচরিত্রেও পরিচিত হয়েছেন?" },
+    bn:"প্রধান চরিত্রে অভিনয় দিয়ে শুরু করে পরে কি খলচরিত্রেও পরিচিত হয়েছেন?" },
   { id:"screen_theatre_tv_film", group:"job",
     en:"Were they widely known for acting in theatre, television and film?",
     bn:"মঞ্চ, টেলিভিশন ও চলচ্চিত্র—তিন মাধ্যমেই কি তিনি বিশেষভাবে পরিচিত ছিলেন?" },
@@ -354,13 +355,13 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
   },
   {
     id: "screen_role_lead", group: "job",
-    en: "Did they usually play the main hero or leading character?",
-    bn: "তিনি কি সাধারণত প্রধান নায়ক বা মুখ্য চরিত্রে অভিনয় করতেন?",
+    en: "Are they known for playing leading roles?",
+    bn: "তিনি কি সাধারণত প্রধান চরিত্রে অভিনয়ের জন্য পরিচিত?",
   },
   {
     id: "screen_role_villain", group: "job",
-    en: "Were they mainly known for playing villains?",
-    bn: "তিনি কি মূলত খলনায়কের চরিত্রে অভিনয়ের জন্য পরিচিত?",
+    en: "Are they especially known for playing villainous characters?",
+    bn: "তিনি কি বিশেষভাবে খলচরিত্রে অভিনয়ের জন্য পরিচিত?",
   },
   {
     id: "screen_role_comedy", group: "job",
@@ -370,7 +371,7 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
   {
     id: "screen_role_supporting", group: "job",
     en: "Did they usually play supporting rather than lead roles?",
-    bn: "তিনি কি সাধারণত প্রধান নায়কের বদলে সহ-চরিত্রে অভিনয় করতেন?",
+    bn: "তিনি কি সাধারণত প্রধান চরিত্রের পরিবর্তে পার্শ্বচরিত্রে অভিনয় করতেন?",
   },
   {
     id: "screen_silent_comedy", group: "job",

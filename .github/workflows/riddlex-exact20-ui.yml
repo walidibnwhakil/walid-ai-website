@@ -2,7 +2,7 @@ name: Riddlex exact owner 20 visible UI audit
 on:
   pull_request:
     paths:
-      - "games/riddlex/owner-exact20-ui.mjs"
+      - "games/riddlex/**"
       - ".github/workflows/riddlex-exact20-ui.yml"
 jobs:
   visible-ui:

@@ -16,6 +16,7 @@ export const SCREEN_STAR_1990S = Object.freeze({
   Q7322180: 2,   // Riaz, recognition in late 1990s
   Q52149647: 1,  // Puja Cherry, became a lead film star in 2018
   Q21066842: 2,  // Amin Khan, 1990s leading actor
+  Q5279795: 2, // Dipjol, late-1990s breakthrough in Teji (BMDb https://bmdb.com.bd/person/607/)
   Q15848298: 2,  // Omar Sani, 1993 breakthrough
 });
 
@@ -104,7 +105,7 @@ export const SCREEN_CAREER_DETAILS = Object.freeze({
   screen_return_after_long_break: Object.freeze({ Q21066842: 2 }),
   screen_debut_abujh_duti_mon: Object.freeze({ Q21066842: 2 }),
   screen_restaurant_business: Object.freeze({ Q15848298: 2 }),
-  screen_film_producer: Object.freeze({ Q5279795: 2 }),
+  screen_film_producer: Object.freeze({ Q5279795: 2, "riddlex-broad-dipjol": 2 }),
   screen_famous_villain_dialogues: Object.freeze({ Q5279795: 2 }),
   screen_800_plus_films: Object.freeze({ Q15868587: 2 }),
   screen_lead_to_villain: Object.freeze({ Q15848298: 2 }),

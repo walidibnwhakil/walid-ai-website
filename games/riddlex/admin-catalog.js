@@ -1,4 +1,4 @@
-import {loadManifest,decodeShard,attachManifest,poolFromEntries,appendShard} from "./kb.js?v=riddlex-73";
+import {loadManifest,decodeShard,attachManifest,poolFromEntries,appendShard,inheritCreditedPortraits} from "./kb.js?v=riddlex-73";
 import {factBit,entityView} from "./engine.js?v=riddlex-74";
 import {EXTRA_IDENTITY_PEOPLE} from "./identity-facts.js";
 import {DOMAIN_PEOPLE} from "./domain-facts.js?v=riddlex-60";
@@ -74,16 +74,25 @@ let sourcePromise;
 export function catalogSource(){
   if(!sourcePromise)sourcePromise=Promise.all([loadManifest(ROOT),fetch(ROOT+"/index.json?v=riddlex-74").then(r=>{
     if(!r.ok)throw Error("Index HTTP "+r.status);return r.json();
-  })]).then(([manifest,index])=>({manifest,index})).catch(e=>{sourcePromise=null;throw e});
+  })]).then(async ([manifest,index])=>{
+    const result={manifest,index,portraitPool:null};
+    // The game inherits attributed portraits from the starter casebook.
+    // Use the same source in the admin catalog, without guessing from names.
+    try{
+      const response=await fetch(ROOT+"/"+index.top);
+      if(response.ok)result.portraitPool=attachManifest(decodeShard(await response.arrayBuffer(),manifest.questions),manifest);
+    }catch{/* browsing remains available if the portrait source is offline */}
+    return result;
+  }).catch(e=>{sourcePromise=null;throw e});
   return sourcePromise;
 }
-function curatedPool(manifest,reviewed){
+function curatedPool(manifest,reviewed,portraitPool){
   const entries=[...EXTRA_IDENTITY_PEOPLE,...DOMAIN_PEOPLE,...BROAD_PEOPLE,...NARRATIVE_PEOPLE,
     ...RECOGNITION_PEOPLE,...UNVERIFIED_OWNER_NAMES,RIDDLEX_CHARACTER,
     ...BROAD_OBJECTS,...EVERYDAY_OBJECTS,...RECOGNITION_ANIMALS,
     ...(EXTRA_HYPOTHESIS_ENTRIES.object||[]),...(EXTRA_HYPOTHESIS_ENTRIES.animal||[])];
   const unique=[...new Map(entries.filter(Boolean).map(r=>[r.id,r])).values()];
-  const pool=poolFromEntries(manifest.questions,unique);
+  const pool=poolFromEntries(manifest.questions,inheritCreditedPortraits(portraitPool,unique));
   // The reviewed subset contains complete owner snapshots. It overrides
   // duplicate packaged rows and is browsable even before their shard is read.
   return applyOwnerRecords(pool,reviewed,appendShard,poolFromEntries);
@@ -92,7 +101,7 @@ export class CatalogBrowser{
   constructor(source,filters,reviewed=[]){
     this.source=source;this.filters=filters;this.reviewed=reviewed;
     this.files=catalogFiles(source.manifest,source.index,filters);
-    this.fileIndex=0;this.position=0;this.pool=curatedPool(source.manifest,reviewed);
+    this.fileIndex=0;this.position=0;this.pool=curatedPool(source.manifest,reviewed,source.portraitPool);
     this.seen=new Set();this.revised=new Set(reviewed.map(r=>r.id));this.scanned=0;this.finished=false;
   }
   async next(signal,onProgress=()=>{}){

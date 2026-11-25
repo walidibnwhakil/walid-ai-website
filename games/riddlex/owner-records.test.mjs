@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {normalizeReviewAnswers,recordCategory,withCategory,exactRecordIds,approvedFacts,applyOwnerRecords,validOwnerQuestion,mergeOwnerQuestions} from "./owner-records.js";
-import {factBit,createState,recompute,inCategory,entityView,answer,decide} from "./engine.js";
+import {factBit,createState,recompute,inCategory,entityView,answer,decide,chooseQuestion,rewind} from "./engine.js";
 import {poolFromEntries,appendShard} from "./kb.js";
 import {catalogFiles,matchesRecord,snapshotRecord} from "./admin-catalog.js";
 
@@ -99,6 +99,7 @@ test("the decision engine actually offers an owner's confirmed clue before guess
   const seen=[];
   let asked=false;
   for(let step=0;step<12;step++){
+    assert.notEqual(chooseQuestion(state),clue.id,"Confirmation must not enter the ordinary question selector");
     const d=decide(state);
     assert.equal(d.type,"ask",JSON.stringify({seen,decision:d}));
     seen.push(d.qid);
@@ -108,4 +109,11 @@ test("the decision engine actually offers an owner's confirmed clue before guess
   }
   assert.ok(asked,JSON.stringify(seen));
   assert.notEqual(decide(state).qid,clue.id);
+  rewind(state);
+  answer(state,clue.id,"no");
+  assert.ok(!state.alive.includes(0),"A known contradictory clue must rule out that guess");
+  assert.ok(state.alive.includes(1),"Missing facts must not count as no");
+  assert.notEqual(decide(state).qid,clue.id);
+  rewind(state);
+  assert.ok(state.alive.includes(0),"Changing the answer restores the candidate");
 });

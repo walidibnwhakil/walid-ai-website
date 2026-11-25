@@ -355,13 +355,13 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
   },
   {
     id: "screen_role_lead", group: "job",
-    en: "Did they usually play the main hero or leading character?",
-    bn: "তিনি কি সাধারণত প্রধান নায়ক বা মুখ্য চরিত্রে অভিনয় করতেন?",
+    en: "Are they known for playing leading roles?",
+    bn: "তিনি কি সাধারণত প্রধান চরিত্রে অভিনয়ের জন্য পরিচিত?",
   },
   {
     id: "screen_role_villain", group: "job",
-    en: "Were they mainly known for playing villains?",
-    bn: "তিনি কি মূলত খলনায়কের চরিত্রে অভিনয়ের জন্য পরিচিত?",
+    en: "Are they especially known for playing villainous characters?",
+    bn: "তিনি কি বিশেষভাবে খলচরিত্রে অভিনয়ের জন্য পরিচিত?",
   },
   {
     id: "screen_role_comedy", group: "job",
@@ -371,7 +371,7 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
   {
     id: "screen_role_supporting", group: "job",
     en: "Did they usually play supporting rather than lead roles?",
-    bn: "তিনি কি সাধারণত প্রধান নায়কের বদলে সহ-চরিত্রে অভিনয় করতেন?",
+    bn: "তিনি কি সাধারণত প্রধান চরিত্রের পরিবর্তে পার্শ্বচরিত্রে অভিনয় করতেন?",
   },
   {
     id: "screen_silent_comedy", group: "job",

@@ -6,14 +6,14 @@ import {fileURLToPath} from "node:url";
 import {resolve,extname,sep} from "node:path";
 import {chromium} from "playwright";
 
-const root=fileURLToPath(new URL("../../",import.meta.url));
+const root=resolve(fileURLToPath(new URL("../../",import.meta.url)));
 const mime={".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".json":"application/json",".css":"text/css",".bin":"application/octet-stream"};
 const server=createServer(async(req,res)=>{
   try{let path=decodeURIComponent(new URL(req.url,"http://localhost").pathname);
     if(path.endsWith("/"))path+="index.html";
     const file=resolve(root,"."+path);if(!file.startsWith(root+sep)&&file!==root)throw Error("path");
-    res.writeHead(200,{"content-type":mime[extname(file)]||"application/octet-stream"});res.end(await readFile(file));
-  }catch{res.end("");}
+    const bytes=await readFile(file);res.writeHead(200,{"content-type":mime[extname(file)]||"application/octet-stream"});res.end(bytes);
+  }catch{res.writeHead(404);res.end("");}
 });
 server.listen(0,"127.0.0.1");await once(server,"listening");
 const origin="http://127.0.0.1:"+server.address().port;

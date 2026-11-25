@@ -74,6 +74,7 @@ export function asOwnerEntry(record,questions) {
 export function applyOwnerRecords(pool,records,append,poolFromEntries) {
   if(!pool||!records?.length)return pool;
   pool.questions=mergeOwnerQuestions(pool.questions,records);
+  pool.questions.packedAttrBytes=pool.attrBytes;
   pool.qIndex=new Map(pool.questions.map((q,i)=>[q.id,i]));
   const map=new Map(records.map(r=>[r.id,r])), found=new Set();
   const facts=new Map(records.map(r=>[r.id,approvedFacts(r,pool.questions)]));

@@ -84,7 +84,12 @@ async function compressImage(file) {
   return dataUrl;
 }
 
-async function ready() {
+let readyPromise=null;
+function ready(){
+  if(!readyPromise)readyPromise=connectFirebase().catch(error=>{readyPromise=null;throw error});
+  return readyPromise;
+}
+async function connectFirebase() {
   if (!window.WALID_FIREBASE_CONFIG) {
     await loadScript("/firebase-config.js");
   }

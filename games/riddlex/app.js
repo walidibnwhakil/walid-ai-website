@@ -1,7 +1,7 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
 import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-71";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
-import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-71";
+import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-72";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_PEOPLE } from "./domain-facts.js?v=riddlex-60";
@@ -96,13 +96,14 @@ function gameInProgress() {
   return mode === "ask" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
 }
 
-const LOAD_MS = 30000;
+const LOAD_MS = 57000;
 const debugLoad = new URLSearchParams(location.search).has("autotest");
 function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "riddlex-71";
+const BUILD = "riddlex-72";
+document.documentElement.dataset.riddlexBuild = BUILD;
 
 function withTimeout(promise, ms) {
   let timer;

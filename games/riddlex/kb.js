@@ -327,10 +327,36 @@ export function categoryShards(manifest, category) {
   });
 }
 
+// A temporary abort or failed body download must not make a player
+// restart the game. Retry once with a fresh request, without retrying
+// permanent client errors such as a missing file.
+async function fetchKnowledge(url, read, firstMs = 18000, secondMs = 30000) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(new Error("Knowledge request timed out: " + url)),
+      attempt === 0 ? firstMs : secondMs);
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        cache: attempt === 0 ? "no-cache" : "reload",
+      });
+      if (!response.ok) {
+        const error = new Error(`Knowledge request failed: ${url} (HTTP ${response.status})`);
+        error.permanent = response.status >= 400 && response.status < 500 &&
+          ![408, 425, 429].includes(response.status);
+        throw error;
+      }
+      return await read(response);
+    } catch (error) {
+      if (attempt === 1 || error?.permanent) throw error;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+}
+
 export async function loadManifest(base = "./kb") {
-  const response = await fetch(`${base}/manifest.json?v=riddlex-71`, { cache: "no-cache" });
-  if (!response.ok) throw new Error("Knowledge manifest failed");
-  const manifest = await response.json();
+  const manifest = await fetchKnowledge(`${base}/manifest.json?v=riddlex-72`, response => response.json(), 10000, 20000);
   for (const question of [...EXTRA_SCREEN_QUESTIONS, ...EXTRA_HYPOTHESIS_QUESTIONS, ...EXTRA_POLITICS_QUESTIONS, ...EXTRA_IDENTITY_QUESTIONS, ...DOMAIN_QUESTIONS, ...BROAD_QUESTIONS, ...NARRATIVE_QUESTIONS, ...EVERYDAY_QUESTIONS, ...RECOGNITION_QUESTIONS, ...PERSONAL_QUESTIONS]) {
     if (!manifest.questions.some((row) => row.id === question.id)) {
       manifest.questions.push({ ...question });
@@ -430,7 +456,7 @@ function decodeOffThread(buffer, questions) {
   return new Promise((resolve, reject) => {
     try {
       if (!worker) {
-        worker = new Worker(new URL("./kb-worker.js", import.meta.url), { type: "module" });
+        worker = new Worker(new URL("./kb-worker.js?v=riddlex-72", import.meta.url), { type: "module" });
         worker.onmessage = (event) => {
           const job = workerJobs.get(event.data.id);
           if (!job) return;
@@ -474,16 +500,7 @@ async function fetchShard(base, name, questions) {
   const key = `${base}/${name}`;
   if (shardCache.has(key)) return shardCache.get(key);
   const pending = (async () => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 18000);
-    let buffer;
-    try {
-      const response = await fetch(key, { signal: controller.signal });
-      if (!response.ok) throw new Error(`Knowledge shard failed: ${name} (HTTP ${response.status})`);
-      buffer = await response.arrayBuffer();
-    } finally {
-      clearTimeout(timer);
-    }
+    const buffer = await fetchKnowledge(key, response => response.arrayBuffer());
     traffic.bytes += buffer.byteLength;
     try {
       return await decodeOffThread(buffer, questions);

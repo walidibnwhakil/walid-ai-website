@@ -1,5 +1,5 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-74";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-76";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-73";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
@@ -11,8 +11,8 @@ import { EVERYDAY_OBJECTS } from "./everyday-facts.js?v=riddlex-71";
 import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js?v=riddlex-71";
 import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
-import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-74";
-import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-74";
+import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
+import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
 
 const $ = (id) => document.getElementById(id);
@@ -105,7 +105,7 @@ function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "riddlex-74";
+const BUILD = "riddlex-76";
 document.documentElement.dataset.riddlexBuild = BUILD;
 
 function withTimeout(promise, ms) {

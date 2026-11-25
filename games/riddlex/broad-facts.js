@@ -96,7 +96,7 @@ export const BROAD_PEOPLE=Object.freeze([
  person("riddlex-broad-rafsan","Rafsan TheChotobhai","রাফসান দ্য ছোটভাই",350,
   ["male","alive","from_bd","youtube","creator_food_vlogs","creator_online_entertainment"]),
  person("riddlex-broad-dipjol","Dipjol","ডিপজল",670,
-  ["male","alive","from_bd","actor","screen_role_villain","screen_bangladesh_bengali","film_villain_dialogues"]),
+  ["male","alive","from_bd","actor","screen_role_villain","screen_bangladesh_bengali","film_villain_dialogues","screen_star_1990s","screen_films_after_2000","screen_film_producer","career_bengali_films"]), // BMDb: Teji (late 1990s); TBS: actor-turned-producer
  fictional("riddlex-broad-aladdin","Aladdin","আলাদিন",1100,
   ["from_film","from_cartoon","fiction_magic_lamp","fiction_genie"]),
  fictional("riddlex-broad-hatim","Hatim","হাতিম",660,

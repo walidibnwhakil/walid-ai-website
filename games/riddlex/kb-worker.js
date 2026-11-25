@@ -1,4 +1,4 @@
-import { decodeShard } from "./kb.js?v=riddlex-72";
+import { decodeShard } from "./kb.js?v=riddlex-73";
 
 self.onmessage = (event) => {
   const { id, buffer, questions } = event.data;

@@ -54,7 +54,43 @@ try {
   }));
   await assertSucceeds(getDoc(doc(anon, "riddlex_entries", slug)));
   await assertFails(setDoc(doc(player, "other_collection", "not-authorized"), { value: "not allowed" }));
-  console.log("FIRESTORE_SECURITY_RULES_PASS: pending moderation, owner approval and unrelated collection protection");
+  // New independent suggestions: original path is immutable even for the
+  // reviewing owner. The accepted, edited facts are a separate record.
+  const proposalId="ci-path-001";
+  const proposalSlot=doc(player,"riddlex_slots","riddlex-ci-player~"+hour+"~1");
+  await assertSucceeds(setDoc(proposalSlot,{slug:proposalId}));
+  const playerProposal=doc(player,"riddlex_suggestions",proposalId);
+  const ownerProposal=doc(owner,"riddlex_suggestions",proposalId);
+  const rawPath=Array.from({length:50},(_,i)=>({q:"question_"+i,a:i%2?"yes":"probably_not"}));
+  const proposal={nameEn:"Test Person",nameBn:"",adult:false,category:"character",
+    answers:rawPath,knownIds:["Q123"],status:"pending",createdBy:"riddlex-ci-player",
+    slot:1,createdAt:serverTimestamp()};
+  await assertFails(setDoc(playerProposal,{...proposal,status:"approved"}));
+  await assertSucceeds(setDoc(playerProposal,proposal));
+  await assertSucceeds(getDoc(playerProposal));
+  await assertFails(getDoc(doc(anon,"riddlex_suggestions",proposalId)));
+  await assertFails(getDoc(doc(env.authenticatedContext("other-user").firestore(),"riddlex_suggestions",proposalId)));
+  await assertFails(updateDoc(playerProposal,{answers:[{q:"real",a:"no"}]}));
+  await assertFails(updateDoc(ownerProposal,{answers:[{q:"real",a:"yes"}],reviewedAt:serverTimestamp()}));
+  const reviewed={nameEn:"Test Person",nameBn:"",category:"real",adult:false,
+    answers:[{q:"real",a:"yes"},{q:"cricketer",a:"yes"}],image:"",credit:"",
+    mode:"patch",revision:1,updatedAt:serverTimestamp()};
+  const ownerRecord=doc(owner,"riddlex_owner_records","Q123");
+  await assertFails(setDoc(doc(player,"riddlex_owner_records","Q123"),reviewed));
+  await assertFails(setDoc(ownerRecord,{...reviewed,adult:true,image:"image"}));
+  await assertSucceeds(setDoc(ownerRecord,reviewed));
+  await assertSucceeds(getDoc(doc(anon,"riddlex_owner_records","Q123")));
+  await assertFails(updateDoc(doc(player,"riddlex_owner_records","Q123"),{answers:[],updatedAt:serverTimestamp()}));
+  await assertFails(updateDoc(playerProposal,{status:"approved",resolvedId:"Q123",reviewedAt:serverTimestamp()}));
+  await assertSucceeds(updateDoc(ownerProposal,{status:"approved",resolvedId:"Q123",reviewedAt:serverTimestamp()}));
+  const saved=await getDoc(ownerProposal);
+  if(JSON.stringify(saved.data().answers)!==JSON.stringify(rawPath))throw Error("Original path changed");
+  const history=doc(owner,"riddlex_owner_records","Q123","history","1");
+  await assertSucceeds(setDoc(history,{revision:1,answers:reviewed.answers}));
+  await assertFails(getDoc(doc(anon,"riddlex_owner_records","Q123","history","1")));
+  await assertFails(updateDoc(history,{revision:5}));
+  await assertFails(updateDoc(entry,{answers:[{q:"real",a:"no"}],confirmations:2,confirmers:["riddlex-ci-player","other-user"],updatedAt:serverTimestamp()}));
+  console.log("FIRESTORE_SECURITY_RULES_PASS: independent paths, owner-only approval and corrections, public reviewed facts, private revision history");
 } finally {
   await env.cleanup();
 }

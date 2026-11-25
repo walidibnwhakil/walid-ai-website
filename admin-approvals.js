@@ -102,7 +102,7 @@
   function clearLink(){link=null;show($("#riddlex-link-note"),false);$("#riddlex-link-note").replaceChildren()}
   function setLink(ctx){
     link=ctx;const note=$("#riddlex-link-note");note.replaceChildren(el("strong","Link correction to an existing record"),
-      el("p","Submitted: "+ctx.data.nameEn+". Search for the existing person or item, then use Link to suggestion. No record is changed until you approve."),
+      el("p","Submitted: "+ctx.data.nameEn+". Search for the existing person or item, then use Link to suggestion. Filters are suggested from the submitted path; clear them if the path is wrong. No record is changed until you approve."),
       btn("Return to suggestion",()=>{const old=link;clearLink();openEditor(old).catch(fail)}));
     show(note,true);
   }
@@ -227,6 +227,25 @@
     }
     return {id:db.collection("riddlex_owner_records").doc().id,nameEn:"",nameBn:"",category:"",adult:false,answers:[],image:"",credit:"",mode:"new"};
   }
+  function prepareDuplicateSearch(ctx,query){
+    const facts=answerMap(ctx.data);
+    setLink({type:ctx.type,id:ctx.id,data:ctx.data});
+    $("#riddlex-query").value=query;
+    const category=sharedRecordCategory(ctx.data,facts);
+    $("#riddlex-category").value=category;
+    $("#riddlex-gender").value=facts.get("male")==="yes"?"male":facts.get("female")==="yes"?"female":"";
+    $("#riddlex-life").value=facts.get("alive")==="yes"?"alive":facts.get("dead")==="yes"||facts.get("alive")==="no"?"dead":"";
+    const countries=[...facts].filter(([key,value])=>typeof key==="string"&&key.startsWith("from_")&&key.length===7&&value==="yes").map(([key])=>key);
+    $("#riddlex-country").value=countries.length===1?countries[0]:"";
+    $("#riddlex-occupation").value="";
+    switchView("catalog",{keepLink:true}).catch(fail);
+  }
+  function sharedRecordCategory(data,facts){
+    if(data.category==="animal"||data.category==="object")return data.category;
+    if(facts.get("real")==="yes")return "real";
+    if(facts.get("fictional")==="yes")return "fictional";
+    return "";
+  }
   async function openEditor(ctx){
     if(!authorized)return;
     const m=await modules();if(!authorized)return;
@@ -249,15 +268,11 @@
       }
       if(modern){
         panel.append(btn(ctx.linked?"Choose a different existing record":"Find duplicate / link existing record",()=>{
-          setLink({type:ctx.type,id:ctx.id,data:ctx.data});$("#riddlex-query").value=ctx.data.nameEn||"";
-          for(const id of ["category","gender","life","country","occupation"])$("#riddlex-"+id).value="";
-          switchView("catalog",{keepLink:true}).catch(fail);
+          prepareDuplicateSearch(ctx,ctx.data.nameEn||"");
         }));
         for(const id of (ctx.data.knownIds||[]).filter(x=>typeof x==="string").slice(0,10)){
           panel.append(btn("Find ID "+id,()=>{
-            setLink({type:ctx.type,id:ctx.id,data:ctx.data});$("#riddlex-query").value=id;
-            for(const id of ["category","gender","life","country","occupation"])$("#riddlex-"+id).value="";
-            switchView("catalog",{keepLink:true}).catch(fail);
+            prepareDuplicateSearch(ctx,id);
           }));
         }
         if(ctx.linked)panel.append(el("p","Editing existing ID "+draft.id+". Existing facts are retained unless you explicitly change them.","muted"));

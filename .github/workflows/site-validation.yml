@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate HTML, links, Games and Tools structure
         run: python3 scripts/validate_site.py
+      - name: Validate public SEO metadata and structured data
+        run: python3 tests/test_public_seo.py
       - name: Validate Others books, sidebar and distinctive icons
         run: python3 tests/test_others_readers.py
       - name: Verify editorial subtitles, historically scoped catalog icons and Bengali names

@@ -1188,11 +1188,9 @@ const EQUIVALENT_QUESTION_GROUPS = [
   ["film_aashram","profile_film_aashram"],
 ];
 function skippedAsDuplicate(state, id) {
-  // A real person necessarily has a name; this generic question is useful
-  // only to distinguish named fictional characters from unnamed ones.
-  if (id === "named" && (state.category !== "character" ||
-      said(state,"real",["yes","probably"]) ||
-      !said(state,"fictional",["yes","probably"]))) return true;
+  // Real/fictional and story-medium clues already classify the character.
+  // Keep the historical named bit for compatibility, never ask it aloud.
+  if (id === "named") return true;
   const equivalents = EQUIVALENT_QUESTION_GROUPS.find(group=>group.includes(id));
   if (equivalents && state.answers.some(row=>row.qid!==id &&
       equivalents.includes(row.qid) && row.value!=="unknown")) return true;
@@ -1552,7 +1550,7 @@ export function questionBlocked(state, qid) {
 function allowedInCategory(state, question) {
   // Most players cannot know someone else's birth decade. The birth facts
   // remain available internally for indexing, but must not be asked aloud.
-  if (question.group === "birth") return false;
+  if (question.id === "named" || question.group === "birth") return false;
   // A current-government answer requires regularly refreshed official data,
   // which this static knowledge snapshot does not provide.
   if (question.id === "in_government") return false;
@@ -1874,7 +1872,7 @@ function verifiedIdentityCandidate(state) {
     // Fantasy, comedy and folklore characters have no passport. Multiple
     // independent, affirmative story-work facts plus the story medium
     // are legitimate proof, without assuming one unique famous character.
-    const storyProof = known.has("fictional") && known.has("named") &&
+    const storyProof = known.has("fictional") &&
       ["from_film","from_cartoon","from_novel","fiction_tv_fantasy"]
         .some(qid=>known.has(qid)) &&
       domain.filter(row=>BROAD_QUESTIONS.some(q=>
@@ -1888,7 +1886,7 @@ function verifiedIdentityCandidate(state) {
         !professionProof) continue;
     if (functionProof?.length && relevant.length < 2) continue;
     if (species?.length && relevant.length < 3) continue;
-    if (fictionProof && (!known.has("named") || relevant.length < 2)) continue;
+    if (fictionProof && relevant.length < 2) continue;
     // All category-specific YES answers on the proposed identity must be
     // source-backed, not contradicted; UNKNOWN answers are neutral.
     const contradiction = answers.some(row => {

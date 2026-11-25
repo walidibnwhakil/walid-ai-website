@@ -213,7 +213,7 @@ test("real public people never receive the ambiguous own-name question", () => {
   const state = startActor();
   assert.equal(questionBlocked(state, "named"), true);
 });
-test("a named-story question is still available for fictional characters", () => {
+test("fictional characters do not receive the redundant own-name question either", () => {
   const fictionPool=poolFromEntries(base, [
     {id:"named-hero",en:"Named hero",yes:["fictional","named"],no:["real"]},
     {id:"unnamed-hero",en:"Unnamed hero",yes:["fictional"],no:["real","named"]},
@@ -221,7 +221,7 @@ test("a named-story question is still available for fictional characters", () =>
   const state=createState(fictionPool,{category:"character"});
   answer(state,"real","no");
   answer(state,"fictional","yes");
-  assert.equal(questionBlocked(state,"named"),false);
+  assert.equal(questionBlocked(state,"named"),true);
 });
 test("the same Aashram question is not repeated with another question ID", () => {
   const questions2=[...questions,{id:"profile_film_aashram",group:"job",parent:"actor"}];

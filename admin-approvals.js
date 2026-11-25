@@ -292,11 +292,95 @@
         actions.append(btn("Reject Submission",()=>legacyDecision(ctx,"rejected")));panel.append(actions);
       }
     }
+    const facts=new Map(draft.answers.map(r=>[r.q,r.a]));
     const top=el("div",undefined,"riddlex-editor-top"),en=field(draft.nameEn),bn=field(draft.nameBn),cat=el("select");
     cat.append(new Option("Choose verified category",""));for(const [key,title] of Object.entries(categories))cat.append(new Option(title,key));cat.value=draft.category||"";
     top.append(labelInput("English name",en),labelInput("বাংলা নাম",bn),labelInput("Category",cat));
     const adult=el("input");adult.type="checkbox";adult.checked=draft.adult;adult.style.width="auto";
     const adultLabel=el("label");adultLabel.append(adult,el("span","Restricted image / name-only record"));top.append(adultLabel);panel.append(el("h3","Reviewed identity"),top);
+    // Quick fields share the very same fact map as the full question editor.
+    // Unselected countries and occupations are not automatically marked No.
+    const quick=el("div",undefined,"riddlex-identity-fields");
+    const basics=el("div",undefined,"riddlex-editor-top");
+    const gender=el("select"),life=el("select");
+    gender.id="riddlex-identity-gender";life.id="riddlex-identity-life";
+    for(const [v,t] of [["","Not established"],["male","Male"],["female","Female"],["conflict","Conflicting answers — review"]])gender.append(new Option(t,v));
+    for(const [v,t] of [["","Not established"],["alive","Alive"],["dead","Deceased"],["conflict","Conflicting answers — review"]])life.append(new Option(t,v));
+    gender.options[3].disabled=true;life.options[3].disabled=true;
+    basics.append(labelInput("Gender",gender),labelInput("Life Status",life));
+    quick.append(basics);
+    function pairValue(yes,no){
+      const a=facts.get(yes),b=facts.get(no);
+      if(a==="yes"&&b==="yes")return "conflict";
+      if(a==="yes")return yes;if(b==="yes")return no;
+      return "";
+    }
+    function changePair(select,first,second){
+      if(select.value==="conflict")return;
+      facts.set(first,select.value?select.value===first?"yes":"no":"unknown");
+      facts.set(second,select.value?select.value===second?"yes":"no":"unknown");
+      renderFacts();
+    }
+    gender.onchange=()=>changePair(gender,"male","female");
+    life.onchange=()=>changePair(life,"alive","dead");
+    const definitions=source.manifest.questions.filter(q=>q.id!=="named");
+    const countryDefs=definitions.filter(q=>q.group==="country"&&/^from_[a-z]{2}$/.test(q.id));
+    const occupationIds=new Set([...m.cat.JOBS,"adult_ent","all_rounder"]);
+    const jobDefs=definitions.filter(q=>occupationIds.has(q.id));
+    const worksDefs=definitions.filter(q=>!occupationIds.has(q.id)&&
+      ["job","politics","person","fiction","adult"].includes(q.group)&&!["male","female","named"].includes(q.id));
+    function optionEditor(title,id,defs,format,searchable=false){
+      const section=el("section",undefined,"riddlex-quick-section");
+      section.append(el("h4",title));
+      const rows=el("div",undefined,"riddlex-quick-records");
+      const add=el("div",undefined,"toolbar"),pick=el("select"),value=el("select");
+      pick.id=id;pick.setAttribute("aria-label",title);
+      value.setAttribute("aria-label",title+" answer");
+      for(const [v,t] of Object.entries(labels))value.append(new Option(t,v));
+      value.value="yes";
+      let search=null;
+      function options(){
+        const previous=pick.value,needle=m.records.normalizeRecordName(search?.value||"");
+        pick.replaceChildren(new Option("Select "+title.toLowerCase(),""));
+        for(const q of defs){
+          const text=format(q);
+          if(needle&&!m.records.normalizeRecordName(text+" "+q.bn+" "+q.id).includes(needle))continue;
+          pick.append(new Option(text,q.id));
+        }
+        if([...pick.options].some(o=>o.value===previous))pick.value=previous;
+      }
+      if(searchable){search=field("","Search films, awards, records, achievements…");search.type="search";search.setAttribute("aria-label","Search notable works");search.oninput=options;section.append(search);}
+      options();
+      add.append(pick,value,btn("Set Answer",()=>{
+        if(!pick.value)return;
+        facts.set(pick.value,value.value);renderFacts();
+      }));
+      section.append(rows,add);quick.append(section);
+      return ()=>{
+        rows.replaceChildren();
+        const saved=defs.filter(q=>["yes","probably"].includes(facts.get(q.id)));
+        for(const q of saved){
+          const row=el("div",undefined,"riddlex-quick-row");
+          const label=el("span",format(q));const select=el("select");
+          select.setAttribute("aria-label",format(q)+" — current answer");
+          for(const [v,t] of Object.entries(labels))select.append(new Option(t,v));
+          select.value=facts.get(q.id);
+          select.onchange=()=>{facts.set(q.id,select.value);renderFacts();};
+          row.append(label,select);rows.append(row);
+        }
+        if(!saved.length)rows.append(el("p","No positive facts recorded.","muted"));
+      };
+    }
+    const showCountries=optionEditor("Country / Nationality","riddlex-identity-country",countryDefs,q=>countryName(q.id));
+    const showJobs=optionEditor("Professions","riddlex-identity-profession",jobDefs,q=>jobNames[q.id]||q.en);
+    const showWorks=optionEditor("Notable Works & Achievements","riddlex-identity-works",worksDefs,q=>q.en||q.id,true);
+    function syncQuick(){
+      show(quick,cat.value==="real"||cat.value==="fictional");
+      gender.value=pairValue("male","female");life.value=pairValue("alive","dead");
+      showCountries();showJobs();showWorks();
+    }
+    cat.onchange=()=>syncQuick();
+    panel.append(quick);
     const preview=el("div");preview.append(photo(draft.image,draft.adult,"riddlex-editor-photo"));const credit=field(draft.credit);credit.maxLength=2000;
     const file=el("input");file.type="file";file.accept="image/jpeg,image/png,image/webp";file.disabled=adult.checked;
     file.onchange=async()=>{try{if(!file.files?.[0])return;draft.image=await compress(file.files[0]);if(adult.checked){draft.image="";return}preview.replaceChildren(photo(draft.image,false,"riddlex-editor-photo"));message(canPublish?"Replacement image ready. Save Changes to publish.":"Image preview ready. Publishing is currently unavailable.")}catch(e){fail(e)}};
@@ -304,23 +388,24 @@
     const photoActions=el("div",undefined,"toolbar");photoActions.append(file,btn("Remove photo",()=>{draft.image="";credit.value="";preview.replaceChildren(photo("",adult.checked))}));
     if(ctx.linked&&ctx.data.image&&!ctx.data.adult)photoActions.append(btn("Use submitted photo",()=>{if(adult.checked)return;draft.image=ctx.data.image;credit.value="Player submission";preview.replaceChildren(photo(draft.image,false,"riddlex-editor-photo"))}));
     panel.append(preview,photoActions,labelInput("Image credit / source",credit));
-    const facts=new Map(draft.answers.map(r=>[r.q,r.a]));
     const tools=el("div",undefined,"toolbar"),filter=field("","Search questions / facts");filter.type="search";
     const showAll=el("input");showAll.type="checkbox";showAll.style.width="auto";
     const allLabel=el("label");allLabel.append(showAll,el("span"," Show all available questions"));
     tools.append(filter,allLabel);
     const factsBox=el("div",undefined,"riddlex-facts");
     function renderFacts(){
+      syncQuick();
       const needle=m.records.normalizeRecordName(filter.value);
       factsBox.replaceChildren();
       for(const q of source.manifest.questions){
+        if(q.id==="named")continue;
         if(needle&&!m.records.normalizeRecordName(q.en+" "+q.bn+" "+q.id).includes(needle))continue;
         if(!needle&&!showAll.checked&&!facts.has(q.id))continue;
         const row=el("div",undefined,"riddlex-fact"),text=el("div");text.append(el("span",q.en||q.id),el("small",q.bn||q.id));
         const select=el("select");select.setAttribute("aria-label",q.en||q.id);
         select.append(new Option("Not recorded",""));for(const [value,label] of Object.entries(labels))select.append(new Option(label,value));
         select.value=facts.get(q.id)||"";
-        select.onchange=()=>{if(select.value)facts.set(q.id,select.value);else facts.delete(q.id)};
+        select.onchange=()=>{if(select.value)facts.set(q.id,select.value);else facts.set(q.id,"unknown");syncQuick()};
         row.append(text,select);factsBox.append(row);
       }
       if(!factsBox.childElementCount)factsBox.append(el("p","Search for a question or enable Show all to add facts.","muted"));

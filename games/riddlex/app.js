@@ -424,10 +424,19 @@ async function beginGuess(index) {
 
 async function onAnswer(value) {
   if (mode !== "ask" || !currentQ) return;
+  const question = currentQ;
+  const round = state;
+  const session = loadToken;
+  currentQ = null;
+  mode = "thinking";
   scene.react(value);
   scene.setMood("thinking");
-  applyAnswer(state, currentQ, value);
-  currentQ = null;
+  // Return control to the browser after the click before doing the
+  // potentially expensive casebook scoring. Lock this question first so
+  // a second click or keyboard press cannot count a different answer.
+  await new Promise(resolve => setTimeout(resolve, 0));
+  if (session !== loadToken || round !== state || mode !== "thinking") return;
+  applyAnswer(round, question, value);
   await step();
 }
 
@@ -539,7 +548,7 @@ function onPlayAgain() {
 }
 
 function onUndo() {
-  if (!state?.answers.length) return;
+  if (mode === "thinking" || !state?.answers.length) return;
   if (["guess","reveal","wrong","learn"].includes(mode)) {
     scene.clearReveal();
     guessIndex = -1;

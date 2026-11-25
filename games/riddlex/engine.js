@@ -156,6 +156,7 @@ export function factBit(pool, index, qi) {
   const id = pool.questions[qi]?.id;
   const override=pool._ownerFacts?.get(pool.ids[index]);
   if(override?.has(id))return override.get(id);
+  if(pool.questions[qi]?.ownerQuestion)return 0; // no fact recorded means unknown
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
   if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;
@@ -862,6 +863,12 @@ export function adultAllowed(state) {
 function gated(state, question, rows) {
   const id = question.id;
   const group = question.group;
+  if(question.ownerQuestion){
+    if(state.answers.length<5 || state.answers.filter(a=>a.qid.startsWith("ownerq_")).length>=3)return false;
+    if(state.category==="character"&&!said(state,question.category,["yes","probably"]))return false;
+    if(state.category!=="character"&&state.category!==question.category)return false;
+    return true;
+  }
   if (LATE.has(id) && state.answers.length < 6 && id !== "adult_ent") {
     // Still allowed once the matching topic is likely; the mass checks below do that.
   }
@@ -3112,7 +3119,7 @@ function crossCareerIdentityQuestion(state) {
   return null;
 }
 
-export function decide(state) {
+function decideBase(state) {
   recompute(state);
   const personalRole=confirmedPersonalRole(state);
   if (personalRole >= 0) return { type:"guess", index:personalRole };
@@ -3475,4 +3482,20 @@ export function entityView(pool, index) {
 export function displayName(entity, lang) {
   if (lang === "bn" && entity.bn) return entity.bn;
   return entity.en || entity.bn || "";
+}
+
+export function decide(state) {
+  const decision=decideBase(state);
+  if(!["guess","defeat"].includes(decision.type)||state.answers.length<5)return decision;
+  const custom=state.pool.questions.filter(q=>q.ownerQuestion);
+  if(!custom.length||state.answers.filter(a=>a.qid.startsWith("ownerq_")).length>=3)return decision;
+  const leader=decision.type==="guess"?decision.index:topTwo(state).best;
+  if(leader==null||leader<0||!eligibleForIdentityQuestion(state,leader))return decision;
+  const rows=state.alive.length>1200?sampleAlive(state,1200):state.alive;
+  for(const q of custom){
+    if(state.answers.some(a=>a.qid===q.id)||!allowedInCategory(state,q)||!gated(state,q,rows)||questionBlocked(state,q.id))continue;
+    if(factBit(state.pool,leader,state.pool.qIndex.get(q.id))!==2)continue;
+    return {type:"ask",qid:q.id};
+  }
+  return decision;
 }

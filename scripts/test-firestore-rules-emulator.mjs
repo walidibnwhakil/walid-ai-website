@@ -79,6 +79,14 @@ try {
   await assertFails(setDoc(doc(player,"riddlex_owner_records","Q123"),reviewed));
   await assertFails(setDoc(ownerRecord,{...reviewed,adult:true,image:"image"}));
   await assertSucceeds(setDoc(ownerRecord,reviewed));
+  const clue={id:"ownerq_0123456789abcdef0123456789abcdef",en:"Did they win a special award?",bn:"তিনি কি বিশেষ পুরস্কার পেয়েছেন?",category:"real"};
+  const custom={...reviewed,customQuestions:[clue],answers:[...reviewed.answers,{q:clue.id,a:"yes"}]};
+  await assertFails(setDoc(doc(player,"riddlex_owner_records","Q123"),custom));
+  await assertFails(setDoc(ownerRecord,{...custom,customQuestions:Array.from({length:25},()=>clue)}));
+  await assertFails(setDoc(ownerRecord,{...custom,customQuestions:"not a list"}));
+  await assertSucceeds(setDoc(ownerRecord,custom));
+  const published=await getDoc(doc(anon,"riddlex_owner_records","Q123"));
+  if(published.data().customQuestions[0].id!==clue.id)throw Error("Owner question was not saved");
   await assertSucceeds(getDoc(doc(anon,"riddlex_owner_records","Q123")));
   await assertFails(updateDoc(doc(player,"riddlex_owner_records","Q123"),{answers:[],updatedAt:serverTimestamp()}));
   await assertFails(updateDoc(playerProposal,{status:"approved",resolvedId:"Q123",reviewedAt:serverTimestamp()}));

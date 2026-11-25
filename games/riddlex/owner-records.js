@@ -43,7 +43,7 @@ export const OWNER_QUESTION_GROUPS = Object.freeze({real:"job",fictional:"fictio
 export function validOwnerQuestion(q) {
   return q && typeof q.id==="string" && /^ownerq_[a-f0-9]{32}$/.test(q.id) &&
     Object.hasOwn(OWNER_QUESTION_GROUPS,q.category) &&
-    [q.en,q.bn].every(t=>typeof t==="string"&&t.trim().length>=5&&t.length<=200&&!/[<>\\u0000-\\u001f]/.test(t));
+    [q.en,q.bn].every(t=>typeof t==="string"&&t.trim().length>=5&&t.length<=200&&!/[<>\u0000-\u001f]/.test(t));
 }
 export function mergeOwnerQuestions(base,records) {
   const result=base.slice(),ids=new Set(result.map(q=>q.id));

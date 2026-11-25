@@ -76,7 +76,7 @@ try{
   await page.goto(origin+"/admin/",{waitUntil:"domcontentloaded"});
   await page.evaluate(()=>{document.body.classList.remove("admin-locked");document.getElementById("workspace-shell").classList.remove("hidden");document.getElementById("riddlex-workspace").classList.remove("hidden");window.WalidAdminApprovals.activate()});
   const first=page.locator(".riddlex-item").filter({hasText:"New Cricket Test"});
-  await first.getByRole("button",{name:"Review path"}).click({timeout:60000});
+  await first.getByRole("button",{name:"Review Submission"}).click({timeout:60000});
   const panel=page.locator("#riddlex-editor");
   await panel.getByText("Original play path — 45 answers").waitFor();
   assert.equal(await panel.locator(".riddlex-path tbody tr").count(),45);
@@ -84,17 +84,17 @@ try{
   assert.ok(await panel.locator("img").count()>0);
   const cricket=panel.locator(".riddlex-fact").filter({hasText:"Do they play cricket?"});
   await cricket.locator("select").selectOption("no");
-  await panel.getByText("I checked for existing records",{exact:false}).click();
-  await panel.getByRole("button",{name:"Accept / publish reviewed facts"}).click();
+  await panel.getByText("I verified that this identity",{exact:false}).click();
+  await panel.getByRole("button",{name:"Accept as New Record"}).click();
   await page.waitForFunction(()=>window.__reviewStore()["riddlex_owner_records/owner-one"]?.answers.some(x=>x.q==="cricketer"&&x.a==="no"));
   const data=await page.evaluate(()=>window.__reviewStore());
   assert.equal(data["riddlex_suggestions/one"].answers.length,45);
   assert.equal(data["riddlex_suggestions/one"].answers.find(x=>x.q==="cricketer").a,"yes");
   assert.equal(data["riddlex_suggestions/one"].status,"approved");
-  await page.locator(".riddlex-item").filter({hasText:"Rejected Test"}).getByRole("button",{name:"Review path"}).click();
-  await panel.getByRole("button",{name:"Reject suggestion"}).click();
+  await page.locator(".riddlex-item").filter({hasText:"Rejected Test"}).getByRole("button",{name:"Review Submission"}).click();
+  await panel.getByRole("button",{name:"Reject Submission"}).click();
   await page.waitForFunction(()=>window.__reviewStore()["riddlex_suggestions/two"].status==="rejected");
-  await page.locator(".riddlex-item").filter({hasText:"Amin Khan"}).getByRole("button",{name:"Review path"}).click();
+  await page.locator(".riddlex-item").filter({hasText:"Amin Khan"}).getByRole("button",{name:"Review Submission"}).click();
   await panel.getByRole("button",{name:"Find ID Q21066842"}).click();
   const candidate=page.locator(".riddlex-item").filter({hasText:"Q21066842"});
   for(let batch=0;batch<12;batch++){
@@ -105,9 +105,9 @@ try{
     await next.click();await page.waitForTimeout(200);
   }
   console.log("CATALOG_SEARCH_STATE",await page.locator("#riddlex-status").innerText(),await page.locator("#riddlex-page-info").innerText());
-  await candidate.getByRole("button",{name:"Link to suggestion"}).click({timeout:30000});
-  await panel.getByText("Editing existing ID Q21066842",{exact:false}).waitFor();
-  await panel.getByRole("button",{name:"Accept / publish reviewed facts"}).click();
+  await candidate.getByRole("button",{name:"Select Existing Record"}).click({timeout:30000});
+  await panel.getByText("Matched record: Q21066842",{exact:false}).waitFor();
+  await panel.getByRole("button",{name:"Accept as Update"}).click();
   await page.waitForFunction(()=>window.__reviewStore()["riddlex_suggestions/three"].resolvedId==="Q21066842");
   const final=await page.evaluate(()=>window.__reviewStore());
   assert.equal(final["riddlex_owner_records/Q21066842"].mode,"patch");

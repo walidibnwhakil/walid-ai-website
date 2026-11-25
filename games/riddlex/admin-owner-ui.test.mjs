@@ -97,7 +97,15 @@ try{
   await page.locator(".riddlex-item").filter({hasText:"Amin Khan"}).getByRole("button",{name:"Review path"}).click();
   await panel.getByRole("button",{name:"Find ID Q21066842"}).click();
   const candidate=page.locator(".riddlex-item").filter({hasText:"Q21066842"});
-  await candidate.getByRole("button",{name:"Link to suggestion"}).click({timeout:90000});
+  for(let batch=0;batch<12;batch++){
+    await page.waitForFunction(()=>document.querySelector("#riddlex-next").disabled===false || document.querySelector("#riddlex-page-info").textContent.includes("records scanned"),null,{timeout:60000});
+    if(await candidate.count())break;
+    const next=page.locator("#riddlex-next");
+    if(await next.isDisabled())break;
+    await next.click();await page.waitForTimeout(200);
+  }
+  console.log("CATALOG_SEARCH_STATE",await page.locator("#riddlex-status").innerText(),await page.locator("#riddlex-page-info").innerText());
+  await candidate.getByRole("button",{name:"Link to suggestion"}).click({timeout:30000});
   await panel.getByText("Editing existing ID Q21066842",{exact:false}).waitFor();
   await panel.getByRole("button",{name:"Accept / publish reviewed facts"}).click();
   await page.waitForFunction(()=>window.__reviewStore()["riddlex_suggestions/three"].resolvedId==="Q21066842");

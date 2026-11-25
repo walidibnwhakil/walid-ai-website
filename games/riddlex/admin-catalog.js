@@ -98,7 +98,7 @@ export class CatalogBrowser{
   async next(signal,onProgress=()=>{}){
     const rows=[];let fetched=0,bytes=0;
     while(rows.length<24){
-      if(signal?.aborted)throw new DOMException("Search stopped","AbortError");
+      if(signal?.aborted)break;
       if(!this.pool || this.position>=this.pool.count){
         this.pool=null;this.position=0;
         if(this.fileIndex>=this.files.length){this.finished=true;break}
@@ -106,9 +106,11 @@ export class CatalogBrowser{
         if(fetched>=10||bytes>=8*1024*1024)break;
         const file=this.files[this.fileIndex];
         onProgress(this.fileIndex+1,this.files.length);
-        const response=await fetch(ROOT+"/"+file,{signal});
+        let response;
+        try{response=await fetch(ROOT+"/"+file,{signal});}catch(error){if(error?.name==="AbortError")break;throw error;}
         if(!response.ok)throw Error("Could not read "+file+" (HTTP "+response.status+")");
-        const buffer=await response.arrayBuffer();
+        let buffer;
+        try{buffer=await response.arrayBuffer();}catch(error){if(error?.name==="AbortError")break;throw error;}
         this.pool=attachManifest(decodeShard(buffer,this.source.manifest.questions),this.source.manifest);
         this.fileIndex++;fetched++;bytes+=buffer.byteLength;
         this.currentFile=file;

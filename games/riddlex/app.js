@@ -1,5 +1,5 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
-import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-73";
+import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-74";
 import { UI, guessFont } from "./i18n.js?v=riddlex-40";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-73";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
@@ -11,7 +11,8 @@ import { EVERYDAY_OBJECTS } from "./everyday-facts.js?v=riddlex-71";
 import { RECOGNITION_PEOPLE, RECOGNITION_ANIMALS } from "./recognition-facts.js?v=riddlex-71";
 import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
-import { answersImplyAdult, loadLearned, nameInPool, nameMatchesAdult, submitLearning } from "./learn.js?v=akinator-35";
+import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-74";
+import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-74";
 import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
 
 const $ = (id) => document.getElementById(id);
@@ -36,6 +37,8 @@ let loading = null;
 let loadedNames = [];
 let loadChain = Promise.resolve();
 let menuCatController = null;
+let ownerRecords = [];
+let ownerPending = null;
 
 function text() { return UI[lang] || UI.en; }
 
@@ -93,7 +96,7 @@ function showMenu() {
 }
 
 function gameInProgress() {
-  return mode === "ask" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
+  return mode === "ask" || mode === "thinking" || mode === "reveal" || mode === "guess" || mode === "wrong" || mode === "retry" || mode === "learn" || mode === "solved";
 }
 
 const LOAD_MS = 57000;
@@ -102,7 +105,7 @@ function loadEvent(event, detail = "") {
   if (!debugLoad) return;
   (window.__riddlexLoadTrace ||= []).push([Date.now(), event, String(detail)]);
 }
-const BUILD = "riddlex-73";
+const BUILD = "riddlex-74";
 document.documentElement.dataset.riddlexBuild = BUILD;
 
 function withTimeout(promise, ms) {
@@ -155,7 +158,7 @@ async function boot() {
 let loadToken = 0;
 let bootGeneration = 0;
 function adoptPool(next) {
-  pool = next;
+  pool = applyOwnerRecords(next, ownerRecords, appendShard, poolFromEntries);
   if (!state || state.category !== category || !pool) return;
   state.pool = pool;
   if (state.weights.length !== pool.count) state.weights = new Float64Array(pool.count);
@@ -291,8 +294,8 @@ async function loadNamed(entries, token, begin) {
     mode = "ask";
     step();
     loadEvent("step.called", currentQ);
-    const learnLater = () => loadLearned(manifest.questions).then((rows) => {
-      if (!rows.length || token !== loadToken || !pool) return;
+    const learnLater = () => loadLearned(manifest.questions, category).then((rows) => {
+      if (!rows.length || token !== loadToken || !pool || !["ask","thinking"].includes(mode)) return;
       adoptPool(mergePools([pool, poolFromEntries(manifest.questions, rows)]));
     }).catch(() => {});
     if (typeof requestIdleCallback === "function") requestIdleCallback(() => learnLater());
@@ -321,6 +324,13 @@ async function startGame(chosen) {
   state = null;
   currentQ = null;
   loadChain = Promise.resolve();
+  ownerRecords = [];
+  ownerPending = loadOwnerRecords().then(records=>{
+    if(token!==loadToken || !["pick","ask","thinking"].includes(mode))return false;
+    ownerRecords=records;
+    if(pool&&records.length)adoptPool(pool);
+    return records.length>0;
+  }).catch(()=>false);
   hideLoadRetry();
   setStatus(text().loading);
   try { await withTimeout(loading, LOAD_MS); }
@@ -362,6 +372,12 @@ async function step() {
     ? queueShards(catalog ? planShardLoads(catalog, state.answers, loadedNames) : fallback, loadToken)
     : null;
   let decision = decide(state);
+  if ((decision.type==="guess"||decision.type==="defeat") && ownerPending) {
+    const outstanding=ownerPending;ownerPending=null;
+    const changed=await withTimeout(outstanding,4000).catch(()=>false);
+    if(loadToken!==session||state!==playingState)return;
+    if(changed)decision=decide(state);
+  }
   // A new clue can activate country/occupation shards that are not yet in
   // memory. Neither a name guess NOR a defeat is final until those relevant
   // knowledge shards have loaded. Otherwise the game gives up immediately
@@ -520,7 +536,8 @@ async function onLearnSubmit(event) {
       file,
       adult,
       answers: state?.answers || [],
-      alreadyKnown: nameInPool(pool, name),
+      category,
+      knownIds: exactRecordIds(pool,name),
     });
     if (session !== loadToken || mode !== "learn") return;
     showLearnMessage(text().saved);

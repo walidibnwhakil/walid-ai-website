@@ -62,6 +62,8 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 @media(max-width:1080px){.ops-desk-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:800px){main{padding:15px 13px 45px}.admin-shell{grid-template-columns:1fr;gap:18px}.admin-sidebar{position:static;padding:12px 14px}.admin-sidebar .site-logo-link{display:none}.admin-sidebar .side-heading{margin:0 0 10px}.admin-sidebar nav{grid-template-columns:repeat(3,1fr)}.admin-sidebar button{text-align:center;padding:9px 5px}.ops-grid{grid-template-columns:1fr}}
 @media(max-width:540px){.panel{padding:14px}.ops-desk-grid{grid-template-columns:repeat(2,1fr)}.ops-desk{min-height:110px}.admin-header h1{font-size:1.5rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.big{font-size:1.25rem}}
+.riddlex-tabs{margin:12px 0}.riddlex-tabs button[aria-pressed="true"]{background:#163f2a;color:#fff;outline:2px solid #86ab93}.riddlex-tabs button[aria-pressed="false"]{background:#fff;color:#244734}.riddlex-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}.riddlex-filters label{display:grid;gap:5px}.riddlex-filters input,.riddlex-filters select{width:100%;min-width:0}.riddlex-path{max-height:340px;overflow:auto;border:1px solid #e1eae3;border-radius:10px;margin:12px 0}.riddlex-path td{vertical-align:top;overflow-wrap:anywhere}.riddlex-path td:first-child{min-width:0;width:2.2em}.riddlex-facts{max-height:420px;overflow:auto;border:1px solid #d8e4da;border-radius:10px;padding:8px}.riddlex-fact{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #e8eee8}.riddlex-fact small{display:block;color:#61786a}.riddlex-item .toolbar{margin-top:10px}.riddlex-thumb{width:95px;height:95px;object-fit:contain}.riddlex-record-meta{overflow-wrap:anywhere}.riddlex-editor-top{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.riddlex-editor-top label{display:grid;gap:4px}.riddlex-editor-top input,.riddlex-editor-top select{width:100%}.riddlex-editor-photo{max-width:180px;max-height:180px;object-fit:contain}#riddlex-pagination{margin:16px 0}.riddlex-item button:disabled,.riddlex-tabs button:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:520px){.riddlex-fact{grid-template-columns:1fr 110px}.riddlex-grid{grid-template-columns:1fr}}
 </style>
 <link rel="stylesheet" href="/admin-shell.css?v=20261122-no-shift-sidebar">
 <link rel="stylesheet" href="/manager-office-chat.css?v=20261122-staff-threads">
@@ -87,7 +89,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
     <nav aria-label="Admin sections">
       <button type="button" data-admin-tab="dashboard" aria-current="page">Analytics</button>
       <button type="button" data-admin-tab="staff">AI Staff &amp; Manager</button>
-      <button type="button" data-admin-tab="riddlex">Riddlex Approvals</button>
+      <button type="button" data-admin-tab="riddlex">Riddlex Database</button>
     </nav>
   </div>
 </aside>
@@ -180,11 +182,43 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
       </div>
     </div>
   </section>
-  <section id="riddlex-workspace" class="hidden" aria-label="Riddlex name approvals">
-    <div class="panel"><h2>Riddlex Approvals</h2><p class="muted">Review community submissions in this same portal. Firebase enforces the owner account permissions.</p>
-      <div class="toolbar"><button id="riddlex-google" type="button">Sign in with Google</button><button id="riddlex-reload" type="button" class="secondary-button">Refresh pending</button></div>
-      <p id="riddlex-status" class="status" role="status">Open this section after signing in as admin.</p></div>
+  <section id="riddlex-workspace" class="hidden" aria-label="Riddlex database manager">
+    <div class="panel">
+      <h2>Riddlex Database Manager</h2>
+      <p class="muted">Review the original play path, check existing records, and publish verified corrections.</p>
+      <div class="toolbar"><button id="riddlex-google" type="button">Sign in with Google</button><button id="riddlex-reload" type="button" class="secondary-button">Refresh</button></div>
+      <p id="riddlex-status" class="status" role="status">Sign in with the authorized Firebase owner account.</p>
+      <div id="riddlex-tools" class="hidden">
+        <nav class="toolbar riddlex-tabs" aria-label="Database sections">
+          <button type="button" data-riddlex-view="suggestions" aria-pressed="true">Suggestions</button>
+          <button type="button" data-riddlex-view="legacy">Older submissions</button>
+          <button type="button" data-riddlex-view="catalog">All database records</button>
+          <button type="button" data-riddlex-view="reviewed">Owner-reviewed records</button>
+          <button id="riddlex-add" type="button" class="secondary-button">Add record</button>
+        </nav>
+        <div id="riddlex-review-filters" class="toolbar">
+          <label for="riddlex-review-status">Status</label>
+          <select id="riddlex-review-status"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All statuses</option></select>
+        </div>
+        <form id="riddlex-search" class="riddlex-filters hidden">
+          <label>Name or ID<input id="riddlex-query" type="search" placeholder="English, বাংলা, alias or ID"></label>
+          <label>Category<select id="riddlex-category"><option value="">All categories</option><option value="real">Real person</option><option value="fictional">Fictional character</option><option value="animal">Animal</option><option value="object">Object</option></select></label>
+          <label>Gender<select id="riddlex-gender"><option value="">Any</option><option value="male">Male</option><option value="female">Female</option><option value="unknown">Unknown</option></select></label>
+          <label>Life status<select id="riddlex-life"><option value="">Any</option><option value="alive">Alive</option><option value="dead">Deceased</option><option value="unknown">Unknown</option></select></label>
+          <label>Country<select id="riddlex-country"><option value="">Any country</option></select></label>
+          <label>Occupation<select id="riddlex-occupation"><option value="">Any occupation</option></select></label>
+          <div class="toolbar"><button type="submit">Search / browse</button><button id="riddlex-stop" type="button" class="secondary-button">Stop search</button></div>
+        </form>
+      </div>
+    </div>
+    <div id="riddlex-link-note" class="panel hidden" role="status"></div>
+    <div id="riddlex-editor" class="panel hidden" aria-label="Edit or review record"></div>
     <div id="riddlex-pending" class="riddlex-grid"></div>
+    <div id="riddlex-pagination" class="toolbar hidden" aria-label="Record pagination">
+      <button id="riddlex-prev" type="button" class="secondary-button">Previous</button>
+      <span id="riddlex-page-info" class="muted"></span>
+      <button id="riddlex-next" type="button" class="secondary-button">Next</button>
+    </div>
   </section>
 </div></div></main>
 <script src="/backend-config.js"></script>
@@ -192,6 +226,6 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 <script src="/admin-section-metrics.js?v=20261122-context-columns"></script>
 <script src="/admin-usage.js?v=20261122-audience-clean"></script>
 <script src="/admin-ops.js?v=20261122-six-hour-manager-office"></script>
-<script src="/admin-approvals.js?v=20261122-ops"></script>
+<script src="/admin-approvals.js?v=20261125-database"></script>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </body></html>

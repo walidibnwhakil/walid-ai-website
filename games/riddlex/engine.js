@@ -86,7 +86,8 @@ function regionBit(pool, index, members) {
     // The same source-backed profile override used by factBit must apply
     // to continental regions. Otherwise an incorrect country bit in the
     // archived shard can contradict a verified birthplace or nationality.
-    const verified=BROAD_PROFILE_FACTS[member]?.[pool.ids[index]] ??
+    const verified=pool._ownerFacts?.get(pool.ids[index])?.get(member) ??
+      BROAD_PROFILE_FACTS[member]?.[pool.ids[index]] ??
       DOMAIN_PROFILE_FACTS[member]?.[pool.ids[index]];
     const bit = verified !== undefined ? verified :
       attrAt(pool.attrs, pool.attrBytes, index, mqi);
@@ -153,6 +154,8 @@ function applyPolitics(pool) {
 export function factBit(pool, index, qi) {
   if (!pool || qi == null || index < 0) return 0;
   const id = pool.questions[qi]?.id;
+  const override=pool._ownerFacts?.get(pool.ids[index]);
+  if(override?.has(id))return override.get(id);
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
   if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;

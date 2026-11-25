@@ -3,6 +3,7 @@
 // answers never accept a picture.
 
 import { mergeAnswerLists, reviewSubmission } from "./learn-guard.js";
+import { normalizeReviewAnswers, recordCategory, withCategory, RECORD_CATEGORIES } from "./owner-records.js";
 
 const SCRIPTS = [
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js",
@@ -83,7 +84,12 @@ async function compressImage(file) {
   return dataUrl;
 }
 
-async function ready() {
+let readyPromise=null;
+function ready(){
+  if(!readyPromise)readyPromise=connectFirebase().catch(error=>{readyPromise=null;throw error});
+  return readyPromise;
+}
+async function connectFirebase() {
   if (!window.WALID_FIREBASE_CONFIG) {
     await loadScript("/firebase-config.js");
   }
@@ -95,34 +101,42 @@ async function ready() {
   return { auth, db };
 }
 
-export async function loadLearned(questions) {
+async function readPages(query) {
+  const rows=[];
+  let cursor=null;
+  do{
+    const snap=await (cursor?query.startAfter(cursor):query).limit(100).get();
+    rows.push(...snap.docs);
+    if(snap.size<100)break;
+    cursor=snap.docs.at(-1);
+  }while(cursor);
+  return rows;
+}
+export async function loadOwnerRecords() {
+  const {db}=await ready();
+  const docs=await readPages(db.collection("riddlex_owner_records").orderBy(firebase.firestore.FieldPath.documentId()));
+  return docs.map(doc=>({...doc.data(),id:doc.id})).filter(r=>
+    RECORD_CATEGORIES.includes(r.category)&&typeof r.nameEn==="string"&&r.nameEn.trim()&&Array.isArray(r.answers));
+}
+export async function loadLearned(questions,gameCategory) {
   try {
     const { db } = await ready();
-    const snap = await db.collection("riddlex_entries").where("status", "in", ["approved", "confirmed"]).limit(80).get();
-    const index = new Map(questions.map((question, position) => [question.id, position]));
-    return snap.docs.map((doc) => {
-      const data = doc.data();
-      const yes = [];
-      const no = [];
-      for (const answer of data.answers || []) {
-        if (!index.has(answer.q)) continue;
-        if (answer.a === "yes" || answer.a === "probably") yes.push(answer.q);
-        if (answer.a === "no" || answer.a === "probably_not") no.push(answer.q);
-      }
-      const adult = data.adult === true;
-      return {
-        id: "learn-" + doc.id,
-        en: String(data.nameEn || "").slice(0, 80),
-        bn: String(data.nameBn || ""),
-        pop: 25 + Math.min(40, Number(data.confirmations) || 1) * 4,
-        yes, no, adult,
-        image: !adult && (data.status === "approved" || data.status === "confirmed") && typeof data.image === "string" ? data.image : "",
-        credit: data.image ? "Player submission" : "",
-      };
-    }).filter((entry) => entry.en);
-  } catch {
-    return [];
-  }
+    const docs=await readPages(db.collection("riddlex_entries").where("status","in",["approved","confirmed"]).orderBy(firebase.firestore.FieldPath.documentId()));
+    const known=new Set(questions.map(q=>q.id));
+    return docs.map(doc=>{
+      const data=doc.data();
+      if(data.managed===true)return null;
+      const cat=recordCategory(data.answers,data.category);
+      if(!cat || (gameCategory==="character"? !["real","fictional"].includes(cat):cat!==gameCategory))return null;
+      const facts=withCategory(normalizeReviewAnswers(data.answers,known),cat);
+      const adult=data.adult===true;
+      return {id:"learn-"+doc.id,en:String(data.nameEn||"").slice(0,80),bn:String(data.nameBn||""),
+        pop:25+Math.min(40,Number(data.confirmations)||1)*4,
+        yes:facts.filter(x=>x.a==="yes").map(x=>x.q),
+        no:facts.filter(x=>x.a==="no").map(x=>x.q),adult,
+        image:!adult&&typeof data.image==="string"?data.image:"",credit:data.image&&!adult?"Player submission":""};
+    }).filter(entry=>entry?.en);
+  }catch{return [];}
 }
 
 export function nameInPool(pool, name) {
@@ -156,7 +170,42 @@ export async function saveMergedEntry(updateDoc, merged, legacy) {
   }
 }
 
-export async function submitLearning({ name, nameBn, file, answers, adult, alreadyKnown }) {
+// Every submission is independently reviewable; a known name is a correction
+// suggestion, not a duplicate to silently discard or merge into an old path.
+export async function submitLearning({name,nameBn,file,answers,adult,category,knownIds=[]}) {
+  const verdict=reviewSubmission(name,answers);
+  if(!verdict.ok)return {status:"thanked",stored:false};
+  if(!["character","animal","object"].includes(category))throw Error("category");
+  const packed=normalizeReviewAnswers(answers);
+  if(!packed.length||packed.length>512)throw Error("answers");
+  let image="";
+  if(file&&!adult)image=await compressImage(file);
+  const {auth,db}=await ready();
+  // A staged release must not break the previous submission feature while
+  // the production rule deployment is awaiting credentials or approval.
+  try{await db.collection("riddlex_owner_records").limit(1).get();}
+  catch(error){
+    if(!isPermissionDenied(error)||knownIds.length)throw error;
+    return submitLegacyLearning({name,nameBn,file,answers,adult,alreadyKnown:false});
+  }
+  const uid=auth.currentUser.uid,hour=Math.floor(Date.now()/3600000);
+  const ref=db.collection("riddlex_suggestions").doc();
+  let slot=-1;
+  for(let n=0;n<5;n++){
+    try{await db.collection("riddlex_slots").doc(uid+"~"+hour+"~"+n).set({slug:ref.id});slot=n;break;}
+    catch{/* occupied slot */}
+  }
+  if(slot<0)throw Error("rate");
+  const payload={nameEn:verdict.name,nameBn:(nameBn||"").trim().slice(0,80),adult:!!adult,
+    category,answers:packed,knownIds:knownIds.filter(id=>typeof id==="string").slice(0,10),
+    status:"pending",createdBy:uid,slot,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+  if(image&&!adult)payload.image=image;
+  await ref.set(payload);
+  return {status:"pending",stored:true};
+}
+
+// Compatibility until the new production rules have been deployed.
+async function submitLegacyLearning({ name, nameBn, file, answers, adult, alreadyKnown }) {
   const verdict = reviewSubmission(name, answers);
   if (!verdict.ok) return { status: "thanked", stored: false };
   const clean = verdict.name.slice(0, 80);

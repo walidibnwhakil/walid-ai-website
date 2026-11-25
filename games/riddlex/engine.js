@@ -1082,11 +1082,12 @@ function linksFor(pool) {
 }
 
 function said(state, qid, values) {
+  const group=EQUIVALENT_QUESTION_INDEX.get(qid);
+  if (!group) return state.answers.some(answer=>answer.qid===qid && values.includes(answer.value));
   const direct=state.answers.find(answer=>answer.qid===qid);
   if (direct && direct.value!=="unknown") return values.includes(direct.value);
-  const group=EQUIVALENT_QUESTION_GROUPS.find(ids=>ids.includes(qid));
   return state.answers.some(answer=>
-    (answer.qid===qid || (group?.includes(answer.qid) && answer.value!=="unknown")) &&
+    (answer.qid===qid || (group.includes(answer.qid) && answer.value!=="unknown")) &&
     values.includes(answer.value));
 }
 
@@ -1187,11 +1188,12 @@ const EQUIVALENT_QUESTION_GROUPS = [
   ["screen_telugu_cinema","career_telugu_films"],
   ["film_aashram","profile_film_aashram"],
 ];
+const EQUIVALENT_QUESTION_INDEX=new Map(EQUIVALENT_QUESTION_GROUPS.flatMap(group=>group.map(id=>[id,group])));
 function skippedAsDuplicate(state, id) {
   // Real/fictional and story-medium clues already classify the character.
   // Keep the historical named bit for compatibility, never ask it aloud.
   if (id === "named") return true;
-  const equivalents = EQUIVALENT_QUESTION_GROUPS.find(group=>group.includes(id));
+  const equivalents = EQUIVALENT_QUESTION_INDEX.get(id);
   if (equivalents && state.answers.some(row=>row.qid!==id &&
       equivalents.includes(row.qid) && row.value!=="unknown")) return true;
   const yes = (qid) => said(state, qid, ["yes", "probably"]);
@@ -3121,8 +3123,6 @@ export function decide(state) {
       !said(state,"knows_you",["yes","probably"]) &&
       !said(state,"actor",["yes","probably"])) {
     const seen = new Set(state.answers.map(row => row.qid));
-    // "Named" is a soft, reversible clue. Asking it early also prevents a
-    // single accidental answer from becoming a fatal hard life/country error.
     // Never interrupt an already confirmed actor's role/era interview.
     for (const id of ["male","alive","from_bd","actor","cricketer"]) {
       if (state.pool.qIndex.has(id) && !seen.has(id) &&
@@ -3275,6 +3275,21 @@ export function decide(state) {
             factBit(state.pool,i,qi)===2 && eligibleForIdentityQuestion(state,i)))
         return {type:"ask",qid:id};
     }
+  }
+  // Authors may be scientists as well. Resolve the broad crossover before
+  // searching every specialty question in the worldwide casebook.
+  if (state.category==="character" && state.answers.length>=10 &&
+      said(state,"real",["yes"]) && said(state,"writer",["yes"]) &&
+      said(state,"actor",["no","probably_not"]) &&
+      !state.answers.some(row=>row.qid==="scientist") &&
+      !said(state,"politician",["yes","probably"])) {
+    const country=COUNTRIES.find(id=>said(state,id,["yes"]));
+    const ci=state.pool.qIndex.get(country), si=state.pool.qIndex.get("scientist");
+    const wi=state.pool.qIndex.get("writer");
+    if(ci!=null && si!=null && wi!=null && state.alive.some(i=>
+      state.weights[i]>0 && factBit(state.pool,i,ci)===2 &&
+      factBit(state.pool,i,wi)===2 && factBit(state.pool,i,si)===2))
+      return {type:"ask",qid:"scientist"};
   }
   const roleAwareSignature=crossCareerIdentityQuestion(state);
   if(roleAwareSignature)return {type:"ask",qid:roleAwareSignature};

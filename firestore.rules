@@ -163,7 +163,7 @@ service cloud.firestore {
         && id.size() > 0 && id.size() <= 140
         && request.resource.data.keys().hasOnly([
           "nameEn","nameBn","adult","category","answers","image","credit","mode",
-          "revision","updatedAt"
+          "revision","updatedAt","customQuestions"
         ])
         && request.resource.data.nameEn is string
         && request.resource.data.nameEn.size() >= 2 && request.resource.data.nameEn.size() <= 80
@@ -176,6 +176,8 @@ service cloud.firestore {
         && request.resource.data.credit is string && request.resource.data.credit.size() <= 2000
         && (request.resource.data.adult == false || request.resource.data.image == "")
         && request.resource.data.mode in ["patch","new"]
+        && (!("customQuestions" in request.resource.data) ||
+          (request.resource.data.customQuestions is list && request.resource.data.customQuestions.size() <= 24))
         && request.resource.data.revision is int && request.resource.data.revision > 0
         && request.resource.data.updatedAt == request.time
         && request.resource.size() < 350000;

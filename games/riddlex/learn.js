@@ -2,7 +2,7 @@
 // the Firestore document. Firebase Storage is not used. Adult-entertainment
 // answers never accept a picture.
 
-import { reviewSubmission } from "./learn-guard.js";
+import { mergeAnswerLists, reviewSubmission } from "./learn-guard.js";
 import { normalizeReviewAnswers, recordCategory, withCategory, RECORD_CATEGORIES } from "./owner-records.js";
 
 const SCRIPTS = [
@@ -176,6 +176,13 @@ export async function submitLearning({name,nameBn,file,answers,adult,category,kn
   let image="";
   if(file&&!adult)image=await compressImage(file);
   const {auth,db}=await ready();
+  // A staged release must not break the previous submission feature while
+  // the production rule deployment is awaiting credentials or approval.
+  try{await db.collection("riddlex_owner_records").limit(1).get();}
+  catch(error){
+    if(!isPermissionDenied(error)||knownIds.length)throw error;
+    return submitLegacyLearning({name,nameBn,file,answers,adult,alreadyKnown:false});
+  }
   const uid=auth.currentUser.uid,hour=Math.floor(Date.now()/3600000);
   const ref=db.collection("riddlex_suggestions").doc();
   let slot=-1;
@@ -190,4 +197,88 @@ export async function submitLearning({name,nameBn,file,answers,adult,category,kn
   if(image&&!adult)payload.image=image;
   await ref.set(payload);
   return {status:"pending",stored:true};
+}
+
+// Compatibility until the new production rules have been deployed.
+async function submitLegacyLearning({ name, nameBn, file, answers, adult, alreadyKnown }) {
+  const verdict = reviewSubmission(name, answers);
+  if (!verdict.ok) return { status: "thanked", stored: false };
+  const clean = verdict.name.slice(0, 80);
+  const slug = slugify(clean);
+  if (!slug) return { status: "thanked", stored: false };
+  if (alreadyKnown) return { status: "thanked", stored: false };
+  const packed = mergeAnswerLists([], answers.slice(0, 36).map((answer) => ({ q: answer.qid, a: answer.value })));
+  let image = "";
+  if (file && !adult) image = await compressImage(file);
+  const { auth, db } = await ready();
+  const uid = auth.currentUser.uid;
+  const hour = Math.floor(Date.now() / 3600000);
+  const ref = db.collection("riddlex_entries").doc(slug);
+  let existing = null;
+  try {
+    existing = await ref.get();
+  } catch (error) {
+    const text = `${error?.code || ""} ${error?.message || error}`;
+    const denied = /permission/i.test(text);
+    if (!denied) throw new Error(text);
+  }
+  if (!existing?.exists) {
+    let slot = -1;
+    for (let n = 0; n < 5; n++) {
+      try {
+        await db.collection("riddlex_slots").doc(`${uid}~${hour}~${n}`).set({ slug });
+        slot = n;
+        break;
+      } catch {
+        // This hour's slot is taken. Try the next one.
+      }
+    }
+    if (slot < 0) throw new Error("rate");
+    const payload = {
+      slug, nameEn: clean, nameBn: (nameBn || "").trim().slice(0, 80),
+      adult: !!adult, answers: packed, status: "pending", confirmations: 1,
+      confirmers: [uid], createdBy: uid, slot,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    if (image && !adult) payload.image = image;
+    const status = await saveNewEntry((data) => ref.set(data), payload);
+    return { status, confirmations: 1 };
+  }
+  const data = existing.data();
+  if (data.status === "rejected") return { status: "thanked", stored: false };
+  const merged = mergeAnswerLists(data.answers, packed);
+  if ((data.confirmers || []).includes(uid)) {
+    if (merged.length !== (data.answers || []).length) {
+      try {
+        await ref.update({
+          answers: merged,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch {
+        // The first saved answers stay if this client cannot update them.
+      }
+    }
+    return { status: data.status, confirmations: data.confirmations };
+  }
+  const confirmations = Math.min(12, (data.confirmations || 1) + 1);
+  const status = data.status; // Confirmations cannot automatically publish a name.
+  const stamp = firebase.firestore.FieldValue.serverTimestamp();
+  const saved = await saveMergedEntry(
+    (data) => ref.update(data),
+    {
+      answers: merged,
+      confirmations,
+      confirmers: [...(data.confirmers || []), uid].slice(0, 12),
+      status,
+      updatedAt: stamp,
+    },
+    {
+      confirmations,
+      confirmers: [...(data.confirmers || []), uid].slice(0, 12),
+      status,
+      updatedAt: stamp,
+    },
+  );
+  return { status: saved === "legacy" ? status : status, confirmations };
 }

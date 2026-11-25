@@ -385,7 +385,7 @@
     cat.onchange=()=>syncQuick();
     panel.append(quick);
     const custom=el("section",undefined,"riddlex-quick-section");
-    custom.append(el("h3","Add Identification Question"),el("p","Use a specific, publicly verifiable Yes/No question. Unrecorded answers remain unknown.","muted"));
+    custom.append(el("h3","Add Confirmation Question"),el("p","Used only to confirm a likely identity before guessing. Enter a specific, publicly verifiable question. Unrecorded answers remain unknown.","muted"));
     const qFields=el("div",undefined,"riddlex-editor-top");
     const qen=field("","e.g. Did they captain the national team?"),qbn=field("","যেমন: তিনি কি জাতীয় দলের অধিনায়ক ছিলেন?");
     qen.maxLength=200;qbn.maxLength=200;qen.id="riddlex-new-question-en";qbn.id="riddlex-new-question-bn";

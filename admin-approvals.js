@@ -245,9 +245,6 @@
     const countries=[...facts].filter(([key,value])=>typeof key==="string"&&key.startsWith("from_")&&key.length===7&&value==="yes").map(([key])=>key);
     $("#riddlex-country").value=countries.length===1?countries[0]:"";
     $("#riddlex-occupation").value="";
-    if((ctx.data.knownIds||[]).includes(query)){
-      for(const key of ["category","gender","life","country","occupation"])$("#riddlex-"+key).value="";
-    }
     switchView("catalog",{keepLink:true}).catch(fail);
   }
   function sharedRecordCategory(data,facts){
@@ -341,14 +338,13 @@
     const duplicateCheck=el("input");duplicateCheck.type="checkbox";duplicateCheck.style.width="auto";
     if(!ctx.record){
       panel.append(el("p","If this identity already exists, choose Check Existing Records and accept as an update. Only use a new record for a genuinely different identity.","muted"));
-      if(isSubmission)duplicateCheck.disabled=(ctx.data.knownIds||[]).length>0;
-      if(duplicateCheck.disabled)panel.append(el("p","An existing ID was reported. Match that record before approval.","muted"));
+      if(isSubmission&&(ctx.data.knownIds||[]).length>0)panel.append(el("p","Possible matches were reported. Check these records before confirming a new identity.","muted"));
       const l=el("label");l.append(duplicateCheck,el("span"," I verified that this identity does not already exist in the database."));panel.append(l);
     }
     const save=btn(isSubmission?(ctx.record?"Accept as Update":"Accept as New Record"):"Save Changes",async()=>{
       if(busy||!authorized)return;
       try{
-        if(!ctx.record&&(duplicateCheck.disabled||!duplicateCheck.checked))throw Error("Search for duplicate records and confirm this is a distinct identity, or link the existing record.");
+        if(!ctx.record&&!duplicateCheck.checked)throw Error("Search for duplicate records and confirm this is a distinct identity, or link the existing record.");
         const nameEn=en.value.trim(),nameBn=bn.value.trim();
         if(nameEn.length<2||nameEn.length>80||!categories[cat.value])throw Error("Enter a valid name and choose the verified category.");
         if(/[<>]/.test(nameEn+nameBn))throw Error("Invalid name characters.");

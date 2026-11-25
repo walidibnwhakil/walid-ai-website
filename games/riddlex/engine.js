@@ -1082,7 +1082,12 @@ function linksFor(pool) {
 }
 
 function said(state, qid, values) {
-  return state.answers.some((answer) => answer.qid === qid && values.includes(answer.value));
+  const direct=state.answers.find(answer=>answer.qid===qid);
+  if (direct && direct.value!=="unknown") return values.includes(direct.value);
+  const group=EQUIVALENT_QUESTION_GROUPS.find(ids=>ids.includes(qid));
+  return state.answers.some(answer=>
+    (answer.qid===qid || (group?.includes(answer.qid) && answer.value!=="unknown")) &&
+    values.includes(answer.value));
 }
 
 const PRIMARY_JOBS = ["footballer", "cricketer", "actor", "singer", "politician", "writer", "scientist", "musician", "director", "business", "youtube"];
@@ -1186,6 +1191,7 @@ function skippedAsDuplicate(state, id) {
   // A real person necessarily has a name; this generic question is useful
   // only to distinguish named fictional characters from unnamed ones.
   if (id === "named" && (state.category !== "character" ||
+      said(state,"real",["yes","probably"]) ||
       !said(state,"fictional",["yes","probably"]))) return true;
   const equivalents = EQUIVALENT_QUESTION_GROUPS.find(group=>group.includes(id));
   if (equivalents && state.answers.some(row=>row.qid!==id &&

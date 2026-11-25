@@ -1183,6 +1183,10 @@ const EQUIVALENT_QUESTION_GROUPS = [
   ["film_aashram","profile_film_aashram"],
 ];
 function skippedAsDuplicate(state, id) {
+  // A real person necessarily has a name; this generic question is useful
+  // only to distinguish named fictional characters from unnamed ones.
+  if (id === "named" && (state.category !== "character" ||
+      !said(state,"fictional",["yes","probably"]))) return true;
   const equivalents = EQUIVALENT_QUESTION_GROUPS.find(group=>group.includes(id));
   if (equivalents && state.answers.some(row=>row.qid!==id &&
       equivalents.includes(row.qid) && row.value!=="unknown")) return true;
@@ -2128,7 +2132,7 @@ function smallCasebookEvidenceQuestion(state) {
   if(state.category!=="character" || state.pool.count>=100)return null;
   const asked=new Set(state.answers.map(row=>row.qid));
   const ids=["cricketer","actor","politician","scientist","footballer",
-    "writer","singer","athlete","all_rounder","alive","named",
+    "writer","singer","athlete","all_rounder","alive",
     "male","female","from_in","from_bd"];
   for(const id of ids) {
     const qi=state.pool.qIndex.get(id);
@@ -3116,7 +3120,7 @@ export function decide(state) {
     // "Named" is a soft, reversible clue. Asking it early also prevents a
     // single accidental answer from becoming a fatal hard life/country error.
     // Never interrupt an already confirmed actor's role/era interview.
-    for (const id of ["male","named","alive","from_bd","actor","cricketer"]) {
+    for (const id of ["male","alive","from_bd","actor","cricketer"]) {
       if (state.pool.qIndex.has(id) && !seen.has(id) &&
           !questionContradicts(state,id) &&
           !skippedAsDuplicate(state,id))
@@ -3384,7 +3388,7 @@ export function decide(state) {
       chooseQuestion(state) || verifiedIdentityDiscoveryQuestion(state) ||
       actorDiscoveryQuestion(state) || firstAllowedQuestion(state) ||
       smallCasebookEvidenceQuestion(state) ||
-      (state.category === "character" && state.pool.count < 100 ? ["alive","named","female","writer","singer"]
+      (state.category === "character" && state.pool.count < 100 ? ["alive","female","writer","singer"]
         .find(id=>state.pool.qIndex.has(id) &&
           !state.answers.some(row=>row.qid===id) &&
           !questionContradicts(state,id)) : null);

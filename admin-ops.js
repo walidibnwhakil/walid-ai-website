@@ -253,7 +253,7 @@
     const cutoff=Date.now()-CHAT_RETENTION_MS;
     const filtered=(Array.isArray(tasks)?tasks:[])
       .filter(item=>item?.role==='manager'&&Date.parse(item.created_at||'')>=cutoff)
-      .sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||'')).slice(-65);
+      .sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
     const taskIds=new Set(filtered.map(item=>item.id));
     const messageItems=filtered.map(task=>({type:'task',created_at:task.created_at,task}));
     for(const notice of Array.isArray(notices)?notices:[]){
@@ -318,7 +318,7 @@
     try{
       const [data,brief]=await Promise.all([
         request('/api/admin/tasks'),
-        request('/api/admin/manager/notices').catch(()=>({notices:managerNotices})),
+        request('/api/admin/manager/notices'),
       ]);
       lastManagerTasks=data.tasks||[];
       managerNotices=Array.isArray(brief.notices)?brief.notices:[];

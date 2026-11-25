@@ -67,6 +67,24 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 </style>
 <link rel="stylesheet" href="/admin-shell.css?v=20261122-no-shift-sidebar">
 <link rel="stylesheet" href="/manager-office-chat.css?v=20261122-staff-threads">
+<style>
+#riddlex-workspace .riddlex-tabs{gap:6px;border-bottom:1px solid var(--adm-border);padding-bottom:12px;margin:16px 0}
+#riddlex-workspace .riddlex-tabs button{font-weight:600;font-size:.86rem;line-height:1.3;border-radius:8px;padding:10px 13px}
+#riddlex-workspace .riddlex-tabs button[aria-pressed="false"]{color:var(--adm-muted);background:var(--adm-surface);border:1px solid var(--adm-border);outline:none}
+#riddlex-workspace .riddlex-tabs button[aria-pressed="true"]{background:#1b445b;color:var(--adm-accent);border:1px solid #42768c;outline:none}
+#riddlex-workspace .riddlex-tabs button:hover{color:var(--adm-text);background:#1c4760}
+#riddlex-workspace .riddlex-item{display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:var(--adm-surface);border-color:var(--adm-border);padding:18px}
+#riddlex-workspace .riddlex-item p{margin:0;line-height:1.5}
+#riddlex-workspace .riddlex-item .toolbar{margin-top:auto;padding-top:10px}
+#riddlex-workspace .riddlex-item h3{font-size:1.02rem;line-height:1.4}
+#riddlex-workspace .riddlex-path,#riddlex-workspace .riddlex-facts{border-color:var(--adm-border)}
+#riddlex-workspace .riddlex-fact{border-bottom-color:var(--adm-border)}
+#riddlex-workspace .riddlex-fact small{color:var(--adm-muted)}
+#riddlex-workspace button:disabled{opacity:.45;cursor:not-allowed}
+#riddlex-workspace #riddlex-status[data-error="false"]{color:var(--adm-muted)}
+#riddlex-workspace #riddlex-editor h3{margin-top:22px}
+@media(max-width:540px){#riddlex-workspace .riddlex-tabs button{font-size:.79rem;padding:9px 10px}}
+</style>
 </head>
 <body class="admin-locked">
 <main>
@@ -185,16 +203,16 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
   <section id="riddlex-workspace" class="hidden" aria-label="Riddlex database manager">
     <div class="panel">
       <h2>Riddlex Database Manager</h2>
-      <p class="muted">Review the original play path, check existing records, and publish verified corrections.</p>
+      <p class="muted">Review player submissions, compare existing records, and manage verified database updates.</p>
       <div class="toolbar"><button id="riddlex-google" type="button">Sign in with Google</button><button id="riddlex-reload" type="button" class="secondary-button">Refresh</button></div>
       <p id="riddlex-status" class="status" role="status">Sign in with the authorized Firebase owner account.</p>
       <div id="riddlex-tools" class="hidden">
         <nav class="toolbar riddlex-tabs" aria-label="Database sections">
-          <button type="button" data-riddlex-view="suggestions" aria-pressed="true">Suggestions</button>
-          <button type="button" data-riddlex-view="legacy">Older submissions</button>
-          <button type="button" data-riddlex-view="catalog">All database records</button>
-          <button type="button" data-riddlex-view="reviewed">Owner-reviewed records</button>
-          <button id="riddlex-add" type="button" class="secondary-button">Add record</button>
+          <button type="button" data-riddlex-view="suggestions" aria-pressed="true">New Suggestions</button>
+          <button type="button" data-riddlex-view="legacy">Previous Submissions</button>
+          <button type="button" data-riddlex-view="catalog">Browse Database</button>
+          <button type="button" data-riddlex-view="reviewed">Verified Records</button>
+          <button id="riddlex-add" type="button" class="secondary-button">Create Record</button>
         </nav>
         <div id="riddlex-review-filters" class="toolbar">
           <label for="riddlex-review-status">Status</label>
@@ -207,13 +225,13 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
           <label>Life status<select id="riddlex-life"><option value="">Any</option><option value="alive">Alive</option><option value="dead">Deceased</option><option value="unknown">Unknown</option></select></label>
           <label>Country<select id="riddlex-country"><option value="">Any country</option></select></label>
           <label>Occupation<select id="riddlex-occupation"><option value="">Any occupation</option></select></label>
-          <div class="toolbar"><button type="submit">Search / browse</button><button id="riddlex-stop" type="button" class="secondary-button">Stop search</button></div>
+          <div class="toolbar"><button type="submit">Search Database</button><button id="riddlex-stop" type="button" class="secondary-button">Pause Search</button></div>
         </form>
       </div>
     </div>
     <div id="riddlex-link-note" class="panel hidden" role="status"></div>
     <div id="riddlex-editor" class="panel hidden" aria-label="Edit or review record"></div>
-    <div id="riddlex-pending" class="riddlex-grid"></div>
+    <div id="riddlex-pending" class="riddlex-grid" aria-live="polite"></div>
     <div id="riddlex-pagination" class="toolbar hidden" aria-label="Record pagination">
       <button id="riddlex-prev" type="button" class="secondary-button">Previous</button>
       <span id="riddlex-page-info" class="muted"></span>
@@ -226,6 +244,6 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 <script src="/admin-section-metrics.js?v=20261122-context-columns"></script>
 <script src="/admin-usage.js?v=20261122-audience-clean"></script>
 <script src="/admin-ops.js?v=20261122-six-hour-manager-office"></script>
-<script src="/admin-approvals.js?v=20261125-database"></script>
+<script src="/admin-approvals.js?v=20261125-review"></script>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </body></html>

@@ -85,6 +85,21 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 #riddlex-workspace #riddlex-editor h3{margin-top:22px}
 @media(max-width:540px){#riddlex-workspace .riddlex-tabs button{font-size:.79rem;padding:9px 10px}}
 </style>
+<style>
+#riddlex-workspace .riddlex-identity-fields{display:grid;gap:16px;margin:20px 0;padding:18px;border:1px solid var(--adm-border);border-radius:12px;background:var(--adm-surface)}
+#riddlex-workspace .riddlex-identity-fields.hidden{display:none!important}
+#riddlex-workspace .riddlex-quick-section{min-width:0;border-top:1px solid var(--adm-border);padding-top:14px}
+#riddlex-workspace .riddlex-quick-section h4{margin:0 0 10px;font-size:.95rem}
+#riddlex-workspace .riddlex-quick-records{display:grid;gap:6px;margin:8px 0 12px}
+#riddlex-workspace .riddlex-quick-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,155px);align-items:center;gap:12px;padding:8px 10px;background:var(--adm-panel);border:1px solid var(--adm-border);border-radius:8px}
+#riddlex-workspace .riddlex-quick-row span{overflow-wrap:anywhere}
+#riddlex-workspace .riddlex-quick-row select{width:100%;min-width:0}
+#riddlex-workspace .riddlex-quick-section .toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,155px) auto;gap:8px}
+#riddlex-workspace .riddlex-quick-section .toolbar select{min-width:0;width:100%}
+#riddlex-workspace .riddlex-quick-section input[type="search"]{width:100%;max-width:100%}
+#riddlex-workspace .riddlex-quick-records p{margin:0}
+@media(max-width:540px){#riddlex-workspace .riddlex-identity-fields{padding:12px;gap:12px}#riddlex-workspace .riddlex-quick-section .toolbar{grid-template-columns:1fr 1fr}#riddlex-workspace .riddlex-quick-section .toolbar select:first-child{grid-column:1/-1}#riddlex-workspace .riddlex-quick-row{grid-template-columns:minmax(0,1fr) 106px;gap:7px}}
+</style>
 </head>
 <body class="admin-locked">
 <main>
@@ -244,6 +259,6 @@ table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:10px;text
 <script src="/admin-section-metrics.js?v=20261122-context-columns"></script>
 <script src="/admin-usage.js?v=20261122-audience-clean"></script>
 <script src="/admin-ops.js?v=20261122-six-hour-manager-office"></script>
-<script src="/admin-approvals.js?v=20261125-portraits"></script>
+<script src="/admin-approvals.js?v=20261125-identity"></script>
 <footer class="legal-footer"><nav aria-label="Site information"><a href="/about-us.html">About Us</a><span aria-hidden="true">·</span><a href="/contact-us.html">Contact Us</a><span aria-hidden="true">·</span><a href="/privacy-policy.html">Privacy Policy</a><span aria-hidden="true">·</span><a href="/terms-of-service.html">Terms of Service</a></nav><p>© 2026 Walid AI. All rights reserved.</p></footer>
 </body></html>

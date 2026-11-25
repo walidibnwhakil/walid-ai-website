@@ -1,5 +1,5 @@
 import {loadManifest,decodeShard,attachManifest,poolFromEntries,appendShard,inheritCreditedPortraits} from "./kb.js?v=riddlex-73";
-import {factBit,entityView} from "./engine.js?v=riddlex-74";
+import {factBit,entityView} from "./engine.js?v=riddlex-76";
 import {EXTRA_IDENTITY_PEOPLE} from "./identity-facts.js";
 import {DOMAIN_PEOPLE} from "./domain-facts.js?v=riddlex-60";
 import {BROAD_PEOPLE,BROAD_OBJECTS} from "./broad-facts.js?v=riddlex-73";
@@ -9,7 +9,7 @@ import {RECOGNITION_PEOPLE,RECOGNITION_ANIMALS} from "./recognition-facts.js?v=r
 import {EXTRA_HYPOTHESIS_ENTRIES} from "./hypothesis-facts.js?v=riddlex-60";
 import {UNVERIFIED_OWNER_NAMES} from "./unverified-owner-names.js";
 import {RIDDLEX_CHARACTER} from "./personal-facts.js?v=riddlex-62";
-import {applyOwnerRecords,normalizeRecordName,RECORD_CATEGORIES} from "./owner-records.js?v=riddlex-74";
+import {applyOwnerRecords,normalizeRecordName,RECORD_CATEGORIES} from "./owner-records.js?v=riddlex-76";
 
 const ROOT="/games/riddlex/kb";
 export const JOBS=["actor","singer","politician","writer","cricketer","footballer","athlete","scientist","musician","director","business","youtube"];
@@ -33,7 +33,7 @@ export function snapshotRecord(pool,i){
     const val=factBit(pool,i,qi);if(val===1||val===2)answers.push({q:pool.questions[qi].id,a:val===2?"yes":"no"});
   }
   return {id:v.id,nameEn:v.en||v.bn,nameBn:v.bn,category:categoryAt(pool,i),adult:v.adult,
-    answers,image:v.adult?"":v.image,credit:v.adult?"":v.credit,mode:"patch"};
+    answers,customQuestions:pool.questions.filter(q=>q.ownerQuestion&&answers.some(a=>a.q===q.id)).map(({id,en,bn,category})=>({id,en,bn,category})),image:v.adult?"":v.image,credit:v.adult?"":v.credit,mode:"patch"};
 }
 export function matchesRecord(pool,i,f){
   if(pool.flags[i]&128)return false;
@@ -72,7 +72,7 @@ export function catalogFiles(manifest,index,f){
 }
 let sourcePromise;
 export function catalogSource(){
-  if(!sourcePromise)sourcePromise=Promise.all([loadManifest(ROOT),fetch(ROOT+"/index.json?v=riddlex-74").then(r=>{
+  if(!sourcePromise)sourcePromise=Promise.all([loadManifest(ROOT),fetch(ROOT+"/index.json?v=riddlex-76").then(r=>{
     if(!r.ok)throw Error("Index HTTP "+r.status);return r.json();
   })]).then(async ([manifest,index])=>{
     const result={manifest,index,portraitPool:null};

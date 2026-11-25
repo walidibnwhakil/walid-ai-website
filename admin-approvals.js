@@ -41,10 +41,11 @@
     });
   }
   async function modules(){
-    if(!shared)shared=Promise.all([import(ROOT+"admin-catalog.js?v=75"),import(ROOT+"owner-records.js?v=riddlex-74")])
+    if(!shared)shared=Promise.all([import(ROOT+"admin-catalog.js?v=76"),import(ROOT+"owner-records.js?v=riddlex-76")])
       .then(([cat,records])=>({cat,records})).catch(e=>{shared=null;throw e});
     const m=await shared;
     if(!source){source=await m.cat.catalogSource();questionMap=new Map(source.manifest.questions.map(q=>[q.id,q]));}
+    if(modern&&!source.ownerQuestionsLoaded){const rows=await allReviewed();source.manifest.questions=m.records.mergeOwnerQuestions(source.manifest.questions,rows);questionMap=new Map(source.manifest.questions.map(q=>[q.id,q]));source.ownerQuestionsLoaded=true;}
     const fill=(id,items,format)=>{const select=$(id);if(select.options.length>1)return;for(const value of items)select.append(new Option(format(value),value))};
     fill("#riddlex-country",m.cat.COUNTRIES,countryName);fill("#riddlex-occupation",m.cat.JOBS,x=>jobNames[x]||x);
     return m;
@@ -293,6 +294,8 @@
       }
     }
     const facts=new Map(draft.answers.map(r=>[r.q,r.a]));
+    const editorQuestions=m.records.mergeOwnerQuestions(source.manifest.questions,[draft]);
+    const editorQuestionMap=new Map(editorQuestions.map(q=>[q.id,q]));
     const top=el("div",undefined,"riddlex-editor-top"),en=field(draft.nameEn),bn=field(draft.nameBn),cat=el("select");
     cat.append(new Option("Choose verified category",""));for(const [key,title] of Object.entries(categories))cat.append(new Option(title,key));cat.value=draft.category||"";
     top.append(labelInput("English name",en),labelInput("বাংলা নাম",bn),labelInput("Category",cat));
@@ -323,7 +326,7 @@
     }
     gender.onchange=()=>changePair(gender,"male","female");
     life.onchange=()=>changePair(life,"alive","dead");
-    const definitions=source.manifest.questions.filter(q=>q.id!=="named");
+    const definitions=editorQuestions.filter(q=>q.id!=="named");
     const countryDefs=definitions.filter(q=>q.group==="country"&&/^from_[a-z]{2}$/.test(q.id));
     const occupationIds=new Set([...m.cat.JOBS,"adult_ent","all_rounder"]);
     const jobDefs=definitions.filter(q=>occupationIds.has(q.id));
@@ -381,6 +384,37 @@
     }
     cat.onchange=()=>syncQuick();
     panel.append(quick);
+    const custom=el("section",undefined,"riddlex-quick-section");
+    custom.append(el("h3","Add Confirmation Question"),el("p","Used only to confirm a likely identity before guessing. Enter a specific, publicly verifiable question. Unrecorded answers remain unknown.","muted"));
+    const qFields=el("div",undefined,"riddlex-editor-top");
+    const qen=field("","e.g. Did they captain the national team?"),qbn=field("","যেমন: তিনি কি জাতীয় দলের অধিনায়ক ছিলেন?");
+    qen.maxLength=200;qbn.maxLength=200;qen.id="riddlex-new-question-en";qbn.id="riddlex-new-question-bn";
+    const qa=el("select");qa.id="riddlex-new-question-answer";for(const [v,t] of Object.entries(labels))qa.append(new Option(t,v));qa.value="yes";
+    qFields.append(labelInput("English Question",qen),labelInput("বাংলা প্রশ্ন",qbn),labelInput("Verified Answer",qa));custom.append(qFields);
+    const addQuestion=btn("Add Question",()=>{
+      try{
+        const enText=qen.value.trim(),bnText=qbn.value.trim();
+        if(!categories[cat.value])throw Error("Select the record category first.");
+        const normalize=m.records.normalizeRecordName;
+        let existing=editorQuestions.find(q=>normalize(q.en)===normalize(enText)||normalize(q.bn)===normalize(bnText));
+        if(existing&&existing.id==="named")throw Error("This retired question is not available in gameplay.");
+        if(existing?.ownerQuestion&&existing.category!==cat.value)throw Error("This question belongs to another category.");
+        if(!existing){
+          const id="ownerq_"+crypto.randomUUID().replaceAll("-","");
+          const definition={id,en:enText,bn:bnText,category:cat.value};
+          if(!m.records.validOwnerQuestion(definition))throw Error("Enter both questions, between 5 and 200 characters.");
+          if([...facts.keys()].filter(k=>k.startsWith("ownerq_")).length>=24)throw Error("A record can contain at most 24 custom questions.");
+          existing=m.records.mergeOwnerQuestions([], [{customQuestions:[definition]}])[0];
+          editorQuestions.push(existing);editorQuestionMap.set(id,existing);definitions.push(existing);
+          if(["job","fiction"].includes(existing.group))worksDefs.push(existing);
+        }
+        facts.set(existing.id,qa.value);qen.value="";qbn.value="";
+        filter.value=existing.en;renderFacts();
+        message(canPublish?"Question added to draft. Save to publish.":"Question added to preview. Publishing is currently unavailable.");
+      }catch(e){fail(e)}
+    },false);
+    custom.append(addQuestion);panel.append(custom);
+
     const preview=el("div");preview.append(photo(draft.image,draft.adult,"riddlex-editor-photo"));const credit=field(draft.credit);credit.maxLength=2000;
     const file=el("input");file.type="file";file.accept="image/jpeg,image/png,image/webp";file.disabled=adult.checked;
     file.onchange=async()=>{try{if(!file.files?.[0])return;draft.image=await compress(file.files[0]);if(adult.checked){draft.image="";return}preview.replaceChildren(photo(draft.image,false,"riddlex-editor-photo"));message(canPublish?"Replacement image ready. Save Changes to publish.":"Image preview ready. Publishing is currently unavailable.")}catch(e){fail(e)}};
@@ -397,7 +431,7 @@
       syncQuick();
       const needle=m.records.normalizeRecordName(filter.value);
       factsBox.replaceChildren();
-      for(const q of source.manifest.questions){
+      for(const q of editorQuestions){
         if(q.id==="named")continue;
         if(needle&&!m.records.normalizeRecordName(q.en+" "+q.bn+" "+q.id).includes(needle))continue;
         if(!needle&&!showAll.checked&&!facts.has(q.id))continue;
@@ -434,14 +468,18 @@
         if(/[<>]/.test(nameEn+nameBn))throw Error("Invalid name characters.");
         if(facts.get("male")==="yes"&&facts.get("female")==="yes")throw Error("Both male and female are marked Yes. Verify gender answers.");
         if(facts.get("alive")==="yes"&&facts.get("dead")==="yes")throw Error("Both alive and deceased are marked Yes. Verify life status.");
-        const final=m.records.withCategory(m.records.normalizeReviewAnswers([...facts].map(([q,a])=>({q,a})),new Set(questionMap.keys())),cat.value);
+        const final=m.records.withCategory(m.records.normalizeReviewAnswers([...facts].map(([q,a])=>({q,a})),new Set(editorQuestionMap.keys())),cat.value);
         if(final.length>512)throw Error("Too many facts.");
         if(adult.checked)draft.image="";
         const payload={nameEn,nameBn,category:cat.value,adult:adult.checked,answers:final,
           image:draft.image||"",credit:adult.checked?"":credit.value.trim(),mode:draft.mode==="new"?"new":"patch"};
+        const customQuestions=final.map(row=>editorQuestionMap.get(row.q)).filter(q=>q?.ownerQuestion).map(({id,en,bn,category})=>({id,en,bn,category}));
+        if(customQuestions.length>24)throw Error("At most 24 custom questions per record.");
+        if(customQuestions.some(q=>q.category!==cat.value))throw Error("A custom question belongs to a different record category.");
+        if(customQuestions.length)payload.customQuestions=customQuestions;
         if(payload.image&&!safeImage(payload.image))throw Error("Invalid image source.");
         busy=true;save.disabled=true;
-        await publish(ctx,draft,payload);clearEditor();clearLink();message("Saved and published to Firestore.");
+        await publish(ctx,draft,payload);source.manifest.questions=m.records.mergeOwnerQuestions(source.manifest.questions,[payload]);questionMap=new Map(source.manifest.questions.map(q=>[q.id,q]));clearEditor();clearLink();message("Saved and published to Firestore.");
         if(view==="catalog")await beginCatalog();else await queryView(true);
       }catch(e){fail(e)}finally{busy=false;save.disabled=false}
     },false);

@@ -156,6 +156,7 @@ export function factBit(pool, index, qi) {
   const id = pool.questions[qi]?.id;
   const override=pool._ownerFacts?.get(pool.ids[index]);
   if(override?.has(id))return override.get(id);
+  if(pool.questions[qi]?.ownerQuestion)return 0; // no fact recorded means unknown
   if (PERSONAL_QUESTION_IDS.has(id)) return PERSONAL_FACTS[pool.ids[index]]?.[id] || 0;
   if (NARRATIVE_FACTS[id]) return NARRATIVE_FACTS[id][pool.ids[index]] || 0;
   if (EVERYDAY_FACTS[id]) return EVERYDAY_FACTS[id][pool.ids[index]] || 0;
@@ -357,13 +358,15 @@ export function recompute(state) {
     (entry.value === "yes" || entry.value === "probably"));
   const localActor = positive("from_bd") && positive("actor");
   const playerPersonal = positive("knows_you");
+  const ownerConfirmations=answers.filter(row=>pool.questions[row.qi]?.ownerQuestion&&["yes","no"].includes(row.value));
   const confirmedRelationships = answers.filter((row) =>
     row.qid.startsWith("your_") && (row.value === "yes" || row.value === "probably"));
   let max = -Infinity;
   for (let i = 0; i < n; i++) {
     if (rejectedIds.has(pool.ids[i]) ||
         (!rejectedIds.size && rejected.has(i)) ||
-        pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category))) {
+        pool.flags[i] & 128 || (state.category && !inCategory(pool, i, state.category)) ||
+        ownerConfirmations.some(row=>factBit(pool,i,row.qi)===(row.value==="yes"?1:2))) {
       logW[i] = -Infinity;
       continue;
     }
@@ -862,6 +865,8 @@ export function adultAllowed(state) {
 function gated(state, question, rows) {
   const id = question.id;
   const group = question.group;
+  // Owner-authored questions never participate in the ordinary interview.
+  if(question.ownerQuestion)return false;
   if (LATE.has(id) && state.answers.length < 6 && id !== "adult_ent") {
     // Still allowed once the matching topic is likely; the mass checks below do that.
   }
@@ -1029,6 +1034,9 @@ export function buildTraitLinks(questions) {
 
   for (const question of list) {
     const id = question.id;
+    // An owner clue is scoped by its explicit category. Do not infer a
+    // profession from its free-form English/Bengali wording.
+    if(question.ownerQuestion){add(question.category,id,{entail:false,mass:false});continue;}
     let parent = ROLE_PARENT[id] || null;
     if (!parent && id.includes("_")) {
       const stemmed = STEM_PARENT[id.split("_")[0]];
@@ -1553,6 +1561,7 @@ export function questionBlocked(state, qid) {
 }
 
 function allowedInCategory(state, question) {
+  if(question.ownerQuestion)return false; // confirmation-only, including fallbacks
   // Most players cannot know someone else's birth decade. The birth facts
   // remain available internally for indexing, but must not be asked aloud.
   if (question.id === "named" || question.group === "birth") return false;
@@ -3112,7 +3121,7 @@ function crossCareerIdentityQuestion(state) {
   return null;
 }
 
-export function decide(state) {
+function decideBase(state) {
   recompute(state);
   const personalRole=confirmedPersonalRole(state);
   if (personalRole >= 0) return { type:"guess", index:personalRole };
@@ -3475,4 +3484,24 @@ export function entityView(pool, index) {
 export function displayName(entity, lang) {
   if (lang === "bn" && entity.bn) return entity.bn;
   return entity.en || entity.bn || "";
+}
+
+export function decide(state) {
+  const decision=decideBase(state);
+  if(decision.type!=="guess"||state.answers.length<5)return decision;
+  const custom=state.pool.questions.filter(q=>q.ownerQuestion);
+  if(!custom.length||state.answers.filter(a=>a.qid.startsWith("ownerq_")).length>=3)return decision;
+  const leader=decision.index;
+  if(leader==null||leader<0||!eligibleForIdentityQuestion(state,leader))return decision;
+  for(const q of custom){
+    if(state.answers.some(a=>a.qid===q.id))continue;
+    if(state.category==="character"){
+      if(!["real","fictional"].includes(q.category)||!said(state,q.category,["yes","probably"]))continue;
+      if(said(state,"knows_you",["yes","probably"]))continue;
+    }else if(state.category!==q.category)continue;
+    const bit=factBit(state.pool,leader,state.pool.qIndex.get(q.id));
+    if(bit!==1&&bit!==2)continue;
+    return {type:"ask",qid:q.id};
+  }
+  return decision;
 }

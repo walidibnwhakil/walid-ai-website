@@ -244,7 +244,7 @@
       if(archived){
         panel.append(el("p","Decision: "+ctx.data.status+(ctx.data.resolvedId?" · linked ID "+ctx.data.resolvedId:"")));
         if(ctx.data.resolvedId&&modern)panel.append(btn("Open published record",async()=>{try{const doc=await db.collection("riddlex_owner_records").doc(ctx.data.resolvedId).get();if(!doc.exists)throw Error("Published record not found.");await openEditor({record:{...doc.data(),id:doc.id}})}catch(e){fail(e)}}));
-        else if(ctx.type==="legacy"&&["approved","confirmed"].includes(ctx.data.status)&&modern)panel.append(btn("Edit this approved legacy record",()=>openEditor({record:{...draft,mode:"patch"},legacyDoc:ctx.id}).catch(fail)));
+        else if(ctx.type==="legacy"&&["approved","confirmed"].includes(ctx.data.status)&&modern)panel.append(btn("Edit this approved legacy record",async()=>{try{await openEditor({record:await latestRecord({...draft,mode:"patch"}),legacyDoc:ctx.id})}catch(e){fail(e)}}));
         panel.scrollIntoView({block:"start",behavior:"smooth"});return;
       }
       if(modern){
@@ -326,7 +326,7 @@
         if(/[<>]/.test(nameEn+nameBn))throw Error("Invalid name characters.");
         if(facts.get("male")==="yes"&&facts.get("female")==="yes")throw Error("Both male and female are marked Yes. Verify gender answers.");
         if(facts.get("alive")==="yes"&&facts.get("dead")==="yes")throw Error("Both alive and deceased are marked Yes. Verify life status.");
-        const final=m.records.withCategory([...facts].map(([q,a])=>({q,a})),cat.value);
+        const final=m.records.withCategory(m.records.normalizeReviewAnswers([...facts].map(([q,a])=>({q,a})),new Set(questionMap.keys())),cat.value);
         if(final.length>512)throw Error("Too many facts.");
         if(adult.checked)draft.image="";
         const payload={nameEn,nameBn,category:cat.value,adult:adult.checked,answers:final,
@@ -376,8 +376,8 @@
   }
   async function reject(ctx){
     if(!authorized||!confirm("Reject "+ctx.data.nameEn+"? Its original answers will remain in review history."))return;
-    if(ctx.type==="legacy"){await db.collection("riddlex_entries").doc(ctx.id).update({status:"rejected",updatedAt:stamp()})}
-    else await db.collection("riddlex_suggestions").doc(ctx.id).update({status:"rejected",reviewedAt:stamp()});
+    const ref=db.collection(ctx.type==="legacy"?"riddlex_entries":"riddlex_suggestions").doc(ctx.id);
+    await db.runTransaction(async tx=>{const latest=await tx.get(ref);if(!latest.exists||latest.data().status!=="pending")throw Error("This submission has already been reviewed. Refresh first.");tx.update(ref,ctx.type==="legacy"?{status:"rejected",updatedAt:stamp()}:{status:"rejected",reviewedAt:stamp()});});
     clearEditor();await queryView(true);
   }
   async function verifyOwner(user){

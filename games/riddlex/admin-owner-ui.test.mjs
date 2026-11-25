@@ -112,6 +112,30 @@ try{
   const final=await page.evaluate(()=>window.__reviewStore());
   assert.equal(final["riddlex_owner_records/Q21066842"].mode,"patch");
   assert.equal(final["riddlex_owner_records/owner-three"],undefined);
+  // Compare the catalog's actual starter portrait source against curated rows.
+  const portraits=await page.evaluate(async()=>{
+    const mod=await import("/games/riddlex/admin-catalog.js?v=75");
+    const source=await mod.catalogSource();
+    const p=source.portraitPool;
+    if(!p)return {loaded:false};
+    const originals=p.images.filter((image,i)=>image&&p.credits[i]&&!(p.flags[i]&1)).length;
+    const rows=(await new mod.CatalogBrowser(source,{},[]).next()).rows;
+    return {loaded:true,originals,visible:rows.filter(x=>x.record.image&&x.record.credit).length};
+  });
+  console.log("CATALOG_PORTRAIT_SOURCE",JSON.stringify(portraits));
+  assert.equal(portraits.loaded,true);
+  assert.ok(portraits.originals>0);
+  assert.ok(portraits.visible>0,"The first catalog page should display existing attributed portraits");
+  // Upload a real JPEG fixture through the editor and confirm published
+  // data, rather than only checking an existing player-submitted photo.
+  await page.locator('[data-riddlex-view="reviewed"]').click();
+  await page.locator(".riddlex-item").filter({hasText:"New Cricket Test"}).getByRole("button",{name:"Edit",exact:true}).click();
+  const jpeg=await page.evaluate(()=>{const canvas=document.createElement("canvas");canvas.width=32;canvas.height=32;const ctx=canvas.getContext("2d");ctx.fillStyle="#123456";ctx.fillRect(0,0,32,32);return canvas.toDataURL("image/jpeg").split(",")[1]});
+  await panel.locator('input[type="file"]').setInputFiles({name:"test-portrait.jpg",mimeType:"image/jpeg",buffer:Buffer.from(jpeg,"base64")});
+  await page.getByText("Replacement image ready. Save Changes to publish.",{exact:true}).waitFor();
+  await panel.getByRole("button",{name:"Save Changes"}).click();
+  await page.waitForFunction(()=>window.__reviewStore()["riddlex_owner_records/owner-one"]?.revision===2);
+  assert.ok((await page.evaluate(()=>window.__reviewStore()["riddlex_owner_records/owner-one"].image)).startsWith("data:image/jpeg;base64,"));
   assert.deepEqual(errors,[]);
   console.log("RIDDLEX_OWNER_UI_PASS: 45-question original trace, photo, edit, accept, reject, catalog search, link existing ID");
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}

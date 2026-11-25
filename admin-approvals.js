@@ -10,6 +10,7 @@
   const PAGE=24;
   const labels={yes:"Yes / হ্যাঁ",no:"No / না",probably:"Probably / সম্ভবত হ্যাঁ",
     probably_not:"Probably not / সম্ভবত না",unknown:"Don't know / জানি না"};
+  const statusNames={pending:"Awaiting review",approved:"Approved",confirmed:"Confirmed",rejected:"Rejected"};
   const categories={real:"Real person",fictional:"Fictional character",animal:"Animal",object:"Object"};
   const jobNames={actor:"Actor / actress",singer:"Singer",politician:"Politician",writer:"Writer",
     cricketer:"Cricketer",footballer:"Footballer",athlete:"Athlete",scientist:"Scientist",
@@ -59,7 +60,7 @@
   }
   function photo(raw,adult,cls="riddlex-thumb"){
     const url=!adult?safeImage(raw):"";
-    if(!url)return el("p",adult?"Image not permitted for this record.":"No image.", "muted");
+    if(!url)return el("p",adult?"Name-only record":"No image provided", "muted");
     const img=el("img",undefined,cls);img.src=url;img.loading="lazy";img.alt="Record image";img.referrerPolicy="no-referrer";
     img.onerror=()=>img.replaceWith(el("p","Image could not be loaded.","muted"));return img;
   }
@@ -76,11 +77,17 @@
   function rawRows(data){return Array.isArray(data?.answers)?data.answers:[]}
   function answerMap(data){return new Map(rawRows(data).map(row=>[row?.q??row?.qid,row?.a??row?.value]))}
   function describe(data,rec){
-    const m=answerMap(data), category=categories[data.category]||categories[rec.recordCategory(data.answers,data.category)]||"Category not established";
+    const m=answerMap(data), category=categories[data.category]||categories[rec.recordCategory(data.answers,data.category)]||categoryHint(data)||"Classification pending";
     return [category,m.get("male")==="yes"?"Male":m.get("female")==="yes"?"Female":"",
       m.get("alive")==="yes"?"Alive":m.get("dead")==="yes"||m.get("alive")==="no"?"Deceased":"",
       ...[...m].filter(([q,a])=>typeof q==="string"&&q.startsWith("from_")&&a==="yes"&&q.length===7).map(([q])=>countryName(q)),
       ...Object.keys(jobNames).filter(q=>m.get(q)==="yes").map(q=>jobNames[q])].filter(Boolean).join(" · ");
+  }
+  function categoryHint(data){
+    const groups=new Set(rawRows(data).map(row=>questionMap.get(row?.q??row?.qid)?.group).filter(Boolean));
+    if(groups.has("animal")&&!groups.has("object")&&!groups.has("job")&&!groups.has("country"))return "Likely animal — verify";
+    if(groups.has("object")&&!groups.has("animal")&&!groups.has("job")&&!groups.has("country"))return "Likely object — verify";
+    return "";
   }
   function pathTable(data){
     const wrap=el("div",undefined,"riddlex-path"), table=el("table"), head=el("thead"), hr=el("tr");
@@ -101,8 +108,8 @@
   function clearEditor(){editor=null;show($("#riddlex-editor"),false);$("#riddlex-editor").replaceChildren()}
   function clearLink(){link=null;show($("#riddlex-link-note"),false);$("#riddlex-link-note").replaceChildren()}
   function setLink(ctx){
-    link=ctx;const note=$("#riddlex-link-note");note.replaceChildren(el("strong","Link correction to an existing record"),
-      el("p","Submitted: "+ctx.data.nameEn+". Search for the existing person or item, then use Link to suggestion. Filters are suggested from the submitted path; clear them if the path is wrong. No record is changed until you approve."),
+    link=ctx;const note=$("#riddlex-link-note");note.replaceChildren(el("strong","Match an existing record"),
+      el("p","Submission: "+ctx.data.nameEn+". Select the matching record to review a correction. Clear filters if the original answers are inaccurate."),
       btn("Return to suggestion",()=>{const old=link;clearLink();openEditor(old).catch(fail)}));
     show(note,true);
   }
@@ -112,8 +119,8 @@
     const token=++request;searchAbort?.abort();searchAbort=null;
     if(reset){pageNo=0;cursors=[null];lastDoc=null;}
     const list=$("#riddlex-pending");list.replaceChildren();show($("#riddlex-pagination"),false);
-    if(view==="suggestions"&&!modern){message("New individual suggestions need the updated Firestore rules. Older submissions are still available.",true);return}
-    if(view==="reviewed"&&!modern){message("Owner-reviewed edits are unavailable until the updated Firestore rules are deployed.",true);return}
+    if(view==="suggestions"&&!modern){message("New submissions are unavailable. Previous submissions remain accessible.",true);return}
+    if(view==="reviewed"&&!modern){message("Verified records will be available once database publishing is enabled.",true);return}
     try{
       const m=await modules();if(token!==request||!authorized)return;
       let query=db.collection(view==="suggestions"?"riddlex_suggestions":view==="legacy"?"riddlex_entries":"riddlex_owner_records");
@@ -131,19 +138,19 @@
         if(data.nameBn&&data.nameBn!==data.nameEn)item.append(el("p",data.nameBn,"muted"));
         item.append(el("p",describe(data,m.records),"riddlex-record-meta"),photo(data.image,data.adult));
         item.append(el("p",isReviewed?"ID: "+doc.id+" · Revision "+(data.revision||1):
-          (data.status||"pending")+" · "+rawRows(data).length+" answers"+(data.knownIds?.length?" · possible existing name":""),"muted"));
+          (statusNames[data.status]||"Awaiting review")+" · "+rawRows(data).length+" answers"+(data.knownIds?.length?" · Possible existing record":""),"muted"));
         const actions=el("div",undefined,"toolbar");
         if(isReviewed){
           actions.append(btn("Edit",()=>openEditor({record:{...data,id:doc.id}}).catch(fail),false));
-          if(link)actions.append(btn("Link to suggestion",()=>linkRecord({...data,id:doc.id}).catch(fail)));
+          if(link)actions.append(btn("Select Existing Record",()=>linkRecord({...data,id:doc.id}).catch(fail)));
         }else{
-          actions.append(btn(data.status==="pending"?"Review path":"View submission",()=>openEditor({type,id:doc.id,data}).catch(fail),false));
+          actions.append(btn(data.status==="pending"?"Review Submission":"View Submission",()=>openEditor({type,id:doc.id,data}).catch(fail),false));
         }
         item.append(actions);list.append(item);
       }
       if(!docs.length)list.append(el("p","No records on this page.","muted"));
       paging(snapshot.size>PAGE,"Page "+(pageNo+1)+" · "+docs.length+" records");
-      message("Showing "+docs.length+" records. "+(modern?"Owner access verified.":"Legacy rules active; editing requires rules deployment."));
+      message(docs.length+" "+(view==="reviewed"?"verified records":"submissions")+" displayed. "+(modern?"":"Publishing is unavailable. You can review and compare records."));
     }catch(e){if(token===request)fail(e)}
   }
   async function allReviewed(){
@@ -162,7 +169,7 @@
     const token=++request;searchAbort?.abort();searchAbort=new AbortController();
     pageNo=0;catalogPages=[];browser=null;$("#riddlex-pending").replaceChildren();show($("#riddlex-pagination"),false);
     try{
-      message("Preparing casebook search…");
+      message("Preparing database search…");
       const m=await modules(),rows=await allReviewed();
       if(token!==request||!authorized||searchAbort.signal.aborted)return;
       browser=new m.cat.CatalogBrowser(source,filters(),rows);
@@ -176,19 +183,19 @@
       const item=el("article",undefined,"riddlex-item");item.append(el("h3",record.nameEn));
       if(record.nameBn&&record.nameBn!==record.nameEn)item.append(el("p",record.nameBn,"muted"));
       item.append(photo(record.image,record.adult),el("p",summary,"riddlex-record-meta"),el("p","ID: "+record.id+" · "+origin,"muted"));
-      const actions=el("div",undefined,"toolbar");actions.append(btn("View / edit",()=>editCatalog(record).catch(fail),false));
-      if(link)actions.append(btn("Link to suggestion",()=>linkRecord(record).catch(fail)));item.append(actions);list.append(item);
+      const actions=el("div",undefined,"toolbar");actions.append(btn("View Record",()=>editCatalog(record).catch(fail),false));
+      if(link)actions.append(btn("Select Existing Record",()=>linkRecord(record).catch(fail)));item.append(actions);list.append(item);
     }
-    if(!page.rows.length)list.append(el("p",page.finished?"No matching records in the remaining casebook.":"No match in this batch. Choose Next to continue searching other shards.","muted"));
+    if(!page.rows.length)list.append(el("p",page.finished?"No matching records in the remaining casebook.":"No matches in this batch. Select Next to continue searching.","muted"));
     paging(pageNo<catalogPages.length-1||!page.finished,"Batch "+(pageNo+1)+" · "+page.rows.length+" matches · "+page.scanned.toLocaleString()+" records scanned");
-    message(page.finished?"Search completed across the selected catalog scope.":"Searched "+page.filesRead+" of "+page.totalFiles+" files. Select Next to continue.");
+    message(page.finished?"Search complete for the selected filters.":"Search in progress: "+page.filesRead+" of "+page.totalFiles+" sections checked. Select Next to continue.");
   }
   async function nextCatalog(){
     if(!browser||!authorized)return;
     const token=++request;searchAbort?.abort();const controller=new AbortController();searchAbort=controller;
     $("#riddlex-next").disabled=true;$("#riddlex-prev").disabled=true;
     try{
-      const page=await browser.next(controller.signal,(n,total)=>{if(token===request)message("Reading casebook file "+n+" of "+total+"…")});
+      const page=await browser.next(controller.signal,(n,total)=>{if(token===request)message("Searching database ("+n+" of "+total+")…")});
       if(token!==request||!authorized)return;
       catalogPages.push(page);pageNo=catalogPages.length-1;renderCatalog();
     }catch(e){
@@ -238,6 +245,9 @@
     const countries=[...facts].filter(([key,value])=>typeof key==="string"&&key.startsWith("from_")&&key.length===7&&value==="yes").map(([key])=>key);
     $("#riddlex-country").value=countries.length===1?countries[0]:"";
     $("#riddlex-occupation").value="";
+    if((ctx.data.knownIds||[]).includes(query)){
+      for(const key of ["category","gender","life","country","occupation"])$("#riddlex-"+key).value="";
+    }
     switchView("catalog",{keepLink:true}).catch(fail);
   }
   function sharedRecordCategory(data,facts){
@@ -266,8 +276,8 @@
         else if(ctx.type==="legacy"&&["approved","confirmed"].includes(ctx.data.status)&&modern)panel.append(btn("Edit this approved legacy record",async()=>{try{await openEditor({record:await latestRecord({...draft,mode:"patch"}),legacyDoc:ctx.id})}catch(e){fail(e)}}));
         panel.scrollIntoView({block:"start",behavior:"smooth"});return;
       }
-      if(modern){
-        panel.append(btn(ctx.linked?"Choose a different existing record":"Find duplicate / link existing record",()=>{
+      {
+        panel.append(btn(ctx.linked?"Choose a different existing record":"Check Existing Records",()=>{
           prepareDuplicateSearch(ctx,ctx.data.nameEn||"");
         }));
         for(const id of (ctx.data.knownIds||[]).filter(x=>typeof x==="string").slice(0,10)){
@@ -275,14 +285,14 @@
             prepareDuplicateSearch(ctx,id);
           }));
         }
-        if(ctx.linked)panel.append(el("p","Editing existing ID "+draft.id+". Existing facts are retained unless you explicitly change them.","muted"));
+        if(ctx.linked)panel.append(el("p","Matched record: "+draft.id+". Only the reviewed information will be updated; no duplicate will be created.","muted"));
       }
     }
     if(!canEdit){
-      panel.append(el("p","Updated Firestore rules are required to save edits. No edited information will be published until permissions are available.","muted"));
+      panel.append(el("p","Publishing is currently unavailable. Review the original answers and compare existing records; approval and editing require an active database connection with publishing permissions.","muted"));
       if(unresolved&&ctx.type==="legacy"){
         const actions=el("div",undefined,"toolbar");
-        actions.append(btn("Approve unchanged",()=>legacyDecision(ctx,"approved"),false),btn("Reject",()=>legacyDecision(ctx,"rejected")));panel.append(actions);
+        actions.append(btn("Reject Submission",()=>legacyDecision(ctx,"rejected")));panel.append(actions);
       }
       panel.scrollIntoView({block:"start",behavior:"smooth"});return;
     }
@@ -330,12 +340,15 @@
     if(ctx.record?.revision&&modern)panel.append(btn("View edit history",()=>showHistory(draft.id,panel).catch(fail)));
     const duplicateCheck=el("input");duplicateCheck.type="checkbox";duplicateCheck.style.width="auto";
     if(!ctx.record){
-      const l=el("label");l.append(duplicateCheck,el("span"," I checked for existing records; this is a distinct new identity."));panel.append(l);
+      panel.append(el("p","If this identity already exists, choose Check Existing Records and accept as an update. Only use a new record for a genuinely different identity.","muted"));
+      if(isSubmission)duplicateCheck.disabled=(ctx.data.knownIds||[]).length>0;
+      if(duplicateCheck.disabled)panel.append(el("p","An existing ID was reported. Match that record before approval.","muted"));
+      const l=el("label");l.append(duplicateCheck,el("span"," I verified that this identity does not already exist in the database."));panel.append(l);
     }
-    const save=btn(isSubmission?"Accept / publish reviewed facts":"Save record",async()=>{
+    const save=btn(isSubmission?(ctx.record?"Accept as Update":"Accept as New Record"):"Save Changes",async()=>{
       if(busy||!authorized)return;
       try{
-        if(!ctx.record&&!duplicateCheck.checked)throw Error("Search for duplicate records and confirm this is a distinct identity, or link the existing record.");
+        if(!ctx.record&&(duplicateCheck.disabled||!duplicateCheck.checked))throw Error("Search for duplicate records and confirm this is a distinct identity, or link the existing record.");
         const nameEn=en.value.trim(),nameBn=bn.value.trim();
         if(nameEn.length<2||nameEn.length>80||!categories[cat.value])throw Error("Enter a valid name and choose the verified category.");
         if(/[<>]/.test(nameEn+nameBn))throw Error("Invalid name characters.");
@@ -353,7 +366,7 @@
       }catch(e){fail(e)}finally{busy=false;save.disabled=false}
     },false);
     const actions=el("div",undefined,"toolbar");actions.append(save);
-    if(unresolved)actions.append(btn("Reject suggestion",()=>reject(ctx).catch(fail)));
+    if(unresolved)actions.append(btn("Reject Submission",()=>reject(ctx).catch(fail)));
     panel.append(actions);
     panel.scrollIntoView({block:"start",behavior:"smooth"});
   }
@@ -386,7 +399,7 @@
     panel.append(section);
   }
   async function legacyDecision(ctx,status){
-    if(!authorized||!confirm((status==="approved"?"Approve without editing ":"Reject ")+ctx.data.nameEn+"?"))return;
+    if(status!=="rejected"||!authorized||!confirm("Reject "+ctx.data.nameEn+"?"))return;
     try{await db.collection("riddlex_entries").doc(ctx.id).update({status,updatedAt:stamp()});clearEditor();await queryView(true)}catch(e){fail(e)}
   }
   async function reject(ctx){

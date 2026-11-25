@@ -1,0 +1,34 @@
+name: Riddlex owner manager production read-only check
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/riddlex-owner-manager-production-check.yml"
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check live website build and anonymous rule permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://walid-ai.com"
+          db="https://firestore.googleapis.com/v1/projects/walid-ai-511908/databases/(default)/documents"
+          for attempt in 1 2 3 4; do
+            admin=$(curl -LsS --max-time 20 "$base/admin/?verify=$GITHUB_RUN_ID-$attempt" -o /tmp/live-admin.html -w '%{http_code}' || true)
+            game=$(curl -LsS --max-time 20 "$base/games/riddlex/?verify=$GITHUB_RUN_ID-$attempt" -o /tmp/live-game.html -w '%{http_code}' || true)
+            rules=$(curl -LsS --max-time 20 "$db/riddlex_owner_records?pageSize=1" -o /dev/null -w '%{http_code}' || true)
+            private=$(curl -LsS --max-time 20 "$db/riddlex_suggestions?pageSize=1" -o /dev/null -w '%{http_code}' || true)
+            echo "LIVE_OWNER_MANAGER attempt=$attempt admin_http=$admin game_http=$game owner_records_http=$rules suggestions_http=$private"
+            if grep -q 'Riddlex Database Manager' /tmp/live-admin.html && grep -q 'app.js?v=riddlex-74' /tmp/live-game.html; then
+              echo "LIVE_SITE_BUILD_74_PRESENT"
+              if [[ "$rules" == "200" && "$private" == "403" ]]; then
+                echo "LIVE_FIRESTORE_READ_RULES_PRESENT"
+                exit 0
+              fi
+            fi
+            if [[ "$attempt" != 4 ]]; then sleep 15; fi
+          done
+          echo "::error::Website or public/private Firestore rule verification did not pass; do not claim live owner editing."
+          exit 1

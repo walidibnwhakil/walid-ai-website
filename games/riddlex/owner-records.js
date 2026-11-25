@@ -38,6 +38,25 @@ export function exactRecordIds(pool,name) {
   }
   return [...ids];
 }
+// Owner questions are separate from the immutable packed question positions.
+export const OWNER_QUESTION_GROUPS = Object.freeze({real:"job",fictional:"fiction",animal:"animal",object:"object"});
+export function validOwnerQuestion(q) {
+  return q && typeof q.id==="string" && /^ownerq_[a-f0-9]{32}$/.test(q.id) &&
+    Object.hasOwn(OWNER_QUESTION_GROUPS,q.category) &&
+    [q.en,q.bn].every(t=>typeof t==="string"&&t.trim().length>=5&&t.length<=200&&!/[<>\\u0000-\\u001f]/.test(t));
+}
+export function mergeOwnerQuestions(base,records) {
+  const result=base.slice(),ids=new Set(result.map(q=>q.id));
+  result.packedAttrBytes=base.packedAttrBytes;
+  for(const record of records||[]){
+    for(const q of (Array.isArray(record.customQuestions)?record.customQuestions:[]).slice(0,24)){
+      if(!validOwnerQuestion(q)||ids.has(q.id))continue;
+      ids.add(q.id);result.push({id:q.id,en:q.en.trim(),bn:q.bn.trim(),
+        category:q.category,group:OWNER_QUESTION_GROUPS[q.category],parent:q.category,ownerQuestion:true});
+    }
+  }
+  return result;
+}
 export function approvedFacts(record, questions) {
   const known=new Set(questions.map(q=>q.id)), facts=new Map();
   for(const {q,a} of withCategory(record.answers,record.category)){
@@ -54,6 +73,8 @@ export function asOwnerEntry(record,questions) {
 }
 export function applyOwnerRecords(pool,records,append,poolFromEntries) {
   if(!pool||!records?.length)return pool;
+  pool.questions=mergeOwnerQuestions(pool.questions,records);
+  pool.qIndex=new Map(pool.questions.map((q,i)=>[q.id,i]));
   const map=new Map(records.map(r=>[r.id,r])), found=new Set();
   const facts=new Map(records.map(r=>[r.id,approvedFacts(r,pool.questions)]));
   const update=(i,r)=>{

@@ -130,8 +130,7 @@ service cloud.firestore {
         && request.resource.data.nameEn is string
         && request.resource.data.nameEn.size() >= 2
         && request.resource.data.nameEn.size() <= 60
-        && request.resource.data.nameEn.matches('^[^<>@:/]{2,60}
-)
+        && request.resource.data.nameEn.matches("^[^<>@:/]{2,60}$")
         && request.resource.data.nameBn is string
         && request.resource.data.nameBn.size() <= 80
         && request.resource.data.adult is bool

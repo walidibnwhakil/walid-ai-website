@@ -41,7 +41,7 @@
     });
   }
   async function modules(){
-    if(!shared)shared=Promise.all([import(ROOT+"admin-catalog.js?v=74"),import(ROOT+"owner-records.js?v=riddlex-74")])
+    if(!shared)shared=Promise.all([import(ROOT+"admin-catalog.js?v=75"),import(ROOT+"owner-records.js?v=riddlex-74")])
       .then(([cat,records])=>({cat,records})).catch(e=>{shared=null;throw e});
     const m=await shared;
     if(!source){source=await m.cat.catalogSource();questionMap=new Map(source.manifest.questions.map(q=>[q.id,q]));}
@@ -183,7 +183,7 @@
       const item=el("article",undefined,"riddlex-item");item.append(el("h3",record.nameEn));
       if(record.nameBn&&record.nameBn!==record.nameEn)item.append(el("p",record.nameBn,"muted"));
       item.append(photo(record.image,record.adult),el("p",summary,"riddlex-record-meta"),el("p","ID: "+record.id+" · "+origin,"muted"));
-      const actions=el("div",undefined,"toolbar");actions.append(btn("View Record",()=>editCatalog(record).catch(fail),false));
+      const actions=el("div",undefined,"toolbar");actions.append(btn(modern?"Edit Record":"View Record",()=>editCatalog(record).catch(fail),false));
       if(link)actions.append(btn("Select Existing Record",()=>linkRecord(record).catch(fail)));item.append(actions);list.append(item);
     }
     if(!page.rows.length)list.append(el("p",page.finished?"No matching records in the remaining casebook.":"No matches in this batch. Select Next to continue searching.","muted"));
@@ -259,7 +259,7 @@
     const panel=$("#riddlex-editor");panel.replaceChildren();show(panel,true);
     const draft=draftFor(ctx,m);editor={ctx,draft};
     const isSubmission=!!ctx.data,unresolved=isSubmission&&ctx.data.status==="pending",
-      archived=isSubmission&&!unresolved,canEdit=modern&&!archived;
+      archived=isSubmission&&!unresolved,canPublish=modern&&!archived;
     panel.append(el("h2",isSubmission?"Review submission: "+ctx.data.nameEn:ctx.record?"Edit record":"Add record"));
     panel.append(btn("Close",()=>clearEditor()));
     if(isSubmission){
@@ -285,13 +285,12 @@
         if(ctx.linked)panel.append(el("p","Matched record: "+draft.id+". Only the reviewed information will be updated; no duplicate will be created.","muted"));
       }
     }
-    if(!canEdit){
-      panel.append(el("p","Publishing is currently unavailable. Review the original answers and compare existing records; approval and editing require an active database connection with publishing permissions.","muted"));
+    if(!canPublish){
+      panel.append(el("p","Preview mode — you can inspect and prepare changes, including a replacement image. Publishing is disabled until the authorized database connection is restored. Unsaved changes are not applied to the game.","muted"));
       if(unresolved&&ctx.type==="legacy"){
         const actions=el("div",undefined,"toolbar");
         actions.append(btn("Reject Submission",()=>legacyDecision(ctx,"rejected")));panel.append(actions);
       }
-      panel.scrollIntoView({block:"start",behavior:"smooth"});return;
     }
     const top=el("div",undefined,"riddlex-editor-top"),en=field(draft.nameEn),bn=field(draft.nameBn),cat=el("select");
     cat.append(new Option("Choose verified category",""));for(const [key,title] of Object.entries(categories))cat.append(new Option(title,key));cat.value=draft.category||"";
@@ -300,7 +299,7 @@
     const adultLabel=el("label");adultLabel.append(adult,el("span","Restricted image / name-only record"));top.append(adultLabel);panel.append(el("h3","Reviewed identity"),top);
     const preview=el("div");preview.append(photo(draft.image,draft.adult,"riddlex-editor-photo"));const credit=field(draft.credit);credit.maxLength=2000;
     const file=el("input");file.type="file";file.accept="image/jpeg,image/png,image/webp";file.disabled=adult.checked;
-    file.onchange=async()=>{try{if(!file.files?.[0])return;draft.image=await compress(file.files[0]);if(adult.checked){draft.image="";return}preview.replaceChildren(photo(draft.image,false,"riddlex-editor-photo"));message("Replacement image ready. Save to publish.")}catch(e){fail(e)}};
+    file.onchange=async()=>{try{if(!file.files?.[0])return;draft.image=await compress(file.files[0]);if(adult.checked){draft.image="";return}preview.replaceChildren(photo(draft.image,false,"riddlex-editor-photo"));message(canPublish?"Replacement image ready. Save Changes to publish.":"Image preview ready. Publishing is currently unavailable.")}catch(e){fail(e)}};
     adult.onchange=()=>{file.disabled=adult.checked;if(adult.checked){draft.image="";credit.value="";file.value=""}preview.replaceChildren(photo(draft.image,adult.checked,"riddlex-editor-photo"))};
     const photoActions=el("div",undefined,"toolbar");photoActions.append(file,btn("Remove photo",()=>{draft.image="";credit.value="";preview.replaceChildren(photo("",adult.checked))}));
     if(ctx.linked&&ctx.data.image&&!ctx.data.adult)photoActions.append(btn("Use submitted photo",()=>{if(adult.checked)return;draft.image=ctx.data.image;credit.value="Player submission";preview.replaceChildren(photo(draft.image,false,"riddlex-editor-photo"))}));
@@ -342,7 +341,7 @@
       const l=el("label");l.append(duplicateCheck,el("span"," I verified that this identity does not already exist in the database."));panel.append(l);
     }
     const save=btn(isSubmission?(ctx.record?"Accept as Update":"Accept as New Record"):"Save Changes",async()=>{
-      if(busy||!authorized)return;
+      if(busy||!authorized||!canPublish)return;
       try{
         if(!ctx.record&&!duplicateCheck.checked)throw Error("Search for duplicate records and confirm this is a distinct identity, or link the existing record.");
         const nameEn=en.value.trim(),nameBn=bn.value.trim();
@@ -361,6 +360,7 @@
         if(view==="catalog")await beginCatalog();else await queryView(true);
       }catch(e){fail(e)}finally{busy=false;save.disabled=false}
     },false);
+    save.disabled=!canPublish;
     const actions=el("div",undefined,"toolbar");actions.append(save);
     if(unresolved)actions.append(btn("Reject Submission",()=>reject(ctx).catch(fail)));
     panel.append(actions);

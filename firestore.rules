@@ -19,7 +19,7 @@ service cloud.firestore {
         data.image is string
         && data.image.size() > 20
         && data.image.size() < 150000
-        && data.image.matches("^data:image/(webp|jpeg);base64,")
+        && data.image.matches("^data:image/(webp|jpeg);base64,[A-Za-z0-9+/=]+$")
       );
     }
     function noAdultPicture(data) {
@@ -43,7 +43,7 @@ service cloud.firestore {
 
     match /riddlex_entries/{slug} {
       allow get: if resource == null
-        || resource.data.status in ["approved", "confirmed", "pending"]
+        || resource.data.status in ["approved", "confirmed"]
         || owner()
         || (signedIn() && resource.data.createdBy == request.auth.uid);
       allow list: if resource.data.status in ["approved", "confirmed"]
@@ -90,7 +90,8 @@ service cloud.firestore {
         && request.resource.data.answers is list
         && request.resource.data.answers.size() > 0
         && request.resource.data.answers.size() <= 36
-        && request.resource.data.answers.size() >= resource.data.answers.size()
+        && request.resource.data.answers == resource.data.answers
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["confirmations","confirmers","updatedAt"])
         && request.resource.data.createdBy == resource.data.createdBy
         && request.resource.data.createdAt == resource.data.createdAt
         && (("image" in resource.data) == ("image" in request.resource.data))
@@ -114,6 +115,76 @@ service cloud.firestore {
         && request.resource.size() < 220000;
 
       allow delete: if owner();
+    }
+
+    // Each play path is an immutable, privately moderated suggestion.
+    match /riddlex_suggestions/{id} {
+      allow get: if owner() || (signedIn() && resource.data.createdBy == request.auth.uid);
+      allow list: if owner();
+      allow create: if signedIn()
+        && id.size() > 0 && id.size() < 120
+        && request.resource.data.keys().hasOnly([
+          "nameEn","nameBn","adult","category","answers","knownIds",
+          "status","createdBy","slot","createdAt","image"
+        ])
+        && request.resource.data.nameEn is string
+        && request.resource.data.nameEn.size() >= 2
+        && request.resource.data.nameEn.size() <= 60
+        && request.resource.data.nameEn.matches('^[^<>@:/]{2,60}
+)
+        && request.resource.data.nameBn is string
+        && request.resource.data.nameBn.size() <= 80
+        && request.resource.data.adult is bool
+        && request.resource.data.category in ["character","animal","object"]
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() > 0
+        && request.resource.data.answers.size() <= 512
+        && request.resource.data.knownIds is list
+        && request.resource.data.knownIds.size() <= 10
+        && request.resource.data.status == "pending"
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.slot is int
+        && request.resource.data.slot >= 0 && request.resource.data.slot <= 4
+        && request.resource.data.createdAt == request.time
+        && validImage(request.resource.data) && noAdultPicture(request.resource.data)
+        && request.resource.size() < 350000
+        && exists(/databases/$(database)/documents/riddlex_slots/$(request.auth.uid + "~" + string(hourNow()) + "~" + string(request.resource.data.slot)))
+        && get(/databases/$(database)/documents/riddlex_slots/$(request.auth.uid + "~" + string(hourNow()) + "~" + string(request.resource.data.slot))).data.slug == id;
+      allow update: if owner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status","resolvedId","reviewedAt"])
+        && request.resource.data.status in ["approved","rejected","pending"]
+        && request.resource.data.reviewedAt == request.time;
+      allow delete: if owner();
+    }
+
+    // The public game may read ONLY owner-reviewed facts, never raw player paths.
+    match /riddlex_owner_records/{id} {
+      allow get, list: if true;
+      allow create, update: if owner()
+        && id.size() > 0 && id.size() <= 140
+        && request.resource.data.keys().hasOnly([
+          "nameEn","nameBn","adult","category","answers","image","credit","mode",
+          "revision","updatedAt"
+        ])
+        && request.resource.data.nameEn is string
+        && request.resource.data.nameEn.size() >= 2 && request.resource.data.nameEn.size() <= 80
+        && request.resource.data.nameBn is string && request.resource.data.nameBn.size() <= 80
+        && request.resource.data.adult is bool
+        && request.resource.data.category in ["real","fictional","animal","object"]
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() > 0 && request.resource.data.answers.size() <= 512
+        && request.resource.data.image is string && request.resource.data.image.size() < 150000
+        && request.resource.data.credit is string && request.resource.data.credit.size() <= 2000
+        && (request.resource.data.adult == false || request.resource.data.image == "")
+        && request.resource.data.mode in ["patch","new"]
+        && request.resource.data.revision is int && request.resource.data.revision > 0
+        && request.resource.data.updatedAt == request.time
+        && request.resource.size() < 350000;
+      allow delete: if owner();
+      match /history/{version} {
+        allow read, create: if owner();
+        allow update, delete: if false;
+      }
     }
   }
 }

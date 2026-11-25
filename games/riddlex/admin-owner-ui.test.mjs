@@ -107,7 +107,7 @@ try{
   console.log("CATALOG_SEARCH_STATE",await page.locator("#riddlex-status").innerText(),await page.locator("#riddlex-page-info").innerText());
   await candidate.getByRole("button",{name:"Select Existing Record"}).click({timeout:30000});
   await panel.getByText("Matched record: Q21066842",{exact:false}).waitFor();
-  await panel.getByRole("button",{name:"Accept / publish reviewed facts"}).click();
+  await panel.getByRole("button",{name:"Accept as Update"}).click();
   await page.waitForFunction(()=>window.__reviewStore()["riddlex_suggestions/three"].resolvedId==="Q21066842");
   const final=await page.evaluate(()=>window.__reviewStore());
   assert.equal(final["riddlex_owner_records/Q21066842"].mode,"patch");

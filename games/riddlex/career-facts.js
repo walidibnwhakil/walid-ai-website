@@ -274,7 +274,7 @@ export const EXTRA_SCREEN_QUESTIONS = Object.freeze([
     bn:"তিনি কি ৮০০টির বেশি চলচ্চিত্রে অভিনয় করেছেন?" },
   { id:"screen_lead_to_villain", group:"job",
     en:"Did they become known for villain roles after starting as a screen hero?",
-    bn:"নায়ক হিসেবে শুরু করে পরে কি খলচরিত্রেও পরিচিত হয়েছেন?" },
+    bn:"প্রধান চরিত্রে অভিনয় দিয়ে শুরু করে পরে কি খলচরিত্রেও পরিচিত হয়েছেন?" },
   { id:"screen_theatre_tv_film", group:"job",
     en:"Were they widely known for acting in theatre, television and film?",
     bn:"মঞ্চ, টেলিভিশন ও চলচ্চিত্র—তিন মাধ্যমেই কি তিনি বিশেষভাবে পরিচিত ছিলেন?" },

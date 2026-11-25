@@ -480,7 +480,8 @@ async function beginDefeat() {
   $("learn-note").textContent = adult ? text().noPhoto : "";
   $("learn-photo").value = "";
   $("learn-name").value = "";
-  $("back").hidden = true;
+  // Players can correct an accidental answer even after an unsuccessful round.
+  $("back").hidden = !state?.answers.length;
 }
 
 function showLearnMessage(message) {
@@ -539,7 +540,7 @@ function onPlayAgain() {
 
 function onUndo() {
   if (!state?.answers.length) return;
-  if (mode === "guess" || mode === "reveal" || mode === "wrong") {
+  if (["guess","reveal","wrong","learn"].includes(mode)) {
     scene.clearReveal();
     guessIndex = -1;
     $("credit").textContent = "";

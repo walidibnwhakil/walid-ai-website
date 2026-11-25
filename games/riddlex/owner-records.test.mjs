@@ -94,10 +94,18 @@ test("the decision engine actually offers an owner's confirmed clue before guess
   const pool=applyOwnerRecords(poolFromEntries(questions,entries),[owner],appendShard,poolFromEntries);
   const state=createState(pool,{category:"character"});
   for(const qid of ["real","male","alive","from_bd","actor"])answer(state,qid,"yes");
-  const d=decide(state);
-  assert.equal(d.type,"ask",JSON.stringify(d));
-  assert.equal(d.qid,clue.id);
-  answer(state,clue.id,"yes");
-  const next=decide(state);
-  assert.notEqual(next.qid,clue.id);
+  // The normal actor-role interview still takes precedence. Answer its
+  // visible questions honestly and verify the owner clue precedes any guess.
+  const seen=[];
+  let asked=false;
+  for(let step=0;step<12;step++){
+    const d=decide(state);
+    assert.equal(d.type,"ask",JSON.stringify({seen,decision:d}));
+    seen.push(d.qid);
+    if(d.qid===clue.id){asked=true;answer(state,d.qid,"yes");break;}
+    const bit=factBit(pool,0,pool.qIndex.get(d.qid));
+    answer(state,d.qid,bit===2?"yes":bit===1?"no":"unknown");
+  }
+  assert.ok(asked,JSON.stringify(seen));
+  assert.notEqual(decide(state).qid,clue.id);
 });

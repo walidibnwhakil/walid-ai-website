@@ -7,7 +7,7 @@ const politicsUrl = new URL(
   import.meta.url,
 );
 const { POLITICS_FACTS, POLITICS_PEOPLE, POLITICS_IDENTITY_QUESTIONS } = await import(politicsUrl);
-import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-60";
+import { SCREEN_STAR_1990S, SCREEN_STAR_PRE1990, SCREEN_CAREER_DETAILS, SCREEN_LIFE_DETAILS } from "./career-facts.js?v=riddlex-73";
 import { PERSONAL_FACTS, PERSONAL_QUESTION_IDS } from "./personal-facts.js?v=riddlex-62";
 import { NARRATIVE_QUESTIONS, NARRATIVE_FACTS } from "./narrative-facts.js";
 import { EVERYDAY_QUESTIONS, EVERYDAY_OBJECTS, EVERYDAY_FACTS, EVERYDAY_FAMILY_IDS } from "./everyday-facts.js?v=riddlex-71";
@@ -15,7 +15,7 @@ import { RECOGNITION_QUESTIONS, RECOGNITION_FACTS, RECOGNITION_SPECIFIC_IDS, REC
 import { HYPOTHESIS_FACTS } from "./hypothesis-facts.js?v=riddlex-60";
 import { IDENTITY_FACTS, IDENTITY_DISTINCTIVE_IDS, EXTRA_IDENTITY_QUESTIONS, EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
 import { DOMAIN_QUESTIONS, DOMAIN_FACTS, DOMAIN_PROFILE_FACTS } from "./domain-facts.js?v=riddlex-60";
-import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-69";
+import { BROAD_QUESTIONS, BROAD_FACTS, BROAD_PROFILE_FACTS } from "./broad-facts.js?v=riddlex-73";
 
 export const ANSWERS = ["yes", "probably", "probably_not", "no", "unknown"];
 
@@ -1175,7 +1175,17 @@ function unrelatedJob(state, id) {
   return !candidatesSplit(state, probe, rows);
 }
 
+// Equivalent questions can originate from different fact tables. A new
+// question ID must not make an already answered proposition new evidence.
+const EQUIVALENT_QUESTION_GROUPS = [
+  ["screen_hindi_cinema","career_hindi_films"],
+  ["screen_telugu_cinema","career_telugu_films"],
+  ["film_aashram","profile_film_aashram"],
+];
 function skippedAsDuplicate(state, id) {
+  const equivalents = EQUIVALENT_QUESTION_GROUPS.find(group=>group.includes(id));
+  if (equivalents && state.answers.some(row=>row.qid!==id &&
+      equivalents.includes(row.qid) && row.value!=="unknown")) return true;
   const yes = (qid) => said(state, qid, ["yes", "probably"]);
   const answered = (qid) => state.answers.some((answer) => answer.qid === qid && answer.value !== "unknown");
   // Alive and dead are the same binary fact. An "unknown" answer should
@@ -2455,6 +2465,7 @@ function lateSupportedPublicGuess(state,best,bestP,secondP) {
   // when a globally famous later actor still carries a large sparse prior.
   const actor=affirm.some(x=>x.qid==="actor");
   if(actor && cinema.length>=2 && careers.length>=1 &&
+     cinema.some(row=>SCREEN_IDENTITY_QUESTIONS.includes(row.qid)) &&
      bestP>=.17 && oddsRatio(bestP,secondP)>=2)
     return true;
   // After 18+ honest answers, two confirmed separate occupations plus
@@ -2486,7 +2497,7 @@ function corroboratedFilmHypothesis(state,index,bestP,secondP) {
       "screen_national_film_award"].includes(row.qid) ||
       SCREEN_IDENTITY_QUESTIONS.includes(row.qid)) &&
     factBit(state.pool,index,row.qi)===2);
-  if(facts.length<2)return false;
+  if(facts.length<2 || !hasScreenIdentityProof(state,index))return false;
   // The candidate must also respect every definite NO; UNKNOWN is neutral.
   return !state.answers.some(row=>{
     if(!["yes","no"].includes(row.value))return false;

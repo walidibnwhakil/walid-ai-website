@@ -31,6 +31,20 @@ class CanonicalExpectationTests(unittest.TestCase):
                 self.assertTrue((ROOT / slug / "index.html").is_file())
                 self.assertIn(f'href="/{slug}/"', home)
 
+    def test_retired_html_aliases_are_absent(self):
+        aliases = (
+            "about-us.html", "contact-us.html", "privacy-policy.html",
+            "privacy.html", "terms-of-service.html", "third-party-licenses.html",
+            "chat.html", "tools.html", "zip.html", "tool-workspace.html",
+            "sections/education.html", "sections/sports.html",
+            "guides/bangla-ocr.html", "guides/image-tools.html", "guides/pdf-tools.html",
+        )
+        sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        for alias in aliases:
+            with self.subTest(alias=alias):
+                self.assertFalse((ROOT / alias).exists())
+                self.assertNotIn(f"https://walid-ai.com/{alias}<", sitemap)
+
     def test_old_quran_writers_are_retired(self):
         workflow_root = ROOT / ".github/workflows"
         for name in (

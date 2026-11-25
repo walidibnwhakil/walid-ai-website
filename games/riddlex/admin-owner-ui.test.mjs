@@ -98,6 +98,10 @@ try{
   const cricket=panel.locator(".riddlex-fact").filter({hasText:"Do they play cricket?"});
   await cricket.locator("select").selectOption("no");
   await panel.getByText("I verified that this identity",{exact:false}).click();
+  await panel.locator("#riddlex-new-question-en").fill("Did they win the fictional test award?");
+  await panel.locator("#riddlex-new-question-bn").fill("তিনি কি পরীক্ষামূলক পুরস্কার পেয়েছেন?");
+  await panel.getByRole("button",{name:"Add Question",exact:true}).click();
+  await panel.locator(".riddlex-fact").filter({hasText:"Did they win the fictional test award?"}).waitFor();
   await panel.getByRole("button",{name:"Accept as New Record"}).click();
   await page.waitForFunction(()=>window.__reviewStore()["riddlex_owner_records/owner-one"]?.answers.some(x=>x.q==="cricketer"&&x.a==="no"));
   const data=await page.evaluate(()=>window.__reviewStore());
@@ -106,6 +110,9 @@ try{
   assert.equal(data["riddlex_suggestions/one"].status,"approved");
   const quickFacts=new Map(data["riddlex_owner_records/owner-one"].answers.map(x=>[x.q,x.a]));
   for(const id of ["alive","from_bd","from_in","actor","profile_film_titanic"])assert.equal(quickFacts.get(id),"yes",id);
+  const customDefinition=data["riddlex_owner_records/owner-one"].customQuestions[0];
+  assert.equal(customDefinition.en,"Did they win the fictional test award?");
+  assert.equal(quickFacts.get(customDefinition.id),"yes");
   assert.equal(quickFacts.get("dead"),"no");
   assert.equal(quickFacts.get("from_pk"),undefined);
   assert.equal(quickFacts.get("cricketer"),"no");
@@ -133,7 +140,7 @@ try{
   assert.equal(final["riddlex_owner_records/owner-three"],undefined);
   // Compare the catalog's actual starter portrait source against curated rows.
   const portraits=await page.evaluate(async()=>{
-    const mod=await import("/games/riddlex/admin-catalog.js?v=75");
+    const mod=await import("/games/riddlex/admin-catalog.js?v=76");
     const source=await mod.catalogSource();
     const p=source.portraitPool;
     if(!p)return {loaded:false};
@@ -155,6 +162,8 @@ try{
   await panel.getByRole("button",{name:"Save Changes"}).click();
   await page.waitForFunction(()=>window.__reviewStore()["riddlex_owner_records/owner-one"]?.revision===2);
   assert.ok((await page.evaluate(()=>window.__reviewStore()["riddlex_owner_records/owner-one"].image)).startsWith("data:image/jpeg;base64,"));
+  assert.equal((await page.evaluate(()=>window.__reviewStore()["riddlex_owner_records/owner-one"].customQuestions[0].id)),customDefinition.id);
+  console.log("RIDDLEX_CUSTOM_QUESTION_UI_PASS: create, publish and preserve bilingual clue across record edits");
   assert.deepEqual(errors,[]);
   console.log("RIDDLEX_OWNER_UI_PASS: 45-question original trace, photo, edit, accept, reject, catalog search, link existing ID");
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}

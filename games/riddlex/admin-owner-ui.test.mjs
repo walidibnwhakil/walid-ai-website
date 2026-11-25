@@ -84,13 +84,13 @@ try{
   assert.ok(await panel.locator("img").count()>0);
   assert.equal(await panel.locator("#riddlex-identity-gender").inputValue(),"male");
   await panel.locator("#riddlex-identity-life").selectOption("alive");
-  const countrySection=panel.locator(".riddlex-quick-section").filter({has:panel.locator("#riddlex-identity-country")});
+  const countrySection=panel.locator(".riddlex-quick-section").filter({has:page.locator("#riddlex-identity-country")});
   await panel.locator("#riddlex-identity-country").selectOption("from_in");
   await countrySection.getByRole("button",{name:"Set Answer",exact:true}).click();
-  const jobSection=panel.locator(".riddlex-quick-section").filter({has:panel.locator("#riddlex-identity-profession")});
+  const jobSection=panel.locator(".riddlex-quick-section").filter({has:page.locator("#riddlex-identity-profession")});
   await panel.locator("#riddlex-identity-profession").selectOption("actor");
   await jobSection.getByRole("button",{name:"Set Answer",exact:true}).click();
-  const workSection=panel.locator(".riddlex-quick-section").filter({has:panel.locator("#riddlex-identity-works")});
+  const workSection=panel.locator(".riddlex-quick-section").filter({has:page.locator("#riddlex-identity-works")});
   await workSection.getByRole("searchbox",{name:"Search notable works"}).fill("Titanic");
   await panel.locator("#riddlex-identity-works").selectOption("profile_film_titanic");
   await workSection.getByRole("button",{name:"Set Answer",exact:true}).click();

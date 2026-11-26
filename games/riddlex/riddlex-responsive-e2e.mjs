@@ -83,6 +83,10 @@ try {
     await page.click('[data-cat="animal"]');
     await page.waitForFunction(()=>window.__riddlex?.state()?.mode==="ask",null,{timeout:30000});
     await layout("ask","en");
+    // Real click: verify controls remain reachable when Back appears on question two.
+    await page.click("#answer-yes");
+    await page.waitForFunction(()=>document.getElementById("progress").textContent.includes("Question 2") && !document.getElementById("back").hidden,null,{timeout:20000});
+    await layout("ask","en");
     await page.click('#game [data-set-lang="bn"]');
     await layout("ask","bn");
     const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);

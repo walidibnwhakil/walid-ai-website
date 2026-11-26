@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=portrait-clear-face-20261127";
+import { createScene, startMenuCat } from "./scene.js?v=portrait-live-motion-20261127";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -173,7 +173,7 @@ function setStatus(message, number) {
   const showNumber = Number.isFinite(number) && number > 0;
   if (badge) {
     badge.hidden = !showNumber;
-    if (showNumber) badge.textContent = String(number);
+    if (showNumber) badge.textContent = lang === "bn" ? String(number).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[Number(d)]) : String(number);
   }
   speech?.classList.toggle("has-badge", showNumber);
   speech?.classList.remove("pop");

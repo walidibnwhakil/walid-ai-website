@@ -726,3 +726,23 @@ html, body {
   #game .speech.pop{animation:portrait-dialogue-in .2s ease-out both;}
   @keyframes portrait-dialogue-in{from{opacity:0;}to{opacity:1;}}
 }
+
+/* Keep the number attached to the question, use one consistent Bengali
+   typeface and remove the legacy status padding that separated the number. */
+#game .speech .q-badge{align-self:center;margin:0;flex:0 0 auto;min-width:1.45em;padding:3px 4px;font-size:1em;line-height:1;display:grid;place-items:center;border-radius:6px;}
+#game .speech .q-badge[hidden]{display:none!important;}
+#game .speech #status{padding:0;margin:0;flex:0 1 auto;min-width:0;letter-spacing:0;word-spacing:normal;overflow-wrap:break-word;word-break:normal;}
+html[lang="bn"] #game .speech #status,html[lang="bn"] #game .speech .q-badge{
+  font-family:SolaimanLipi,"Times New Roman",Times,serif;font-weight:400;
+}
+@media(max-aspect-ratio:4/5){
+  #game .speech{gap:5px;padding:7px 8px;align-items:center;min-height:0;}
+  html[lang="bn"] #game .speech #status{font-size:clamp(15px,4.1vw,18px);line-height:1.22;padding:0;}
+  #game .speech .q-badge{font-size:clamp(14px,3.8vw,16px);}
+  #game #answers{bottom:clamp(35px,5vh,44px);gap:8px;}
+  #game #categories{bottom:22px;}
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game #answers{bottom:35px;gap:6px;}
+  #game #answers .answer-row button{min-height:42px;}
+}

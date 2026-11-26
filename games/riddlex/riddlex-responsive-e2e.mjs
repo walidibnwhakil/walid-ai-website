@@ -222,6 +222,28 @@ try {
       await page.waitForTimeout(350);
       if(shotFolder)await page.screenshot({path:join(shotFolder,"layered-mood-"+mood+".png"),animations:"disabled"});
     }
+    await page.waitForFunction(()=>window.__riddlex.expression().portraitMotion.poses.length===9,null,{timeout:15000});
+    await page.evaluate(()=>window.__riddlex.setMood("curious"));
+    await page.waitForTimeout(2200);
+    const snap=()=>page.evaluate(()=>{
+      const c=document.getElementById("stage");
+      const pixels=c.getContext("2d").getImageData(0,0,c.width,c.height).data;
+      let hash=2166136261;for(let i=0;i<pixels.length;i+=16)hash=Math.imul(hash^pixels[i],16777619)^pixels[i+3];
+      return {hash,stats:window.__riddlex.expression().portraitMotion};
+    });
+    const beforeMotion=await snap();
+    await page.waitForTimeout(650);
+    const afterMotion=await snap();
+    assert.notEqual(afterMotion.hash,beforeMotion.hash,"portrait animation canvas is static");
+    assert.ok(afterMotion.stats.smoke>beforeMotion.stats.smoke&&afterMotion.stats.idle>beforeMotion.stats.idle&&afterMotion.stats.cat>beforeMotion.stats.cat,"idle/smoke/cat did not render");
+    for(const key of ["happy","sad","worried","confused","surprised"]){
+      await page.evaluate(key=>window.__riddlex.setMood(key),key);
+      await page.waitForTimeout(2400);
+      const current=await snap();
+      assert.ok(current.stats.face>afterMotion.stats.face,"face pose did not render "+key);
+      if(shotFolder)await page.screenshot({path:join(shotFolder,"portrait-live-"+key+".png")});
+    }
+    console.log("PORTRAIT_LIVE_MOTION_PASS",JSON.stringify(afterMotion.stats));
     const client=await page.context().newCDPSession(page);
     await client.send("Emulation.setCPUThrottlingRate",{rate:4});
     await client.send("Performance.enable");

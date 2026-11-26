@@ -184,7 +184,7 @@ function setStatus(message, number) {
 function placeUnderBubble() {
   const wrap = document.querySelector(".stage-wrap");
   const bubble = $("speech");
-  if (!wrap || !bubble || wrap.clientWidth / Math.max(1, wrap.clientHeight) >= 0.8) return;
+  if (!wrap || !bubble || !matchMedia("(max-aspect-ratio: 4/5)").matches) return;
   const wr = wrap.getBoundingClientRect();
   const sr = bubble.getBoundingClientRect();
   if (sr.height < 8) return;

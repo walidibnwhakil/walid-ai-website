@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="Riddlex — Online Character Guessing Game | Walid AI">
   <meta name="twitter:description" content="Think of a person, character, animal or object. Play Riddlex online and answer questions as the detective tries to guess your choice.">
   <meta name="twitter:image" content="https://walid-ai.com/walid-ai-share-20261122-compatible.jpg">
-  <link rel="stylesheet" href="./style.css?v=approved-wall-table-20261126">
+  <link rel="stylesheet" href="./style.css?v=menu-viewport-20261127">
   <link rel="icon" href="/favicon.ico?v=20261109-pink" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20261109-pink">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261109-pink">
@@ -45,9 +45,9 @@
       #menu .riddlex-guide-actions button { min-height:24px; padding:2px; font-size:clamp(10px,2.9vh,16px); }
     }
     @media (max-aspect-ratio:4/5) {
-      #menu .riddlex-guide-actions { left:50%; bottom:max(3%,env(safe-area-inset-bottom)); width:min(300px,82%); gap:8px; }
-      #menu .riddlex-guide-actions button { min-height:44px; font-size:16px; }
-      #menu #play { bottom:calc(max(3%,env(safe-area-inset-bottom)) + 52px); }
+      #menu .riddlex-guide-actions { left:50%; bottom:8px; width:min(300px,86%); gap:6px; }
+      #menu .riddlex-guide-actions button { min-height:44px; font-size:clamp(12px,3.8cqw,16px); }
+      #menu #play { bottom:58px; min-height:48px; font-size:clamp(17px,5.6cqw,22px); padding:6px 12px; }
     }
   @media (max-height:620px) and (max-aspect-ratio:4/5){#riddlex-guide{padding:12px;font-size:15px;line-height:1.3}#riddlex-guide h2{margin-bottom:8px;font-size:22px}#riddlex-guide ol{padding-inline-start:22px}#riddlex-guide li{margin-bottom:4px}#riddlex-guide .guide-language{gap:6px;margin-bottom:8px}#riddlex-guide button{min-height:36px;padding:6px 12px}#riddlex-guide .guide-close{min-height:36px;margin-top:4px}}@media (max-height:430px) and (min-aspect-ratio:4/5){#riddlex-guide{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 20px);padding:12px 16px;font-size:13px;line-height:1.28}#riddlex-guide h2{margin-bottom:6px;font-size:20px}#riddlex-guide ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px;margin:4px 0;padding-inline-start:20px}#riddlex-guide li{margin-bottom:3px}#riddlex-guide .guide-language{gap:6px;margin-bottom:6px}#riddlex-guide button{min-height:32px;padding:4px 10px}#riddlex-guide .guide-close{min-height:32px;margin-top:4px}}</style>
 <style id="riddlex-menu-ambient-css">
@@ -64,9 +64,13 @@
 #menu .riddlex-guide-actions svg{width:1em;height:1em;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 #menu[hidden] .menu-ambient *,#menu.ambient-paused .menu-ambient *{animation-play-state:paused}
 #menu.ambient-paused .menu-ambient{visibility:hidden}
+#menu:not(.art-ready) .menu-ambient,#menu:not(.art-ready) .menu-cat{visibility:hidden}
+#menu:not(.art-ready) .menu-ambient *{animation-play-state:paused}
+#menu.art-ready:not(.ambient-paused) .menu-ambient *{animation-play-state:running}
+
 @media (max-aspect-ratio:4/5){
 #menu .menu-ambient-landscape{display:none}
-#menu .menu-ambient-portrait{display:block;inset:auto;left:50%;top:50%;width:max(100cqw,56.25cqh);height:max(100cqh,177.77778cqw);transform:translate(-50%,-50%)}
+#menu .menu-ambient-portrait{display:block;inset:0;width:100%;height:100%;transform:none}
 #menu .menu-ambient-portrait .menu-pipe-smoke{left:52.7%;top:58.1%;width:16%;height:21%;transform:translate(-44%,-100%)}
 #menu .menu-ambient-portrait .menu-lamp-glow{left:92.3%;top:66.4%;width:17%;height:11%}}
 @media (prefers-reduced-motion:reduce){#menu .menu-ambient{display:none!important}#menu .menu-ambient *{animation:none!important}}
@@ -84,13 +88,32 @@
         <script>
           (function () {
             var orientation = matchMedia("(max-aspect-ratio: 4/5)");
+            var menu = document.getElementById("menu");
+            var generation = 0;
             function syncMenuArt() {
               var portrait = orientation.matches;
+              var token = ++generation;
+              menu.classList.remove("art-ready");
               document.documentElement.dataset.orient = portrait ? "portrait" : "landscape";
-              document.querySelectorAll("#menu img").forEach(function (img) {
+              var active = menu.querySelector(portrait ? ".menu-port" : ".menu-card");
+              menu.querySelectorAll("img").forEach(function (img) {
                 var src = portrait ? img.getAttribute("data-portrait") : img.getAttribute("data-landscape");
                 if (src && img.getAttribute("src") !== src) img.src = src;
               });
+              // Wait for the selected image to decode AND be painted. Do not let
+              // smoke/lamp/cat effects flash on an empty room or during rotation.
+              function ready() {
+                if (token !== generation || !active.naturalWidth) return;
+                requestAnimationFrame(function () {
+                  requestAnimationFrame(function () {
+                    if (token === generation && active.complete && active.naturalWidth)
+                      menu.classList.add("art-ready");
+                  });
+                });
+              }
+              if (typeof active.decode === "function") active.decode().then(ready, function () {});
+              else if (active.complete) ready();
+              else active.addEventListener("load", ready, {once:true});
             }
             syncMenuArt();
             if (orientation.addEventListener) orientation.addEventListener("change", syncMenuArt);

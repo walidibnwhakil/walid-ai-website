@@ -711,3 +711,18 @@ html, body {
   #menu .menu-back {top:7px;left:8px;padding:6px 12px;}
   #menu #play {width:min(280px,78%);}
 }
+
+/* Keep the approved portrait detective's face clear of the dialogue,
+   including the initial category prompt. The desktop is unchanged. */
+@media(max-aspect-ratio:4/5){
+  #game .speech {
+    left:var(--speech-left,56%);max-width:var(--speech-max,42%);
+    padding:6px 8px;gap:4px;
+  }
+  #game .speech::after,#game .speech.has-badge::after {
+    left:calc(-1 * var(--speech-tail,12px) + 2px);
+    width:var(--speech-tail,12px);height:16px;
+  }
+  #game .speech.pop{animation:portrait-dialogue-in .2s ease-out both;}
+  @keyframes portrait-dialogue-in{from{opacity:0;}to{opacity:1;}}
+}

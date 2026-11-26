@@ -175,12 +175,15 @@ export function createScene(canvas) {
     if (!bubble || !bubble.offsetHeight || !canvas.width || !canvas.height || cssSize.width < 10 || actorBox.w < 2) return;
     const dx = cssSize.width / canvas.width, dy = cssSize.height / canvas.height;
     if (portraitMode) {
-      const x = Math.round(cssSize.width * (document.documentElement.lang === "bn" ? .42 : .46));
       const actorArt = room.querySelector(".approved-actors");
       const rect = actorArt.getBoundingClientRect(), stage = canvas.getBoundingClientRect();
-      const mouthY = rect.top - stage.top + rect.height * .40;
-      const values = {"--speech-left":x,"--speech-max":cssSize.width-x-9,"--speech-tail":18,
-        "--speech-top":Math.max(4,Math.min(rect.bottom-stage.top-bubble.offsetHeight-10,mouthY-bubble.offsetHeight+8))};
+      // In the approved portrait, the face ends at approximately 51% of
+      // the image width. Reserve that entire area in every language.
+      const x = Math.ceil(rect.left-stage.left+rect.width*.56);
+      const tail = Math.max(8,Math.min(14,Math.floor(rect.width*.035)));
+      const pipeY = rect.top-stage.top+rect.height*.509;
+      const values = {"--speech-left":x,"--speech-max":Math.max(0,cssSize.width-x-8),"--speech-tail":tail,
+        "--speech-top":Math.max(4,Math.min(rect.bottom-stage.top-bubble.offsetHeight-10,pipeY-bubble.offsetHeight+3))};
       for(const [name,number] of Object.entries(values)){
         const value=Math.round(number)+"px";
         if(room.style.getPropertyValue(name)!==value)room.style.setProperty(name,value);

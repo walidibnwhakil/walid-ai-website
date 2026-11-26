@@ -119,8 +119,9 @@ try {
           const buttons=[...document.querySelectorAll(mode==="pick"?"#categories .cat-row button":"#answers button")];
           const mobile=matchMedia("(max-aspect-ratio:4/5)").matches;
           const wall=rect(document.querySelector(".approved-wall-plaque"));
+          const portraitArt=rect(document.querySelector(".approved-actors"));
           const logo=mobile?{x:wall.x+wall.width*.59,y:wall.y,left:wall.x+wall.width*.59,right:wall.x+wall.width*.96,top:wall.top,bottom:wall.bottom,width:wall.width*.37,height:wall.height}:rect(document.querySelector(".room-logo"));
-          return {stage:rect(stage),bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
+          return {stage:rect(stage),portraitArt,bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
             cat:rect(document.querySelector(".room-cat")),actor:rect(document.querySelector(".room-detective")),
             logo,desk:rect(document.querySelector(mobile?".approved-table":".room-desk")),
             frontHidden:getComputedStyle(document.querySelector(".room-front")).display==="none",
@@ -138,6 +139,7 @@ try {
         assert.ok(inside(g.bubble),"speech outside screen "+JSON.stringify({width,height,mode,g}));
         assert.ok(inside(g.logo)&&g.logo.bottom<g.desk.top,"logo must be mounted on the back wall "+JSON.stringify({width,height,g}));
         if(width/height<=.8){
+          assert.ok(g.bubble.left>=g.portraitArt.left+g.portraitArt.width*.55,"speech covers detective face "+JSON.stringify({width,height,lang,mode,g}));
           assert.ok(g.frontHidden,"mobile desk front must be hidden");
           assert.ok(g.desk.bottom>=g.stage.bottom-2,"tabletop must extend to bottom of mobile stage");
           assert.ok(g.buttons.every(b=>b.top>=g.desk.top&&b.bottom<=g.desk.bottom+1),"all mobile controls must be on tabletop");
@@ -167,6 +169,10 @@ try {
       }
     }
     await layout("pick","en");
+    await page.click('#game [data-set-lang="bn"]');
+    await page.evaluate(async()=>{await document.fonts.load('400 19px SolaimanLipi','তুমি কী নিয়ে ভাবছ?');});
+    await layout("pick","bn");
+    await page.click('#game [data-set-lang="en"]');
     await page.click('[data-cat="animal"]');
     await page.waitForFunction(()=>window.__riddlex?.state()?.mode==="ask",null,{timeout:30000});
     await layout("ask","en");
@@ -192,6 +198,10 @@ try {
       const long=await getBubble();
       assert.ok(long.width>short.width+15||long.height>short.height+15,"speech does not adapt to question length");
       assert.ok(short.x>=0&&long.x>=0&&long.x+long.width<=width+1&&long.y>=0&&long.y+long.height<=height,"adaptive question outside viewport");
+      if(width/height<=.8){
+        const art=await page.locator(".approved-actors").boundingBox();
+        assert.ok(short.x>=art.x+art.width*.55&&long.x>=art.x+art.width*.55,"short or long speech covers face");
+      }
       if(shotFolder)await page.screenshot({path:join(shotFolder,"speech-long-"+width+"x"+height+".png"),animations:"disabled"});
       await page.locator("#status").evaluate((el,value)=>el.textContent=value,original);
       await page.waitForTimeout(150);

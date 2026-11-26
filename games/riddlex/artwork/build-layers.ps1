@@ -92,8 +92,3 @@ Write-Layer $board 'crumple-hands.png' 264 650 177 103 @(
 Write-Layer $printerScene 'printer.png' 358 276 150 151 @(
     359,323, 372,302, 390,289, 419,282, 476,277, 508,276, 508,427, 468,422, 412,414, 359,399
 )
-$portrait = Join-Path $source 'Whakil Ahamed Shakil-.jpg'
-$dimensions = [Drawing.Image]::FromFile($portrait)
-$portraitHeight = [Math]::Round(240 * $dimensions.Height / $dimensions.Width)
-Write-Layer $portrait 'founder.jpg' 0 0 $dimensions.Width $dimensions.Height @() 240 $portraitHeight
-$dimensions.Dispose()

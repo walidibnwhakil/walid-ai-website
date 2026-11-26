@@ -4,7 +4,7 @@ Source archive supplied by the user on 2026-11-05. Archive SHA-256
 `263198d6ba3525da799752083afd10ee409ba19b11b345f64b0eb98650bd62de`.
 
 The original collage, splash concept, alternate title concept, printer concept,
-gameplay storyboard, and founder portrait are unmodified in `artwork/originals`.
+and gameplay storyboard are unmodified in `artwork/originals`.
 The supplied A4, B1 and C4 crops are unchanged in `artwork/selected-crops`.
 
 | Runtime asset | Source and transformation |
@@ -18,7 +18,6 @@ The supplied A4, B1 and C4 crops are unchanged in `artwork/selected-crops`.
 | `crumple-hands.png` | Hands and paper from the lower-left gameplay storyboard panel. |
 | `crumpled.png` | Airborne paper ball from the lower-left gameplay storyboard panel. |
 | `printer.png` | Printer silhouette from the supplied printer concept. |
-| `founder.jpg` | Resized derivative of the uploaded portrait. The game requests it only after Play and displays it only in the office. |
 | `images/einstein.jpg` | Harris & Ewing photograph, Library of Congress item 2016885961, no known publication restrictions. The local 150-pixel image is associated with the existing `einstein` casebook ID. [Catalog record](https://www.loc.gov/pictures/item/2016885961/) · [Image file](https://cdn.loc.gov/service/pnp/hec/31000/31012_150px.jpg). |
 
 The visual layers are crops and masks from the supplied references. The game
@@ -36,7 +35,6 @@ Paths are relative to `games/riddlex`.
 | artwork/originals/a_richly_detailed_cinematic_illustrated_game_titl.png | a60009be095e4fc22adcfef2459ce750488a5cfa464ec03bdb7017cfd11dabbb |
 | artwork/originals/detective_s_printer_reveals_the_answer.png | ec39fbf84e21cd404cadf50545ee2ac62e08ab61143deec34a2841c1d28c42c7 |
 | artwork/originals/riddlex_detective_game_montage.png | 65fed8f8f93eda2b09aab7fa0ac99b8740c00eaf5459b0b3831ebf721e25def9 |
-| artwork/originals/Whakil Ahamed Shakil-.jpg | 1ee3a5c788bcd18ded070f19ec0936c624b3adbec573f0654fd9c894e8ac1f0f |
 | artwork/selected-crops/A4_Modern_Classic_Detective.png | d4e4280a888c3c6b067ff155f20bfada501d0cdf59dcd1844ecba9d7411751ba |
 | artwork/selected-crops/B1_Fluffy_White_Cat.png | da4e9bce609c5232c701118500d2060ac30eb089be9f9277484743a7d8a55797 |
 | artwork/selected-crops/C4_Minimal_Detective_Office.png | f1ee5e9ef48ba65a9094a61de88508dc54020ba9fdd571b71e196d1d68484f71 |
@@ -45,7 +43,6 @@ Paths are relative to `games/riddlex`.
 | images/approved/crumple-hands.png | 456648180a1414e2f8d9567d47072ef289c7a45f51a505aed9677d0b944c7165 |
 | images/approved/crumpled.png | 82d9500aa34291804d3e408d2375e9817a301b1dbb7a82902b5e5d942f6f73c2 |
 | images/approved/detective.png | 4bb9eb4a39ef456d5d718cb4474b6a127da3aba346ef274139bf8eeb9d6049ca |
-| images/approved/founder.jpg | 696aa737acbb0f26e2aca08f1128686e44128a5b12a41d55bfaf98b8e13b49e7 |
 | images/approved/grip.png | 54e02c5ed36e0711f03bdccfec8893f4850c1a052bcfdfd67559fae5b3e636c9 |
 | images/approved/office.jpg | 1927f060aef1e413b7b374e1b852afa8de83a75d74a208d26c0c16b5e7318415 |
 | images/approved/printer.png | 7a8d3bce1949c362c7edae124923bad9f7ce5718692a8a2128ffb3d0936b2c85 |

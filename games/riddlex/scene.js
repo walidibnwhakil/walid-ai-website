@@ -95,6 +95,7 @@ export function createScene(canvas) {
   const ctx = canvas.getContext("2d", { alpha: false });
   const images = {};
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const portraitViewport = matchMedia("(max-aspect-ratio: 4/5)");
   const puff = document.createElement("canvas");
   puff.width = puff.height = 32;
   const puffCtx = puff.getContext("2d");
@@ -153,7 +154,7 @@ export function createScene(canvas) {
   }
 
   function currentArt() {
-    const narrow = canvas.width / Math.max(1, canvas.height) < 0.8;
+    const narrow = portraitViewport.matches;
     if (narrow && images.portrait) return images.portrait;
     if (!narrow && images.room) return images.room;
     return images.base || null;
@@ -163,7 +164,7 @@ export function createScene(canvas) {
     const cw = canvas.width;
     const ch = canvas.height;
     const art = currentArt();
-    portraitMode = !!(art && cw / ch < 0.8);
+    portraitMode = !!(art && portraitViewport.matches);
     if (!art) {
       view = { x: 0, y: 0, w: cw, h: ch };
     } else {
@@ -214,7 +215,7 @@ export function createScene(canvas) {
     const [, noteBottom] = frac(0, portraitMode ? 0.62 : 0.44);
     parent.style.setProperty("--note-bottom", Math.max(0.2, noteBottom).toFixed(4));
     parent.classList.toggle("portrait-scene", portraitMode);
-    parent.dispatchEvent(new Event("riddlex-scene-layout"));
+    parent.dispatchEvent?.(new Event("riddlex-scene-layout"));
   }
 
   function drawSmoke(dt) {
@@ -653,7 +654,7 @@ export function createScene(canvas) {
     frame.last = now;
     clock += dt;
     resize();
-    const wantOrient = canvas.width / Math.max(1, canvas.height) < 0.8 ? "portrait" : "landscape";
+    const wantOrient = portraitViewport.matches ? "portrait" : "landscape";
     if (images.cache?.[wantOrient] && images.baseOrient !== wantOrient) applyPack(wantOrient);
     const plates = images.overlays || {};
     faceNow = faces.step(dt, (key) => !!plates[key]);
@@ -686,10 +687,7 @@ export function createScene(canvas) {
   }
 
   function screenOrient() {
-    const rect = canvas.getBoundingClientRect();
-    const ratio = rect.width > 0 ? rect.width / Math.max(1, rect.height) : 1;
-    if (rect.width > 0) return ratio < 0.8 ? "portrait" : "landscape";
-    return matchMedia("(max-aspect-ratio: 4/5)").matches ? "portrait" : "landscape";
+    return portraitViewport.matches ? "portrait" : "landscape";
   }
 
   function applyPack(orient) {

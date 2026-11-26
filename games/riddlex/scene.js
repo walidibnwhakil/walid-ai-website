@@ -128,8 +128,8 @@ export function createScene(canvas) {
 
   function makePuff(scatter) {
     return {
-      x: (portraitMode ? 0.58 : 0.592) + rand(-0.004, 0.004),
-      y: scatter ? rand(0.16, 0.25) : (portraitMode ? 0.275 : 0.255),
+      x: (portraitMode ? 0.625 : 0.592) + rand(-0.004, 0.004),
+      y: scatter ? rand(0.16, 0.25) : (portraitMode ? 0.31 : 0.255),
       vx: rand(-0.003, 0.003),
       vy: rand(-0.018, -0.008),
       life: scatter ? Math.random() * 2.4 : 0,
@@ -163,24 +163,23 @@ export function createScene(canvas) {
 
   function currentArt() {
     const narrow = portraitViewport.matches;
-    if (narrow && images.portrait) return images.portrait;
-    if (!narrow && images.room) return images.room;
-    return images.base || null;
+    return (narrow ? images.portrait : images.room) || null;
   }
 
   function layoutRoom() {
     const cw = canvas.width;
     const ch = canvas.height;
     const art = currentArt();
-    portraitMode = !!(art && portraitViewport.matches);
+    portraitMode = portraitViewport.matches;
     if (!art) {
       view = { x: 0, y: 0, w: cw, h: ch };
+      deskEdge = ch * .48;
     } else {
       if (portraitMode) {
         const chrome = phoneChrome();
         const topY = chrome.logo + 6 * chrome.dpr;
         const cut = 0.50, start = 0.118;
-        const reserve = 220 * chrome.dpr;
+        const reserve = 240 * chrome.dpr;
         const scale = Math.max(0.01, Math.min(cw * 1.06 / art.width,
           (ch - topY - reserve) / ((cut - start) * art.height)));
         const w = art.width * scale;
@@ -426,9 +425,8 @@ export function createScene(canvas) {
     const { u, photo, photoH, nameH, w, h } = box;
     const parent = canvas.parentElement;
     if (parent && canvas.height) {
-      parent.style.setProperty("--note-bottom", ((box.y + h) / canvas.height).toFixed(4));
-      parent.style.setProperty("--note-left", (box.x / canvas.width).toFixed(4));
-      parent.style.setProperty("--note-width", (box.w / canvas.width).toFixed(4));
+      const vars = {"--note-bottom":((box.y+h)/canvas.height).toFixed(4),"--note-left":(box.x/canvas.width).toFixed(4),"--note-width":(box.w/canvas.width).toFixed(4)};
+      for (const [name,value] of Object.entries(vars)) if (parent.style.getPropertyValue(name)!==value) parent.style.setProperty(name,value);
     }
     ctx.save();
     // Settle upright: a short fade, a small rise, and a slight scale.
@@ -483,7 +481,7 @@ export function createScene(canvas) {
     ctx.restore();
   }
 
-  function drawPhoneLogo() {
+  function drawPhoneLogo(target = ctx) {
     const art = currentArt();
     if (!art) return;
     const orient = portraitMode ? "portrait" : "landscape";
@@ -527,7 +525,7 @@ export function createScene(canvas) {
     const maxH = portraitMode ? phoneChrome().logo : Math.max(28,view.y * 1.12);
     const dw = Math.min(canvas.width * (portraitMode ? .63 : .25), maxH * (logoSprite.width / logoSprite.height));
     const dh = dw * (logoSprite.height / logoSprite.width);
-    ctx.drawImage(logoSprite, (canvas.width - dw) / 2, Math.max(2,(maxH - dh) / 2), dw, dh);
+    target.drawImage(logoSprite, (canvas.width - dw) / 2, Math.max(2,(maxH - dh) / 2), dw, dh);
   }
 
   function drawPresent() {
@@ -671,6 +669,7 @@ export function createScene(canvas) {
     panel.addColorStop(0,"#382013");panel.addColorStop(.4,"#2a170d");panel.addColorStop(1,"#1c100b");
     g.fillStyle=panel;g.fillRect(0,panelY,w,Math.max(0,h-panelY));
     g.fillStyle="#aa7835";g.fillRect(0,panelY,w,Math.max(1,w*.0012));
+    drawPhoneLogo(g);
   }
 
   function frame(now) {
@@ -686,7 +685,7 @@ export function createScene(canvas) {
     const plates = images.overlays || {};
     faceNow = faces.step(dt, (key) => !!plates[key]);
     const art = currentArt();
-    if (art) { paintRoomLayer(art); ctx.drawImage(staticRoom,0,0); drawPhoneLogo(); }
+    if (art) { paintRoomLayer(art); ctx.drawImage(staticRoom,0,0); }
     else { ctx.fillStyle="#21130b"; ctx.fillRect(0,0,canvas.width,canvas.height); }
     // Only the existing feathered expression, cat, smoke and reveal plates move.
     if (!reduce) { drawSmoke(dt); stepCat(dt); }
@@ -706,6 +705,8 @@ export function createScene(canvas) {
     images.overlays = pack.overlays || {};
     if (orient === "portrait") images.portrait = pack.base;
     else images.room = pack.base;
+    portraitMode = orient === 'portrait';
+    for (const particle of smoke) Object.assign(particle, makePuff(false));
   }
 
   async function loadOverlaySet(orient) {
@@ -740,6 +741,7 @@ export function createScene(canvas) {
     if (!document.hidden) raf = requestAnimationFrame(frame);
   }
 
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => { if (running) resize(); }).observe(canvas);
   portraitViewport.addEventListener?.('change', async () => {
     if (!running) return;
     const orient = screenOrient();

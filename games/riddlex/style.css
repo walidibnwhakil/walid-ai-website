@@ -746,3 +746,19 @@ html[lang="bn"] #game .speech #status,html[lang="bn"] #game .speech .q-badge{
   #game #answers{bottom:35px;gap:6px;}
   #game #answers .answer-row button{min-height:42px;}
 }
+
+/* After confirmation the detective speaks the result; there is no duplicate
+   result panel, name card, or photo. Only the replay button stays on the desk. */
+#game[data-view="solved"] #hud{
+  position:absolute;top:var(--edge);bottom:0;left:0;right:0;
+  display:grid;place-items:center;margin:0;padding:0 12px;max-height:none;overflow:visible;
+}
+#game[data-view="solved"] #guess{display:grid;place-items:center;width:100%;margin:0;gap:0;}
+#game[data-view="solved"] #again{width:min(78%,320px);min-height:46px;border-radius:999px;border:1px solid #efc676;background:linear-gradient(#fff1ca,#f4ce81);color:#392417;box-shadow:0 4px 7px #10070066;}
+#game[data-view="solved"] #solved-line,#game[data-view="solved"] #credit{display:none!important;}
+#game[data-view="thinking"] .speech::before,#game[data-view="reveal"] .speech::before{
+  content:"";position:absolute;bottom:-5px;left:10px;width:23px;height:3px;
+  border-radius:3px;background:#e6bd68;animation:guess-thinking-pulse .8s ease-in-out infinite alternate;
+}
+@keyframes guess-thinking-pulse{from{opacity:.25;transform:scaleX(.55)}to{opacity:1;transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){#game .speech::before{animation:none!important;}}

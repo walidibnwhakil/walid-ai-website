@@ -1,6 +1,6 @@
 import { setGameInProgress } from "../refresh-guard.mjs";
 import { answer as applyAnswer, canPrint, createState, decide, displayName, entityView, factBit, recompute, rejectIndex, rewind } from "./engine.js?v=riddlex-76";
-import { UI, guessFont } from "./i18n.js?v=riddlex-40";
+import { UI, guessFont } from "./i18n.js?v=portrait-solved-clean-20261127";
 import { appendShard, categoryShards, imageSrc, loadManifest, loadShards, mergePools, planShardLoads, poolFromEntries, inheritCreditedPortraits, traffic } from "./kb.js?v=riddlex-73";
 import { PERSONAL_RELATIONS, RIDDLEX_CHARACTER } from "./personal-facts.js?v=riddlex-62";
 import { EXTRA_IDENTITY_PEOPLE } from "./identity-facts.js";
@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=portrait-live-motion2-20261127";
+import { createScene, startMenuCat } from "./scene.js?v=portrait-solved-clean-20261127";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -192,20 +192,21 @@ function scheduleUnderBubble() {
 }
 
 function showOnly(which) {
+  game.dataset.view = which;
   $("categories").hidden = which !== "pick";
   const panel = $("ask-panel");
-  if (panel) panel.hidden = which !== "ask" && which !== "pick";
+  if (panel) panel.hidden = !["ask","pick","thinking","reveal","solved"].includes(which);
   answers.hidden = which !== "ask";
   guessBox.hidden = which !== "guess" && which !== "wrong" && which !== "solved";
   $("correct").hidden = which !== "guess";
   $("wrong").hidden = which !== "guess";
   $("retry").hidden = which !== "wrong";
-  $("solved-line").hidden = which !== "solved";
+  $("solved-line").hidden = true;
   $("again").hidden = which !== "solved";
   learnForm.hidden = which !== "learn";
   $("learn-again").hidden = true;
   $("back").hidden = !(state && state.answers.length && (which === "ask" || which === "guess"));
-  $("credit").hidden = which === "pick" || which === "ask";
+  $("credit").hidden = ["pick","ask","thinking","reveal","solved"].includes(which);
   scheduleUnderBubble();
 }
 
@@ -225,6 +226,7 @@ async function openPlay() {
   $("progress").textContent = "";
   $("confirm").hidden = true;
   scene.setMood("curious");
+  document.fonts?.load('400 28px SolaimanLipi','বাংলা প্রশ্ন').catch(()=>{});
   try { await scene.start(); } catch { /* the picture can arrive late; the choices stay up */ }
   scheduleUnderBubble();
   const token = loadToken;
@@ -358,6 +360,12 @@ async function step() {
     ? queueShards(catalog ? planShardLoads(catalog, state.answers, loadedNames) : fallback, loadToken)
     : null;
   let decision = decide(state);
+  if ((decision.type==="guess"||decision.type==="defeat") && (ownerPending||pending)) {
+    // Keep an actual visible thinking prompt while relevant knowledge finishes.
+    setStatus(text().thinking);showOnly("thinking");
+    await new Promise(resolve=>setTimeout(resolve,0));
+    if(loadToken!==session||state!==playingState)return;
+  }
   if ((decision.type==="guess"||decision.type==="defeat") && ownerPending) {
     const outstanding=ownerPending;ownerPending=null;
     const changed=await withTimeout(outstanding,4000).catch(()=>false);
@@ -402,17 +410,16 @@ async function beginGuess(index) {
   const name = displayName(entity, lang);
   const printable = canPrint(pool, index);
   setStatus(text().writing);
-  showOnly("none");
+  showOnly("reveal");
   scene.setMood("confident");
   const font = guessFont(lang, name);
-  if (document.fonts?.load) {
-    try { await withTimeout(document.fonts.load(font, name), 2500); } catch { /* use the fallback font */ }
-    if (loadToken !== session || mode !== "reveal") return;
-  }
+  // Font is prewarmed when opening the game. Never block the final reveal on a font fetch.
+  document.fonts?.load(font, name).catch(()=>{});
   const result = await scene.playReveal({
     name,
     font,
     imageUrl: printable ? imageSrc(entity.image) : "",
+    onPhoto: () => { if (session===loadToken && guessIndex===index && ["reveal","guess"].includes(mode) && entity.credit) $("credit").textContent=`${text().credit}: ${entity.credit}`; },
   });
   if (loadToken !== session || mode !== "reveal") return;
   mode = "guess";
@@ -420,7 +427,7 @@ async function beginGuess(index) {
   setStatus(text().prompt(shownName));
   const guessLine = $("guess-line");
   if (guessLine) guessLine.textContent = text().prompt(shownName);
-  $("credit").textContent = result.printed && entity.credit ? `${text().credit}: ${entity.credit}` : "";
+  $("credit").textContent = (result.printed || scene.debug().revealBounds) && entity.credit ? `${text().credit}: ${entity.credit}` : "";
   showOnly("guess");
 }
 
@@ -539,7 +546,12 @@ async function onLearnSubmit(event) {
 function onCorrect() {
   if (mode !== "guess") return;
   mode = "solved";
+  scene.clearReveal();
+  guessIndex = -1;
+  $("guess-line").textContent = "";
+  $("credit").textContent = "";
   scene.setMood("happy");
+  setStatus(text().solvedLine);
   showOnly("solved");
   $("back").hidden = true;
 }
@@ -578,12 +590,17 @@ function setLanguage(next) {
   } else if (mode === "pick") {
     setStatus(text().pick);
     $("progress").textContent = "";
-  } else if (guessIndex >= 0 && pool && ["reveal", "guess", "wrong", "solved"].includes(mode)) {
+  } else if (mode === "solved") {
+    setStatus(text().solvedLine);
+  } else if (mode === "thinking") {
+    setStatus(text().thinking);
+  } else if (guessIndex >= 0 && pool && ["reveal", "guess", "wrong"].includes(mode)) {
     const entity = entityView(pool, guessIndex);
     const name = displayName(entity, lang);
     scene.relabel(name, guessFont(lang, name));
     $("guess-line").textContent = text().prompt(name);
-    if (mode === "guess" || mode === "solved") setStatus(text().prompt(name));
+    if (mode === "guess") setStatus(text().prompt(name));
+    if (mode === "reveal") setStatus(text().writing);
     if (mode === "wrong") setStatus(text().missed);
     if ($("credit").textContent && entity.credit) $("credit").textContent = `${text().credit}: ${entity.credit}`;
   } else if (mode === "learn" && !learnForm.hidden && !$("learn-note").textContent) {

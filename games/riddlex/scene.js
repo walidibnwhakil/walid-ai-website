@@ -678,7 +678,7 @@ export function createScene(canvas) {
       }
     } else if (reveal.phase === "present") {
       reveal.present = 0.92 + Math.min(0.18, reveal.t * 0.4);
-      if (reveal.t > 0.45 && !reveal.done) {
+      if (reveal.t > 0.16 && !reveal.done) {
         reveal.done = true;
         reveal.resolve({ printed: !!reveal.printed });
       }
@@ -822,35 +822,26 @@ export function createScene(canvas) {
 
   async function playReveal(options) {
     const font = options.font || '400 28px "Times New Roman", serif';
-    const photo = options.imageUrl ? await loadImage(options.imageUrl) : null;
     const prepared = prepareInk(options.name || "?", font);
-    reveal = {
+    const card = {
       phase: reduce ? "present" : "write",
-      t: 0,
-      name: options.name || "?",
-      font,
-      imageUrl: photo ? options.imageUrl : "",
-      photo,
-      printed: false,
-      writeDur: reduce ? 0.01 : Math.min(1.15, Math.max(0.55, (options.name || "").length * 0.05)),
-      inkWidth: prepared.width,
-      textX: prepared.textX || 0,
-      present: 1,
-      page: null,
-      resolve: () => {},
-      done: false,
+      t: 0,name:options.name||"?",font,imageUrl:"",photo:null,printed:false,
+      writeDur:reduce?.01:Math.min(.48,Math.max(.22,(options.name||"").length*.018)),
+      inkWidth:prepared.width,textX:prepared.textX||0,present:1,page:null,
+      resolve:()=>{},done:false
     };
-    mood = "confident";
-    faces.setMood("confident");setPortraitReaction("surprised",1.5);
-    if (reduce) {
-      reveal.printed = !!photo;
-      reveal.page = { canvas: ink, w: ink.width, h: ink.height };
-      reveal.done = true;
-      return { printed: !!photo };
-    }
-    return new Promise((resolve) => {
-      reveal.resolve = resolve;
+    reveal=card;
+    mood="confident";faces.setMood("confident");setPortraitReaction("surprised",1.5);
+    // Do not wait up to five seconds for the optional portrait before showing
+    // the guess. A late picture may join only this same, still-current card.
+    if(options.imageUrl)loadImage(options.imageUrl,5000).then(photo=>{
+      if(!photo||reveal!==card)return;
+      card.photo=photo;card.imageUrl=options.imageUrl;
+      if(card.phase==="present")card.printed=true;
+      options.onPhoto?.();
     });
+    if(reduce){card.page={canvas:ink,w:ink.width,h:ink.height};card.done=true;return {printed:!!card.photo};}
+    return new Promise(resolve=>{card.resolve=resolve;});
   }
 
   // Reprint an already-revealed answer in the selected language.
@@ -900,12 +891,13 @@ export function createScene(canvas) {
   }
 
   function clearReveal() {
+    if(reveal&&!reveal.done){reveal.done=true;reveal.resolve({printed:false});}
     reveal = null;
   }
 
   return {
     start, stop, resize, alignSpeech,
-    setMood(value) { mood = value; faces.setMood(value); if(value==="sad"||value==="defeated")setPortraitReaction("sad",2.5);if(value==="confident")setPortraitReaction("surprised",1.3); },
+    setMood(value) { mood = value; faces.setMood(value); if(value==="sad"||value==="defeated")setPortraitReaction("sad",2.5);if(value==="confident")setPortraitReaction("surprised",1.3);if(value==="happy")setPortraitReaction("happy",2.2); },
     react(answer) { const key=faces.react(answer);if(key)setPortraitReaction(key,2.1);return key; },
     blinkCat() { catLife.blink = 0.2; },
     flickCat() { catLife.flick = 0.35; },

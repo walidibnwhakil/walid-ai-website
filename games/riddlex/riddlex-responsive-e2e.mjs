@@ -206,7 +206,7 @@ try {
       await page.locator("#status").evaluate((el,value)=>el.textContent=value,original);
       await page.waitForTimeout(150);
     }
-    const artBytes=(await Promise.all(["approved-wall-top","approved-wall-plaque","approved-actors","approved-table","portrait-happy","portrait-sad","portrait-serious","portrait-worried","portrait-confused","portrait-cat"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
+    const artBytes=(await Promise.all(["approved-wall-top","approved-wall-plaque","approved-actors-clean","approved-table","portrait-happy","portrait-sad","portrait-serious","portrait-worried","portrait-confused","portrait-cat"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
     assert.ok(artBytes<300000,"static art exceeds 300KB");
     assert.ok(!requests.some(u=>/images\/approved\/(game-desk|portrait-neutral|face-portrait|cat-portrait)/.test(u)),"old gameplay art unexpectedly loaded");
     // Capture all five existing expression states at the integrated sprite.
@@ -875,6 +875,16 @@ try {
           const correctFlower=trial.flower &&
             /kathgolap|frangipani|plumeria|কাঠগোলাপ/i.test(label);
           if (correctById || correctByName || correctFlower) {
+            // Confirm the real guess; the name/photo must disappear, while
+            // the detective's own speech and replay button remain.
+            await page.click("#correct");
+            await page.waitForFunction(()=>window.__riddlex.state().mode==="solved");
+            assert.equal(await page.locator("#speech").isVisible(),true);
+            assert.equal(await page.locator("#solved-line").isVisible(),false);
+            assert.equal(await page.locator("#again").isVisible(),true);
+            assert.equal(await page.evaluate(()=>window.__riddlex.expression().revealBounds),null);
+            assert.equal(await page.locator("#guess-line").textContent(),"");
+            if(shotFolder)await page.screenshot({path:join(shotFolder,"solved-no-name.png")});
             outcome="correct";break;
           }
           wrongGuesses.push(guessRecord);

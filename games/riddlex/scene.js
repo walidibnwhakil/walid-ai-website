@@ -1,7 +1,4 @@
-// The room, detective, pipe and cat are one painted picture.
-// Breathing is a slight scale of that whole picture, anchored at the floor.
-// Face and cat plates cross-fade with opacity and share that same transform.
-// Nothing is ever a shifted rectangle of the painting.
+// Responsive independent room/character layers; canvas is only for expressions, smoke and reveal.
 
 import { createExpressions } from "./expressions.js?v=akinator-27";
 
@@ -92,9 +89,10 @@ export function fitPhotoInside(photoWidth, photoHeight, boxX, boxY, boxWidth, bo
 }
 
 export function createScene(canvas) {
-  const ctx = canvas.getContext("2d", { alpha: false });
+  const ctx = canvas.getContext("2d", { alpha: true });
   const images = {};
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const portraitViewport = matchMedia("(max-aspect-ratio: 4/5)");
   const puff = document.createElement("canvas");
   puff.width = puff.height = 32;
   const puffCtx = puff.getContext("2d");
@@ -115,15 +113,23 @@ export function createScene(canvas) {
   let raf = 0;
   let reveal = null;
   let view = { x: 0, y: 0, w: 1, h: 1 };
-  let logoSprite = null;
   let layoutDirty = true;
+  let cssSize = { width: 0, height: 0 };
+  let frameTime = 0;
+  let deskEdge = 0;
+  let actorBox = { x:0,y:0,w:1,h:1 };
+  let catBox = { x:0,y:0,w:1,h:1 };
+  let overlayPromise;
+  const room = canvas.parentElement;
+  const actor = room.querySelector(".room-detective");
+  const cat = room.querySelector(".room-cat");
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
   function makePuff(scatter) {
     return {
-      x: (portraitMode ? 0.58 : 0.592) + rand(-0.004, 0.004),
-      y: scatter ? rand(0.16, 0.25) : (portraitMode ? 0.275 : 0.255),
+      x: 0.592 + rand(-0.004, 0.004),
+      y: scatter ? rand(0.16, 0.25) : 0.255,
       vx: rand(-0.003, 0.003),
       vy: rand(-0.018, -0.008),
       life: scatter ? Math.random() * 2.4 : 0,
@@ -138,9 +144,11 @@ export function createScene(canvas) {
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
-    const dpr = Math.min(2, devicePixelRatio || 1);
-    const width = Math.max(320, Math.round(rect.width * dpr));
-    const height = Math.max(180, Math.round(rect.height * dpr));
+    if (!rect.width || !rect.height) return;
+    cssSize = { width: rect.width, height: rect.height };
+    const dpr = Math.min(1.5, devicePixelRatio || 1, Math.sqrt(1800000 / (rect.width * rect.height)));
+    const width = Math.max(1, Math.round(rect.width * dpr));
+    const height = Math.max(1, Math.round(rect.height * dpr));
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
@@ -149,78 +157,47 @@ export function createScene(canvas) {
     if (layoutDirty) {
       layoutDirty = false;
       layoutRoom();
+
     }
   }
 
-  function currentArt() {
-    const narrow = canvas.width / Math.max(1, canvas.height) < 0.8;
-    if (narrow && images.portrait) return images.portrait;
-    if (!narrow && images.room) return images.room;
-    return images.base || null;
+  function spriteBounds(node, naturalW, naturalH) {
+    const r = node.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+    const scale = Math.min(r.width/naturalW,r.height/naturalH);
+    const w = naturalW*scale, h = naturalH*scale;
+    const dx = canvas.width/Math.max(1,cr.width), dy = canvas.height/Math.max(1,cr.height);
+    return {x:(r.left-cr.left+(r.width-w)/2)*dx,y:(r.bottom-cr.top-h)*dy,w:w*dx,h:h*dy};
+  }
+
+  function alignSpeech() {
+    const bubble = room.querySelector("#speech");
+    if (!bubble || !bubble.offsetHeight || !canvas.height) return;
+    const dy = cssSize.height/canvas.height;
+    const mouthY = (actorBox.y+actorBox.h*.48)*dy;
+    const tail = portraitMode ? 14 : 18;
+    const y = Math.max(0,Math.min(cssSize.height*.67-bubble.offsetHeight,mouthY-bubble.offsetHeight-tail));
+    const value = Math.round(y)+"px";
+    if (room.style.getPropertyValue("--speech-top")!==value) room.style.setProperty("--speech-top",value);
   }
 
   function layoutRoom() {
-    const cw = canvas.width;
-    const ch = canvas.height;
-    const art = currentArt();
-    portraitMode = !!(art && cw / ch < 0.8);
-    if (!art) {
-      view = { x: 0, y: 0, w: cw, h: ch };
-    } else {
-      let scale = Math.max(cw / art.width, ch / art.height);
-      let x = 0;
-      let y = (ch - art.height * scale) / 2;
-      if (portraitMode) {
-        // Close-up: hat to a short strip of desk fills the space above the answers.
-        const chrome = phoneChrome();
-        const hatV = 0.118;
-        const deskV = 0.495;
-        const topY = chrome.logo + chrome.dpr * 2;
-        const bottomY = ch - chrome.buttons;
-        scale = Math.max(0.4, (bottomY - topY) / ((deskV - hatV) * art.height));
-        const span = cw / (art.width * scale);
-        const u0 = Math.max(0.16, Math.min(0.42, 0.61 - span / 2));
-        view = {
-          x: -art.width * u0 * scale,
-          y: topY - hatV * art.height * scale,
-          w: art.width * scale,
-          h: art.height * scale,
-        };
-      } else {
-        const w = art.width * scale;
-        const h = art.height * scale;
-        x = cw * 0.50 - w * 0.52;
-        y = ch * 0.42 - h * 0.38;
-        const logoPad = Math.max(8, cw * 0.012);
-        if (x + w * 0.03 < logoPad) x = logoPad - w * 0.03;
-        x = Math.min(0, Math.max(cw - w, x));
-        y = Math.min(0, Math.max(ch - h, y));
-        view = { x, y, w, h };
-      }
-    }
-    const parent = canvas.parentElement;
-    if (!parent || !cw || !ch) return;
-    const face = FACE[portraitMode ? "portrait" : "landscape"];
-    const cat = CAT_FACE[portraitMode ? "portrait" : "landscape"];
-    const spot = portraitMode
-      ? { bu: 0.34, bv: face.v + face.h + 0.07, dv: 0.62 }
-      : { bu: 0.62, bv: 0.16, dv: 0.60 };
-    const frac = (u, v) => [(view.x + view.w * u) / cw, (view.y + view.h * v) / ch];
-    const [bubbleLeft, bubbleTop] = frac(spot.bu, spot.bv);
-    const [, chin] = frac(0, face.v + face.h);
-    const belowFace = face.v + face.h + (portraitMode ? 0.02 : 0.04);
-    const catPaws = cat.v + cat.h + 0.012;
-    const [, hands] = frac(0, portraitMode ? Math.max(belowFace, catPaws) : belowFace);
-    const [, catTop] = frac(0, Math.max(0.08, cat.v - 0.045));
-    parent.style.setProperty("--bubble-left", Math.max(0.02, bubbleLeft).toFixed(4));
-    parent.style.setProperty("--bubble-top", Math.max(0.02, bubbleTop).toFixed(4));
-    parent.style.setProperty("--chin-y", chin.toFixed(4));
-    parent.style.setProperty("--hands-y", hands.toFixed(4));
-    parent.style.setProperty("--cat-top", catTop.toFixed(4));
-    parent.style.setProperty("--desk-y", ((view.y + view.h * spot.dv) / ch).toFixed(4));
-    const [, noteBottom] = frac(0, portraitMode ? 0.62 : 0.44);
-    parent.style.setProperty("--note-bottom", Math.max(0.2, noteBottom).toFixed(4));
-    parent.classList.toggle("portrait-scene", portraitMode);
+    const cw=canvas.width,ch=canvas.height;
+    portraitMode=portraitViewport.matches;
+    actorBox=spriteBounds(actor,543,380);
+    catBox=spriteBounds(cat,347,138);
+    // The neutral sprite was cut from the original landscape scene at
+    // (359,121) in a 1366px render, whose source artwork starts at (0,124).
+    // Maintain that exact source coordinate system for face and smoke plates.
+    view={x:actorBox.x-359*actorBox.w/543,
+      y:actorBox.y+3*actorBox.h/380,
+      w:1366*actorBox.w/543,h:(1366*928/1648)*actorBox.h/380};
+    const desk=room.querySelector(".room-desk").getBoundingClientRect();
+    const cr=canvas.getBoundingClientRect();
+    deskEdge=(desk.top-cr.top)*ch/Math.max(1,cr.height);
+    room.style.setProperty("--room-edge",(deskEdge/ch).toFixed(4));
+    room.style.setProperty("--desk-y",(deskEdge/ch).toFixed(4));
+    room.classList.toggle("portrait-scene",portraitMode);
+    alignSpeech();
   }
 
   function drawSmoke(dt) {
@@ -250,16 +227,17 @@ export function createScene(canvas) {
   }
 
   function drawFaces() {
-    const box = FACE[portraitMode ? "portrait" : "landscape"];
-    const plates = images.overlays || {};
-    const levels = faceNow.levels || {};
-    for (const key of ["worried", "confused", "serious", "sad", "happy"]) {
-      drawPlate(plates[key], box, levels[key] || 0);
+    const plates=images.overlays||{};
+    const levels=faceNow.levels||{};
+    function paint(plate,box,alpha) {
+      if(!plate || alpha<.02) return;
+      ctx.globalAlpha=Math.min(1,alpha);
+      ctx.drawImage(plate,box.x,box.y,box.w,box.h);
+      ctx.globalAlpha=1;
     }
-    const catShut = catLife.blink > 0 ? blinkCover(catLife.blink) : 0;
-    drawPlate(plates.cat, CAT_FACE[portraitMode ? "portrait" : "landscape"], catShut);
-    const flick = catLife.flick > 0 ? flickCover(catLife.flick) : 0;
-    drawPlate(plates.tail, CAT_TAIL[portraitMode ? "portrait" : "landscape"], flick);
+    for(const key of ["worried","confused","serious","sad","happy"]) paint(plates[key],actorBox,levels[key]||0);
+    paint(plates.cat,catBox,catLife.blink>0?blinkCover(catLife.blink):0);
+    paint(plates.tail,catBox,catLife.flick>0?flickCover(catLife.flick):0);
   }
 
   function blinkAlpha(t) {
@@ -320,7 +298,7 @@ export function createScene(canvas) {
   }
 
   function phoneChrome() {
-    const cssH = canvas.getBoundingClientRect().height || canvas.height;
+    const cssH = cssSize.height || canvas.height;
     const dpr = canvas.height / Math.max(1, cssH);
     return {
       dpr,
@@ -330,7 +308,7 @@ export function createScene(canvas) {
   }
 
   function paperBox() {
-    const chin = iy(FACE.portrait.v + FACE.portrait.h);
+    const chin = actorBox.y + actorBox.h*.66;
     const w = canvas.width * 0.40;
     const h = canvas.width * 0.155;
     const limit = canvas.height - phoneChrome().buttons - 8;
@@ -372,9 +350,8 @@ export function createScene(canvas) {
     // A photo card shows the whole picture, large, in the space to the right of
     // the detective's face. It may cover the shelves, cat, lamp and desk.
     // A name-only card stays centred under the chin.
-    const rect = canvas.getBoundingClientRect();
-    const cssW = rect.width || canvas.width;
-    const cssH = rect.height || canvas.height;
+    const cssW = cssSize.width || canvas.width;
+    const cssH = cssSize.height || canvas.height;
     const dpr = canvas.width / Math.max(1, cssW);
     let w;
     let photoH = 0;
@@ -414,7 +391,7 @@ export function createScene(canvas) {
       w = Math.min(view.w * 0.32, canvas.width * 0.46);
       nameH = Math.min(view.h * 0.11, 72 * dpr);
       x = ix(0.50) - w / 2;
-      y = iy(0.50) - nameH;
+      y = Math.min(canvas.height-164*dpr-nameH,deskEdge-nameH);
     }
     const h = Math.max(16, photoH + nameH);
     if (photo) y = Math.max(8 * dpr, Math.min(y, canvas.height - 164 * dpr - h));
@@ -426,9 +403,8 @@ export function createScene(canvas) {
     const { u, photo, photoH, nameH, w, h } = box;
     const parent = canvas.parentElement;
     if (parent && canvas.height) {
-      parent.style.setProperty("--note-bottom", ((box.y + h) / canvas.height).toFixed(4));
-      parent.style.setProperty("--note-left", (box.x / canvas.width).toFixed(4));
-      parent.style.setProperty("--note-width", (box.w / canvas.width).toFixed(4));
+      const vars = {"--note-bottom":((box.y+h)/canvas.height).toFixed(4),"--note-left":(box.x/canvas.width).toFixed(4),"--note-width":(box.w/canvas.width).toFixed(4)};
+      for (const [name,value] of Object.entries(vars)) if (parent.style.getPropertyValue(name)!==value) parent.style.setProperty(name,value);
     }
     ctx.save();
     // Settle upright: a short fade, a small rise, and a slight scale.
@@ -481,50 +457,6 @@ export function createScene(canvas) {
       ctx.drawImage(reveal.page.canvas, (w - dw) / 2, bandY + (nameH - dh) / 2, dw, dh);
     }
     ctx.restore();
-  }
-
-  function drawPhoneLogo() {
-    const art = images.portrait;
-    if (!portraitMode || !art) return;
-    if (!logoSprite) {
-      const sw = Math.round(art.width * 0.62);
-      const sh = Math.round(art.height * 0.15);
-      const sample = document.createElement("canvas");
-      sample.width = sw;
-      sample.height = sh;
-      const g = sample.getContext("2d");
-      g.drawImage(art, 0, 0, sw, sh, 0, 0, sw, sh);
-      const img = g.getImageData(0, 0, sw, sh);
-      const pix = img.data;
-      let minX = sw;
-      let minY = sh;
-      let maxX = 0;
-      let maxY = 0;
-      for (let i = 0; i < pix.length; i += 4) {
-        const r = pix[i];
-        const gc = pix[i + 1];
-        const b = pix[i + 2];
-        const gold = r > 145 && gc > 95 && r > b + 35 && gc > b + 10;
-        pix[i + 3] = gold ? 255 : 0;
-        if (!gold) continue;
-        const x = (i / 4) % sw;
-        const y = (i / 4 - x) / sw;
-        if (x < minX) minX = x;
-        if (y < minY) minY = y;
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
-      }
-      g.putImageData(img, 0, 0);
-      const bw = Math.max(1, maxX - minX + 1);
-      const bh = Math.max(1, maxY - minY + 1);
-      logoSprite = document.createElement("canvas");
-      logoSprite.width = bw;
-      logoSprite.height = bh;
-      logoSprite.getContext("2d").drawImage(sample, minX, minY, bw, bh, 0, 0, bw, bh);
-    }
-    const dw = Math.min(canvas.width * 0.78, phoneChrome().logo * (logoSprite.width / logoSprite.height));
-    const dh = dw * (logoSprite.height / logoSprite.width);
-    ctx.drawImage(logoSprite, (canvas.width - dw) / 2, phoneChrome().dpr * 2, dw, dh);
   }
 
   function drawPresent() {
@@ -636,130 +568,71 @@ export function createScene(canvas) {
     }
   }
 
-  function drawPortrait(art) {
-    const scale = view.w / art.width;
-    const v0 = 0.118;
-    let cut = 0.495;
-    if (reveal) {
-      const v = (canvas.height + 8 - view.y) / (art.height * scale);
-      cut = Math.max(0.495, Math.min(0.66, v));
-    }
-    const srcX = Math.max(0, -view.x / scale);
-    const srcW = Math.min(art.width - srcX, canvas.width / scale);
-    const srcY = art.height * v0;
-    const srcH = art.height * (cut - v0);
-    const destX = view.x + srcX * scale;
-    const destY = view.y + srcY * scale;
-    const destH = srcH * scale;
-    ctx.drawImage(art, srcX, srcY, srcW, srcH, destX, destY, srcW * scale, destH);
-    if (reveal) {
-      const target = canvas.height;
-      const drawn = destY + destH;
-      if (drawn < target - 1) {
-        const strip = art.height * 0.035;
-        ctx.drawImage(art, srcX, art.height * cut - strip, srcW, strip, destX, drawn - 1, srcW * scale, target - drawn + 1);
-      }
-    }
-  }
-
   function frame(now) {
-    if (!running) return;
-    const dt = Math.min(0.034, (now - (frame.last || now)) / 1000 || 0.016);
-    frame.last = now;
-    clock += dt;
-    resize();
-    const wantOrient = canvas.width / Math.max(1, canvas.height) < 0.8 ? "portrait" : "landscape";
-    if (images.cache?.[wantOrient] && images.baseOrient !== wantOrient) applyPack(wantOrient);
-    const plates = images.overlays || {};
-    faceNow = faces.step(dt, (key) => !!plates[key]);
-    const art = currentArt();
-    ctx.fillStyle = "#1a100c";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    // At most ±0.4% so the whole room, detective and cat stay one piece.
-    if (!reduce) {
-      const scale = 1 + Math.sin(clock * 1.05) * 0.004;
-      const ax = view.x + view.w * 0.5;
-      const ay = view.y + view.h;
-      ctx.translate(ax, ay);
-      ctx.scale(scale, scale);
-      ctx.translate(-ax, -ay);
-    }
-    if (art) {
-      if (portraitMode) drawPortrait(art);
-      else ctx.drawImage(art, view.x, view.y, view.w, view.h);
-    }
-    drawPhoneLogo();
-    if (!reduce) drawSmoke(dt);
-    stepCat(dt);
-    updateReveal(dt);
-    drawFaces();
-    drawReveal();
-    ctx.restore();
-    if (art && !portraitMode) {
-      const gapTop = view.y + view.h;
-      if (canvas.height - gapTop > 2) {
-        const fade = ctx.createLinearGradient(0, gapTop - 2, 0, canvas.height);
-        fade.addColorStop(0, "#6b3a1c");
-        fade.addColorStop(1, "#2a160e");
-        ctx.fillStyle = fade;
-        ctx.fillRect(0, gapTop - 2, canvas.width, canvas.height - gapTop + 2);
-      }
-    }
-    raf = requestAnimationFrame(frame);
+    if (!running || document.hidden) return;
+    raf=requestAnimationFrame(frame);
+    if(frameTime && now-frameTime<1000/30-1) return;
+    const dt=Math.min(.10,(now-(frameTime||now))/1000||.033);
+    frameTime=now;clock+=dt;
+    if(layoutDirty) resize();
+    const plates=images.overlays||{};
+    faceNow=faces.step(dt,key=>!!plates[key]);
+    // Static art is rendered once by the browser. Only a transparent effects
+    // canvas is cleared and redrawn, capped at 30fps and 1.8M backing pixels.
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(!reduce){drawSmoke(dt);stepCat(dt);}
+    updateReveal(dt);drawFaces();drawReveal();
   }
 
-  function screenOrient() {
-    const rect = canvas.getBoundingClientRect();
-    const ratio = rect.width > 0 ? rect.width / Math.max(1, rect.height) : 1;
-    if (rect.width > 0) return ratio < 0.8 ? "portrait" : "landscape";
-    return matchMedia("(max-aspect-ratio: 4/5)").matches ? "portrait" : "landscape";
-  }
+  function screenOrient(){return portraitViewport.matches?"portrait":"landscape";}
 
-  function applyPack(orient) {
-    const pack = images.cache?.[orient];
-    if (!pack?.base) return;
-    images.base = pack.base;
-    images.baseOrient = orient;
-    layoutDirty = true;
-    images.overlays = pack.overlays || {};
-    if (orient === "portrait") images.portrait = pack.base;
-    else images.room = pack.base;
-  }
-
-  async function loadOverlaySet(orient) {
-    const entries = await Promise.all(Object.entries(OVERLAYS[orient] || {}).map(async ([key, src]) => {
-      return [key, await loadImage(`${src}?v=akinator-28`)];
+  async function loadOverlaySet() {
+    // Both layouts use the same approved landscape cutouts, eliminating the
+    // second portrait expression pack and keeping expression alignment exact.
+    const source=OVERLAYS.landscape;
+    const sprites=await Promise.all([loadImage("./images/layered/detective.webp"),loadImage("./images/layered/cat.webp")]);
+    const entries=await Promise.all(Object.entries(source).map(async ([key,src])=>{
+      const plate=await loadImage(src+"?v=akinator-28");
+      const animal=key==="cat"||key==="tail",base=sprites[animal?1:0];
+      if(!plate||!base)return [key,null];
+      const crop=animal?(key==="cat"?CAT_FACE.landscape:CAT_TAIL.landscape):FACE.landscape;
+      const ox=animal?899:359,oy=animal?363:121;
+      const sheet=document.createElement("canvas");
+      sheet.width=base.width;sheet.height=base.height;
+      const g=sheet.getContext("2d");
+      const sw=1366,sh=1366*928/1648;
+      g.drawImage(plate,crop.u*sw-ox,124+crop.v*sh-oy,crop.w*sw,crop.h*sh);
+      // Clip to the exact transparent character outline. Never carry the old
+      // bookcase/window pixels into the new room.
+      g.globalCompositeOperation="destination-in";
+      g.drawImage(base,0,0);
+      return [key,sheet];
     }));
-    const overlays = {};
-    for (const [key, image] of entries) if (image) overlays[key] = image;
-    return overlays;
-  }
-
-  async function loadPack(orient) {
-    const pack = { base: null, overlays: {} };
-    pack.base = await loadImage(BASE[orient], 12000);
-    loadOverlaySet(orient).then((overlays) => {
-      pack.overlays = overlays || {};
-      if (images.baseOrient === orient) images.overlays = pack.overlays;
-    }).catch(() => {});
-    return pack;
+    images.overlays=Object.fromEntries(entries.filter(([,v])=>v));
   }
 
   async function start() {
-    const orient = screenOrient();
-    images.cache = images.cache || {};
-    if (!images.cache[orient]) images.cache[orient] = await loadPack(orient);
-    applyPack(orient);
-    const other = orient === "portrait" ? "landscape" : "portrait";
-    if (!images.cache[other]) {
-      loadPack(other).then((pack) => { images.cache[other] = pack; }).catch(() => {});
+    for(const img of room.querySelectorAll(".room-art img[data-src]")){
+      if(!img.getAttribute("src"))img.src=img.dataset.src;
     }
-    resize();
-    if (running) return;
-    running = true;
-    raf = requestAnimationFrame(frame);
+    if(!overlayPromise)overlayPromise=loadOverlaySet().catch(()=>{overlayPromise=null;});
+    images.baseOrient=screenOrient();
+    layoutDirty=true;resize();
+    if(running)return;
+    running=true;frameTime=0;
+    if(!document.hidden)raf=requestAnimationFrame(frame);
   }
+  if(typeof ResizeObserver==="function"){
+    new ResizeObserver(()=>{if(running){layoutDirty=true;resize();}}).observe(canvas);
+    new ResizeObserver(()=>{if(running)alignSpeech();}).observe(room.querySelector("#speech"));
+  }
+  portraitViewport.addEventListener?.("change",()=>{
+    images.baseOrient=screenOrient();layoutDirty=true;if(running)resize();
+  });
+  document.addEventListener("visibilitychange",()=>{
+    cancelAnimationFrame(raf);frameTime=0;
+    if(running&&!document.hidden){layoutDirty=true;raf=requestAnimationFrame(frame);}
+  });
 
   function stop() {
     running = false;
@@ -854,7 +727,7 @@ export function createScene(canvas) {
   }
 
   return {
-    start, stop, resize,
+    start, stop, resize, alignSpeech,
     setMood(value) { mood = value; faces.setMood(value); },
     react(answer) { return faces.react(answer); },
     blinkCat() { catLife.blink = 0.2; },

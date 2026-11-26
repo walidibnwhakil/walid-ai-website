@@ -4,7 +4,7 @@
   font-weight: 400;
   font-display: swap;
   src: local("SolaimanLipi"),
-       url("https://cdn.jsdelivr.net/gh/mdminhazulhaque/solaimanlipi@4f2f4824cc61f48cfcb2ec63e57ff2407a33d758/fonts/solaimanlipi.woff2") format("woff2");
+       url("./fonts/SolaimanLipi.woff2") format("woff2");
   unicode-range: U+0980-09FF, U+0964-0965, U+200C, U+200D, U+25CC;
 }
 :root { color-scheme: light; }
@@ -191,7 +191,14 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   border: 1px solid #e6bd68; background: #24150dcc; color: #ffe6a4;
 }
 @media (min-aspect-ratio: 4/5) {
-  .stage-wrap:has(#back:not([hidden])) #answers { left: 60px; }
+  #categories { left: max(16px, calc((100% - 720px) / 2)); right: max(16px, calc((100% - 720px) / 2)); }
+  #categories .cat-row button { font-size: 18px; }
+  #answers { left: max(16px, calc((100% - 920px) / 2)); right: max(16px, calc((100% - 920px) / 2)); }
+  /* Answer positioning is handled by the final layered layout, including Back. */
+  @media (max-height: 450px) {
+    #categories .cat-row button { min-height: 42px; font-size: 15px; }
+    #answers button { min-height: 42px; padding: 6px; font-size: 15px; }
+  }
 }
 html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-weight: 400; }
 #learn {
@@ -240,7 +247,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
     position: absolute; left: 0; right: 0; z-index: 5;
     width: fit-content; max-width: calc(100% - 24px);
     margin-left: auto; margin-right: auto;
-    top: calc(var(--chin-y, 0.42) * 100% - 14px);
+    top: calc(var(--question-y, 0.46) * 100% + 6px);
   }
   #status { width: auto; flex: 0 1 auto; }
   .speech::after, .speech.has-badge::after {
@@ -252,7 +259,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #status { font-size: 16px; padding: 10px 16px; border-radius: 14px; }
   #categories, #answers {
     /* Just under the speech bubble. --under-bubble is the bubble's bottom, not desk-y. */
-    top: var(--under-bubble, calc(var(--chin-y, 0.42) * 100% + 52px));
+    top: var(--under-bubble, calc(var(--question-y, 0.46) * 100% + 60px));
     bottom: auto; left: 12px; right: 12px; width: auto; z-index: 6;
   }
   .cat-row, .answer-row {
@@ -317,4 +324,162 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+}
+
+/* In-game controls are separate from the illustrated room and short desk. */
+#game .stage-wrap { background:#21130b; }
+#game #categories .cat-row button, #game #answers button {
+  border:1px solid #e1b66d; border-radius:999px;
+  background:linear-gradient(#fff2d0,#e7c285); color:#35200f;
+  box-shadow:0 3px 7px #10080445; font-weight:700;
+}
+#game #categories .cat-row button:hover, #game #answers button:hover { background:#ffe0a0; }
+#game #categories .cat-row button:focus-visible, #game #answers button:focus-visible {
+  outline:2px solid #fff1c7; outline-offset:2px;
+}
+#game #categories .cat-row button::before {
+  content:""; display:inline-block; width:1em; height:1em; margin-right:.4em;
+  background:currentColor; vertical-align:-.12em; mask-repeat:no-repeat; mask-size:contain; mask-position:center;
+}
+#game #categories [data-cat="character"]::before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M4 21v-3a8 8 0 0116 0v3z'/%3E%3C/svg%3E")}
+#game #categories [data-cat="object"]::before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' d='M12 2 22 7v10l-10 5-10-5V7z M2 7l10 5 10-5M12 12v10'/%3E%3C/svg%3E")}
+#game #categories [data-cat="animal"]::before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cellipse cx='4' cy='9' rx='2.5' ry='3.5'/%3E%3Cellipse cx='9' cy='5' rx='2.5' ry='3.5'/%3E%3Cellipse cx='15' cy='5' rx='2.5' ry='3.5'/%3E%3Cellipse cx='20' cy='9' rx='2.5' ry='3.5'/%3E%3Cpath d='M12 10c-3 0-9 6-7 9s5 1 7 1 5 2 7-1-4-9-7-9z'/%3E%3C/svg%3E")}
+@media (min-aspect-ratio:4/5){
+  #game #categories {top:calc(var(--room-edge,.6)*100% + clamp(8px,3vh,28px));}
+  #game #categories .cat-row button {min-height:clamp(42px,6vh,56px);}
+  #game #answers {bottom:clamp(10px,3vh,30px);}
+  #game #answers button {min-height:clamp(42px,6.5vh,58px);}
+}
+@media (max-aspect-ratio:4/5){
+  #game .speech {top:calc(var(--question-y,.46)*100% + 8px); max-width:calc(100% - 28px);}
+  #game .speech::after, #game .speech.has-badge::after {left:40%;}
+  #game #categories {left:12px;right:12px;}
+  #game #categories .cat-row {display:grid;grid-template-columns:1fr;gap:8px;width:min(78%,360px);margin:auto;}
+  #game #categories .cat-row button {width:100%;height:44px;min-height:44px;font-size:17px;padding:0 12px;}
+  #game #answers {gap:8px;}
+  #game #answers .answer-row {gap:8px;flex-wrap:nowrap;width:100%;max-width:440px;}
+  #game #answers button {flex:1 1 0;min-width:0;min-height:44px;height:auto;padding:6px 8px;font-size:15px;line-height:1.15;white-space:normal;}
+  #game .q-badge {flex-basis:32px;}
+}
+
+/* Riddlex bilingual typography: readable Bangla without synthetic bold. */
+html[lang="en"] body { font-family: "Times New Roman", Times, SolaimanLipi, serif; }
+html[lang="bn"] body { font-family: SolaimanLipi, "Times New Roman", Times, serif; }
+#game .lang-switch [data-set-lang="en"], #riddlex-guide [data-guide-lang="en"] {
+  font-family: "Times New Roman", Times, serif; font-weight: 400;
+}
+#game .lang-switch [data-set-lang="bn"], #riddlex-guide [data-guide-lang="bn"],
+#riddlex-guide [lang="bn"] {
+  font-family: SolaimanLipi, "Times New Roman", Times, serif;
+  font-weight: 400; font-synthesis: none;
+}
+html[lang="bn"] #game button, html[lang="bn"] #game input,
+html[lang="bn"] #game #status, html[lang="bn"] #game #solved-line,
+html[lang="bn"] #game .q-badge {
+  font-family: SolaimanLipi, "Times New Roman", Times, serif;
+  font-weight: 400; font-synthesis: none;
+}
+html[lang="bn"] #game #status { font-size: 24px; line-height: 1.5; overflow-wrap: anywhere; }
+html[lang="bn"] #game #categories .cat-row button,
+html[lang="bn"] #game #answers button { font-size: 20px; line-height: 1.35; }
+html[lang="bn"] #game #solved-line { line-height: 1.5; }
+@media (max-aspect-ratio:4/5) {
+  html[lang="bn"] #game #status { font-size: 19px; line-height: 1.5; padding: 8px 12px; }
+  html[lang="bn"] #game #categories .cat-row button { font-size: 19px; line-height: 1.35; height: auto; }
+  html[lang="bn"] #game #answers button { font-size: 17px; line-height: 1.35; }
+}
+@media (min-aspect-ratio:4/5) and (max-height:450px) {
+  html[lang="bn"] #game #status { font-size: 19px; line-height: 1.4; }
+  html[lang="bn"] #game #categories .cat-row button,
+  html[lang="bn"] #game #answers button { font-size: 17px; }
+}
+
+/* Approved layered layout. Static sprites, exact carved desk, live HTML controls. */
+#game {grid-template-rows:clamp(47px,7vh,66px) minmax(0,1fr);isolation:isolate;border:1px solid #9b7238;border-radius:clamp(0px,1.1vw,16px);}
+#game .play-top {height:auto;padding:7px clamp(10px,2vw,26px);background:linear-gradient(#392517,#24160e);z-index:5;}
+#game .play-top button {font-size:clamp(12px,1.25vw,17px);padding:7px 12px;min-height:36px;}
+#game .stage-wrap {--edge:72%;--actor-bottom:27.7%;background:#2b180d;isolation:isolate;}
+#game .room-art {position:absolute;inset:0;z-index:0;isolation:isolate;pointer-events:none;overflow:hidden;}
+.room-library {position:absolute;inset:0 0 auto;height:var(--edge);background:url("images/layered/library.webp") center top/110% auto no-repeat;z-index:-2;}
+.room-library::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#27160945,transparent 24%,#32160a10 65%,#20110b48);}
+.room-logo{position:absolute;z-index:5;left:50%;top:1%;width:clamp(170px,23vw,330px);height:auto;transform:translateX(-50%);filter:drop-shadow(0 3px 2px #140700);}
+.room-detective,.room-cat,.room-lamp{position:absolute;bottom:var(--actor-bottom);height:auto;object-fit:contain;object-position:center bottom;}
+.room-detective{left:27%;width:39%;max-height:61%;z-index:1;filter:drop-shadow(0 3px 3px #210f0850);}
+.room-cat{left:65%;width:23%;max-height:25%;z-index:2;}
+.room-lamp{left:8%;width:15%;max-height:45%;z-index:1;}
+.room-lens{position:absolute;bottom:calc(var(--actor-bottom) - 1.4%);width:11%;height:auto;left:16%;z-index:4;}
+.room-desk{position:absolute;top:var(--edge);height:6.8%;left:0;right:0;background:linear-gradient(0deg,#1e090026,transparent 55%),url("images/layered/desk.webp") center/100% 100%;box-shadow:inset 0 3px 7px #32110050;z-index:3;}
+.room-desk::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:26%;background:url("images/layered/desk-rim.webp") center/100% 100% no-repeat;box-shadow:0 5px 7px #14070070;}
+.room-front{position:absolute;top:calc(var(--edge) + 6.8%);bottom:0;left:0;right:0;background:url("images/layered/desk-front.webp") center/100% 100% no-repeat;z-index:0;}
+#game #stage{position:absolute;inset:0;z-index:2;pointer-events:none;background:transparent;}
+#game .speech{left:64%;right:auto;top:var(--speech-top,40%);width:min(30%,420px);margin:0;min-height:48px;max-width:none;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 14px;background:#fffcf7;color:#2c2019;border-radius:18px;filter:none;box-shadow:0 5px 10px #10070033;text-align:center;}
+#game #status{background:transparent;padding:0;border-radius:0;flex:0 1 auto;font-size:clamp(16px,1.85vw,24px);line-height:1.25;}
+#game .q-badge{flex:0 0 auto;border-radius:9px;padding:5px;min-width:21px;background:#276c61;font-size:.9em;line-height:1.25;}
+#game .speech::after,#game .speech.has-badge::after{content:"";position:absolute;pointer-events:none;left:-25px;top:auto;bottom:5px;right:auto;margin:0;width:30px;height:25px;border:0;background:#fffcf7;clip-path:polygon(100% 0,100% 65%,0 100%,65% 47%);}
+#game #categories,#game #answers{position:absolute;top:calc(var(--edge) + 9.3%);bottom:7.5%;left:50%;right:auto;transform:translateX(-50%);width:min(78%,930px);margin:0;z-index:5;align-content:center;align-items:center;}
+#game #categories .cat-row{width:100%;gap:clamp(8px,1.7vw,24px);}
+#game #categories .cat-row button,#game #answers button{font-size:clamp(15px,1.6vw,21px);min-height:44px;padding:9px 12px;border-color:#efc676;background:linear-gradient(#fff1ca,#f4ce81);box-shadow:0 4px 7px #10070066;}
+#game #answers{width:min(85%,1050px);gap:10px;}
+#game #back{bottom:2.2%;left:2%;}
+html[lang="bn"] #game #status{font-size:clamp(19px,1.9vw,25px);line-height:1.45;font-weight:400;}
+html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers button{font-size:clamp(17px,1.75vw,23px);line-height:1.35;font-weight:400;}
+@media(max-aspect-ratio:4/5){
+  #game{grid-template-rows:47px minmax(0,1fr);border:0;border-radius:0;}
+  #game .play-top{padding:5px 9px;}
+  #game .play-top button{padding:6px 9px;font-size:13px;}
+  #game .stage-wrap{--edge:58%;--actor-bottom:41.8%;}
+  .room-library{background-size:auto 147%;background-position:48% top;}
+  .room-logo{top:1.1%;width:min(64%,260px);}
+  .room-detective{left:-7%;width:74%;max-height:52%;}
+  .room-cat{left:56%;width:44%;max-height:22%;}
+  .room-lamp{left:-10%;width:25%;max-height:27%;}
+  .room-lens{left:0%;width:20%;}
+  .room-front{background-image:url("images/layered/desk-front-mobile.webp");}
+  #game .speech{top:var(--speech-top,36%);left:55%;width:42%;padding:8px;min-height:40px;border-radius:15px;}
+  #game #status{font-size:clamp(14px,4.3vw,20px);line-height:1.3;}
+  #game .speech::after,#game .speech.has-badge::after{left:-18px;width:23px;height:21px;bottom:4px;}
+  #game #categories,#game #answers{top:calc(var(--edge) + 9.3%);bottom:7.5%;left:50%;right:auto;width:min(78%,360px);}
+  #game #categories .cat-row{width:100%;gap:10px;}
+  #game #categories .cat-row button{height:auto;min-height:48px;font-size:17px;padding:5px 12px;}
+  #game #answers{width:min(88%,440px);bottom:10%;gap:8px;justify-content:center;}
+  #game #answers .answer-row{width:100%;gap:7px;flex-wrap:nowrap;justify-content:center;}
+  #game #answers button{min-width:0;min-height:44px;height:auto;font-size:15px;padding:5px 7px;line-height:1.2;}
+  html[lang="bn"] #game #status{font-size:clamp(17px,4.6vw,20px);line-height:1.4;}
+  html[lang="bn"] #game #answers button{font-size:17px;line-height:1.3;}
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game .stage-wrap{--edge:54%;--actor-bottom:45.8%;}
+  .room-logo{width:55%;}
+  .room-detective{max-height:48%;}
+  #game #categories,#game #answers{top:calc(var(--edge) + 6.2%);bottom:4.5%;}
+  #game #categories .cat-row{gap:6px;}
+  #game #categories .cat-row button{min-height:44px;padding:4px 8px;font-size:15px;}
+  #game #answers{bottom:9%;gap:5px;}
+  #game #answers button{min-height:44px;padding:4px 6px;font-size:13px;}
+  #game #back{min-width:34px;min-height:34px;width:34px;height:34px;}
+  html[lang="bn"] #game #answers button{font-size:15px;}
+}
+@media(min-aspect-ratio:4/5) and (max-height:450px){
+  #game{grid-template-rows:38px minmax(0,1fr);}
+  #game .stage-wrap{--edge:68%;--actor-bottom:31.8%;}
+  #game .play-top button{padding:4px 10px;min-height:30px;}
+  .room-logo{width:min(24%,180px);}
+  #game #categories,#game #answers{top:calc(var(--edge) + 8%);bottom:5%;}
+  #game #categories .cat-row button,#game #answers button{min-height:44px;font-size:14px;padding:5px 8px;}
+  #game .speech{padding:7px;min-height:32px;}
+  #game #status{font-size:14px;}
+  #game .speech::after,#game .speech.has-badge::after{left:-15px;width:20px;height:17px;bottom:3px;}
+  html[lang="bn"] #game #status{font-size:17px;}
+}
+
+/* Keep all five buttons centered after Back becomes visible on question two. */
+@media (min-aspect-ratio:4/5) {
+  #game .stage-wrap:has(#back:not([hidden])) #answers {
+    left:50%;right:auto;transform:translateX(-50%);
+    width:min(85%,1050px);
+  }
+}
+@media (min-aspect-ratio:4/5) and (max-height:450px) {
+  #game .stage-wrap {--edge:58%;--actor-bottom:41.8%;}
+  #game #answers {top:calc(var(--edge) + 9%);bottom:5%;}
 }

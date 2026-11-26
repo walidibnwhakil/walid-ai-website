@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
+import { createScene, startMenuCat } from "./scene.js?v=approved-layered-20261126";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -24,7 +24,8 @@ const guessBox = $("guess");
 const learnForm = $("learn");
 const scene = createScene($("stage"));
 
-let lang = localStorage.getItem("riddlex-lang") || "en";
+let lang = "en";
+try { if (localStorage.getItem("riddlex-lang") === "bn") lang = "bn"; } catch { /* English remains the default. */ }
 let category = null;
 let manifest = null;
 let catalog = null;
@@ -182,22 +183,7 @@ function setStatus(message, number) {
 }
 
 function placeUnderBubble() {
-  const wrap = document.querySelector(".stage-wrap");
-  const bubble = $("speech");
-  if (!wrap || !bubble || wrap.clientWidth / Math.max(1, wrap.clientHeight) >= 0.8) return;
-  const wr = wrap.getBoundingClientRect();
-  const sr = bubble.getBoundingClientRect();
-  if (sr.height < 8) return;
-  const shown = !$("categories").hidden ? $("categories") : $("answers");
-  const height = shown && !shown.hidden ? shown.getBoundingClientRect().height : 96;
-  const gap = 10;
-  let top = sr.bottom - wr.top + gap;
-  const max = Math.max(gap, wr.height - height - 8);
-  if (top > max) top = max;
-  const next = `${Math.round(top)}px`;
-  if (wrap.style.getPropertyValue("--under-bubble") !== next) {
-    wrap.style.setProperty("--under-bubble", next);
-  }
+  scene.alignSpeech();
 }
 
 function scheduleUnderBubble() {
@@ -420,7 +406,7 @@ async function beginGuess(index) {
   scene.setMood("confident");
   const font = guessFont(lang, name);
   if (document.fonts?.load) {
-    try { await withTimeout(document.fonts.load(font), 2500); } catch { /* use the fallback font */ }
+    try { await withTimeout(document.fonts.load(font, name), 2500); } catch { /* use the fallback font */ }
     if (loadToken !== session || mode !== "reveal") return;
   }
   const result = await scene.playReveal({
@@ -583,7 +569,7 @@ function onUndo() {
 
 function setLanguage(next) {
   lang = next === "bn" ? "bn" : "en";
-  localStorage.setItem("riddlex-lang", lang);
+  try { localStorage.setItem("riddlex-lang", lang); } catch { /* Language switching still works without storage. */ }
   applyLanguage();
   if (mode === "ask" && currentQ && pool) {
     const question = pool.questions[pool.qIndex.get(currentQ)];
@@ -650,6 +636,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 window.addEventListener("resize", () => { scene.resize(); scheduleUnderBubble(); });
+document.querySelector(".stage-wrap")?.addEventListener("riddlex-scene-layout", scheduleUnderBubble);
 if (typeof ResizeObserver === "function") {
   const bubble = $("speech");
   if (bubble) new ResizeObserver(() => placeUnderBubble()).observe(bubble);

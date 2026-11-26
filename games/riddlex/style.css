@@ -536,3 +536,34 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game .speech{padding:6px 8px;gap:4px;}
   #game .speech::after,#game .speech.has-badge::after{height:17px;}
 }
+
+/* Mobile answer tray: both rows share the same outer edges, not button widths.
+   Three generous equal columns above; two wider equal columns below. */
+@media (max-aspect-ratio:4/5) {
+  #game #answers {
+    width:min(calc(100% - 32px),380px);
+    gap:9px;
+  }
+  #game #answers .answer-row {
+    display:grid;width:100%;max-width:none;gap:8px;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  #game #answers .answer-row + .answer-row {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #game #answers .answer-row button {
+    width:100%;min-width:0;min-height:48px;padding:8px 5px;
+    border:1px solid #eac274;border-radius:14px;
+    background:linear-gradient(180deg,#fff5d5 0%,#f5d18b 100%);
+    box-shadow:inset 0 1px 0 #fff8dd,0 3px 6px #190b0566;
+    font-size:clamp(14px,4vw,17px);line-height:1.2;
+  }
+  html[lang="bn"] #game #answers .answer-row button {font-size:clamp(16px,4.5vw,19px);line-height:1.3;}
+  #game #answers .answer-row button:hover {background:#ffe1a0;}
+  #game #answers .answer-row button:active {background:#e9bc70;}
+}
+@media (max-aspect-ratio:4/5) and (max-height:620px) {
+  #game #answers {gap:7px;}
+  #game #answers .answer-row {gap:7px;}
+  #game #answers .answer-row button {min-height:44px;padding:5px 4px;}
+}

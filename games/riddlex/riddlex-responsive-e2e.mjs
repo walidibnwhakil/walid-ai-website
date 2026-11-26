@@ -82,6 +82,11 @@ try {
           assert.ok(g.number&&Math.abs(g.status.left-g.number.right)<=8,"number separated from question");
           if(width/height<=.8){
             assert.deepEqual(g.rows.map(row=>row.length),[3,2],"portrait answer rows must contain three then two");
+            const [upper,lower]=g.rows;
+            assert.ok(Math.abs(upper[0].left-lower[0].left)<=2&&Math.abs(upper[2].right-lower[1].right)<=2,"row edges must align");
+            assert.ok(upper.every(b=>Math.abs(b.width-upper[0].width)<=2)&&lower.every(b=>Math.abs(b.width-lower[0].width)<=2),"balanced columns within each row");
+            assert.ok(lower[0].width>=upper[0].width*1.35&&upper[0].width>=80,"bottom pair wider and top buttons comfortably wide");
+
             assert.ok(g.rows[0].every(b=>Math.abs(b.y-g.rows[0][0].y)<=4)&&g.rows[1].every(b=>Math.abs(b.y-g.rows[1][0].y)<=4)&&Math.max(...g.rows[0].map(b=>b.bottom))<=Math.min(...g.rows[1].map(b=>b.top))+2,"incorrect portrait answer rows");
           }
         }

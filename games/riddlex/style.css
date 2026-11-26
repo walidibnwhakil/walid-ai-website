@@ -4,7 +4,7 @@
   font-weight: 400;
   font-display: swap;
   src: local("SolaimanLipi"),
-       url("https://cdn.jsdelivr.net/gh/mdminhazulhaque/solaimanlipi@4f2f4824cc61f48cfcb2ec63e57ff2407a33d758/fonts/solaimanlipi.woff2") format("woff2");
+       url("./fonts/SolaimanLipi.woff2") format("woff2");
   unicode-range: U+0980-09FF, U+0964-0965, U+200C, U+200D, U+25CC;
 }
 :root { color-scheme: light; }

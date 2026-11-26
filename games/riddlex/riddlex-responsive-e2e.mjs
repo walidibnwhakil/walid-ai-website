@@ -12,7 +12,7 @@ const mime = {
   ".html": "text/html", ".css": "text/css", ".js": "text/javascript",
   ".mjs": "text/javascript", ".json": "application/json",
   ".bin": "application/octet-stream", ".webp": "image/webp",
-  ".jpg": "image/jpeg", ".png": "image/png",
+  ".jpg": "image/jpeg", ".png": "image/png", ".woff2": "font/woff2",
 };
 const server = createServer(async (request, response) => {
   const pathname = new URL(request.url, "http://127.0.0.1").pathname;
@@ -88,6 +88,7 @@ try {
     await page.waitForFunction(()=>document.getElementById("progress").textContent.includes("Question 2") && !document.getElementById("back").hidden,null,{timeout:20000});
     await layout("ask","en");
     await page.click('#game [data-set-lang="bn"]');
+    await page.evaluate(async()=>{const fonts=await document.fonts.load('400 19px SolaimanLipi','বাংলা প্রশ্ন হ্যাঁ না');if(!fonts.length||!fonts.every(f=>f.status==="loaded"))throw Error("SolaimanLipi did not load");});
     await layout("ask","bn");
     const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
     assert.ok(artBytes<300000,"static art exceeds 300KB");

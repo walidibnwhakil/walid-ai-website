@@ -675,3 +675,13 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game #answers{bottom:32px;gap:6px;}
   #game #answers .answer-row button{min-height:42px;padding:4px 3px;}
 }
+
+@media(max-aspect-ratio:4/5){
+  #game .stage-wrap{--plaque-zone:calc(100vw * .218);--actor-zone:min(65%,calc(100vw * .79));}
+  #game .approved-wall{height:calc(100% - var(--table-zone) - var(--actor-zone) - var(--plaque-zone));}
+  #game .approved-wall-plaque{bottom:calc(var(--table-zone) + var(--actor-zone));height:var(--plaque-zone);}
+  #game .stage-wrap:not(.portrait-art-ready) #hud,#game .stage-wrap:not(.portrait-art-ready) #back{visibility:hidden;}
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game .stage-wrap{--actor-zone:min(60%,calc(100vw * .69));--plaque-zone:min(19%,calc(100vw * .218));}
+}

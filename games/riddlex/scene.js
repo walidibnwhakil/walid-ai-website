@@ -1,7 +1,5 @@
-// The room, detective, pipe and cat are one painted picture.
-// Breathing is a slight scale of that whole picture, anchored at the floor.
-// Face and cat plates cross-fade with opacity and share that same transform.
-// Nothing is ever a shifted rectangle of the painting.
+// Original room art is cached as a static room and desk composition.
+// Face, cat, smoke and reveal layers animate independently without zooming the room.
 
 import { createExpressions } from "./expressions.js?v=akinator-27";
 
@@ -118,6 +116,13 @@ export function createScene(canvas) {
   let view = { x: 0, y: 0, w: 1, h: 1 };
   let logoSprite = null;
   let layoutDirty = true;
+  let cssSize = { width: 0, height: 0 };
+  let frameTime = 0;
+  let logoPaintOrient = "";
+  let staticKey = "";
+  let deskEdge = 0;
+  const staticRoom = document.createElement("canvas");
+  const staticCtx = staticRoom.getContext("2d", { alpha: false });
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
@@ -139,9 +144,11 @@ export function createScene(canvas) {
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
-    const dpr = Math.min(2, devicePixelRatio || 1);
-    const width = Math.max(320, Math.round(rect.width * dpr));
-    const height = Math.max(180, Math.round(rect.height * dpr));
+    if (!rect.width || !rect.height) return;
+    cssSize = { width: rect.width, height: rect.height };
+    const dpr = Math.min(1.5, devicePixelRatio || 1, Math.sqrt(1800000 / (rect.width * rect.height)));
+    const width = Math.max(1, Math.round(rect.width * dpr));
+    const height = Math.max(1, Math.round(rect.height * dpr));
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
@@ -150,6 +157,7 @@ export function createScene(canvas) {
     if (layoutDirty) {
       layoutDirty = false;
       layoutRoom();
+      staticKey = '';
     }
   }
 
@@ -169,25 +177,23 @@ export function createScene(canvas) {
       view = { x: 0, y: 0, w: cw, h: ch };
     } else {
       if (portraitMode) {
-        // Keep the entire room width rather than magnifying only the face and desk.
-        // Leave a dedicated area for a longer question and two rows of answers.
         const chrome = phoneChrome();
-        const hatV = 0.118;
-        const deskV = 0.46;
-        const topY = chrome.logo + chrome.dpr * 2;
-        const reserve = 206 * chrome.dpr;
-        const scale = Math.max(0.01, Math.min(cw / art.width,
-          (ch - topY - reserve) / ((deskV - hatV) * art.height)));
+        const topY = chrome.logo + 6 * chrome.dpr;
+        const cut = 0.50, start = 0.118;
+        const reserve = 220 * chrome.dpr;
+        const scale = Math.max(0.01, Math.min(cw * 1.06 / art.width,
+          (ch - topY - reserve) / ((cut - start) * art.height)));
         const w = art.width * scale;
-        view = { x: (cw - w) / 2, y: topY - hatV * art.height * scale,
-          w, h: art.height * scale };
+        view = { x: w > cw ? cw - w : (cw - w) / 2,
+          y: topY - start * art.height * scale, w, h: art.height * scale };
+        deskEdge = view.y + view.h * cut;
       } else {
-        // Frame the complete artwork on wide and tall displays. Never crop or
-        // stretch the detective, cat, logo or room to fill a mismatched aspect.
-        const scale = Math.min(cw / art.width, ch / art.height) * 0.94;
+        const topY = Math.min(ch * .115, cw * .07);
+        const reserve = Math.max(ch * .24, 75 * (canvas.width / Math.max(1,cssSize.width)));
+        const scale = Math.max(.01, Math.min(cw / art.width, (ch - topY - reserve) / (art.height * .58)));
         const w = art.width * scale;
-        const h = art.height * scale;
-        view = { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
+        view = { x: (cw - w) / 2, y: topY, w, h: art.height * scale };
+        deskEdge = view.y + view.h * .58;
       }
     }
     const parent = canvas.parentElement;
@@ -207,11 +213,11 @@ export function createScene(canvas) {
     parent.style.setProperty("--bubble-left", Math.max(0.02, bubbleLeft).toFixed(4));
     parent.style.setProperty("--bubble-top", Math.max(0.02, bubbleTop).toFixed(4));
     parent.style.setProperty("--chin-y", chin.toFixed(4));
-    const [, questionY] = frac(0, 0.46);
-    parent.style.setProperty("--question-y", questionY.toFixed(4));
+    parent.style.setProperty("--question-y", Math.max(0.02,deskEdge/ch).toFixed(4));
+    parent.style.setProperty("--room-edge", Math.max(0.02,deskEdge/ch).toFixed(4));
     parent.style.setProperty("--hands-y", hands.toFixed(4));
     parent.style.setProperty("--cat-top", catTop.toFixed(4));
-    parent.style.setProperty("--desk-y", ((view.y + view.h * spot.dv) / ch).toFixed(4));
+    parent.style.setProperty("--desk-y", Math.max(0.02, Math.min(0.85, (deskEdge + (portraitMode ? 0 : ch * .05)) / ch)).toFixed(4));
     const [, noteBottom] = frac(0, portraitMode ? 0.62 : 0.44);
     parent.style.setProperty("--note-bottom", Math.max(0.2, noteBottom).toFixed(4));
     parent.classList.toggle("portrait-scene", portraitMode);
@@ -315,7 +321,7 @@ export function createScene(canvas) {
   }
 
   function phoneChrome() {
-    const cssH = canvas.getBoundingClientRect().height || canvas.height;
+    const cssH = cssSize.height || canvas.height;
     const dpr = canvas.height / Math.max(1, cssH);
     return {
       dpr,
@@ -367,9 +373,8 @@ export function createScene(canvas) {
     // A photo card shows the whole picture, large, in the space to the right of
     // the detective's face. It may cover the shelves, cat, lamp and desk.
     // A name-only card stays centred under the chin.
-    const rect = canvas.getBoundingClientRect();
-    const cssW = rect.width || canvas.width;
-    const cssH = rect.height || canvas.height;
+    const cssW = cssSize.width || canvas.width;
+    const cssH = cssSize.height || canvas.height;
     const dpr = canvas.width / Math.max(1, cssW);
     let w;
     let photoH = 0;
@@ -479,11 +484,13 @@ export function createScene(canvas) {
   }
 
   function drawPhoneLogo() {
-    const art = images.portrait;
-    if (!portraitMode || !art) return;
-    if (!logoSprite) {
-      const sw = Math.round(art.width * 0.62);
-      const sh = Math.round(art.height * 0.15);
+    const art = currentArt();
+    if (!art) return;
+    const orient = portraitMode ? "portrait" : "landscape";
+    if (!logoSprite || logoPaintOrient !== orient) {
+      logoPaintOrient = orient;
+      const sw = Math.round(art.width * (portraitMode ? .45 : .24));
+      const sh = Math.round(art.height * (portraitMode ? .115 : .185));
       const sample = document.createElement("canvas");
       sample.width = sw;
       sample.height = sh;
@@ -517,9 +524,10 @@ export function createScene(canvas) {
       logoSprite.height = bh;
       logoSprite.getContext("2d").drawImage(sample, minX, minY, bw, bh, 0, 0, bw, bh);
     }
-    const dw = Math.min(canvas.width * 0.78, phoneChrome().logo * (logoSprite.width / logoSprite.height));
+    const maxH = portraitMode ? phoneChrome().logo : Math.max(28,view.y * 1.12);
+    const dw = Math.min(canvas.width * (portraitMode ? .63 : .25), maxH * (logoSprite.width / logoSprite.height));
     const dh = dw * (logoSprite.height / logoSprite.width);
-    ctx.drawImage(logoSprite, (canvas.width - dw) / 2, phoneChrome().dpr * 2, dw, dh);
+    ctx.drawImage(logoSprite, (canvas.width - dw) / 2, Math.max(2,(maxH - dh) / 2), dw, dh);
   }
 
   function drawPresent() {
@@ -631,59 +639,58 @@ export function createScene(canvas) {
     }
   }
 
-  function drawPortrait(art) {
+  function paintRoomLayer(art) {
+    const w = canvas.width, h = canvas.height;
+    const key = [w,h,images.baseOrient,view.x,view.y,view.w,deskEdge].join(":");
+    if (staticKey === key) return;
+    staticKey = key;
+    staticRoom.width = w; staticRoom.height = h;
+    const g = staticCtx;
+    g.fillStyle = "#21130b"; g.fillRect(0,0,w,h);
     const scale = view.w / art.width;
-    const v0 = 0.118;
-    // Show the original desk below the question and buttons, not an abrupt crop.
-    const cut = Math.max(0.495, Math.min(1, (canvas.height - view.y) / (art.height * scale)));
-    const srcX = Math.max(0, -view.x / scale);
-    const srcW = Math.min(art.width - srcX, canvas.width / scale);
-    const srcY = art.height * v0;
-    const srcH = art.height * (cut - v0);
-    const destX = view.x + srcX * scale;
-    const destY = view.y + srcY * scale;
-    const destH = srcH * scale;
-    ctx.drawImage(art, srcX, srcY, srcW, srcH, destX, destY, srcW * scale, destH);
-    // If the room ends on an unusually tall screen, retain the warm backdrop
-    // rather than stretching a decorative wood strip or distorting the art.
+    const v0 = portraitMode ? .118 : 0;
+    const v1 = portraitMode ? .50 : .58;
+    const srcX = Math.max(0,-view.x/scale);
+    const srcW = Math.min(art.width-srcX,w/scale);
+    const deskStart = portraitMode ? .445 : .49;
+    const destX = view.x + srcX*scale;
+    const strip = (from,to) => g.drawImage(art,srcX,art.height*from,srcW,
+      art.height*(to-from),destX,view.y+view.h*from,srcW*scale,view.h*(to-from));
+    strip(v0,deskStart); strip(deskStart,v1);
+    // Replace the baked-in left logo panel, keeping the original lamp and room.
+    if (!portraitMode) {
+      const left=ix(0), top=iy(0), pw=view.w*.243, ph=view.h*.185;
+      g.save();g.beginPath();g.rect(left,top,pw,ph);g.clip();
+      g.drawImage(art,0,0,Math.max(1,Math.round(art.width*.026)),Math.round(art.height*.185),left,top,pw,ph);
+      const shade=g.createLinearGradient(left,top,left+pw,top);
+      shade.addColorStop(0,"rgba(28,13,7,.2)");shade.addColorStop(1,"rgba(28,13,7,.45)");
+      g.fillStyle=shade;g.fillRect(left,top,pw,ph);g.restore();
+    }
+    const panelY=Math.min(h,Math.max(0,deskEdge));
+    const panel=g.createLinearGradient(0,panelY,0,h);
+    panel.addColorStop(0,"#382013");panel.addColorStop(.4,"#2a170d");panel.addColorStop(1,"#1c100b");
+    g.fillStyle=panel;g.fillRect(0,panelY,w,Math.max(0,h-panelY));
+    g.fillStyle="#aa7835";g.fillRect(0,panelY,w,Math.max(1,w*.0012));
   }
 
   function frame(now) {
-    if (!running) return;
-    const dt = Math.min(0.034, (now - (frame.last || now)) / 1000 || 0.016);
-    frame.last = now;
+    if (!running || document.hidden) return;
+    raf = requestAnimationFrame(frame);
+    if (frameTime && now-frameTime < 1000/30-1) return;
+    const dt = Math.min(.10, (now-(frameTime||now))/1000 || .033);
+    frameTime = now;
     clock += dt;
-    resize();
-    const wantOrient = portraitViewport.matches ? "portrait" : "landscape";
+    const wantOrient = screenOrient();
     if (images.cache?.[wantOrient] && images.baseOrient !== wantOrient) applyPack(wantOrient);
+    if (layoutDirty) resize();
     const plates = images.overlays || {};
     faceNow = faces.step(dt, (key) => !!plates[key]);
     const art = currentArt();
-    ctx.fillStyle = "#1a100c";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    // At most ±0.4% so the whole room, detective and cat stay one piece.
-    if (!reduce) {
-      const scale = 1 + Math.sin(clock * 1.05) * 0.004;
-      const ax = view.x + view.w * 0.5;
-      const ay = view.y + view.h;
-      ctx.translate(ax, ay);
-      ctx.scale(scale, scale);
-      ctx.translate(-ax, -ay);
-    }
-    if (art) {
-      if (portraitMode) drawPortrait(art);
-      else ctx.drawImage(art, view.x, view.y, view.w, view.h);
-    }
-    drawPhoneLogo();
-    if (!reduce) drawSmoke(dt);
-    stepCat(dt);
-    updateReveal(dt);
-    drawFaces();
-    drawReveal();
-    ctx.restore();
-
-    raf = requestAnimationFrame(frame);
+    if (art) { paintRoomLayer(art); ctx.drawImage(staticRoom,0,0); drawPhoneLogo(); }
+    else { ctx.fillStyle="#21130b"; ctx.fillRect(0,0,canvas.width,canvas.height); }
+    // Only the existing feathered expression, cat, smoke and reveal plates move.
+    if (!reduce) { drawSmoke(dt); stepCat(dt); }
+    updateReveal(dt); drawFaces(); drawReveal();
   }
 
   function screenOrient() {
@@ -725,15 +732,26 @@ export function createScene(canvas) {
     images.cache = images.cache || {};
     if (!images.cache[orient]) images.cache[orient] = await loadPack(orient);
     applyPack(orient);
-    const other = orient === "portrait" ? "landscape" : "portrait";
-    if (!images.cache[other]) {
-      loadPack(other).then((pack) => { images.cache[other] = pack; }).catch(() => {});
-    }
+    // Load the other orientation only if the viewport actually rotates.
     resize();
     if (running) return;
     running = true;
-    raf = requestAnimationFrame(frame);
+    frameTime = 0;
+    if (!document.hidden) raf = requestAnimationFrame(frame);
   }
+
+  portraitViewport.addEventListener?.('change', async () => {
+    if (!running) return;
+    const orient = screenOrient();
+    images.cache ||= {};
+    if (!images.cache[orient]) images.cache[orient] = await loadPack(orient);
+    if (running && screenOrient() === orient) { applyPack(orient); resize(); }
+  });
+  document.addEventListener('visibilitychange', () => {
+    cancelAnimationFrame(raf);
+    frameTime = 0;
+    if (running && !document.hidden) raf = requestAnimationFrame(frame);
+  });
 
   function stop() {
     running = false;

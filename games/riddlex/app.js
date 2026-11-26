@@ -24,7 +24,8 @@ const guessBox = $("guess");
 const learnForm = $("learn");
 const scene = createScene($("stage"));
 
-let lang = localStorage.getItem("riddlex-lang") || "en";
+let lang = "en";
+try { if (localStorage.getItem("riddlex-lang") === "bn") lang = "bn"; } catch { /* English remains the default. */ }
 let category = null;
 let manifest = null;
 let catalog = null;
@@ -421,7 +422,7 @@ async function beginGuess(index) {
   scene.setMood("confident");
   const font = guessFont(lang, name);
   if (document.fonts?.load) {
-    try { await withTimeout(document.fonts.load(font), 2500); } catch { /* use the fallback font */ }
+    try { await withTimeout(document.fonts.load(font, name), 2500); } catch { /* use the fallback font */ }
     if (loadToken !== session || mode !== "reveal") return;
   }
   const result = await scene.playReveal({
@@ -584,7 +585,7 @@ function onUndo() {
 
 function setLanguage(next) {
   lang = next === "bn" ? "bn" : "en";
-  localStorage.setItem("riddlex-lang", lang);
+  try { localStorage.setItem("riddlex-lang", lang); } catch { /* Language switching still works without storage. */ }
   applyLanguage();
   if (mode === "ask" && currentQ && pool) {
     const question = pool.questions[pool.qIndex.get(currentQ)];

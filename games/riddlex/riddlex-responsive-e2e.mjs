@@ -38,6 +38,62 @@ if (shotFolder) await mkdir(shotFolder, { recursive: true });
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
+  // Cold-load the real portrait menu with deliberately delayed artwork.
+  // Effects must stay invisible until the selected image has been painted.
+  {
+    const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2});
+    let unblock, requested;
+    const release=new Promise(resolve=>{unblock=resolve;});
+    const started=new Promise(resolve=>{requested=resolve;});
+    await page.route("**/*",async route=>{
+      const url=new URL(route.request().url());
+      if(url.origin!==origin)return route.abort();
+      if(url.pathname.endsWith("/menu-portrait.webp")){requested();await release;}
+      return route.continue();
+    });
+    await page.goto(origin+"/games/riddlex/?autotest=1",{waitUntil:"domcontentloaded"});
+    await started;
+    try {
+      assert.equal(await page.locator("#menu").evaluate(el=>el.classList.contains("art-ready")),false);
+      assert.equal(await page.locator(".menu-ambient-portrait").evaluate(el=>getComputedStyle(el).visibility),"hidden");
+      assert.equal(await page.locator(".menu-ambient-portrait path").first().evaluate(el=>getComputedStyle(el).animationPlayState),"paused");
+      assert.equal(await page.locator("#menu-cat").evaluate(el=>getComputedStyle(el).visibility),"hidden");
+    } finally {unblock();}
+    await page.waitForFunction(()=>document.getElementById("menu").classList.contains("art-ready"),null,{timeout:15000});
+    for(const [width,height] of [[320,568],[360,640],[390,570],[390,844],[412,915],[430,932]]){
+      await page.setViewportSize({width,height});
+      await page.waitForTimeout(100);
+      const g=await page.evaluate(()=>{
+        const rect=sel=>document.querySelector(sel).getBoundingClientRect().toJSON();
+        const art=document.querySelector(".menu-port");
+        window.scrollTo(0,500);
+        return {image:rect(".menu-port"),frame:rect(".menu-frame"),play:rect("#play"),
+          back:rect(".menu-back"),guides:[...document.querySelectorAll(".riddlex-guide-actions button")].map(el=>el.getBoundingClientRect().toJSON()),
+          natural:[art.naturalWidth,art.naturalHeight],fit:getComputedStyle(art).objectFit,
+          scroll:[document.documentElement.scrollWidth,document.documentElement.scrollHeight,window.scrollX,window.scrollY],
+          effects:getComputedStyle(document.querySelector(".menu-ambient-portrait")).visibility};
+      });
+      const inside=r=>r.left>=-2&&r.top>=-2&&r.right<=width+2&&r.bottom<=height+2;
+      assert.ok([g.image,g.frame,g.play,g.back,...g.guides].every(inside),"menu clipped "+JSON.stringify({width,height,g}));
+      assert.equal(g.fit,"contain");
+      assert.ok(Math.abs(g.image.width/g.image.height-g.natural[0]/g.natural[1])<.015,"portrait artwork aspect ratio not preserved");
+      assert.ok(g.scroll[0]<=width+2&&g.scroll[1]<=height+2&&g.scroll[2]===0&&g.scroll[3]===0,"menu is scrollable "+JSON.stringify(g));
+      assert.ok(g.play.height>=44&&g.guides.every(b=>b.height>=44),"menu tap target too small");
+      assert.ok(g.play.bottom<=g.guides[0].top+1,"menu controls overlap");
+      assert.equal(g.effects,"visible","ambient effects did not resume after art");
+      if(shotFolder)await page.screenshot({path:join(shotFolder,"menu-fit-"+width+"x"+height+".png")});
+      console.log("MENU_VIEWPORT_ART_READY_PASS",width,height);
+    }
+    await page.click('[data-riddlex-guide="rules"]');
+    await page.waitForFunction(()=>document.getElementById("menu").classList.contains("ambient-paused"));
+    await page.click(".guide-close");
+    await page.waitForFunction(()=>!document.getElementById("menu").classList.contains("ambient-paused"));
+    await page.click("#play");
+    await page.waitForFunction(()=>!document.getElementById("game").hidden);
+    await page.close();
+  }
+
+
   // Verify the actual integrated approved sprites, both languages, layout and
   // render budget on the same real game. Existing gameplay tests remain below.
   {

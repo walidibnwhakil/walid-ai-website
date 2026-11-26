@@ -50,6 +50,27 @@
       #menu #play { bottom:calc(max(3%,env(safe-area-inset-bottom)) + 52px); }
     }
   @media (max-height:620px) and (max-aspect-ratio:4/5){#riddlex-guide{padding:12px;font-size:15px;line-height:1.3}#riddlex-guide h2{margin-bottom:8px;font-size:22px}#riddlex-guide ol{padding-inline-start:22px}#riddlex-guide li{margin-bottom:4px}#riddlex-guide .guide-language{gap:6px;margin-bottom:8px}#riddlex-guide button{min-height:36px;padding:6px 12px}#riddlex-guide .guide-close{min-height:36px;margin-top:4px}}@media (max-height:430px) and (min-aspect-ratio:4/5){#riddlex-guide{width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 20px);padding:12px 16px;font-size:13px;line-height:1.28}#riddlex-guide h2{margin-bottom:6px;font-size:20px}#riddlex-guide ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px;margin:4px 0;padding-inline-start:20px}#riddlex-guide li{margin-bottom:3px}#riddlex-guide .guide-language{gap:6px;margin-bottom:6px}#riddlex-guide button{min-height:32px;padding:4px 10px}#riddlex-guide .guide-close{min-height:32px;margin-top:4px}}</style>
+<style id="riddlex-menu-ambient-css">
+#menu .menu-ambient{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;contain:layout paint}
+#menu .menu-ambient-portrait{display:none}
+#menu .menu-pipe-smoke{position:absolute;left:29.9%;top:50.5%;width:8.1%;height:25%;transform:translate(-44%,-100%);overflow:visible}
+#menu .menu-pipe-smoke path{fill:none;stroke-linecap:round;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:riddlex-smoke 7s linear infinite}
+#menu .menu-pipe-smoke path:nth-child(2){animation-delay:-2.4s}
+#menu .menu-pipe-smoke path:nth-child(3){animation-delay:-4.8s}
+@keyframes riddlex-smoke{0%{opacity:0;transform:translate(0,5px) scale(.54,.48)}20%{opacity:.46}50%{opacity:.36;transform:translate(5px,-10px) scale(.88,.95)}85%{opacity:.12}100%{opacity:0;transform:translate(17px,-28px) scale(1.12,1.25)}}
+#menu .menu-lamp-glow{position:absolute;left:92.3%;top:61%;width:9%;height:13%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(255,204,105,.28),rgba(255,165,50,.10) 35%,transparent 72%);opacity:.36;animation:riddlex-lamp 8s ease-in-out infinite alternate}
+@keyframes riddlex-lamp{0%,100%{opacity:.27}50%{opacity:.58}}
+#menu .riddlex-guide-actions button{border-color:#e5b756;background:linear-gradient(#51331b,#2b170c 55%,#42230f);color:#ffe7af;box-shadow:0 2px 6px #0007,inset 0 1px 0 #e7c46a45;display:flex;align-items:center;justify-content:center;gap:.4em}
+#menu .riddlex-guide-actions svg{width:1em;height:1em;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#menu[hidden] .menu-ambient *,#menu.ambient-paused .menu-ambient *{animation-play-state:paused}
+#menu.ambient-paused .menu-ambient{visibility:hidden}
+@media (max-aspect-ratio:4/5){
+#menu .menu-ambient-landscape{display:none}
+#menu .menu-ambient-portrait{display:block;inset:auto;left:50%;top:50%;width:max(100cqw,56.25cqh);height:max(100cqh,177.77778cqw);transform:translate(-50%,-50%)}
+#menu .menu-ambient-portrait .menu-pipe-smoke{left:61.1%;top:51.1%;width:16%;height:21%;transform:translate(-44%,-100%)}
+#menu .menu-ambient-portrait .menu-lamp-glow{left:92%;top:55.8%;width:17%;height:11%}}
+@media (prefers-reduced-motion:reduce){#menu .menu-ambient{display:none!important}#menu .menu-ambient *{animation:none!important}}
+</style>
 </head>
 <body>
   <div id="menu">
@@ -76,10 +97,24 @@
             else orientation.addListener(syncMenuArt);
           })();
         </script>
+        <div class="menu-ambient menu-ambient-landscape" aria-hidden="true">
+          <svg class="menu-pipe-smoke" viewBox="0 0 100 160" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d="M44 158 C42 145 64 135 54 119 S33 96 46 79 S68 51 52 33 S39 13 50 4" stroke="#eaded0" stroke-width="4"/>
+            <path d="M44 158 C57 144 38 133 44 118 S70 94 55 76 S43 49 62 33 S59 14 64 4" stroke="#f5e7d8" stroke-width="2.8"/>
+            <path d="M44 158 C39 143 55 127 49 112 S43 91 58 76 S68 49 57 29 S66 14 75 7" stroke="#d7c8b9" stroke-width="6"/>
+          </svg><span class="menu-lamp-glow"></span>
+        </div>
+        <div class="menu-ambient menu-ambient-portrait" aria-hidden="true">
+          <svg class="menu-pipe-smoke" viewBox="0 0 100 160" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d="M44 158 C42 145 64 135 54 119 S33 96 46 79 S68 51 52 33 S39 13 50 4" stroke="#eaded0" stroke-width="4"/>
+            <path d="M44 158 C57 144 38 133 44 118 S70 94 55 76 S43 49 62 33 S59 14 64 4" stroke="#f5e7d8" stroke-width="2.8"/>
+            <path d="M44 158 C39 143 55 127 49 112 S43 91 58 76 S68 49 57 29 S66 14 75 7" stroke="#d7c8b9" stroke-width="6"/>
+          </svg><span class="menu-lamp-glow"></span>
+        </div>
         <button id="play" type="button" aria-label="Play Now"><span class="play-glyph" aria-hidden="true"></span><span id="play-label">Play Now</span></button>
         <div class="riddlex-guide-actions" aria-label="Game information">
-          <button type="button" data-riddlex-guide="rules" aria-haspopup="dialog">How to Play</button>
-          <button type="button" data-riddlex-guide="about" aria-haspopup="dialog">About</button>
+          <button type="button" data-riddlex-guide="rules" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v15M12 5C9 3 5 3 2 5v14c3-2 7-2 10 1 3-3 7-3 10-1V5c-3-2-7-2-10 0z"/></svg><span>How to Play</span></button>
+          <button type="button" data-riddlex-guide="about" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.1"/></svg><span>About</span></button>
         </div>
       </div>
     </div>
@@ -147,6 +182,20 @@
           renderGuide();
         });
       });
+    })();
+  </script>
+  <script>
+    (function () {
+      var menu = document.getElementById("menu");
+      var guide = document.getElementById("riddlex-guide");
+      function syncAmbient() {
+        menu.classList.toggle("ambient-paused", document.hidden || menu.hidden || guide.open);
+      }
+      document.addEventListener("visibilitychange", syncAmbient);
+      var observer = new MutationObserver(syncAmbient);
+      observer.observe(menu, {attributes:true, attributeFilter:["hidden"]});
+      observer.observe(guide, {attributes:true, attributeFilter:["open"]});
+      syncAmbient();
     })();
   </script>
   <div id="game" hidden>

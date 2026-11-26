@@ -24,12 +24,14 @@ jobs:
         run: python3 scripts/render_sports_snapshot.py
       - name: Generate true-size transparent PWA icons from the original flower
         run: python3 scripts/build_pwa_icons.py
+      - name: Stage only public runtime files
+        run: python3 scripts/stage_public_pages.py
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload static website
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
           # A rerun must never create duplicate artifacts with the same name.
           name: pages-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Wait for GitHub Pages artifact indexing

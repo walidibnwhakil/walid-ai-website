@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=approved-layered-20261126";
+import { createScene, startMenuCat } from "./scene.js?v=compact-nameplate-20261126";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");

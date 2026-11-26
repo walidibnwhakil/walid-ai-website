@@ -483,3 +483,56 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game .stage-wrap {--edge:58%;--actor-bottom:41.8%;}
   #game #answers {top:calc(var(--edge) + 9%);bottom:5%;}
 }
+
+/* Owner-approved refinement: the logo is a small desk nameplate, never a hat overlay.
+   A speech bubble hugs its text, with the number adjacent to the question. */
+#game .room-logo {
+  top:calc(var(--edge) - 1.2%);bottom:auto;left:50%;height:7.8%;width:auto;
+  max-width:38%;max-height:60px;padding:2px 7px;object-fit:contain;
+  background:linear-gradient(#3e2413,#24120a);border:1px solid #cfa45d;border-radius:6px;
+  box-shadow:0 3px 5px #16090090;filter:none;
+}
+#game .speech {
+  left:var(--speech-left,58%);top:var(--speech-top,38%);
+  width:max-content;max-width:var(--speech-max,40%);
+  min-width:0;min-height:0;padding:8px 11px;gap:6px;
+  justify-content:flex-start;align-items:center;text-align:left;
+}
+#game #status {flex:0 1 auto;min-width:0;width:auto;overflow-wrap:anywhere;text-align:left;}
+#game .q-badge {
+  flex:0 0 auto;align-self:flex-start;min-width:1.35em;
+  padding:3px 5px;line-height:1.15;border-radius:6px;
+  margin-top:1px;
+}
+#game .speech::after,#game .speech.has-badge::after {
+  left:calc(-1 * var(--speech-tail,30px) + 2px);width:var(--speech-tail,30px);
+  height:24px;bottom:-4px;top:auto;right:auto;margin:0;border:0;
+  clip-path:polygon(100% 0,100% 66%,0 100%,70% 40%);
+}
+@media(max-aspect-ratio:4/5){
+  #game .stage-wrap{--edge:56%;--actor-bottom:43.8%;}
+  #game .room-logo{height:7.8%;max-height:52px;max-width:42%;}
+  #game .speech{padding:7px 8px;gap:4px;border-radius:13px;}
+  #game .speech::after,#game .speech.has-badge::after{height:18px;}
+  #game #categories{top:calc(var(--edge) + 9%);}
+  #game #answers{
+    top:calc(var(--edge) + 9%);bottom:auto;width:min(96%,440px);
+    display:flex;flex-direction:column;justify-content:flex-start;gap:8px;
+  }
+  #game #answers .answer-row{display:flex;width:auto;max-width:100%;flex-wrap:nowrap;justify-content:center;gap:8px;}
+  #game #answers button{
+    flex:0 1 auto;width:auto;min-width:44px;min-height:44px;height:auto;
+    padding:7px clamp(10px,3vw,16px);border-radius:999px;white-space:normal;
+  }
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game .stage-wrap{--edge:52%;--actor-bottom:47.8%;}
+  #game #answers{gap:6px;}
+  #game #answers .answer-row{gap:6px;}
+  #game #answers button{padding:5px 10px;}
+}
+@media(min-aspect-ratio:4/5) and (max-height:450px){
+  #game .room-logo{max-height:29px;padding:1px 4px;}
+  #game .speech{padding:6px 8px;gap:4px;}
+  #game .speech::after,#game .speech.has-badge::after{height:17px;}
+}

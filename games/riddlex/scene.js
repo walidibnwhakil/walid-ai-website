@@ -167,35 +167,26 @@ export function createScene(canvas) {
     if (!art) {
       view = { x: 0, y: 0, w: cw, h: ch };
     } else {
-      let scale = Math.max(cw / art.width, ch / art.height);
-      let x = 0;
-      let y = (ch - art.height * scale) / 2;
       if (portraitMode) {
-        // Close-up: hat to a short strip of desk fills the space above the answers.
+        // Keep the entire room width rather than magnifying only the face and desk.
+        // Leave a dedicated area for a longer question and two rows of answers.
         const chrome = phoneChrome();
         const hatV = 0.118;
-        const deskV = 0.495;
+        const deskV = 0.46;
         const topY = chrome.logo + chrome.dpr * 2;
-        const bottomY = ch - chrome.buttons;
-        scale = Math.max(0.4, (bottomY - topY) / ((deskV - hatV) * art.height));
-        const span = cw / (art.width * scale);
-        const u0 = Math.max(0.16, Math.min(0.42, 0.61 - span / 2));
-        view = {
-          x: -art.width * u0 * scale,
-          y: topY - hatV * art.height * scale,
-          w: art.width * scale,
-          h: art.height * scale,
-        };
+        const reserve = 206 * chrome.dpr;
+        const scale = Math.max(0.01, Math.min(cw / art.width,
+          (ch - topY - reserve) / ((deskV - hatV) * art.height)));
+        const w = art.width * scale;
+        view = { x: (cw - w) / 2, y: topY - hatV * art.height * scale,
+          w, h: art.height * scale };
       } else {
+        // Frame the complete artwork on wide and tall displays. Never crop or
+        // stretch the detective, cat, logo or room to fill a mismatched aspect.
+        const scale = Math.min(cw / art.width, ch / art.height) * 0.94;
         const w = art.width * scale;
         const h = art.height * scale;
-        x = cw * 0.50 - w * 0.52;
-        y = ch * 0.42 - h * 0.38;
-        const logoPad = Math.max(8, cw * 0.012);
-        if (x + w * 0.03 < logoPad) x = logoPad - w * 0.03;
-        x = Math.min(0, Math.max(cw - w, x));
-        y = Math.min(0, Math.max(ch - h, y));
-        view = { x, y, w, h };
+        view = { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
       }
     }
     const parent = canvas.parentElement;
@@ -215,12 +206,15 @@ export function createScene(canvas) {
     parent.style.setProperty("--bubble-left", Math.max(0.02, bubbleLeft).toFixed(4));
     parent.style.setProperty("--bubble-top", Math.max(0.02, bubbleTop).toFixed(4));
     parent.style.setProperty("--chin-y", chin.toFixed(4));
+    const [, questionY] = frac(0, 0.46);
+    parent.style.setProperty("--question-y", questionY.toFixed(4));
     parent.style.setProperty("--hands-y", hands.toFixed(4));
     parent.style.setProperty("--cat-top", catTop.toFixed(4));
     parent.style.setProperty("--desk-y", ((view.y + view.h * spot.dv) / ch).toFixed(4));
     const [, noteBottom] = frac(0, portraitMode ? 0.62 : 0.44);
     parent.style.setProperty("--note-bottom", Math.max(0.2, noteBottom).toFixed(4));
     parent.classList.toggle("portrait-scene", portraitMode);
+    parent.dispatchEvent(new Event("riddlex-scene-layout"));
   }
 
   function drawSmoke(dt) {
@@ -639,11 +633,8 @@ export function createScene(canvas) {
   function drawPortrait(art) {
     const scale = view.w / art.width;
     const v0 = 0.118;
-    let cut = 0.495;
-    if (reveal) {
-      const v = (canvas.height + 8 - view.y) / (art.height * scale);
-      cut = Math.max(0.495, Math.min(0.66, v));
-    }
+    // Show the original desk below the question and buttons, not an abrupt crop.
+    const cut = Math.max(0.495, Math.min(1, (canvas.height - view.y) / (art.height * scale)));
     const srcX = Math.max(0, -view.x / scale);
     const srcW = Math.min(art.width - srcX, canvas.width / scale);
     const srcY = art.height * v0;
@@ -652,14 +643,8 @@ export function createScene(canvas) {
     const destY = view.y + srcY * scale;
     const destH = srcH * scale;
     ctx.drawImage(art, srcX, srcY, srcW, srcH, destX, destY, srcW * scale, destH);
-    if (reveal) {
-      const target = canvas.height;
-      const drawn = destY + destH;
-      if (drawn < target - 1) {
-        const strip = art.height * 0.035;
-        ctx.drawImage(art, srcX, art.height * cut - strip, srcW, strip, destX, drawn - 1, srcW * scale, target - drawn + 1);
-      }
-    }
+    // If the room ends on an unusually tall screen, retain the warm backdrop
+    // rather than stretching a decorative wood strip or distorting the art.
   }
 
   function frame(now) {
@@ -696,16 +681,7 @@ export function createScene(canvas) {
     drawFaces();
     drawReveal();
     ctx.restore();
-    if (art && !portraitMode) {
-      const gapTop = view.y + view.h;
-      if (canvas.height - gapTop > 2) {
-        const fade = ctx.createLinearGradient(0, gapTop - 2, 0, canvas.height);
-        fade.addColorStop(0, "#6b3a1c");
-        fade.addColorStop(1, "#2a160e");
-        ctx.fillStyle = fade;
-        ctx.fillRect(0, gapTop - 2, canvas.width, canvas.height - gapTop + 2);
-      }
-    }
+
     raf = requestAnimationFrame(frame);
   }
 

@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=room-framing-20261126";
+import { createScene, startMenuCat } from "./scene.js?v=layered-room-20261126";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -192,7 +192,8 @@ function placeUnderBubble() {
   const height = shown && !shown.hidden ? shown.getBoundingClientRect().height : 96;
   const gap = 10;
   let top = sr.bottom - wr.top + gap;
-  const max = Math.max(gap, wr.height - height - 8);
+  const reserve = $("back").hidden ? 8 : 54;
+  const max = Math.max(gap, wr.height - height - reserve);
   if (top > max) top = max;
   const next = `${Math.round(top)}px`;
   if (wrap.style.getPropertyValue("--under-bubble") !== next) {

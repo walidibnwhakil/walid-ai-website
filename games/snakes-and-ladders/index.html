@@ -26,6 +26,21 @@
 <meta property="og:image" content="https://walid-ai.com/walid-ai-share-20261122-compatible.jpg">
 <meta name="twitter:image" content="https://walid-ai.com/walid-ai-share-20261122-compatible.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"VideoGame","@id":"https://walid-ai.com/games/snakes-and-ladders/#game","name":"Snakes & Ladders — The Serpent King's Realm","url":"https://walid-ai.com/games/snakes-and-ladders/","description":"Play animated Snakes and Ladders online in your browser against a bot or with 2–4 local players on the same device.","gamePlatform":"Web browser","playMode":["SinglePlayer","MultiPlayer"],"publisher":{"@id":"https://walid-ai.com/#organization"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Walid AI","item":"https://walid-ai.com/"},{"@type":"ListItem","position":2,"name":"Games","item":"https://walid-ai.com/games/"},{"@type":"ListItem","position":3,"name":"Snakes & Ladders — The Serpent King's Realm","item":"https://walid-ai.com/games/snakes-and-ladders/"}]}]}</script>
+
+    <style>
+      #menu .menu-utility-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(5px,0.8vw,10px); flex:1 0 auto; min-width:0; }
+      #menu .menu-utility-row .menu-pill { min-width:0; padding-inline:5px; gap:4px; font-size:clamp(13px,1.65vw,25px); }
+      #menu .menu-utility-row .menu-symbol { width:18%; }
+      #menu .menu-utility-row .menu-symbol svg { width:100%; max-width:26px; height:auto; }
+      @media (max-aspect-ratio:4/5) {
+        #menu .menu-utility-row { flex:1 1 auto; min-height:44px; max-height:72px; }
+        #menu .menu-utility-row .menu-pill { height:100%; font-size:clamp(15px,4.4vw,22px); }
+        #menu .menu-utility-row .menu-symbol { width:16%; }
+      }
+      @media (max-height:480px) and (min-aspect-ratio:1/1) {
+        #menu .menu-utility-row .menu-pill { font-size:clamp(12px,2vw,18px); }
+      }
+    </style>
 </head>
   <body>
     <div id="world">
@@ -154,6 +169,7 @@
             <option value="4">Local Multiplayer — 4 Players</option>
           </select>
           <div id="colors" aria-label="Player colors"></div>
+          <div class="menu-utility-row">
           <button class="menu-pill" data-panel="settings">
             <span class="menu-symbol" aria-hidden="true"
               ><svg viewBox="0 0 24 24">
@@ -170,6 +186,11 @@
                   d="M2 18h7v13H2ZM12 10h8v21h-8ZM23 1h7v30h-7Z"
                 /></svg></span
             ><span>Statistics</span>
+          </button>
+          </div>
+          <button class="menu-pill" type="button" data-panel="rules">
+            <span class="menu-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M4 5h10l2 2 2-2h10v22H18l-2 2-2-2H4ZM16 7v22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg></span>
+            <span>Game Rules</span>
           </button>
         </div>
       </section>

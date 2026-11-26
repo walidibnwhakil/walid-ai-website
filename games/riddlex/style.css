@@ -453,9 +453,9 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   .room-detective{max-height:48%;}
   #game #categories,#game #answers{top:calc(var(--edge) + 6.2%);bottom:4.5%;}
   #game #categories .cat-row{gap:6px;}
-  #game #categories .cat-row button{min-height:40px;padding:4px 8px;font-size:15px;}
+  #game #categories .cat-row button{min-height:44px;padding:4px 8px;font-size:15px;}
   #game #answers{bottom:9%;gap:5px;}
-  #game #answers button{min-height:38px;padding:4px 6px;font-size:13px;}
+  #game #answers button{min-height:44px;padding:4px 6px;font-size:13px;}
   #game #back{min-width:34px;min-height:34px;width:34px;height:34px;}
   html[lang="bn"] #game #answers button{font-size:15px;}
 }
@@ -465,7 +465,7 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game .play-top button{padding:4px 10px;min-height:30px;}
   .room-logo{width:min(24%,180px);}
   #game #categories,#game #answers{top:calc(var(--edge) + 8%);bottom:5%;}
-  #game #categories .cat-row button,#game #answers button{min-height:38px;font-size:14px;padding:5px 8px;}
+  #game #categories .cat-row button,#game #answers button{min-height:44px;font-size:14px;padding:5px 8px;}
   #game .speech{padding:7px;min-height:32px;}
   #game #status{font-size:14px;}
   #game .speech::after,#game .speech.has-badge::after{left:-15px;width:20px;height:17px;bottom:3px;}

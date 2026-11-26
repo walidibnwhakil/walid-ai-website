@@ -38,6 +38,81 @@ if (shotFolder) await mkdir(shotFolder, { recursive: true });
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
+  // Verify the actual integrated approved sprites, both languages, layout and
+  // render budget on the same real game. Existing gameplay tests remain below.
+  {
+    const page = await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1});
+    const errors=[],requests=[];
+    page.on("pageerror",e=>errors.push(e.message));
+    page.on("request",r=>requests.push(r.url()));
+    await page.route("**/*",r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
+    await page.goto(origin+"/games/riddlex/?autotest=1",{waitUntil:"load"});
+    await page.click("#play");
+    await page.waitForFunction(()=>[...document.querySelectorAll(".room-art img")].every(i=>i.complete&&i.naturalWidth>0),null,{timeout:15000});
+    await page.waitForFunction(()=>window.__riddlex?.expression().plates.length===7,null,{timeout:15000});
+    assert.equal(await page.locator("html").getAttribute("lang"),"en");
+    const dims=[[1440,900],[1649,825],[1024,768],[667,375],[320,568],[390,844],[412,915]];
+    async function layout(mode,lang){
+      for(const [width,height] of dims){
+        await page.setViewportSize({width,height});
+        await page.waitForTimeout(130);
+        const g=await page.evaluate(({mode,lang})=>{
+          const rect=node=>node.getBoundingClientRect().toJSON();
+          const stage=document.querySelector(".stage-wrap"), canvas=document.getElementById("stage");
+          const buttons=[...document.querySelectorAll(mode==="pick"?"#categories .cat-row button":"#answers button")];
+          return {stage:rect(stage),bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
+            cat:rect(document.querySelector(".room-cat")),actor:rect(document.querySelector(".room-detective")),
+            canvasPixels:canvas.width*canvas.height,alpha:canvas.getContext("2d").getContextAttributes().alpha,
+            font:getComputedStyle(document.getElementById("status")).fontFamily,
+            scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,
+            lang:document.documentElement.lang};
+        },{mode,lang});
+        const inside=b=>b.x>=-2&&b.y>=-2&&b.right<=width+2&&b.bottom<=height+2;
+        assert.ok(g.scrollWidth<=width+2&&g.scrollHeight<=height+2,"page overflow "+JSON.stringify({width,height,mode,g}));
+        assert.ok(g.buttons.every(b=>inside(b)&&b.width>=40&&b.height>=40),"clipped controls "+JSON.stringify({width,height,mode,g}));
+        assert.ok(inside(g.bubble),"speech outside screen "+JSON.stringify({width,height,mode,g}));
+        assert.ok(g.buttons.every(b=>g.bubble.bottom<=b.top+2||g.bubble.right<=b.left||g.bubble.left>=b.right),"speech/controls overlap");
+        assert.ok(g.canvasPixels<=1810000&&g.alpha,"effects canvas budget");
+        assert.equal(g.lang,lang);
+        assert.match(g.font,lang==="bn"?/SolaimanLipi/:/Times New Roman/);
+        if(shotFolder)await page.screenshot({path:join(shotFolder,"layered-"+mode+"-"+lang+"-"+width+"x"+height+".png"),animations:"disabled"});
+        console.log("APPROVED_LAYERED_LAYOUT_PASS",mode,lang,width,height,g.canvasPixels);
+      }
+    }
+    await layout("pick","en");
+    await page.click('[data-cat="animal"]');
+    await page.waitForFunction(()=>window.__riddlex?.state()?.mode==="ask",null,{timeout:30000});
+    await layout("ask","en");
+    await page.click('#game [data-set-lang="bn"]');
+    await layout("ask","bn");
+    const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
+    assert.ok(artBytes<300000,"static art exceeds 300KB");
+    assert.ok(!requests.some(u=>/images\/approved\/(game-desk|portrait-neutral|face-portrait|cat-portrait)/.test(u)),"old gameplay art unexpectedly loaded");
+    // Capture all five existing expression states at the integrated sprite.
+    await page.setViewportSize({width:390,height:844});
+    for(const [answer,key] of [["yes","happy"],["no","serious"],["unknown","confused"]]){
+      await page.evaluate(answer=>window.__riddlex.react(answer),answer);
+      await page.waitForTimeout(110);
+      assert.equal(await page.evaluate(()=>window.__riddlex.expression().expression.key),key);
+      if(shotFolder)await page.screenshot({path:join(shotFolder,"layered-expression-"+key+".png"),animations:"disabled"});
+    }
+    for(const mood of ["sad","worried"]){
+      await page.evaluate(mood=>window.__riddlex.setMood(mood),mood);
+      await page.waitForTimeout(350);
+      if(shotFolder)await page.screenshot({path:join(shotFolder,"layered-mood-"+mood+".png"),animations:"disabled"});
+    }
+    const client=await page.context().newCDPSession(page);
+    await client.send("Emulation.setCPUThrottlingRate",{rate:4});
+    await client.send("Performance.enable");
+    const before=await client.send("Performance.getMetrics");
+    await page.waitForTimeout(3000);
+    const after=await client.send("Performance.getMetrics");
+    const value=(m,n)=>m.metrics.find(x=>x.name===n)?.value||0;
+    console.log("LAYERED_PERFORMANCE_EMULATED_4X",JSON.stringify({artBytes,taskMs:(value(after,"TaskDuration")-value(before,"TaskDuration"))*1000,scriptMs:(value(after,"ScriptDuration")-value(before,"ScriptDuration"))*1000,layoutCount:value(after,"LayoutCount")-value(before,"LayoutCount"),windowMs:3000}));
+    assert.deepEqual(errors,[],"layered gameplay browser errors");
+    await page.close();
+  }
+
   for (const { width, height, orient } of [
     { width: 390, height: 844, orient: "portrait" },
     { width: 1366, height: 768, orient: "landscape" },

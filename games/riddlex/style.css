@@ -568,93 +568,72 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game #answers .answer-row button {min-height:44px;padding:5px 4px;}
 }
 
-/* Portrait camera looks across the tabletop, not down at its front panel.
-   Reserve a real, full-width tabletop for every control, including the small
-   nameplate at the back. No front fascia or decorative lower panel on phones. */
+
+/* Final owner-approved framing: wall-mounted Riddlex plaque, real wooden
+   tabletop texture taken from the approved artwork, no mobile fascia.
+   All interactive text remains the existing bilingual HTML. */
+#game .room-logo {
+  top:10%;right:16%;left:auto;bottom:auto;transform:none;z-index:0;
+  width:clamp(140px,16vw,250px);height:auto;max-width:none;max-height:none;
+  padding:0;background:none;border:0;border-radius:3px;
+  box-shadow:0 3px 7px #18090066;filter:none;object-fit:contain;
+}
 @media (max-aspect-ratio:4/5) {
   #game .stage-wrap {
-    --table-zone:clamp(184px,46vw,210px);
+    --table-zone:clamp(154px,30%,248px);
     --edge:calc(100% - var(--table-zone));
     --actor-bottom:calc(var(--table-zone) - 1px);
   }
-  #game .room-front {display:none;}
-  #game .room-library {height:var(--edge);background-size:auto 147%;background-position:48% top;}
-  #game .room-desk {
-    top:var(--edge);bottom:0;height:auto;
-    background:linear-gradient(180deg,#30150835 0%,transparent 25%,#19090222 100%),url("images/layered/desk.webp") 42% center/auto 100%;
-    background-size:100% 100%,auto 100%;
-    box-shadow:inset 0 2px 5px #30150866;
+  #game .room-library {
+    height:var(--edge);background-size:auto 160%;background-position:49% top;
   }
-  #game .room-desk::after {height:5px;bottom:0;box-shadow:none;}
   #game .room-logo {
-    top:calc(var(--edge) + 3px);bottom:auto;left:50%;
-    height:32px;width:auto;max-width:36%;max-height:none;
-    padding:1px 6px;border-radius:4px;
-    box-shadow:0 2px 3px #16090080;
+    top:16%;right:5%;width:38%;max-width:195px;height:auto;max-height:none;
   }
-  #game #answers,#game #categories {
-    top:calc(var(--edge) + 45px);bottom:8px;
-    align-content:start;justify-content:start;
+  #game .room-detective {
+    left:-22%;width:104%;max-height:64%;
   }
-  #game #answers {gap:9px;}
+  #game .room-cat {left:57%;width:46%;max-height:24%;}
+  #game .room-lamp {display:none;}
+  #game .room-lens {left:1%;width:19%;bottom:calc(var(--table-zone) - 10px);}
+  #game .room-front {display:none;}
+  #game .room-desk {
+    top:var(--edge);bottom:0;height:auto;clip-path:none;border:0;
+    background:linear-gradient(180deg,#32140540,transparent 10%,transparent 92%,#32140522),url("images/layered/mobile-tabletop.webp") center/100% 100% no-repeat;
+    box-shadow:inset 0 2px 4px #2d150a70;
+  }
+  #game .room-desk::before {display:none;}
+  #game .room-desk::after {
+    height:9px;bottom:0;background:url("images/layered/desk-rim.webp") center/100% 100% no-repeat;
+    box-shadow:none;
+  }
+  #game #answers {
+    top:calc(var(--edge) + 14px);bottom:40px;
+    align-content:center;justify-content:center;gap:9px;
+    background:none;
+  }
+  #game #categories {
+    top:calc(var(--edge) + 8px);bottom:10px;
+    align-content:center;justify-content:center;
+  }
   #game #categories .cat-row {gap:5px;}
   #game #categories .cat-row button {min-height:40px;padding:4px 10px;}
-  #game #back {left:5px;bottom:5px;}
-  #game .room-lens {bottom:calc(var(--table-zone) - 6px);}
+  #game #answers .answer-row button {
+    border:1px solid #eac274;border-radius:999px;
+    background:linear-gradient(180deg,#fff4d2,#f5ce81);
+    color:#392417;box-shadow:inset 0 1px 0 #fff9de,0 3px 6px #190b0566;
+  }
+  #game #answers .answer-row button:hover {background:#ffe1a0;}
+  #game #answers .answer-row button:active {background:#e9bc70;}
+  #game #back {bottom:5px;left:5px;width:32px;height:32px;min-width:32px;min-height:32px;}
 }
 @media (max-aspect-ratio:4/5) and (max-height:620px) {
-  #game .stage-wrap {--table-zone:174px;}
-  #game .room-logo {height:28px;}
-  #game #answers,#game #categories {top:calc(var(--edge) + 36px);}
-  #game #answers {gap:7px;}
-  #game #categories .cat-row {gap:4px;}
-}
-
-/* Physical tabletop: use the existing wood's horizontal grain (without its
-   elongated specular stripes), tapered side edges and a narrow front bevel.
-   The Riddlex nameplate sits off-centre on the right side, not near the face. */
-#game .room-logo {
-  left:auto;right:5%;transform:none;top:calc(var(--edge) - 1%);
-  height:6.5%;max-height:48px;max-width:22%;
-}
-@media (max-aspect-ratio:4/5) {
-  #game .stage-wrap {
-    --table-zone:clamp(194px,46vw,210px);
-  }
-  #game .room-desk {
-    background:linear-gradient(180deg,#27100895 0%,#4d1c0915 7%,#f9cb841c 24%,#f4c27c24 65%,#35130825 94%,#28100750 100%),url("images/layered/desk.webp") 17% center/400% 100% no-repeat;
-    background-size:100% 100%,400% 100%;
-    clip-path:polygon(5% 0,95% 0,100% 100%,0 100%);
-    border-top:2px solid #a46938;
-    box-shadow:inset 0 3px 7px #210e07a0;
-  }
-  #game .room-desk::before {
-    content:"";position:absolute;inset:0 0 8px;pointer-events:none;
-    background:linear-gradient(180deg,transparent 14%,#572c131c 15%,transparent 16%,transparent 38%,#50271025 39%,#f8d39822 40%,transparent 41%,transparent 69%,#542b142c 70%,#f6c58b22 71%,transparent 72%),linear-gradient(102deg,#2b110850 0%,transparent 9%,transparent 91%,#2b110850 100%);
-    box-shadow:inset 0 -2px 8px #200f0640;
-  }
-  #game .room-desk::after {
-    height:8px;bottom:0;
-    background:linear-gradient(180deg,#e7b16b 0%,#ab622f 20%,#693719 55%,#351b0e 100%);
-    border-top:1px solid #f6c78d;box-shadow:0 -1px 3px #34170966;
-  }
-  #game .room-logo {
-    top:calc(var(--edge) + 4px);right:24px;left:auto;transform:none;
-    height:36px;width:auto;max-width:31%;max-height:none;padding:1px 5px;
-    background:linear-gradient(#54321d,#281509);
-    border-radius:3px;border:1px solid #d9b16d;
-    box-shadow:0 2px 0 #3a1e0c,0 4px 5px #1c0b06a0;
-  }
-  #game .room-lens {left:5%;bottom:calc(var(--table-zone) - 8px);width:19%;}
-  #game #answers {top:calc(var(--edge) + 48px);bottom:12px;align-content:start;}
-  #game #categories {top:calc(var(--edge) + 48px);}
-  #game #back {bottom:4px;width:32px;height:32px;min-width:32px;min-height:32px;}
-}
-@media (max-aspect-ratio:4/5) and (max-height:620px) {
-  #game .stage-wrap {--table-zone:174px;}
-  #game .room-logo {height:30px;top:calc(var(--edge) + 3px);}
-  #game #answers,#game #categories {top:calc(var(--edge) + 38px);}
+  #game .room-logo {top:7%;right:5%;width:35%;}
+  #game .room-detective {left:-22%;width:98%;max-height:63%;}
+  #game #answers {top:calc(var(--edge) + 8px);bottom:39px;gap:7px;}
+  #game #answers .answer-row {gap:7px;}
+  #game #answers .answer-row button {min-height:44px;padding:5px 4px;}
 }
 @media (min-aspect-ratio:4/5) and (max-height:450px) {
-  #game .room-logo {max-height:24px;}
+  #game .room-logo {top:3%;right:14%;width:14%;max-width:115px;}
 }

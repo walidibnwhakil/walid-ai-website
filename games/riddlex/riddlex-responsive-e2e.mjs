@@ -76,15 +76,15 @@ try {
         assert.ok(g.scrollWidth<=width+2&&g.scrollHeight<=height+2,"page overflow "+JSON.stringify({width,height,mode,g}));
         assert.ok(g.buttons.every(b=>inside(b)&&b.width>=40&&b.height>=40),"clipped controls "+JSON.stringify({width,height,mode,g}));
         assert.ok(inside(g.bubble),"speech outside screen "+JSON.stringify({width,height,mode,g}));
-        assert.ok(inside(g.logo)&&Math.abs(g.logo.top-g.desk.top)<Math.max(8,g.stage.height*.03),"logo not on desk "+JSON.stringify({width,height,g}));
+        assert.ok(inside(g.logo)&&g.logo.bottom<g.desk.top,"logo must be mounted on the back wall "+JSON.stringify({width,height,g}));
         if(width/height<=.8){
           assert.ok(g.frontHidden,"mobile desk front must be hidden");
           assert.ok(g.desk.bottom>=g.stage.bottom-2,"tabletop must extend to bottom of mobile stage");
           assert.ok(g.buttons.every(b=>b.top>=g.desk.top&&b.bottom<=g.desk.bottom+1),"all mobile controls must be on tabletop");
-          assert.ok(g.logo.top>=g.desk.top-1&&g.logo.bottom<=g.desk.bottom,"nameplate must rest on tabletop");
+          assert.ok(g.desk.height<=g.stage.height*.36+2,"mobile tabletop is too deep");
         }
         assert.ok(g.buttons.every(b=>g.logo.bottom<=b.top+2||g.logo.right<=b.left||g.logo.left>=b.right),"nameplate/controls overlap");
-        assert.ok(g.logo.left>=g.stage.left+g.stage.width*.67,"nameplate must sit on the right side, away from the detective");
+        assert.ok(g.logo.left>=g.stage.left+g.stage.width*.55,"wall plaque must sit right of the detective");
         if(mode==="ask"){
           assert.equal(g.buttons.length,5,"all five answers must remain available");
           assert.ok(g.number&&Math.abs(g.status.left-g.number.right)<=8,"number separated from question");
@@ -136,7 +136,7 @@ try {
       await page.locator("#status").evaluate((el,value)=>el.textContent=value,original);
       await page.waitForTimeout(150);
     }
-    const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
+    const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens","mobile-tabletop","wall-plaque"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
     assert.ok(artBytes<300000,"static art exceeds 300KB");
     assert.ok(!requests.some(u=>/images\/approved\/(game-desk|portrait-neutral|face-portrait|cat-portrait)/.test(u)),"old gameplay art unexpectedly loaded");
     // Capture all five existing expression states at the integrated sprite.

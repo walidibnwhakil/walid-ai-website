@@ -240,7 +240,7 @@ try {
       await page.evaluate(key=>window.__riddlex.setMood(key),key);
       await page.waitForTimeout(2400);
       const current=await snap();
-      assert.ok(current.stats.face>afterMotion.stats.face,"face pose did not render "+key);
+      assert.ok(current.stats.face>afterMotion.stats.face&&current.stats.activePose===key,"face pose did not render "+key+" "+JSON.stringify(current.stats));
       if(shotFolder)await page.screenshot({path:join(shotFolder,"portrait-live-"+key+".png")});
     }
     console.log("PORTRAIT_LIVE_MOTION_PASS",JSON.stringify(afterMotion.stats));

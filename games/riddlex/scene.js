@@ -132,7 +132,7 @@ export function createScene(canvas) {
   // portrait. Every frame then costs only a few canvas drawImage calls.
   // Coordinates are in the 700 x 487 approved character artwork.
   let portraitPoses = null, portraitPoseSource = null;
-  let motionStats = {frames:0,smoke:0,face:0,idle:0,cat:0};
+  let motionStats = {frames:0,smoke:0,face:0,idle:0,cat:0,activePose:""};
   const poseBounds={x:112,y:0,w:331,h:344};
   const catPoseBounds={x:414,y:324,w:286,h:151};
   function bakePose(source, bounds, controls){
@@ -144,17 +144,17 @@ export function createScene(canvas) {
     const output=document.createElement("canvas");output.width=w;output.height=h;
     const out=output.getContext("2d"),pixels=out.createImageData(w,h),dst=pixels.data;
     for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
-      let dx=0,dy=0;
+      let dx=0,dy=0,coverage=0;
       for(const [cx,cy,rx,ry,mx,my] of controls){
         const u=(xx+x-cx)/rx,v=(yy+y-cy)/ry,d=u*u+v*v;
-        if(d<1){const k=(1-d)*(1-d);dx+=mx*k;dy+=my*k;}
+        if(d<1){const k=(1-d)*(1-d);dx+=mx*k;dy+=my*k;coverage=Math.max(coverage,Math.min(1,(1-d)*3.5));}
       }
       const sx=Math.max(0,Math.min(w-1.001,xx-dx)),sy=Math.max(0,Math.min(h-1.001,yy-dy));
       const ix=Math.floor(sx),iy=Math.floor(sy),fx=sx-ix,fy=sy-iy;
       const p=(yy*w+xx)*4,a=(iy*w+ix)*4,b=a+4,c=a+w*4,d=c+4;
       for(let j=0;j<3;j++)dst[p+j]=(src[a+j]*(1-fx)+src[b+j]*fx)*(1-fy)+(src[c+j]*(1-fx)+src[d+j]*fx)*fy;
       // The crop is transparent near its edges; the unchanged room stays put.
-      dst[p+3]=Math.round(255*Math.min(1,xx/12,yy/9,(w-1-xx)/12,(h-1-yy)/12));
+      dst[p+3]=Math.round(255*coverage*Math.min(1,xx/12,yy/9,(w-1-xx)/12,(h-1-yy)/12));
     }
     out.putImageData(pixels,0,0);
     return output;
@@ -359,8 +359,9 @@ export function createScene(canvas) {
         else key=faceNow.key||"";
       }
       if(!reduce&&paintPose("idle",.15+.85*(.5+.5*Math.sin(clock*1.8))))motionStats.idle++;
-      if(key&&paintPose(key,.94))motionStats.face++;
-      else if(key&&plates[key]&&key!=="surprised"){
+      motionStats.activePose="";
+      if(key&&paintPose(key,.93)){motionStats.face++;motionStats.activePose=key;}
+      else if(!portraitPoses&&key&&plates[key]&&key!=="surprised"){
         // Original fallback only until the newly baked pose is available.
         ctx.globalAlpha=.85;
         ctx.drawImage(plates[key],portraitBox.x+218/700*portraitBox.w,portraitBox.y+106/487*portraitBox.h,134/700*portraitBox.w,119/487*portraitBox.h);
@@ -729,8 +730,11 @@ export function createScene(canvas) {
     // Static art is rendered once by the browser. Only a transparent effects
     // canvas is cleared and redrawn, capped at 30fps and 1.8M backing pixels.
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    if(!reduce){drawSmoke(dt);stepCat(dt);}
-    updateReveal(dt);drawFaces();drawReveal();
+    if(!reduce)stepCat(dt);
+    updateReveal(dt);drawFaces();
+    // The feathered head overlays must never paint over the rising smoke.
+    if(!reduce)drawSmoke(dt);
+    drawReveal();
   }
 
   function screenOrient(){return portraitViewport.matches?"portrait":"landscape";}

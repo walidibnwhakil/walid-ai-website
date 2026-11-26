@@ -84,6 +84,7 @@ try {
           assert.ok(g.logo.top>=g.desk.top-1&&g.logo.bottom<=g.desk.bottom,"nameplate must rest on tabletop");
         }
         assert.ok(g.buttons.every(b=>g.logo.bottom<=b.top+2||g.logo.right<=b.left||g.logo.left>=b.right),"nameplate/controls overlap");
+        assert.ok(g.logo.left>=g.stage.left+g.stage.width*.67,"nameplate must sit on the right side, away from the detective");
         if(mode==="ask"){
           assert.equal(g.buttons.length,5,"all five answers must remain available");
           assert.ok(g.number&&Math.abs(g.status.left-g.number.right)<=8,"number separated from question");

@@ -171,13 +171,23 @@ export function createScene(canvas) {
 
   function alignSpeech() {
     const bubble = room.querySelector("#speech");
-    if (!bubble || !bubble.offsetHeight || !canvas.height) return;
-    const dy = cssSize.height/canvas.height;
-    const mouthY = (actorBox.y+actorBox.h*.48)*dy;
-    const tail = portraitMode ? 14 : 18;
-    const y = Math.max(0,Math.min(cssSize.height*.67-bubble.offsetHeight,mouthY-bubble.offsetHeight-tail));
-    const value = Math.round(y)+"px";
-    if (room.style.getPropertyValue("--speech-top")!==value) room.style.setProperty("--speech-top",value);
+    if (!bubble || !bubble.offsetHeight || !canvas.width || !canvas.height || cssSize.width < 10 || actorBox.w < 2) return;
+    const dx = cssSize.width / canvas.width, dy = cssSize.height / canvas.height;
+    const mouthX = (actorBox.x + actorBox.w * .70) * dx;
+    const mouthY = (actorBox.y + actorBox.h * .49) * dy;
+    const tail = Math.max(18, Math.min(portraitMode ? 23 : 42, cssSize.width * .029));
+    const rightInset = portraitMode ? 8 : 18;
+    const minSpace = portraitMode ? Math.min(136, cssSize.width * .42) : Math.min(230, cssSize.width * .32);
+    const x = Math.max(8, Math.min(mouthX + tail + 6, cssSize.width - rightInset - minSpace));
+    function set(name, number) {
+      const value = Math.round(number) + "px";
+      if (room.style.getPropertyValue(name) !== value) room.style.setProperty(name, value);
+    }
+    set("--speech-left", x);
+    set("--speech-max", Math.min(portraitMode ? 290 : 460, cssSize.width - x - rightInset));
+    set("--speech-tail", tail);
+    // Align the tip near the mouth, and allow a longer question to grow upward.
+    set("--speech-top", Math.max(4, Math.min(deskEdge * dy - bubble.offsetHeight - 12, mouthY - bubble.offsetHeight + 5)));
   }
 
   function layoutRoom() {

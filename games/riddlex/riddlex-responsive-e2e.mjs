@@ -62,6 +62,11 @@ try {
           const buttons=[...document.querySelectorAll(mode==="pick"?"#categories .cat-row button":"#answers button")];
           return {stage:rect(stage),bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
             cat:rect(document.querySelector(".room-cat")),actor:rect(document.querySelector(".room-detective")),
+            logo:rect(document.querySelector(".room-logo")),desk:rect(document.querySelector(".room-desk")),
+            frontHidden:getComputedStyle(document.querySelector(".room-front")).display==="none",
+            number:document.getElementById("q-badge").hidden?null:rect(document.getElementById("q-badge")),
+            status:rect(document.getElementById("status")),
+            rows:[...document.querySelectorAll("#answers .answer-row")].map(row=>[...row.querySelectorAll("button")].map(rect)),
             canvasPixels:canvas.width*canvas.height,alpha:canvas.getContext("2d").getContextAttributes().alpha,
             font:getComputedStyle(document.getElementById("status")).fontFamily,
             scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,
@@ -71,6 +76,28 @@ try {
         assert.ok(g.scrollWidth<=width+2&&g.scrollHeight<=height+2,"page overflow "+JSON.stringify({width,height,mode,g}));
         assert.ok(g.buttons.every(b=>inside(b)&&b.width>=40&&b.height>=40),"clipped controls "+JSON.stringify({width,height,mode,g}));
         assert.ok(inside(g.bubble),"speech outside screen "+JSON.stringify({width,height,mode,g}));
+        assert.ok(inside(g.logo)&&g.logo.bottom<g.desk.top,"logo must be mounted on the back wall "+JSON.stringify({width,height,g}));
+        if(width/height<=.8){
+          assert.ok(g.frontHidden,"mobile desk front must be hidden");
+          assert.ok(g.desk.bottom>=g.stage.bottom-2,"tabletop must extend to bottom of mobile stage");
+          assert.ok(g.buttons.every(b=>b.top>=g.desk.top&&b.bottom<=g.desk.bottom+1),"all mobile controls must be on tabletop");
+          assert.ok(g.desk.height<=g.stage.height*.36+2,"mobile tabletop is too deep");
+        }
+        assert.ok(g.buttons.every(b=>g.logo.bottom<=b.top+2||g.logo.right<=b.left||g.logo.left>=b.right),"nameplate/controls overlap");
+        assert.ok(g.logo.left>=g.stage.left+g.stage.width*.55,"wall plaque must sit right of the detective");
+        if(mode==="ask"){
+          assert.equal(g.buttons.length,5,"all five answers must remain available");
+          assert.ok(g.number&&Math.abs(g.status.left-g.number.right)<=8,"number separated from question");
+          if(width/height<=.8){
+            assert.deepEqual(g.rows.map(row=>row.length),[3,2],"portrait answer rows must contain three then two");
+            const [upper,lower]=g.rows;
+            assert.ok(Math.abs(upper[0].left-lower[0].left)<=2&&Math.abs(upper[2].right-lower[1].right)<=2,"row edges must align");
+            assert.ok(upper.every(b=>Math.abs(b.width-upper[0].width)<=2)&&lower.every(b=>Math.abs(b.width-lower[0].width)<=2),"balanced columns within each row");
+            assert.ok(lower[0].width>=upper[0].width*1.35&&upper[0].width>=80,"bottom pair wider and top buttons comfortably wide");
+
+            assert.ok(g.rows[0].every(b=>Math.abs(b.y-g.rows[0][0].y)<=4)&&g.rows[1].every(b=>Math.abs(b.y-g.rows[1][0].y)<=4)&&Math.max(...g.rows[0].map(b=>b.bottom))<=Math.min(...g.rows[1].map(b=>b.top))+2,"incorrect portrait answer rows");
+          }
+        }
         assert.ok(g.buttons.every(b=>g.bubble.bottom<=b.top+2||g.bubble.right<=b.left||g.bubble.left>=b.right),"speech/controls overlap");
         assert.ok(g.canvasPixels<=1810000&&g.alpha,"effects canvas budget");
         assert.equal(g.lang,lang);
@@ -90,7 +117,26 @@ try {
     await page.click('#game [data-set-lang="bn"]');
     await page.evaluate(async()=>{const fonts=await document.fonts.load('400 19px SolaimanLipi','বাংলা প্রশ্ন হ্যাঁ না');if(!fonts.length||!fonts.every(f=>f.status==="loaded"))throw Error("SolaimanLipi did not load");});
     await layout("ask","bn");
-    const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
+    // Exercise short and long questions with the existing visible DOM and
+    // ResizeObserver: prove width adapts instead of stretching to a fixed board.
+    for(const [width,height] of [[1366,768],[390,844],[320,568]]){
+      await page.setViewportSize({width,height});
+      await page.waitForTimeout(150);
+      const original=await page.locator("#status").textContent();
+      const getBubble=()=>page.locator("#speech").boundingBox();
+      await page.locator("#status").evaluate(el=>el.textContent="কে?");
+      await page.waitForTimeout(150);
+      const short=await getBubble();
+      await page.locator("#status").evaluate(el=>el.textContent="আপনি যে চরিত্রটির কথা ভাবছেন, তিনি কি বাংলা চলচ্চিত্রে প্রধান চরিত্রে অভিনয়ের জন্য বিখ্যাত?");
+      await page.waitForTimeout(150);
+      const long=await getBubble();
+      assert.ok(long.width>short.width+15||long.height>short.height+15,"speech does not adapt to question length");
+      assert.ok(short.x>=0&&long.x>=0&&long.x+long.width<=width+1&&long.y>=0&&long.y+long.height<=height,"adaptive question outside viewport");
+      if(shotFolder)await page.screenshot({path:join(shotFolder,"speech-long-"+width+"x"+height+".png"),animations:"disabled"});
+      await page.locator("#status").evaluate((el,value)=>el.textContent=value,original);
+      await page.waitForTimeout(150);
+    }
+    const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens","mobile-tabletop","wall-plaque"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
     assert.ok(artBytes<300000,"static art exceeds 300KB");
     assert.ok(!requests.some(u=>/images\/approved\/(game-desk|portrait-neutral|face-portrait|cat-portrait)/.test(u)),"old gameplay art unexpectedly loaded");
     // Capture all five existing expression states at the integrated sprite.

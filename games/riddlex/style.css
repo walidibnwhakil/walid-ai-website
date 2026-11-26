@@ -483,3 +483,157 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game .stage-wrap {--edge:58%;--actor-bottom:41.8%;}
   #game #answers {top:calc(var(--edge) + 9%);bottom:5%;}
 }
+
+/* Owner-approved refinement: the logo is a small desk nameplate, never a hat overlay.
+   A speech bubble hugs its text, with the number adjacent to the question. */
+#game .room-logo {
+  top:calc(var(--edge) - 1.2%);bottom:auto;left:50%;height:7.8%;width:auto;
+  max-width:38%;max-height:60px;padding:2px 7px;object-fit:contain;
+  background:linear-gradient(#3e2413,#24120a);border:1px solid #cfa45d;border-radius:6px;
+  box-shadow:0 3px 5px #16090090;filter:none;
+}
+#game .speech {
+  left:var(--speech-left,58%);top:var(--speech-top,38%);
+  width:max-content;max-width:var(--speech-max,40%);
+  min-width:0;min-height:0;padding:8px 11px;gap:6px;
+  justify-content:flex-start;align-items:center;text-align:left;
+}
+#game #status {flex:0 1 auto;min-width:0;width:auto;overflow-wrap:anywhere;text-align:left;}
+#game .q-badge {
+  flex:0 0 auto;align-self:flex-start;min-width:1.35em;
+  padding:3px 5px;line-height:1.15;border-radius:6px;
+  margin-top:1px;
+}
+#game .speech::after,#game .speech.has-badge::after {
+  left:calc(-1 * var(--speech-tail,30px) + 2px);width:var(--speech-tail,30px);
+  height:24px;bottom:-4px;top:auto;right:auto;margin:0;border:0;
+  clip-path:polygon(100% 0,100% 66%,0 100%,70% 40%);
+}
+@media(max-aspect-ratio:4/5){
+  #game .stage-wrap{--edge:56%;--actor-bottom:43.8%;}
+  #game .room-logo{height:7.8%;max-height:52px;max-width:42%;}
+  #game .speech{padding:7px 8px;gap:4px;border-radius:13px;}
+  #game .speech::after,#game .speech.has-badge::after{height:18px;}
+  #game #categories{top:calc(var(--edge) + 9%);}
+  #game #answers{
+    top:calc(var(--edge) + 9%);bottom:auto;width:min(96%,440px);
+    display:flex;flex-direction:column;justify-content:flex-start;gap:8px;
+  }
+  #game #answers .answer-row{display:flex;width:auto;max-width:100%;flex-wrap:nowrap;justify-content:center;gap:8px;}
+  #game #answers button{
+    flex:0 1 auto;width:auto;min-width:44px;min-height:44px;height:auto;
+    padding:7px clamp(10px,3vw,16px);border-radius:999px;white-space:normal;
+  }
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game .stage-wrap{--edge:52%;--actor-bottom:47.8%;}
+  #game #answers{gap:6px;}
+  #game #answers .answer-row{gap:6px;}
+  #game #answers button{padding:5px 10px;}
+}
+@media(min-aspect-ratio:4/5) and (max-height:450px){
+  #game .room-logo{max-height:29px;padding:1px 4px;}
+  #game .speech{padding:6px 8px;gap:4px;}
+  #game .speech::after,#game .speech.has-badge::after{height:17px;}
+}
+
+/* Mobile answer tray: both rows share the same outer edges, not button widths.
+   Three generous equal columns above; two wider equal columns below. */
+@media (max-aspect-ratio:4/5) {
+  #game #answers {
+    width:min(calc(100% - 32px),380px);
+    gap:9px;
+  }
+  #game #answers .answer-row {
+    display:grid;width:100%;max-width:none;gap:8px;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  #game #answers .answer-row + .answer-row {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #game #answers .answer-row button {
+    width:100%;min-width:0;min-height:48px;padding:8px 5px;
+    border:1px solid #eac274;border-radius:14px;
+    background:linear-gradient(180deg,#fff5d5 0%,#f5d18b 100%);
+    box-shadow:inset 0 1px 0 #fff8dd,0 3px 6px #190b0566;
+    font-size:clamp(14px,4vw,17px);line-height:1.2;
+  }
+  html[lang="bn"] #game #answers .answer-row button {font-size:clamp(16px,4.5vw,19px);line-height:1.3;}
+  #game #answers .answer-row button:hover {background:#ffe1a0;}
+  #game #answers .answer-row button:active {background:#e9bc70;}
+}
+@media (max-aspect-ratio:4/5) and (max-height:620px) {
+  #game #answers {gap:7px;}
+  #game #answers .answer-row {gap:7px;}
+  #game #answers .answer-row button {min-height:44px;padding:5px 4px;}
+}
+
+
+/* Final owner-approved framing: wall-mounted Riddlex plaque, real wooden
+   tabletop texture taken from the approved artwork, no mobile fascia.
+   All interactive text remains the existing bilingual HTML. */
+#game .room-logo {
+  top:12%;right:33%;left:auto;bottom:auto;transform:none;z-index:0;
+  width:clamp(80px,9vw,150px);height:auto;max-width:none;max-height:none;
+  padding:0;background:none;border:0;border-radius:3px;
+  box-shadow:0 3px 7px #18090066;filter:none;object-fit:contain;
+}
+@media (max-aspect-ratio:4/5) {
+  #game .stage-wrap {
+    --table-zone:clamp(154px,30%,248px);
+    --edge:calc(100% - var(--table-zone));
+    --actor-bottom:calc(var(--table-zone) - 1px);
+  }
+  #game .room-library {
+    height:var(--edge);background-size:auto 160%;background-position:49% top;
+  }
+  #game .room-logo {
+    top:16%;right:5%;width:38%;max-width:195px;height:auto;max-height:none;
+  }
+  #game .room-detective {
+    left:-22%;width:104%;max-height:64%;
+  }
+  #game .room-cat {left:57%;width:46%;max-height:24%;}
+  #game .room-lamp {display:none;}
+  #game .room-lens {left:1%;width:19%;bottom:calc(var(--table-zone) - 10px);}
+  #game .room-front {display:none;}
+  #game .room-desk {
+    top:var(--edge);bottom:0;height:auto;clip-path:none;border:0;
+    background:linear-gradient(180deg,#32140540,transparent 10%,transparent 92%,#32140522),url("images/layered/mobile-tabletop.webp") center/100% 100% no-repeat;
+    box-shadow:inset 0 2px 4px #2d150a70;
+  }
+  #game .room-desk::before {display:none;}
+  #game .room-desk::after {
+    height:9px;bottom:0;background:url("images/layered/desk-rim.webp") center/100% 100% no-repeat;
+    box-shadow:none;
+  }
+  #game #answers {
+    top:calc(var(--edge) + 14px);bottom:40px;
+    align-content:center;justify-content:center;gap:9px;
+    background:none;
+  }
+  #game #categories {
+    top:calc(var(--edge) + 8px);bottom:10px;
+    align-content:center;justify-content:center;
+  }
+  #game #categories .cat-row {gap:5px;}
+  #game #categories .cat-row button {min-height:40px;padding:4px 10px;}
+  #game #answers .answer-row button {
+    border:1px solid #eac274;border-radius:999px;
+    background:linear-gradient(180deg,#fff4d2,#f5ce81);
+    color:#392417;box-shadow:inset 0 1px 0 #fff9de,0 3px 6px #190b0566;
+  }
+  #game #answers .answer-row button:hover {background:#ffe1a0;}
+  #game #answers .answer-row button:active {background:#e9bc70;}
+  #game #back {bottom:5px;left:5px;width:32px;height:32px;min-width:32px;min-height:32px;}
+}
+@media (max-aspect-ratio:4/5) and (max-height:620px) {
+  #game .room-logo {top:7%;right:5%;width:35%;}
+  #game .room-detective {left:-22%;width:98%;max-height:63%;}
+  #game #answers {top:calc(var(--edge) + 8px);bottom:39px;gap:7px;}
+  #game #answers .answer-row {gap:7px;}
+  #game #answers .answer-row button {min-height:44px;padding:5px 4px;}
+}
+@media (min-aspect-ratio:4/5) and (max-height:450px) {
+  #game .room-logo {top:3%;right:33%;width:9%;max-width:80px;}
+}

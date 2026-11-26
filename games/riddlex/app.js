@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=portrait-solved-clean-20261127";
+import { createScene, startMenuCat } from "./scene.js?v=portrait-solved-atomic-20261127";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -551,8 +551,8 @@ function onCorrect() {
   $("guess-line").textContent = "";
   $("credit").textContent = "";
   scene.setMood("happy");
-  setStatus(text().solvedLine);
   showOnly("solved");
+  setStatus(text().solvedLine);
   $("back").hidden = true;
 }
 

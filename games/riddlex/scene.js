@@ -893,6 +893,9 @@ export function createScene(canvas) {
   function clearReveal() {
     if(reveal&&!reveal.done){reveal.done=true;reveal.resolve({printed:false});}
     reveal = null;
+    // Erase the last painted card immediately, even before the next 30fps tick.
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(running&&!document.hidden){drawFaces();if(!reduce)drawSmoke(0);}
   }
 
   return {
@@ -908,6 +911,7 @@ export function createScene(canvas) {
         plates: Object.keys(images.overlays || {}),
         orient: images.baseOrient || "",
         portrait: portraitMode,
+        revealActive: !!reveal,
         revealBounds: reveal?.photo ? (() => {
           const { x, y, w, h, photoH } = noteMetrics(1);
           return { x, y, w, h, photoH, canvasW: canvas.width, canvasH: canvas.height };

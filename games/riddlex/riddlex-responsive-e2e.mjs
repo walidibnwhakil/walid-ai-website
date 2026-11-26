@@ -882,9 +882,20 @@ try {
             assert.equal(await page.locator("#speech").isVisible(),true);
             assert.equal(await page.locator("#solved-line").isVisible(),false);
             assert.equal(await page.locator("#again").isVisible(),true);
+            assert.equal(await page.evaluate(()=>window.__riddlex.expression().revealActive),false,"name-only or photo card must be removed");
             assert.equal(await page.evaluate(()=>window.__riddlex.expression().revealBounds),null);
             assert.equal(await page.locator("#guess-line").textContent(),"");
+            assert.equal(await page.locator("#speech").evaluate(e=>getComputedStyle(e).opacity),"1","victory speech must be visible immediately");
+            assert.match(await page.locator("#status").textContent(),/Great! I guessed it\.|দারুণ! আমি ঠিক ধরেছি।/);
+            await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
             if(shotFolder)await page.screenshot({path:join(shotFolder,"solved-no-name.png")});
+            await page.click('#game [data-set-lang="bn"]');
+            assert.equal(await page.locator("#status").textContent(),"দারুণ! আমি ঠিক ধরেছি।");
+            assert.equal(await page.evaluate(()=>window.__riddlex.expression().revealActive),false);
+            await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+            if(shotFolder)await page.screenshot({path:join(shotFolder,"solved-bn-no-name.png")});
+            await page.click('#game [data-set-lang="en"]');
+            console.log("SOLVED_ATOMIC_VISUAL_PASS");
             outcome="correct";break;
           }
           wrongGuesses.push(guessRecord);

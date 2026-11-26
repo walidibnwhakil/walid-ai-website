@@ -762,3 +762,6 @@ html[lang="bn"] #game .speech #status,html[lang="bn"] #game .speech .q-badge{
 }
 @keyframes guess-thinking-pulse{from{opacity:.25;transform:scaleX(.55)}to{opacity:1;transform:scaleX(1)}}
 @media(prefers-reduced-motion:reduce){#game .speech::before{animation:none!important;}}
+
+/* A victory is a single, atomic visible state: never fade its speech from zero. */
+#game[data-view="solved"] .speech.pop{animation:none;opacity:1;transform:none;}

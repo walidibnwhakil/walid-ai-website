@@ -105,9 +105,10 @@ class SportsBackendTests(unittest.TestCase):
         self.assertEqual(result[0]["homeScore"], 2)
 
     def test_failed_cricket_refresh_preserves_last_known_good_data(self):
+        recent_start = fetch.datetime.now(fetch.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
         previous = {"sports": {"cricket": {
             "label": "Cricket", "coverage": "available",
-            "matches": [{"id": "known", "homeTeam": "A", "awayTeam": "B", "status": "finished", "startTime": "2026-11-15T00:00:00Z"}]
+            "matches": [{"id": "known", "homeTeam": "A", "awayTeam": "B", "status": "finished", "startTime": recent_start}]
         }}}
         with patch.object(fetch, "read_events", return_value=[]), \
              patch.object(fetch, "read_global_soccer_recent", return_value=[]), \

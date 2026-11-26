@@ -191,7 +191,14 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   border: 1px solid #e6bd68; background: #24150dcc; color: #ffe6a4;
 }
 @media (min-aspect-ratio: 4/5) {
-  .stage-wrap:has(#back:not([hidden])) #answers { left: 60px; }
+  #categories { left: max(16px, calc((100% - 720px) / 2)); right: max(16px, calc((100% - 720px) / 2)); }
+  #categories .cat-row button { font-size: 18px; }
+  #answers { left: max(16px, calc((100% - 920px) / 2)); right: max(16px, calc((100% - 920px) / 2)); }
+  .stage-wrap:has(#back:not([hidden])) #answers { left: max(60px, calc((100% - 920px) / 2)); }
+  @media (max-height: 450px) {
+    #categories .cat-row button { min-height: 42px; font-size: 15px; }
+    #answers button { min-height: 42px; padding: 6px; font-size: 15px; }
+  }
 }
 html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-weight: 400; }
 #learn {
@@ -240,7 +247,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
     position: absolute; left: 0; right: 0; z-index: 5;
     width: fit-content; max-width: calc(100% - 24px);
     margin-left: auto; margin-right: auto;
-    top: calc(var(--chin-y, 0.42) * 100% - 14px);
+    top: calc(var(--question-y, 0.46) * 100% + 6px);
   }
   #status { width: auto; flex: 0 1 auto; }
   .speech::after, .speech.has-badge::after {
@@ -252,7 +259,7 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #status { font-size: 16px; padding: 10px 16px; border-radius: 14px; }
   #categories, #answers {
     /* Just under the speech bubble. --under-bubble is the bubble's bottom, not desk-y. */
-    top: var(--under-bubble, calc(var(--chin-y, 0.42) * 100% + 52px));
+    top: var(--under-bubble, calc(var(--question-y, 0.46) * 100% + 60px));
     bottom: auto; left: 12px; right: 12px; width: auto; z-index: 6;
   }
   .cat-row, .answer-row {

@@ -573,8 +573,8 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
    tabletop texture taken from the approved artwork, no mobile fascia.
    All interactive text remains the existing bilingual HTML. */
 #game .room-logo {
-  top:10%;right:16%;left:auto;bottom:auto;transform:none;z-index:0;
-  width:clamp(140px,16vw,250px);height:auto;max-width:none;max-height:none;
+  top:12%;right:33%;left:auto;bottom:auto;transform:none;z-index:0;
+  width:clamp(80px,9vw,150px);height:auto;max-width:none;max-height:none;
   padding:0;background:none;border:0;border-radius:3px;
   box-shadow:0 3px 7px #18090066;filter:none;object-fit:contain;
 }
@@ -635,5 +635,5 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game #answers .answer-row button {min-height:44px;padding:5px 4px;}
 }
 @media (min-aspect-ratio:4/5) and (max-height:450px) {
-  #game .room-logo {top:3%;right:14%;width:14%;max-width:115px;}
+  #game .room-logo {top:3%;right:33%;width:9%;max-width:80px;}
 }

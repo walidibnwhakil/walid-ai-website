@@ -194,7 +194,7 @@ html:has(#game:not([hidden])), html:has(#game:not([hidden])) body { height: 100d
   #categories { left: max(16px, calc((100% - 720px) / 2)); right: max(16px, calc((100% - 720px) / 2)); }
   #categories .cat-row button { font-size: 18px; }
   #answers { left: max(16px, calc((100% - 920px) / 2)); right: max(16px, calc((100% - 920px) / 2)); }
-  .stage-wrap:has(#back:not([hidden])) #answers { left: max(60px, calc((100% - 920px) / 2)); }
+  /* Answer positioning is handled by the final layered layout, including Back. */
   @media (max-height: 450px) {
     #categories .cat-row button { min-height: 42px; font-size: 15px; }
     #answers button { min-height: 42px; padding: 6px; font-size: 15px; }
@@ -470,4 +470,16 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game #status{font-size:14px;}
   #game .speech::after,#game .speech.has-badge::after{left:-15px;width:20px;height:17px;bottom:3px;}
   html[lang="bn"] #game #status{font-size:17px;}
+}
+
+/* Keep all five buttons centered after Back becomes visible on question two. */
+@media (min-aspect-ratio:4/5) {
+  #game .stage-wrap:has(#back:not([hidden])) #answers {
+    left:50%;right:auto;transform:translateX(-50%);
+    width:min(85%,1050px);
+  }
+}
+@media (min-aspect-ratio:4/5) and (max-height:450px) {
+  #game .stage-wrap {--edge:58%;--actor-bottom:41.8%;}
+  #game #answers {top:calc(var(--edge) + 9%);bottom:5%;}
 }

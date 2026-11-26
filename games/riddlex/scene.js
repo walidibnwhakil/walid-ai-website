@@ -173,6 +173,19 @@ export function createScene(canvas) {
     const bubble = room.querySelector("#speech");
     if (!bubble || !bubble.offsetHeight || !canvas.width || !canvas.height || cssSize.width < 10 || actorBox.w < 2) return;
     const dx = cssSize.width / canvas.width, dy = cssSize.height / canvas.height;
+    if (portraitMode) {
+      const x = Math.round(cssSize.width * (document.documentElement.lang === "bn" ? .42 : .46));
+      const actorArt = room.querySelector(".approved-actors");
+      const rect = actorArt.getBoundingClientRect(), stage = canvas.getBoundingClientRect();
+      const mouthY = rect.top - stage.top + rect.height * .40;
+      const values = {"--speech-left":x,"--speech-max":cssSize.width-x-9,"--speech-tail":18,
+        "--speech-top":Math.max(4,Math.min(rect.bottom-stage.top-bubble.offsetHeight-10,mouthY-bubble.offsetHeight+8))};
+      for(const [name,number] of Object.entries(values)){
+        const value=Math.round(number)+"px";
+        if(room.style.getPropertyValue(name)!==value)room.style.setProperty(name,value);
+      }
+      return;
+    }
     const mouthX = (actorBox.x + actorBox.w * .70) * dx;
     const mouthY = (actorBox.y + actorBox.h * .49) * dy;
     const tail = Math.max(18, Math.min(portraitMode ? 23 : 42, cssSize.width * .029));
@@ -590,8 +603,15 @@ export function createScene(canvas) {
     // Static art is rendered once by the browser. Only a transparent effects
     // canvas is cleared and redrawn, capped at 30fps and 1.8M backing pixels.
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    if(!reduce){drawSmoke(dt);stepCat(dt);}
-    updateReveal(dt);drawFaces();drawReveal();
+    if(!reduce){
+      if(!portraitMode)drawSmoke(dt);
+      stepCat(dt);
+    }
+    updateReveal(dt);
+    // Never paste expression plates from the old detective over the new
+    // approved portrait. Desktop continues using its original full set.
+    if(!portraitMode)drawFaces();
+    drawReveal();
   }
 
   function screenOrient(){return portraitViewport.matches?"portrait":"landscape";}
@@ -621,7 +641,21 @@ export function createScene(canvas) {
     images.overlays=Object.fromEntries(entries.filter(([,v])=>v));
   }
 
+  let portraitReady = null;
+  function preparePortrait() {
+    if(portraitReady)return portraitReady;
+    room.classList.remove("portrait-art-ready");
+    const nodes=[...room.querySelectorAll(".approved-portrait-art img[data-src]")];
+    portraitReady=Promise.all(nodes.map(img=>{
+      if(!img.getAttribute("src"))img.src=img.dataset.src;
+      return img.decode();
+    })).then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))
+      .then(()=>{room.classList.add("portrait-art-ready");alignSpeech();})
+      .catch(()=>{portraitReady=null;});
+    return portraitReady;
+  }
   async function start() {
+    if(portraitViewport.matches) await preparePortrait();
     for(const img of room.querySelectorAll(".room-art img[data-src]")){
       if(!img.getAttribute("src"))img.src=img.dataset.src;
     }
@@ -637,7 +671,7 @@ export function createScene(canvas) {
     new ResizeObserver(()=>{if(running)alignSpeech();}).observe(room.querySelector("#speech"));
   }
   portraitViewport.addEventListener?.("change",()=>{
-    images.baseOrient=screenOrient();layoutDirty=true;if(running)resize();
+    images.baseOrient=screenOrient();if(portraitViewport.matches)preparePortrait();layoutDirty=true;if(running)resize();
   });
   document.addEventListener("visibilitychange",()=>{
     cancelAnimationFrame(raf);frameTime=0;

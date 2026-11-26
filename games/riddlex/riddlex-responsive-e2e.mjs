@@ -63,6 +63,7 @@ try {
           return {stage:rect(stage),bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
             cat:rect(document.querySelector(".room-cat")),actor:rect(document.querySelector(".room-detective")),
             logo:rect(document.querySelector(".room-logo")),desk:rect(document.querySelector(".room-desk")),
+            frontHidden:getComputedStyle(document.querySelector(".room-front")).display==="none",
             number:document.getElementById("q-badge").hidden?null:rect(document.getElementById("q-badge")),
             status:rect(document.getElementById("status")),
             rows:[...document.querySelectorAll("#answers .answer-row")].map(row=>[...row.querySelectorAll("button")].map(rect)),
@@ -75,7 +76,13 @@ try {
         assert.ok(g.scrollWidth<=width+2&&g.scrollHeight<=height+2,"page overflow "+JSON.stringify({width,height,mode,g}));
         assert.ok(g.buttons.every(b=>inside(b)&&b.width>=40&&b.height>=40),"clipped controls "+JSON.stringify({width,height,mode,g}));
         assert.ok(inside(g.bubble),"speech outside screen "+JSON.stringify({width,height,mode,g}));
-        assert.ok(inside(g.logo)&&Math.abs(g.logo.top-g.desk.top)<g.stage.height*.03,"logo not on desk "+JSON.stringify({width,height,g}));
+        assert.ok(inside(g.logo)&&Math.abs(g.logo.top-g.desk.top)<Math.max(8,g.stage.height*.03),"logo not on desk "+JSON.stringify({width,height,g}));
+        if(width/height<=.8){
+          assert.ok(g.frontHidden,"mobile desk front must be hidden");
+          assert.ok(g.desk.bottom>=g.stage.bottom-2,"tabletop must extend to bottom of mobile stage");
+          assert.ok(g.buttons.every(b=>b.top>=g.desk.top&&b.bottom<=g.desk.bottom+1),"all mobile controls must be on tabletop");
+          assert.ok(g.logo.top>=g.desk.top-1&&g.logo.bottom<=g.desk.bottom,"nameplate must rest on tabletop");
+        }
         assert.ok(g.buttons.every(b=>g.logo.bottom<=b.top+2||g.logo.right<=b.left||g.logo.left>=b.right),"nameplate/controls overlap");
         if(mode==="ask"){
           assert.equal(g.buttons.length,5,"all five answers must remain available");

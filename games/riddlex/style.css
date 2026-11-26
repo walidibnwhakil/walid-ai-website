@@ -567,3 +567,44 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game #answers .answer-row {gap:7px;}
   #game #answers .answer-row button {min-height:44px;padding:5px 4px;}
 }
+
+/* Portrait camera looks across the tabletop, not down at its front panel.
+   Reserve a real, full-width tabletop for every control, including the small
+   nameplate at the back. No front fascia or decorative lower panel on phones. */
+@media (max-aspect-ratio:4/5) {
+  #game .stage-wrap {
+    --table-zone:clamp(184px,46vw,210px);
+    --edge:calc(100% - var(--table-zone));
+    --actor-bottom:calc(var(--table-zone) - 1px);
+  }
+  #game .room-front {display:none;}
+  #game .room-library {height:var(--edge);background-size:auto 112%;background-position:48% top;}
+  #game .room-desk {
+    top:var(--edge);bottom:0;height:auto;
+    background:linear-gradient(180deg,#30150835 0%,transparent 25%,#19090222 100%),url("images/layered/desk.webp") center/100% 100%;
+    box-shadow:inset 0 2px 5px #30150866;
+  }
+  #game .room-desk::after {height:5px;bottom:0;box-shadow:none;}
+  #game .room-logo {
+    top:calc(var(--edge) + 3px);bottom:auto;left:50%;
+    height:32px;width:auto;max-width:36%;max-height:none;
+    padding:1px 6px;border-radius:4px;
+    box-shadow:0 2px 3px #16090080;
+  }
+  #game #answers,#game #categories {
+    top:calc(var(--edge) + 45px);bottom:8px;
+    align-content:start;justify-content:start;
+  }
+  #game #answers {gap:9px;}
+  #game #categories .cat-row {gap:5px;}
+  #game #categories .cat-row button {min-height:40px;padding:4px 10px;}
+  #game #back {left:5px;bottom:5px;}
+  #game .room-lens {bottom:calc(var(--table-zone) - 6px);}
+}
+@media (max-aspect-ratio:4/5) and (max-height:620px) {
+  #game .stage-wrap {--table-zone:174px;}
+  #game .room-logo {height:28px;}
+  #game #answers,#game #categories {top:calc(var(--edge) + 36px);}
+  #game #answers {gap:7px;}
+  #game #categories .cat-row {gap:4px;}
+}

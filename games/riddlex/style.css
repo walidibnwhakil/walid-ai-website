@@ -578,10 +578,11 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
     --actor-bottom:calc(var(--table-zone) - 1px);
   }
   #game .room-front {display:none;}
-  #game .room-library {height:var(--edge);background-size:auto 112%;background-position:48% top;}
+  #game .room-library {height:var(--edge);background-size:auto 147%;background-position:48% top;}
   #game .room-desk {
     top:var(--edge);bottom:0;height:auto;
-    background:linear-gradient(180deg,#30150835 0%,transparent 25%,#19090222 100%),url("images/layered/desk.webp") center/100% 100%;
+    background:linear-gradient(180deg,#30150835 0%,transparent 25%,#19090222 100%),url("images/layered/desk.webp") 42% center/auto 100%;
+    background-size:100% 100%,auto 100%;
     box-shadow:inset 0 2px 5px #30150866;
   }
   #game .room-desk::after {height:5px;bottom:0;box-shadow:none;}

@@ -361,3 +361,35 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
   #game #answers button {flex:1 1 0;min-width:0;min-height:44px;height:auto;padding:6px 8px;font-size:15px;line-height:1.15;white-space:normal;}
   #game .q-badge {flex-basis:32px;}
 }
+
+/* Riddlex bilingual typography: readable Bangla without synthetic bold. */
+html[lang="en"] body { font-family: "Times New Roman", Times, SolaimanLipi, serif; }
+html[lang="bn"] body { font-family: SolaimanLipi, "Times New Roman", Times, serif; }
+#game .lang-switch [data-set-lang="en"], #riddlex-guide [data-guide-lang="en"] {
+  font-family: "Times New Roman", Times, serif; font-weight: 400;
+}
+#game .lang-switch [data-set-lang="bn"], #riddlex-guide [data-guide-lang="bn"],
+#riddlex-guide [lang="bn"] {
+  font-family: SolaimanLipi, "Times New Roman", Times, serif;
+  font-weight: 400; font-synthesis: none;
+}
+html[lang="bn"] #game button, html[lang="bn"] #game input,
+html[lang="bn"] #game #status, html[lang="bn"] #game #solved-line,
+html[lang="bn"] #game .q-badge {
+  font-family: SolaimanLipi, "Times New Roman", Times, serif;
+  font-weight: 400; font-synthesis: none;
+}
+html[lang="bn"] #game #status { font-size: 24px; line-height: 1.5; overflow-wrap: anywhere; }
+html[lang="bn"] #game #categories .cat-row button,
+html[lang="bn"] #game #answers button { font-size: 20px; line-height: 1.35; }
+html[lang="bn"] #game #solved-line { line-height: 1.5; }
+@media (max-aspect-ratio:4/5) {
+  html[lang="bn"] #game #status { font-size: 19px; line-height: 1.5; padding: 8px 12px; }
+  html[lang="bn"] #game #categories .cat-row button { font-size: 19px; line-height: 1.35; height: auto; }
+  html[lang="bn"] #game #answers button { font-size: 17px; line-height: 1.35; }
+}
+@media (min-aspect-ratio:4/5) and (max-height:450px) {
+  html[lang="bn"] #game #status { font-size: 19px; line-height: 1.4; }
+  html[lang="bn"] #game #categories .cat-row button,
+  html[lang="bn"] #game #answers button { font-size: 17px; }
+}

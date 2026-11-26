@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=riddlex-39";
+import { createScene, startMenuCat } from "./scene.js?v=room-framing-20261126";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -650,6 +650,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 window.addEventListener("resize", () => { scene.resize(); scheduleUnderBubble(); });
+document.querySelector(".stage-wrap")?.addEventListener("riddlex-scene-layout", scheduleUnderBubble);
 if (typeof ResizeObserver === "function") {
   const bubble = $("speech");
   if (bubble) new ResizeObserver(() => placeUnderBubble()).observe(bubble);

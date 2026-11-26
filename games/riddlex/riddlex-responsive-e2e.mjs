@@ -93,6 +93,7 @@ try {
     await page.close();
   }
 
+
   // Verify the actual integrated approved sprites, both languages, layout and
   // render budget on the same real game. Existing gameplay tests remain below.
   {
@@ -103,21 +104,25 @@ try {
     await page.route("**/*",r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());
     await page.goto(origin+"/games/riddlex/?autotest=1",{waitUntil:"load"});
     await page.click("#play");
-    await page.waitForFunction(()=>[...document.querySelectorAll(".room-art img")].every(i=>i.complete&&i.naturalWidth>0),null,{timeout:15000});
-    await page.waitForFunction(()=>window.__riddlex?.expression().plates.length===7,null,{timeout:15000});
+    await page.waitForFunction(()=>document.querySelector(".stage-wrap").classList.contains("portrait-art-ready")&&[...document.querySelectorAll(".approved-portrait-art img")].every(i=>i.complete&&i.naturalWidth>0),null,{timeout:15000});
+    await page.waitForFunction(()=>window.__riddlex?.expression().plates.length===6,null,{timeout:15000});
     assert.equal(await page.locator("html").getAttribute("lang"),"en");
     const dims=[[1440,900],[1649,825],[1024,768],[667,375],[320,568],[390,844],[412,915]];
     async function layout(mode,lang){
       for(const [width,height] of dims){
         await page.setViewportSize({width,height});
+        await page.waitForFunction(()=>!matchMedia("(max-aspect-ratio:4/5)").matches||document.querySelector(".stage-wrap").classList.contains("portrait-art-ready"));
         await page.waitForTimeout(130);
         const g=await page.evaluate(({mode,lang})=>{
           const rect=node=>node.getBoundingClientRect().toJSON();
           const stage=document.querySelector(".stage-wrap"), canvas=document.getElementById("stage");
           const buttons=[...document.querySelectorAll(mode==="pick"?"#categories .cat-row button":"#answers button")];
+          const mobile=matchMedia("(max-aspect-ratio:4/5)").matches;
+          const wall=rect(document.querySelector(".approved-wall-plaque"));
+          const logo=mobile?{x:wall.x+wall.width*.59,y:wall.y,left:wall.x+wall.width*.59,right:wall.x+wall.width*.96,top:wall.top,bottom:wall.bottom,width:wall.width*.37,height:wall.height}:rect(document.querySelector(".room-logo"));
           return {stage:rect(stage),bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
             cat:rect(document.querySelector(".room-cat")),actor:rect(document.querySelector(".room-detective")),
-            logo:rect(document.querySelector(".room-logo")),desk:rect(document.querySelector(".room-desk")),
+            logo,desk:rect(document.querySelector(mobile?".approved-table":".room-desk")),
             frontHidden:getComputedStyle(document.querySelector(".room-front")).display==="none",
             number:document.getElementById("q-badge").hidden?null:rect(document.getElementById("q-badge")),
             status:rect(document.getElementById("status")),
@@ -191,7 +196,7 @@ try {
       await page.locator("#status").evaluate((el,value)=>el.textContent=value,original);
       await page.waitForTimeout(150);
     }
-    const artBytes=(await Promise.all(["library","desk","desk-rim","desk-front","desk-front-mobile","logo","lamp","detective","cat","lens","mobile-tabletop","wall-plaque"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
+    const artBytes=(await Promise.all(["approved-wall-top","approved-wall-plaque","approved-actors","approved-table","portrait-happy","portrait-sad","portrait-serious","portrait-worried","portrait-confused","portrait-cat"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
     assert.ok(artBytes<300000,"static art exceeds 300KB");
     assert.ok(!requests.some(u=>/images\/approved\/(game-desk|portrait-neutral|face-portrait|cat-portrait)/.test(u)),"old gameplay art unexpectedly loaded");
     // Capture all five existing expression states at the integrated sprite.

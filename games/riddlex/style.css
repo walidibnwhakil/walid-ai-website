@@ -638,6 +638,54 @@ html[lang="bn"] #game #categories .cat-row button,html[lang="bn"] #game #answers
   #game .room-logo {top:3%;right:33%;width:9%;max-width:80px;}
 }
 
+/* Portrait art is sourced directly from the owner's approved illustration,
+   not recomposed from the prior library, detective, cat and desk images.
+   The original desktop artwork and desktop controls remain unchanged. */
+.approved-portrait-art{display:none;}
+@media(max-aspect-ratio:4/5){
+  #game .stage-wrap{
+    --table-zone:clamp(136px,23%,196px);
+    --actor-zone:min(65%,calc(100vw * .75));
+    --edge:calc(100% - var(--table-zone));
+  }
+  #game .room-art{visibility:hidden;}
+  #game .approved-portrait-art{display:block;position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:#32190d;}
+  #game .approved-portrait-art img{position:absolute;display:block;left:0;width:100%;object-fit:fill;}
+  #game .approved-wall{top:0;height:calc(100% - var(--table-zone) - var(--actor-zone));}
+  #game .approved-actors{bottom:var(--table-zone);height:var(--actor-zone);}
+  #game .approved-table{bottom:0;height:var(--table-zone);}
+  #game .stage-wrap:not(.portrait-art-ready) .approved-portrait-art,
+  #game .stage-wrap:not(.portrait-art-ready) #ask-panel,
+  #game .stage-wrap:not(.portrait-art-ready) #categories,
+  #game .stage-wrap:not(.portrait-art-ready) #stage{visibility:hidden;}
+  #game #answers{top:auto;bottom:26px;gap:8px;width:min(92%,440px);}
+  #game #answers .answer-row button{min-height:44px;padding:5px 4px;font-size:clamp(14px,4vw,18px);line-height:1.2;}
+  html[lang="bn"] #game #answers .answer-row button{font-size:clamp(16px,4.5vw,19px);}
+  #game #categories{top:calc(var(--edge) + 8px);bottom:12px;}
+  #game #categories .cat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+  #game #categories .cat-row button{min-height:44px;padding:4px 3px;font-size:clamp(13px,3.8vw,17px);}
+  #game .speech{gap:4px;padding:7px 9px;max-width:var(--speech-max,52%);}
+  #game #status{font-size:clamp(14px,4.2vw,17px);line-height:1.25;}
+  html[lang="bn"] #game #status{font-size:clamp(15px,4.1vw,18px);line-height:1.4;}
+  #game .q-badge{min-width:19px;padding:2px 4px;}
+  #game #back{width:30px;height:30px;min-width:30px;min-height:30px;bottom:3px;left:5px;}
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game .stage-wrap{--table-zone:133px;--actor-zone:min(60%,calc(100vw * .69));}
+  #game #answers{bottom:32px;gap:6px;}
+  #game #answers .answer-row button{min-height:42px;padding:4px 3px;}
+}
+
+@media(max-aspect-ratio:4/5){
+  #game .stage-wrap{--plaque-zone:calc(100vw * .218);--actor-zone:min(65%,calc(100vw * .79));}
+  #game .approved-wall{height:calc(100% - var(--table-zone) - var(--actor-zone) - var(--plaque-zone));}
+  #game .approved-wall-plaque{bottom:calc(var(--table-zone) + var(--actor-zone));height:var(--plaque-zone);}
+  #game .stage-wrap:not(.portrait-art-ready) #hud,#game .stage-wrap:not(.portrait-art-ready) #back{visibility:hidden;}
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game .stage-wrap{--actor-zone:min(60%,calc(100vw * .69));--plaque-zone:min(19%,calc(100vw * .218));}
+}
+
 /* Riddlex is a single-screen app, including its landing menu. Keep the
    dynamic mobile viewport bounded even while browser bars expand/collapse. */
 html, body {

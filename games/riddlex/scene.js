@@ -119,7 +119,8 @@ export function createScene(canvas) {
   let deskEdge = 0;
   let actorBox = { x:0,y:0,w:1,h:1 };
   let catBox = { x:0,y:0,w:1,h:1 };
-  let overlayPromise;
+  let overlayPromise, portraitOverlayPromise, desktopPlates = {}, portraitPlates = {};
+  let portraitBox = {x:0,y:0,w:1,h:1};
   const room = canvas.parentElement;
   const actor = room.querySelector(".room-detective");
   const cat = room.querySelector(".room-cat");
@@ -173,6 +174,19 @@ export function createScene(canvas) {
     const bubble = room.querySelector("#speech");
     if (!bubble || !bubble.offsetHeight || !canvas.width || !canvas.height || cssSize.width < 10 || actorBox.w < 2) return;
     const dx = cssSize.width / canvas.width, dy = cssSize.height / canvas.height;
+    if (portraitMode) {
+      const x = Math.round(cssSize.width * (document.documentElement.lang === "bn" ? .42 : .46));
+      const actorArt = room.querySelector(".approved-actors");
+      const rect = actorArt.getBoundingClientRect(), stage = canvas.getBoundingClientRect();
+      const mouthY = rect.top - stage.top + rect.height * .40;
+      const values = {"--speech-left":x,"--speech-max":cssSize.width-x-9,"--speech-tail":18,
+        "--speech-top":Math.max(4,Math.min(rect.bottom-stage.top-bubble.offsetHeight-10,mouthY-bubble.offsetHeight+8))};
+      for(const [name,number] of Object.entries(values)){
+        const value=Math.round(number)+"px";
+        if(room.style.getPropertyValue(name)!==value)room.style.setProperty(name,value);
+      }
+      return;
+    }
     const mouthX = (actorBox.x + actorBox.w * .70) * dx;
     const mouthY = (actorBox.y + actorBox.h * .49) * dy;
     const tail = Math.max(18, Math.min(portraitMode ? 23 : 42, cssSize.width * .029));
@@ -201,7 +215,13 @@ export function createScene(canvas) {
     view={x:actorBox.x-359*actorBox.w/543,
       y:actorBox.y+3*actorBox.h/380,
       w:1366*actorBox.w/543,h:(1366*928/1648)*actorBox.h/380};
-    const desk=room.querySelector(".room-desk").getBoundingClientRect();
+    if(portraitMode){
+      const art=room.querySelector(".approved-actors").getBoundingClientRect(), cr=canvas.getBoundingClientRect();
+      portraitBox={x:(art.left-cr.left)*cw/Math.max(1,cr.width),y:(art.top-cr.top)*ch/Math.max(1,cr.height),w:art.width*cw/Math.max(1,cr.width),h:art.height*ch/Math.max(1,cr.height)};
+      actorBox={x:portraitBox.x,y:portraitBox.y,w:portraitBox.w*.68,h:portraitBox.h*.91};
+      view={x:portraitBox.x+(.559-.592)*portraitBox.w,y:portraitBox.y+(.509-.255)*portraitBox.h,w:portraitBox.w,h:portraitBox.h};
+    }
+    const desk=room.querySelector(portraitMode?".approved-table":".room-desk").getBoundingClientRect();
     const cr=canvas.getBoundingClientRect();
     deskEdge=(desk.top-cr.top)*ch/Math.max(1,cr.height);
     room.style.setProperty("--room-edge",(deskEdge/ch).toFixed(4));
@@ -239,6 +259,12 @@ export function createScene(canvas) {
   function drawFaces() {
     const plates=images.overlays||{};
     const levels=faceNow.levels||{};
+    if(portraitMode){
+      function paintPortrait(plate,x,y,w,h,alpha){if(!plate||alpha<.02)return;ctx.globalAlpha=Math.min(1,alpha);ctx.drawImage(plate,portraitBox.x+x/700*portraitBox.w,portraitBox.y+y/487*portraitBox.h,w/700*portraitBox.w,h/487*portraitBox.h);ctx.globalAlpha=1;}
+      for(const key of ["worried","confused","serious","sad","happy"])paintPortrait(plates[key],218,106,134,119,levels[key]||0);
+      paintPortrait(plates.cat,453,395,77,42,catLife.blink>0?blinkCover(catLife.blink):0);
+      return;
+    }
     function paint(plate,box,alpha) {
       if(!plate || alpha<.02) return;
       ctx.globalAlpha=Math.min(1,alpha);
@@ -585,7 +611,8 @@ export function createScene(canvas) {
     const dt=Math.min(.10,(now-(frameTime||now))/1000||.033);
     frameTime=now;clock+=dt;
     if(layoutDirty) resize();
-    const plates=images.overlays||{};
+    const plates=portraitMode?portraitPlates:desktopPlates;
+    images.overlays=plates;
     faceNow=faces.step(dt,key=>!!plates[key]);
     // Static art is rendered once by the browser. Only a transparent effects
     // canvas is cleared and redrawn, capped at 30fps and 1.8M backing pixels.
@@ -618,14 +645,38 @@ export function createScene(canvas) {
       g.drawImage(base,0,0);
       return [key,sheet];
     }));
-    images.overlays=Object.fromEntries(entries.filter(([,v])=>v));
+    desktopPlates=Object.fromEntries(entries.filter(([,v])=>v));
+    if(!portraitViewport.matches)images.overlays=desktopPlates;
   }
 
-  async function start() {
+  let portraitReady = null;
+  function preparePortrait() {
+    if(portraitReady)return portraitReady;
+    room.classList.remove("portrait-art-ready");
+    const nodes=[...room.querySelectorAll(".approved-portrait-art img[data-src]")];
+    portraitReady=Promise.all(nodes.map(img=>{
+      if(!img.getAttribute("src"))img.src=img.dataset.src;
+      return img.decode();
+    })).then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))
+      .then(()=>{room.classList.add("portrait-art-ready");alignSpeech();})
+      .catch(()=>{portraitReady=null;});
+    return portraitReady;
+  }
+  async function prepareDesktop(){
     for(const img of room.querySelectorAll(".room-art img[data-src]")){
       if(!img.getAttribute("src"))img.src=img.dataset.src;
     }
     if(!overlayPromise)overlayPromise=loadOverlaySet().catch(()=>{overlayPromise=null;});
+  }
+  function preparePortraitEffects(){
+    if(!portraitOverlayPromise)portraitOverlayPromise=Promise.all(["happy","sad","serious","worried","confused","cat"].map(async key=>[key,await loadImage("./images/layered/portrait-"+key+".webp")])).then(entries=>{
+      portraitPlates=Object.fromEntries(entries.filter(([,v])=>v));
+      if(portraitViewport.matches)images.overlays=portraitPlates;
+    }).catch(()=>{portraitOverlayPromise=null;});
+  }
+  async function start() {
+    if(portraitViewport.matches){await preparePortrait();preparePortraitEffects();}
+    else await prepareDesktop();
     images.baseOrient=screenOrient();
     layoutDirty=true;resize();
     if(running)return;
@@ -637,7 +688,7 @@ export function createScene(canvas) {
     new ResizeObserver(()=>{if(running)alignSpeech();}).observe(room.querySelector("#speech"));
   }
   portraitViewport.addEventListener?.("change",()=>{
-    images.baseOrient=screenOrient();layoutDirty=true;if(running)resize();
+    images.baseOrient=screenOrient();if(portraitViewport.matches){preparePortrait();preparePortraitEffects();}else prepareDesktop();layoutDirty=true;if(running)resize();
   });
   document.addEventListener("visibilitychange",()=>{
     cancelAnimationFrame(raf);frameTime=0;

@@ -325,3 +325,39 @@ html[lang="bn"] button, html[lang="bn"] input, html[lang="bn"] .speech { font-we
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* In-game controls are separate from the illustrated room and short desk. */
+#game .stage-wrap { background:#21130b; }
+#game #categories .cat-row button, #game #answers button {
+  border:1px solid #e1b66d; border-radius:999px;
+  background:linear-gradient(#fff2d0,#e7c285); color:#35200f;
+  box-shadow:0 3px 7px #10080445; font-weight:700;
+}
+#game #categories .cat-row button:hover, #game #answers button:hover { background:#ffe0a0; }
+#game #categories .cat-row button:focus-visible, #game #answers button:focus-visible {
+  outline:2px solid #fff1c7; outline-offset:2px;
+}
+#game #categories .cat-row button::before {
+  content:""; display:inline-block; width:1em; height:1em; margin-right:.4em;
+  background:currentColor; vertical-align:-.12em; mask-repeat:no-repeat; mask-size:contain; mask-position:center;
+}
+#game #categories [data-cat="character"]::before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M4 21v-3a8 8 0 0116 0v3z'/%3E%3C/svg%3E")}
+#game #categories [data-cat="object"]::before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' d='M12 2 22 7v10l-10 5-10-5V7z M2 7l10 5 10-5M12 12v10'/%3E%3C/svg%3E")}
+#game #categories [data-cat="animal"]::before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cellipse cx='4' cy='9' rx='2.5' ry='3.5'/%3E%3Cellipse cx='9' cy='5' rx='2.5' ry='3.5'/%3E%3Cellipse cx='15' cy='5' rx='2.5' ry='3.5'/%3E%3Cellipse cx='20' cy='9' rx='2.5' ry='3.5'/%3E%3Cpath d='M12 10c-3 0-9 6-7 9s5 1 7 1 5 2 7-1-4-9-7-9z'/%3E%3C/svg%3E")}
+@media (min-aspect-ratio:4/5){
+  #game #categories {top:calc(var(--room-edge,.6)*100% + clamp(8px,3vh,28px));}
+  #game #categories .cat-row button {min-height:clamp(42px,6vh,56px);}
+  #game #answers {bottom:clamp(10px,3vh,30px);}
+  #game #answers button {min-height:clamp(42px,6.5vh,58px);}
+}
+@media (max-aspect-ratio:4/5){
+  #game .speech {top:calc(var(--question-y,.46)*100% + 8px); max-width:calc(100% - 28px);}
+  #game .speech::after, #game .speech.has-badge::after {left:40%;}
+  #game #categories {left:12px;right:12px;}
+  #game #categories .cat-row {display:grid;grid-template-columns:1fr;gap:8px;width:min(78%,360px);margin:auto;}
+  #game #categories .cat-row button {width:100%;height:44px;min-height:44px;font-size:17px;padding:0 12px;}
+  #game #answers {gap:8px;}
+  #game #answers .answer-row {gap:8px;flex-wrap:nowrap;width:100%;max-width:440px;}
+  #game #answers button {flex:1 1 0;min-width:0;min-height:44px;height:auto;padding:6px 8px;font-size:15px;line-height:1.15;white-space:normal;}
+  #game .q-badge {flex-basis:32px;}
+}

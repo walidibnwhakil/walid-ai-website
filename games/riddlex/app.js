@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=layered-room-20261126";
+import { createScene, startMenuCat } from "./scene.js?v=approved-layered-20261126";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -183,23 +183,7 @@ function setStatus(message, number) {
 }
 
 function placeUnderBubble() {
-  const wrap = document.querySelector(".stage-wrap");
-  const bubble = $("speech");
-  if (!wrap || !bubble || !matchMedia("(max-aspect-ratio: 4/5)").matches) return;
-  const wr = wrap.getBoundingClientRect();
-  const sr = bubble.getBoundingClientRect();
-  if (sr.height < 8) return;
-  const shown = !$("categories").hidden ? $("categories") : $("answers");
-  const height = shown && !shown.hidden ? shown.getBoundingClientRect().height : 96;
-  const gap = 10;
-  let top = sr.bottom - wr.top + gap;
-  const reserve = $("back").hidden ? 8 : 54;
-  const max = Math.max(gap, wr.height - height - reserve);
-  if (top > max) top = max;
-  const next = `${Math.round(top)}px`;
-  if (wrap.style.getPropertyValue("--under-bubble") !== next) {
-    wrap.style.setProperty("--under-bubble", next);
-  }
+  scene.alignSpeech();
 }
 
 function scheduleUnderBubble() {

@@ -133,6 +133,7 @@ export function createScene(canvas) {
   // Coordinates are in the 700 x 487 approved character artwork.
   let portraitPoses = null, portraitPoseSource = null;
   let desktopPoses=null, desktopArtPromise=null;
+  let desktopActive="",desktopAlpha=0,desktopBlinkAt=3.8,desktopBlinkEnd=0;
   let motionStats = {frames:0,smoke:0,face:0,idle:0,cat:0,activePose:""};
   const poseBounds={x:112,y:0,w:331,h:344};
   const catPoseBounds={x:414,y:324,w:286,h:151};
@@ -186,26 +187,132 @@ export function createScene(canvas) {
   }
   // New desktop overlays are sampled from the exact approved artwork, in
   // its own 1440×747 coordinate system. No old face or room pixels are used.
+  // Desktop facial rig: the neutral head is tilted 18 degrees, so
+  // displace individual brows/lids/lip contours in that coordinate system.
+  // This is a pre-baked local patch, not a per-frame full-head stretch.
+  function bakeDesktopFace(source,bounds,controls,key){
+    const {x,y,w,h}=bounds;
+    const sheet=document.createElement("canvas");sheet.width=w;sheet.height=h;
+    const g=sheet.getContext("2d",{willReadFrequently:true});
+    g.drawImage(source,x,y,w,h,0,0,w,h);
+    const original=g.getImageData(0,0,w,h).data;
+    const warped=new Uint8ClampedArray(original.length);
+    const C=Math.cos(Math.PI/10),S=Math.sin(Math.PI/10);
+    const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+    function sample(pixels,xx,yy,c){
+      xx=clamp(xx,0,w-1.001);yy=clamp(yy,0,h-1.001);
+      const i=Math.floor(xx),j=Math.floor(yy),u=xx-i,v=yy-j;
+      const k=(j*w+i)*4+c;
+      return (pixels[k]*(1-u)+pixels[k+4]*u)*(1-v)
+        +(pixels[k+w*4]*(1-u)+pixels[k+w*4+4]*u)*v;
+    }
+    for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
+      let dx=0,dy=0;
+      for(const [cx,cy,rx,ry,mx,my] of controls){
+        const ax=xx+x-cx,ay=yy+y-cy;
+        const u=(ax*C+ay*S)/rx,v=(-ax*S+ay*C)/ry;
+        const k=Math.max(0,1-u*u-v*v)**2;
+        dx+=(mx*C-my*S)*k;dy+=(mx*S+my*C)*k;
+      }
+      // Opening a lid must not stretch the iris or pupil. Keep both
+      // measured iris centers pixel-stable, feathering the restriction
+      // into the surrounding eyelid. The original glints stay intact.
+      if(key==="surprised"||key==="worried"||key==="confused"){
+        let freedom=1;
+        for(const [cx,cy] of [[704,240],[755,258]]){
+          const r=Math.hypot(xx+x-cx,yy+y-cy);
+          const u=clamp((r-5.2)/5.8,0,1);
+          freedom=Math.min(freedom,u*u*(3-2*u));
+        }
+        dx*=freedom;dy*=freedom;
+      }
+      const p=(yy*w+xx)*4;
+      for(let c=0;c<3;c++)warped[p+c]=sample(original,xx-dx,yy-dy,c);
+      warped[p+3]=255;
+    }
+    const out=g.createImageData(w,h),dst=out.data;
+    // Keep the painted lip texture for happy; synthesize an opening only for surprise.
+    const open=key==="surprised";
+    for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
+      const p=(yy*w+xx)*4;
+      let dv=0,alpha=0,interior=null;
+      if(open){
+        // A small parting of the real lip seam: keep the pipe-side
+        // corner fixed and use the original lip colors, not a drawn
+        // tooth strip or a second red outline.
+        const ax=xx+x-708,ay=yy+y-302;
+        const u=ax*C+ay*S,v=-ax*S+ay*C;
+        const t=u/17.5;
+        const shape=Math.max(0,1-t*t)**1.25;
+        if(shape>0){
+          const seam=.7-1.1*t*t;
+          const up=.85*shape,down=3.4*shape;
+          const upper=seam-up,lower=seam+down;
+          if(v<upper){
+            dv=-up*Math.max(0,1-(upper-v)/6)**2;
+          }else if(v>lower){
+            dv=down*Math.max(0,1-(v-lower)/8)**2;
+          }else{
+            // Keep the source sample on the original seam throughout
+            // the opening so its old red edge cannot appear twice.
+            dv=v-seam;
+            const edge=clamp(Math.min(v-upper,lower-v)/.95,0,1);
+            alpha=edge*edge*(3-2*edge)*clamp(shape*5,0,1);
+            const depth=clamp((v-upper)/Math.max(.1,up+down),0,1);
+            const sx=xx+(v-seam)*S,sy=yy-(v-seam)*C;
+            interior=[0,1,2].map(c=>{
+              const pigment=sample(warped,sx,sy,c);
+              const shadow=[39,19,15][c]+[16,6,5][c]*depth;
+              return shadow*.76+pigment*.24;
+            });
+          }
+        }
+      }
+      let change=0;
+      for(let c=0;c<3;c++){
+        let value=sample(warped,xx+dv*S,yy-dv*C,c);
+        if(alpha>0&&interior){
+          const texture=(original[p+c]-sample(original,xx+.7,yy+.7,c))*.15;
+          value=value*(1-alpha)+(interior[c]+texture)*alpha;
+        }
+        dst[p+c]=value;change=Math.max(change,Math.abs(dst[p+c]-original[p+c]));
+      }
+      // Unchanged pixels need no overlay. The outer face, hat, nose,
+      // glasses bridge, pipe and room stay in the original artwork.
+      dst[p+3]=change>0?Math.round(255*Math.min(1,xx/6,yy/6,(w-1-xx)/6,(h-1-yy)/6)):0;
+    }
+    g.putImageData(out,0,0);return sheet;
+  }
   async function prepareDesktopPoses(source){
-    const face={x:620,y:190,w:200,h:180}, kitty={x:960,y:388,w:295,h:115};
+    const face={x:640,y:207,w:155,h:125},kitty={x:960,y:388,w:295,h:115};
+    const C=Math.cos(Math.PI/10),S=Math.sin(Math.PI/10);
+    const eye=(cx,cy,amount)=>[
+      [cx+2*S,cy-4*C,16,7,0,-amount],
+      [cx-2*S,cy+4*C,16,7,0,amount*.6]
+    ];
+    const mouth=(a,b,c)=>[[687,297,15,13,0,a],[704,302,18,12,0,b],[723,309,12,10,0,c]];
+    // Deliberate, independently readable emotions: natural closed-lip smile,
+    // lowered brows and narrowed eyes, downturned sad lips, raised inner
+    // worried brows, one raised confused brow, wide-eyed open-mouth surprise.
     const build=[
-      ["happy",face,[[665,291,33,25,-5,-6],[748,302,35,25,5,-8],[705,302,45,29,0,4],[684,247,25,16,0,3],[756,261,24,16,0,3]]],
-      ["sad",face,[[665,291,32,26,3,6],[747,302,33,29,-3,7],[687,228,32,22,2,-6],[751,243,32,22,-3,-5]]],
-      ["worried",face,[[686,229,34,22,2,-7],[752,244,33,23,-3,-7],[684,246,23,13,0,-3],[756,260,24,13,0,-3]]],
-      ["serious",face,[[686,230,34,20,4,5],[752,244,33,20,-4,5],[685,248,24,13,0,2],[756,261,23,13,0,2]]],
-      ["confused",face,[[686,228,33,24,0,-8],[752,244,32,21,-2,5],[684,247,24,13,0,-3],[705,301,38,26,2,2]]],
-      ["surprised",face,[[686,228,34,25,0,-10],[752,243,33,25,0,-10],[684,246,25,15,0,-4],[756,260,25,15,0,-4],[705,303,35,25,0,5]]],
-      ["idle",face,[[700,225,80,65,.8,-1.4],[705,290,75,60,0,-1.6]]],
+      ["happy",face,[[691,298,13,9,-1,-6],[707,303,16,9,0,1],[724,308,10,8,0,-1],...eye(703,239,-1.6),...eye(758,258,-1.6),[683,277,18,12,1,-3],[704,221,23,11,0,-2],[758,245,20,9,0,-2]]],
+      ["sad",face,[...mouth(7,-3,2),...eye(703,239,-2),...eye(758,258,-2),[718,225,14,10,0,-7],[747,243,13,9,0,-6]]],
+      ["serious",face,[...mouth(1,0,0),...eye(703,239,-4),...eye(758,258,-4),[716,225,15,10,2,7],[747,243,14,10,-2,7],[693,221,13,8,0,-1],[768,246,13,8,0,-1]]],
+      ["worried",face,[...mouth(3,1,0),...eye(703,239,2.4),...eye(758,258,2.4),[716,225,15,10,0,-9],[748,243,15,10,0,-9],[693,221,13,8,0,3],[768,246,13,8,0,3]]],
+      ["confused",face,[...mouth(2,1,-1),...eye(703,239,2),...eye(758,258,-2),[700,221,22,11,0,-8],[758,246,20,10,0,3]]],
+      ["surprised",face,[...eye(703,239,2.7),...eye(758,258,2.7),[703,222,24,12,0,-7],[758,244,22,12,0,-6]]],
+      ["blink",face,[...eye(703,239,-6),...eye(758,258,-6)]],
       ["cat",kitty,[[1004,452,12,9,0,4],[1044,457,12,9,0,4]]],
       ["tail",kitty,[[1213,474,31,22,2,-3],[1241,478,20,17,-2,-3]]]
     ];
     const result={};
     for(const [key,bounds,controls] of build){
       await new Promise(resolve=>setTimeout(resolve,0));
-      result[key]={image:bakePose(source,bounds,controls),bounds};
+      const image=bounds===face?bakeDesktopFace(source,bounds,controls,key):bakePose(source,bounds,controls);
+      result[key]={image,bounds};
     }
     desktopPoses=result;
-    desktopPlates=Object.fromEntries(Object.entries(result).filter(([key])=>!["idle","surprised"].includes(key)));
+    desktopPlates=Object.fromEntries(Object.entries(result).filter(([key])=>!["blink","surprised"].includes(key)));
     if(!portraitViewport.matches)images.overlays=desktopPlates;
   }
   function paintDesktopPose(key,alpha){
@@ -417,10 +524,31 @@ export function createScene(canvas) {
       }
       return;
     }
+    // One expression per frame. No breathing warp beneath a reaction and
+    // no overlap between two expressions. Reactions win over idle moods.
     let key=portraitReaction.until>clock?portraitReaction.key:"";
-    if(!key)key=mood==="happy"?"happy":mood==="sad"||mood==="defeated"?"sad":mood==="thinking"?"worried":faceNow.key||"";
-    if(!reduce&&paintDesktopPose("idle",.2+.7*(.5+.5*Math.sin(clock*1.7))))motionStats.idle++;
-    if(key&&paintDesktopPose(key,.93)){motionStats.face++;motionStats.activePose=key;}
+    let target=1;
+    if(key){
+      const remaining=portraitReaction.until-clock;
+      target=Math.min(1,remaining/.18);
+    }else if(mood==="happy"||mood==="confident")key="happy";
+    else if(mood==="sad"||mood==="defeated")key="sad";
+    else if(mood==="thinking"||mood==="worried")key="worried";
+    else if(["serious","confused","surprised"].includes(mood))key=mood;
+    else key="";
+    if(!key&&!reduce){
+      if(clock>=desktopBlinkAt){desktopBlinkEnd=clock+.22;desktopBlinkAt=clock+rand(3.2,5.8);}
+      if(clock<desktopBlinkEnd){key="blink";target=Math.sin(Math.PI*(desktopBlinkEnd-clock)/.22);}
+    }
+    if(key!==desktopActive){
+      desktopActive=key;desktopAlpha=reduce?1:0;
+    }
+    desktopAlpha=reduce?target:Math.min(target,desktopAlpha+.24);
+    motionStats.activePose="";
+    if(key&&paintDesktopPose(key,desktopAlpha)){
+      motionStats.activePose=key;
+      if(key==="blink")motionStats.idle++;else motionStats.face++;
+    }
     if(!reduce){
       paintDesktopPose("cat",catLife.blink>0?blinkCover(catLife.blink):0);
       paintDesktopPose("tail",catLife.flick>0?flickCover(catLife.flick):0);
@@ -985,6 +1113,7 @@ export function createScene(canvas) {
       return {
         expression: faces.picture(),
         portraitMotion:{...motionStats,poses:Object.keys(portraitPoses||{}),reaction:portraitReaction.until>clock?portraitReaction.key:""},
+        desktopMotion:{activePose:desktopActive,alpha:desktopActive?desktopAlpha:0,poses:Object.keys(desktopPoses||{}),faceLayers:desktopActive&&desktopAlpha>0?1:0},
         plates: Object.keys(images.overlays || {}),
         orient: images.baseOrient || "",
         portrait: portraitMode,

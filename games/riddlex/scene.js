@@ -237,35 +237,34 @@ export function createScene(canvas) {
       const p=(yy*w+xx)*4;
       let dv=0,alpha=0,interior=null;
       if(open){
-        // Separate the existing upper/lower lip seam rather than placing
-        // an oval on the skin. The right-hand pipe corner is outside the mask.
-        const smile=false;
-        // Surprise follows the existing full lip seam (left corner to
-        // pipe corner), rather than a detached round hole in the beard.
-        const ax=xx+x-(smile?706:710),ay=yy+y-(smile?302:304);
-        const u=ax*C+ay*S,v=-ax*S+ay*C,mw=smile?21:18;
-        const shape=Math.max(0,1-(u/mw)**2)**.7;
+        // A small parting of the real lip seam: keep the pipe-side
+        // corner fixed and use the original lip colors, not a drawn
+        // tooth strip or a second red outline.
+        const ax=xx+x-708,ay=yy+y-302;
+        const u=ax*C+ay*S,v=-ax*S+ay*C;
+        const t=u/17.5;
+        const shape=Math.max(0,1-t*t)**1.25;
         if(shape>0){
-          const seam=smile?clamp(1.4-4*(u/mw)**2,-4,2):.8-1.5*(u/mw)**2;
-          const upper=seam-shape*(smile?1.8:1.5),lower=seam+shape*(smile?4.2:4.8);
-          dv=(v<upper?upper*Math.max(0,1-(upper-v)/7):lower*Math.max(0,1-(v-lower)/10))*Math.min(1,shape*3);
-          alpha=clamp(Math.min(v-upper,lower-v)*1.55,0,1)*clamp(shape*4,0,1);
-          const depth=clamp((v-upper)/Math.max(.1,lower-upper),0,1);
-          interior=[48+25*depth,22+10*depth,17+7*depth];
-          if(smile){
-            const shade=Math.max(0,1-Math.abs(u)/mw);
-            const tooth=clamp((.66-depth)*7,0,1)*clamp(depth*9,0,1)*clamp((.94-Math.abs(u)/mw)*12,0,1);
-            const toothColor=[170+39*shade,139+32*shade,108+24*shade];
-            // Gentle shadows between teeth, kept in the warm room lighting.
-            const groove=Math.pow(Math.max(0,Math.cos((u+1)*Math.PI/5)),14)*9;
-            interior=interior.map((n,c)=>n*(1-tooth)+(toothColor[c]-groove)*tooth);
+          const seam=.7-1.1*t*t;
+          const up=.85*shape,down=3.4*shape;
+          const upper=seam-up,lower=seam+down;
+          if(v<upper){
+            dv=-up*Math.max(0,1-(upper-v)/6)**2;
+          }else if(v>lower){
+            dv=down*Math.max(0,1-(v-lower)/8)**2;
           }else{
-            // Soft upper tooth edge and warm reflected light on the
-            // lower lip; no flat circular patch or painted tongue.
-            const edge=clamp((.25-depth)*6,0,1)*clamp(depth*12,0,1)*clamp((.86-Math.abs(u)/mw)*7,0,1);
-            const rim=clamp((depth-.78)*4,0,1);
-            interior=interior.map((n,c)=>n*(1-edge)+[140,104,78][c]*edge);
-            interior=interior.map((n,c)=>n*(1-rim*.5)+[126,61,46][c]*rim*.5);
+            // Keep the source sample on the original seam throughout
+            // the opening so its old red edge cannot appear twice.
+            dv=v-seam;
+            const edge=clamp(Math.min(v-upper,lower-v)/.95,0,1);
+            alpha=edge*edge*(3-2*edge)*clamp(shape*5,0,1);
+            const depth=clamp((v-upper)/Math.max(.1,up+down),0,1);
+            const sx=xx+(v-seam)*S,sy=yy-(v-seam)*C;
+            interior=[0,1,2].map(c=>{
+              const pigment=sample(warped,sx,sy,c);
+              const shadow=[39,19,15][c]+[16,6,5][c]*depth;
+              return shadow*.76+pigment*.24;
+            });
           }
         }
       }
@@ -296,7 +295,7 @@ export function createScene(canvas) {
     // lowered brows and narrowed eyes, downturned sad lips, raised inner
     // worried brows, one raised confused brow, wide-eyed open-mouth surprise.
     const build=[
-      ["happy",face,[...mouth(-7,2,-3),...eye(703,239,-3.2),...eye(758,258,-3.2),[681,282,17,13,1,-2],[704,221,23,11,0,-2],[758,245,20,9,0,-2]]],
+      ["happy",face,[[691,298,13,9,-1,-6],[707,303,16,9,0,1],[724,308,10,8,0,-1],...eye(703,239,-1.6),...eye(758,258,-1.6),[683,277,18,12,1,-3],[704,221,23,11,0,-2],[758,245,20,9,0,-2]]],
       ["sad",face,[...mouth(7,-3,2),...eye(703,239,-2),...eye(758,258,-2),[718,225,14,10,0,-7],[747,243,13,9,0,-6]]],
       ["serious",face,[...mouth(1,0,0),...eye(703,239,-4),...eye(758,258,-4),[716,225,15,10,2,7],[747,243,14,10,-2,7],[693,221,13,8,0,-1],[768,246,13,8,0,-1]]],
       ["worried",face,[...mouth(3,1,0),...eye(703,239,2.4),...eye(758,258,2.4),[716,225,15,10,0,-9],[748,243,15,10,0,-9],[693,221,13,8,0,3],[768,246,13,8,0,3]]],

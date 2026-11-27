@@ -817,3 +817,22 @@ html[lang="bn"] #game .speech #status,html[lang="bn"] #game .speech .q-badge{
     left:calc(-1 * var(--speech-tail,24px) + 7px);
   }
 }
+
+/* Entire approved desktop scene, including its own integrated wall sign,
+   window, detective, cat and ornate table. Only rasterized mock controls
+   were removed. All live controls remain independent HTML. */
+.approved-desktop-art{display:none;}
+@media(min-aspect-ratio:4/5){
+  #game .stage-wrap{--edge:66.3%;--actor-bottom:33.7%;}
+  #game .approved-desktop-art{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:0;pointer-events:none;}
+  #game .room-art{visibility:hidden;}
+  #game .stage-wrap:not(.desktop-art-ready) :is(#ask-panel,#categories,#hud,#back,#stage){visibility:hidden;}
+  #game #answers,#game #categories{top:79%;bottom:10%;width:min(79%,1050px);}
+  #game .stage-wrap:has(#back:not([hidden])) #answers{width:min(85%,1050px);}
+  #game .speech{border-radius:24px;background:#fff2d7;}
+  #game .speech::after,#game .speech.has-badge::after{background:#fff2d7;}
+  #game[data-view="solved"] #hud{top:76%;bottom:10%;}
+}
+@media(min-aspect-ratio:4/5) and (max-height:450px){
+  #game #answers,#game #categories{top:77%;bottom:5%;}
+}

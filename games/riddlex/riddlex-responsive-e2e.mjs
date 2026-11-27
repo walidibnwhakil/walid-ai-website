@@ -111,7 +111,7 @@ try {
     async function layout(mode,lang){
       for(const [width,height] of dims){
         await page.setViewportSize({width,height});
-        await page.waitForFunction(()=>!matchMedia("(max-aspect-ratio:4/5)").matches||document.querySelector(".stage-wrap").classList.contains("portrait-art-ready"));
+        await page.waitForFunction(()=>document.querySelector(".stage-wrap").classList.contains(matchMedia("(max-aspect-ratio:4/5)").matches?"portrait-art-ready":"desktop-art-ready"));
         await page.waitForTimeout(130);
         const g=await page.evaluate(({mode,lang})=>{
           const rect=node=>node.getBoundingClientRect().toJSON();
@@ -120,10 +120,12 @@ try {
           const mobile=matchMedia("(max-aspect-ratio:4/5)").matches;
           const wall=rect(document.querySelector(".approved-wall-plaque"));
           const portraitArt=rect(document.querySelector(".approved-actors"));
-          const logo=mobile?{x:wall.x+wall.width*.59,y:wall.y,left:wall.x+wall.width*.59,right:wall.x+wall.width*.96,top:wall.top,bottom:wall.bottom,width:wall.width*.37,height:wall.height}:rect(document.querySelector(".room-logo"));
+          const art=rect(document.querySelector(".approved-desktop-art"));
+          const box=(x,y,w,h)=>({x:art.x+x/1440*art.width,y:art.y+y/747*art.height,left:art.x+x/1440*art.width,right:art.x+(x+w)/1440*art.width,top:art.y+y/747*art.height,bottom:art.y+(y+h)/747*art.height,width:w/1440*art.width,height:h/747*art.height});
+          const logo=mobile?{x:wall.x+wall.width*.59,y:wall.y,left:wall.x+wall.width*.59,right:wall.x+wall.width*.96,top:wall.top,bottom:wall.bottom,width:wall.width*.37,height:wall.height}:box(858,92,188,120);
           return {stage:rect(stage),portraitArt,bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
             cat:rect(document.querySelector(".room-cat")),actor:rect(document.querySelector(".room-detective")),
-            logo,desk:rect(document.querySelector(mobile?".approved-table":".room-desk")),
+            logo,desk:mobile?rect(document.querySelector(".approved-table")):box(0,495,1440,252),
             frontHidden:getComputedStyle(document.querySelector(".room-front")).display==="none",
             number:document.getElementById("q-badge").hidden?null:rect(document.getElementById("q-badge")),
             status:rect(document.getElementById("status")),
@@ -189,18 +191,15 @@ try {
     await page.waitForTimeout(90);
     assert.equal(await page.evaluate(()=>window.__riddlex.expression().expression.key),"serious");
     const polish=await page.evaluate(()=>{
-      const logo=document.querySelector(".room-logo"),bubble=document.querySelector("#speech");
-      const ls=getComputedStyle(logo),rect=logo.getBoundingClientRect(),stage=document.querySelector(".stage-wrap").getBoundingClientRect();
-      return {clip:ls.clipPath,logoSrc:logo.getAttribute("data-src"),transform:ls.transform,logoLeft:(rect.left-stage.left)/stage.width,logoRight:(rect.right-stage.left)/stage.width,shadow:getComputedStyle(bubble).filter,tail:getComputedStyle(bubble,"::after").backgroundColor,body:getComputedStyle(bubble).backgroundColor};
+      const art=document.querySelector(".approved-desktop-art"),bubble=document.querySelector("#speech"),r=art.getBoundingClientRect(),b=bubble.getBoundingClientRect();
+      return {src:art.getAttribute("data-src"),width:art.naturalWidth,height:art.naturalHeight,oldHidden:getComputedStyle(document.querySelector(".room-art")).visibility==="hidden",gap:b.left-(r.left+r.width*772/1440),tail:parseFloat(getComputedStyle(bubble,"::after").width),tailColor:getComputedStyle(bubble,"::after").backgroundColor,body:getComputedStyle(bubble).backgroundColor};
     });
-    assert.equal(polish.clip,"none","approved asset has its own transparent cutout, no CSS clipping");
-    assert.equal(polish.logoSrc,"images/layered/approved-desktop-plaque.webp","use the actual approved plaque");
-    assert.notEqual(polish.transform,"none","plaque must follow panel perspective");
-    assert.ok(polish.logoLeft>=.604&&polish.logoRight<=.666,"plaque extends beyond inner desktop wall panel");
-    assert.ok(Math.abs((polish.logoLeft+polish.logoRight)/2-.635)<.005,"plaque not centered on wood panel");
-    const proximity=await page.evaluate(()=>{const a=document.querySelector(".room-detective").getBoundingClientRect(),b=document.querySelector("#speech").getBoundingClientRect();return {gap:b.left-(a.left+a.width*.70),tail:parseFloat(getComputedStyle(document.querySelector("#speech"),"::after").width)};});
-    assert.ok(proximity.gap<=30&&proximity.tail<=25,"desktop speech is unnecessarily far away");
-    assert.equal(polish.tail,polish.body,"speech tail color mismatch");
+    assert.equal(polish.src,"images/layered/approved-desktop-stage.webp");
+    assert.equal(polish.width,1440);
+    assert.equal(polish.height,747);
+    assert.equal(polish.oldHidden,true,"old room must not be visible");
+    assert.ok(polish.gap<=30&&polish.tail<=25,"desktop question too far from mouth");
+    assert.equal(polish.tailColor,polish.body);
     if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-real-no-polished.png")});
     console.log("DESKTOP_NO_POLISH_PASS",JSON.stringify({responseNo,polish}));
     await page.click('#game [data-set-lang="bn"]');

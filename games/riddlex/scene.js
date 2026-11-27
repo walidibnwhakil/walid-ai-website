@@ -226,16 +226,19 @@ export function createScene(canvas) {
       if(open){
         // Separate the existing upper/lower lip seam rather than placing
         // an oval on the skin. The right-hand pipe corner is outside the mask.
-        const ax=xx+x-706,ay=yy+y-302,u=ax*C+ay*S,v=-ax*S+ay*C;
-        const smile=key==="happy",mw=smile?21:10.5;
+        const smile=key==="happy";
+        // Surprise follows the existing full lip seam (left corner to
+        // pipe corner), rather than a detached round hole in the beard.
+        const ax=xx+x-(smile?706:710),ay=yy+y-(smile?302:304);
+        const u=ax*C+ay*S,v=-ax*S+ay*C,mw=smile?21:18;
         const shape=Math.max(0,1-(u/mw)**2)**.7;
         if(shape>0){
-          const seam=smile?clamp(1.4-4*(u/mw)**2,-4,2):0;
-          const upper=seam-shape*(smile?1.8:3),lower=seam+shape*(smile?4.2:7);
+          const seam=smile?clamp(1.4-4*(u/mw)**2,-4,2):.8-1.5*(u/mw)**2;
+          const upper=seam-shape*(smile?1.8:1.5),lower=seam+shape*(smile?4.2:4.8);
           dv=(v<upper?upper*Math.max(0,1-(upper-v)/7):lower*Math.max(0,1-(v-lower)/10))*Math.min(1,shape*3);
           alpha=clamp(Math.min(v-upper,lower-v)*1.55,0,1)*clamp(shape*4,0,1);
           const depth=clamp((v-upper)/Math.max(.1,lower-upper),0,1);
-          interior=[62+17*depth,28+3*depth,22-2*depth];
+          interior=[48+25*depth,22+10*depth,17+7*depth];
           if(smile){
             const shade=Math.max(0,1-Math.abs(u)/mw);
             const tooth=clamp((.66-depth)*7,0,1)*clamp(depth*9,0,1)*clamp((.94-Math.abs(u)/mw)*12,0,1);
@@ -244,8 +247,12 @@ export function createScene(canvas) {
             const groove=Math.pow(Math.max(0,Math.cos((u+1)*Math.PI/5)),14)*9;
             interior=interior.map((n,c)=>n*(1-tooth)+(toothColor[c]-groove)*tooth);
           }else{
-            const tongue=clamp((depth-.72)*5,0,1)*clamp((.75-Math.abs(u)/mw)*5,0,1);
-            interior=interior.map((n,c)=>n*(1-tongue)+[120,53,45][c]*tongue);
+            // Soft upper tooth edge and warm reflected light on the
+            // lower lip; no flat circular patch or painted tongue.
+            const edge=clamp((.25-depth)*6,0,1)*clamp(depth*12,0,1)*clamp((.86-Math.abs(u)/mw)*7,0,1);
+            const rim=clamp((depth-.78)*4,0,1);
+            interior=interior.map((n,c)=>n*(1-edge)+[140,104,78][c]*edge);
+            interior=interior.map((n,c)=>n*(1-rim*.5)+[126,61,46][c]*rim*.5);
           }
         }
       }

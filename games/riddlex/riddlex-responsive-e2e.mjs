@@ -190,9 +190,15 @@ try {
     assert.equal(await page.evaluate(()=>window.__riddlex.expression().expression.key),"serious");
     const polish=await page.evaluate(()=>{
       const logo=document.querySelector(".room-logo"),bubble=document.querySelector("#speech");
-      return {clip:getComputedStyle(logo).clipPath,shadow:getComputedStyle(bubble).filter,tail:getComputedStyle(bubble,"::after").backgroundColor,body:getComputedStyle(bubble).backgroundColor};
+      const style=getComputedStyle(logo);
+      return {clip:style.clipPath,logoSrc:logo.getAttribute("data-src"),logoWidth:logo.naturalWidth,logoBackground:style.backgroundColor,logoBorder:style.borderTopWidth,logoShadow:style.boxShadow,shadow:getComputedStyle(bubble).filter,tail:getComputedStyle(bubble,"::after").backgroundColor,body:getComputedStyle(bubble).backgroundColor};
     });
-    assert.notEqual(polish.clip,"none","rectangular plaque backing remains");
+    assert.equal(polish.logoSrc,"images/layered/logo.webp","use the original transparent logo, not a separate plaque");
+    assert.equal(polish.logoWidth,321,"original logo did not load");
+    assert.equal(polish.clip,"none","no clipped wooden backing");
+    assert.equal(polish.logoBackground,"rgba(0, 0, 0, 0)");
+    assert.equal(polish.logoBorder,"0px");
+    assert.equal(polish.logoShadow,"none");
     assert.equal(polish.tail,polish.body,"speech tail color mismatch");
     if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-real-no-polished.png")});
     console.log("DESKTOP_NO_POLISH_PASS",JSON.stringify({responseNo,polish}));

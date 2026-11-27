@@ -193,11 +193,13 @@ try {
       const ls=getComputedStyle(logo),rect=logo.getBoundingClientRect(),stage=document.querySelector(".stage-wrap").getBoundingClientRect();
       return {clip:ls.clipPath,logoSrc:logo.getAttribute("data-src"),transform:ls.transform,logoLeft:(rect.left-stage.left)/stage.width,logoRight:(rect.right-stage.left)/stage.width,shadow:getComputedStyle(bubble).filter,tail:getComputedStyle(bubble,"::after").backgroundColor,body:getComputedStyle(bubble).backgroundColor};
     });
-    assert.notEqual(polish.clip,"none","rectangular plaque backing remains");
-    assert.equal(polish.logoSrc,"images/layered/wall-plaque.webp","restore original carved sign");
+    assert.equal(polish.clip,"none","approved asset has its own transparent cutout, no CSS clipping");
+    assert.equal(polish.logoSrc,"images/layered/approved-desktop-plaque.webp","use the actual approved plaque");
     assert.notEqual(polish.transform,"none","plaque must follow panel perspective");
     assert.ok(polish.logoLeft>=.604&&polish.logoRight<=.666,"plaque extends beyond inner desktop wall panel");
     assert.ok(Math.abs((polish.logoLeft+polish.logoRight)/2-.635)<.005,"plaque not centered on wood panel");
+    const proximity=await page.evaluate(()=>{const a=document.querySelector(".room-detective").getBoundingClientRect(),b=document.querySelector("#speech").getBoundingClientRect();return {gap:b.left-(a.left+a.width*.70),tail:parseFloat(getComputedStyle(document.querySelector("#speech"),"::after").width)};});
+    assert.ok(proximity.gap<=30&&proximity.tail<=25,"desktop speech is unnecessarily far away");
     assert.equal(polish.tail,polish.body,"speech tail color mismatch");
     if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-real-no-polished.png")});
     console.log("DESKTOP_NO_POLISH_PASS",JSON.stringify({responseNo,polish}));

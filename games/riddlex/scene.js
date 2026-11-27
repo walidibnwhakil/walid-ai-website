@@ -262,10 +262,10 @@ export function createScene(canvas) {
     }
     const mouthX = (actorBox.x + actorBox.w * .70) * dx;
     const mouthY = (actorBox.y + actorBox.h * .49) * dy;
-    const tail = Math.max(18, Math.min(portraitMode ? 23 : 42, cssSize.width * .029));
+    const tail = Math.max(14, Math.min(25, cssSize.width * .019));
     const rightInset = portraitMode ? 8 : 18;
     const minSpace = portraitMode ? Math.min(136, cssSize.width * .42) : Math.min(230, cssSize.width * .32);
-    const x = Math.max(8, Math.min(mouthX + tail + 6, cssSize.width - rightInset - minSpace));
+    const x = Math.max(8, Math.min(mouthX + tail + 2, cssSize.width - rightInset - minSpace));
     function set(name, number) {
       const value = Math.round(number) + "px";
       if (room.style.getPropertyValue(name) !== value) room.style.setProperty(name, value);

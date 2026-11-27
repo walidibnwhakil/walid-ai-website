@@ -26,6 +26,11 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"VideoGame","@id":"https://walid-ai.com/games/riddlex/#game","name":"Riddlex — The Guessing Detective","url":"https://walid-ai.com/games/riddlex/","description":"Think of a person, character, animal or object. Play Riddlex online and answer questions as the detective tries to guess your choice.","gamePlatform":"Web browser","playMode":["SinglePlayer"],"publisher":{"@id":"https://walid-ai.com/#organization"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Walid AI","item":"https://walid-ai.com/"},{"@type":"ListItem","position":2,"name":"Games","item":"https://walid-ai.com/games/"},{"@type":"ListItem","position":3,"name":"Riddlex — The Guessing Detective","item":"https://walid-ai.com/games/riddlex/"}]}]}</script>
 
   <style>
+    /* A single first-paint gate for the complete menu, not separate controls.
+       Opacity on the parent also covers descendants with visibility overrides. */
+    #menu:not(.menu-ready) .menu-stage { opacity:0; visibility:hidden; pointer-events:none; }
+    #menu .menu-stage { transition:none; }
+    #menu .menu-load-retry { position:absolute; inset:50% auto auto 50%; transform:translate(-50%,-50%); padding:10px 16px; border:1px solid #e6bd68; border-radius:999px; background:#392418; color:#ffe7bd; }
     #menu .riddlex-guide-actions { position:absolute; z-index:3; left:64.2%; bottom:4%; transform:translateX(-50%); width:34.6%; display:grid; grid-template-columns:1fr 1fr; gap:clamp(4px,0.7vw,12px); }
     #menu .riddlex-guide-actions button { min-width:0; min-height:32px; padding:5px 3px; border:1px solid #e6bd68; border-radius:999px; background:linear-gradient(#55351d,#26160e); color:#ffe7af; font-size:clamp(12px,1.45vw,22px); font-weight:700; white-space:nowrap; box-shadow:0 3px 10px #0008; }
     #menu .riddlex-guide-actions button:hover { filter:brightness(1.18); }
@@ -78,7 +83,7 @@
 </head>
 <body>
   <div id="menu">
-    <div class="menu-stage">
+    <div class="menu-stage" inert>
       <img class="menu-blur" alt="" data-landscape="./images/approved/menu-user-approved.webp?v=20261122-menu">
       <div class="menu-frame">
         <a class="menu-back" href="/games/">Back</a>
@@ -90,10 +95,19 @@
             var orientation = matchMedia("(max-aspect-ratio: 4/5)");
             var menu = document.getElementById("menu");
             var generation = 0;
+            var stage = menu.querySelector(".menu-stage");
+            function syncMenuReady() {
+              var ready = menu.classList.contains("art-ready") && menu.classList.contains("controls-ready");
+              stage.inert = !ready;
+              menu.classList.toggle("menu-ready", ready);
+            }
+            menu.addEventListener("riddlex-menu-controls-ready", syncMenuReady);
             function syncMenuArt() {
               var portrait = orientation.matches;
               var token = ++generation;
               menu.classList.remove("art-ready");
+              syncMenuReady();
+              menu.querySelector(".menu-load-retry")?.setAttribute("hidden","");
               document.documentElement.dataset.orient = portrait ? "portrait" : "landscape";
               var active = menu.querySelector(portrait ? ".menu-port" : ".menu-card");
               menu.querySelectorAll("img").forEach(function (img) {
@@ -106,16 +120,34 @@
                 if (token !== generation || !active.naturalWidth) return;
                 requestAnimationFrame(function () {
                   requestAnimationFrame(function () {
-                    if (token === generation && active.complete && active.naturalWidth)
+                    if (token === generation && active.complete && active.naturalWidth) {
                       menu.classList.add("art-ready");
+                      syncMenuReady();
+                    }
                   });
                 });
               }
-              if (typeof active.decode === "function") active.decode().then(ready, function () {});
-              else if (active.complete) ready();
-              else active.addEventListener("load", ready, {once:true});
+              function failed() {
+                if(token !== generation)return;
+                var retry=menu.querySelector(".menu-load-retry");
+                if(retry)retry.hidden=false;
+              }
+              var pictures=portrait?[active]:[active,menu.querySelector(".menu-blur")];
+              function decoded(img) {
+                if(typeof img.decode==="function")return img.decode();
+                if(img.complete)return img.naturalWidth?Promise.resolve():Promise.reject(new Error("image"));
+                return new Promise(function(resolve,reject){
+                  img.addEventListener("load",resolve,{once:true});
+                  img.addEventListener("error",reject,{once:true});
+                });
+              }
+              Promise.all(pictures.map(decoded)).then(ready,failed);
             }
             syncMenuArt();
+            menu.addEventListener("click", function(e){
+              if(!e.target.closest(".menu-load-retry"))return;
+              location.reload();
+            });
             if (orientation.addEventListener) orientation.addEventListener("change", syncMenuArt);
             else orientation.addListener(syncMenuArt);
           })();
@@ -141,6 +173,7 @@
         </div>
       </div>
     </div>
+    <button class="menu-load-retry" type="button" hidden>Retry loading menu</button>
   </div>
 
   <dialog id="riddlex-guide" aria-labelledby="riddlex-guide-title">
@@ -306,7 +339,7 @@
     </div>
     </div>
   </div>
-  <script type="module" src="./app.js?v=approved-full-desktop-20261127"></script>
+  <script type="module" src="./app.js?v=atomic-menu-20261127"></script>
   <script src="/usage.js?v=20261109-2"></script>
 </body>
 </html>

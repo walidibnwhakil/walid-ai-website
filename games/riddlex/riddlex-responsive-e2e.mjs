@@ -180,6 +180,22 @@ try {
     await page.click("#answer-yes");
     await page.waitForFunction(()=>document.getElementById("progress").textContent.includes("Question 2") && !document.getElementById("back").hidden,null,{timeout:20000});
     await layout("ask","en");
+    await page.setViewportSize({width:1440,height:900});
+    await page.waitForFunction(()=>!window.__riddlex.expression().portrait&&window.__riddlex.expression().plates.includes("serious"));
+    const startedNo=Date.now();
+    await page.click("#answer-no");
+    await page.waitForFunction(()=>document.getElementById("progress").textContent.includes("Question 3"),null,{timeout:20000});
+    const responseNo=Date.now()-startedNo;
+    await page.waitForTimeout(90);
+    assert.equal(await page.evaluate(()=>window.__riddlex.expression().expression.key),"serious");
+    const polish=await page.evaluate(()=>{
+      const logo=document.querySelector(".room-logo"),bubble=document.querySelector("#speech");
+      return {clip:getComputedStyle(logo).clipPath,shadow:getComputedStyle(bubble).filter,tail:getComputedStyle(bubble,"::after").backgroundColor,body:getComputedStyle(bubble).backgroundColor};
+    });
+    assert.notEqual(polish.clip,"none","rectangular plaque backing remains");
+    assert.equal(polish.tail,polish.body,"speech tail color mismatch");
+    if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-real-no-polished.png")});
+    console.log("DESKTOP_NO_POLISH_PASS",JSON.stringify({responseNo,polish}));
     await page.click('#game [data-set-lang="bn"]');
     await page.evaluate(async()=>{const fonts=await document.fonts.load('400 19px SolaimanLipi','বাংলা প্রশ্ন হ্যাঁ না');if(!fonts.length||!fonts.every(f=>f.status==="loaded"))throw Error("SolaimanLipi did not load");});
     await layout("ask","bn");

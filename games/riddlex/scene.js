@@ -154,7 +154,8 @@ export function createScene(canvas) {
       const p=(yy*w+xx)*4,a=(iy*w+ix)*4,b=a+4,c=a+w*4,d=c+4;
       for(let j=0;j<3;j++)dst[p+j]=(src[a+j]*(1-fx)+src[b+j]*fx)*(1-fy)+(src[c+j]*(1-fx)+src[d+j]*fx)*fy;
       // The crop is transparent near its edges; the unchanged room stays put.
-      dst[p+3]=Math.round(255*coverage*Math.min(1,xx/12,yy/9,(w-1-xx)/12,(h-1-yy)/12));
+      const sourceAlpha=(src[a+3]*(1-fx)+src[b+3]*fx)*(1-fy)+(src[c+3]*(1-fx)+src[d+3]*fx)*fy;
+      dst[p+3]=Math.round(sourceAlpha*coverage*Math.min(1,xx/12,yy/9,(w-1-xx)/12,(h-1-yy)/12));
     }
     out.putImageData(pixels,0,0);
     return output;
@@ -739,14 +740,48 @@ export function createScene(canvas) {
 
   function screenOrient(){return portraitViewport.matches?"portrait":"landscape";}
 
+  function desktopSeriousPose(base){
+    const bounds={x:239,y:86,w:152,h:139};
+    const local=bakePose(base,bounds,[
+      [284,112,35,20,4,4],[356,128,31,20,-3,4],
+      [286,135,26,13,0,2],[353,149,25,13,0,2],
+      [299,184,32,19,0,2]
+    ]);
+    const sheet=document.createElement("canvas");sheet.width=base.width;sheet.height=base.height;
+    sheet.getContext("2d").drawImage(local,bounds.x,bounds.y);
+    return sheet;
+  }
+  // Limit photographic expression plates to the face itself, with a soft
+  // elliptical feather. Keep the neutral hat, hair, room and smoke intact.
+  function cleanDesktopFace(sheet,base){
+    const g=sheet.getContext("2d",{willReadFrequently:true});
+    const n=document.createElement("canvas");n.width=base.width;n.height=base.height;
+    const ng=n.getContext("2d",{willReadFrequently:true});ng.drawImage(base,0,0);
+    const neutral=ng.getImageData(0,0,n.width,n.height).data;
+    const im=g.getImageData(0,0,sheet.width,sheet.height),p=im.data;
+    for(let y=0;y<sheet.height;y++)for(let x=0;x<sheet.width;x++){
+      const i=(y*sheet.width+x)*4;
+      const r=Math.hypot((x-310)/103,(y-157)/93);
+      const feather=Math.max(0,Math.min(1,(1-r)/.24));
+      p[i+3]=Math.round(p[i+3]*feather);
+      if(!p[i+3])continue;
+      const lum=(v)=>.2126*v[i]+.7152*v[i+1]+.0722*v[i+2];
+      const sourceLum=lum(p),baseLum=lum(neutral);
+      // Never introduce a patch substantially darker than the original face.
+      const lift=Math.max(0,baseLum*.78-sourceLum);
+      for(let j=0;j<3;j++)p[i+j]=Math.min(255,p[i+j]+lift);
+    }
+    g.putImageData(im,0,0);return sheet;
+  }
   async function loadOverlaySet() {
     // Both layouts use the same approved landscape cutouts, eliminating the
     // second portrait expression pack and keeping expression alignment exact.
     const source=OVERLAYS.landscape;
     const sprites=await Promise.all([loadImage("./images/layered/detective.webp"),loadImage("./images/layered/cat.webp")]);
     const entries=await Promise.all(Object.entries(source).map(async ([key,src])=>{
-      const plate=await loadImage(src+"?v=akinator-28");
       const animal=key==="cat"||key==="tail",base=sprites[animal?1:0];
+      if(key==="serious"&&base)return [key,desktopSeriousPose(base)];
+      const plate=await loadImage(src+"?v=akinator-28");
       if(!plate||!base)return [key,null];
       const crop=animal?(key==="cat"?CAT_FACE.landscape:CAT_TAIL.landscape):FACE.landscape;
       const ox=animal?899:359,oy=animal?363:121;
@@ -759,7 +794,7 @@ export function createScene(canvas) {
       // bookcase/window pixels into the new room.
       g.globalCompositeOperation="destination-in";
       g.drawImage(base,0,0);
-      return [key,sheet];
+      return [key,animal?sheet:cleanDesktopFace(sheet,base)];
     }));
     desktopPlates=Object.fromEntries(entries.filter(([,v])=>v));
     if(!portraitViewport.matches)images.overlays=desktopPlates;

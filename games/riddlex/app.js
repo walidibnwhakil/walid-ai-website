@@ -13,7 +13,7 @@ import { UNVERIFIED_OWNER_NAMES } from "./unverified-owner-names.js";
 import { EXTRA_HYPOTHESIS_ENTRIES } from "./hypothesis-facts.js?v=riddlex-60";
 import { answersImplyAdult, loadLearned, loadOwnerRecords, nameMatchesAdult, submitLearning } from "./learn.js?v=riddlex-76";
 import { applyOwnerRecords, exactRecordIds } from "./owner-records.js?v=riddlex-76";
-import { createScene, startMenuCat } from "./scene.js?v=portrait-solved-atomic-20261127";
+import { createScene, startMenuCat } from "./scene.js?v=desktop-polish-20261127";
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
@@ -176,9 +176,9 @@ function setStatus(message, number) {
     if (showNumber) badge.textContent = lang === "bn" ? String(number).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[Number(d)]) : String(number);
   }
   speech?.classList.toggle("has-badge", showNumber);
+  // Keep the dialogue visible when the answer changes; no forced reflow or
+  // restarted entrance animation on every tap.
   speech?.classList.remove("pop");
-  void speech?.offsetWidth;
-  speech?.classList.add("pop");
   scheduleUnderBubble();
 }
 
@@ -186,9 +186,10 @@ function placeUnderBubble() {
   scene.alignSpeech();
 }
 
+let speechFrame=0;
 function scheduleUnderBubble() {
-  placeUnderBubble();
-  requestAnimationFrame(placeUnderBubble);
+  if(speechFrame)return;
+  speechFrame=requestAnimationFrame(()=>{speechFrame=0;placeUnderBubble();});
 }
 
 function showOnly(which) {
@@ -443,7 +444,12 @@ async function onAnswer(value) {
   // Return control to the browser after the click before doing the
   // potentially expensive casebook scoring. Lock this question first so
   // a second click or keyboard press cannot count a different answer.
-  await new Promise(resolve => setTimeout(resolve, 0));
+  // Allow the pressed button and immediate reaction to paint before scoring.
+  // The timeout fallback also handles background tabs where RAF is paused.
+  await new Promise(resolve=>{
+    const timer=setTimeout(resolve,70);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{clearTimeout(timer);resolve();}));
+  });
   if (session !== loadToken || round !== state || mode !== "thinking") return;
   applyAnswer(round, question, value);
   await step();

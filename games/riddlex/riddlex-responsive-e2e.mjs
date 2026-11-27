@@ -249,6 +249,29 @@ try {
     assert.equal(polish.tailColor,polish.body);
     if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-real-no-polished.png")});
     console.log("DESKTOP_NO_POLISH_PASS",JSON.stringify({responseNo,polish}));
+    // Verify every actual desktop face separately. These crops use the current
+    // scene, not obsolete portrait or legacy detective images.
+    await page.waitForFunction(()=>window.__riddlex.expression().desktopMotion.poses.length===9);
+    const seenFaces=new Set();
+    for(const key of ["happy","serious","sad","worried","confused","surprised"]){
+      await page.evaluate(key=>window.__riddlex.setMood(key),key);
+      await page.waitForFunction(key=>{
+        const d=window.__riddlex.expression().desktopMotion;
+        return d.activePose===key&&d.alpha>=.95&&d.faceLayers===1;
+      },key,{timeout:10000});
+      const hash=await page.evaluate(()=>{
+        const c=document.getElementById("stage"),g=c.getContext("2d");
+        const data=g.getImageData(Math.floor(c.width*640/1440),Math.floor(c.height*207/747),Math.ceil(c.width*155/1440),Math.ceil(c.height*125/747)).data;
+        let hash=2166136261;for(let i=0;i<data.length;i++)hash=Math.imul(hash^data[i],16777619);
+        return hash;
+      });
+      assert.ok(!seenFaces.has(hash),"desktop expressions must differ: "+key);
+      seenFaces.add(hash);
+      if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-expression-"+key+".png")});
+      await page.evaluate(()=>window.__riddlex.setMood("curious"));
+      await page.waitForFunction(()=>["","blink"].includes(window.__riddlex.expression().desktopMotion.activePose),null,{timeout:10000});
+    }
+    console.log("DESKTOP_EXCLUSIVE_EXPRESSIONS_PASS",seenFaces.size);
     await page.click('#game [data-set-lang="bn"]');
     await page.evaluate(async()=>{const fonts=await document.fonts.load('400 19px SolaimanLipi','বাংলা প্রশ্ন হ্যাঁ না');if(!fonts.length||!fonts.every(f=>f.status==="loaded"))throw Error("SolaimanLipi did not load");});
     await layout("ask","bn");

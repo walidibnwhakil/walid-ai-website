@@ -133,6 +133,7 @@ export function createScene(canvas) {
   // Coordinates are in the 700 x 487 approved character artwork.
   let portraitPoses = null, portraitPoseSource = null;
   let desktopPoses=null, desktopArtPromise=null;
+  let desktopActive="",desktopAlpha=0,desktopBlinkAt=3.8,desktopBlinkEnd=0;
   let motionStats = {frames:0,smoke:0,face:0,idle:0,cat:0,activePose:""};
   const poseBounds={x:112,y:0,w:331,h:344};
   const catPoseBounds={x:414,y:324,w:286,h:151};
@@ -187,15 +188,19 @@ export function createScene(canvas) {
   // New desktop overlays are sampled from the exact approved artwork, in
   // its own 1440×747 coordinate system. No old face or room pixels are used.
   async function prepareDesktopPoses(source){
-    const face={x:620,y:190,w:200,h:180}, kitty={x:960,y:388,w:295,h:115};
+    // Measured landmarks on the deployed 1440×747 artwork: left eye
+    // (704,240), right eye (758,258), mouth under the moustache, pipe
+    // anchored at (740,310). Restrict movement to separate facial features.
+    // Never move the nose, jaw, glasses bridge, hat, or pipe.
+    const face={x:640,y:207,w:155,h:125}, kitty={x:960,y:388,w:295,h:115};
     const build=[
-      ["happy",face,[[665,291,33,25,-5,-6],[748,302,35,25,5,-8],[705,302,45,29,0,4],[684,247,25,16,0,3],[756,261,24,16,0,3]]],
-      ["sad",face,[[665,291,32,26,3,6],[747,302,33,29,-3,7],[687,228,32,22,2,-6],[751,243,32,22,-3,-5]]],
-      ["worried",face,[[686,229,34,22,2,-7],[752,244,33,23,-3,-7],[684,246,23,13,0,-3],[756,260,24,13,0,-3]]],
-      ["serious",face,[[686,230,34,20,4,5],[752,244,33,20,-4,5],[685,248,24,13,0,2],[756,261,23,13,0,2]]],
-      ["confused",face,[[686,228,33,24,0,-8],[752,244,32,21,-2,5],[684,247,24,13,0,-3],[705,301,38,26,2,2]]],
-      ["surprised",face,[[686,228,34,25,0,-10],[752,243,33,25,0,-10],[684,246,25,15,0,-4],[756,260,25,15,0,-4],[705,303,35,25,0,5]]],
-      ["idle",face,[[700,225,80,65,.8,-1.4],[705,290,75,60,0,-1.6]]],
+      ["happy",face,[[690,290,23,17,0,-5],[700,302,20,13,0,-3],[730,302,13,11,0,-3],[704,248,19,8,0,-2],[758,265,18,8,0,-2]]],
+      ["serious",face,[[710,225,21,10,0,4],[752,242,20,10,0,3],[704,237,19,8,0,2],[759,255,19,8,0,2],[690,293,19,12,0,2]]],
+      ["sad",face,[[691,295,18,13,0,4],[729,303,11,10,0,2],[716,223,18,10,0,-4],[746,239,18,10,0,-4],[704,237,19,8,0,2],[759,255,19,8,0,2]]],
+      ["worried",face,[[714,224,18,11,0,-5],[748,241,18,11,0,-4],[704,234,18,8,0,-2],[759,252,18,8,0,-2],[691,296,18,12,0,3]]],
+      ["confused",face,[[697,221,22,12,0,-6],[753,242,18,10,0,3],[704,235,19,8,0,-2],[759,255,18,8,0,2],[691,296,18,12,0,2]]],
+      ["surprised",face,[[700,223,24,12,0,-7],[758,240,23,12,0,-7],[704,234,19,8,0,-2],[759,253,19,8,0,-2],[704,247,19,8,0,1.5],[759,266,19,8,0,1.5],[710,307,17,10,0,2]]],
+      ["blink",face,[[704,238,18,8,0,5],[758,257,18,8,0,5],[704,246,18,8,0,-4],[758,265,18,8,0,-4]]],
       ["cat",kitty,[[1004,452,12,9,0,4],[1044,457,12,9,0,4]]],
       ["tail",kitty,[[1213,474,31,22,2,-3],[1241,478,20,17,-2,-3]]]
     ];
@@ -205,7 +210,7 @@ export function createScene(canvas) {
       result[key]={image:bakePose(source,bounds,controls),bounds};
     }
     desktopPoses=result;
-    desktopPlates=Object.fromEntries(Object.entries(result).filter(([key])=>!["idle","surprised"].includes(key)));
+    desktopPlates=Object.fromEntries(Object.entries(result).filter(([key])=>!["blink","surprised"].includes(key)));
     if(!portraitViewport.matches)images.overlays=desktopPlates;
   }
   function paintDesktopPose(key,alpha){
@@ -417,10 +422,31 @@ export function createScene(canvas) {
       }
       return;
     }
+    // One expression per frame. No breathing warp beneath a reaction and
+    // no overlap between two expressions. Reactions win over idle moods.
     let key=portraitReaction.until>clock?portraitReaction.key:"";
-    if(!key)key=mood==="happy"?"happy":mood==="sad"||mood==="defeated"?"sad":mood==="thinking"?"worried":faceNow.key||"";
-    if(!reduce&&paintDesktopPose("idle",.2+.7*(.5+.5*Math.sin(clock*1.7))))motionStats.idle++;
-    if(key&&paintDesktopPose(key,.93)){motionStats.face++;motionStats.activePose=key;}
+    let target=1;
+    if(key){
+      const remaining=portraitReaction.until-clock;
+      target=Math.min(1,remaining/.18);
+    }else if(mood==="happy"||mood==="confident")key="happy";
+    else if(mood==="sad"||mood==="defeated")key="sad";
+    else if(mood==="thinking"||mood==="worried")key="worried";
+    else if(["serious","confused","surprised"].includes(mood))key=mood;
+    else key="";
+    if(!key&&!reduce){
+      if(clock>=desktopBlinkAt){desktopBlinkEnd=clock+.22;desktopBlinkAt=clock+rand(3.2,5.8);}
+      if(clock<desktopBlinkEnd){key="blink";target=Math.sin(Math.PI*(desktopBlinkEnd-clock)/.22);}
+    }
+    if(key!==desktopActive){
+      desktopActive=key;desktopAlpha=reduce?1:0;
+    }
+    desktopAlpha=reduce?target:Math.min(target,desktopAlpha+.24);
+    motionStats.activePose="";
+    if(key&&paintDesktopPose(key,desktopAlpha)){
+      motionStats.activePose=key;
+      if(key==="blink")motionStats.idle++;else motionStats.face++;
+    }
     if(!reduce){
       paintDesktopPose("cat",catLife.blink>0?blinkCover(catLife.blink):0);
       paintDesktopPose("tail",catLife.flick>0?flickCover(catLife.flick):0);
@@ -985,6 +1011,7 @@ export function createScene(canvas) {
       return {
         expression: faces.picture(),
         portraitMotion:{...motionStats,poses:Object.keys(portraitPoses||{}),reaction:portraitReaction.until>clock?portraitReaction.key:""},
+        desktopMotion:{activePose:desktopActive,alpha:desktopActive?desktopAlpha:0,poses:Object.keys(desktopPoses||{}),faceLayers:desktopActive&&desktopAlpha>0?1:0},
         plates: Object.keys(images.overlays || {}),
         orient: images.baseOrient || "",
         portrait: portraitMode,

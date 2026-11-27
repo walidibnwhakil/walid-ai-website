@@ -196,7 +196,8 @@ try {
     assert.notEqual(polish.clip,"none","rectangular plaque backing remains");
     assert.equal(polish.logoSrc,"images/layered/wall-plaque.webp","restore original carved sign");
     assert.notEqual(polish.transform,"none","plaque must follow panel perspective");
-    assert.ok(polish.logoLeft>=.59&&polish.logoRight<=.675,"plaque extends beyond desktop wall panel");
+    assert.ok(polish.logoLeft>=.604&&polish.logoRight<=.666,"plaque extends beyond inner desktop wall panel");
+    assert.ok(Math.abs((polish.logoLeft+polish.logoRight)/2-.635)<.005,"plaque not centered on wood panel");
     assert.equal(polish.tail,polish.body,"speech tail color mismatch");
     if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-real-no-polished.png")});
     console.log("DESKTOP_NO_POLISH_PASS",JSON.stringify({responseNo,polish}));

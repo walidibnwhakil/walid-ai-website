@@ -1,48 +1,146 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-26T13:36:52.998838+00:00",
+  "updatedAt": "2026-11-27T06:41:15.292857+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Zverev too good for Fery in Davis Cup quarter-final",
-      "url": "https://www.bbc.co.uk/sport/tennis/videos/c8p3vez6zzz4o?at_medium=RSS&at_campaign=rss",
+      "title": "Australia's sandpapergate probe to also include 2017-18 Ashes",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/cxdd1335nyj0o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-26T13:28:11+00:00",
+      "publishedAt": "2026-11-27T00:43:03+00:00",
       "category": "Sports"
     },
     {
-      "title": "Not even making a 12-man bench - what next for Garnacho?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cr3wgd5exl0do?at_medium=RSS&at_campaign=rss",
+      "title": "'Priceless' Duran proves 'the man' but is he papering over cracks at Celtic?",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c62klz1wwdn7o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-26T13:23:05+00:00",
+      "publishedAt": "2026-11-27T00:18:44+00:00",
       "category": "Sports"
     },
     {
-      "title": "Manchester United held in Lisbon: is Mauricio Pochettino just unlucky? – Football Weekly podcast",
-      "url": "https://www.theguardian.com/football/audio/2026/nov/26/manchester-united-held-in-lisbon-is-mauricio-pochettino-just-unlucky-football-weekly",
+      "title": "Premier League: 10 things to look out for this weekend",
+      "url": "https://www.theguardian.com/football/2026/nov/27/premier-league-10-things-to-look-out-for-this-weekend",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-26T12:11:18+00:00",
+      "publishedAt": "2026-11-27T00:00:48+00:00",
       "category": "Sports"
     },
     {
-      "title": "Manchester United, Liverpool and Spurs using same law firm to set up legal claim against City",
-      "url": "https://www.theguardian.com/football/2026/nov/26/manchester-united-liverpool-tottenham-arsenal-city-legal-claim-financial-breaches-damages",
+      "title": "Europa League: Bournemouth make it a perfect 10 while Celtic leave it late",
+      "url": "https://www.theguardian.com/football/2026/nov/26/europa-league-roundup-bournemouth-celta-vigo-celtic-milan-benfica",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-26T12:00:34+00:00",
+      "publishedAt": "2026-11-26T23:24:43+00:00",
       "category": "Sports"
     },
     {
-      "title": "Faldo urges LIV stars to 'chip in' for unpaid firms",
-      "url": "https://www.bbc.co.uk/sport/golf/articles/ckq6emzlegjyo?at_medium=RSS&at_campaign=rss",
+      "title": "Bournemouth 'allowed to dream' as fans book Europa League final hotels",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmq5v84vw818o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-26T11:45:31+00:00",
+      "publishedAt": "2026-11-26T22:27:52+00:00",
       "category": "Sports"
     },
     {
-      "title": "Fifa confirms internal data stolen in cyber attack",
-      "url": "https://www.bbc.co.uk/sport/football/articles/crd61nvg4d84o?at_medium=RSS&at_campaign=rss",
+      "title": "Reinildo error extends Sunderland woe as Jagiellonia grab Europa League draw",
+      "url": "https://www.theguardian.com/football/2026/nov/26/sunderland-jagiellonia-bialystok-europa-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-26T22:27:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Thomas Frank earns first Crystal Palace win as McNeil cuts down Real Sociedad",
+      "url": "https://www.theguardian.com/football/2026/nov/26/crystal-palace-real-sociedad-europa-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-26T22:10:14+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Haaland considers Man City exit - Friday's gossip",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c9zr568gje67o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-26T11:30:07+00:00",
+      "publishedAt": "2026-11-26T21:25:06+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Fury 'never received' schizophrenia diagnosis",
+      "url": "https://www.bbc.co.uk/sport/boxing/articles/cwj3klxj10edo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-26T21:25:00+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "No post-match drug testing in South Africa v New Zealand series",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c69309lz275wo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-26T21:20:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Taylor and Lewis lose all five pairs matches on return",
+      "url": "https://www.bbc.co.uk/sport/darts/articles/cm9q8y09xgdno?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-26T21:11:52+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Fifa staff asked to attend interviews as Infantino sell-off scheme investigated",
+      "url": "https://www.theguardian.com/football/2026/nov/26/fifa-gianni-infantino-sell-off-scheme-investigated",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-26T21:11:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Pro-Palestinian banner as Besiktas face Israeli team causes delay and diplomatic incident",
+      "url": "https://www.theguardian.com/football/2026/nov/26/crowd-trouble-besiktas-hapoel-beer-sheva-diplomatic-incident-israel-palestine",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-26T20:47:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Éric Cantona: ‘If I regret something about the kung fu kick, it’s that I would love to kick him in another place’",
+      "url": "https://www.theguardian.com/football/2026/nov/26/eric-cantona-interview-new-documentary",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-26T20:00:44+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "GB win decider to reach Davis Cup semis for first time since 2019",
+      "url": "https://www.bbc.co.uk/sport/tennis/articles/c5m2lvevrk1mo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-26T17:20:42+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Germany's Freigang given 16-month ban over drugs test issues",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqlym4rd3y52o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-26T17:12:45+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "India's Pant joins New Zealand club match under false name",
+      "url": "https://www.bbc.co.uk/sport/cricket/articles/crx27984p14jo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-26T16:21:44+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Russell says Verstappen's criticism 'quite amusing'",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/c5lykr98yd88o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-26T16:10:58+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Football Daily | Bayern Munich go from bad to worse with own goals on and off the pitch",
+      "url": "https://www.theguardian.com/football/2026/nov/26/football-daily-newsletter-bayern-munich",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-26T15:48:28+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Champions League review: Lille monster Bayern, De Bruyne’s sad return and more United chaos",
+      "url": "https://www.theguardian.com/football/2026/nov/26/champions-league-review-lille-bayern-munich-kevin-de-bruyne-napoli",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-26T15:00:39+00:00",
       "category": "Sports"
     },
     {
@@ -53,13 +151,6 @@
       "category": "Sports"
     },
     {
-      "title": "440 players, three days, one venue - the Nations Championship logistics logjam",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6wy4kmjggr9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-26T10:28:10+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Neville, Carragher and the inescapable podcasting feedback loop of doom | Jonathan Liew",
       "url": "https://www.theguardian.com/football/2026/nov/26/gary-neville-jamie-carragher-podcast-manchester-united-michael-carrick",
       "source": "The Guardian Football",
@@ -67,101 +158,10 @@
       "category": "Sports"
     },
     {
-      "title": "‘Not Bayern-like’: Joshua Kimmich fumes at club’s treatment of Jamal Musiala",
-      "url": "https://www.theguardian.com/football/2026/nov/26/bayern-munich-joshua-kimmich-jamal-musiala",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-26T10:19:07+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Botham back as Morgan-Williams to make first start",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cq4gn8nwd2zwo?at_medium=RSS&at_campaign=rss",
+      "title": "Last chance to vote for BBC Men's Footballer of the Year",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c61wrqr7l1d8o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-26T09:01:32+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Weekly sports quiz: What year will the UK host the Women's World Cup?",
-      "url": "https://www.bbc.co.uk/sport/articles/cm5y1g91xq3po?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-26T08:02:45+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "No drums, no tifo … no point? The impact of Palace’s missing Holmesdale Fanatics",
-      "url": "https://www.theguardian.com/football/2026/nov/26/no-drums-no-tifo-no-point-the-impact-of-palaces-missing-holmesdale-fanatics",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-26T08:00:50+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Four-time MVP Rodgers released and may have played last NFL game",
-      "url": "https://www.bbc.co.uk/sport/american-football/articles/c64gn8ryp7jno?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-26T07:51:10+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Why KMI Panel frustrates referees too - and impacts their salary",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cq20x16zxxzeo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-26T07:28:18+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'Laughing gas has ended careers' - so how common is it in football?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c6kgdrj9nxgdo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-26T06:18:30+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Motorcycle passenger who took stunning cricket catch found",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/ckwy8gj013elo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-25T23:50:02+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Championship roundup: Stoke rise to second, Birmingham condemn Burnley to record drought",
-      "url": "https://www.theguardian.com/football/2026/nov/25/championship-roundup-stoke-millwall-burnley-home-record-birmingham",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-25T22:55:48+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Lammens howler denies Man Utd victory against Sporting in incident-packed game",
-      "url": "https://www.bbc.co.uk/sport/football/videos/c6ly5145gg1do?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-25T22:32:51+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Isak and Wirtz on target as resurgent Liverpool sweep aside Club Brugge",
-      "url": "https://www.theguardian.com/football/2026/nov/25/club-brugge-liverpool-champions-league-match-report",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-25T22:04:10+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Oliver Glasner criticises Nottingham Forest players for not learning English",
-      "url": "https://www.theguardian.com/football/2026/nov/25/oliver-glasner-criticises-nottingham-forest-for-not-making-players-learn-english",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-25T21:17:34+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Alejandro Garnacho and the curious case of Aston Villa’s outcast loanees | Ben Fisher",
-      "url": "https://www.theguardian.com/football/2026/nov/25/alejandro-garnacho-aston-villa-loanees-unai-emery",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-25T17:00:31+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "‘He’s more elegant’: Bellingham downplays Zidane comparisons after wondergoal",
-      "url": "https://www.theguardian.com/football/2026/nov/25/jude-bellingham-downplays-comparisons-to-zidane-after-wondergoal",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-25T12:59:29+00:00",
+      "publishedAt": "2026-11-19T06:30:04+00:00",
       "category": "Sports"
     },
     {
@@ -4290,25 +4290,31 @@
           "innings": [
             {
               "team": "india a Inning 1",
-              "runs": 308,
-              "wickets": 7,
-              "overs": 49
+              "runs": 317,
+              "wickets": 8,
+              "overs": 50
+            },
+            {
+              "team": "Sri Lanka A,India A Inning 1",
+              "runs": 318,
+              "wickets": 2,
+              "overs": 41.3
             }
           ],
-          "winner": null,
-          "resultText": null,
+          "winner": "Sri Lanka A",
+          "resultText": "Sri Lanka A won by 8 wkts",
           "competition": "Sri Lanka A vs India A, 1st Semi-Final (A1 v B2), ACC Mens Asia Cup Rising Stars 2026",
           "matchType": "odi",
           "startTime": "2026-11-26T10:00:00Z",
           "finishedAt": null,
-          "status": "live",
+          "status": "finished",
           "source": "CricketData"
         },
         {
           "id": "2abf13c7-c314-4313-be7c-d99ad98d4aef",
           "homeTeam": "Andaman Admirals",
           "awayTeam": "Haryana Phoenix",
-          "homeScore": 29,
+          "homeScore": 70,
           "awayScore": 109,
           "innings": [
             {
@@ -4319,50 +4325,92 @@
             },
             {
               "team": "Andaman Admirals Inning 1",
-              "runs": 29,
-              "wickets": 1,
-              "overs": 3.5
+              "runs": 70,
+              "wickets": 7,
+              "overs": 9
             }
           ],
-          "winner": null,
-          "resultText": null,
+          "winner": "Haryana Phoenix",
+          "resultText": "Haryana Phoenix won by 39 runs",
           "competition": "Andaman Admirals vs Haryana Phoenix, 3rd Match, Group B, Indian Softball Cricket League 2026",
           "matchType": "t20",
           "startTime": "2026-11-26T11:30:00Z",
           "finishedAt": null,
-          "status": "live",
+          "status": "finished",
           "source": "CricketData"
         },
         {
           "id": "1f5bec9f-567f-430b-886d-05f1bad06179",
-          "homeTeam": "J&k Northern Warriors",
+          "homeTeam": "J&K Northern Warriors",
           "awayTeam": "Chandigarh Royal Strikers",
           "homeScore": null,
           "awayScore": null,
           "innings": [],
-          "winner": null,
-          "resultText": null,
-          "competition": "J&k Northern Warriors vs Chandigarh Royal Strikers, 4th Match, Group B, Indian Softball Cricket League 2026",
+          "winner": "Chandigarh Royal Strikers",
+          "resultText": "Chandigarh Royal Strikers won by 19 runs",
+          "competition": "J&K Northern Warriors vs Chandigarh Royal Strikers, 4th Match, Group B, Indian Softball Cricket League 2026",
           "matchType": "t20",
           "startTime": "2026-11-26T13:30:00Z",
           "finishedAt": null,
-          "status": "live",
+          "status": "finished",
           "source": "CricketData"
         },
         {
           "id": "03e96f7c-b12c-4fee-b32d-f385ab68e572",
           "homeTeam": "Andaman Admirals",
-          "awayTeam": "Up Kings",
+          "awayTeam": "UP Kings",
           "homeScore": null,
           "awayScore": null,
-          "innings": [],
-          "winner": null,
-          "resultText": null,
-          "competition": "Andaman Admirals vs Up Kings, 5th Match, Group B, Indian Softball Cricket League 2026",
+          "innings": [
+            {
+              "team": "up kings Inning 1",
+              "runs": 104,
+              "wickets": 7,
+              "overs": 9
+            },
+            {
+              "team": "Andaman Admirals,UP Kings Inning 1",
+              "runs": 54,
+              "wickets": 8,
+              "overs": 9
+            }
+          ],
+          "winner": "UP Kings",
+          "resultText": "UP Kings won by 50 runs",
+          "competition": "Andaman Admirals vs UP Kings, 5th Match, Group B, Indian Softball Cricket League 2026",
           "matchType": "t20",
           "startTime": "2026-11-26T15:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
+          "source": "CricketData"
+        },
+        {
+          "id": "0c634572-f50a-4265-bc9d-8ef5fea964d6",
+          "homeTeam": "Indonesia Women",
+          "awayTeam": "Malaysia Women",
+          "homeScore": 68,
+          "awayScore": 67,
+          "innings": [
+            {
+              "team": "Malaysia Women Inning 1",
+              "runs": 67,
+              "wickets": 6,
+              "overs": 13
+            },
+            {
+              "team": "Indonesia Women Inning 1",
+              "runs": 68,
+              "wickets": 2,
+              "overs": 10.3
+            }
+          ],
+          "winner": "Indonesia Women",
+          "resultText": "Indonesia Women won by 8 wkts - 13 overs game due to rain",
+          "competition": "Indonesia Women vs Malaysia Women, Final, Malaysia Womens T20I Tri-Series, 2026",
+          "matchType": "t20",
+          "startTime": "2026-11-27T02:00:00Z",
+          "finishedAt": null,
+          "status": "finished",
           "source": "CricketData"
         },
         {
@@ -4377,6 +4425,22 @@
           "competition": "Chandigarh Royal Strikers vs Andhra Warriors, 6th Match, Group B, Indian Softball Cricket League 2026",
           "matchType": "t20",
           "startTime": "2026-11-27T09:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "52e54477-0f42-4b04-8ae2-63851f0b1ef1",
+          "homeTeam": "Pakistan A",
+          "awayTeam": "Bangladesh A",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Pakistan A vs Bangladesh A, 2nd Semi-Final (B1 v A2), ACC Mens Asia Cup Rising Stars 2026",
+          "matchType": "odi",
+          "startTime": "2026-11-27T10:00:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"

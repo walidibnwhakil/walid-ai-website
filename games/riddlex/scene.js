@@ -127,6 +127,75 @@ export function createScene(canvas) {
   const ink = document.createElement("canvas");
   const mask = document.createElement("canvas");
 
+
+  // Bake small feathered, local deformation poses once from the approved
+  // portrait. Every frame then costs only a few canvas drawImage calls.
+  // Coordinates are in the 700 x 487 approved character artwork.
+  let portraitPoses = null, portraitPoseSource = null;
+  let motionStats = {frames:0,smoke:0,face:0,idle:0,cat:0,activePose:""};
+  const poseBounds={x:112,y:0,w:331,h:344};
+  const catPoseBounds={x:414,y:324,w:286,h:151};
+  function bakePose(source, bounds, controls){
+    const {x,y,w,h}=bounds;
+    const input=document.createElement("canvas");input.width=w;input.height=h;
+    const g=input.getContext("2d",{willReadFrequently:true});
+    g.drawImage(source,x,y,w,h,0,0,w,h);
+    const src=g.getImageData(0,0,w,h).data;
+    const output=document.createElement("canvas");output.width=w;output.height=h;
+    const out=output.getContext("2d"),pixels=out.createImageData(w,h),dst=pixels.data;
+    for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
+      let dx=0,dy=0,coverage=0;
+      for(const [cx,cy,rx,ry,mx,my] of controls){
+        const u=(xx+x-cx)/rx,v=(yy+y-cy)/ry,d=u*u+v*v;
+        if(d<1){const k=(1-d)*(1-d);dx+=mx*k;dy+=my*k;coverage=Math.max(coverage,Math.min(1,(1-d)*3.5));}
+      }
+      const sx=Math.max(0,Math.min(w-1.001,xx-dx)),sy=Math.max(0,Math.min(h-1.001,yy-dy));
+      const ix=Math.floor(sx),iy=Math.floor(sy),fx=sx-ix,fy=sy-iy;
+      const p=(yy*w+xx)*4,a=(iy*w+ix)*4,b=a+4,c=a+w*4,d=c+4;
+      for(let j=0;j<3;j++)dst[p+j]=(src[a+j]*(1-fx)+src[b+j]*fx)*(1-fy)+(src[c+j]*(1-fx)+src[d+j]*fx)*fy;
+      // The crop is transparent near its edges; the unchanged room stays put.
+      dst[p+3]=Math.round(255*coverage*Math.min(1,xx/12,yy/9,(w-1-xx)/12,(h-1-yy)/12));
+    }
+    out.putImageData(pixels,0,0);
+    return output;
+  }
+  async function preparePortraitPoses(){
+    const source=room.querySelector(".approved-actors");
+    if(!source?.naturalWidth||portraitPoseSource===source)return;
+    portraitPoseSource=source;
+    const build=[
+      ["idle",poseBounds,[[274,80,148,104,1.7,-2.1],[267,181,127,106,1.4,-1.4],[252,281,145,66,0,-2.2]]],
+      ["happy",poseBounds,[[235,192,42,32,-5,-8],[316,205,39,38,5,-9],[276,209,55,32,0,3],[250,146,29,18,0,3],[316,159,29,18,0,3]]],
+      ["sad",poseBounds,[[234,193,40,40,2,8],[316,206,42,40,-2,8],[253,125,36,26,2,-7],[307,139,35,25,-4,-5],[276,210,44,25,0,-3]]],
+      ["worried",poseBounds,[[247,125,40,26,3,-9],[314,140,39,28,-4,-7],[250,148,30,17,0,-3],[316,162,30,17,0,-3],[236,194,34,27,0,4],[313,206,36,28,0,5]]],
+      ["serious",poseBounds,[[250,125,42,24,5,6],[315,141,39,24,-4,6],[249,147,28,17,0,3],[317,160,27,17,0,3]]],
+      ["confused",poseBounds,[[249,124,37,30,0,-9],[317,141,34,25,-2,5],[250,146,31,18,0,-3],[315,161,30,18,0,2],[274,207,43,31,3,3]]],
+      ["surprised",poseBounds,[[248,122,40,30,0,-11],[315,139,40,28,0,-11],[250,143,29,17,0,-5],[316,155,29,19,0,-5],[275,210,38,27,0,6]]],
+      ["ear",catPoseBounds,[[467,359,28,30,3,-3],[542,375,30,32,-4,2]]],
+      ["catIdle",catPoseBounds,[[594,401,90,52,0,-2.6],[643,408,50,37,1,-1.6]]]
+    ];
+    const poses={};
+    // Yield between each small bake so category/answer taps never wait on it.
+    for(const [key,bounds,controls] of build){
+      await new Promise(resolve=>setTimeout(resolve,0));
+      poses[key]={image:bakePose(source,bounds,controls),bounds};
+    }
+    portraitPoses=poses;
+  }
+  function paintPose(key,alpha){
+    const pose=portraitPoses?.[key];
+    if(!pose||alpha<.025)return false;
+    const {x,y,w,h}=pose.bounds;
+    ctx.globalAlpha=Math.min(1,alpha);
+    ctx.drawImage(pose.image,portraitBox.x+x/700*portraitBox.w,portraitBox.y+y/487*portraitBox.h,w/700*portraitBox.w,h/487*portraitBox.h);
+    ctx.globalAlpha=1;
+    return true;
+  }
+  let portraitReaction={key:"",until:0};
+  function setPortraitReaction(key,seconds=1.8){
+    portraitReaction={key,until:clock+seconds};
+  }
+
   function makePuff(scatter) {
     return {
       x: 0.592 + rand(-0.004, 0.004),
@@ -175,12 +244,15 @@ export function createScene(canvas) {
     if (!bubble || !bubble.offsetHeight || !canvas.width || !canvas.height || cssSize.width < 10 || actorBox.w < 2) return;
     const dx = cssSize.width / canvas.width, dy = cssSize.height / canvas.height;
     if (portraitMode) {
-      const x = Math.round(cssSize.width * (document.documentElement.lang === "bn" ? .42 : .46));
       const actorArt = room.querySelector(".approved-actors");
       const rect = actorArt.getBoundingClientRect(), stage = canvas.getBoundingClientRect();
-      const mouthY = rect.top - stage.top + rect.height * .40;
-      const values = {"--speech-left":x,"--speech-max":cssSize.width-x-9,"--speech-tail":18,
-        "--speech-top":Math.max(4,Math.min(rect.bottom-stage.top-bubble.offsetHeight-10,mouthY-bubble.offsetHeight+8))};
+      // In the approved portrait, the face ends at approximately 51% of
+      // the image width. Reserve that entire area in every language.
+      const x = Math.ceil(rect.left-stage.left+rect.width*.56);
+      const tail = Math.max(8,Math.min(14,Math.floor(rect.width*.035)));
+      const pipeY = rect.top-stage.top+rect.height*.509;
+      const values = {"--speech-left":x,"--speech-max":Math.max(0,cssSize.width-x-8),"--speech-tail":tail,
+        "--speech-top":Math.max(4,Math.min(rect.bottom-stage.top-bubble.offsetHeight-10,pipeY-bubble.offsetHeight+3))};
       for(const [name,number] of Object.entries(values)){
         const value=Math.round(number)+"px";
         if(room.style.getPropertyValue(name)!==value)room.style.setProperty(name,value);
@@ -231,17 +303,33 @@ export function createScene(canvas) {
   }
 
   function drawSmoke(dt) {
+    if(portraitMode){
+      // A visible rising plume from the actual bowl, not the old room's
+      // coordinates. Five soft, drifting puffs expand and fade upward.
+      const scale=portraitBox.w/700;
+      for(let i=0;i<6;i++){
+        const t=(clock*.30+i/6)%1;
+        const fade=Math.sin(Math.PI*t);
+        const x=portraitBox.x+399*scale+Math.sin(t*5.1+clock*.55)*10*scale*t+15*t*scale;
+        const y=portraitBox.y+231/487*portraitBox.h-t*112*scale;
+        const size=(14+45*t)*scale;
+        ctx.globalAlpha=.72*fade;
+        ctx.drawImage(puff,x-size/2,y-size/2,size,size);
+      }
+      ctx.globalAlpha=1;motionStats.smoke++;
+      return;
+    }
     for (const particle of smoke) {
       particle.life += dt;
       if (particle.life > particle.max || particle.y < 0.12) Object.assign(particle, makePuff(false));
       particle.x += particle.vx * dt + Math.sin(clock * 1.4 + particle.wobble) * 0.004 * dt;
       particle.y += particle.vy * dt;
-      const alpha = Math.sin((particle.life / particle.max) * Math.PI) * 0.12;
-      const size = particle.size * (view.w / 900);
+      const alpha = Math.sin((particle.life / particle.max) * Math.PI) * 0.38;
+      const size = particle.size * (view.w / 900) * 2.6;
       ctx.globalAlpha = alpha;
       ctx.drawImage(puff, ix(particle.x) - size / 2, iy(particle.y) - size / 2, size, size);
     }
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = 1;motionStats.smoke++;
   }
 
   function easeOut(p) {
@@ -260,9 +348,34 @@ export function createScene(canvas) {
     const plates=images.overlays||{};
     const levels=faceNow.levels||{};
     if(portraitMode){
-      function paintPortrait(plate,x,y,w,h,alpha){if(!plate||alpha<.02)return;ctx.globalAlpha=Math.min(1,alpha);ctx.drawImage(plate,portraitBox.x+x/700*portraitBox.w,portraitBox.y+y/487*portraitBox.h,w/700*portraitBox.w,h/487*portraitBox.h);ctx.globalAlpha=1;}
-      for(const key of ["worried","confused","serious","sad","happy"])paintPortrait(plates[key],218,106,134,119,levels[key]||0);
-      paintPortrait(plates.cat,453,395,77,42,catLife.blink>0?blinkCover(catLife.blink):0);
+      // Keep the live expressions even when the gameplay engine immediately
+      // asks another question. Idle breathing never overrides a reaction.
+      let key=portraitReaction.until>clock?portraitReaction.key:"";
+      if(!key){
+        if(mood==="happy"||mood==="confident")key="happy";
+        else if(mood==="sad"||mood==="defeated")key="sad";
+        else if(mood==="thinking"||mood==="worried")key="worried";
+        else if(mood==="confused"||mood==="serious"||mood==="surprised")key=mood;
+        else key=faceNow.key||"";
+      }
+      if(!reduce&&paintPose("idle",.15+.85*(.5+.5*Math.sin(clock*1.8))))motionStats.idle++;
+      motionStats.activePose="";
+      if(key&&paintPose(key,.93)){motionStats.face++;motionStats.activePose=key;}
+      else if(!portraitPoses&&key&&plates[key]&&key!=="surprised"){
+        // Original fallback only until the newly baked pose is available.
+        ctx.globalAlpha=.85;
+        ctx.drawImage(plates[key],portraitBox.x+218/700*portraitBox.w,portraitBox.y+106/487*portraitBox.h,134/700*portraitBox.w,119/487*portraitBox.h);
+        ctx.globalAlpha=1;
+      }
+      if(!reduce){
+        if(paintPose("catIdle",.15+.85*(.5+.5*Math.sin(clock*2.1))))motionStats.cat++;
+        if(catLife.flick>0)paintPose("ear",flickCover(catLife.flick));
+        if(plates.cat&&catLife.blink>0){
+          ctx.globalAlpha=blinkCover(catLife.blink);
+          ctx.drawImage(plates.cat,portraitBox.x+453/700*portraitBox.w,portraitBox.y+395/487*portraitBox.h,77/700*portraitBox.w,42/487*portraitBox.h);
+          ctx.globalAlpha=1;
+        }
+      }
       return;
     }
     function paint(plate,box,alpha) {
@@ -565,7 +678,7 @@ export function createScene(canvas) {
       }
     } else if (reveal.phase === "present") {
       reveal.present = 0.92 + Math.min(0.18, reveal.t * 0.4);
-      if (reveal.t > 0.45 && !reveal.done) {
+      if (reveal.t > 0.16 && !reveal.done) {
         reveal.done = true;
         reveal.resolve({ printed: !!reveal.printed });
       }
@@ -609,7 +722,7 @@ export function createScene(canvas) {
     raf=requestAnimationFrame(frame);
     if(frameTime && now-frameTime<1000/30-1) return;
     const dt=Math.min(.10,(now-(frameTime||now))/1000||.033);
-    frameTime=now;clock+=dt;
+    frameTime=now;clock+=dt;motionStats.frames++;
     if(layoutDirty) resize();
     const plates=portraitMode?portraitPlates:desktopPlates;
     images.overlays=plates;
@@ -617,8 +730,11 @@ export function createScene(canvas) {
     // Static art is rendered once by the browser. Only a transparent effects
     // canvas is cleared and redrawn, capped at 30fps and 1.8M backing pixels.
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    if(!reduce){drawSmoke(dt);stepCat(dt);}
-    updateReveal(dt);drawFaces();drawReveal();
+    if(!reduce)stepCat(dt);
+    updateReveal(dt);drawFaces();
+    // The feathered head overlays must never paint over the rising smoke.
+    if(!reduce)drawSmoke(dt);
+    drawReveal();
   }
 
   function screenOrient(){return portraitViewport.matches?"portrait":"landscape";}
@@ -658,7 +774,7 @@ export function createScene(canvas) {
       if(!img.getAttribute("src"))img.src=img.dataset.src;
       return img.decode();
     })).then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))
-      .then(()=>{room.classList.add("portrait-art-ready");alignSpeech();})
+      .then(()=>{room.classList.add("portrait-art-ready");alignSpeech();preparePortraitPoses().catch(()=>{portraitPoseSource=null;});})
       .catch(()=>{portraitReady=null;});
     return portraitReady;
   }
@@ -706,35 +822,26 @@ export function createScene(canvas) {
 
   async function playReveal(options) {
     const font = options.font || '400 28px "Times New Roman", serif';
-    const photo = options.imageUrl ? await loadImage(options.imageUrl) : null;
     const prepared = prepareInk(options.name || "?", font);
-    reveal = {
+    const card = {
       phase: reduce ? "present" : "write",
-      t: 0,
-      name: options.name || "?",
-      font,
-      imageUrl: photo ? options.imageUrl : "",
-      photo,
-      printed: false,
-      writeDur: reduce ? 0.01 : Math.min(1.15, Math.max(0.55, (options.name || "").length * 0.05)),
-      inkWidth: prepared.width,
-      textX: prepared.textX || 0,
-      present: 1,
-      page: null,
-      resolve: () => {},
-      done: false,
+      t: 0,name:options.name||"?",font,imageUrl:"",photo:null,printed:false,
+      writeDur:reduce?.01:Math.min(.48,Math.max(.22,(options.name||"").length*.018)),
+      inkWidth:prepared.width,textX:prepared.textX||0,present:1,page:null,
+      resolve:()=>{},done:false
     };
-    mood = "confident";
-    faces.setMood("confident");
-    if (reduce) {
-      reveal.printed = !!photo;
-      reveal.page = { canvas: ink, w: ink.width, h: ink.height };
-      reveal.done = true;
-      return { printed: !!photo };
-    }
-    return new Promise((resolve) => {
-      reveal.resolve = resolve;
+    reveal=card;
+    mood="confident";faces.setMood("confident");setPortraitReaction("surprised",1.5);
+    // Do not wait up to five seconds for the optional portrait before showing
+    // the guess. A late picture may join only this same, still-current card.
+    if(options.imageUrl)loadImage(options.imageUrl,5000).then(photo=>{
+      if(!photo||reveal!==card)return;
+      card.photo=photo;card.imageUrl=options.imageUrl;
+      if(card.phase==="present")card.printed=true;
+      options.onPhoto?.();
     });
+    if(reduce){card.page={canvas:ink,w:ink.width,h:ink.height};card.done=true;return {printed:!!card.photo};}
+    return new Promise(resolve=>{card.resolve=resolve;});
   }
 
   // Reprint an already-revealed answer in the selected language.
@@ -759,7 +866,7 @@ export function createScene(canvas) {
 
   function playWrong() {
     mood = "sad";
-    faces.setMood("sad");
+    faces.setMood("sad");setPortraitReaction("sad",2.5);
     if (!reveal) reveal = { page: null, name: "" };
     reveal.phase = "wrong";
     reveal.t = 0;
@@ -784,21 +891,27 @@ export function createScene(canvas) {
   }
 
   function clearReveal() {
+    if(reveal&&!reveal.done){reveal.done=true;reveal.resolve({printed:false});}
     reveal = null;
+    // Erase the last painted card immediately, even before the next 30fps tick.
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(running&&!document.hidden){drawFaces();if(!reduce)drawSmoke(0);}
   }
 
   return {
     start, stop, resize, alignSpeech,
-    setMood(value) { mood = value; faces.setMood(value); },
-    react(answer) { return faces.react(answer); },
+    setMood(value) { mood = value; faces.setMood(value); if(value==="sad"||value==="defeated")setPortraitReaction("sad",2.5);if(value==="confident")setPortraitReaction("surprised",1.3);if(value==="happy")setPortraitReaction("happy",2.2); },
+    react(answer) { const key=faces.react(answer);if(key)setPortraitReaction(key,2.1);return key; },
     blinkCat() { catLife.blink = 0.2; },
     flickCat() { catLife.flick = 0.35; },
     debug() {
       return {
         expression: faces.picture(),
+        portraitMotion:{...motionStats,poses:Object.keys(portraitPoses||{}),reaction:portraitReaction.until>clock?portraitReaction.key:""},
         plates: Object.keys(images.overlays || {}),
         orient: images.baseOrient || "",
         portrait: portraitMode,
+        revealActive: !!reveal,
         revealBounds: reveal?.photo ? (() => {
           const { x, y, w, h, photoH } = noteMetrics(1);
           return { x, y, w, h, photoH, canvasW: canvas.width, canvasH: canvas.height };

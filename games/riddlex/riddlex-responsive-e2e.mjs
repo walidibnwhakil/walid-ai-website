@@ -119,8 +119,9 @@ try {
           const buttons=[...document.querySelectorAll(mode==="pick"?"#categories .cat-row button":"#answers button")];
           const mobile=matchMedia("(max-aspect-ratio:4/5)").matches;
           const wall=rect(document.querySelector(".approved-wall-plaque"));
+          const portraitArt=rect(document.querySelector(".approved-actors"));
           const logo=mobile?{x:wall.x+wall.width*.59,y:wall.y,left:wall.x+wall.width*.59,right:wall.x+wall.width*.96,top:wall.top,bottom:wall.bottom,width:wall.width*.37,height:wall.height}:rect(document.querySelector(".room-logo"));
-          return {stage:rect(stage),bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
+          return {stage:rect(stage),portraitArt,bubble:rect(document.getElementById("speech")),buttons:buttons.map(rect),
             cat:rect(document.querySelector(".room-cat")),actor:rect(document.querySelector(".room-detective")),
             logo,desk:rect(document.querySelector(mobile?".approved-table":".room-desk")),
             frontHidden:getComputedStyle(document.querySelector(".room-front")).display==="none",
@@ -138,6 +139,7 @@ try {
         assert.ok(inside(g.bubble),"speech outside screen "+JSON.stringify({width,height,mode,g}));
         assert.ok(inside(g.logo)&&g.logo.bottom<g.desk.top,"logo must be mounted on the back wall "+JSON.stringify({width,height,g}));
         if(width/height<=.8){
+          assert.ok(g.bubble.left>=g.portraitArt.left+g.portraitArt.width*.55,"speech covers detective face "+JSON.stringify({width,height,lang,mode,g}));
           assert.ok(g.frontHidden,"mobile desk front must be hidden");
           assert.ok(g.desk.bottom>=g.stage.bottom-2,"tabletop must extend to bottom of mobile stage");
           assert.ok(g.buttons.every(b=>b.top>=g.desk.top&&b.bottom<=g.desk.bottom+1),"all mobile controls must be on tabletop");
@@ -167,6 +169,10 @@ try {
       }
     }
     await layout("pick","en");
+    await page.click('#game [data-set-lang="bn"]');
+    await page.evaluate(async()=>{await document.fonts.load('400 19px SolaimanLipi','তুমি কী নিয়ে ভাবছ?');});
+    await layout("pick","bn");
+    await page.click('#game [data-set-lang="en"]');
     await page.click('[data-cat="animal"]');
     await page.waitForFunction(()=>window.__riddlex?.state()?.mode==="ask",null,{timeout:30000});
     await layout("ask","en");
@@ -192,11 +198,15 @@ try {
       const long=await getBubble();
       assert.ok(long.width>short.width+15||long.height>short.height+15,"speech does not adapt to question length");
       assert.ok(short.x>=0&&long.x>=0&&long.x+long.width<=width+1&&long.y>=0&&long.y+long.height<=height,"adaptive question outside viewport");
+      if(width/height<=.8){
+        const art=await page.locator(".approved-actors").boundingBox();
+        assert.ok(short.x>=art.x+art.width*.55&&long.x>=art.x+art.width*.55,"short or long speech covers face");
+      }
       if(shotFolder)await page.screenshot({path:join(shotFolder,"speech-long-"+width+"x"+height+".png"),animations:"disabled"});
       await page.locator("#status").evaluate((el,value)=>el.textContent=value,original);
       await page.waitForTimeout(150);
     }
-    const artBytes=(await Promise.all(["approved-wall-top","approved-wall-plaque","approved-actors","approved-table","portrait-happy","portrait-sad","portrait-serious","portrait-worried","portrait-confused","portrait-cat"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
+    const artBytes=(await Promise.all(["approved-wall-top","approved-wall-plaque","approved-actors-clean","approved-table","portrait-happy","portrait-sad","portrait-serious","portrait-worried","portrait-confused","portrait-cat"].map(n=>readFile(new URL("games/riddlex/images/layered/"+n+".webp",root))))).reduce((total,b)=>total+b.byteLength,0);
     assert.ok(artBytes<300000,"static art exceeds 300KB");
     assert.ok(!requests.some(u=>/images\/approved\/(game-desk|portrait-neutral|face-portrait|cat-portrait)/.test(u)),"old gameplay art unexpectedly loaded");
     // Capture all five existing expression states at the integrated sprite.
@@ -212,6 +222,28 @@ try {
       await page.waitForTimeout(350);
       if(shotFolder)await page.screenshot({path:join(shotFolder,"layered-mood-"+mood+".png"),animations:"disabled"});
     }
+    await page.waitForFunction(()=>window.__riddlex.expression().portraitMotion.poses.length===9,null,{timeout:15000});
+    await page.evaluate(()=>window.__riddlex.setMood("curious"));
+    await page.waitForTimeout(2200);
+    const snap=()=>page.evaluate(()=>{
+      const c=document.getElementById("stage");
+      const pixels=c.getContext("2d").getImageData(0,0,c.width,c.height).data;
+      let hash=2166136261;for(let i=0;i<pixels.length;i+=16)hash=Math.imul(hash^pixels[i],16777619)^pixels[i+3];
+      return {hash,stats:window.__riddlex.expression().portraitMotion};
+    });
+    const beforeMotion=await snap();
+    await page.waitForTimeout(650);
+    const afterMotion=await snap();
+    assert.notEqual(afterMotion.hash,beforeMotion.hash,"portrait animation canvas is static");
+    assert.ok(afterMotion.stats.smoke>beforeMotion.stats.smoke&&afterMotion.stats.idle>beforeMotion.stats.idle&&afterMotion.stats.cat>beforeMotion.stats.cat,"idle/smoke/cat did not render");
+    for(const key of ["happy","sad","worried","confused","surprised"]){
+      await page.evaluate(key=>window.__riddlex.setMood(key),key);
+      await page.waitForTimeout(2400);
+      const current=await snap();
+      assert.ok(current.stats.face>afterMotion.stats.face&&current.stats.activePose===key,"face pose did not render "+key+" "+JSON.stringify(current.stats));
+      if(shotFolder)await page.screenshot({path:join(shotFolder,"portrait-live-"+key+".png")});
+    }
+    console.log("PORTRAIT_LIVE_MOTION_PASS",JSON.stringify(afterMotion.stats));
     const client=await page.context().newCDPSession(page);
     await client.send("Emulation.setCPUThrottlingRate",{rate:4});
     await client.send("Performance.enable");
@@ -843,6 +875,27 @@ try {
           const correctFlower=trial.flower &&
             /kathgolap|frangipani|plumeria|কাঠগোলাপ/i.test(label);
           if (correctById || correctByName || correctFlower) {
+            // Confirm the real guess; the name/photo must disappear, while
+            // the detective's own speech and replay button remain.
+            await page.click("#correct");
+            await page.waitForFunction(()=>window.__riddlex.state().mode==="solved");
+            assert.equal(await page.locator("#speech").isVisible(),true);
+            assert.equal(await page.locator("#solved-line").isVisible(),false);
+            assert.equal(await page.locator("#again").isVisible(),true);
+            assert.equal(await page.evaluate(()=>window.__riddlex.expression().revealActive),false,"name-only or photo card must be removed");
+            assert.equal(await page.evaluate(()=>window.__riddlex.expression().revealBounds),null);
+            assert.equal(await page.locator("#guess-line").textContent(),"");
+            assert.equal(await page.locator("#speech").evaluate(e=>getComputedStyle(e).opacity),"1","victory speech must be visible immediately");
+            assert.match(await page.locator("#status").textContent(),/Great! I guessed it\.|দারুণ! আমি ঠিক ধরেছি।/);
+            await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+            if(shotFolder)await page.screenshot({path:join(shotFolder,"solved-no-name.png")});
+            await page.click('#game [data-set-lang="bn"]');
+            assert.equal(await page.locator("#status").textContent(),"দারুণ! আমি ঠিক ধরেছি।");
+            assert.equal(await page.evaluate(()=>window.__riddlex.expression().revealActive),false);
+            await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+            if(shotFolder)await page.screenshot({path:join(shotFolder,"solved-bn-no-name.png")});
+            await page.click('#game [data-set-lang="en"]');
+            console.log("SOLVED_ATOMIC_VISUAL_PASS");
             outcome="correct";break;
           }
           wrongGuesses.push(guessRecord);

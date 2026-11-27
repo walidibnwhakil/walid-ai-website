@@ -711,3 +711,57 @@ html, body {
   #menu .menu-back {top:7px;left:8px;padding:6px 12px;}
   #menu #play {width:min(280px,78%);}
 }
+
+/* Keep the approved portrait detective's face clear of the dialogue,
+   including the initial category prompt. The desktop is unchanged. */
+@media(max-aspect-ratio:4/5){
+  #game .speech {
+    left:var(--speech-left,56%);max-width:var(--speech-max,42%);
+    padding:6px 8px;gap:4px;
+  }
+  #game .speech::after,#game .speech.has-badge::after {
+    left:calc(-1 * var(--speech-tail,12px) + 2px);
+    width:var(--speech-tail,12px);height:16px;
+  }
+  #game .speech.pop{animation:portrait-dialogue-in .2s ease-out both;}
+  @keyframes portrait-dialogue-in{from{opacity:0;}to{opacity:1;}}
+}
+
+/* Keep the number attached to the question, use one consistent Bengali
+   typeface and remove the legacy status padding that separated the number. */
+#game .speech .q-badge{align-self:center;margin:0;flex:0 0 auto;min-width:1.45em;padding:3px 4px;font-size:1em;line-height:1;display:grid;place-items:center;border-radius:6px;}
+#game .speech .q-badge[hidden]{display:none!important;}
+#game .speech #status{padding:0;margin:0;flex:0 1 auto;min-width:0;letter-spacing:0;word-spacing:normal;overflow-wrap:break-word;word-break:normal;}
+html[lang="bn"] #game .speech #status,html[lang="bn"] #game .speech .q-badge{
+  font-family:SolaimanLipi,"Times New Roman",Times,serif;font-weight:400;
+}
+@media(max-aspect-ratio:4/5){
+  #game .speech{gap:5px;padding:7px 8px;align-items:center;min-height:0;}
+  html[lang="bn"] #game .speech #status{font-size:clamp(15px,4.1vw,18px);line-height:1.22;padding:0;}
+  #game .speech .q-badge{font-size:clamp(14px,3.8vw,16px);}
+  #game #answers{bottom:clamp(35px,5vh,44px);gap:8px;}
+  #game #categories{bottom:22px;}
+}
+@media(max-aspect-ratio:4/5) and (max-height:620px){
+  #game #answers{bottom:35px;gap:6px;}
+  #game #answers .answer-row button{min-height:42px;}
+}
+
+/* After confirmation the detective speaks the result; there is no duplicate
+   result panel, name card, or photo. Only the replay button stays on the desk. */
+#game[data-view="solved"] #hud{
+  position:absolute;top:var(--edge);bottom:0;left:0;right:0;
+  display:grid;place-items:center;margin:0;padding:0 12px;max-height:none;overflow:visible;
+}
+#game[data-view="solved"] #guess{display:grid;place-items:center;width:100%;margin:0;gap:0;}
+#game[data-view="solved"] #again{width:min(78%,320px);min-height:46px;border-radius:999px;border:1px solid #efc676;background:linear-gradient(#fff1ca,#f4ce81);color:#392417;box-shadow:0 4px 7px #10070066;}
+#game[data-view="solved"] #solved-line,#game[data-view="solved"] #credit{display:none!important;}
+#game[data-view="thinking"] .speech::before,#game[data-view="reveal"] .speech::before{
+  content:"";position:absolute;bottom:-5px;left:10px;width:23px;height:3px;
+  border-radius:3px;background:#e6bd68;animation:guess-thinking-pulse .8s ease-in-out infinite alternate;
+}
+@keyframes guess-thinking-pulse{from{opacity:.25;transform:scaleX(.55)}to{opacity:1;transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){#game .speech::before{animation:none!important;}}
+
+/* A victory is a single, atomic visible state: never fade its speech from zero. */
+#game[data-view="solved"] .speech.pop{animation:none;opacity:1;transform:none;}

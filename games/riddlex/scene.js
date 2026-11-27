@@ -214,6 +214,18 @@ export function createScene(canvas) {
         const k=Math.max(0,1-u*u-v*v)**2;
         dx+=(mx*C-my*S)*k;dy+=(mx*S+my*C)*k;
       }
+      // Opening a lid must not stretch the iris or pupil. Keep both
+      // measured iris centers pixel-stable, feathering the restriction
+      // into the surrounding eyelid. The original glints stay intact.
+      if(key==="surprised"||key==="worried"||key==="confused"){
+        let freedom=1;
+        for(const [cx,cy] of [[704,240],[755,258]]){
+          const r=Math.hypot(xx+x-cx,yy+y-cy);
+          const u=clamp((r-5.2)/5.8,0,1);
+          freedom=Math.min(freedom,u*u*(3-2*u));
+        }
+        dx*=freedom;dy*=freedom;
+      }
       const p=(yy*w+xx)*4;
       for(let c=0;c<3;c++)warped[p+c]=sample(original,xx-dx,yy-dy,c);
       warped[p+3]=255;
@@ -288,7 +300,7 @@ export function createScene(canvas) {
       ["serious",face,[...mouth(2,-1,0),...eye(703,239,-2.8),...eye(758,258,-2.8),[717,225,16,10,0,5],[747,243,15,10,0,4]]],
       ["worried",face,[...mouth(3,-2,0),...eye(703,239,1.8),...eye(758,258,1.8),[716,225,15,10,0,-7],[748,243,15,10,0,-7]]],
       ["confused",face,[...mouth(2,1,-1),...eye(703,239,2),...eye(758,258,-2),[700,221,22,11,0,-8],[758,246,20,10,0,3]]],
-      ["surprised",face,[...eye(703,239,4.5),...eye(758,258,4.5),[703,222,24,12,0,-7],[758,244,22,12,0,-6]]],
+      ["surprised",face,[...eye(703,239,2.7),...eye(758,258,2.7),[703,222,24,12,0,-7],[758,244,22,12,0,-6]]],
       ["blink",face,[...eye(703,239,-6),...eye(758,258,-6)]],
       ["cat",kitty,[[1004,452,12,9,0,4],[1044,457,12,9,0,4]]],
       ["tail",kitty,[[1213,474,31,22,2,-3],[1241,478,20,17,-2,-3]]]

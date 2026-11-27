@@ -132,6 +132,7 @@ export function createScene(canvas) {
   // portrait. Every frame then costs only a few canvas drawImage calls.
   // Coordinates are in the 700 x 487 approved character artwork.
   let portraitPoses = null, portraitPoseSource = null;
+  let desktopPoses=null, desktopArtPromise=null;
   let motionStats = {frames:0,smoke:0,face:0,idle:0,cat:0,activePose:""};
   const poseBounds={x:112,y:0,w:331,h:344};
   const catPoseBounds={x:414,y:324,w:286,h:151};
@@ -182,6 +183,37 @@ export function createScene(canvas) {
       poses[key]={image:bakePose(source,bounds,controls),bounds};
     }
     portraitPoses=poses;
+  }
+  // New desktop overlays are sampled from the exact approved artwork, in
+  // its own 1440×747 coordinate system. No old face or room pixels are used.
+  async function prepareDesktopPoses(source){
+    const face={x:620,y:190,w:200,h:180}, kitty={x:960,y:388,w:295,h:115};
+    const build=[
+      ["happy",face,[[665,291,33,25,-5,-6],[748,302,35,25,5,-8],[705,302,45,29,0,4],[684,247,25,16,0,3],[756,261,24,16,0,3]]],
+      ["sad",face,[[665,291,32,26,3,6],[747,302,33,29,-3,7],[687,228,32,22,2,-6],[751,243,32,22,-3,-5]]],
+      ["worried",face,[[686,229,34,22,2,-7],[752,244,33,23,-3,-7],[684,246,23,13,0,-3],[756,260,24,13,0,-3]]],
+      ["serious",face,[[686,230,34,20,4,5],[752,244,33,20,-4,5],[685,248,24,13,0,2],[756,261,23,13,0,2]]],
+      ["confused",face,[[686,228,33,24,0,-8],[752,244,32,21,-2,5],[684,247,24,13,0,-3],[705,301,38,26,2,2]]],
+      ["surprised",face,[[686,228,34,25,0,-10],[752,243,33,25,0,-10],[684,246,25,15,0,-4],[756,260,25,15,0,-4],[705,303,35,25,0,5]]],
+      ["idle",face,[[700,225,80,65,.8,-1.4],[705,290,75,60,0,-1.6]]],
+      ["cat",kitty,[[1004,452,12,9,0,4],[1044,457,12,9,0,4]]],
+      ["tail",kitty,[[1213,474,31,22,2,-3],[1241,478,20,17,-2,-3]]]
+    ];
+    const result={};
+    for(const [key,bounds,controls] of build){
+      await new Promise(resolve=>setTimeout(resolve,0));
+      result[key]={image:bakePose(source,bounds,controls),bounds};
+    }
+    desktopPoses=result;
+    desktopPlates=Object.fromEntries(Object.entries(result).filter(([key])=>!["idle","surprised"].includes(key)));
+    if(!portraitViewport.matches)images.overlays=desktopPlates;
+  }
+  function paintDesktopPose(key,alpha){
+    const pose=desktopPoses?.[key];if(!pose||alpha<.025)return false;
+    const {x,y,w,h}=pose.bounds;
+    ctx.globalAlpha=Math.min(1,alpha);
+    ctx.drawImage(pose.image,x/1440*canvas.width,y/747*canvas.height,w/1440*canvas.width,h/747*canvas.height);
+    ctx.globalAlpha=1;return true;
   }
   function paintPose(key,alpha){
     const pose=portraitPoses?.[key];
@@ -260,12 +292,12 @@ export function createScene(canvas) {
       }
       return;
     }
-    const mouthX = (actorBox.x + actorBox.w * .70) * dx;
-    const mouthY = (actorBox.y + actorBox.h * .49) * dy;
-    const tail = Math.max(18, Math.min(portraitMode ? 23 : 42, cssSize.width * .029));
+    const mouthX = cssSize.width * (772/1440);
+    const mouthY = cssSize.height * (312/747);
+    const tail = Math.max(14, Math.min(25, cssSize.width * .019));
     const rightInset = portraitMode ? 8 : 18;
     const minSpace = portraitMode ? Math.min(136, cssSize.width * .42) : Math.min(230, cssSize.width * .32);
-    const x = Math.max(8, Math.min(mouthX + tail + 6, cssSize.width - rightInset - minSpace));
+    const x = Math.max(8, Math.min(mouthX + tail + 2, cssSize.width - rightInset - minSpace));
     function set(name, number) {
       const value = Math.round(number) + "px";
       if (room.style.getPropertyValue(name) !== value) room.style.setProperty(name, value);
@@ -294,9 +326,16 @@ export function createScene(canvas) {
       actorBox={x:portraitBox.x,y:portraitBox.y,w:portraitBox.w*.68,h:portraitBox.h*.91};
       view={x:portraitBox.x+(.559-.592)*portraitBox.w,y:portraitBox.y+(.509-.255)*portraitBox.h,w:portraitBox.w,h:portraitBox.h};
     }
-    const desk=room.querySelector(portraitMode?".approved-table":".room-desk").getBoundingClientRect();
-    const cr=canvas.getBoundingClientRect();
-    deskEdge=(desk.top-cr.top)*ch/Math.max(1,cr.height);
+    if(!portraitMode){
+      view={x:0,y:0,w:cw,h:ch};
+      actorBox={x:cw*396/1440,y:ch*120/747,w:cw*548/1440,h:ch*383/747};
+      catBox={x:cw*945/1440,y:ch*380/747,w:cw*318/1440,h:ch*126/747};
+      deskEdge=ch*495/747;
+    }else{
+      const desk=room.querySelector(".approved-table").getBoundingClientRect();
+      const cr=canvas.getBoundingClientRect();
+      deskEdge=(desk.top-cr.top)*ch/Math.max(1,cr.height);
+    }
     room.style.setProperty("--room-edge",(deskEdge/ch).toFixed(4));
     room.style.setProperty("--desk-y",(deskEdge/ch).toFixed(4));
     room.classList.toggle("portrait-scene",portraitMode);
@@ -320,17 +359,16 @@ export function createScene(canvas) {
       ctx.globalAlpha=1;motionStats.smoke++;
       return;
     }
-    for (const particle of smoke) {
-      particle.life += dt;
-      if (particle.life > particle.max || particle.y < 0.12) Object.assign(particle, makePuff(false));
-      particle.x += particle.vx * dt + Math.sin(clock * 1.4 + particle.wobble) * 0.004 * dt;
-      particle.y += particle.vy * dt;
-      const alpha = Math.sin((particle.life / particle.max) * Math.PI) * 0.38;
-      const size = particle.size * (view.w / 900) * 2.6;
-      ctx.globalAlpha = alpha;
-      ctx.drawImage(puff, ix(particle.x) - size / 2, iy(particle.y) - size / 2, size, size);
+    const scale=canvas.width/1440;
+    for(let i=0;i<6;i++){
+      const t=(clock*.30+i/6)%1,fade=Math.sin(Math.PI*t);
+      const x=(823+Math.sin(t*5.1+clock*.55)*12*t+18*t)*scale;
+      const y=(329-t*112)/747*canvas.height;
+      const size=(14+42*t)*scale;
+      ctx.globalAlpha=.72*fade;
+      ctx.drawImage(puff,x-size/2,y-size/2,size,size);
     }
-    ctx.globalAlpha = 1;motionStats.smoke++;
+    ctx.globalAlpha=1;motionStats.smoke++;
   }
 
   function easeOut(p) {
@@ -379,15 +417,14 @@ export function createScene(canvas) {
       }
       return;
     }
-    function paint(plate,box,alpha) {
-      if(!plate || alpha<.02) return;
-      ctx.globalAlpha=Math.min(1,alpha);
-      ctx.drawImage(plate,box.x,box.y,box.w,box.h);
-      ctx.globalAlpha=1;
+    let key=portraitReaction.until>clock?portraitReaction.key:"";
+    if(!key)key=mood==="happy"?"happy":mood==="sad"||mood==="defeated"?"sad":mood==="thinking"?"worried":faceNow.key||"";
+    if(!reduce&&paintDesktopPose("idle",.2+.7*(.5+.5*Math.sin(clock*1.7))))motionStats.idle++;
+    if(key&&paintDesktopPose(key,.93)){motionStats.face++;motionStats.activePose=key;}
+    if(!reduce){
+      paintDesktopPose("cat",catLife.blink>0?blinkCover(catLife.blink):0);
+      paintDesktopPose("tail",catLife.flick>0?flickCover(catLife.flick):0);
     }
-    for(const key of ["worried","confused","serious","sad","happy"]) paint(plates[key],actorBox,levels[key]||0);
-    paint(plates.cat,catBox,catLife.blink>0?blinkCover(catLife.blink):0);
-    paint(plates.tail,catBox,catLife.flick>0?flickCover(catLife.flick):0);
   }
 
   function blinkAlpha(t) {
@@ -511,8 +548,7 @@ export function createScene(canvas) {
     let pad = 8;
     let namePx = 0;
     if (photo) {
-      const face = FACE.landscape;
-      const faceRight = ix(face.u + face.w);
+      const faceRight = canvas.width * (808/1440);
       const s = Math.min(cssW / 1280, cssH / 760);
       pad = 12 * s * dpr;
       nameH = 48 * s * dpr;
@@ -814,10 +850,16 @@ export function createScene(canvas) {
     return portraitReady;
   }
   async function prepareDesktop(){
-    for(const img of room.querySelectorAll(".room-art img[data-src]")){
+    if(desktopArtPromise)return desktopArtPromise;
+    const img=room.querySelector(".approved-desktop-art");
+    desktopArtPromise=(async()=>{
       if(!img.getAttribute("src"))img.src=img.dataset.src;
-    }
-    if(!overlayPromise)overlayPromise=loadOverlaySet().catch(()=>{overlayPromise=null;});
+      await img.decode();
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      room.classList.add("desktop-art-ready");
+      if(!desktopPoses&&!overlayPromise)overlayPromise=prepareDesktopPoses(img).catch(()=>{overlayPromise=null;});
+    })().catch(()=>{desktopArtPromise=null;});
+    return desktopArtPromise;
   }
   function preparePortraitEffects(){
     if(!portraitOverlayPromise)portraitOverlayPromise=Promise.all(["happy","sad","serious","worried","confused","cat"].map(async key=>[key,await loadImage("./images/layered/portrait-"+key+".webp")])).then(entries=>{

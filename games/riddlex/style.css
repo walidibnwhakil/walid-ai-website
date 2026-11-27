@@ -766,13 +766,28 @@ html[lang="bn"] #game .speech #status,html[lang="bn"] #game .speech .q-badge{
 /* A victory is a single, atomic visible state: never fade its speech from zero. */
 #game[data-view="solved"] .speech.pop{animation:none;opacity:1;transform:none;}
 
-/* The desktop plaque is cut along its carved outline, not its rectangular
-   backing photograph. Mobile's approved wall artwork is not changed. */
+/* Anchor the existing carved sign to the center of the actual inner wall
+   panel, rather than its left molding. The background is 110% wide and
+   centered: its inner panel maps to approximately 60.4–66.4% of the stage.
+   A separate shadow wrapper follows the complete carved silhouette; do
+   not cut through the gold frame or introduce a second wooden rectangle. */
+.room-logo-mount{display:contents;}
 @media(min-aspect-ratio:4/5){
-  #game .room-logo{
-    background:none;border:0;padding:0;box-shadow:none;filter:none;
-    clip-path:polygon(2% 29%,7% 26%,9% 19%,26% 17%,32% 14%,38% 10%,43% 8%,49% 7%,55% 9%,61% 13%,66% 16%,83% 17%,90% 13%,94% 23%,96% 24%,96% 75%,92% 79%,88% 90%,12% 96%,8% 92%,5% 86%,2% 85%);
+  #game .room-logo-mount{
+    display:block;position:absolute;left:63.5%;top:min(8.4vw,15%);width:5.9%;
+    transform:translateX(-50%);z-index:0;line-height:0;
+    filter:drop-shadow(1px 2px 1.5px #190a05b0);
   }
+  #game .room-logo{
+    position:relative;display:block;inset:auto;width:100%;height:auto;max-width:none;max-height:none;
+    margin:0;padding:0;background:none;border:0;box-shadow:none;border-radius:0;
+    transform:skewY(-3deg);transform-origin:center;
+    filter:brightness(.96) saturate(.94);
+    clip-path:none;
+  }
+}
+@media(min-aspect-ratio:4/5) and (max-height:450px){
+  #game .room-logo-mount{top:min(5.8vw,13%);}
 }
 /* One warm ivory silhouette: the curved tail overlaps the bubble body,
    and one drop-shadow follows both rather than outlining a separate triangle. */
@@ -788,4 +803,36 @@ html[lang="bn"] #game .speech #status,html[lang="bn"] #game .speech .q-badge{
 }
 @media(max-aspect-ratio:4/5){
   #game .speech::after,#game .speech.has-badge::after{height:14px;bottom:4px;left:calc(-1 * var(--speech-tail,12px) + 4px);}
+}
+
+/* Owner-approved desktop dialogue: shorter tail, close to the mouth,
+   warm ivory body, unchanged adaptive question width and number. */
+@media(min-aspect-ratio:4/5){
+  #game .speech{
+    background:#fff2d7;border-radius:24px;padding:8px 12px;
+    filter:drop-shadow(0 2px 3px #10070035);
+  }
+  #game .speech::after,#game .speech.has-badge::after{
+    background:#fff2d7;height:19px;bottom:3px;
+    left:calc(-1 * var(--speech-tail,24px) + 7px);
+  }
+}
+
+/* Entire approved desktop scene, including its own integrated wall sign,
+   window, detective, cat and ornate table. Only rasterized mock controls
+   were removed. All live controls remain independent HTML. */
+.approved-desktop-art{display:none;}
+@media(min-aspect-ratio:4/5){
+  #game .stage-wrap{--edge:66.3%;--actor-bottom:33.7%;}
+  #game .approved-desktop-art{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:0;pointer-events:none;}
+  #game .room-art{visibility:hidden;}
+  #game .stage-wrap:not(.desktop-art-ready) :is(#ask-panel,#categories,#hud,#back,#stage){visibility:hidden;}
+  #game #answers,#game #categories{top:79%;bottom:10%;width:min(79%,1050px);}
+  #game .stage-wrap:has(#back:not([hidden])) #answers{width:min(85%,1050px);}
+  #game .speech{border-radius:24px;background:#fff2d7;}
+  #game .speech::after,#game .speech.has-badge::after{background:#fff2d7;}
+  #game[data-view="solved"] #hud{top:76%;bottom:10%;}
+}
+@media(min-aspect-ratio:4/5) and (max-height:450px){
+  #game #answers,#game #categories{top:77%;bottom:5%;}
 }

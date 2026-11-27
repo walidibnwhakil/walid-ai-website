@@ -753,3 +753,7 @@ if (new URLSearchParams(location.search).has("autotest")) {
 
 boot();
 showMenu();
+// All menu click handlers and the initial language are ready; the art gate
+// exposes the full screen in one frame, without waiting on knowledge fetches.
+menu.classList.add("controls-ready");
+menu.dispatchEvent(new Event("riddlex-menu-controls-ready"));

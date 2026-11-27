@@ -58,8 +58,16 @@ try {
       assert.equal(await page.locator(".menu-ambient-portrait").evaluate(el=>getComputedStyle(el).visibility),"hidden");
       assert.equal(await page.locator(".menu-ambient-portrait path").first().evaluate(el=>getComputedStyle(el).animationPlayState),"paused");
       assert.equal(await page.locator("#menu-cat").evaluate(el=>getComputedStyle(el).visibility),"hidden");
+      assert.equal(await page.locator("#menu").evaluate(el=>el.classList.contains("menu-ready")),false);
+      assert.equal(await page.locator(".menu-stage").evaluate(el=>el.inert),true);
+      assert.equal(await page.locator(".menu-stage").evaluate(el=>getComputedStyle(el).opacity),"0");
+      for(const selector of ["#play",".menu-back",'[data-riddlex-guide="rules"]','[data-riddlex-guide="about"]']){
+        assert.equal(await page.locator(selector).isVisible(),false,"early menu control "+selector);
+      }
     } finally {unblock();}
-    await page.waitForFunction(()=>document.getElementById("menu").classList.contains("art-ready"),null,{timeout:15000});
+    await page.waitForFunction(()=>document.getElementById("menu").classList.contains("menu-ready"),null,{timeout:20000});
+    assert.equal(await page.locator(".menu-stage").evaluate(el=>el.inert),false);
+    assert.equal(await page.locator(".menu-stage").evaluate(el=>getComputedStyle(el).opacity),"1");
     for(const [width,height] of [[320,568],[360,640],[390,570],[390,844],[412,915],[430,932]]){
       await page.setViewportSize({width,height});
       await page.waitForTimeout(100);
@@ -93,6 +101,45 @@ try {
     await page.close();
   }
 
+
+  // Desktop cold-load with a deliberately delayed main image. The same
+  // parent gate must suppress the blur, artwork and all menu text together.
+  {
+    const page=await browser.newPage({viewport:{width:1440,height:900}});
+    let unblock,requested;
+    const release=new Promise(resolve=>{unblock=resolve;});
+    const started=new Promise(resolve=>{requested=resolve;});
+    await page.route("**/*",async route=>{
+      const url=new URL(route.request().url());
+      if(url.origin!==origin)return route.abort();
+      if(url.pathname.endsWith("/menu-user-approved.webp")){requested();await release;}
+      return route.continue();
+    });
+    await page.goto(origin+"/games/riddlex/?autotest=1",{waitUntil:"domcontentloaded"});
+    await started;
+    try{
+      assert.equal(await page.locator(".menu-stage").evaluate(el=>getComputedStyle(el).opacity),"0");
+      assert.equal(await page.locator(".menu-stage").evaluate(el=>el.inert),true);
+      for(const selector of ["#play",".menu-back",".riddlex-guide-actions",".menu-card",".menu-blur"]){
+        assert.equal(await page.locator(selector).isVisible(),false,"desktop early menu element "+selector);
+      }
+    }finally{unblock();}
+    await page.waitForFunction(()=>document.getElementById("menu").classList.contains("menu-ready"),null,{timeout:20000});
+    assert.equal(await page.locator(".menu-stage").evaluate(el=>el.inert),false);
+    for(const selector of ["#play",".menu-back",".riddlex-guide-actions",".menu-card"]){
+      assert.equal(await page.locator(selector).isVisible(),true,"missing ready menu element "+selector);
+    }
+    await page.click('[data-riddlex-guide="about"]');
+    await page.waitForFunction(()=>document.getElementById("riddlex-guide").open);
+    await page.click(".guide-close");
+    await page.click("#play");
+    await page.waitForFunction(()=>!document.getElementById("game").hidden);
+    await page.click("#to-menu");
+    await page.waitForFunction(()=>!document.getElementById("menu").hidden&&document.getElementById("menu").classList.contains("menu-ready"));
+    assert.equal(await page.locator(".menu-stage").evaluate(el=>el.inert),false);
+    console.log("DESKTOP_MENU_ATOMIC_READY_PASS");
+    await page.close();
+  }
 
   // Verify the actual integrated approved sprites, both languages, layout and
   // render budget on the same real game. Existing gameplay tests remain below.

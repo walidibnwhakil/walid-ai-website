@@ -231,14 +231,15 @@ export function createScene(canvas) {
       warped[p+3]=255;
     }
     const out=g.createImageData(w,h),dst=out.data;
-    const open=key==="happy"||key==="surprised";
+    // Keep the painted lip texture for happy; synthesize an opening only for surprise.
+    const open=key==="surprised";
     for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
       const p=(yy*w+xx)*4;
       let dv=0,alpha=0,interior=null;
       if(open){
         // Separate the existing upper/lower lip seam rather than placing
         // an oval on the skin. The right-hand pipe corner is outside the mask.
-        const smile=key==="happy";
+        const smile=false;
         // Surprise follows the existing full lip seam (left corner to
         // pipe corner), rather than a detached round hole in the beard.
         const ax=xx+x-(smile?706:710),ay=yy+y-(smile?302:304);
@@ -291,14 +292,14 @@ export function createScene(canvas) {
       [cx-2*S,cy+4*C,16,7,0,amount*.6]
     ];
     const mouth=(a,b,c)=>[[687,297,15,13,0,a],[704,302,18,12,0,b],[723,309,12,10,0,c]];
-    // Deliberate, independently readable emotions: smile with teeth,
+    // Deliberate, independently readable emotions: natural closed-lip smile,
     // lowered brows and narrowed eyes, downturned sad lips, raised inner
     // worried brows, one raised confused brow, wide-eyed open-mouth surprise.
     const build=[
-      ["happy",face,[...mouth(-5,0,-2),...eye(703,239,-2.3),...eye(758,258,-2.3),[704,221,23,11,0,-2],[758,245,20,9,0,-2]]],
+      ["happy",face,[...mouth(-7,2,-3),...eye(703,239,-3.2),...eye(758,258,-3.2),[681,282,17,13,1,-2],[704,221,23,11,0,-2],[758,245,20,9,0,-2]]],
       ["sad",face,[...mouth(7,-3,2),...eye(703,239,-2),...eye(758,258,-2),[718,225,14,10,0,-7],[747,243,13,9,0,-6]]],
-      ["serious",face,[...mouth(2,-1,0),...eye(703,239,-2.8),...eye(758,258,-2.8),[717,225,16,10,0,5],[747,243,15,10,0,4]]],
-      ["worried",face,[...mouth(3,-2,0),...eye(703,239,1.8),...eye(758,258,1.8),[716,225,15,10,0,-7],[748,243,15,10,0,-7]]],
+      ["serious",face,[...mouth(1,0,0),...eye(703,239,-4),...eye(758,258,-4),[716,225,15,10,2,7],[747,243,14,10,-2,7],[693,221,13,8,0,-1],[768,246,13,8,0,-1]]],
+      ["worried",face,[...mouth(3,1,0),...eye(703,239,2.4),...eye(758,258,2.4),[716,225,15,10,0,-9],[748,243,15,10,0,-9],[693,221,13,8,0,3],[768,246,13,8,0,3]]],
       ["confused",face,[...mouth(2,1,-1),...eye(703,239,2),...eye(758,258,-2),[700,221,22,11,0,-8],[758,246,20,10,0,3]]],
       ["surprised",face,[...eye(703,239,2.7),...eye(758,258,2.7),[703,222,24,12,0,-7],[758,244,22,12,0,-6]]],
       ["blink",face,[...eye(703,239,-6),...eye(758,258,-6)]],

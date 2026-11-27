@@ -271,6 +271,10 @@ try {
       await page.evaluate(()=>window.__riddlex.setMood("curious"));
       await page.waitForFunction(()=>["","blink"].includes(window.__riddlex.expression().desktopMotion.activePose),null,{timeout:10000});
     }
+    // Capture the same neutral portrait without an active reaction, to
+    // allow actual visual comparison with all six expression screenshots.
+    await page.waitForFunction(()=>window.__riddlex.expression().desktopMotion.activePose==="");
+    if(shotFolder)await page.screenshot({path:join(shotFolder,"desktop-expression-neutral.png")});
     console.log("DESKTOP_EXCLUSIVE_EXPRESSIONS_PASS",seenFaces.size);
     await page.click('#game [data-set-lang="bn"]');
     await page.evaluate(async()=>{const fonts=await document.fonts.load('400 19px SolaimanLipi','বাংলা প্রশ্ন হ্যাঁ না');if(!fonts.length||!fonts.every(f=>f.status==="loaded"))throw Error("SolaimanLipi did not load");});

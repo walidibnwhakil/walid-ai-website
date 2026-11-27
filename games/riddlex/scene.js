@@ -187,27 +187,110 @@ export function createScene(canvas) {
   }
   // New desktop overlays are sampled from the exact approved artwork, in
   // its own 1440×747 coordinate system. No old face or room pixels are used.
+  // Desktop facial rig: the neutral head is tilted 18 degrees, so
+  // displace individual brows/lids/lip contours in that coordinate system.
+  // This is a pre-baked local patch, not a per-frame full-head stretch.
+  function bakeDesktopFace(source,bounds,controls,key){
+    const {x,y,w,h}=bounds;
+    const sheet=document.createElement("canvas");sheet.width=w;sheet.height=h;
+    const g=sheet.getContext("2d",{willReadFrequently:true});
+    g.drawImage(source,x,y,w,h,0,0,w,h);
+    const original=g.getImageData(0,0,w,h).data;
+    const warped=new Uint8ClampedArray(original.length);
+    const C=Math.cos(Math.PI/10),S=Math.sin(Math.PI/10);
+    const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+    function sample(pixels,xx,yy,c){
+      xx=clamp(xx,0,w-1.001);yy=clamp(yy,0,h-1.001);
+      const i=Math.floor(xx),j=Math.floor(yy),u=xx-i,v=yy-j;
+      const k=(j*w+i)*4+c;
+      return (pixels[k]*(1-u)+pixels[k+4]*u)*(1-v)
+        +(pixels[k+w*4]*(1-u)+pixels[k+w*4+4]*u)*v;
+    }
+    for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
+      let dx=0,dy=0;
+      for(const [cx,cy,rx,ry,mx,my] of controls){
+        const ax=xx+x-cx,ay=yy+y-cy;
+        const u=(ax*C+ay*S)/rx,v=(-ax*S+ay*C)/ry;
+        const k=Math.max(0,1-u*u-v*v)**2;
+        dx+=(mx*C-my*S)*k;dy+=(mx*S+my*C)*k;
+      }
+      const p=(yy*w+xx)*4;
+      for(let c=0;c<3;c++)warped[p+c]=sample(original,xx-dx,yy-dy,c);
+      warped[p+3]=255;
+    }
+    const out=g.createImageData(w,h),dst=out.data;
+    const open=key==="happy"||key==="surprised";
+    for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
+      const p=(yy*w+xx)*4;
+      let dv=0,alpha=0,interior=null;
+      if(open){
+        // Separate the existing upper/lower lip seam rather than placing
+        // an oval on the skin. The right-hand pipe corner is outside the mask.
+        const ax=xx+x-706,ay=yy+y-302,u=ax*C+ay*S,v=-ax*S+ay*C;
+        const smile=key==="happy",mw=smile?21:10.5;
+        const shape=Math.max(0,1-(u/mw)**2)**.7;
+        if(shape>0){
+          const seam=smile?clamp(1.4-4*(u/mw)**2,-4,2):0;
+          const upper=seam-shape*(smile?1.8:3),lower=seam+shape*(smile?4.2:7);
+          dv=(v<upper?upper*Math.max(0,1-(upper-v)/7):lower*Math.max(0,1-(v-lower)/10))*Math.min(1,shape*3);
+          alpha=clamp(Math.min(v-upper,lower-v)*1.55,0,1)*clamp(shape*4,0,1);
+          const depth=clamp((v-upper)/Math.max(.1,lower-upper),0,1);
+          interior=[62+17*depth,28+3*depth,22-2*depth];
+          if(smile){
+            const shade=Math.max(0,1-Math.abs(u)/mw);
+            const tooth=clamp((.66-depth)*7,0,1)*clamp(depth*9,0,1)*clamp((.94-Math.abs(u)/mw)*12,0,1);
+            const toothColor=[170+39*shade,139+32*shade,108+24*shade];
+            // Gentle shadows between teeth, kept in the warm room lighting.
+            const groove=Math.pow(Math.max(0,Math.cos((u+1)*Math.PI/5)),14)*9;
+            interior=interior.map((n,c)=>n*(1-tooth)+(toothColor[c]-groove)*tooth);
+          }else{
+            const tongue=clamp((depth-.72)*5,0,1)*clamp((.75-Math.abs(u)/mw)*5,0,1);
+            interior=interior.map((n,c)=>n*(1-tongue)+[120,53,45][c]*tongue);
+          }
+        }
+      }
+      let change=0;
+      for(let c=0;c<3;c++){
+        let value=sample(warped,xx+dv*S,yy-dv*C,c);
+        if(alpha>0&&interior){
+          const texture=(original[p+c]-sample(original,xx+.7,yy+.7,c))*.15;
+          value=value*(1-alpha)+(interior[c]+texture)*alpha;
+        }
+        dst[p+c]=value;change=Math.max(change,Math.abs(dst[p+c]-original[p+c]));
+      }
+      // Unchanged pixels need no overlay. The outer face, hat, nose,
+      // glasses bridge, pipe and room stay in the original artwork.
+      dst[p+3]=change>0?Math.round(255*Math.min(1,xx/6,yy/6,(w-1-xx)/6,(h-1-yy)/6)):0;
+    }
+    g.putImageData(out,0,0);return sheet;
+  }
   async function prepareDesktopPoses(source){
-    // Measured landmarks on the deployed 1440×747 artwork: left eye
-    // (704,240), right eye (758,258), mouth under the moustache, pipe
-    // anchored at (740,310). Restrict movement to separate facial features.
-    // Never move the nose, jaw, glasses bridge, hat, or pipe.
-    const face={x:640,y:207,w:155,h:125}, kitty={x:960,y:388,w:295,h:115};
+    const face={x:640,y:207,w:155,h:125},kitty={x:960,y:388,w:295,h:115};
+    const C=Math.cos(Math.PI/10),S=Math.sin(Math.PI/10);
+    const eye=(cx,cy,amount)=>[
+      [cx+2*S,cy-4*C,16,7,0,-amount],
+      [cx-2*S,cy+4*C,16,7,0,amount*.6]
+    ];
+    const mouth=(a,b,c)=>[[687,297,15,13,0,a],[704,302,18,12,0,b],[723,309,12,10,0,c]];
+    // Deliberate, independently readable emotions: smile with teeth,
+    // lowered brows and narrowed eyes, downturned sad lips, raised inner
+    // worried brows, one raised confused brow, wide-eyed open-mouth surprise.
     const build=[
-      ["happy",face,[[690,290,23,17,0,-5],[700,302,20,13,0,-3],[730,302,13,11,0,-3],[704,248,19,8,0,-2],[758,265,18,8,0,-2]]],
-      ["serious",face,[[710,225,21,10,0,4],[752,242,20,10,0,3],[704,237,19,8,0,2],[759,255,19,8,0,2],[690,293,19,12,0,2]]],
-      ["sad",face,[[691,295,18,13,0,4],[729,303,11,10,0,2],[716,223,18,10,0,-4],[746,239,18,10,0,-4],[704,237,19,8,0,2],[759,255,19,8,0,2]]],
-      ["worried",face,[[714,224,18,11,0,-5],[748,241,18,11,0,-4],[704,234,18,8,0,-2],[759,252,18,8,0,-2],[691,296,18,12,0,3]]],
-      ["confused",face,[[697,221,22,12,0,-6],[753,242,18,10,0,3],[704,235,19,8,0,-2],[759,255,18,8,0,2],[691,296,18,12,0,2]]],
-      ["surprised",face,[[700,223,24,12,0,-7],[758,240,23,12,0,-7],[704,234,19,8,0,-2],[759,253,19,8,0,-2],[704,247,19,8,0,1.5],[759,266,19,8,0,1.5],[710,307,17,10,0,2]]],
-      ["blink",face,[[704,238,18,8,0,5],[758,257,18,8,0,5],[704,246,18,8,0,-4],[758,265,18,8,0,-4]]],
+      ["happy",face,[...mouth(-5,0,-2),...eye(703,239,-2.3),...eye(758,258,-2.3),[704,221,23,11,0,-2],[758,245,20,9,0,-2]]],
+      ["sad",face,[...mouth(7,-3,2),...eye(703,239,-2),...eye(758,258,-2),[718,225,14,10,0,-7],[747,243,13,9,0,-6]]],
+      ["serious",face,[...mouth(2,-1,0),...eye(703,239,-2.8),...eye(758,258,-2.8),[717,225,16,10,0,5],[747,243,15,10,0,4]]],
+      ["worried",face,[...mouth(3,-2,0),...eye(703,239,1.8),...eye(758,258,1.8),[716,225,15,10,0,-7],[748,243,15,10,0,-7]]],
+      ["confused",face,[...mouth(2,1,-1),...eye(703,239,2),...eye(758,258,-2),[700,221,22,11,0,-8],[758,246,20,10,0,3]]],
+      ["surprised",face,[...eye(703,239,4.5),...eye(758,258,4.5),[703,222,24,12,0,-7],[758,244,22,12,0,-6]]],
+      ["blink",face,[...eye(703,239,-6),...eye(758,258,-6)]],
       ["cat",kitty,[[1004,452,12,9,0,4],[1044,457,12,9,0,4]]],
       ["tail",kitty,[[1213,474,31,22,2,-3],[1241,478,20,17,-2,-3]]]
     ];
     const result={};
     for(const [key,bounds,controls] of build){
       await new Promise(resolve=>setTimeout(resolve,0));
-      result[key]={image:bakePose(source,bounds,controls),bounds};
+      const image=bounds===face?bakeDesktopFace(source,bounds,controls,key):bakePose(source,bounds,controls);
+      result[key]={image,bounds};
     }
     desktopPoses=result;
     desktopPlates=Object.fromEntries(Object.entries(result).filter(([key])=>!["blink","surprised"].includes(key)));

@@ -1,8 +1,92 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-28T01:04:19.112874+00:00",
+  "updatedAt": "2026-11-28T09:46:27.641139+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "Manchester United v Brentford buildup, Premier League news and more – matchday live",
+      "url": "https://www.theguardian.com/football/live/2026/nov/28/manchester-united-v-brentford-buildup-premier-league-news-and-more-matchday-live",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-28T09:44:37+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'I was trying to be someone I wasn't' – Steward on All Blacks shot",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c67420k9jyxgo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T09:11:50+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Ranking the Premier League's ultimate free-kick specialists",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cjzx97dz149qo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T08:14:24+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Basque to the future: Andoni Iraola fired up for first Merseyside derby",
+      "url": "https://www.theguardian.com/football/2026/nov/28/andoni-iraola-first-merseyside-derby-liverpool-everton-premier-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-28T08:00:34+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "The Renéessance is over but Arsenal’s chaotic cycle will go on without further change | Suzanne Wrack",
+      "url": "https://www.theguardian.com/football/2026/nov/28/renee-slegers-arsenal-womens-super-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-28T08:00:33+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "How dad's embarrassment was making of Gross at Brighton",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm3egnw0y0d0o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T07:25:04+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Who am I? Plus today's other quizzes",
+      "url": "https://www.bbc.co.uk/sport/football/articles/c35y1kgn2l90o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T07:04:56+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'It doesn't come from me' - Eckert irked by Southampton jibes at Boro",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cq8e0xrk2gwno?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T06:54:09+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "How a football team rebuilt after 19 players died in plane crash",
+      "url": "https://www.bbc.co.uk/sport/football/articles/ck0ev91zlwgpo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T06:30:34+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Are these three brothers British skiing's next family dynasty?",
+      "url": "https://www.bbc.co.uk/sport/articles/c61wrqxgyd2no?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T06:17:50+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Columbus Crew eliminate Messi and Inter Miami from MLS playoffs with stoppage-time strike",
+      "url": "https://www.theguardian.com/football/2026/nov/27/inter-miami-columbus-crew-mls-playoffs-lionel-messi",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-28T03:53:14+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Farrell senses 'shift' as Ireland end year strongly with Wallabies win",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c6879ezd5r5qo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-28T00:05:10+00:00",
+      "category": "Sports"
+    },
     {
       "title": "Wilshere v Ramsey - Arsenal legends treading similar managerial paths",
       "url": "https://www.bbc.co.uk/sport/football/articles/cm1dvn9w1px4o?at_medium=RSS&at_campaign=rss",
@@ -25,13 +109,6 @@
       "category": "Sports"
     },
     {
-      "title": "Five-try Ireland beat Australia in autumn finale",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cw987l0ej11mo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T22:17:45+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Spygate tensions erupt at Southampton after Finn Azaz’s cry-baby celebration riles Boro",
       "url": "https://www.theguardian.com/football/2026/nov/27/southampton-middlesbrough-championship-match-report-spygate-finn-azaz",
       "source": "The Guardian Football",
@@ -46,14 +123,7 @@
       "category": "Sports"
     },
     {
-      "title": "Gibbs-White stars, Fofana struggles - player ratings for Forest v Chelsea",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmwy85xxjgxvo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T21:59:48+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'You're not welcome here' - Chelsea fans turn on Fofana",
+      "title": "'You're not welcome here' - fans turn on Fofana as Chelsea lose again",
       "url": "https://www.bbc.co.uk/sport/football/articles/cmqlqeqd4wg5o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-27T21:31:54+00:00",
@@ -74,38 +144,10 @@
       "category": "Sports"
     },
     {
-      "title": "Mercedes set pace in eventful Qatar second practice",
-      "url": "https://www.bbc.co.uk/sport/formula1/articles/cqpv903y40jko?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T19:50:06+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Wales aim to finish historic campaign with Japan win",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cr0jx98elggxo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T19:35:49+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Decline of deities - the long game the All Blacks cannot afford to lose",
       "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cmkgkl7de60go?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
       "publishedAt": "2026-11-27T18:42:05+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Why snooker could be the most mentally challenging sport",
-      "url": "https://www.bbc.co.uk/sport/snooker/articles/cm174wqxk8lpo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T17:00:10+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Football Daily | Watford, the Pozzos and the hottest managerial seat in the game",
-      "url": "https://www.theguardian.com/football/2026/nov/27/watford-hottest-managerial-seat-pozzos-football-daily-newsletter",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T16:36:35+00:00",
       "category": "Sports"
     },
     {
@@ -116,52 +158,10 @@
       "category": "Sports"
     },
     {
-      "title": "Manchester United extend Fernandes contract until 2028 to stop free transfer",
-      "url": "https://www.theguardian.com/football/2026/nov/27/manchester-united-bruno-fernandes-contract-2028-activate-option-mauricio-pochettino",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T15:29:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Renée Slegers leaves job as Arsenal Women’s coach after dismal run of results",
-      "url": "https://www.theguardian.com/football/2026/nov/27/renee-slegers-leaves-arsenal-women-head-coach",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T15:11:25+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Man Utd trigger Fernandes' one-year contract extension",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c6d91j5geepqo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T15:08:41+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Cricket Australia may not like sandpaper forum findings - Vaughan",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/c5pv903jvy2po?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T14:05:57+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "French and Bulgarian presidents condemn violence at Marseille v Levski Europa League game",
-      "url": "https://www.theguardian.com/football/2026/nov/27/french-bulgarian-presidents-emmanuel-macron-iliana-iotova-condemn-violence-marseille-levski-sofia-europa-league",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T13:58:00+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Ross County have 102 goals and British football’s best start but is it a fairytale?",
       "url": "https://www.theguardian.com/football/2026/nov/27/ross-county-british-football-best-start-102-goals",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-27T12:00:10+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "England outclass Australia again to take series lead",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/cm9d704g26z4o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T11:45:14+00:00",
       "category": "Sports"
     },
     {
@@ -3875,35 +3875,6 @@
       "coverage": "available",
       "source": "CricketData",
       "matches": [
-        {
-          "id": "20c5f3c7-3f93-46c7-a445-e4bcb2322ab4",
-          "homeTeam": "Malaysia Women",
-          "awayTeam": "China Women",
-          "homeScore": 104,
-          "awayScore": 93,
-          "innings": [
-            {
-              "team": "Malaysia Women Inning 1",
-              "runs": 104,
-              "wickets": 6,
-              "overs": 20
-            },
-            {
-              "team": "China Women Inning 1",
-              "runs": 93,
-              "wickets": 10,
-              "overs": 19.3
-            }
-          ],
-          "winner": "Malaysia Women",
-          "resultText": "Malaysia Women won by 11 runs",
-          "competition": "Malaysia Women vs China Women, 6th Match, Malaysia Womens T20I Tri-Series, 2026",
-          "matchType": "t20",
-          "startTime": "2026-11-25T02:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
         {
           "id": "7842c1c6-cf1d-4a79-8063-27df6a6ddfdc",
           "homeTeam": "Bihar Rising",

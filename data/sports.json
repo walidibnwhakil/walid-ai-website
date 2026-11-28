@@ -1,20 +1,97 @@
 {
   "kind": "sports",
-  "updatedAt": "2026-11-27T17:50:22.556225+00:00",
+  "updatedAt": "2026-11-28T01:04:19.112874+00:00",
   "status": "ok",
   "items": [
     {
-      "title": "Emery praises Garnacho attitude after Villa selection snub",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cwp9d4eg4n2xo?at_medium=RSS&at_campaign=rss",
+      "title": "Wilshere v Ramsey - Arsenal legends treading similar managerial paths",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cm1dvn9w1px4o?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
-      "publishedAt": "2026-11-27T17:42:00+00:00",
+      "publishedAt": "2026-11-27T22:58:49+00:00",
       "category": "Sports"
     },
     {
-      "title": "Manchester United extend Fernandes’s contract to 2028; Raya back in Arsenal training – football live",
-      "url": "https://www.theguardian.com/football/live/2026/nov/27/premier-league-news-levski-fans-marseille-violence-football",
+      "title": "Arteta sets Arsenal 100-point Premier League target to emulate Manchester City",
+      "url": "https://www.theguardian.com/football/2026/nov/27/arteta-sets-arsenal-100-point-premier-league-target-to-emulate-manchester-city",
       "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T17:24:16+00:00",
+      "publishedAt": "2026-11-27T22:30:22+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "‘My Tottenham was born’: De Zerbi harks back to opening defeat for Sunderland return",
+      "url": "https://www.theguardian.com/football/2026/nov/27/roberto-de-zerbi-tottenham-sunderland",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-27T22:30:22+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Five-try Ireland beat Australia in autumn finale",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cw987l0ej11mo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-27T22:17:45+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Spygate tensions erupt at Southampton after Finn Azaz’s cry-baby celebration riles Boro",
+      "url": "https://www.theguardian.com/football/2026/nov/27/southampton-middlesbrough-championship-match-report-spygate-finn-azaz",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-27T22:11:28+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Gibbs-White and Igor Jesus fire Nottingham Forest past shaky Chelsea",
+      "url": "https://www.theguardian.com/football/2026/nov/27/nottingham-forest-chelsea-premier-league-match-report",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-27T22:10:35+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Gibbs-White stars, Fofana struggles - player ratings for Forest v Chelsea",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmwy85xxjgxvo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-27T21:59:48+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "'You're not welcome here' - Chelsea fans turn on Fofana",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cmqlqeqd4wg5o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-27T21:31:54+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Champions League to be a factor in Paz move - Saturday's gossip",
+      "url": "https://www.bbc.co.uk/sport/football/articles/cqvg23jg6x78o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-27T21:19:27+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Why have things started to go wrong for Manchester City under Enzo Maresca?",
+      "url": "https://www.theguardian.com/football/2026/nov/27/why-things-started-go-wrong-manchester-city-under-enzo-maresca",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-27T20:00:19+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Mercedes set pace in eventful Qatar second practice",
+      "url": "https://www.bbc.co.uk/sport/formula1/articles/cqpv903y40jko?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-27T19:50:06+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Wales aim to finish historic campaign with Japan win",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cr0jx98elggxo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-27T19:35:49+00:00",
+      "category": "Sports"
+    },
+    {
+      "title": "Decline of deities - the long game the All Blacks cannot afford to lose",
+      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/cmkgkl7de60go?at_medium=RSS&at_campaign=rss",
+      "source": "BBC Sport",
+      "publishedAt": "2026-11-27T18:42:05+00:00",
       "category": "Sports"
     },
     {
@@ -39,10 +116,10 @@
       "category": "Sports"
     },
     {
-      "title": "Arsenal head coach Slegers leaves by mutual consent",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmy49d5kpw78o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T16:14:34+00:00",
+      "title": "Manchester United extend Fernandes contract until 2028 to stop free transfer",
+      "url": "https://www.theguardian.com/football/2026/nov/27/manchester-united-bruno-fernandes-contract-2028-activate-option-mauricio-pochettino",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-27T15:29:41+00:00",
       "category": "Sports"
     },
     {
@@ -60,20 +137,6 @@
       "category": "Sports"
     },
     {
-      "title": "What happens now for Bayern Munich and Musiala?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cmly5j49ypzqo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T15:03:12+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "'I am not a magician' - what can Maresca's Man City learn from watertight Arsenal?",
-      "url": "https://www.bbc.co.uk/sport/football/articles/cknv47dee54zo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T14:37:58+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Cricket Australia may not like sandpaper forum findings - Vaughan",
       "url": "https://www.bbc.co.uk/sport/cricket/articles/c5pv903jvy2po?at_medium=RSS&at_campaign=rss",
       "source": "BBC Sport",
@@ -81,17 +144,10 @@
       "category": "Sports"
     },
     {
-      "title": "Australia set to drop Lyon for first New Zealand Test",
-      "url": "https://www.bbc.co.uk/sport/cricket/articles/ckjre1p5g4l7o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T12:24:09+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Fury cleared to fight Joshua after wife retracts schizophrenia claim",
-      "url": "https://www.bbc.co.uk/sport/boxing/articles/c539gd2x2ye1o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T12:13:15+00:00",
+      "title": "French and Bulgarian presidents condemn violence at Marseille v Levski Europa League game",
+      "url": "https://www.theguardian.com/football/2026/nov/27/french-bulgarian-presidents-emmanuel-macron-iliana-iotova-condemn-violence-marseille-levski-sofia-europa-league",
+      "source": "The Guardian Football",
+      "publishedAt": "2026-11-27T13:58:00+00:00",
       "category": "Sports"
     },
     {
@@ -109,66 +165,10 @@
       "category": "Sports"
     },
     {
-      "title": "Twickenham set to be half empty for Nations Championship finals opening night",
-      "url": "https://www.bbc.co.uk/sport/rugby-union/articles/c65y1k8428qdo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T11:17:46+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Clashes mar European games as Macron condemns violence",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c69q8y5x03ywo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC Sport",
-      "publishedAt": "2026-11-27T10:24:24+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Can Borussia Dortmund finally end their title wait? Three big questions for Bundesliga leaders",
-      "url": "https://www.theguardian.com/football/2026/nov/27/borussia-dortmund-bundesliga",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T10:00:01+00:00",
-      "category": "Sports"
-    },
-    {
       "title": "Tarik Muharemovic: ‘Dad is at every Leeds game. I sometimes hear him shouting from the stands’",
       "url": "https://www.theguardian.com/football/2026/nov/27/tarik-muharemovic-leeds-bosnia-dad-parents",
       "source": "The Guardian Football",
       "publishedAt": "2026-11-27T09:57:44+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Liam Delap’s struggles are symbolic of damaging Chelsea churn",
-      "url": "https://www.theguardian.com/football/2026/nov/27/liam-delap-struggles-damaging-chelsea-churn",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T08:00:57+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Premier League: 10 things to look out for this weekend",
-      "url": "https://www.theguardian.com/football/2026/nov/27/premier-league-10-things-to-look-out-for-this-weekend",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-27T00:00:48+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Éric Cantona: ‘If I regret something about the kung fu kick, it’s that I would love to kick him in another place’",
-      "url": "https://www.theguardian.com/football/2026/nov/26/eric-cantona-interview-new-documentary",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-26T20:00:44+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Search for next USMNT head coach needs to prioritize competence over fame",
-      "url": "https://www.theguardian.com/football/2026/nov/25/usmnt-head-coach-search",
-      "source": "The Guardian Football",
-      "publishedAt": "2026-11-25T10:00:12+00:00",
-      "category": "Sports"
-    },
-    {
-      "title": "Sign up for the Football Daily newsletter: our free football email",
-      "url": "https://www.theguardian.com/info/2022/nov/14/football-daily-email-sign-up",
-      "source": "The Guardian Football",
-      "publishedAt": "2022-11-14T09:05:50+00:00",
       "category": "Sports"
     }
   ],
@@ -199,13 +199,13 @@
           "id": "83253",
           "homeTeam": "SV Werder Bremen",
           "awayTeam": "Borussia Mönchengladbach",
-          "homeScore": null,
-          "awayScore": null,
-          "winner": null,
+          "homeScore": 3,
+          "awayScore": 3,
+          "winner": "Draw",
           "competition": "1. Fußball-Bundesliga 2026/2027",
           "startTime": "2026-11-27T19:30:00Z",
           "finishedAt": null,
-          "status": "scheduled",
+          "status": "finished",
           "source": "OpenLigaDB",
           "homeCountry": "Germany",
           "awayCountry": "Germany",
@@ -3876,296 +3876,6 @@
       "source": "CricketData",
       "matches": [
         {
-          "id": "74293804-c2a4-4a56-844d-474dcb395470",
-          "homeTeam": "Western Australia",
-          "awayTeam": "England",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [
-            {
-              "team": "england Inning 1",
-              "runs": 251,
-              "wickets": 10,
-              "overs": 48
-            },
-            {
-              "team": "Western Australia,England Inning 1",
-              "runs": 159,
-              "wickets": 10,
-              "overs": 32.3
-            }
-          ],
-          "winner": "England",
-          "resultText": "England won by 92 runs",
-          "competition": "Western Australia vs England, Tour Match, England tour of Australia, 2026",
-          "matchType": "",
-          "startTime": "2026-11-07T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "b143ee8f-6faa-48bd-a69e-dc7aa65494ba",
-          "homeTeam": "Sri Lanka A",
-          "awayTeam": "Afghanistan A",
-          "homeScore": 144,
-          "awayScore": 139,
-          "innings": [
-            {
-              "team": "Afghanistan A Inning 1",
-              "runs": 139,
-              "wickets": 10,
-              "overs": 35.3
-            },
-            {
-              "team": "Sri Lanka A Inning 1",
-              "runs": 144,
-              "wickets": 4,
-              "overs": 21.4
-            }
-          ],
-          "winner": "Sri Lanka A",
-          "resultText": "Sri Lanka A won by 6 wkts",
-          "competition": "Sri Lanka A vs Afghanistan A, 2nd Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
-          "matchType": "odi",
-          "startTime": "2026-11-19T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "6e68f8dd-bcb7-49fc-a3ee-7e58ebff2d67",
-          "homeTeam": "Bangladesh A",
-          "awayTeam": "Hong Kong",
-          "homeScore": 220,
-          "awayScore": 219,
-          "innings": [
-            {
-              "team": "Hong Kong Inning 1",
-              "runs": 219,
-              "wickets": 8,
-              "overs": 50
-            },
-            {
-              "team": "Bangladesh A Inning 1",
-              "runs": 220,
-              "wickets": 2,
-              "overs": 41
-            }
-          ],
-          "winner": "Bangladesh A",
-          "resultText": "Bangladesh A won by 8 wkts",
-          "competition": "Bangladesh A vs Hong Kong, China, 1st Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
-          "matchType": "odi",
-          "startTime": "2026-11-19T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "2ccadc74-616d-40d4-9931-d03a39313ada",
-          "homeTeam": "Malaysia Women",
-          "awayTeam": "Indonesia Women",
-          "homeScore": 93,
-          "awayScore": 95,
-          "innings": [
-            {
-              "team": "Malaysia Women Inning 1",
-              "runs": 93,
-              "wickets": 6,
-              "overs": 20
-            },
-            {
-              "team": "Indonesia Women Inning 1",
-              "runs": 95,
-              "wickets": 3,
-              "overs": 18.4
-            }
-          ],
-          "winner": "Indonesia Women",
-          "resultText": "Indonesia Women won by 7 wkts",
-          "competition": "Malaysia Women vs Indonesia Women, 1st Match, Malaysia Womens T20I Tri-Series, 2026",
-          "matchType": "t20",
-          "startTime": "2026-11-20T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "39bb2cbe-5c92-4892-99ad-4f49a5b1e51b",
-          "homeTeam": "India A",
-          "awayTeam": "Nepal",
-          "homeScore": 332,
-          "awayScore": 26,
-          "innings": [
-            {
-              "team": "India A Inning 1",
-              "runs": 332,
-              "wickets": 9,
-              "overs": 50
-            },
-            {
-              "team": "Nepal Inning 1",
-              "runs": 26,
-              "wickets": 10,
-              "overs": 11.3
-            }
-          ],
-          "winner": "India A",
-          "resultText": "India A won by 306 runs",
-          "competition": "India A vs Nepal, 4th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
-          "matchType": "odi",
-          "startTime": "2026-11-20T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "72455080-e167-4dfe-8f30-120a5fa644a4",
-          "homeTeam": "Pakistan A",
-          "awayTeam": "United Arab Emirates",
-          "homeScore": 245,
-          "awayScore": 184,
-          "innings": [
-            {
-              "team": "Pakistan A Inning 1",
-              "runs": 245,
-              "wickets": 10,
-              "overs": 46.4
-            },
-            {
-              "team": "United Arab Emirates Inning 1",
-              "runs": 184,
-              "wickets": 10,
-              "overs": 40.5
-            }
-          ],
-          "winner": "Pakistan A",
-          "resultText": "Pakistan A won by 61 runs",
-          "competition": "Pakistan A vs United Arab Emirates, 3rd Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
-          "matchType": "odi",
-          "startTime": "2026-11-20T00:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "f666c7b1-fe23-4213-a2b4-3685f784a958",
-          "homeTeam": "Sri Lanka A",
-          "awayTeam": "Bangladesh A",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [
-            {
-              "team": "bangladesh a Inning 1",
-              "runs": 145,
-              "wickets": 10,
-              "overs": 42.5
-            },
-            {
-              "team": "Sri Lanka A,Bangladesh A Inning 1",
-              "runs": 146,
-              "wickets": 3,
-              "overs": 21.5
-            }
-          ],
-          "winner": "Sri Lanka A",
-          "resultText": "Sri Lanka A won by 7 wkts",
-          "competition": "Sri Lanka A vs Bangladesh A, 10th Match, Group A, ACC Mens Asia Cup Rising Stars 2026",
-          "matchType": "odi",
-          "startTime": "2026-11-23T10:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "55d8876a-0e3e-44df-9826-dece3fe4d219",
-          "homeTeam": "China Women",
-          "awayTeam": "Indonesia Women",
-          "homeScore": 55,
-          "awayScore": 146,
-          "innings": [
-            {
-              "team": "Indonesia Women Inning 1",
-              "runs": 146,
-              "wickets": 8,
-              "overs": 20
-            },
-            {
-              "team": "China Women Inning 1",
-              "runs": 55,
-              "wickets": 10,
-              "overs": 15.2
-            }
-          ],
-          "winner": "Indonesia Women",
-          "resultText": "Indonesia Women won by 91 runs",
-          "competition": "China Women vs Indonesia Women, 5th Match, Malaysia Womens T20I Tri-Series, 2026",
-          "matchType": "t20",
-          "startTime": "2026-11-24T02:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "34838ce0-fb99-4126-a4e4-2f1557abc8c1",
-          "homeTeam": "India A",
-          "awayTeam": "United Arab Emirates",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [
-            {
-              "team": "united arab emirates Inning 1",
-              "runs": 249,
-              "wickets": 8,
-              "overs": 50
-            },
-            {
-              "team": "India A,United Arab Emirates Inning 1",
-              "runs": 254,
-              "wickets": 3,
-              "overs": 14.2
-            }
-          ],
-          "winner": "India A",
-          "resultText": "India A won by 7 wkts",
-          "competition": "India A vs United Arab Emirates, 11th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
-          "matchType": "odi",
-          "startTime": "2026-11-24T06:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
-          "id": "3d6289f5-71db-4917-8de3-9872ba0437e9",
-          "homeTeam": "Pakistan A",
-          "awayTeam": "Nepal",
-          "homeScore": null,
-          "awayScore": null,
-          "innings": [
-            {
-              "team": "pakistan a Inning 1",
-              "runs": 168,
-              "wickets": 10,
-              "overs": 42
-            },
-            {
-              "team": "Pakistan A,Nepal Inning 1",
-              "runs": 72,
-              "wickets": 10,
-              "overs": 17.3
-            }
-          ],
-          "winner": "Pakistan A",
-          "resultText": "Pakistan A won by 96 runs",
-          "competition": "Pakistan A vs Nepal, 12th Match, Group B, ACC Mens Asia Cup Rising Stars 2026",
-          "matchType": "odi",
-          "startTime": "2026-11-24T10:00:00Z",
-          "finishedAt": null,
-          "status": "finished",
-          "source": "CricketData"
-        },
-        {
           "id": "20c5f3c7-3f93-46c7-a445-e4bcb2322ab4",
           "homeTeam": "Malaysia Women",
           "awayTeam": "China Women",
@@ -4554,6 +4264,262 @@
           "competition": "South Africa A vs England Lions, 1st Unofficial ODI, England Lions tour of South Africa, 2026",
           "matchType": "",
           "startTime": "2026-12-01T08:00:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "0fe15146-9f8c-4729-906d-27bb6921eaab",
+          "homeTeam": "Real Challengers Bengaluru",
+          "awayTeam": "Jharkhand Vanguard",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Real Challengers Bengaluru vs Jharkhand Vanguard, 103rd Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-21T11:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "3b782ffb-bc2d-4d06-a0cb-61a230c7b593",
+          "homeTeam": "Pondicherry Pitchers",
+          "awayTeam": "Coral Strikers Lakshadweep",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Pondicherry Pitchers vs Coral Strikers Lakshadweep, 104th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-21T13:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "c2660c13-d55a-4ed1-9ae3-ca178bb62d21",
+          "homeTeam": "Maharashtra Super Strikers",
+          "awayTeam": "Punjab Golden Fighters",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Maharashtra Super Strikers vs Punjab Golden Fighters, 105th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-21T15:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "36593a01-3b97-40af-92db-cdb27d205998",
+          "homeTeam": "Real Challengers Bengaluru",
+          "awayTeam": "Mp Malwa Royals",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Real Challengers Bengaluru vs Mp Malwa Royals, 106th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-22T09:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "6b1ecfda-9cf4-4159-9771-77cb7bb7e10a",
+          "homeTeam": "Pondicherry Pitchers",
+          "awayTeam": "Hima Hawks North East",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Pondicherry Pitchers vs Hima Hawks North East, 107th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-22T11:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "a67ec8b2-5696-42df-b7a2-d569db6eaafb",
+          "homeTeam": "Punjab Golden Fighters",
+          "awayTeam": "Coral Strikers Lakshadweep",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Punjab Golden Fighters vs Coral Strikers Lakshadweep, 108th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-22T13:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "d742cd7d-0b32-4514-82a9-573e6d6a8a3c",
+          "homeTeam": "Real Challengers Bengaluru",
+          "awayTeam": "Maharashtra Super Strikers",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Real Challengers Bengaluru vs Maharashtra Super Strikers, 109th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-22T15:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "605227a9-48b3-452f-ac33-0d0ef1c7df89",
+          "homeTeam": "Jharkhand Vanguard",
+          "awayTeam": "Mp Malwa Royals",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Jharkhand Vanguard vs Mp Malwa Royals, 110th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-23T09:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "4de9bd38-692c-4f33-b899-95c241c64b40",
+          "homeTeam": "Real Challengers Bengaluru",
+          "awayTeam": "Punjab Golden Fighters",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Real Challengers Bengaluru vs Punjab Golden Fighters, 111th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-23T11:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "024fe0cf-9684-4fdd-a644-6233a9495522",
+          "homeTeam": "Coral Strikers Lakshadweep",
+          "awayTeam": "Hima Hawks North East",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Coral Strikers Lakshadweep vs Hima Hawks North East, 112th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-23T13:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "d4f88f5f-b48f-4a3b-9c40-2a76fa30d7d2",
+          "homeTeam": "Pondicherry Pitchers",
+          "awayTeam": "Mp Malwa Royals",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Pondicherry Pitchers vs Mp Malwa Royals, 113th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-23T15:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "0a7ae1de-3272-49aa-83bb-a7f650b3cc27",
+          "homeTeam": "Jharkhand Vanguard",
+          "awayTeam": "Maharashtra Super Strikers",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Jharkhand Vanguard vs Maharashtra Super Strikers, 114th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-24T09:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "a8263b03-ec25-4f41-bab2-56e09bad26f7",
+          "homeTeam": "Punjab Golden Fighters",
+          "awayTeam": "Hima Hawks North East",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Punjab Golden Fighters vs Hima Hawks North East, 115th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-24T11:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "ab74b146-3632-4eba-86ec-92d42471d3b2",
+          "homeTeam": "Coral Strikers Lakshadweep",
+          "awayTeam": "Jharkhand Vanguard",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Coral Strikers Lakshadweep vs Jharkhand Vanguard, 116th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-24T13:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "fbfefad1-618f-4ec5-b447-db1fce3ce350",
+          "homeTeam": "Maharashtra Super Strikers",
+          "awayTeam": "Mp Malwa Royals",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Maharashtra Super Strikers vs Mp Malwa Royals, 117th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-24T15:30:00Z",
+          "finishedAt": null,
+          "status": "scheduled",
+          "source": "CricketData"
+        },
+        {
+          "id": "bc543dd6-0a32-4f25-8cd7-98a8a5f9057b",
+          "homeTeam": "Pondicherry Pitchers",
+          "awayTeam": "Real Challengers Bengaluru",
+          "homeScore": null,
+          "awayScore": null,
+          "innings": [],
+          "winner": null,
+          "resultText": null,
+          "competition": "Pondicherry Pitchers vs Real Challengers Bengaluru, 118th Match, Group D, Indian Softball Cricket League 2026",
+          "matchType": "t20",
+          "startTime": "2026-12-25T11:30:00Z",
           "finishedAt": null,
           "status": "scheduled",
           "source": "CricketData"

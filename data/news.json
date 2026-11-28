@@ -1,8 +1,50 @@
 {
   "kind": "news",
-  "updatedAt": "2026-11-27T17:50:22.428834+00:00",
+  "updatedAt": "2026-11-28T01:04:18.758279+00:00",
   "status": "ok",
   "items": [
+    {
+      "title": "'Poison seller' Kenneth Law apologises in court to the families of his victims",
+      "url": "https://www.bbc.co.uk/news/articles/cmx2898wq2qjo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-28T00:56:55+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Spanish PM and rivals rally supporters in final pitch for votes",
+      "url": "https://www.bbc.co.uk/news/articles/c8wy5p4gdnwvo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-27T21:55:53+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Capsized tanker carrying 7,000 tonnes of diesel to be towed away from Ibiza",
+      "url": "https://www.bbc.co.uk/news/articles/cvrlgz6g0ekgo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-27T20:34:45+00:00",
+      "category": "World"
+    },
+    {
+      "title": "'We couldn't give up that easily': Marching bands scramble to cover costs after Thanksgiving parade rearranged",
+      "url": "https://www.bbc.co.uk/news/articles/ckd71ypy9e8eo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-27T20:06:31+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Weary of war but with no sign of backing down, Kyiv faces another punishing winter",
+      "url": "https://www.bbc.co.uk/news/articles/c3pw4yrr8kz9o?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-27T18:42:50+00:00",
+      "category": "World"
+    },
+    {
+      "title": "Zelensky criticises 'strange' Trump-Putin friendship in BBC interview",
+      "url": "https://www.bbc.co.uk/news/articles/c820q9wgrpyyo?at_medium=RSS&at_campaign=rss",
+      "source": "BBC World",
+      "publishedAt": "2026-11-27T18:00:40+00:00",
+      "category": "World"
+    },
     {
       "title": "Kenyan doomsday cult leader convicted over further 123 deaths",
       "url": "https://www.bbc.co.uk/news/articles/cmy49de4xx1zo?at_medium=RSS&at_campaign=rss",
@@ -18,52 +60,10 @@
       "category": "World"
     },
     {
-      "title": "Those who torched police stations, hospitals identified: Home minister",
-      "url": "https://en.prothomalo.com/bangladesh/local-news/l0gud6s437",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-27T16:45:41+00:00",
-      "category": "World"
-    },
-    {
       "title": "Brazil pushes back on Macron calling its meat 'doped'",
       "url": "https://www.bbc.co.uk/news/articles/c6rrg28npvzeo?at_medium=RSS&at_campaign=rss",
       "source": "BBC World",
       "publishedAt": "2026-11-27T15:54:15+00:00",
-      "category": "World"
-    },
-    {
-      "title": "‘Keep guerrilla boys ready; their task will be to kill about 10 BNP, Jamaat men’",
-      "url": "https://en.prothomalo.com/bangladesh/local-news/pgyy9j03b7",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-27T15:53:40+00:00",
-      "category": "World"
-    },
-    {
-      "title": "John Simpson: Ukraine is bowed but still unbroken as freezing weather sets in",
-      "url": "https://www.bbc.co.uk/news/articles/c3pw4yrr8kz9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-27T15:18:51+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Marching bands scramble to cover costs after Thanksgiving parade rearranged",
-      "url": "https://www.bbc.co.uk/news/articles/ckd71ypy9e8eo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-27T15:15:19+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Shahadat’s 103* sets Pakistan A 233-run target in semi-final",
-      "url": "https://en.prothomalo.com/sports/cricket/u362wf3h3c",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-27T14:44:52+00:00",
-      "category": "Bangladesh"
-    },
-    {
-      "title": "Chhatra Dal leader dragged off bus, beaten and robbed in Gopalganj",
-      "url": "https://en.prothomalo.com/bangladesh/crime-and-law/2o2k6gkzcz",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-27T14:40:39+00:00",
       "category": "World"
     },
     {
@@ -72,34 +72,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-27T13:38:07+00:00",
       "category": "Technology"
-    },
-    {
-      "title": "Awami League claims Tungipara rally as ‘women’s rally’ in Banani",
-      "url": "https://en.prothomalo.com/bangladesh/politics/3z3b867r7g",
-      "source": "Prothom Alo English",
-      "publishedAt": "2026-11-27T12:26:42+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Ex-media executive admits saying Australian child sex abuse survivor 'looking to be raped again'",
-      "url": "https://www.bbc.co.uk/news/articles/ckr5grlq78n9o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-27T11:44:40+00:00",
-      "category": "Technology"
-    },
-    {
-      "title": "Clashes mar European games as Macron condemns violence",
-      "url": "https://www.bbc.co.uk/sport/football/articles/c69q8y5x03ywo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-27T10:24:24+00:00",
-      "category": "World"
-    },
-    {
-      "title": "Zelensky criticises 'strange' Trump-Putin friendship in BBC interview",
-      "url": "https://www.bbc.co.uk/news/articles/c820q9wgrpyyo?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-27T09:07:48+00:00",
-      "category": "World"
     },
     {
       "title": "Millions of wives in South Asia unprotected from marital rape - study",
@@ -114,13 +86,6 @@
       "source": "BBC World",
       "publishedAt": "2026-11-27T07:28:10+00:00",
       "category": "World"
-    },
-    {
-      "title": "Leaders clash in final Spain election debate as housing dominates run-in",
-      "url": "https://www.bbc.co.uk/news/articles/ckr5gr4g8gn5o?at_medium=RSS&at_campaign=rss",
-      "source": "BBC World",
-      "publishedAt": "2026-11-27T06:03:39+00:00",
-      "category": "Technology"
     }
   ],
   "sources": [
@@ -134,7 +99,7 @@
       "name": "Prothom Alo English",
       "url": "https://en.prothomalo.com/feed/",
       "host": "en.prothomalo.com",
-      "ok": true
+      "ok": false
     },
     {
       "name": "BBC World",
